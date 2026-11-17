@@ -1,0 +1,139 @@
+name: test
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  offline:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - version: v0.12.6
+            asset: nvim-linux-x86_64
+            sha256: 474430d53e6264f6d6dd18db42d6dc9df3a1b56ca9e88a325bbf860e1a811d87
+            scope: full
+            experimental: false
+          - version: v0.11.5
+            asset: nvim-linux-x86_64
+            sha256: b2f91117be5b5ea39edd7297156dc2a4a8df4add6c95a90809a8df19e7ab6f52
+            scope: full
+            experimental: false
+          - version: nightly
+            asset: nvim-linux-x86_64
+            # A moving nightly cannot have a stable pin; do not reuse a stale hash.
+            sha256: ''
+            scope: full
+            experimental: true
+          - version: v0.10.4
+            asset: nvim-linux-x86_64
+            sha256: 95aaa8e89473f5421114f2787c13ae0ec6e11ebbd1a13a1bd6fcf63420f8073f
+            scope: foundation
+            experimental: false
+    continue-on-error: ${{ matrix.experimental }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      # Official refs/tags/v4 and v4.4.0 resolve to this commit.
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      # Official refs/tags/v5 and v5.6.0 resolve to this commit.
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.12'
+      - name: Install pinned Neovim
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/nvim-zh-ci
+          curl -fsSL --retry 3 "https://github.com/neovim/neovim/releases/download/${{ matrix.version }}/${{ matrix.asset }}.tar.gz" -o /tmp/nvim-zh-ci/nvim.tar.gz
+          if [[ -n "${{ matrix.sha256 }}" ]]; then
+            printf '%s  %s\n' '${{ matrix.sha256 }}' /tmp/nvim-zh-ci/nvim.tar.gz | sha256sum -c -
+          else
+            echo 'NVIM_ARCHIVE_SHA256=SKIP reason=mutable_nightly_no_stable_official_digest'
+          fi
+          tar -xzf /tmp/nvim-zh-ci/nvim.tar.gz -C /tmp/nvim-zh-ci
+          echo "/tmp/nvim-zh-ci/${{ matrix.asset }}/bin" >> "$GITHUB_PATH"
+      - name: Install gettext for native MO verification
+        if: matrix.version == 'v0.12.6'
+        run: |
+          if ! command -v msgfmt >/dev/null; then
+            sudo apt-get update
+            sudo apt-get install -y gettext
+          fi
+      - name: Verify shipped native MO against the pinned cache
+        if: matrix.version == 'v0.12.6'
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: |
+          python3 - <<'PY'
+          import hashlib
+          from pathlib import Path
+          import sys
+          import tempfile
+
+          root = Path.cwd()
+          sys.path.insert(0, str(root / 'tools'))
+          import native_catalog as nc
+
+          manifest = nc.load_manifest(root)
+          cached = root / 'build/upstream/zh_CN.UTF-8.po'
+          shipped = root / 'build/native/zh_CN.UTF-8/LC_MESSAGES/nvim.mo'
+          for path in (cached, shipped):
+              if not path.is_file():
+                  raise SystemExit(f'required native input is missing: {path}')
+          with tempfile.TemporaryDirectory(prefix='nvim-zh-native-mo-ci-') as tmp:
+              stats = nc.build(root, manifest, cached, Path(tmp) / 'out',
+                               expect_sha=manifest['upstream']['sha256'])
+          actual = hashlib.sha256(shipped.read_bytes()).hexdigest()
+          if stats['mo_sha256'] != actual:
+              raise SystemExit(f'shipped native MO is stale: {actual} != {stats["mo_sha256"]}')
+          print(f'NATIVE_MO_REPRODUCIBLE=PASS sha256={actual}')
+          PY
+      - name: Foundation checks
+        run: make test-foundation
+      - name: Full offline contract and release checks
+        if: matrix.scope == 'full'
+        run: make test
+      - name: CI compatibility evidence
+        run: nvim --version | head -n 3
+
+  upstream-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      # Official refs/tags/v4 and v4.4.0 resolve to this commit.
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      # Official refs/tags/v5 and v5.6.0 resolve to this commit.
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.12'
+      - name: Install Neovim 0.12.6
+        run: |
+          set -euo pipefail
+          curl -fsSL --retry 3 https://github.com/neovim/neovim/releases/download/v0.12.6/nvim-linux-x86_64.tar.gz -o /tmp/nvim.tar.gz
+          printf '%s  %s\n' '474430d53e6264f6d6dd18db42d6dc9df3a1b56ca9e88a325bbf860e1a811d87' /tmp/nvim.tar.gz | sha256sum -c -
+          tar -xzf /tmp/nvim.tar.gz -C /tmp
+          echo /tmp/nvim-linux-x86_64/bin >> "$GITHUB_PATH"
+      - name: Fetch fixed upstream archives
+        run: |
+          mkdir -p /tmp/nvim-zh-smoke
+          fetch() { mkdir -p "/tmp/nvim-zh-smoke/$1"; curl -fsSL "https://github.com/$2/archive/$3.tar.gz" | tar -xz --strip-components=1 -C "/tmp/nvim-zh-smoke/$1"; }
+          fetch which-key folke/which-key.nvim 3aab2147e74890957785941f0c1ad87d0a44c15a
+          fetch telescope nvim-telescope/telescope.nvim 40aedd8a68c78a656a10a8d62d80c54af59420fb
+          fetch plenary nvim-lua/plenary.nvim 74b06c6c75e4eeb3108ec01852001636d85a932b
+          fetch lazy folke/lazy.nvim 306a05526ada86a7b30af95c5cc81ffba93fef97
+          fetch nvim-tree nvim-tree/nvim-tree.lua 69eb0c34ed3d836d5a0d92d913b77dd73b054f2f
+          fetch nvim-cmp hrsh7th/nvim-cmp 2ffe79f1f021def8dd1fcd81deb16f1bb0d989f3
+      - name: Run real public-seam smoke
+        run: make test-phase4 test-phase7
+        env:
+          NVIM_ZH_TEST_WHICH_KEY: /tmp/nvim-zh-smoke/which-key
+          NVIM_ZH_TEST_TELESCOPE: /tmp/nvim-zh-smoke/telescope
+          NVIM_ZH_TEST_PLENARY: /tmp/nvim-zh-smoke/plenary
+          NVIM_ZH_TEST_LAZY: /tmp/nvim-zh-smoke/lazy
+          NVIM_ZH_TEST_NVIM_TREE: /tmp/nvim-zh-smoke/nvim-tree
+          NVIM_ZH_TEST_NVIM_CMP: /tmp/nvim-zh-smoke/nvim-cmp

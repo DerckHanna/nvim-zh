@@ -1,0 +1,847 @@
+*dev_style.txt*          Nvim
+
+
+                            NVIM 参考手册
+
+
+Nvim 风格准则                                        *dev-style*
+
+为 Nvim 源码工作的开发者准备的一套风格准则。
+
+许可证：CC-By 3.0 https://creativecommons.org/licenses/by/3.0/
+
+                                              输入 |gO| 查看目录。
+
+==============================================================================
+背景
+
+让代码库保持易于管理的一种办法，就是强制统一风格。任何程序员都能读懂别人的
+代码并迅速理解它，这一点非常重要。
+
+保持统一的风格、遵循约定，意味着我们可以更轻松地用「模式匹配」推断出各种
+符号是什么，以及它们身上有哪些不变量成立。建立通用且必需的惯用法与模式，
+会让代码好懂得多。
+
+在某些情形下，也许有充分理由去改动某些风格规则，但我们仍然保持原样，以维护
+一致性。
+
+
+==============================================================================
+头文件                                                  *dev-style-header*
+
+
+头文件保护 ~
+
+所有头文件都应当以 `#pragma once` 开头，以防被多次包含。
+
+    在 foo/bar.h 中:
+>c
+        #pragma once
+<
+
+头文件体系 ~
+
+Nvim 使用两类头文件：一类是 "normal"（普通）头文件，一类是 "defs" 头文件。
+通常每个 normal 头文件都会有一个对应的 defs 头文件，例如 `fileio.h` 与
+`fileio_defs.h`。做这种区分是为了尽量减少改动时的重编译量。原因在于，新增
+函数或修改函数签名的频率要高于改变一个类型。目标是做到以下几点：
+
+- 所有头文件（defs 与 normal）只能包含 defs 头文件、系统头文件以及生成的
+  声明。换句话说，头文件不得包含 normal 头文件。
+
+- 源文件（.c）可以包含所有头文件，但只有在需要符号而非类型时，才应当只
+  包含 normal 头文件。
+
+按下面的准则决定什么该放在哪里：
+
+符号：
+  - 常规的函数声明
+  - `extern` 变量（包括 `EXTERN` 宏）
+
+非符号：
+  - 宏，即 `#define`
+  - 带 `FUNC_ATTR_ALWAYS_INLINE` 属性的 static inline 函数
+  - typedef
+  - struct
+  - enum
+
+- 所有符号都必须移到 normal 头文件。
+
+- 被多个头文件使用的非符号，应当移到 defs 头文件。这是为了保证头文件只
+  包含 defs 头文件。反过来，只被单个头文件使用的非符号，应当移到那个头文件
+  里。
+
+- 例外：如果该宏调用了函数，那它就必须移到 normal 头文件。
+
+==============================================================================
+作用域                                                  *dev-style-scope*
+
+局部变量 ~
+
+把函数内的变量放在尽可能窄的作用域里，并在声明处完成初始化。
+
+C99 允许在函数中的任意位置声明变量。请尽量在局部的作用域内、尽量靠近首次
+使用处声明变量。这样读者更容易找到声明，也能看出变量是什么类型、被初始化
+成了什么。特别是，应当用初始化代替「先声明再赋值」，例如 >c
+
+    int i;
+    i = f();      // ❌: initialization separate from declaration.
+
+    int j = g();  // ✅: declaration has initialization.
+
+
+初始化 ~
+
+如果不带初始化，多个声明可以写在一行；但每个初始化都应当单独占一行。
+
+>c
+    int i;
+    int j;              // ✅
+    int i, j;           // ✅: multiple declarations, no initialization.
+    int i = 0;
+    int j = 0;          // ✅: one initialization per line.
+
+    int i = 0, j;       // ❌: multiple declarations with initialization.
+    int i = 0, j = 0;   // ❌: multiple declarations with initialization.
+
+==============================================================================
+Nvim 特有的魔法
+
+clint ~
+
+用 `clint.lua` 检查风格错误。
+
+`src/clint.lua` 是一个 Lua 脚本，它读取源文件并找出风格错误。它并不完美，
+既有误报也有漏报，但仍然是个有价值的工具。误报可以在行尾加上 `// NOLINT`
+来忽略。
+
+uncrustify ~
+
+src/uncrustify.cfg 是期望的代码格式的权威依据，用于处理 clint.lua 未覆盖的
+情形。如果某项检查已被 uncrustify 规则覆盖，我们就删掉 clint.lua 里的该检查。
+
+==============================================================================
+其它 C 特性                                          *dev-style-features*
+
+
+变长数组与 alloca() ~
+
+我们不允许使用变长数组或 `alloca()`。
+
+变长数组可能导致难以察觉的栈溢出。
+
+
+后置自增与后置自减 ~
+
+在语句中请使用后置形式（`i++`）。 >c
+
+    for (int i = 0; i < 3; i++) { }
+    int j = ++i;  // ✅: ++i is used as an expression.
+
+    for (int i = 0; i < 3; ++i) { }
+    ++i;  // ❌: ++i is used as a statement.
+
+
+const 的使用 ~
+
+尽可能使用 `const` 指针。非指针的参数定义上避免使用 `const`。
+
+    const 放在哪里 ~
+
+    有人更喜欢 `int const *foo` 这种写法，而不喜欢 `const int *foo`。他们的
+    理由是这样更好读，因为更一致：它保持了「`const` 总是紧跟它所描述的对象」
+    这条规则。但在深层嵌套指针表达式很少的代码库里，这个一致性论据并不成立，
+    因为大多数 `const` 表达式只有一个 `const`，而且它作用在底层的值上。这种
+    情形下并没有一致性需要维护。把 `const` 放在前面可以说更好读，因为它合于
+    英语习惯：把「形容词」（`const`）放在「名词」（`int`）之前。
+
+    话虽如此，我们鼓励把 `const` 放在前面，但并不强制要求。只是要和周围的
+    代码保持一致！ >c
+
+    void foo(const char *p, int i);
+    }
+
+    int foo(const int a, const bool b) {
+    }
+
+    int foo(int *const p) {
+    }
+
+
+整数类型 ~
+
+内置的整数类型中，只使用 `char`、`int`、`uint8_t`、`int8_t`、`uint16_t`、
+`int16_t`、`uint32_t`、`int32_t`、`uint64_t`、`int64_t`、`uintmax_t`、
+`intmax_t`、`size_t`、`ssize_t`、`uintptr_t`、`intptr_t` 与 `ptrdiff_t`。
+
+`int` 只用于错误码和局部的琐碎变量。
+
+转换整数类型时要小心。整数转换与整型提升可能带来反直觉的行为。注意 `char`
+的有无符号性由具体实现决定。
+
+对外暴露的类型必须有固定宽度（`uint8_t` 等）
+
+固定宽度的类型没有方便的 `printf` 格式占位符。如果必须格式化固定宽度的
+整数，就转换成 `uintmax_t` 或 `intmax_t`。
+
+类型		无符号      有符号
+`char`		`%hhu`	    `%hhd`
+`int`		n/a	    `%d`
+`(u)intmax_t`	`%ju`	    `%jd`
+`(s)size_t`	`%zu`	    `%zd`
+`ptrdiff_t`	`%tu`	    `%td`
+
+
+布尔值 ~
+
+用 `bool` 表示布尔值。 >c
+
+    int loaded = 1;  // ❌: loaded should have type bool.
+
+
+条件 ~
+
+不要用 "yoda-conditions"（尤达条件）。每个条件里最多用一次赋值。 >c
+
+    if (1 == x) {
+
+    if (x == 1) {  //use this order
+
+    if ((x = f()) && (y = g())) {
+
+
+函数声明 ~
+
+每个函数都不得有单独的声明。
+
+函数声明由 gen_declarations.lua 脚本生成。 >c
+
+    static void f(void);
+
+    static void f(void)
+    {
+      ...
+    }
+
+
+翻译单元总体布局 ~
+
+公开函数的定义要放在 static 函数的定义之前。 >c
+
+    <HEADER>
+
+    <PUBLIC FUNCTION DEFINITIONS>
+
+    <STATIC FUNCTION DEFINITIONS>
+
+
+与声明生成器的集成 ~
+
+每个 C 文件都必须包含所生成头文件的 #include。
+
+在 .c 文件中，这个 #include 必须放在其它 #includes 和 typedef 之后；在头文件
+中则放在其它所有内容之后。如果 .c 文件不含任何 static 函数，允许在该 .c 文件
+中省略这个 #include。
+
+被包含的文件名由 .c 文件名去掉扩展名、再在前面加上相对 src/nvim 的目录名
+构成。存放 static 函数声明的文件名以 `.c.generated.h` 结尾，
+`*.h.generated.h` 文件只包含非 static 的函数声明。 >c
+
+    // src/nvim/foo.c file
+    #include <stddef.h>
+
+    typedef int FooType;
+
+    #include "foo.c.generated.h"
+
+    …
+
+
+    // src/nvim/foo.h file
+    #pragma once
+
+    …
+
+    #include "foo.h.generated.h"
+
+
+64 位可移植性 ~
+
+代码应当对 64 位和 32 位都友好。要记住打印、比较和结构对齐方面的问题。
+
+- 记住 `sizeof(void *)` != `sizeof(int)`。如果需要指针大小的整数，请用
+  `intptr_t`。
+
+- 你可能需要小心结构对齐，尤其是存放在磁盘上的结构体。任何含有
+  `int64_t`/`uint64_t` 成员的结构体，在 64 位系统上默认会按 8 字节对齐。
+  如果这样的结构体在 32 位与 64 位代码之间通过磁盘共享，你就需要确保两种
+  架构上的打包方式一致。大多数编译器都提供了改变结构对齐的方式。gcc 上
+  可以用 `__attribute__((packed))`。MSVC 提供 `#pragma pack()` 与
+  `__declspec(align())`。
+
+- 按需使用 `LL` 或 `ULL` 后缀创建 64 位常量。例如： >c
+
+    int64_t my_value = 0x123456789LL;
+    uint64_t my_mask = 3ULL << 48;
+
+
+sizeof ~
+
+优先用 `sizeof(varname)`，而不是 `sizeof(type)`。
+
+当你取的是某个具体变量的大小时，用 `sizeof(varname)`。万一有人现在或以后
+改了该变量的类型，`sizeof(varname)` 会自动随之更新。对于与任何具体变量无关
+的代码，例如管理某种外部或内部数据格式、而用适当 C 类型的变量并不方便的
+代码，可以用 `sizeof(type)`。 >c
+
+    Struct data;
+    memset(&data, 0, sizeof(data));
+
+    memset(&data, 0, sizeof(Struct));
+
+    if (raw_size < sizeof(int)) {
+      fprintf(stderr, "compressed record not big enough for count: %ju", raw_size);
+      return false;
+    }
+
+
+==============================================================================
+命名                                                  *dev-style-naming*
+
+最重要的一致性规则，管的就是命名。一个名字的风格会立刻告诉我们被命名的是
+哪类东西：类型、变量、函数、常量、宏等等，无需去查找该实体的声明。我们大脑
+里的模式匹配引擎在很大程度上依赖这些命名规则。
+
+命名规则相当随意，但我们认为在这个领域里一致性比个人喜好更重要，所以不管
+你觉得它们是否合理，规则就是规则。
+
+
+通用命名规则 ~
+
+函数名、变量名和文件名都应当有描述性；避用缩写。
+
+在合理范围内，名字要尽量具有描述性。不要操心节省横向空间，让新读者一眼看懂
+你的代码要重要得多。不要使用在你的项目之外会让读者费解或有歧义的缩写，也
+不要靠删掉单词内部的字母来缩写。 >c
+
+    int price_count_reader;    // No abbreviation.
+    int num_errors;            // "num" is a widespread convention.
+    int num_dns_connections;   // Most people know what "DNS" stands for.
+
+    int n;                     // Meaningless.
+    int nerr;                  // Ambiguous abbreviation.
+    int n_comp_conns;          // Ambiguous abbreviation.
+    int wgc_connections;       // Only your group knows what this stands for.
+    int pc_reader;             // Lots of things can be abbreviated "pc".
+    int cstmr_id;              // Deletes internal letters.
+
+
+文件名 ~
+
+文件名应当全小写，可以包含下划线（`_`）。
+
+用下划线分隔单词。可接受的文件名示例: >
+
+    my_useful_file.c
+    getline_fix.c  // ✅: getline refers to the glibc function.
+
+C 文件应当以 `.c` 结尾，头文件应当以 `.h` 结尾。
+
+不要使用 `/usr/include` 中已有的文件名，例如 `db.h`。
+
+一般来说，让文件名非常具体。例如，用 `http_server_logs.h` 而不是 `logs.h`。
+
+
+类型名 ~
+
+用 typedef 定义过的 struct 和 enum 以大写字母开头，每个新词的首字母也大写，
+不用下划线：`MyExcitingStruct`。
+
+未用 typedef 的 struct 和 enum 全小写，词之间用下划线：
+`struct my_exciting_struct` 。 >c
+
+    struct my_struct {
+      ...
+    };
+    typedef struct my_struct MyAwesomeStruct;
+
+
+变量名 ~
+
+变量名全小写，词之间用下划线。例如：`my_exciting_local_variable`。
+
+    常见的变量名 ~
+
+    例如： >c
+
+        string table_name;  // ✅: uses underscore.
+        string tablename;   // ✅: all lowercase.
+
+        string tableName;   // ❌: mixed case.
+<
+
+    结构体变量 ~
+
+    结构体中的成员应当像普通变量那样命名。 >c
+
+        struct url_table_properties {
+          string name;
+          int num_entries;
+        }
+<
+
+    全局变量 ~
+
+    除非绝对必要，不要使用全局变量。全局变量要加 `g_` 前缀。
+
+
+常量名 ~
+
+用一个 `k` 后接混合大小写：`kDaysInAWeek`。
+
+所有编译期常量，无论声明在局部还是全局，都遵循与其它变量稍有不同的命名
+约定。用一个 `k` 后接首字母大写的单词： >c
+
+    const int kDaysInAWeek = 7;
+
+函数名 ~
+
+函数名全小写，词之间用下划线。例如：`my_exceptional_function()`。同一头文件
+中的所有函数都应当有共同的前缀。
+
+在 `os_unix.h` 中： >c
+
+    void unix_open(const char *path);
+    void unix_user_id(void);
+
+如果你的函数在出错时会崩溃，应当在函数名后加上 `or_die`。这只适用于可能被
+生产代码使用的函数，以及正常运行时相当可能发生的错误。
+
+
+枚举项名 ~
+
+枚举项应当像常量那样命名：`kEnumName`。 >c
+
+    enum url_table_errors {
+      kOK = 0,
+      kErrorOutOfMemory,
+      kErrorMalformedInput,
+    };
+
+
+宏名 ~
+
+它们长这样：`MY_MACRO_THAT_SCARES_CPP_DEVELOPERS`。 >c
+
+    #define ROUND(x) ...
+    #define PI_ROUNDED 5.0
+
+
+==============================================================================
+注释                                                *dev-style-comments*
+
+注释对保持代码可读至关重要。下面的规则说明应当注释什么、注释在哪里。但请
+记住：注释固然非常重要，最好的代码是自解释的。
+
+写注释时，要为你的读者而写：下一个需要看懂你代码的贡献者。要大方些 ——
+下一个可能就是你！
+
+Nvim 使用 Doxygen 注释。
+
+
+注释风格 ~
+
+只使用 `//` 风格的语法。 >c
+
+    // This is a comment spanning
+    // multiple lines
+    f();
+
+
+文件注释 ~
+
+每个文件开头都写一段描述其内容的注释。
+
+    法律声明 ~
+
+    我们没有这种东西。这些东西在 LICENSE 里，而且只在那里。
+
+    文件内容 ~
+
+    每个文件都应当在顶部有一段注释描述其内容。
+
+    一般来说，`.h` 文件会描述该文件中声明的变量和函数，并概述它们的用途与
+    用法。`.c` 文件应当包含更多关于实现细节的信息，或者对棘手算法的讨论。
+    如果你觉得这些实现细节或算法讨论对读 `.h` 的人有用，尽管把它放到 `.h`
+    里，但要在 `.c` 中说明文档在 `.h` 文件里。
+
+    不要在 `.h` 和 `.c` 里重复同样的注释。重复的注释会各自跑偏。 >c
+
+    /// A brief description of this file.
+    ///
+    /// A longer description of this file.
+    /// Be very generous here.
+
+
+结构体注释 ~
+
+每个 struct 定义都应当配有注释，说明它的用途和用法。 >c
+
+    /// Window info stored with a buffer.
+    ///
+    /// Two types of info are kept for a buffer which are associated with a
+    /// specific window:
+    /// 1. Each window can have a different line number associated with a
+    /// buffer.
+    /// 2. The window-local options for a buffer work in a similar way.
+    /// The window-info is kept in a list at g_wininfo.  It is kept in
+    /// most-recently-used order.
+    struct win_info {
+      /// Next entry or NULL for last entry.
+      WinInfo *wi_next;
+      /// Previous entry or NULL for first entry.
+      WinInfo *wi_prev;
+      /// Pointer to window that did the wi_fpos.
+      Win *wi_win;
+      ...
+    };
+
+如果字段注释很短，也可以写在字段旁边。但同一个 struct 内要保持一致，并
+遵循必要的 doxygen 风格。 >c
+
+    struct wininfo_S {
+      WinInfo *wi_next;  ///< Next entry or NULL for last entry.
+      WinInfo *wi_prev;  ///< Previous entry or NULL for first entry.
+      Win *wi_win;       ///< Pointer to window that did the wi_fpos.
+      ...
+    };
+
+如果你已经在文件顶部的注释里详细描述过某个 struct，尽可以直接写「完整描述
+见文件顶部注释」，但一定要有某种注释。
+
+记录 struct 所做出的同步假设（如果有）。如果该 struct 的实例可能被多个线程
+访问，要格外小心地记录多线程使用方面的规则与不变量。
+
+
+函数注释 ~
+
+声明处的注释描述函数的用途；定义处的注释描述它的运作方式。
+
+    函数声明 ~
+
+    每个函数声明前面都应当紧挨着一段注释，说明该函数做什么以及怎么用。这类
+    注释应当是描述性的（"Opens the file"），而不是祈使式的（"Open the
+    file"）；注释是在描述这个函数，而不是在吩咐函数做什么。一般来说，这类
+    注释不描述函数如何完成任务；那应当留给函数定义处的注释。
+
+    函数声明处的注释里值得提及的事项：
+
+    - 函数是否分配了需要调用者释放的内存。
+    - 是否有某个参数可以为空指针。
+    - 函数的使用方式是否有性能方面的影响。
+    - 函数是否可重入。它有哪些同步假设？ >c
+    /// Brief description of the function.
+    ///
+    /// Detailed description.
+    /// May span multiple paragraphs.
+    ///
+    /// @param arg1 Description of arg1
+    /// @param arg2 Description of arg2. May span
+    ///        multiple lines.
+    ///
+    /// @return Description of the return value.
+    Iterator *get_iterator(void *arg1, void *arg2);
+<
+
+    函数定义 ~
+
+    如果函数完成工作的方式有任何棘手的部分，函数定义处就应当有一段解释性
+    注释。例如，在定义处的注释里，你可以描述所用的任何编码技巧，概述你经过
+    的各个步骤，或者解释你为什么这样实现该函数，而不用某个可行的替代方案。
+    比如，你可以说明为什么函数的前半段必须获取一把锁，而后半段为什么不需要。
+
+    注意，不要只是重复函数声明处（`.h` 文件里或别处）给出的注释。可以简短
+    地重述函数做什么，但注释的重点应当在它怎么做。 >c
+
+    // Note that we don't use Doxygen comments here.
+    Iterator *get_iterator(void *arg1, void *arg2)
+    {
+      ...
+    }
+
+
+变量注释 ~
+
+一般来说，变量的实际名字本身就应当足够有描述性，让人对它的用途有清楚的
+了解。某些情形下需要更多注释。
+
+    全局变量 ~
+
+    所有全局变量都应当有注释，说明它们是什么、用途为何。例如： >c
+
+        /// The total number of tests cases that we run
+        /// through in this regression test.
+        const int kNumTestCases = 6;
+
+
+实现注释 ~
+
+在实现中，你应当在代码里棘手、不显然、有趣或重要的地方写注释。
+
+    行注释 ~
+
+    另外，不显然的行应当在行尾加注释。这些行尾注释应当与代码之间隔 2 个
+    空格。示例： >c
+
+        // If we have enough memory, mmap the data portion too.
+        mmap_budget = max<int64>(0, mmap_budget - index_->length());
+        if (mmap_budget >= data_size_ && !MmapData(mmap_chunk_bytes, mlock)) {
+          return;  // Error already logged.
+        }
+<
+    注意，既有描述代码在做什么的注释，也有在函数返回时提示「错误已经记录过
+    了」的注释。
+
+    如果在连续几行上都有注释，把它们对齐往往更易读： >c
+
+        do_something();                      // Comment here so the comments line up.
+        do_something_else_that_is_longer();  // Comment here so there are two spaces between
+                                             // the code and the comment.
+        { // One space before comment when opening a new scope is allowed,
+          // thus the comment lines up with the following comments and code.
+          do_something_else();  // Two spaces before line comments normally.
+        }
+<
+
+    NULL、true/false、1、2、3... ~
+
+    当你向函数传入空指针、布尔值或字面整数值时，应当考虑加注释说明它们是
+    什么，或者用常量让代码自解释。例如，比较下面两种写法：
+    >c
+
+        bool success = calculate_something(interesting_value,
+                                           10,
+                                           false,
+                                           NULL);  // What are these arguments??
+<
+
+    与这种写法： >c
+
+        bool success = calculate_something(interesting_value,
+                                           10,     // Default base value.
+                                           false,  // Not the first time we're calling this.
+                                           NULL);  // No callback.
+<
+
+    或者，用常量或自解释的变量： >c
+
+        const int kDefaultBaseValue = 10;
+        const bool kFirstTimeCalling = false;
+        Callback *null_callback = NULL;
+        bool success = calculate_something(interesting_value,
+                                           kDefaultBaseValue,
+                                           kFirstTimeCalling,
+                                           null_callback);
+<
+
+    禁忌 ~
+
+    注意，绝不要去描述代码本身。假定读代码的人 C 比你熟，尽管他或她并不
+    知道你想干什么： >c
+
+        // Now go through the b array and make sure that if i occurs,
+        // the next element is i+1.
+        ...        // Geez.  What a useless comment.
+
+
+标点、拼写与语法 ~
+
+留意标点、拼写和语法；写得好的注释比写得差的更好读。
+
+注释应当像叙述性文字一样可读，大小写与标点都要得当。许多情况下，完整的
+句子比句子片段更好读。较短的注释，例如代码行尾的注释，有时可以不那么正式，
+但风格上要保持一致。
+
+虽然代码评审者指出「这里该用分号你却用了逗号」会让人沮丧，但源码保持高水平
+的清晰度与可读性非常重要。正确的标点、拼写和语法有助于达到这个目标。
+
+
+TODO 注释 ~
+
+对临时的、短期性的方案，或者够用但不完美的代码，使用 `TODO` 注释。
+
+`TODO` 应当包含全大写的字符串 `TODO`，后面跟上最能就该 `TODO` 所指问题提供
+背景的人的名字、邮箱地址或其它标识。主要目的是保持一种可搜索的 `TODO`
+格式，以便找到那个在有人询问时能提供更多细节的人。一个 `TODO` 并不构成
+被引用者会修好该问题的承诺。因此，当你写一个 `TODO` 时，几乎总是写上你自己
+的名字。 >c
+
+    // TODO(kl@gmail.com): Use a "*" here for concatenation operator.
+    // TODO(Zeke): change this to use relations.
+
+如果你的 `TODO` 是「将来某日做某事」这种形式，务必写明一个非常具体的日期
+（"Fix by November 2005"），或者一个非常具体的事件（"Remove this code when
+all clients can handle XML responses."）。
+
+
+弃用注释 ~
+
+用 `@deprecated` 文档字符串记号标出被弃用的接口点。
+
+你可以在注释中写上全大写的 `@deprecated` 一词，从而把某个接口标记为已弃用。
+该注释写在接口声明之前，或者写在与声明同一行上。
+
+在 `@deprecated` 之后，用括号写上你的名字、邮箱或其它标识。
+
+弃用注释必须包含简单明确的指引，告诉人们如何修正他们的调用点。在 C 里，
+你可以把被弃用的函数实现成一个内联函数，由它调用新的接口点。
+
+把某个接口点标记为 `DEPRECATED` 并不会神奇地让任何调用点发生改变。如果你真
+想让人停止使用被弃用的设施，你得自己去修调用点，或者招募一队人来帮你。
+
+新代码不应当包含对已弃用接口点的调用。请改用新的接口点。如果你看不懂那些
+指引，就去找做这次弃用的人，请对方教你使用新的接口点。
+
+
+==============================================================================
+排版                                                *dev-style-format*
+
+编码风格与排版相当随意，但如果每个人都用同一种风格，项目就远更容易跟进。
+个人未必认同排版规则的每一处，有些规则也许要花点时间才能习惯，但所有项目
+贡献者都遵循风格规则是很重要的，这样大家都能轻松读懂彼此的代码。
+
+
+非 ASCII 字符 ~
+
+非 ASCII 字符应当少见，并且必须使用 UTF-8 编码。
+
+你不应当在源码里硬编码面向用户的文本（真的不应当吗？），连英文也不行，所以
+非 ASCII 字符的使用应当少见。不过在某些情形下，在代码里包含这类词是合适的。
+例如，如果你的代码要解析来自外部的数据文件，把那些数据文件里用到的非 ASCII
+字符串硬编码为分隔符，可能是合适的。更常见的是，单元测试代码（它不需要
+本地化）里可能含有非 ASCII 字符串。这种情形下应当使用 UTF-8，因为那是大多数
+能处理 ASCII 之外内容的工具都理解的编码。
+
+十六进制编码也行，而且在能提升可读性时值得鼓励 —— 例如，`"\uFEFF"` 是
+Unicode 的零宽不换行空格字符；如果以直白的 UTF-8 写进源码里，它将是不可见的。
+
+
+花括号初始化列表 ~
+
+花括号列表的格式，完全按你在该位置格式化一次函数调用的方式来写，只是 `{`
+之后要有一个空格、`}` 之前要有一个空格
+
+如果花括号列表跟在某个名字之后（例如类型名或变量名），就当作 `{}` 是该名字
+的函数调用的圆括号来格式化。如果没有名字，就假定名字为空。 >c
+
+    struct my_struct m = {  // Here, you could also break before {.
+        superlongvariablename1,
+        superlongvariablename2,
+        { short, interior, list },
+        { interiorwrappinglist,
+          interiorwrappinglist2 } };
+
+
+循环与 switch 语句 ~
+
+在 case 之间的非平凡贯穿（fall-through）处加注释。
+
+如果不是基于枚举值做条件，switch 语句应当总有一个 `default` 分支（若基于
+枚举值，编译器会在有值未被处理时警告你）。如果 default 分支永远不该执行，
+直接用 `abort()`： >c
+
+    switch (var) {
+      case 0:
+        ...
+        break;
+      case 1:
+        ...
+        break;
+      default:
+        abort();
+    }
+
+基于枚举值做条件的 switch 语句，如果是穷尽的，就不应当有 `default` 分支。
+显式的 case 标签优于 `default`，即使这会导致同一段代码出现多个 case 标签。
+例如，不要这样写： >c
+
+    case A:
+      ...
+    case B:
+      ...
+    case C:
+      ...
+    default:
+      ...
+
+你应当这样写： >c
+
+    case A:
+      ...
+    case B:
+      ...
+    case C:
+      ...
+    case D:
+    case E:
+    case F:
+      ...
+
+有些编译器不把穷尽的枚举 switch 语句识别为穷尽，于是当 switch 的每个 case 里
+都有 return、而其后没有兜底的 return 语句时，就会产生编译警告。为了消除这类
+虚假错误，建议在 switch 语句之后使用 `UNREACHABLE`，明确告诉编译器该 switch
+语句总是返回，其后的任何代码都不可达。例如： >c
+
+    enum { A, B, C } var;
+    ...
+    switch (var) {
+      case A:
+        return 1;
+      case B:
+        return 2;
+      case C:
+        return 3;
+    }
+    UNREACHABLE;
+
+返回值 ~
+
+不要无谓地在 `return` 表达式外面加括号。
+
+只有在 `x = expr;` 里也会加括号的地方，才在 `return expr;` 里加括号。 >c
+
+    return result;
+    return (some_long_condition && another_condition);
+
+    return (value);  // You wouldn't write var = (value);
+    return(result);  // return is not a function!
+
+
+横向空白 ~
+
+横向空白的使用取决于位置。
+
+    变量 ~
+>c
+        int long_variable = 0;  // Don't align assignments.
+        int i             = 1;
+
+        struct my_struct {  // Exception: struct arrays.
+          const char *boy;
+          const char *girl;
+          int pos;
+        } my_variable[] = {
+          { "Mia",       "Michael", 8  },
+          { "Elizabeth", "Aiden",   10 },
+          { "Emma",      "Mason",   2  },
+        };
+<
+
+==============================================================================
+结语
+
+这份风格指南是为了让代码更可读。如果你觉得为了清晰必须违反它的规则，那就
+违反！但请在你的 pull request 里加一条说明，解释你的理由。
+
+
+ vim:tw=78:ts=8:et:ft=help:norl:

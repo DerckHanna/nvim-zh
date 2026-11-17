@@ -1,0 +1,837 @@
+*gui.txt*       Nvim
+
+
+                  VIM REFERENCE MANUAL    by Bram Moolenaar
+
+
+Nvim 图形用户界面                                       *gui* *GUI*
+
+任何支持 Nvim |ui-protocol| 的客户端都可以用作 Nvim 的 UI。而且多个 UI 可以
+连接到同一个 Nvim 实例！「UI」和「GUI」这两个术语经常混用，因为所有 Nvim UI
+客户端都具有相同的能力上限；「TUI」指输出到终端的 UI 客户端，而「GUI」直接
+输出到操作系统的图形系统。
+
+除特别说明外，本文档描述的是 TUI 和 GUI 都可用的 UI 能力（前提是该 UI 支持
+相应特性）。终端 UI 特有的说明见 |TUI|。以 "gui-" 为前缀的 help tag 指 UI
+特性，而以 "ui-" 为前缀的 help tag 指 |ui-protocol|。
+
+                                      输入 |gO| 查看目录。
+
+==============================================================================
+第三方 GUI                                      *third-party-guis* *vscode*
+
+Nvim 自带「终端 UI」（|TUI|），但也能与许多（第三方）GUI 配合使用，这些 GUI
+可以在 Nvim 之上提供全新的外观或额外特性。例如，"vscode-neovim" 实质上让你
+把 VSCode 当作 Nvim 的 GUI 来使用。
+
+- vscode-neovim（在 VSCode 中使用 Nvim！） https://github.com/vscode-neovim/vscode-neovim
+- Firenvim（在网页浏览器中使用 Nvim！） https://github.com/glacambre/firenvim
+- Neovide https://neovide.dev/
+- Goneovim https://github.com/akiyosi/goneovim
+- Nvy https://github.com/RMichelsen/Nvy
+- Neovim-Qt (Qt5) https://github.com/equalsraf/neovim-qt
+- VimR (macOS) https://github.com/qvacua/vimr
+- 其他 https://github.com/neovim/neovim/wiki/Related-projects#gui
+
+==============================================================================
+启动 GUI                                        *gui-config* *gui-start*
+
+                                *ginit.vim* *gui-init* *gvimrc* *$MYGVIMRC*
+对于 GUI 专属配置，Nvim 提供 |UIEnter| 事件。它在其他 |initialization| 之后
+触发，或在任何 UI 挂接时触发（多个 UI 可以连接到任意 Nvim 实例）。
+
+示例：下面把 "g:gui" 设为该 UI 的 "rgb" 字段的值：    >
+        :autocmd UIEnter * let g:gui = filter(nvim_list_uis(),{k,v-> v.chan==v:event.chan})[0].rgb
+<
+								*ui-lifecycle*
+Nvim 的 |clientserver| 架构允许你 |:restart|、|:detach|（Nvim 继续在后台
+运行），或 |:connect| 到另一个实例。
+
+使用场景：
+- 在（意外）SSH 断开后让远程机器上的会话继续运行
+- 从操作系统的文件管理器中在已有会话里打开文件
+- 把 Nvim 作为后台进程（守护进程/服务）运行，按需 attach/detach
+
+------------------------------------------------------------------------------
+停止或分离当前 UI
+
+                                                *:detach*
+:detach
+                分离当前 UI。其他 UI（如果有）保持挂接状态。
+                服务器（通常是 `nvim --embed`）继续作为后台进程运行，
+                并且你之后可以重新挂接上去。
+                分离之前，你可能想记下服务器地址：
+                >vim
+                    :echo v:servername
+<
+                注意：服务器会关闭 UI 的 RPC 通道，因此 :detach 对任何 UI 客户端都有效。
+                但如果客户端没有预料到这一点，它可能会（错误地）报告一个错误。
+
+------------------------------------------------------------------------------
+重启 Nvim
+
+                                                *:restart* *:restart!* *E5201*
+:restart[!] [+cmd] [command]
+                重启 Nvim。设置 |v:exitreason|。另见 |ZR|。
+                包含 [!] 时，不恢复会话。
+
+                1. 保存当前会话（除非给出了 [!]）。
+                2. 使用 `:qall` 停止 Nvim（如果给出，则用 |+cmd|）。
+                3. 使用相同的 |v:argv| 启动一个新的 Nvim 服务器（`-- [file…]` 文件和 `-S [file]` 除外），并设置 |v:startreason|。
+                4. 恢复已保存的会话（除非给出了 [!]）。
+                5. 把所有 UI 挂接到新的 Nvim 服务器，并在其上运行 `[command]`。
+
+                示例：丢弃改动并用 `:qall!` 停止，然后重启： >
+                    :restart +qall!
+<                示例：重启并恢复当前会话： >
+                    :mksession! Session.vim | restart! source Session.vim
+<                示例：重启并更新插件： >
+                    :restart lua vim.pack.update()
+<
+                注意：
+                • 仅当 UI 和服务器位于同一系统上时才有效。
+                • Windows 限制：执行 +cmd 时，|v:servername| 指向一个临时地址。
+                • 如果没有 UI 处理 "restart" 事件，这会留下一个悬空的进程。
+                • 要调整 `:restart` 恢复的内容，请设置 'sessionoptions'。
+
+------------------------------------------------------------------------------
+把 UI 连接到另一个服务器
+
+                                                *:connect*
+:connect {address}
+                把 UI 从它当前挂接的服务器上分离，转而挂接到 {address} 处的服务器。
+
+                注意：如果当前 UI 没有实现 "connect" UI 事件，该命令等价于 |:detach|。
+
+:connect! {address}
+                与 |:connect| 相同，但如果被分离的服务器当前没有其他 UI 挂接，则同时停止
+                该服务器。
+
+------------------------------------------------------------------------------
+GUI 命令
+
+                                                *:winp* *:winpos* *E188*
+:winp[os]
+                以像素为单位显示 GUI vim window 左上角的当前位置。并非所有版本都可用。
+                另见 |getwinpos()|、|getwinposx()| 和 |getwinposy()|。
+
+:winp[os] {X} {Y}                                                       *E466*
+                把 GUI vim window 放到给定的 {X} 和 {Y} 坐标处。坐标应以像素为单位指定该
+                window 左上角的位置。当 GUI window 尚未打开时，这些值会被记住，直到
+                window 打开。位置会被调整，以尽量让 window 适配屏幕（如果可能）。
+
+                                            *:wi* *:win* *:winsize* *E465*
+:win[size] {width} {height}
+                把 window 大小设为 {width} 字符宽、{height} 字符高。
+                已过时，请使用 ":set lines=11 columns=22"。
+
+==============================================================================
+使用鼠标                                        *mouse-using*
+
+                                        *mouse-mode-table* *mouse-overview*
+当 'mousemodel' 为 "extend" 时，鼠标按键行为的概览：
+
+               *<S-LeftMouse>* *<A-RightMouse>* *<S-RightMouse>* *<RightDrag>*
+                                                 *<RightRelease>* *<LeftDrag>*
+普通模式： >
+  event         position     selection        change  action
+                 cursor                       window
+  ---------------------------------------------------------------------------
+  <LeftMouse>     yes          end              yes
+  <C-LeftMouse>   yes          end              yes    "CTRL-]" (2)
+  <S-LeftMouse>   yes       no change           yes    "*" (2)
+  <LeftDrag>      yes     start or extend (1)   no
+  <LeftRelease>   yes     start or extend (1)   no
+  <MiddleMouse>   yes       if not active       no     put
+  <MiddleMouse>   yes       if active           no     yank and put
+  <RightMouse>    yes     start or extend       yes
+  <A-RightMouse>  yes start or extend blockw.   yes
+  <S-RightMouse>  yes        no change          yes    "#" (2)
+  <C-RightMouse>  no         no change          no     "CTRL-T"
+  <RightDrag>     yes         extend            no
+  <RightRelease>  yes         extend            no
+
+插入或替换模式： >
+  event         position     selection        change  action
+                 cursor                       window
+  ---------------------------------------------------------------------------
+  <LeftMouse>     yes     (cannot be active)    yes
+  <C-LeftMouse>   yes     (cannot be active)    yes    "CTRL-O^]" (2)
+  <S-LeftMouse>   yes     (cannot be active)    yes    "CTRL-O*" (2)
+  <LeftDrag>      yes     start or extend (1)   no     like CTRL-O (1)
+  <LeftRelease>   yes     start or extend (1)   no     like CTRL-O (1)
+  <MiddleMouse>   no      (cannot be active)    no     put register
+  <RightMouse>    yes     start or extend       yes    like CTRL-O
+  <A-RightMouse>  yes start or extend blockw.   yes
+  <S-RightMouse>  yes     (cannot be active)    yes    "CTRL-O#" (2)
+  <C-RightMouse>  no      (cannot be active)    no     "CTRL-O CTRL-T"
+
+在 help window 中： >
+  event         position     selection        change  action
+                 cursor                       window
+  ---------------------------------------------------------------------------
+  <2-LeftMouse>   yes     (cannot be active)    no     "^]" (jump to help tag)
+
+当 'mousemodel' 为 "popup" 时，情况有所不同：
+
+                                                               *<A-LeftMouse>*
+普通模式： >
+  event         position     selection        change  action
+                 cursor                       window
+  ---------------------------------------------------------------------------
+  <S-LeftMouse>   yes     start or extend (1)   no
+  <A-LeftMouse>   yes     start/extend blockw   no
+  <RightMouse>    no      popup menu            no
+
+插入或替换模式： >
+  event         position     selection        change  action
+                 cursor                       window
+  ---------------------------------------------------------------------------
+  <S-LeftMouse>   yes     start or extend (1)   no     like CTRL-O (1)
+  <A-LeftMouse>   yes     start/extend blockw   no
+  <RightMouse>    no      popup menu            no
+
+(1) 仅当按下后鼠标指针移动过
+(2) 仅当点击发生在同一个 buffer 中
+
+点击鼠标左键会使光标重新定位。如果点击发生在另一个 window 中，该 window
+会成为活动 window。编辑命令行时，光标只能定位在命令行上。处于插入模式时，
+Vim 保持在插入模式。如果设置了 'scrolloff'，且光标定位在距 window 边缘
+'scrolloff' 行以内，文本会滚动。
+
+把鼠标左键按在第一个字符上，把鼠标移到最后一个字符，再松开按键，即可开始
+一次选区。松开按键之前，你不一定总能看到选区，只有在某些版本（GUI、Win32）
+中拖动才会立即显示。注意，当 'scrolloff' 非零时，把鼠标移到 window 中
+第一行/最后一行的至少一个字符之外，就能让文本滚动。
+
+在普通模式、可视模式和选择模式下，点击鼠标右键会扩展可视区域。当
+'mousemodel' 为 "popup" 时，必须按住 Shift 键并使用左键。在正在编辑另一个
+buffer 的 window 中点击时，可视模式或选择模式会停止。
+
+在普通模式、可视模式和选择模式下，按住 Alt 键点击鼠标右键会使可视区域变为
+块状。当 'mousemodel' 为 "popup" 时，必须配合 Alt 键使用左键。注意，在按住
+Alt 键时 window 管理器会吞掉鼠标事件的系统上，此功能无效（它可能会移动
+window）。
+
+                *double-click* *<2-LeftMouse>* *<3-LeftMouse>* *<4-LeftMouse>*
+支持双击、三击和四击。选择文本时，额外的点击会扩展选区： >
+
+        click           select
+        ---------------------------------
+        double          word or % match
+        triple          line
+        quadruple       rectangular block
+
+例外：在 :help window 中，双击会跳转到被点击单词的 help。
+
+双击一个单词会选中该单词。'iskeyword' 用于指定哪些字符属于单词。双击一个
+存在匹配的字符会一直选中到该匹配处（类似于使用 "v%"）。如果匹配是
+#if/#else/#endif 块，选区会变为按行的。双击的时间间隔可以用 'mousetime'
+选项设置。
+
+示例：配置双击跳转到光标下的 tag： >vim
+        :map <2-LeftMouse> :exe "tag " .. expand("<cword>")<CR>
+
+用双击来拖动鼠标（按下、松开、再按下然后拖动）会选中整个单词。这会持续到
+松开按键为止，此时选区又变为按字符的。
+
+用鼠标滚动的说明见 |scroll-mouse-wheel|。
+
+在插入模式下，开始一次选区时，Vim 会临时进入普通模式。当可视模式或选择
+模式结束时，它会回到插入模式。这类似于在插入模式下使用 CTRL-O。当
+'selectmode' 选项包含 "mouse" 时会使用选择模式。
+
+                                                *X1Mouse* *X1Drag* *X1Release*
+                                                *X2Mouse* *X2Drag* *X2Release*
+                                              *<MiddleRelease>* *<MiddleDrag>*
+鼠标点击可以用这些 |keycodes| 来映射： >
+      code           mouse button              normal action
+  ---------------------------------------------------------------------------
+  <LeftMouse>     left pressed               set cursor position
+  <LeftDrag>      left moved while pressed   extend selection
+  <LeftRelease>   left released              set selection end
+  <MiddleMouse>   middle pressed             paste text at cursor position
+  <MiddleDrag>    middle moved while pressed -
+  <MiddleRelease> middle released            -
+  <RightMouse>    right pressed              extend selection
+  <RightDrag>     right moved while pressed  extend selection
+  <RightRelease>  right released             set selection end
+  <X1Mouse>       X1 button pressed          -
+  <X1Drag>        X1 moved while pressed     -
+  <X1Release>     X1 button release          -
+  <X2Mouse>       X2 button pressed          -
+  <X2Drag>        X2 moved while pressed     -
+  <X2Release>     X2 button release          -
+
+X1 和 X2 按键指某些鼠标上的额外按键（例如右侧拇指键）。
+
+示例： >vim
+        :noremap <MiddleMouse> <LeftMouse><MiddleMouse>
+在中键点击的位置粘贴（否则粘贴会在光标位置进行）。 >vim
+
+        :noremap <LeftRelease> <LeftRelease>y
+在使用可视模式时立即抽取选区。
+
+注意使用 ":noremap" 而不是 "map"，以避免递归映射。
+>vim
+        :map <X1Mouse> <C-O>
+        :map <X2Mouse> <C-I>
+把 X1 和 X2 按键映射为在跳转列表中前进和后退，见 |CTRL-O| 和 |CTRL-I|。
+
+                                       *mouse-swap-buttons* *pi_swapmouse*
+要交换鼠标左右键的含义： >vim
+        :noremap        <LeftMouse>     <RightMouse>
+        :noremap        <LeftDrag>      <RightDrag>
+        :noremap        <LeftRelease>   <RightRelease>
+        :noremap        <RightMouse>    <LeftMouse>
+        :noremap        <RightDrag>     <LeftDrag>
+        :noremap        <RightRelease>  <LeftRelease>
+        :noremap        g<LeftMouse>    <C-RightMouse>
+        :noremap        g<RightMouse>   <C-LeftMouse>
+        :noremap!       <LeftMouse>     <RightMouse>
+        :noremap!       <LeftDrag>      <RightDrag>
+        :noremap!       <LeftRelease>   <RightRelease>
+        :noremap!       <RightMouse>    <LeftMouse>
+        :noremap!       <RightDrag>     <LeftDrag>
+        :noremap!       <RightRelease>  <LeftRelease>
+<
+
+`swapmouse` 插件正是做这件事的。用 |pack-add| 加载它： >vim
+    :packadd! swapmouse
+<
+
+==============================================================================
+滚动条                                          *gui-scrollbars*
+
+有垂直滚动条和一个水平滚动条。你可以用 'guioptions' 选项配置显示哪些滚动条。
+
+界面看起来像这样（使用 `:set guioptions=mlrb`）：
+>
+                       +------------------------------+
+                       | File  Edit              Help | <- Menu bar (m)
+                       +-+--------------------------+-+
+                       |^|                          |^|
+                       |#| Text area.               |#|
+                       | |                          | |
+                       |v|__________________________|v|
+ Normal status line -> |-+ File.c              5,2  +-|
+ between Vim windows   |^|""""""""""""""""""""""""""|^|
+                       | |                          | |
+                       | | Another file buffer.     | |
+                       | |                          | |
+                       |#|                          |#|
+ Left scrollbar (l) -> |#|                          |#| <- Right
+                       |#|                          |#|    scrollbar (r)
+                       | |                          | |
+                       |v|                          |v|
+                       +-+--------------------------+-+
+                       | |< ####                   >| | <- Bottom
+                       +-+--------------------------+-+    scrollbar (b)
+<
+只要不把相应的字母放进 'guioptions' 字符串，就可以关闭任何一个滚动条或菜单
+组件。底部滚动条仅在设置了 'nowrap' 时才有用。
+
+
+垂直滚动条                                      *gui-vert-scroll*
+
+每个 Vim window 旁边都有一个滚动条，可以上下滚动，以在该 buffer 的文本中
+移动。滚动条滑块的大小表示 window 中可见部分占该 buffer 的比例。把滚动条
+一直拖到底时，文件的最后一行会出现在 window 顶部。
+
+如果一个 window 被压缩到零高度（因为另一个 window 变大），它的滚动条会
+消失。当该 window 恢复时，它又会重新出现。
+
+如果 window 是垂直分割的，那么当它是当前 window，且从当前 window 的中线
+画一条垂直线、该线穿过这个 window 时，它才会得到滚动条。当两侧都有滚动条，
+而当前 window 的中线在左半边时，右侧滚动条列会包含最右边那些 window 的
+滚动条。另一侧同理。
+
+
+水平滚动条                                      *gui-horiz-scroll*
+
+当 'wrap' 选项关闭时，可以用（Vim GUI 底部的）水平滚动条来横向滚动文本。
+滚动条滑块的大小使得最长可见行的文本能够尽可能地向左和向右滚动。必要时光标
+会移动，它必须停留在可见字符上（除非设置了 'virtualedit'）。
+
+计算最长可见行的长度需要相当多的运算，而且每次有变化时都必须重新计算。如果
+这太耗时，或者你不喜欢光标跳到另一行，请在 'guioptions' 中加入 'h' 标志。
+此时滚动范围由光标所在行的文本决定。
+
+==============================================================================
+拖放                                            *drag-n-drop*
+
+你可以把一个或多个文件拖放到 Vim window 中，它们会像使用了 |:drop| 命令一样
+被打开。
+
+如果在拖放时按住 Shift，Vim 会切换到第一个被拖放文件所在的目录。如果按住
+Ctrl，Vim 总会为该文件分割出一个新 window。否则仅当当前 buffer 已被修改时
+才会分割。
+
+你也可以把一个目录拖放到 Vim 上。这会为该目录启动 explorer 插件（假设它已
+启用，否则你会看到一条错误消息）。按住 Shift 则改为切换到该目录。
+
+如果 Vim 恰好在编辑命令行，被拖放的文件和目录名会被插入到光标处。这样你就
+可以在任意 Ex 命令中使用这些名称。特殊字符（空格、制表符、双引号和 "|"；
+在非 MS-Windows 系统上还有反斜杠）会被转义。
+
+==============================================================================
+菜单                                            *menus*
+
+简介见用户手册中的 |usr_42.txt|。
+
+
+使用菜单                                        *using-menus*
+
+基本上，菜单的用法和映射一样。你可以定义自己的菜单，数量随意。长期使用 Vim
+的人不太会用菜单。但它的威力在于添加自己的菜单和菜单项。对于那些你记不住
+按键序列的操作，它们最有用。
+
+要创建其他语言的菜单，见 |:menutrans|。
+
+                                                        *menu.vim*
+默认菜单从文件 "$VIMRUNTIME/menu.vim" 读取。路径的来源见 |$VIMRUNTIME|。
+你可以设置自己的菜单。以默认菜单集作为起点是个好主意。你可以添加更多菜单项；
+或者，如果你完全不喜欢默认菜单，可以先用 |:unmenu-all| 移除所有菜单。你也
+可以通过在 vimrc 文件中加入下面这一行来避免加载默认菜单（不是你的 gvimrc
+文件！）： >
+        :let did_install_default_menus = 1
+如果你还想避免加载 Syntax 菜单： >
+        :let did_install_syntax_menu = 1
+Syntax 菜单中的第一项可以用来在菜单里显示所有可用的 filetype（加载可能需要
+一点时间）。如果你希望启动时就已经有全部 filetype，请加入： >
+        :let do_syntax_sel_menu = 1
+
+注意，menu.vim 会在执行 `:syntax on` 或 `:filetype on` 时，或在你的 .vimrc
+文件被 source 之后被 source。这意味着 'encoding' 选项和消息语言
+（`:language messages`）必须在那之前设置（如果你想修改它们）。
+
+                                                        *console-menus*
+虽然这部分文档属于 GUI 章节，但实际上在控制台模式下也可以使用菜单。只是
+那时你必须显式加载 |menu.vim|，默认不会加载。你可以使用 |:emenu| 命令以及
+借助 'wildmenu' 的命令行补全，几乎像真正的菜单系统一样访问菜单项。要做到
+这一点，请把这些命令放进你的 vimrc 文件： >
+        :source $VIMRUNTIME/menu.vim
+        :set wildmenu
+        :set cpo-=<
+        :set wcm=<C-Z>
+        :map <F4> :emenu <C-Z>
+按下 <F4> 会启动菜单。现在你可以用光标键选择一个菜单项。按 <Enter> 执行
+它。想取消就按 <Esc>。
+
+创建新菜单                                      *creating-menus*
+
+                                *:me*  *:menu*  *:noreme*  *:noremenu*
+                                *E330* *E327* *E331* *E336* *E333*
+                                *E328* *E329* *E337* *E792* *E1310*
+要创建新的菜单项，请使用 ":menu" 命令。它们大体上类似 ":map" 系列命令（见
+|map-modes|），但第一个参数是菜单项名，以菜单和子菜单的路径形式给出，之间
+用 '.' 分隔，例如： >
+
+   :menu File.Save  :w<CR>
+   :inoremenu File.Save  <C-O>:w<CR>
+   :menu Edit.Big\ Changes.Delete\ All\ Spaces  :%s/[ ^I]//g<CR>
+
+最后一条会在菜单栏中创建一个名为 "Edit" 的新项，按住它不放会弹出一个包含
+"Big Changes" 项的菜单，而它又是一个子菜单，其中包含 "Delete All Spaces"
+项，选中它会执行相应操作。
+
+要为终端模式创建菜单，请使用 |:tlmenu| 而不是 |:tmenu|，这与按键映射
+（|:tmap|）不同。这是因为 |:tmenu| 已经用于定义菜单的提示文本。见
+|terminal-input|。
+
+菜单名中的特殊字符：
+
+                                                        *menu-shortcut*
+- & 紧随其后的字符是快捷键。请确保每个快捷键在一个（子）菜单中只使用一次。如果你想在菜单名中插入字面量 "&"，请使用 "&&"。
+                                                        *menu-text*
+- <Tab> 把菜单名与右对齐的文本分隔开。它可以用来显示等效的键入命令。为方便起见，这里可以使用文本 "<Tab>"。如果你使用的是真正的制表符，别忘了在它前面加一个反斜杠！
+
+示例： >
+
+   :amenu &File.&Open<Tab>:e  :browse e<CR>
+
+[按字面输入]
+按住 <Alt> 键并按快捷键 "F"，然后再按 "O"，即可使用该菜单。第二部分显示为
+"Open     :e"。":e" 是右对齐的，且 "O" 带下划线，表示它是快捷键。
+
+                                        *:am*  *:amenu*  *:an*      *:anoremenu*
+":amenu" 命令可以一次为所有模式定义菜单项，终端模式除外。为了让命令正确
+工作，某些模式下会自动插入一个字符： >
+    mode            inserted        appended
+    Normal          nothing         nothing
+    Visual          <C-C>           <C-\><C-G>
+    Insert          <C-\><C-O>
+    Cmdline         <C-C>           <C-\><C-G>
+    Op-pending      <C-C>           <C-\><C-G>
+<
+示例： >
+
+    :amenu File.Next     :next^M
+
+等价于： >
+
+    :nmenu File.Next     :next^M
+    :vmenu File.Next     ^C:next^M^\^G
+    :imenu File.Next     ^\^O:next^M
+    :cmenu File.Next     ^C:next^M^\^G
+    :omenu File.Next     ^C:next^M^\^G
+
+注意：在插入模式下，由于 CTRL-O 的限制，这只对单条普通模式命令有效。如果你
+有两条或更多命令，就需要使用 ":imenu" 命令。要在任意模式下插入文本，可以
+使用表达式 register： >
+
+    :amenu Insert.foobar   "='foobar'<CR>P
+
+特殊文本 <Cmd> 开始一个「命令菜单」，它直接执行命令而不切换模式。凡是
+可以使用 ":...<CR>" 的地方，你都可以改用 "<Cmd>...<CR>"。更多信息见
+|<Cmd>|。示例： >
+    anoremenu File.Next <Cmd>next<CR>
+
+注意，Cmdline 模式下的 <Esc> 会执行命令，就像在映射中一样。这与 Vi 兼容。
+使用 CTRL-C 退出 Cmdline 模式。
+
+                *:nme* *:nmenu*  *:nnoreme* *:nnoremenu* *:nunme* *:nunmenu*
+以 "n" 开头的菜单命令在普通模式下工作。|mapmode-n|
+
+                *:ome* *:omenu*  *:onoreme* *:onoremenu* *:ounme* *:ounmenu*
+以 "o" 开头的菜单命令在操作符待决模式下工作。|mapmode-o|
+
+                *:vme* *:vmenu*  *:vnoreme* *:vnoremenu* *:vunme* *:vunmenu*
+以 "v" 开头的菜单命令在可视模式下工作。|mapmode-v|
+
+                *:xme* *:xmenu*  *:xnoreme* *:xnoremenu* *:xunme* *:xunmenu*
+以 "x" 开头的菜单命令在可视模式和选择模式下工作。|mapmode-x|
+
+                *:sme* *:smenu*  *:snoreme* *:snoremenu* *:sunme* *:sunmenu*
+以 "s" 开头的菜单命令在选择模式下工作。|mapmode-s|
+
+                *:ime* *:imenu*  *:inoreme* *:inoremenu* *:iunme* *:iunmenu*
+以 "i" 开头的菜单命令在插入模式下工作。|mapmode-i|
+
+                *:cme* *:cmenu*  *:cnoreme* *:cnoremenu* *:cunme* *:cunmenu*
+以 "c" 开头的菜单命令在 Cmdline 模式下工作。|mapmode-c|
+
+                *:tlm* *:tlmenu* *:tln*     *:tlnoremenu* *:tlu*   *:tlunmenu*
+以 "tl" 开头的菜单命令在终端模式下工作。|mapmode-t|
+
+                                                *:menu-<silent>* *:menu-silent*
+要定义一个不会在命令行上回显的菜单，请把 "<silent>" 作为第一个参数。示例： >
+        :menu <silent> Settings.Ignore\ case  :set ic<CR>
+使用这个菜单时，":set ic" 不会被回显。不过被执行命令产生的消息仍会显示。
+要让它们也安静下来，请在被执行的命令中加上 ":silent"： >
+        :menu <silent> Search.Header :exe ":silent normal /Header\r"<CR>
+"<silent>" 也可以紧跟在 "<script>" 之后出现。
+
+                                                *:menu-<script>* *:menu-script*
+菜单的 "to" 部分会被检查是否包含映射。如果你不想要这样，请使用 ":noremenu"
+命令（或针对特定模式的类似命令）。如果你确实想使用脚本局部映射，请把
+"<script>" 作为 ":menu" 命令的最前一个参数，或紧跟在 "<silent>" 之后。
+
+                                                        *menu-priority*
+你可以给菜单一个优先级。优先级更高的菜单更靠右。优先级以数字形式写在
+":menu" 命令之前。示例： >
+        :80menu Buffer.next :bn<CR>
+
+默认菜单的优先级如下： >
+        File            10
+        Edit            20
+        Tools           40
+        Syntax          50
+        Buffers         60
+        Window          70
+        Help            9999
+<
+未给出优先级或给出零时，使用 500。PopUp 菜单的优先级不会被使用。
+
+你可以使用高于 9999 的优先级，让它排在 Help 菜单之后，但这是非标准的，
+不推荐。可能的最高优先级约为 32000。最低为 1。
+
+                                                        *sub-menu-priority*
+同样的机制可以用来定位子菜单。此时优先级以点号分隔的优先级列表形式写在
+菜单名之前： >
+        :menu 80.500 Buffer.next :bn<CR>
+仅当该项不应放在常规位置时，才需要给出子菜单优先级。例如，要把一个子菜单
+放到其他项之前： >
+        :menu 80.100 Buffer.first :brew<CR>
+或者把子菜单放到其他项之后，这样后续使用默认优先级的项会排在它之前： >
+        :menu 80.900 Buffer.last :blast<CR>
+当某个数字缺失时，将使用默认值 500： >
+        :menu .900 myMenu.test :echo "text"<CR>
+菜单优先级仅在创建新菜单时使用。如果菜单已经存在，例如存在于另一个模式中，
+优先级不会改变。因此，优先级只需在某个菜单第一次被使用时给出。PopUp 菜单
+是个例外。每个模式（Normal、Op-pending、Visual、Insert、Cmdline）都有一个
+单独的 PopUp 菜单。这些菜单中的顺序可以各不相同。这与菜单栏菜单不同，后者
+的顺序在所有模式中都相同。注意：子菜单优先级目前并非对所有版本的 GUI 都
+有效。
+
+                                                        *menu-separator* *E332*
+菜单项之间可以用一个特殊项分隔，它会在项之间插入一些空间。根据系统的不同，
+它显示为一条线或一条虚线。这些项必须以 '-' 开头并以 '-' 结尾。中间的部分
+用于给它一个唯一的名字。优先级可以像普通项一样使用。示例： >
+        :menu Example.item1     :do something
+        :menu Example.-Sep-     :
+        :menu Example.item2     :do something different
+注意，分隔符也需要一个 rhs。它是什么并不重要，因为该项永远不会被选中。为
+简单起见，用一个冒号即可。
+
+                                                        *gui-toolbar*
+默认工具栏在 menu.vim 中设置。工具栏的显示由 'guioptions' 的字母 'T' 控制。
+因此你可以同时有菜单和工具栏，也可以只有其中之一，或两者都没有。外观由
+'toolbar' 选项控制。你可以在图像、文本或两者之间选择。
+
+                                                        *toolbar-icon*
+工具栏定义为一个名为 ToolBar 的特殊菜单，它只有一层。Vim 对这个菜单中的项
+解释如下：
+- 1 如果指定了 "icon=" 参数，则使用该名称的文件。
+    文件可以用完整路径指定，也可以用基本名指定。后一种情况下，会在 'runtimepath'
+    中的 "bitmaps" 目录里查找它，与第 3 点相同。示例： >
+        :amenu icon=/usr/local/pixmaps/foo_icon.xpm ToolBar.Foo :echo "Foo"<CR>
+        :amenu icon=FooIcon ToolBar.Foo :echo "Foo"<CR>
+<   注意第一种情况包含扩展名，而第二种情况省略了扩展名。
+    如果文件无法打开，则尝试后面的点。
+    文件名中的空格必须用反斜杠转义。
+    菜单优先级必须放在 icon 参数_之后_： >
+        :amenu icon=foo 1.42 ToolBar.Foo :echo "42!"<CR>
+- 2 名为 'BuiltIn##' 的项（其中 ## 是数字）被视为 Vim 内置位图中
+    的第 ## 号。目前共有 31 个，编号从 0 到 30，涵盖了大多数常见编辑
+    操作 |builtin-tools|。 >
+        :amenu ToolBar.BuiltIn22 :call SearchNext("back")<CR>
+- 3 名称不同的项会先在 'runtimepath' 中的 "bitmaps" 目录里查找。
+    如果找到，该位图文件会被用作工具栏按钮图像。注意，确切的文件名与操作系统
+    有关：例如，在 Win32 下，命令 >
+        :amenu ToolBar.Hello :echo "hello"<CR>
+会找到文件 'hello.bmp'。在 X11 下则是 'Hello.xpm'。
+对于 MS-Windows，位图会被缩放以适配按钮。对于 MS-Windows，18 x 18 像素的
+大小效果最好。对于 MS-Windows，位图应使用标准调色板的 16 色。浅灰色像素会
+被改为 window 边框颜色，深灰色像素会被改为 window 阴影颜色。更多颜色也可能
+有效，具体取决于你的系统。
+- 4 如果仍未找到位图，Vim 会在其内置名称列表中检查是否有匹配。
+    每个内置按钮图像都有一个名字。因此，命令 >
+        :amenu ToolBar.Open :e
+<   会在不存在 open.bmp 时显示内置的 "open a file" 按钮图像。
+    所有内置名称都可以在 menu.vim 中看到其用法。
+- 5 如果以上都失败，则显示一个空白但仍然可用的按钮。
+
+                                                        *builtin-tools*
+>
+    nr  Name                Normal action
+    00  New                 open new window
+    01  Open                browse for file to open in current window
+    02  Save                write buffer to file
+    03  Undo                undo last change
+    04  Redo                redo last undone change
+    05  Cut                 delete selected text to clipboard
+    06  Copy                copy selected text to clipboard
+    07  Paste               paste text from clipboard
+    08  Print               print current buffer
+    09  Help                open a buffer on Vim's builtin help
+    10  Find                start a search command
+    11  SaveAll             write all modified buffers to file
+    12  SaveSesn            write session file for current situation
+    13  NewSesn             write new session file
+    14  LoadSesn            load session file
+    15  RunScript           browse for file to run as a Vim script
+    16  Replace             prompt for substitute command
+    17  WinClose            close current window
+    18  WinMax              make current window use many lines
+    19  WinMin              make current window use few lines
+    20  WinSplit            split current window
+    21  Shell               start a shell
+    22  FindPrev            search again, backward
+    23  FindNext            search again, forward
+    24  FindHelp            prompt for word to search help for
+    25  Make                run make and jump to first error
+    26  TagJump             jump to tag under the cursor
+    27  RunCtags            build tags for files in current directory
+    28  WinVSplit           split current window vertically
+    29  WinMaxWidth         make current window use many columns
+    30  WinMinWidth         make current window use few columns
+<
+                                        *hidden-menus* *win32-hidden-menus*
+在 Win32 GUI 中，以 ']' 开头的菜单名会把该菜单排除在主菜单栏之外。此时必须
+使用 |:popup| 命令来显示它。
+
+分割 window 时，window 工具栏不会被复制到新的 window。
+
+                                                        *popup-menu*
+你可以定义特殊菜单 "PopUp"。当 'mousemodel' 设为 popup 或 popup_setpos 时，
+按下鼠标右键显示的就是这个菜单。
+
+默认的 "PopUp" 菜单是： >vim
+    amenu     PopUp.Open\ in\ web\ browser  gx
+    anoremenu PopUp.Inspect                 <Cmd>Inspect<CR>
+    anoremenu PopUp.Go\ to\ definition      <Cmd>lua vim.lsp.buf.definition()<CR>
+    anoremenu PopUp.Show\ Diagnostics       <Cmd>lua vim.diagnostic.open_float()<CR>
+    anoremenu PopUp.Show\ All\ Diagnostics  <Cmd>lua vim.diagnostic.setqflist()<CR>
+    anoremenu PopUp.Configure\ Diagnostics  <Cmd>help vim.diagnostic.config()<CR>
+    anoremenu PopUp.-1-                     <Nop>
+    vnoremenu PopUp.Cut                     "+x
+    vnoremenu PopUp.Copy                    "+y
+    anoremenu PopUp.Paste                   "+gP
+    vnoremenu PopUp.Paste                   "+P
+    vnoremenu PopUp.Delete                  "_x
+    nnoremenu PopUp.Select\ All             ggVG
+    vnoremenu PopUp.Select\ All             gg0oG$
+    inoremenu PopUp.Select\ All             <C-Home><C-O>VG
+    anoremenu PopUp.-2-                     <Nop>
+    anoremenu PopUp.How-to\ disable\ mouse  <Cmd>help disable-mouse<CR>
+<
+
+显示菜单被映射到什么                            *showing-menus*
+
+要查看某个已有菜单被映射到什么，只需在菜单命令后给出一个参数（就像用
+":map" 命令那样）。如果指定的菜单是子菜单，那么该层级下的所有菜单都会显示。
+如果在 :menu 后完全不给参数，则会显示相应模式的全部菜单项（例如 :cmenu
+对应 Command-line 模式）。
+
+列表中紧邻 rhs 之前的特殊字符：
+• * 菜单是用 "nore" 定义的，不允许重映射。
+• & 菜单是用 "<script>" 定义的，允许重映射脚本局部映射。
+• s 菜单是用 "<silent>" 定义的，触发时不会显示它被映射到什么。
+• - 菜单已被禁用。
+
+注意，在菜单命令后输入菜单名时按 <Tab>，可以用来补全菜单项的名称。
+
+
+执行菜单                                        *execute-menus*
+
+                                                *:em*  *:emenu* *E334* *E335*
+:[range]em[enu] {menu}          从命令行执行 {menu}。
+                                默认执行普通模式的菜单。如果指定了范围，则执行可视模式的菜单。
+                                如果从 <c-o> 中使用，则执行插入模式的菜单。例如： >
+        :emenu File.Exit
+
+:[range]em[enu] {mode} {menu}   同上，但执行 {mode} 的菜单：
+                                - 'n'：|:nmenu|  普通模式
+                                - 'v'：|:vmenu|  可视模式
+                                - 's'：|:smenu|  选择模式
+                                - 'o'：|:omenu|  操作符待决模式
+                                - 't'：|:tlmenu| 终端模式
+                                - 'i'：|:imenu|  插入模式
+                                - 'c'：|:cmenu|  Cmdline 模式
+
+
+你可以用 :emenu 访问那些你可能在 GUI 模式下已经习惯的有用菜单项。关于与此
+配合良好的选项，见 'wildmenu'。示例见 |console-menus|。
+
+使用范围时，如果行与 '<,'> 匹配，则用上一次的可视选区来执行菜单。
+
+
+删除菜单                                        *delete-menus*
+
+                                                *:unme*  *:unmenu*
+                                                *:aun*   *:aunmenu*
+要删除一个菜单项或整个子菜单，请使用 unmenu 系列命令，它们与 unmap 命令
+类似。例如： >
+    :unmenu! Edit.Paste
+
+这会从 Insert 和 Command-line 模式的 Edit 菜单中移除 Paste 项。
+
+注意，在 umenu 命令后输入菜单名时按 <Tab>，可以为相应模式补全菜单项的名称。
+
+要移除所有菜单，请使用：                        *:unmenu-all*  >
+        :unmenu *       " remove all menus in Normal and visual mode
+        :unmenu! *      " remove all menus in Insert and Command-line mode
+        :aunmenu *      " remove all menus in all modes, except for Terminal
+                        " mode
+        :tlunmenu *     " remove all menus in Terminal mode
+
+如果你想去掉菜单栏： >
+        :set guioptions-=m
+
+
+禁用菜单                                        *disable-menus*
+
+                                                *:menu-disable* *:menu-enable*
+如果你不想移除菜单，只是想暂时禁用它，可以在 ":menu" 命令中加上 "enable"
+或 "disable" 关键字。例如： >
+        :menu disable &File.&Open\.\.\.
+        :amenu enable *
+        :amenu disable &Tools.*
+
+该命令适用的模式与所有菜单命令一样。注意，为了让翻译过的名称能够被找到，
+需要包含像 "&" 这样的字符。当参数为 "*" 时，所有菜单都会受影响。否则，
+受影响的是给定菜单名及其下所有已存在的子菜单。
+
+
+菜单示例                                        *menu-examples*
+
+下面是一个用菜单来添加菜单项的例子！你可以为光标下的关键字添加一个菜单项。
+这里使用了 register "z"。 >
+
+  :nmenu Words.Add\ Var         wb"zye:menu! Words.<C-R>z <C-R>z<CR>
+  :nmenu Words.Remove\ Var      wb"zye:unmenu! Words.<C-R>z<CR>
+  :vmenu Words.Add\ Var         "zy:menu! Words.<C-R>z <C-R>z <CR>
+  :vmenu Words.Remove\ Var      "zy:unmenu! Words.<C-R>z<CR>
+  :imenu Words.Add\ Var         <Esc>wb"zye:menu! Words.<C-R>z <C-R>z<CR>a
+  :imenu Words.Remove\ Var      <Esc>wb"zye:unmenu! Words.<C-R>z<CR>a
+
+（rhs 使用 <> 记法，你可以复制/粘贴这段文本来试用这些映射，或把这些行放进
+你的 gvimrc；"<C-R>" 是 CTRL-R，"<CR>" 是 <CR> 键。|<>|）
+
+                                                        *tooltips* *menu-tips*
+工具提示与菜单提示
+
+见用户手册中的 |42.4| 一节。
+
+                                                        *:tmenu*
+:tm[enu] {menupath} {rhs}       为菜单或工具定义提示。(仅限
+                                X11 和 Win32 GUI)
+
+:tm[enu] [menupath]             列出菜单提示。(仅限 X11 和 Win32 GUI)
+
+                                                        *:tunmenu*
+:tu[nmenu] {menupath}           移除菜单或工具的提示。
+                                (仅限 X11 和 Win32 GUI)
+
+注意：要为终端模式创建菜单，请改用 |:tlmenu|。
+
+为某个菜单项定义了提示后，当鼠标悬停在该项上时，它会显示在命令行区域，很像
+状态栏中的标准 Windows 菜单提示。（Vim 处于 Command-line 模式时除外，那时
+当然什么也不显示。）
+为 ToolBar 项定义了提示后，当鼠标停在该按钮上时，它会以通常的方式作为工具
+提示出现。使用 |hl-Tooltip| 高亮组来改变它的颜色。
+
+每个菜单项都可以定义一个「tip」。例如，像这样定义一个菜单项时： >
+        :amenu MyMenu.Hello :echo "Hello"<CR>
+提示这样定义： >
+        :tmenu MyMenu.Hello Displays a greeting.
+用下面的方式删除它： >
+        :tunmenu MyMenu.Hello
+
+工具提示目前仅在 X11 和 Win32 GUI 中受支持。不过，在不久的将来它们应该会
+出现在其他 GUI 平台上。
+
+":tmenu" 命令的用法和其他菜单命令一样，它使用相同的参数。":tunmenu" 删除
+已有的菜单提示，方式与其他 unmenu 命令相同。
+
+如果一个菜单项变得无效（即它在所有模式下的动作都被删除），Vim 会替你删除
+菜单提示（以及该项）。这意味着 :aunmenu 会删除一个菜单项——你不需要再执行
+:tunmenu。
+
+
+5.9 弹出菜单
+
+你可以让菜单在光标处弹出。它的行为与 PopUp 菜单类似，区别在于可以弹出任意
+菜单树。
+
+                                                        *:popup* *:popu*
+:popu[p] {name}                 弹出菜单 {name}。所命名的菜单必须
+                                至少有一个子项，但不必出现在菜单栏上（见 |hidden-menus|）。
+
+:popu[p]! {name}                同上，但使用鼠标指针的位置而不是
+                                光标位置。
+
+示例： >
+        :popup File
+会让 "File" 菜单（如果存在）出现在文本光标处（如果使用了 !，则是鼠标指针
+处）。 >
+
+        :amenu ]Toolbar.Make    :make<CR>
+        :popup ]Toolbar
+这会创建一个不存在于主菜单栏上的弹出菜单。
+
+以 ']' 开头的菜单不会被显示。
+
+
+ vim:tw=78:sw=4:ts=8:et:ft=help:norl:

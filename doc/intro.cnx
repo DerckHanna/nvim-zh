@@ -1,0 +1,546 @@
+*intro.txt*     Nvim
+
+
+                             NVIM 参考手册
+
+
+Nvim                                                    *ref* *reference*
+
+                                      输入 |gO| 查看目录。
+
+==============================================================================
+简介                                                      *intro*
+
+Vim 是一个文本编辑器，它包含 Unix 程序 "Vi" 的绝大多数命令，并新增了许多命令。
+
+本手册的总览见 "help.txt" 文件，|help.txt|。在 Vim 内部可以用 <Help> 或 <F1>
+键访问它，也可以用 |:help| 命令（只需输入 ":help"，不带竖线或引号）。
+   可以把 'helpfile' 选项设为帮助文件的名称，以防它不在默认位置。跳转到某个
+主题的方式与跳转标签相同：用 CTRL-] 跳转到光标下的主题，用 CTRL-T 跳回来。
+
+                                                        *pronounce*
+Vim 读作一个单词，发音类似 Jim。所以 Nvim 读作 "En-Vim"，两个音节。
+
+本手册是所有 Nvim 编辑器与 API 功能的参考。它不是一本入门教程；相反，为初学者
+准备的内容有动手实践的 |tutor|、|lua-guide| 和 |user-manual|。
+
+------------------------------------------------------------------------------
+资源                                                      *resources*
+
+                                                *internet* *www* *distribution*
+Nvim 主页：
+
+        https://neovim.io/
+
+                                                *book*
+学习 Vi、Vim 和 Nvim 的资源很多。我们推荐：
+
+- Drew Neil 所著的 "Practical Vim"。它因专注于快速掌握常见 Vim 编辑任务而广受
+  好评。
+- Drew Neil 所著的 "Modern Vim"。书中探讨了 Nvim 与 Vim 8 的新特性。
+- http://vimcasts.org
+- Steve Oualline 所著的 "Vim - Vi Improved"。这是第一本专门为 Vim
+  撰写的书。其中一些部分被收录进了 Vim 用户手册。|frombook|  ISBN:
+  0735710015
+- 更多信息见 https://www.vim.org/iccf/click5.html
+- Vim FAQ： https://vimhelp.org/vim_faq.txt.html
+
+                                                *bugs* *bug-report* *feature-request*
+在这里报告缺陷并请求新特性：https://github.com/neovim/neovim/issues
+要简短，但也要完整。始终给出一个可复现的例子，并设法弄清是哪些设置或其他东西
+触发了这个缺陷。如果 Nvim 崩溃了，试着取得一份 backtrace（见
+|dev-tools-backtrace|）。
+
+==============================================================================
+安装 Nvim                                                 *install*
+
+                                                *download* *upgrade* *ubuntu*
+要安装或升级 Nvim，你可以……
+- 下载预编译的压缩包：
+  https://github.com/neovim/neovim/releases
+- 使用你的系统包管理器：
+  https://github.com/neovim/neovim/blob/master/INSTALL.md#install-from-package
+- 从源码构建：
+  https://github.com/neovim/neovim/blob/master/INSTALL.md#install-from-source
+
+------------------------------------------------------------------------------
+卸载 Nvim                                                 *uninstall*
+
+要卸载 Nvim：
+- 如果你下载的是预编译压缩包，或从源码构建 Nvim（例如
+  `make install`），直接删除它的文件即可，这些文件通常位于： >
+  /usr/local/bin/nvim
+  /usr/local/share/nvim
+<
+  - 要查明 Nvim 安装在何处，运行这些命令： >
+    :echo v:progpath
+    :echo $VIMRUNTIME
+<
+- 如果你通过包管理器安装，请阅读该包管理器的文档。常见例子：
+  - APT (Debian, Ubuntu, …)： `apt-get remove neovim`
+  - Homebrew (macOS)： `brew uninstall neovim`
+  - Scoop (Windows)： `scoop uninstall neovim`
+
+==============================================================================
+赞助 Vim/Nvim 的开发                                      *sponsor*
+
+修复缺陷和添加新特性需要大量的时间与精力。要表达你对这份工作的感谢，并
+激励开发者继续在 Vim 上工作，请捐赠一笔款项。
+
+你所捐出的钱将主要用于帮助乌干达的儿童。见 |uganda|。但与此同时，捐款也会提升
+开发团队继续在 Vim 上工作的动力！
+
+关于赞助的最新信息，请查看 Vim 网站：
+
+        https://www.vim.org/sponsor/
+
+
+Nvim 的开发资金与 Vim 分开募集：
+
+        https://neovim.io/#sponsor
+
+==============================================================================
+Bram Moolenaar                  *Bram* *Moolenaar* *Bram-Moolenaar* *brammool*
+
+Nvim 是 Vim（"Vi IMproved"）文本编辑器的一个分支，它最初由 Bram Moolenaar
+开发。在 Nvim 的源码中搜索他的名字，你会发现他的工作至今仍有多少保留在
+Nvim 之中。2023 年 8 月 3 日，他逝世，享年 62 岁。如果 Vim 或 Nvim 在你的
+生活中派上了用场，请阅读 |Uganda|，并以你认为合适的方式纪念他。
+
+- 讣告文章： https://github.com/vim/vim/discussions/12742
+- 告别： https://github.com/vim/vim/discussions/12737
+
+==============================================================================
+按键码                                *key-notation* *key-codes* *keycodes*
+
+这些键的名称用于文档之中。它们也可以用在 ":map" 命令里。
+
+notation        含义          等价写法  十进制值                  ~
+<Nul>           零            CTRL-@    0（存为 10） *<Nul>*
+<BS>            退格          CTRL-H    8         *backspace*
+<Tab>           制表符        CTRL-I    9         *tab* *Tab*
+                                                  *linefeed*
+<NL>            换行          CTRL-J    10（用于 <Nul>）
+<CR>            回车          CTRL-M    13        *carriage-return*
+<Return>        同 <CR>                           *<Return>*
+<Enter>         同 <CR>                           *<Enter>*
+<Esc>           退出          CTRL-[    27        *escape* *<Esc>*
+<Space>         空格                    32        *space*
+<lt>            小于号        <         60        *<lt>*
+<Bslash>        反斜杠        \         92        *backslash* *<Bslash>*
+<Bar>           竖线          |         124       *<Bar>*
+<Del>           删除                    127
+<CSI>           命令序列起始  ALT-Esc   155       *<CSI>*
+
+<EOL>           行尾（可以是 <CR>、<NL> 或 <CR><NL>，
+                取决于系统和 'fileformat'）       *<EOL>*
+<Ignore>        取消等待字符                      *<Ignore>*
+<NOP>           什么都不做（no-op），映射中有用   *<Nop>*
+                <Ignore> 是一个键，<NOP> 指「没有键」。
+
+<Up>            光标上移                      *cursor-up* *cursor_up*
+<Down>          光标下移                      *cursor-down* *cursor_down*
+<Left>          光标左移                      *cursor-left* *cursor_left*
+<Right>         光标右移                      *cursor-right* *cursor_right*
+<S-Up>          Shift + 光标上移
+<S-Down>        Shift + 光标下移
+<S-Left>        Shift + 光标左移
+<S-Right>       Shift + 光标右移
+<C-Left>        Control + 光标左移
+<C-Right>       Control + 光标右移
+<F1> - <F12>    功能键 1 到 12                *function_key* *function-key*
+<S-F1> - <S-F12> Shift + 功能键 1 到 12       *<S-F1>*
+<Help>          Help 键
+<Undo>          Undo 键
+<Find>          Find 键
+<Select>        Select 键
+<Insert>        Insert 键
+<Home>          Home 键                       *home*
+<End>           End 键                        *end*
+<PageUp>        向上翻页                      *page_up* *page-up*
+<PageDown>      向下翻页                      *page_down* *page-down*
+<kUp>           小键盘光标上移                *keypad-cursor-up*
+<kDown>         小键盘光标下移                *keypad-cursor-down*
+<kLeft>         小键盘光标左移                *keypad-cursor-left*
+<kRight>        小键盘光标右移                *keypad-cursor-right*
+<kHome>         小键盘 Home（左上角）         *keypad-home*
+<kEnd>          小键盘 End（左下角）          *keypad-end*
+<kOrigin>       小键盘原点（正中）            *keypad-origin*
+<kPageUp>       小键盘向上翻页（右上角）      *keypad-page-up*
+<kPageDown>     小键盘向下翻页（右下角）      *keypad-page-down*
+<kDel>          小键盘删除                    *keypad-delete*
+<kPlus>         小键盘 +                      *keypad-plus*
+<kMinus>        小键盘 -                      *keypad-minus*
+<kMultiply>     小键盘 *                      *keypad-multiply*
+<kDivide>       小键盘 /                      *keypad-divide*
+<kPoint>        小键盘 .                      *keypad-point*
+<kComma>        小键盘 ,                      *keypad-comma*
+<kEqual>        小键盘 =                      *keypad-equal*
+<kEnter>        小键盘 Enter                  *keypad-enter*
+<k0> - <k9>     小键盘 0 到 9                 *keypad-0* *keypad-9*
+<S-…>           Shift + 键                    *shift* *<S-*
+<C-…>           Control + 键                  *control* *ctrl* *<C-*
+<M-…>           Alt 键或 meta 键              *META* *ALT* *<M-*
+<A-…>           同 <M-…>                      *<A-*
+<T-…>           meta 键（meta 不是 alt 时）   *<T-*
+<D-…>           Command 键或 "super" 键       *<D-*
+
+
+注意：
+
+- 某些键是否可用（<Help>、<S-Right>、…）取决于 UI 或宿主终端。
+- 如果 numlock 打开，|TUI| 收到的是纯 ASCII 值，所以映射 <k0>、<k1>、……、<k9>
+  和 <kPoint> 不会生效。
+- Nvim 支持映射带修饰键的多字节字符，例如 `<M-ä>`。实际哪些组合能用取决于 UI
+  或宿主终端。
+- 当按下某个键时使用了 meta 或 alt 修饰键，而该按键不存在映射，Nvim 可能表现得
+  好像在该键之前按下了 <Esc>。
+- 可以表示组合修饰键（例如用 <M-C-T> 表示 CTRL-ALT-T），但你的终端必须能编码
+  这样的输入，否则无法生效。|tui-input|
+
+                                                                *<>*
+示例常常用 <> 表示法给出。有时这只是为了说清楚你要输入什么，但很多时候它可以按
+字面输入，例如在 ":map" 命令中。规则是：
+1.  可打印字符直接输入，反斜杠和 "<" 除外
+2.  反斜杠用 "\\"、双反斜杠，或 "<Bslash>" 表示。
+3.  字面的 "<" 用 "\<" 或 "<lt>" 表示。当不会有混淆时，可以直接使用 "<"。
+4.  "<key>" 表示所键入的特殊键（见上面的表）。例子：
+    - <Esc>             Escape 键
+    - <C-G>             CTRL-G
+    - <Up>              光标上移键
+    - <C-LeftMouse>     Control + 鼠标左键点击
+    - <S-F11>           带 Shift 的功能键 11
+    - <M-a>             Meta- a（'a' 的第 8 位置位）
+    - <M-A>             Meta- A（'A' 的第 8 位置位）
+
+<> 表示法用 <lt> 来转义键名的特殊含义。使用反斜杠也可以，但仅当 'cpoptions' 不
+包含 'B' 标志时才有效。
+
+把 CTRL-H 映射为 "<Home>" 这六个字符的例子： >vim
+        :imap <C-H> \<Home>
+        :imap <C-H> <lt>Home>
+第一个只有当 'B' 标志不在 'cpoptions' 中时才有效。第二个总是有效。
+要在映射中得到一个字面的 "<lt>"： >vim
+        :map <C-L> <lt>lt>
+
+这个表示法可以用在双引号字符串中，开头使用 "\<"，例如 "\<C-Space>"。这会产生
+一个特殊键码。要把它转换回可读文本，使用 `keytrans()`。
+
+==============================================================================
+模式简介                                    *vim-modes-intro* *vim-modes*
+
+Vim 有七种基本（BASIC）模式：
+
+                                        *Normal* *Normal-mode* *command-mode*
+- Normal 模式:          在 Normal 模式下你可以输入所有普通的编辑器命令。启动
+                        编辑器后你就处于这个模式。它也被称为 command 模式。
+
+- Visual 模式:          这类似于 Normal 模式，但移动命令会扩展一块高亮区域。
+                        当使用非移动命令时，该命令会作用于高亮区域。见
+                        |Visual-mode|。
+                        如果 'showmode' 选项打开，window 底部会显示
+                        "-- VISUAL --"。
+
+- Select 模式:          这最像 MS-Windows 的选择模式。输入一个可打印字符会删除
+                        选区并开始 Insert 模式。见 |Select-mode|。
+                        如果 'showmode' 选项打开，window 底部会显示
+                        "-- SELECT --"。
+
+- Insert 模式:          在 Insert 模式下，你输入的文本会被插入 buffer。见
+                        |Insert-mode|。
+                        如果 'showmode' 选项打开，window 底部会显示
+                        "-- INSERT --"。
+
+- Cmdline 模式:         在 Command-line 模式（也叫 Cmdline 模式）下，你可以在
+                        window 的底部输入一行文本。这用于 Ex 命令 ":"、模式
+                        搜索命令 "?" 和 "/"，以及过滤命令 "!"。|Cmdline-mode|
+
+- Ex 模式:              类似 Command-line 模式，但输入一条命令后你仍留在 Ex
+                        模式。对命令行的编辑能力非常有限。|Ex-mode|
+
+                                                        *Terminal-mode*
+- Terminal 模式:        在 Terminal 模式下，所有输入（除 CTRL-\ 外）都被发送到
+                        当前 |terminal| buffer 中运行的进程。如果按下 CTRL-\，
+                        下一个键也会被发送，除非它是 CTRL-N（|CTRL-\_CTRL-N|）
+                        或 CTRL-O（|t_CTRL-\_CTRL-O|）。
+                        如果 'showmode' 选项打开，window 底部会显示
+                        "-- TERMINAL --"。
+
+还有六种附加（ADDITIONAL）模式。它们是 BASIC 模式的变体：
+
+                                *Operator-pending* *Operator-pending-mode*
+- Operator-pending 模式: 这类似于 Normal 模式，但在操作符命令已经开始之后，Vim
+                        正在等待一个 {motion}，用以指定该操作符将作用的文本。
+
+- Replace 模式:         Replace 模式是 Insert 模式的一种特殊情况。你可以做与
+                        Insert 模式相同的事情，但你每输入一个字符，已有文本中
+                        就删除一个字符。见 |Replace-mode|。
+                        如果 'showmode' 选项打开，window 底部会显示
+                        "-- REPLACE --"。
+
+- Virtual Replace 模式: Virtual Replace 模式类似于 Replace 模式，但你替换的是
+                        屏幕上的空间，而不是文件中的字符。见
+                        |Virtual-Replace-mode|。
+                        如果 'showmode' 选项打开，window 底部会显示
+                        "-- VREPLACE --"。
+
+- Insert Normal 模式:   在 Insert 模式下按下 CTRL-O 时进入（见 |i_CTRL-O|）。
+                        这类似于 Normal 模式，但在执行一条命令后 Vim 就返回
+                        Insert 模式。
+                        如果 'showmode' 选项打开，window 底部会显示
+                        "-- (insert) --"。
+
+- Insert Visual 模式:   从 Insert 模式开始 Visual 选择时进入，例如先按 CTRL-O
+                        再按 "v"、"V" 或 "CTRL-V"。Visual 选择结束后，Vim 返回
+                        Insert 模式。
+                        如果 'showmode' 选项打开，window 底部会显示
+                        "-- (insert) VISUAL --"。
+
+- Insert Select 模式:   从 Insert 模式进入 Select 模式时进入。例如通过拖动
+                        鼠标或 <S-Right>。Select 模式结束后，Vim 返回
+                        Insert 模式。
+                        如果 'showmode' 选项打开，window 底部会显示
+                        "-- (insert) SELECT --"。
+
+==============================================================================
+模式之间的切换                                            *mode-switching*
+
+如果你由于任何原因不知道自己处于哪个模式，总可以输入两次 <Esc> 回到 Normal
+模式。但这对 Ex 模式不起作用，要用 ":visual"。当你看到屏幕闪烁，或在输入 <Esc>
+后听到铃声，就说明你已回到 Normal 模式。不过，在 Insert 模式中使用 CTRL-O 之后
+按下 <Esc>，你也会听到铃声，但仍处于 Insert 模式，请再按一次 <Esc>。
+
+                                                        *i_esc*
+ >
+ FROM mode      TO mode
+                Normal  Visual  Select  Insert    Replace   Cmd-line  Ex >
+ Normal                 v V ^V    *4     *1        R gR     : / ? !   gQ
+ Visual          *2               ^G     c C        --        :       --
+ Select          *5     ^O ^G            *6         --        --      --
+ Insert          <Esc>    --      --              <Insert>    --      --
+ Replace         <Esc>    --      --    <Insert>              --      --
+ Command-line    *3       --      --     :start     --                --
+ Ex              :vi      --      --     --         --        --
+
+ -- not possible
+<
+
+- 1 通过给出 "i"、"I"、"a"、"A"、"o"、"O"、"c"、"C"、"s" 或 "S" 命令，从
+    Normal 模式进入 Insert 模式。
+- 2 在 Visual 模式给出一个非移动命令，命令因此被执行，从而回到 Normal 模式；
+    或者按下 <Esc>、"v"、"V" 或 "CTRL-V"（见 |v_v|），它们只是停止 Visual 模式
+    而没有副作用。
+- 3 从 Command-line 模式回到 Normal 模式，办法有：
+    - 按 <CR> 或 <NL>，这会执行已输入的命令。
+    - 删除整行（例如用 CTRL-U），再输入一个最后的 <BS>。
+    - 按 CTRL-C 或 <Esc>，这会退出命令行而不执行命令。
+    最后一种情况中，<Esc> 可能正是以 'wildchar' 选项所定义的字符，此时它会开始
+    命令行补全。你可以不管它，再按一次 <Esc>。
+- 4 从 Normal 模式进入 Select 模式，办法有：
+    - 当 'selectmode' 包含 "mouse" 时，用鼠标选择文本
+    - 当 'selectmode' 选项包含 "key" 时，按住 Shift 键并使用不可打印的命令移动
+      光标
+    - 当 'selectmode' 包含 "cmd" 时，使用 "v"、"V" 或 "CTRL-V"
+    - 使用 "gh"、"gH" 或 "g CTRL-H"  |g_CTRL-H|
+- 5 在不按住 Shift 键的情况下，用一个不可打印的命令移动光标，从而从 Select
+    模式回到 Normal 模式。
+- 6 在 Select 模式下输入一个可打印字符进入 Insert 模式。选区被删除，该字符被
+    插入。
+
+                        *CTRL-\_CTRL-N* *i_CTRL-\_CTRL-N* *c_CTRL-\_CTRL-N*
+                                      *v_CTRL-\_CTRL-N* *t_CTRL-\_CTRL-N*
+此外，命令 CTRL-\ CTRL-N 或 <C-\><C-N> 可以从任何其他模式进入 Normal 模式。
+这可以用来确保 Vim 处于 Normal 模式，而且不会像 <Esc> 那样引起铃声。不过，这在
+Ex 模式下不起作用。当它用在一个需要参数的命令之后（例如 |f| 或 |m|）时，
+'ttimeoutlen' 所设置的超时时间适用。
+
+        *CTRL-\_CTRL-G* *i_CTRL-\_CTRL-G* *c_CTRL-\_CTRL-G* *v_CTRL-\_CTRL-G*
+为了向后兼容，CTRL-\ CTRL-G 的行为与 |CTRL-\_CTRL-N| 相同。
+
+                                *gQ* *mode-Ex* *Ex-mode* *Ex* *EX* *E501*
+gQ                      切换到 Ex 模式。这就像依次输入 ":" 命令，不同之处
+                        在于：
+                        - 不必一直按着 ":"。
+                        - 屏幕不会在每条命令之后刷新。
+                        使用 `:vi` 命令（|:visual|）退出此模式。
+
+==============================================================================
+Window 的内容                                           *window-contents*
+
+在 Normal 模式和 Insert/Replace 模式下，屏幕 window 显示 buffer 的当前内容：
+所见即所得。有两个例外：
+- 当 'cpoptions' 选项包含 '$' 且改动只在一行之内时，文本不会被直接删除，而是
+  在最后一个被删除的字符处放一个 '$'。
+- 在一个 window 中插入文本时，显示同一文本的其他 window 不会更新，直到插入
+  结束。
+
+超过 window 宽度的行会折行，除非 'wrap' 选项关闭（见下文）。可以设置
+'linebreak' 选项，让折行发生在空白字符处。
+
+如果 buffer 最后一行之后 window 还有空间，Vim 会在 window 最后几行的第一列
+显示 '~'，如下所示：
+>
+        +-----------------------+
+        |some line              |
+        |last line              |
+        |~                      |
+        |~                      |
+        +-----------------------+
+<
+因此 '~' 行表示已经到达 buffer 的末尾。
+
+如果 window 中的最后一行放不下，Vim 会在 window 最后几行的第一列以一个 '@'
+来表示，如下所示：
+>
+        +-----------------------+
+        |first line             |
+        |second line            |
+        |@                      |
+        |@                      |
+        +-----------------------+
+<
+因此 '@' 行表示有一行放不进这个 window。
+
+当 'display' 选项中含有 "lastline" 标志时，你不会在 window 左侧看到 '@'
+字符。如果最后一行放不下，就只显示放得下的那部分，并且最后一行的最后三个字符
+被替换为 "@@@"，如下所示：
+>
+        +-----------------------+
+        |first line             |
+        |second line            |
+        |a very long line that d|
+        |oesn't fit in the wi@@@|
+        +-----------------------+
+<
+如果只有一行太长而放不进 window，这是一种特殊情况。Vim 只显示该行的部分，
+即光标所在位置附近的部分。不显示任何特殊字符，以便你可以编辑这一行的各个
+部分。
+
+可以用 |hl-NonText| 高亮组为 '@' 和 '~' 字符设置特殊的高亮。这样就能把它们
+与 buffer 中真正的字符区分开。
+
+'showbreak' 选项包含的内容是放在折行之前的字符串。
+
+                                                        *wrap-off*
+如果 'wrap' 选项关闭，长行不会折行。只显示能放进屏幕的部分。如果光标移到该行
+未显示的部分，屏幕会水平滚动。这种方法的优点是各列按原样显示，放不进屏幕的行
+也能编辑。缺点是你无法一次看到一行的所有字符。可以把 'sidescroll' 选项设为
+滚动时最少滚动的列数。
+
+所有普通的 ASCII 字符都直接显示在屏幕上。<Tab> 被替换为它所表示的空格数。其他
+不可打印字符被替换为 "^{char}"，其中 {char} 是加上 64 之后的那个不可打印字符。
+因此字符 7（铃）会显示为 "^G"。127 到 160 之间的字符被替换为 "~{char}"，其中
+{char} 是减去 64 之后的那个字符。这些字符在屏幕上占据的位置不止一个。光标只能
+定位在第一个位置上。
+
+如果设置 'number' 选项，所有行前面都会冠以行号。小提示：如果你不喜欢折行与行号
+混在一起，可以把 'showbreak' 选项设为八个空格： >
+        ":set showbreak=\ \ \ \ \ \ \ \ "
+
+如果设置 'list' 选项，<Tab> 字符不会显示为若干个空格，而显示为 "^I"。行尾会放
+一个 '$'，这样你就能找到行尾的空白。
+
+在 Command-line 模式下，只有命令行本身被正确显示。一旦你回到 Command
+模式，buffer 内容的显示就会被更新。
+
+window 的最后一行用于状态消息和其他消息。只有当某个选项打开时才会使用状态
+消息： >
+
+  status message                option       default    Unix default
+  current mode                  'showmode'      on          on
+  command characters            'showcmd'       on          off
+  cursor position               'ruler'         off         off
+
+当前模式是 "-- INSERT --" 或 "-- REPLACE --"，见 'showmode'。命令字符指那些你
+已经输入但尚未被使用的按键。
+
+如果你的终端很慢，可以关闭状态消息以加快编辑： >
+        :set nosc noru nosm
+
+如果有错误，错误消息至少会显示一秒（以反显方式显示）。
+
+某些命令会显示有多少行受到影响。这一提示在超过哪个阈值时出现，可以用 'report'
+选项控制（默认为 2）。
+
+Vim 的名称和当前文件的完整名称会显示在标题栏中。当 window 被调整大小时，Vim
+会自动重绘这个 window。你可以把 window 缩到任意小，但如果它太小，连一行都放不
+下。把它至少设为 40 列宽，才能阅读最后一行上的大多数消息。
+
+==============================================================================
+定义                                                  *definitions* *jargon*
+
+- buffer：包含若干行文本，通常来自一个文件。
+- screen（屏幕）：Nvim 用来显示内容的整个区域。
+- window：对某个 buffer 的一个视图。同一个 buffer 可以有多个 window。
+- frame：window 保存在一棵 frame 树中。每个 frame 包含一个列、一个行或一个
+  window（"leaf" frame）。
+
+一个 screen 包含一个或多个 window，它们之间以状态行分隔，底部是命令行。
+>
+        +-------------------------------+
+ screen | window 1      | window 2      |
+        |               |               |
+        |               |               |
+        |= status line =|= status line =|
+        | window 3                      |
+        |                               |
+        |                               |
+        |==== status line ==============|
+        |command line                   |
+        +-------------------------------+
+<
+命令行也用于显示消息。当命令行没有足够空间时，屏幕向上滚动。
+
+四种类型的行彼此不同：
+
+- buffer lines：buffer 中的行。这与从文件读出/写入文件的行相同。它们可以长
+                 达数千个字符。
+- logical lines：施加了折叠之后的 buffer lines。在一个闭合折叠中的 buffer
+                 lines 被改成一个单独的 logical line："+-- 99 lines folded"。
+                 它们可以长达数千个字符。
+- window lines：显示在 window 中的行：一段 logical lines，并施加了折行、换行
+                 等处理。它们的长度不能超过 window 允许的值，超长的行会被折行
+                 或截断。
+- screen lines：Nvim 所用的 screen 的行。由所有 window 的 window lines 加上
+                 状态行和命令行组成。它们的长度不能超过 screen 允许的值。当
+                 命令行变长时它会折行，并且各行会滚动以腾出空间。
+
+>
+  buffer lines    logical lines   window lines    screen lines
+  -----------------------------------------------------------------------
+  1. one          1. one          1. +-- folded   1.  +-- folded
+  2. two          2. +-- folded   2. five         2.  five
+  3. three        3. five         3. six          3.  six
+  4. four         4. six          4. seven        4.  seven
+  5. five         5. seven                        5.  === status line ===
+  6. six                                          6.  aaa
+  7. seven                                        7.  bbb
+                                                  8.  ccc ccc c
+  1. aaa          1. aaa          1. aaa          9.  cc
+  2. bbb          2. bbb          2. bbb          10. ddd
+  3. ccc ccc ccc  3. ccc ccc ccc  3. ccc ccc c    11. ~
+  4. ddd          4. ddd          4. cc           12. === status line ===
+                                  5. ddd          13. (command line)
+                                  6. ~
+<
+
+API 客户端 ~
+所有外部 UI 和远程插件（区别于普通的 Vim 插件）通常都称为 "clients"；但只有当
+某个东西的目的是为他人方便而抽象或封装 RPC API 时，我们才称它为 "API client"
+（就像 AWS 的 boto3 之于 REST 客户端或 SDK：你可以用 curl 这样的 HTTP 客户端
+直接与 AWS REST 通信，但 boto3 把它包装成一个方便的 python 接口）。例如，Nvim
+的 node-client 就是一个 API client：
+    https://github.com/neovim/node-client
+
+
+宿主 ~
+插件的 "host" 既是一个客户端（Nvim API 的客户端），也是一个服务器（外部平台
+的服务器，例如 python）。它是一个承载了其他插件的远程插件。
+
+
+远程插件 ~
+通过 |:UpdateRemotePlugins| 注册任意代码，它运行在单独的进程中，并通过 |api|
+与 Nvim 通信。
+
+
+ vim:tw=78:ts=8:et:sw=4:ft=help:norl:

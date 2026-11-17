@@ -1,0 +1,30 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: nvim-zh clangd diagnostics\n"
+"PO-Revision-Date: 2026-11-17 20:38+0800\n"
+"Last-Translator: nvim-zh maintainers\n"
+"Language-Team: Simplified Chinese\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: zh_CN\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: tests/phase5/fixtures/clangd-corpus.json
+msgctxt "redefinition"
+msgid "Redefinition of '{name}'"
+msgstr "'{name}' 重复定义"
+
+#: tests/phase5/fixtures/clangd-corpus.json
+msgctxt "previous_definition"
+msgid "Previous definition is here"
+msgstr "此前的定义在这里"
+
+#: tests/phase7/fixtures/clangd-real-observed.json tests/phase7/corpus/undeclared.cpp
+msgctxt "undeclared_identifier"
+msgid "Use of undeclared identifier '{name}'"
+msgstr "使用了未声明的标识符 '{name}'"
+
+#: tests/phase7/fixtures/clangd-real-observed.json tests/phase7/corpus/unknown_type.cpp
+msgctxt "unknown_type_name"
+msgid "Unknown type name '{name}'"
+msgstr "未知类型名 '{name}'"

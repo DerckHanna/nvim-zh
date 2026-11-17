@@ -1,0 +1,542 @@
+*usr_05.txt*	Nvim
+
+
+		     VIM USER MANUAL	by Bram Moolenaar
+
+
+			        设置你的选项
+
+
+Vim 可以按你的需要调整。本章讲怎样让 Vim 启动时就带上不同的选项
+设置，怎样添加 plugin 来扩展 Vim 的能力，以及怎样定义你自己的宏。
+
+|05.1|	vimrc 文件
+|05.2|	init.vim 内容示例
+|05.3|	简单的映射
+|05.4|	添加 package
+|05.5|	添加 plugin
+|05.6|	添加帮助文件
+|05.7|	选项 window
+|05.8|	常用的选项
+
+     下一章：|usr_06.txt|  使用语法高亮
+ 上一章：|usr_04.txt|  做小改动
+ 目录：|usr_toc.txt|
+
+==============================================================================
+*05.1*	vimrc 文件				*vimrc-intro*
+
+你大概已经厌倦了反复输入那些常用的命令。要让 Vim 一启动就带上你最
+喜欢的选项设置和映射，就把它们写进所谓的 init.vim 文件。Vim 启动时
+会执行这个文件里的命令。
+
+如果你已经有 init.vim 文件（比如你的系统管理员替你建好了一个），可以
+这样编辑它： >
+
+	:edit $MYVIMRC
+
+如果你还没有 vimrc 文件，看 |init.vim| 了解可以在哪里创建它。
+
+这个文件总会被使用，推荐用它：
+
+	~/.config/nvim/init.vim         (Unix and OSX) ~
+	~/AppData/Local/nvim/init.vim   (Windows) ~
+
+vimrc 文件里可以放任何你在冒号后面输入的命令。最简单的那些用于设置
+选项。比如你想让 Vim 启动时总是打开 'ignorecase' 选项，就把这一行加到
+vimrc 文件里： >
+
+	set ignorecase
+
+要让这新的一行生效，你需要退出 Vim 再重新启动。后面你会学到不退出
+Vim 也能让它生效的办法。
+
+本章只讲最基本的内容。要了解更多写 Vim script 文件的方法：
+|usr_41.txt|。
+
+==============================================================================
+*05.2*	init.vim 内容示例                          *vimrc_example.vim*
+
+第 1 章里讲过怎样创建 vimrc 文件。 >
+
+	:exe 'edit' stdpath('config').'/init.vim'
+
+本节我们来解释可以写在这个文件里的各种命令。这会给你一些提示，教
+你怎么设置自己的偏好。不过并非所有东西都会讲到。用 ":help" 命令可以
+找到更多信息。
+>
+	set backup
+
+这告诉 Vim 在覆盖写一个文件时保留它的一份备份副本。备份文件的名字
+与原文件相同，只是末尾多了一个 "~"。见 |07.4|
+>
+	set history=50
+<
+在历史记录里保留 50 条命令和 50 个搜索模式。想记住更少或更多的
+行，就换一个数字。
+>
+	map Q gq
+
+这定义了一个按键映射。下一节会多讲一些。它把 "Q" 命令定义成用 "gq"
+操作符做格式化。否则 "Q" 命令会重复最后记录的那个 register。
+>
+	vnoremap _g y:exe "grep /" .. escape(@", '\\/') .. "/ *.c *.h"<CR>
+
+这个映射把可视选中的文本 yank 出来，然后在 C 文件里搜索它。这是个
+复杂的映射。你能看出映射可以用来做相当复杂的事情。不过它仍然只是
+一串命令，执行起来跟你亲手输入一样。
+
+							*vimrc-filetype*
+>
+	filetype plugin indent on
+
+这会打开三个很聪明的机制：
+1. 文件类型检测。
+   每次你开始编辑一个文件，Vim 都会试着判断这是什么类型的文件。编辑
+   "main.c" 时，Vim 看到 ".c" 扩展名，就把它认成 "c" 文件类型。编辑以
+   "#!/bin/sh" 开头的文件时，Vim 会把它认成 "sh" 文件类型。
+   文件类型检测用于语法高亮，也用于下面另外两项。
+   见 |filetypes|。
+
+2. 使用文件类型 plugin 文件
+   很多不同的文件类型要用不同的选项来编辑。比如编辑 "c" 文件时，把
+   'cindent' 选项设成自动缩进各行非常有用。这些常用的选项设置随 Vim
+   一起放在文件类型的 plugin 里。你也可以添加自己的，见
+   |write-filetype-plugin|。
+
+3. 使用 indent 文件
+   编辑程序时，一行的缩进往往可以自动算出来。Vim 附带了一批文件类型
+   的缩进规则。见 |:filetype-indent-on| 和 'indentexpr'。
+
+
+				*restore-cursor* *last-position-jump*  >vim
+    augroup RestoreCursor
+      autocmd!
+      autocmd BufReadPre * autocmd FileType <buffer> ++once
+        \ let s:line = line("'\"")
+        \ | if s:line >= 1 && s:line <= line("$") && &filetype !~# 'commit'
+        \      && index(['xxd', 'gitrebase'], &filetype) == -1
+        \      && !&diff
+        \ |   execute "normal! g`\""
+        \ | endif
+    augroup END
+
+又一个自动命令。这次它用在读完任何文件之后。后面那一堆复杂的东西
+检查 '" 标记有没有定义，若有就跳到那里。下列情况它不这么做：
+ - 编辑 commit 或 rebase 消息时，这类消息多半与上次的不是同一条，
+ - 用 xxd(1) 过滤并编辑二进制文件时，它会把输入文件来回变换，可以说
+   让文件有了双重身份（也见 |using-xxd|），以及
+ - Vim 处于 diff 模式时
+
+行首的反斜杠用来续上一行的命令。这样可以避免某一行变得太长。见
+|line-continuation|。这只在 Vim script 文件里有效，在命令行上输入
+命令时无效。
+
+>
+	command DiffOrig vert new | set bt=nofile | r ++edit # | 0d_
+		  \ | diffthis | wincmd p | diffthis
+
+这添加了 ":DiffOrig" 命令。在改动过内容的 buffer 里用它，可以看到它与
+载入时那个文件的差异。见 |diff| 和 |:DiffOrig|。
+
+>
+	set nolangremap
+
+防止 langmap 选项作用于映射产生出来的字符。如果设置了（默认如此），
+这可能破坏 plugin（但它向后兼容）。见 'langremap'。
+
+==============================================================================
+*05.3*	简单的映射
+
+映射让你把一组 Vim 命令绑定到单个按键上。举个例子，假设你需要给某些
+单词套上大括号，也就是说把 "amount" 这样的单词改成 "{amount}"。用
+:map 命令，你可以告诉 Vim 让 F5 键干这件事。命令如下： >
+
+	:map <F5> i{<Esc>ea}<Esc>
+<
+	注意：
+	输入这条命令时，<F5> 要靠敲四个字符输入。同理，<Esc> 不是靠按
+	<Esc> 键输入，而是敲五个字符。读手册时要留意这个差别！
+
+我们来拆开看看：
+    <F5>	F5 功能键。这是触发键，一按下它，那串命令就执行。
+
+    i{<Esc>	插入 { 字符。<Esc> 键结束插入模式。
+
+    e		移到单词末尾。
+
+    a}<Esc>	把 } 追加到单词后面。
+
+执行完 ":map" 命令之后，要给一个单词套上 {}，只需把光标移到它的
+第一个字符上，然后按 F5。
+
+这个例子里触发键是单个按键；它也可以是任意一串字符。但你要是用一个
+已有的 Vim 命令，那个命令就再也用不上了。最好避开这种做法。
+   可以用于映射的一个按键是反斜杠。你大概想定义不止一个映射，那就再加
+上一个字符。比如你可以把 "\p" 映射为给单词套上圆括号，把 "\c" 映射为
+套上大括号： >
+
+	:map \p i(<Esc>ea)<Esc>
+	:map \c i{<Esc>ea}<Esc>
+
+你得把 \ 和 p 挨得很快地连着输入，这样 Vim 才知道它们属于一起。
+
+":map" 命令（不带参数）列出你当前的映射。至少是 Normal 模式的那些。
+映射的更多内容见 |40.1| 节。
+
+==============================================================================
+*05.4*	添加 package					*add-package*
+
+你可以用 |:packadd| 按需启用 package。这对手头偶尔才想启用的 plugin
+很有用。要启用 `example_package`，用下面这条命令： >
+       packadd example_package
+
+就这么简单！现在你可以查看这个 plugin 的帮助了： >
+       :help example_package
+
+这之所以有效，是因为 `:packadd` 载入 plugin 时也把 package 目录加进了
+'runtimepath'，于是帮助文件能被找到。
+
+package 是一组你可以加给 Vim 的文件。package 有两类：可选的，和启动
+时自动载入的。
+
+你可以在互联网上的各种地方找到 package。它通常以压缩包或仓库的
+形式发布。对于压缩包，可以照这些步骤做：
+	1. 创建 package 目录： >
+		mkdir -p ~/.local/share/nvim/site/pack/fancy
+<	   "fancy" 可以是任何你喜欢的名字。用一个能描述这个 package 的名字。
+	2. 把压缩包解到那个目录里。这里假定压缩包里的顶层目录是 "start"： >
+		cd ~/.local/share/nvim/site/pack/fancy
+		unzip /tmp/fancy.zip
+<	  如果压缩包的布局不一样，要确保最后得到这样的路径：
+		~/.local/share/nvim/site/pack/fancy/start/fancytext/plugin/fancy.vim ~
+	  这里 "fancytext" 是 package 的名字，它也可以是别的任何名字。
+
+
+------------------------------------------------------------------------------
+添加 nohlsearch package	*nohlsearch-install* *package-nohlsearch*
+------------------------------------------------------------------------------
+
+用这条命令载入这个 plugin： >
+	packadd nohlsearch
+<
+在 'updatetime' 之后或进入 |Insert| 模式之后自动执行 |:nohlsearch|。
+因此假定用默认的 updatetime，空闲 4 秒之后 hlsearch 就会被挂起／关闭。
+
+要在 plugin 载入之后关掉它的效果： >
+	au! nohlsearch
+<
+
+
+关于 package 的更多信息可以在这里找到：|packages|。
+
+==============================================================================
+*05.5*	添加 plugin					*add-plugin* *plugin*
+
+Vim 的功能可以通过添加 plugin 来扩展。plugin 不过是一个 Vim script
+文件，Vim 启动时它会自动载入。添加 plugin 非常简单，把它丢进你的
+plugin 目录即可。
+
+plugin 有两类：
+
+    全局 plugin：用于所有类型的文件
+  文件类型 plugin：只用于某一类特定的文件
+
+先讲全局 plugin，再讲文件类型 plugin |add-filetype-plugin|。
+
+
+全局 plugin
+
+启动 Vim 时，它会自动载入若干个全局 plugin。你什么都不用做。它们
+添加的是大多数人都会想用的功能，只不过这些功能是用 Vim script 实现
+的，而不是编译进 Vim 里。你可以在帮助索引 |standard-plugin-list| 里
+看到它们的列表。也见 |load-plugins|。
+
+							*add-global-plugin*
+你可以添加一个全局 plugin，添加一些你在使用 Vim 时总会用到的功能。
+添加全局 plugin 只有两步：
+1. 弄到这个 plugin 的一份拷贝。
+2. 把它丢进正确的目录。
+
+
+获取全局 plugin
+
+在哪里能找到 plugin？
+- 有些总是被载入，你可以在目录 $VIMRUNTIME/plugin 里看到它们。
+- 有些随 Vim 一起发布。你能在目录 $VIMRUNTIME/scripts 及其子目录里
+  找到它们，也在 $VIM/vimfiles/pack/dist/opt/ 下面。
+- 从网上下载。https://www.vim.org 上有大量收集。
+- 有时它们会被贴在 Vim 的邮件列表里。
+- 你也可以自己写一个，见 |write-plugin|。
+
+
+使用全局 plugin
+
+先读一读 plugin 本身的文字，看看有没有什么特殊条件。然后把文件复制
+到你的 plugin 目录：
+
+	system		plugin directory ~
+	Unix		~/.local/share/nvim/site/plugin
+
+Unix 上的例子（假定你还没有 plugin 目录）： >
+
+	mkdir -p ~/.local/share/nvim/site/plugin
+	cp /tmp/yourplugin.vim ~/.local/share/nvim/site/plugin
+
+就这么简单！现在你可以用这个 plugin 里定义的命令了。
+
+与其把 plugin 直接放进 plugin/ 目录，不如把它们组织到 plugin/ 下的
+子目录里。举个例子，可以把所有 Perl plugin 放在
+"~/.local/share/nvim/site/plugin/perl/*.vim"。
+
+
+文件类型 plugin			*add-filetype-plugin* *ftplugins*
+
+Vim 发行版附带了一批用于不同文件类型的 plugin，用这条命令就能开始用
+它们： >
+
+	:filetype plugin on
+
+就这么简单！见 |vimrc-filetype|。
+
+如果你正在用的某个文件类型缺 plugin，或者你找到了更好的，可以自己
+加。添加文件类型 plugin 有两步：
+1. 弄到这个 plugin 的一份拷贝。
+2. 把它丢进正确的目录。
+
+
+获取文件类型 plugin
+
+你能在跟全局 plugin 相同的地方找到它们。注意看有没有提到文件类型，
+提到了就能知道这个 plugin 是全局的还是文件类型的。$VIMRUNTIME/scripts
+里的脚本是全局的，文件类型 plugin 在 $VIMRUNTIME/ftplugin 里。
+
+
+使用文件类型 plugin					*ftplugin-name*
+
+你可以把文件类型 plugin 丢进正确的目录来添加它。这个目录的名字和上面
+说的全局 plugin 目录相同，只是最后一段是 "ftplugin"。假设你找到了一
+个用于 "stuff" 文件类型的 plugin，而且你在 Unix 上。那么你可以把这个
+文件移到 ftplugin 目录里： >
+
+	mkdir -p ~/.local/share/nvim/site/ftplugin
+	mv thefile ~/.local/share/nvim/site/ftplugin/stuff.vim
+
+如果那个文件已经存在，说明你已经有 "stuff" 的 plugin 了。你也许想
+检查一下已有的 plugin 跟你要加的这个是否冲突。如果没问题，你可以给
+新的那个换个名字： >
+
+	mv thefile ~/.local/share/nvim/site/ftplugin/stuff_too.vim
+
+下划线用来把文件类型名字和后面的部分分开，后面那部分可以是任何东西。
+你要是用 "otherstuff.vim"，那就不管用，它会为 "otherstuff" 文件类型
+载入。
+
+文件类型 plugin 的通用名字是： >
+
+	ftplugin/<filetype>.vim
+	ftplugin/<filetype>_<name>.vim
+	ftplugin/<filetype>/<name>.vim
+
+这里 "<name>" 可以是任何你喜欢的名字。
+Unix 上 "stuff" 文件类型的例子： >
+
+	~/.local/share/nvim/site/ftplugin/stuff.vim
+	~/.local/share/nvim/site/ftplugin/stuff_def.vim
+	~/.local/share/nvim/site/ftplugin/stuff/header.vim
+
+<filetype> 这部分是 plugin 要作用的文件类型的名字。只有这个文件类型的
+文件才会用这个 plugin 里的设置。<name> 这部分无所谓，你可以用它给同
+一个文件类型放好几个 plugin。注意它必须以 ".vim" 或 ".lua" 结尾。
+
+
+进一步阅读：
+|filetype-plugins|	文件类型 plugin 的文档，以及关于怎样避免映射
+			引起问题的信息。
+|load-plugins|		全局 plugin 在启动过程中什么时候被载入。
+|ftplugin-overrule|	覆盖全局 plugin 里的设置。
+|write-plugin|		怎样写一个 plugin script。
+|plugin-details|	关于使用 plugin 的更多信息，或者你的 plugin 不
+			工作的时候。
+|new-filetype|		怎样检测新的文件类型。
+
+==============================================================================
+*05.6*	添加帮助文件		                   *add-local-help*
+
+运气好的话，你安装的 plugin 也带着一个帮助文件。我们来讲讲怎样安装
+这个帮助文件，好让你能轻松地找到新 plugin 的帮助。
+
+假设有一个 plugin（"my-plugin"），它带着的帮助文件放在非标准位置（它
+通常放在一个叫 `doc/` 的子目录里）。
+
+首先，在 'runtimepath' 的某个目录里创建一个 "doc" 目录： >
+
+	:!mkdir -p ~/.local/share/nvim/site/doc
+
+现在把帮助文件复制到 "doc" 目录里： >
+
+	:!cp my-plugin/my-plugin-doc.txt ~/.local/share/nvim/site/doc
+
+接下来是窍门，它能让你跳到新帮助文件里的各个主题。用 |:helptags|
+命令生成本地的 tags 文件： >
+
+	:helptags ~/.local/share/nvim/site/doc
+
+你这样做就能看到本地帮助文件的条目： >
+
+	:help local-additions
+
+本地帮助文件里的标题行会被自动加进这一节。在那里你能看到添加了哪些
+本地帮助文件，并通过 tag 跳到它们。
+
+写本地帮助文件的方法见 |write-local-help|。
+
+==============================================================================
+*05.7*	选项 window
+
+如果你在找一个能做你想做的事的选项，可以在帮助文件里搜：|options|。
+另一个办法是用这条命令： >
+
+	:options
+
+这会打开一个新的 window，里面是一份选项列表，每个选项带一行说明。选项
+按主题分组。把光标移到某个主题上，按 <Enter> 就跳到那里。再按 <Enter>
+跳回来。或者用 CTRL-O。
+
+你可以改动选项的值。比如移到 "displaying text" 这个主题，然后把光标
+向下移到这一行：
+
+	set wrap	nowrap ~
+
+按下 <Enter> 时，这一行会变成：
+
+	set nowrap	wrap ~
+
+这个选项现在就被关掉了。
+
+就在这一行上方是对 'wrap' 选项的简短说明。把光标上移一行，把它放到
+这一行上。现在按 <Enter>，你就跳到了 'wrap' 选项的完整帮助。
+
+对于接受数字或字符串参数的选项，你可以直接编辑那个值。然后按 <Enter>
+应用新值。比如把光标往上移几行到这一行：
+
+	set so=0 ~
+
+用 "$" 把光标定位到那个零上。用 "r5" 把它改成五。然后按 <Enter> 应用
+新值。这时你再把光标挪来挪去，会注意到还没移到 window 边界，文本就开始
+滚动了。这就是 'scrolloff' 选项的作用：它指定一个相对 window 边框的
+偏移量，滚动从那里开始。
+
+==============================================================================
+*05.8*	常用的选项
+
+选项多得不得了。它们大多数你几乎永远用不到。这里提几个比较有用的。
+别忘了你可以在选项名前后各加一个单引号，用 ":help" 命令找到这些选项的
+更多帮助。比如： >
+
+	:help 'wrap'
+
+万一你把某个选项的值弄乱了，可以在选项名后面加一个 & 把它设回默认值。
+例如： >
+
+	:set iskeyword&
+
+
+不折行显示
+
+Vim 通常会把长行折行显示，好让你看到全部文本。有时让文本一直往
+window 右边延伸会更好。那你就得左右滚动文本，才能看到一整个长行。用
+这条命令关掉折行： >
+
+	:set nowrap
+
+当你移向没有显示出来的文本时，Vim 会自动滚动。想看十个字符的上下文，
+这样做： >
+
+	:set sidescroll=10
+
+这不改动文件里的文本，只改变显示方式。
+
+
+折行时的移动命令
+
+大多数四处移动的命令在行首和行尾就停下不动了。你可以用 'whichwrap'
+选项改变这一点。这样把它设成默认值： >
+
+	:set whichwrap=b,s
+
+这允许 <BS> 键在行首第一个位置时把光标移到上一行的行尾。而 <Space>
+键会从一行的行尾移到下一行的行首。
+
+要让 <Left> 和 <Right> 方向键也能绕过去，用这条命令： >
+
+	:set whichwrap=b,s,<,>
+
+这仍然只对 Normal 模式有效。要让 <Left> 和 <Right> 在插入模式下也能
+这样做： >
+
+	:set whichwrap=b,s,<,>,[,]
+
+还有几个别的标志可以加，见 'whichwrap'。
+
+
+查看 Tab
+
+文件里有 Tab 时，你看不出它们在哪里。要让它们可见： >
+
+	:set list
+
+现在每个 Tab 都显示成 ^I。而每行行尾会显示一个 $，这样那些原本会被
+忽略的行尾空白你也能一眼看出来。
+   缺点是一个文件里 Tab 很多时，这样看着很难看。如果你用彩色终端，或者
+用的是 GUI，Vim 可以把空格和 Tab 显示成高亮字符。用 'listchars' 选项： >
+
+	:set listchars=tab:>-,trail:-
+
+现在每个 Tab 都会显示成 ">---"（"-" 的个数有多有少），行尾空白显示成
+"-"。好看多了，是吧？
+
+
+关键字
+
+'iskeyword' 选项指定哪些字符可以出现在一个单词里： >
+
+	:set iskeyword
+<	  iskeyword=@,48-57,_,192-255 ~
+
+"@" 代表所有字母字符。"48-57" 代表 ASCII 字符 48 到 57，也就是数字
+0 到 9。"192-255" 是可打印的拉丁字符。
+   有时你会想把连字符也包含进关键字里，好让 "w" 这样的命令把
+"upper-case" 当成一个单词。可以这样做： >
+
+	:set iskeyword+=-
+	:set iskeyword
+<	  iskeyword=@,48-57,_,192-255,- ~
+
+看看新的值，你会发现 Vim 替你加了一个逗号。
+   要移除某个字符用 "-="。比如移除下划线： >
+
+	:set iskeyword-=_
+	:set iskeyword
+<	  iskeyword=@,48-57,192-255,- ~
+
+这一次逗号被自动删掉了。
+
+
+留给消息的空间
+
+Vim 启动时，底部有一行是用来显示消息的。消息很长时，它要么被截断，
+这样你只能看到其中一部分；要么文本滚动，你得按 <Enter> 才能继续。
+   你可以把 'cmdheight' 选项设成用于显示消息的行数。例如： >
+
+	:set cmdheight=3
+
+这确实意味着能用来编辑文本的地方变小了，所以这是个折中。
+
+==============================================================================
+
+下一章：|usr_06.txt|  使用语法高亮
+
+版权：见 |manual-copyright|
+
+vim:tw=78:ts=8:noet:ft=help:norl:

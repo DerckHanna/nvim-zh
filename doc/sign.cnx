@@ -1,0 +1,347 @@
+*sign.txt*      Nvim
+
+
+		  VIM REFERENCE MANUAL	  by Gordon Prieur
+					  and Bram Moolenaar
+
+
+Sign 支持功能					*sign-support*
+
+                                      输入 |gO| 查看目录。
+
+==============================================================================
+1. 简介					*sign-intro* *signs* *gutter*
+
+当调试器或其他 IDE 工具驱动编辑器时，它需要能够给出特定的高亮，以快速告诉用户有关该
+文件的有用信息。一个例子是调试器在左侧列中用一个图标表示断点。另一个例子可以是表示
+程序计数器（PC）的箭头。sign 功能既允许在 window 左侧放置一个 sign（图标），也允许
+定义会应用于该行的高亮。把 sign 显示为图像很可能只在 gvim 中可行（尽管 Sun
+Microsystem 的 dtterm 也支持这一点，它是我所知唯一支持这一点的终端模拟器）。文本
+sign 和高亮在任何彩色终端模拟器中都应该可行。
+
+sign 和高亮并非只对调试器有用。有些插件用 sign 来标记构建错误或显示版本控制状态。
+
+使用 sign 有两个步骤：
+
+1. 定义 sign。这指定图像、文本和高亮。例如，你可以定义一个 "break" sign，其图像是
+   停止路标，文本是 "!!"。
+
+2. 放置 sign。这指定显示该 sign 的文件和行号。一个已定义的 sign 可以在不同的行和文件
+   中被多次放置。
+
+							*sign-column*
+当为某个文件定义了 sign 时，Vim 会自动添加一个两字符宽的列来显示它们。当最后一个
+sign 被取消放置时，该列会再次消失。这一行为可以用 'signcolumn' 选项改变。
+
+该列的颜色由 SignColumn 高亮组设置 |hl-SignColumn|。设置颜色的示例： >
+
+	:highlight SignColumn guibg=darkgrey
+<
+如果启用了 'cursorline'，则使用 CursorLineSign 高亮组 |hl-CursorLineSign|。
+							*sign-identifier*
+每个已放置的 sign 由一个称为 sign 标识符的数字标识。该标识符用于跳转到该 sign 或
+移除该 sign。标识符在使用 |:sign-place| 命令或 |sign_place()| 函数放置 sign 时被
+分配。每个 sign 标识符都应该是唯一的数字（每个 buffer 内）。两次放置同一个标识符会
+移动先前放置的 sign。可以以 0 作为 sign 标识符调用 |sign_place()| 函数，以分配下一个
+可用的标识符。
+
+							*sign-group*
+每个已放置的 sign 都可以归属于全局组或某个具名组。放置 sign 时，如果未提供组名，或
+使用了空字符串，则该 sign 被放入全局组。否则该 sign 被放入具名组。sign 标识符在一个
+组内唯一。sign 组让 Vim 插件可以使用唯一的 sign，而不会与其他使用 sign 的插件相互
+干扰。
+
+							*sign-priority*
+每个已放置的 sign 都被分配一个优先级值，与 sign 组无关。sign 的默认优先级是 10，可以
+在定义时指定不同的值来为不同的 sign 改变该值。当多个各自带有图标或文本的 sign 被放置
+在同一行时，sign 按优先级递减的顺序从左到右排列，直到达到 'signcolumn' 中设置的最大
+宽度。放不下的低优先级 sign 会被隐藏。带高亮属性的最高优先级 sign 总是会显示。
+
+当放置 sign 的那一行被删除时，该 sign 也随之被移除。
+
+==============================================================================
+2. 命令					*sign-commands* *:sig* *:sign*
+
+下面是一个示例，它在当前文件的第 23 行放置一个 sign "piet"，显示文本 ">>"： >
+	:sign define piet text=>> texthl=Search
+	:exe ":sign place 2 line=23 name=piet file=" .. expand("%:p")
+
+下面是再次删除它的命令： >
+	:sign unplace 2
+
+注意 ":sign" 命令之后不能跟随另一条命令或注释。如果你确实需要这样做，请使用
+|:execute| 命令。
+
+
+DEFINING A SIGN.			*:sign-define* *E255* *E160* *E612*
+
+关于等效的 Vim script 函数见 |sign_define()|。
+
+:sig[n] define {name} {argument}...
+		定义一个新的 sign，或设置现有 sign 的属性。
+		{name} 既可以是一个数字（全部为数字），也可以是以非数字
+		开头的名称。前导零会被忽略，因此 "0012"、"012" 和 "12"
+		被视为同一个名称。
+		大约可以定义 120 个不同的 sign。
+
+		接受的参数：
+
+	icon={bitmap}
+		定义可找到该位图的文件名。应该是完整路径。该位图应该
+		正好占据两个字符的位置。这一点不会被检查。如果位图太大，
+		会导致重绘问题。
+			toolkit		支持 ~
+			Win32		.bmp, .ico, .cur
+
+	priority={prio}
+		sign 的默认优先级，见 |sign-priority|。
+
+	linehl={group}
+		用于放置该 sign 的整行的高亮组。最有用的做法是定义背景
+		色。
+
+	numhl={group}
+		用于放置该 sign 的行上那个行号的高亮组。与 |hl-LineNr|、
+		|hl-LineNrAbove|、|hl-LineNrBelow| 和 |hl-CursorLineNr|
+		结合使用。
+
+	text={text}						*E239*
+		定义在没有图标或未使用 GUI 时显示的文本。只允许可打印
+		字符，且它们必须占据一个或两个显示单元。
+
+	texthl={group}
+		用于该文本项的高亮组。
+
+	culhl={group}
+		当光标位于与该 sign 相同的行且启用了 'cursorline' 时，
+		用于该文本项的高亮组。
+
+	示例： >
+		:sign define MySign text=>> texthl=Search linehl=DiffText
+<
+
+DELETING A SIGN						*:sign-undefine* *E155*
+
+关于等效的 Vim script 函数见 |sign_undefine()|。
+
+:sig[n] undefine {name}
+		删除先前定义的一个 sign。如果仍有使用该 {name} 的 sign
+		被放置，这会引起麻烦。
+
+		示例： >
+			:sign undefine MySign
+<
+
+LISTING SIGNS						*:sign-list* *E156*
+
+关于等效的 Vim script 函数见 |sign_getdefined()|。
+
+:sig[n] list	列出所有已定义的 sign 及其属性。
+
+:sig[n] list {name}
+		列出一个已定义的 sign 及其属性。
+
+
+PLACING SIGNS						*:sign-place* *E158*
+
+关于等效的 Vim script 函数见 |sign_place()|。
+
+:sig[n] place {id} line={lnum} name={name} file={fname}
+		把定义为 {name} 的 sign 放置在文件 {fname} 的第 {lnum} 行。
+							*:sign-fname*
+		文件 {fname} 必须已经加载在某个 buffer 中。必须使用确切的
+		文件名，通配符、$ENV 和 ~ 不会被展开，空白字符不能转义。
+		结尾的空白字符会被忽略。
+
+		该 sign 被记在 {id} 之下，可用于后续操作。{id} 必须是一个
+		数字。多次放置同一个 {id} 会移动该 sign。
+
+		可以在 "file=" 之前指定以下可选的 sign 属性：
+			group={group}	把 sign 放入 sign 组 {group}
+			priority={prio}	为 sign 分配优先级 {prio}
+
+		默认情况下，sign 被放入全局 sign 组。
+
+		默认情况下，除非 sign 定义中另有指定，sign 被分配默认
+		优先级 10。要分配不同的优先级值，请用 "priority={prio}"
+		指定一个值。当同一行上放置了多个 sign 时，优先级用于决定
+		显示哪个 sign。
+
+		示例： >
+			:sign place 5 line=3 name=sign1 file=a.py
+			:sign place 6 group=g2 line=2 name=sign2 file=x.py
+			:sign place 9 group=g2 priority=50 line=5
+							\ name=sign1 file=a.py
+<
+:sig[n] place {id} line={lnum} name={name} [buffer={nr}]
+		同上，但使用 buffer {nr}。如果未给出 buffer 参数，则在当前
+		buffer 中放置该 sign。
+
+		示例： >
+			:sign place 10 line=99 name=sign3
+			:sign place 10 line=99 name=sign3 buffer=3
+<
+							*E885*
+:sig[n] place {id} name={name} file={fname}
+		把文件 {fname} 中已放置的 sign {id} 改为使用已定义的
+		sign {name}。关于 {fname} 的说明见上文 |:sign-fname|。
+		这可以在不移动 sign 的情况下改变所显示的 sign（例如，当
+		调试器停在断点处时）。
+
+		可选的 "group={group}" 属性可以用在 "file=" 之前，以选择
+		某个特定组中的 sign。可选的 "priority={prio}" 属性可以用来
+		改变现有 sign 的优先级。
+
+		示例： >
+			:sign place 23 name=sign1 file=/path/to/edit.py
+<
+:sig[n] place {id} name={name} [buffer={nr}]
+		同上，但使用 buffer {nr}。如果未给出 buffer 参数，则使用
+		当前 buffer。
+
+		示例： >
+			:sign place 23 name=sign1
+			:sign place 23 name=sign1 buffer=7
+<
+
+REMOVING SIGNS						*:sign-unplace* *E159*
+
+关于等效的 Vim script 函数见 |sign_unplace()|。
+
+:sig[n] unplace {id} file={fname}
+		从文件 {fname} 中移除先前放置的 sign {id}。
+		关于 {fname} 的说明见上文 |:sign-fname|。
+
+:sig[n] unplace {id} group={group} file={fname}
+		同上，但移除 sign 组 {group} 中的 sign {id}。
+
+:sig[n] unplace {id} group=* file={fname}
+		同上，但从所有 sign 组中移除 sign {id}。
+
+:sig[n] unplace * file={fname}
+		移除文件 {fname} 中所有已放置的 sign。
+
+:sig[n] unplace * group={group} file={fname}
+		从文件 {fname} 中移除组 {group} 中所有已放置的 sign。
+
+:sig[n] unplace * group=* file={fname}
+		从文件 {fname} 中移除所有组中所有已放置的 sign。
+
+:sig[n] unplace {id} buffer={nr}
+		从 buffer {nr} 中移除先前放置的 sign {id}。
+
+:sig[n] unplace {id} group={group} buffer={nr}
+		从 buffer {nr} 中移除组 {group} 中先前放置的 sign {id}。
+
+:sig[n] unplace {id} group=* buffer={nr}
+		从 buffer {nr} 中移除所有组中先前放置的 sign {id}。
+
+:sig[n] unplace * buffer={nr}
+		移除 buffer {nr} 中所有已放置的 sign。
+
+:sig[n] unplace * group={group} buffer={nr}
+		从 buffer {nr} 中移除组 {group} 中所有已放置的 sign。
+
+:sig[n] unplace * group=* buffer={nr}
+		从 buffer {nr} 中移除所有组中所有已放置的 sign。
+
+:sig[n] unplace {id}
+		从该 sign 出现的所有文件中移除先前放置的 sign {id}。
+
+:sig[n] unplace {id} group={group}
+		从该 sign 出现的所有文件中移除组 {group} 中先前放置的
+		sign {id}。
+
+:sig[n] unplace {id} group=*
+		从该 sign 出现的所有文件中移除所有组中先前放置的 sign
+		{id}。
+
+:sig[n] unplace *
+		从所有文件中移除全局组中所有已放置的 sign。
+
+:sig[n] unplace * group={group}
+		从所有文件中移除组 {group} 中所有已放置的 sign。
+
+:sig[n] unplace * group=*
+		从所有文件中移除所有组中所有已放置的 sign。
+
+:sig[n] unplace
+		移除光标位置处的一个已放置的 sign。如果该行中放置了多个
+		sign，则只移除其中一个。
+
+:sig[n] unplace group={group}
+		移除光标位置处组 {group} 中的一个已放置的 sign。
+
+:sig[n] unplace group=*
+		移除光标位置处任意组中的一个已放置的 sign。
+
+
+LISTING PLACED SIGNS					*:sign-place-list*
+
+关于等效的 Vim script 函数见 |sign_getplaced()|。
+
+:sig[n] place file={fname}
+		列出文件 {fname} 中已放置的 sign。
+		关于 {fname} 的说明见上文 |:sign-fname|。
+
+:sig[n] place group={group} file={fname}
+		列出文件 {fname} 中组 {group} 里的 sign。
+
+:sig[n] place group=* file={fname}
+		列出文件 {fname} 中所有组里的 sign。
+
+:sig[n] place buffer={nr}
+		列出 buffer {nr} 中已放置的 sign。
+
+:sig[n] place group={group} buffer={nr}
+		列出 buffer {nr} 中组 {group} 里的 sign。
+
+:sig[n] place group=* buffer={nr}
+		列出 buffer {nr} 中所有组里的 sign。
+
+:sig[n] place	列出所有文件中全局组里已放置的 sign。
+
+:sig[n] place group={group}
+		列出所有文件中 sign 组 {group} 的已放置 sign。
+
+:sig[n] place group=*
+		列出所有文件中所有 sign 组里已放置的 sign。
+
+
+JUMPING TO A SIGN					*:sign-jump* *E157*
+
+关于等效的 Vim script 函数见 |sign_jump()|。
+
+:sig[n] jump {id} file={fname}
+		打开文件 {fname}，或跳转到包含 {fname} 的 window，并把
+		光标定位在 sign {id} 处。
+		关于 {fname} 的说明见上文 |:sign-fname|。
+		如果该文件未显示在 window 中，且当前文件无法被 |abandon|，
+		则失败。
+
+:sig[n] jump {id} group={group} file={fname}
+		同上，但跳转到组 {group} 中的 sign
+
+:sig[n] jump {id} [buffer={nr}]				*E934*
+		同上，但使用 buffer {nr}。如果 buffer {nr} 没有名称，则
+		失败。如果未给出 buffer 参数，则使用当前 buffer。
+
+:sig[n] jump {id} group={group} [buffer={nr}]
+		同上，但跳转到组 {group} 中的 sign
+
+
+==============================================================================
+3. 函数					*sign-functions-details*
+
+见：
+  - |sign_define()|
+  - |sign_getdefined()|
+  - |sign_getplaced()|
+  - |sign_jump()|
+  - |sign_place()|
+  - |sign_placelist()|
+  - |sign_undefine()|
+  - |sign_unplace()|
+  - |sign_unplacelist()|
+
+ vim:tw=78:ts=8:noet:ft=help:norl:

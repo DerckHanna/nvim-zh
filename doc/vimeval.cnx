@@ -1,0 +1,3656 @@
+*vimeval.txt*	Nvim
+
+
+		  VIM REFERENCE MANUAL	  by Bram Moolenaar
+
+
+表达式求值	*vimscript* *expression* *expr* *E15* *eval* *eval.txt*
+
+表达式的用法在用户手册第 41 章介绍 |usr_41.txt|。
+
+				      输入 |gO| 查看目录。
+
+==============================================================================
+1. 变量						*variables*
+
+1.1 变量类型 ~
+						*E712* *E896* *E897* *E899* *E908* *E909*
+					*E928* *E964* *E966* *E1023* *E1098* *E1174* *E1175*
+					*E1203* *E1206* *E1210* *E1211* *E1212* *E1219* *E1220*
+					*E1222* *E1225* *E1226* *E1238* *E1250* *E1252* *E1256*
+					*E1265* *E1297* *E5010* *E5050* *E5060* *E5070* *E5071*
+					*E5299* *E5300* *E5401* *E5420* *E6000*
+变量共有七种类型：
+
+							*Number* *Integer*
+Number		32 位或 64 位有符号数 |expr-number|
+		可用位数见 |v:numbersize|。
+		示例：-123  0x10  0177  0o177  0b1011
+
+Float		浮点数 |floating-point-format| *Float*
+		示例：123.456  1.15e-6  -1.1e3
+
+String		以 NUL 结尾的 8 位无符号字符（字节）串。
+		|expr-string| 示例："ab\txx\"--"  'x-z''a,c'
+
+Funcref		对函数的引用 |Funcref|。
+		示例：function("strlen")
+		它可以绑定 dictionary 与参数，此时行为如同
+		一个 Partial。
+		示例：function("Callback", [arg], myDict)
+
+List		有序的项目序列，详见 |List|。
+		示例：[1, 2, ['a', 'b']]
+
+Dictionary	关联、无序的数组：每个条目有一个键和一个
+		值 |Dictionary|
+		示例： >
+			{"blue": "#0000ff", "red": "#ff0000"}
+			#{blue: "#0000ff", red: "#ff0000"}
+
+Blob		二进制大对象（Binary Large Object）。可存任意字节序列。见 |Blob|
+		详情。
+		示例：0zFF00ED015DAF
+		0z 是空 Blob。
+
+Number 与 String 类型会依据使用方式自动转换，具体取决于
+它们的用法。
+
+从 Number 到 String 的转换是取该 Number 的 ASCII 表示。
+示例：
+	Number 123	-->	String "123" ~
+	Number 0	-->	String "0" ~
+	Number -1	-->	String "-1" ~
+							*octal*
+从 String 到 Number 的转换是把开头的数字转成一个
+数值。可识别十六进制 "0xf9"、八进制 "017" 或 "0o17"，以及二进制 "0b10"
+数。若 String 不以数字开头，结果为
+零。示例：
+	String "456"	-->	Number 456 ~
+	String "6bar"	-->	Number 6 ~
+	String "foo"	-->	Number 0 ~
+	String "0xf1"	-->	Number 241 ~
+	String "0100"	-->	Number 64 ~
+	String "0o100"	-->	Number 64 ~
+	String "0b101"	-->	Number 5 ~
+	String "-8"	-->	Number -8 ~
+	String "+8"	-->	Number 0 ~
+
+要强制从 String 到 Number 的转换，给它加零即可： >
+	:echo "0100" + 0
+<	64 ~
+
+为避免前导零引发八进制转换，或想使用不同的
+进制，请用 |str2nr()|。
+
+						*TRUE* *FALSE* *Boolean*
+布尔运算符使用 Number。零为 FALSE，非零为 TRUE。
+也可以使用 |v:false| 与 |v:true|。
+函数返回 TRUE 时即 Number 一，返回 FALSE 时即
+Number 零。
+
+注意下面这条命令： >
+	:if "foo"
+	:" NOT executed
+"foo" 被转换为 0，即 FALSE。若字符串以
+非零数字开头，则表示 TRUE： >
+	:if "8foo"
+	:" executed
+要测试字符串非空，用 empty()： >
+	:if !empty("foo")
+
+<						*falsy* *truthy*
+表达式可用作条件，忽略类型，只看
+值是「算真」还是「算假」。falsy 为：
+	数字零
+	空 string、blob、list 或 dictionary
+其它值都是 truthy。示例：
+	0	falsy
+	1	truthy
+	-1	truthy
+	0.0	falsy
+	0.1	truthy
+	''	falsy
+	'x'	truthy
+	[]	falsy
+	[0]	truthy
+	{}	falsy
+	#{x: 1} truthy
+	0z	falsy
+	0z00	truthy
+
+							*non-zero-arg*
+函数参数的行为常与 |TRUE| 略有不同：若
+参数存在且求值为非零 Number、|v:true| 或
+非空 String，则该值被视为 TRUE。
+注意 " " 与 "0" 也是非空字符串，因此也算 TRUE。
+List、Dictionary 或 Float 既不是 Number 也不是 String，因此求值为 FALSE。
+
+				*E745* *E728* *E703* *E729* *E730* *E731*
+				*E974* *E975* *E976*
+|List|、|Dictionary|、|Funcref| 与 |Blob| 类型不会自动
+转换。
+
+							*E805* *E806* *E808*
+Number 与 Float 混用时 Number 会转为 Float。除此
+之外 Float 没有自动转换。可用 str2float() 把 String
+转成 Float，printf() 把 Float 转成 String，float2nr() 把 Float 转成 Number。
+
+					*E362* *E891* *E892* *E893* *E894* *E907*
+在期待 Float 的地方也可以用 Number，但别的都不行。
+
+					*no-type-checking*
+试图改变变量类型不会报错。
+
+
+1.2 函数引用 ~
+					*Funcref* *E695* *E718* *E1192*
+Funcref 变量可用 |function()| 函数、|funcref()|
+函数获得，或用 lambda 表达式 |expr-lambda| 创建。它可
+以在表达式中出现在函数名的位置，即参数
+两侧括号之前，用来调用它所引用的函数。示例： >
+
+	:let Fn = function("MyFunc")
+	:echo Fn()
+<							*E704* *E705* *E707*
+Funcref 变量名须以大写字母、"s:"、"w:"、"t:" 或 "b:" 开头。你
+可以用 "g:"，但其后的名字仍须以大写字母开头。你
+不能同时拥有同名的 Funcref 变量与函数。
+
+特殊情况是定义函数并直接把它返回的 Funcref 赋给
+Dictionary 条目。示例： >
+	:function dict.init() dict
+	:   let self.val = 0
+	:endfunction
+
+Dictionary 的键可以小写字母开头。此处并不使用实际
+的函数名。另见 |numbered-function|。
+
+Funcref 也可以配合 |:call| 命令使用： >
+	:call Fn()
+	:call dict.init()
+
+被引用函数的名称可用 |string()| 获得。 >
+	:let func = string(Fn)
+
+可以用 |call()| 调用 Funcref，并用一个 list 变量作
+参数： >
+	:let r = call(Fn, mylist)
+<
+							*Partial*
+Funcref 可以选择绑定一个 Dictionary 和/或参数。这也叫
+Partial。创建方式是给 function() 或 funcref() 传
+Dictionary 和/或参数。调用该函数时 Dictionary 和/或
+参数会被传给该函数。示例： >
+
+	let Cb = function('Callback', ['foo'], myDict)
+	call Cb('bar')
+
+这等价于这样调用： >
+	call myDict.Callback('foo', 'bar')
+
+注意，把函数绑定到 Dictionary 在函数是
+Dictionary 成员时也会发生： >
+
+	let myDict.myFunction = MyFunction
+	call myDict.myFunction()
+
+此处 MyFunction() 会收到 myDict 作为 "self"。这发生在
+"myFunction" 成员被访问时。把 "myFunction" 赋给 otherDict
+并调用它时，它会绑定到 otherDict： >
+
+	let otherDict.myFunction = myDict.myFunction
+	call otherDict.myFunction()
+
+现在 "self" 会是 "otherDict"。但若该 dictionary 被显式
+绑定，就不会这样： >
+
+	let myDict.myFunction = function(MyFunction, myDict)
+	let otherDict.myFunction = myDict.myFunction
+	call otherDict.myFunction()
+
+此处 "self" 会是 "myDict"，因为它是被显式绑定的。
+
+
+1.3 List ~
+						*list* *List* *Lists* *E686*
+List 是有序的项目序列。项目可以是任意类型。项目
+可按索引号访问。项目可在序列中任意
+位置添加与删除。
+
+
+List 创建 ~
+							*E696* *E697*
+List 由方括号中逗号分隔的项目列表创建。
+示例： >
+	:let mylist = [1, two, 3, "four"]
+	:let emptylist = []
+
+项目可以是任意表达式。用 List 作项目会创建
+List 的 List： >
+	:let nestlist = [[11, 12], [21, 22], [31, 32]]
+
+最后一个项目之后的额外逗号会被忽略。
+
+
+List 索引 ~
+							*list-index* *E684*
+List 中的项目可把索引放在 List 之后的方括号
+中访问。索引从零开始，因此第一个项目的索引为零。 >
+	:let item = mylist[0]		" get the first item: 1
+	:let item = mylist[2]		" get the third item: 3
+
+若得到的项目是 list，则可继续重复： >
+	:let item = nestlist[0][1]	" get the first list, second item: 12
+<
+负索引从末尾算起。索引 -1 指 List 的最后一个项目，
+-2 指倒数第二个项目，依此类推。 >
+	:let last = mylist[-1]		" get the last item: "four"
+
+要避免无效索引报错，请用 |get()| 函数。当项目
+不可用时它返回零或你指定的默认值： >
+	:echo get(mylist, idx)
+	:echo get(mylist, idx, "NONE")
+
+
+List 连接 ~
+							*list-concatenation*
+两个 list 可用 "+" 运算符连接： >
+	:let longlist = mylist + [5, 6]
+	:let longlist = [5, 6] + mylist
+要在前后追加一个项目，用 [] 把它包成 list。
+
+list 可以用 |:let+=| 或
+|extend()| 原地与另一个连接： >
+	:let mylist += [7, 8]
+	:call extend(mylist, [7, 8])
+<
+关于原地修改 list 的更多内容见下文 |list-modification|。
+
+
+子列表 ~
+							*sublist*
+List 的一部分可指定首尾索引来获得，
+索引在方括号中用冒号分隔： >
+	:let shortlist = mylist[2:-1]	" get List [3, "four"]
+
+省略第一个索引相当于零。省略最后一个索引
+相当于 -1。 >
+	:let endlist = mylist[2:]	" from item 2 to the end: [3, "four"]
+	:let shortlist = mylist[2:2]	" List with one item: [3]
+	:let otherlist = mylist[:]	" make a copy of the List
+
+注意最后一个索引是包含的。若你偏好排他
+索引，请用 |slice()| 方法。
+
+若第一个索引超出 List 的最后一个项目，或第二个项目
+在第一个项目之前，结果为空 list。不会有错误
+消息。
+
+若第二个索引等于或大于 list 的长度，
+则使用长度减一： >
+	:let mylist = [0, 1, 2, 3]
+	:echo mylist[2:8]		" result: [2, 3]
+
+注意：mylist[s:e] 表示把变量 "s:e" 作索引。当心
+在 ":" 之前使用单字母变量。需要时插入空格：
+mylist[s : e]。
+
+
+List 同一性 ~
+							*list-identity*
+当变量 "aa" 是 list 而你又把它赋给另一个变量 "bb" 时，两个
+变量引用同一个 list。因此修改 list "aa" 也会
+改变 "bb"： >
+	:let aa = [1, 2, 3]
+	:let bb = aa
+	:call add(aa, 4)
+	:echo bb
+<	[1, 2, 3, 4]
+
+复制 list 要用 |copy()| 函数。前述 [:] 也
+可行。这会创建 list 的浅拷贝：修改 list 中的
+项目也会修改拷贝出的 list 中的项目： >
+	:let aa = [[1, 'a'], 2, 3]
+	:let bb = copy(aa)
+	:call add(aa, 4)
+	:let aa[0][1] = 'aaa'
+	:echo aa
+<	[[1, aaa], 2, 3, 4] >
+	:echo bb
+<	[[1, aaa], 2, 3]
+
+要得到完全独立的 list，请用 |deepcopy()|。它也会
+递归复制 list 中的值。最多到一百层深。
+
+"is" 运算符可用来检查两个变量是否引用同一个
+List。"isnot" 相反。相比之下 "==" 比较两个 list 是否
+有相同的值。 >
+	:let alist = [1, 2, 3]
+	:let blist = [1, 2, 3]
+	:echo alist is blist
+<	0 >
+	:echo alist == blist
+<	1
+
+关于比较 list：两个 list 若长度相同且所有项目比较相等，
+即被视为相等，与使用 "==" 时一样。有一个
+例外：比较一个数与一个字符串时，它们被视为
+不同。此处没有自动类型转换，与在变量上
+使用 "==" 时不同。示例： >
+	echo 4 == "4"
+<	1 >
+	echo [4] == ["4"]
+<	0
+
+因此比较 List 比比较数与字符串更严格。你
+也可以通过把简单值放进 list 来这样比较： >
+
+	:let a = 5
+	:let b = "5"
+	:echo a == b
+<	1 >
+	:echo [a] == [b]
+<	0
+
+
+List 解包 ~
+
+要把 list 中的项目解包到各个变量，可把变量
+放进方括号，像列表项那样： >
+	:let [var1, var2] = mylist
+
+当变量个数与 list 中项目个数不匹配时
+会报错。要处理 list 中多出的项目，在末尾加 ";"
+和一个变量名： >
+	:let [var1, var2; rest] = mylist
+
+这等价于： >
+	:let var1 = mylist[0]
+	:let var2 = mylist[1]
+	:let rest = mylist[2:]
+
+区别在于只有两个项目时不会报错。"rest" 那时是
+空 list。
+
+
+List 修改 ~
+							*list-modification*
+要修改 list 中的某个特定项目，这样用 |:let|： >
+	:let list[4] = "four"
+	:let listlist[0][3] = item
+
+要修改 list 的一部分，可以指定要修改的首尾项目。
+所赋的值至少要有该范围内的项目数： >
+	:let list[3:5] = [3, 4, 5]
+
+要原地向 List 添加项目，可用 |:let+=|（|list-concatenation|）： >
+	:let listA = [1, 2]
+	:let listA += [3, 4]
+<
+当两个变量引用同一个 List 时，原地修改其中一个 List
+会使被引用的 List 被原地改变： >
+	:let listA = [1, 2]
+	:let listB = listA
+	:let listB += [3, 4]
+	:echo listA
+	[1, 2, 3, 4]
+<
+向 list 增删项目要用函数。以下是几个
+示例： >
+	:call insert(list, 'a')		" prepend item 'a'
+	:call insert(list, 'a', 3)	" insert item 'a' before list[3]
+	:call add(list, "new")		" append String item
+	:call add(list, [1, 2])		" append a List as one new item
+	:call extend(list, [1, 2])	" extend the list with two more items
+	:let i = remove(list, 3)	" remove item 3
+	:unlet list[3]			" idem
+	:let l = remove(list, 3, -1)	" remove items 3 to last item
+	:unlet list[3 : ]		" idem
+	:call filter(list, 'v:val !~ "x"')  " remove items with an 'x'
+
+改变 list 中项目的顺序： >
+	:call sort(list)		" sort a list alphabetically
+	:call reverse(list)		" reverse the order of items
+	:call uniq(sort(list))		" sort and remove duplicates
+
+
+For 循环 ~
+
+|:for| 循环会为 |List|、|String| 或 |Blob| 中的每个项目执行命令。
+依次把变量设为每个项目。以 List 为例： >
+	:for item in mylist
+	:   call Doit(item)
+	:endfor
+
+这等价于： >
+	:let index = 0
+	:while index < len(mylist)
+	:   let item = mylist[index]
+	:   :call Doit(item)
+	:   let index = index + 1
+	:endwhile
+
+如果你只想修改 list 中的每个项目，|map()|
+函数会比 for 循环更简单。
+
+就像 |:let| 命令，|:for| 也接受变量列表。这
+要求参数是 List 的 List。 >
+	:for [lnum, col] in [[1, 3], [2, 8], [3, 0]]
+	:   call Doit(lnum, col)
+	:endfor
+
+这相当于对每个 list 项目都执行一次 |:let| 命令。同样，类型
+必须保持一致，否则会报错。
+
+也可以把剩余项目放进一个 List 变量： >
+	:for [i, j; rest] in listlist
+	:   call Doit(i, j)
+	:   if !empty(rest)
+	:      echo "remainder: " .. string(rest)
+	:   endif
+	:endfor
+
+对 Blob 则一次使用一个字节。
+
+对 String 则一次使用一个字符，包括任何组合字符，作为一个
+String。示例： >
+	for c in text
+	  echo 'This character is ' .. c
+	endfor
+
+
+List 函数 ~
+						*E714*
+对 List 有用的函数： >
+	:let r = call(funcname, list)	" call a function with an argument list
+	:if empty(list)			" check if list is empty
+	:let l = len(list)		" number of items in list
+	:let big = max(list)		" maximum value in list
+	:let small = min(list)		" minimum value in list
+	:let xs = count(list, 'x')	" count nr of times 'x' appears in list
+	:let i = index(list, 'x')	" index of first 'x' in list
+	:let lines = getline(1, 10)	" get ten text lines from buffer
+	:call append('$', lines)	" append text lines in buffer
+	:let list = split("a b c")	" create list from items in a string
+	:let string = join(list, ', ')	" create string from list items
+	:let s = string(list)		" String representation of list
+	:call map(list, '">> " .. v:val')  " prepend ">> " to each item
+
+别忘了，把特性组合起来可以让事情变简单。例如，
+要把一个 list 中所有数字相加： >
+	:exe 'let sum = ' .. join(nrlist, '+')
+
+
+1.4 Dictionary ~
+				 *Dict* *dict* *Dictionaries* *Dictionary*
+Dictionary 是关联数组：每个条目有一个键和一个值。条目
+可用键定位。条目没有特定的存储
+顺序。
+
+
+Dictionary 创建 ~
+						*E720* *E721* *E722* *E723*
+Dictionary 由花括号中逗号分隔的条目创建。每个
+条目有一个键和一个值，用冒号分隔。每个键只能
+出现一次。示例： >
+	:let mydict = {1: 'one', 2: 'two', 3: 'three'}
+	:let emptydict = {}
+<							*E713* *E716* *E717*
+键始终是 String。可以用 Number，它会自动转为
+String。因此 String '4' 与 Number 4 会找到同一个
+条目。注意 String '04' 与 Number 04 不同，因为
+Number 会被转为 String '4'，前导零被丢弃。空
+字符串也可以用作键。
+						*literal-Dict* *#{}*
+为避免给每个键都加引号，可用 #{} 形式。这
+确实要求键只由 ASCII 字母、数字、'-' 与 '_' 组成。
+示例： >
+	:let mydict = #{zero: 0, one_key: 1, two-key: 2, 333: 3}
+注意这里的 333 是字符串 "333"。用 #{} 不可能有空键。
+
+值可以是任意表达式。用 Dictionary 作值会创建
+嵌套的 Dictionary： >
+	:let nestdict = {1: {11: 'a', 12: 'b'}, 2: {21: 'c'}}
+
+最后一个条目之后的额外逗号会被忽略。
+
+
+访问条目 ~
+
+访问条目的常规做法是把键放进方括号： >
+	:let val = mydict["one"]
+	:let mydict["four"] = 4
+
+与 List 不同，你可以这样向已有 Dictionary 添加新条目。
+
+对于完全由字母、数字和下划线组成的键，可用下面
+这种形式 |expr-entry|： >
+	:let val = mydict.one
+	:let mydict.four = 4
+
+由于条目可以是任意类型，包括 List 和 Dictionary，索引与
+键查找可以连续重复： >
+	:echo dict.key[idx].key
+
+
+Dictionary 转 List ~
+
+你可能想遍历 dictionary 中的条目。为此需要
+把 Dictionary 转成 List 再传给 |:for|。
+
+最常见的是遍历键，用 |keys()| 函数： >
+	:for key in keys(mydict)
+	:   echo key .. ': ' .. mydict[key]
+	:endfor
+
+键的 List 是无序的。你可能想先排序： >
+	:for key in sort(keys(mydict))
+
+要遍历值，用 |values()| 函数：  >
+	:for v in values(mydict)
+	:   echo "value: " .. v
+	:endfor
+
+若要同时得到键和值，用 |items()| 函数。它返回
+一个 List，其中每个项目是含两个项目的 List（键与值）： >
+	:for [key, value] in items(mydict)
+	:   echo key .. ': ' .. value
+	:endfor
+
+
+Dictionary 同一性 ~
+							*dict-identity*
+与 List 一样，复制 Dictionary 要用 |copy()| 与 |deepcopy()|。否则，
+赋值的结果是引用同一个
+Dictionary： >
+	:let onedict = {'a': 1, 'b': 2}
+	:let adict = onedict
+	:let adict['a'] = 11
+	:echo onedict['a']
+	11
+
+若所有键值对都比较相等，则两个 Dictionary 比较相等。更多
+信息见 |list-identity|。
+
+
+Dictionary 修改 ~
+							*dict-modification*
+要修改 Dictionary 中已有的条目，或添加新条目，
+这样用 |:let|： >
+	:let dict[4] = "four"
+	:let dict['one'] = item
+
+从 Dictionary 中删除条目用 |remove()| 或 |:unlet|。
+从 dict 中删除键为 "aaa" 的条目有三种方式： >
+	:let i = remove(dict, 'aaa')
+	:unlet dict.aaa
+	:unlet dict['aaa']
+
+把一个 Dictionary 并入另一个用 |extend()|： >
+	:call extend(adict, bdict)
+这会把 bdict 的所有条目并入 adict。重复的键会使 adict 中的条目
+被覆盖。可选的第三个参数可以改变这一点。
+注意 Dictionary 中条目的顺序无关紧要，因此不要
+指望 ":echo adict" 会把 bdict 的项目显示在 adict 原有条目
+之后。
+
+从 Dictionary 中剔除条目可用 |filter()|： >
+	:call filter(dict, 'v:val =~ "x"')
+这会从 "dict" 中删除所有值不匹配 'x' 的条目。
+也可用它删除所有条目： >
+	call filter(dict, 0)
+
+
+Dictionary 函数 ~
+				*Dictionary-function* *self* *E725* *E862*
+用 "dict" 属性定义的函数可以配合 dictionary 以
+特殊方式使用。示例： >
+	:function Mylen() dict
+	:   return len(self.data)
+	:endfunction
+	:let mydict = {'data': [0, 1, 2, 3], 'len': function("Mylen")}
+	:echo mydict.len()
+
+这就像面向对象编程中的方法。Dictionary 中的
+该条目是一个 |Funcref|。局部变量 "self" 指向调用该函数
+的 dictionary。
+
+也可以把不带 "dict" 属性的函数作为
+Funcref 加到 Dictionary，但那时没有 "self" 变量。
+
+				*numbered-function* *anonymous-function*
+为避免给函数额外起名，可以这样定义并直接
+赋给一个 Dictionary： >
+	:let mydict = {'data': [0, 1, 2, 3]}
+	:function mydict.len()
+	:   return len(self.data)
+	:endfunction
+	:echo mydict.len()
+
+此后函数会得到一个编号，dict.len 的值是一个 |Funcref|
+引用该函数。该函数只能通过
+|Funcref| 使用。当不再有引用它的 |Funcref| 时，它会被自动
+删除。
+
+编号函数不必使用 "dict" 属性。
+
+若编号函数报错，可以用一个技巧查明它是哪个函数。
+假设该函数是 42，命令为： >
+	:function g:42
+
+
+Dictionary 相关函数 ~
+							*E715*
+可用于 Dictionary 的函数： >
+	:if has_key(dict, 'foo')	" TRUE if dict has entry with key "foo"
+	:if empty(dict)			" TRUE if dict is empty
+	:let l = len(dict)		" number of items in dict
+	:let big = max(dict)		" maximum value in dict
+	:let small = min(dict)		" minimum value in dict
+	:let xs = count(dict, 'x')	" count nr of times 'x' appears in dict
+	:let s = string(dict)		" String representation of dict
+	:call map(dict, '">> " .. v:val')  " prepend ">> " to each item
+
+
+1.5 Blob ~
+						*blob* *Blob* *Blobs* *E978*
+Blob 是二进制对象。例如，可以用它从文件中读取图像并
+通过 channel 发送。
+
+Blob 的行为大致像数字的 |List|，其中每个数字是
+一个 8 位字节的值，从 0 到 255。
+
+
+Blob 创建 ~
+
+Blob 可以用 |blob-literal| 创建： >
+	:let b = 0zFF00ED015DAF
+为便于阅读，可以在字节（一对十六进制字符）之间插入点号，
+它们不会改变值： >
+	:let b = 0zFF00.ED01.5DAF
+
+可以用 |readfile()| 从文件读取 blob，把 {type} 参数
+设为 "B"，例如： >
+	:let b = readfile('image.png', 'B')
+
+
+Blob 索引 ~
+							*blob-index* *E979*
+访问 Blob 中的某个字节，是把索引放在 Blob 之后的
+方括号中。索引从零开始，因此第一个字节索引为零。 >
+	:let myblob = 0z00112233
+	:let byte = myblob[0]		" get the first byte: 0x00
+	:let byte = myblob[2]		" get the third byte: 0x22
+
+负索引从末尾算起。索引 -1 指 Blob 的最后一个字节，
+-2 指倒数第二个字节，依此类推。 >
+	:let last = myblob[-1]		" get the last byte: 0x33
+
+要避免无效索引报错，请用 |get()| 函数。当项目
+不可用时它返回 -1 或你指定的默认值： >
+	:echo get(myblob, idx)
+	:echo get(myblob, idx, 999)
+
+
+Blob 迭代 ~
+
+|:for| 循环会为 Blob 的每个字节执行命令。循环变量依次
+设为 Blob 中的每个字节。示例： >
+	:for byte in 0z112233
+	:   call Doit(byte)
+	:endfor
+这会以 0x11、0x22 和 0x33 调用 Doit()。
+
+
+Blob 拼接 ~
+							*blob-concatenation*
+两个 blob 可以用 "+" 运算符拼接： >
+	:let longblob = myblob + 0z4455
+	:let longblob = 0z4455 + myblob
+一个 blob 可以用 |:let+=| 就地与另一个拼接： >
+	:let myblob += 0z6677
+关于就地修改 blob 的更多内容，见下面的 |blob-modification|。
+
+
+Blob 的一部分 ~
+
+通过指定首个与末个索引（在方括号内用冒号分隔）可以取得 Blob 的一部分： >
+	:let myblob = 0z00112233
+	:let shortblob = myblob[1:2]	" get 0z1122
+	:let shortblob = myblob[2:-1]	" get 0z2233
+
+省略首个索引相当于零。省略末个索引相当于 -1。 >
+	:let endblob = myblob[2:]	" from item 2 to the end: 0z2233
+	:let shortblob = myblob[2:2]	" Blob with one byte: 0z22
+	:let otherblob = myblob[:]	" make a copy of the Blob
+
+如果首个索引超出 Blob 的末个字节，或第二个索引位于首个索引之前，结果为
+空 Blob。不会报错。
+
+如果第二个索引等于或大于 Blob 的长度，则使用长度减一： >
+	:echo myblob[2:8]		" result: 0z2233
+
+
+Blob 修改 ~
+							*blob-modification*
+要修改 blob 的某个特定字节，这样使用 |:let|： >
+	:let blob[4] = 0x44
+
+当索引刚好超出 Blob 末尾一个位置时，会追加。任何更大的索引都是错误。
+
+要修改一串字节，可以使用 [:] 记法： >
+	let blob[1:3] = 0z445566
+被替换的字节长度必须与提供的值完全相同。 *E972*
+
+要修改 blob 的一部分，可以指定要修改的首个与末个字节。值在该范围内的字节
+数必须相同： >
+	:let blob[3:5] = 0z334455
+
+要就地给 Blob 添加项，可以使用 |:let+=|（|blob-concatenation|）： >
+	:let blobA = 0z1122
+	:let blobA += 0z3344
+当两个变量引用同一个 Blob 时，就地修改其中一个会导致被引用的 Blob 也被就地
+修改： >
+	:let blobA = 0z1122
+	:let blobB = blobA
+	:let blobB += 0z3344
+	:echo blobA
+	0z11223344
+你也可以使用函数 |add()|、|remove()| 和 |insert()|。
+
+
+Blob 同一性 ~
+
+Blob 可以比较是否相等： >
+	if blob == 0z001122
+以及是否同一： >
+	if blob is otherblob
+<							*blob-identity* *E977*
+当变量 "aa" 是一个 Blob 并赋值给另一个变量 "bb" 时，两个变量引用同一个
+Blob。此时 "is" 运算符返回真。
+
+使用 [:] 或 |copy()| 制作副本时，值相同，但同一性不同： >
+	:let blob = 0z112233
+	:let blob2 = blob
+	:echo blob == blob2
+<	1 >
+	:echo blob is blob2
+<	1 >
+	:let blob3 = blob[:]
+	:echo blob == blob3
+<	1 >
+	:echo blob is blob3
+<	0
+
+制作 Blob 副本用 |copy()| 函数。如上所述，用 [:] 也可以。
+
+
+1.6 关于变量的更多内容 ~
+							*more-variables*
+如果你需要知道变量或表达式的类型，使用 |type()| 函数。
+
+当 'shada' 选项包含 '!' 标志时，以大写字母开头且不含小写字母的全局变量
+会被存入 shada 文件 |shada-file|。
+
+当 'sessionoptions' 选项包含 "global" 时，以大写字母开头且至少含一个小写
+字母的全局变量会被存入会话文件 |session-file|。
+
+变量名		可存储的位置 ~
+my_var_6	不可以
+My_Var_6	会话文件
+MY_VAR_6	shada 文件
+
+
+可以用花括号组成变量名，见 |curly-braces-names|。
+
+==============================================================================
+2. 表达式语法					*expression-syntax*
+
+表达式语法概览，从最不具结合力到最具结合力：
+
+|expr1|	expr2
+	expr2 ? expr1 : expr1	if-then-else（条件）
+
+|expr2|	expr3
+	expr3 || expr3 ...	logical OR（逻辑或）
+
+|expr3|	expr4
+	expr4 && expr4 ...	logical AND（逻辑与）
+
+|expr4|	expr5
+	expr5 == expr5		equal（相等）
+	expr5 != expr5		not equal（不相等）
+	expr5 >	 expr5		greater than（大于）
+	expr5 >= expr5		greater than or equal（大于等于）
+	expr5 <	 expr5		smaller than（小于）
+	expr5 <= expr5		smaller than or equal（小于等于）
+	expr5 =~ expr5		regexp matches（正则匹配）
+	expr5 !~ expr5		regexp doesn't match（正则不匹配）
+
+	expr5 ==? expr5		equal, ignoring case（相等，忽略大小写）
+	expr5 ==# expr5		equal, match case（相等，匹配大小写）
+	etc.			如上，追加 ? 表示忽略大小写，追加 #
+				表示匹配大小写
+
+	expr5 is expr5		同一个 |List|、|Dictionary| 或 |Blob| 实例
+	expr5 isnot expr5	不同的 |List|、|Dictionary| 或 |Blob|
+				实例
+
+|expr5|	expr6
+	expr6 +	 expr6 ...	number addition, list or blob concatenation
+				数字加法，list 或 blob 拼接
+	expr6 -	 expr6 ...	number subtraction（数字减法）
+	expr6 .	 expr6 ...	string concatenation（字符串拼接）
+	expr6 .. expr6 ...	string concatenation（字符串拼接）
+
+|expr6|	expr7
+	expr7 *	 expr7 ...	number multiplication（数字乘法）
+	expr7 /	 expr7 ...	number division（数字除法）
+	expr7 %	 expr7 ...	number modulo（数字取模）
+
+|expr7|	expr8
+	! expr7			logical NOT（逻辑非）
+	- expr7			unary minus（一元负号）
+	+ expr7			unary plus（一元正号）
+
+|expr8|	expr9
+	expr8[expr1]		byte of a String or item of a |List|
+				String 的字节或 List 的项
+	expr8[expr1 : expr1]	substring of a String or sublist of a |List|
+				String 的子串或 List 的子列表
+	expr8.name		entry in a |Dictionary|（条目）
+	expr8(expr1, ...)	function call with |Funcref| variable
+				用 Funcref 变量发起函数调用
+	expr8->name(expr1, ...)	|method| 调用
+
+|expr9|	number			number constant（数字常量）
+	"string"		string constant, backslash is special
+				字符串常量，反斜杠有特殊含义
+	`'string'`		string constant, ' is doubled
+				字符串常量，单引号需写成两个
+	[expr1, ...]		|List|
+	`{expr1: expr1, ...}`	|Dictionary|
+	#{key: expr1, ...}	|Dictionary|
+	&option			option value（选项值）
+	(expr1)			nested expression（嵌套表达式）
+	variable		internal variable（内部变量）
+	va{ria}ble		internal variable with curly braces
+				带花括号的内部变量
+	$VAR			environment variable（环境变量）
+	@r			contents of register "r"（register "r" 的内容）
+	function(expr1, ...)	function call（函数调用）
+	func{ti}on(expr1, ...)	function call with curly braces
+				带花括号的函数调用
+	`{args -> expr1}`	lambda expression（lambda 表达式）
+
+
+"..." 表示这一层中的运算可以连写。示例： >
+	&nu || &list && &shell == "csh"
+
+同一层内的所有表达式都从左到右解析。
+
+表达式嵌套深度限制为 1000 层（用 MSVC 构建时为 300），以避免耗尽栈而崩溃。
+*E1169*
+
+
+------------------------------------------------------------------------------
+expr1				*expr1* *ternary* *falsy-operator* *??* *E109*
+
+三元运算符：expr2 ? expr1 : expr1
+falsy 运算符：  expr2 ?? expr1
+
+三元运算符 ~
+
+'?' 之前的表达式会被求值为一个数字。若它求值为 |TRUE|，结果就是 '?' 与 ':'
+之间那个表达式的值，否则结果是 ':' 之后那个表达式的值。示例： >
+	:echo lnum == 1 ? "top" : lnum
+
+由于第一个表达式是 "expr2"，它不能再包含另一个 ?:。另外两个表达式可以，
+因此允许 ?: 的递归使用。示例： >
+	:echo lnum == 1 ? "top" : lnum == 1000 ? "last" : lnum
+
+为了保持可读性，建议使用 |line-continuation|： >
+	:echo lnum == 1
+	:\	? "top"
+	:\	: lnum == 1000
+	:\		? "last"
+	:\		: lnum
+
+你应当总在 ':' 之前留一个空格，否则它可能被误认为 "a:1" 这样的变量用法。
+
+falsy 运算符 ~
+
+它也被称为 "null coalescing operator"（空值合并运算符），但那过于复杂，因此
+我们直接称它为 falsy 运算符。
+
+'??' 之前的表达式会被求值。若它求值为 |truthy|，就用它作为结果。否则求值
+'??' 之后的表达式并作为结果。这在为可能得到零或空值的表达式提供默认值时
+最有用： >
+	echo theList ?? 'list is empty'
+	echo GetName() ?? 'unknown'
+
+下面两者相似，但并不等同： >
+	expr2 ?? expr1
+	expr2 ? expr2 : expr1
+第二行中 "expr2" 被求值了两次。
+
+
+------------------------------------------------------------------------------
+expr2 与 expr3						*expr2* *expr3*
+
+expr3 || expr3 ..	logical OR（逻辑或）		*expr-barbar*
+expr4 && expr4 ..	logical AND（逻辑与）		*expr-&&*
+
+"||" 与 "&&" 运算符在两侧各接受一个参数。参数会被（转换）为 Number。结果：
+
+    输入			输出 ~
+n1	n2		n1 || n2	n1 && n2 ~
+|FALSE|	|FALSE|		|FALSE|		|FALSE|
+|FALSE|	|TRUE|		|TRUE|		|FALSE|
+|TRUE|	|FALSE|		|TRUE|		|FALSE|
+|TRUE|	|TRUE|		|TRUE|		|TRUE|
+
+这些运算符可以连写，例如： >
+
+	&nu || &list && &shell == "csh"
+
+注意 "&&" 的优先级高于 "||"，因此它的含义是： >
+
+	&nu || (&list && &shell == "csh")
+
+一旦结果确定，表达式就"短路"，即后续参数不再求值。这与 C 中的情形类似。
+例如： >
+
+	let a = 1
+	echo a || b
+
+即使没有名为 "b" 的变量这也是有效的，因为 "a" 是 |TRUE|，所以结果必然是
+|TRUE|。类似地： >
+
+	echo exists("b") && b == "yes"
+
+无论 "b" 是否已定义，这都是有效的。第二个子句只会在 "b" 已定义时才求值。
+
+
+------------------------------------------------------------------------------
+expr4							*expr4*
+
+expr5 {cmp} expr5
+
+比较两个 expr5 表达式，结果为假时得到 0，为真时得到 1。
+
+			*expr-==*  *expr-!=*  *expr->*	 *expr->=*
+			*expr-<*   *expr-<=*  *expr-=~*  *expr-!~*
+			*expr-==#* *expr-!=#* *expr->#*  *expr->=#*
+			*expr-<#*  *expr-<=#* *expr-=~#* *expr-!~#*
+			*expr-==?* *expr-!=?* *expr->?*  *expr->=?*
+			*expr-<?*  *expr-<=?* *expr-=~?* *expr-!~?*
+			*expr-is* *expr-isnot* *expr-is#* *expr-isnot#*
+			*expr-is?* *expr-isnot?*
+		沿用 'ignorecase'	匹配大小写	忽略大小写 ~
+equal（相等）			==		==#		==?
+not equal（不相等）		!=		!=#		!=?
+greater than（大于）		>		>#		>?
+greater than or equal（大于等于）	>=		>=#		>=?
+smaller than（小于）		<		<#		<?
+smaller than or equal（小于等于）	<=		<=#		<=?
+regexp matches（正则匹配）	=~		=~#		=~?
+regexp doesn't match（正则不匹配）	!~		!~#		!~?
+same instance（同一实例）	is		is#		is?
+different instance（不同实例）	isnot		isnot#		isnot?
+
+示例：
+"abc" ==# "Abc"	  求值为 0
+"abc" ==? "Abc"	  求值为 1
+"abc" == "Abc"	  若设置了 'ignorecase' 则求值为 1，否则为 0
+
+							*E691* *E692*
+|List| 只能与 |List| 比较，且只能用 "equal"、"not equal"、"is" 和 "isnot"。
+这会递归地比较 list 的值。忽略大小写意味着比较项值时忽略大小写。
+
+							*E735* *E736*
+|Dictionary| 只能与 |Dictionary| 比较，且只能用 "equal"、"not equal"、"is"
+和 "isnot"。这会递归地比较 |Dictionary| 的键/值。忽略大小写意味着比较项值时
+忽略大小写。
+
+							*E694*
+|Funcref| 只能与 |Funcref| 比较，且只能用 "equal"、"not equal"、"is" 和
+"isnot"。从不忽略大小写。绑定了参数或 Dictionary（用 partial）与否很关键。
+Dictionary 也必须相等（或在 "is" 的情况下同一），参数也必须相等（或同一）。
+
+要比较两个 Funcref 是否指向同一个函数、忽略绑定的 Dictionary 和参数，请用
+|get()| 取得函数名： >
+	if get(Part1, 'name') == get(Part2, 'name')
+	   " Part1 and Part2 refer to the same function
+
+对 |List|、|Dictionary| 或 |Blob| 使用 "is" 或 "isnot" 会检查这些表达式是否
+引用同一个 |List|、|Dictionary| 或 |Blob| 实例。|List| 的副本与原 |List|
+不同。对非 |List|、|Dictionary|、|Blob| 使用 "is" 等同于使用 "equal"，使用
+"isnot" 等同于使用 "not equal"。只是类型不同就意味着值不同： >
+	echo 4 == '4'
+	1
+	echo 4 is '4'
+	0
+	echo 0 is []
+	0
+"is#"/"isnot#" 与 "is?"/"isnot?" 可用于匹配和忽略大小写。
+
+比较 String 与 Number 时，String 会被转换为 Number，然后按 Number 比较。
+这意味着： >
+	echo 0 == 'x'
+	1
+因为 'x' 转换为 Number 是零。然而： >
+	echo [0] == ['x']
+	0
+在 List 或 Dictionary 内部不会做这种转换。
+
+比较两个 String 时，使用 strcmp() 或 stricmp()。这给出的是数学差值（比较
+字节值），不一定是本地语言中的字母顺序差值。
+
+使用带尾部 '#' 的运算符，或在 'ignorecase' 关闭时使用短形式，比较用
+strcmp()：大小写敏感。
+
+使用带尾部 '?' 的运算符，或在设置了 'ignorecase' 时使用短形式，比较用
+stricmp()：忽略大小写。
+
+不使用 'smartcase'。
+
+"=~" 与 "!~" 运算符用右参数作为模式去匹配左参数。模式是什么见 |pattern|。
+无论 'magic' 或 'cpoptions' 的实际值为何，这种匹配总是如同设置了 'magic'
+且 'cpoptions' 为空。这让脚本可移植。为避免正则模式中的反斜杠被重复转义，
+请使用单引号字符串，见 |literal-string|。
+由于字符串被视为单独一行（包含 \n，即反斜杠-n）的多行模式不会匹配。
+不过，字面的 NL 字符可以像普通字符一样被匹配。示例：
+	"foo\nbar" =~ "\n"	求值为 1
+	"foo\nbar" =~ "\\n"	求值为 0
+
+
+
+------------------------------------------------------------------------------
+expr5 与 expr6						*expr5* *expr6*
+
+expr6 + expr6   Number 加法、|List| 或 |Blob| 拼接		*expr-+*
+expr6 - expr6   Number 减法				*expr--*
+expr6 . expr6   String 拼接				*expr-.*
+expr6 .. expr6  String 拼接				*expr-..*
+
+对 |Lists| 只可能用 "+"，且此时两个 expr6 都必须是 list。结果是一个新 list，
+由两个 list 拼接而成。
+
+String 拼接首选 ".."，因为 "." 有歧义，它也被用于 |Dict| 成员访问和浮点数。
+
+expr7 * expr7  Number 乘法				*expr-star*
+expr7 / expr7  Number 除法				*expr-/*
+expr7 % expr7  Number 取模				*expr-%*
+
+除 "." 与 ".." 外，所有运算都会把 Strings 转换为 Numbers。
+按位运算符见 |and()|、|or()| 和 |xor()|。
+
+注意 "+" 与 "." 的区别：
+	"123" + "456" = 579
+	"123" . "456" = "123456"
+
+由于 '.' 与 '+'、'-' 优先级相同，需要这样读： >
+	1 . 90 + 90.0
+即： >
+	(1 . 90) + 90.0
+这是可行的，因为 String "190" 会自动转换为 Number 190，而它可以与 Float
+90.0 相加。然而： >
+	1 . 90 * 90.0
+应读作： >
+	1 . (90 * 90.0)
+因为 '.' 的优先级低于 "*"。这不会成功，因为它试图把一个 Float 与一个
+String 拼接。
+
+Number 除以零时结果取决于被除数的值：
+	  0 / 0  = -0x80000000	(对 Float 而言类似 NaN)
+	 >0 / 0  =  0x7fffffff	(类似正无穷)
+	 <0 / 0  = -0x7fffffff	(类似负无穷)
+	(Vim 7.2 之前总是 0x7fffffff)
+
+启用 64 位 Number 支持时：
+	  0 / 0  = -0x8000000000000000	(对 Float 而言类似 NaN)
+	 >0 / 0  =  0x7fffffffffffffff	(类似正无穷)
+	 <0 / 0  = -0x7fffffffffffffff	(类似负无穷)
+
+'%' 右侧为零时结果为 0。
+
+这些运算符对 |Funcref| 都不适用。
+
+. 与 % 不适用于 Float。 *E804*
+
+
+------------------------------------------------------------------------------
+expr7							*expr7*
+
+! expr7			logical NOT（逻辑非）		*expr-!*
+- expr7			unary minus（一元负号）		*expr-unary--*
++ expr7			unary plus（一元正号）		*expr-unary-+*
+
+对 '!'，|TRUE| 变为 |FALSE|，|FALSE| 变为 |TRUE|（即一）。
+对 '-'，数字的符号被改变。
+对 '+'，数字保持不变。注意："++" 没有任何效果。
+
+String 会先被转换为 Number。
+
+这三个运算符可以重复并混用。示例：
+	!-1	    == 0
+	!!8	    == 1
+	--9	    == 9
+
+
+------------------------------------------------------------------------------
+expr8							*expr8*
+
+该表达式要么是 |expr9|，要么是下面若干可选项的序列（顺序任意）。例如以下都是
+可能的：
+	expr8[expr1].name
+	expr8.name[expr1]
+	expr8(expr1, ...)[expr1].name
+	expr8->(expr1, ...)[expr1]
+求值总是从左到右。
+
+
+expr8[expr1]		item of String or |List|	*expr-[]* *E111*
+							*subscript*
+在老式 Vim script 中：
+若 expr8 是 Number 或 String，这得到包含 expr8 中第 expr1 个单字节的 String。
+expr8 被当作 String 使用（数字会自动转换为 String），expr1 被当作 Number。
+这不识别多字节编码，替代方案见 `byteidx()`，或用 `split()` 把字符串转成
+字符 list。示例，取得光标下的字节： >
+	:let c = getline(".")[col(".") - 1]
+
+索引零给出首个字节。这与 C 中的行为一致。当心：文本列号从一开始！
+示例，取得光标下的字节： >
+	:let c = getline(".")[col(".") - 1]
+
+索引零给出首个字节。当心：文本列号从一开始！
+
+若 String 的长度小于索引，结果为空 String。负索引总是得到空字符串（原因：
+向后兼容）。用 [-1:] 取得末个字节。
+
+若 expr8 是 |List|，则得到索引 expr1 处的项。可能的索引值见 |list-index|。
+若索引超出范围则报错。示例： >
+	:let item = mylist[-1]		" get last item
+
+一般而言，若 |List| 的索引等于或大于该 |List| 的长度，或比该 |List| 的长度
+还要负，就会报错。
+
+
+expr8[expr1a : expr1b]	substring 或 |sublist|		*expr-[:]* *substring*
+
+若 expr8 是 String，这得到从 expr1a 到 expr1b（含 expr1b）的字节或字符
+组成的子串。expr8 被当作 String，expr1a 与 expr1b 被当作 Number。
+
+在老式 Vim script 中索引是字节索引。这不识别多字节编码，计算索引用
+|byteidx()|。若 expr8 是 Number，会先转换为 String。
+
+索引 expr1b 处的项包含在内，即闭区间。要使用排除式索引，用 |slice()| 函数。
+
+若省略 expr1a 则用零。若省略 expr1b 则用字符串长度减一。
+
+可以用负数从字符串末尾开始度量。-1 是末个字符，-2 是倒数第二个，依此类推。
+
+若索引超出字符串范围，相应字符被省略。若 expr1b 小于 expr1a，结果为空
+字符串。
+
+示例： >
+	:let c = name[-1:]		" last byte of a string
+	:let c = name[0:-1]		" the whole string
+	:let c = name[-2:-2]		" last but one byte of a string
+	:let s = line(".")[4:]		" from the fifth byte to the end
+	:let s = s[:-3]			" remove last two bytes
+<							*slice*
+若 expr8 是 |List|，这得到一个新的 |List|，包含由索引 expr1a 与 expr1b 指定
+的项。其行为与 String 一样，如上所述。另见下面的 |sublist|。示例： >
+	:let l = mylist[:3]		" first four items
+	:let l = mylist[4:4]		" List with one item
+	:let l = mylist[:]		" shallow copy of a List
+
+若 expr8 是 |Blob|，这得到一个新的 |Blob|，包含索引 expr1a 与 expr1b（闭
+区间）之间的字节。示例： >
+	:let b = 0zDEADBEEF
+	:let bs = b[1:2]		" 0zADBE
+	:let bs = b[]			" copy of 0zDEADBEEF
+
+对 |Funcref| 使用 expr8[expr1] 或 expr8[expr1a : expr1b] 会报错。
+
+当心命名空间与「变量后跟冒号表示子列表」之间的混淆： >
+	mylist[n:]     " uses variable n
+	mylist[s:]     " uses namespace s:, error!
+
+
+expr8.name		entry in a |Dictionary|		*expr-entry*
+
+若 expr8 是 |Dictionary| 且其后跟一个点，则其后的名字会被用作该
+|Dictionary| 中的键。这就像：
+expr8[name]。
+
+该名字必须由字母数字字符组成，与变量名一样，但可以以数字开头。不能使用
+花括号。
+
+点之前或之后不得有空白。
+
+示例： >
+	:let dict = {"one": 1, 2: "two"}
+	:echo dict.one		" shows "1"
+	:echo dict.2		" shows "two"
+	:echo dict .2		" error because of space before the dot
+
+注意点也被用于 String 拼接。为避免混淆，String 拼接时总在点两侧留空格。
+
+
+expr8(expr1, ...)	|Funcref| function call		*E1085*
+
+当 expr8 是 |Funcref| 类型的变量时，调用它所引用的函数。
+
+
+expr8->name([args])	method call			*method* *->*
+expr8->{lambda}([args])
+
+							*E260* *E276*
+对于同时也作为全局函数提供的 method，这等同于： >
+	name(expr8 [, args])
+也可以有专门针对 "expr8" 类型的 method。
+
+这允许链式调用，把一个 method 的返回值传给下一个 method： >
+	mylist->filter(filterexpr)->map(mapexpr)->sort()->join()
+<
+使用 lambda 的示例： >
+	GetPercentage()->{x -> x * 100}()->printf('%d%%')
+<
+使用 -> 时，|expr7| 运算符会先被应用，因此： >
+	-1.234->string()
+等价于： >
+	(-1.234)->string()
+而 NOT 等价于： >
+	-(1.234->string())
+<
+							*E274*
+"->name(" 中不得包含空白。"->" 之前和 "(" 之后可以有空白，因此可以这样
+分行： >
+	mylist
+	\ ->filter(filterexpr)
+	\ ->map(mapexpr)
+	\ ->sort()
+	\ ->join()
+
+使用 lambda 形式时，} 与 ( 之间不得有空白。
+
+
+
+							*expr9*
+------------------------------------------------------------------------------
+number
+
+number			number constant			*expr-number*
+
+			*0x* *hex-number* *0o* *octal-number* *binary-number*
+十进制、十六进制（以 0x 或 0X 开头）、二进制（以 0b 或 0B 开头）
+和八进制（以 0、0o 或 0O 开头）。
+
+						*floating-point-format*
+浮点数可以写成两种形式：
+
+	[-+]{N}.{M}
+	[-+]{N}.{M}[eE][-+]{exp}
+
+{N} 与 {M} 是数字。{N} 与 {M} 都必须存在，且只能包含数字。
+[-+] 表示可选的加号或减号。
+{exp} 是指数，即 10 的幂。
+只接受小数点，不接受逗号，无论当前 locale 是什么。
+
+示例：
+	123.456
+	+0.0001
+	55.0
+	-0.123
+	1.234e03
+	1.0E-6
+	-3.1416e+88
+
+以下写法无效：
+	3.		空的 {M}
+	1e40		缺少 .{M}
+
+理由：
+在引入浮点数之前，文本 "123.456" 被解释为两个数字 "123" 和 "456"，两者都
+转换为字符串并拼接，得到字符串 "123456"。由于这被认为毫无意义，而且我们
+找不到 Vim 脚本中有意这样用的地方，于是为了能使用浮点数的常规写法，接受了
+这次向后不兼容的改动。
+
+							*float-pi* *float-e*
+几个便于复制粘贴的有用数值： >
+	:let pi = 3.14159265359
+	:let e  = 2.71828182846
+或者，如果你不想把它们写成浮点字面量，也可以使用函数，如下所示： >
+	:let pi = acos(-1.0)
+	:let e  = exp(1.0)
+<
+						*floating-point-precision*
+浮点数的精度和范围取决于 Vim 编译时所用库中 "double" 的含义。运行时无法
+改变这一点。
+
+显示 |Float| 的默认方式是使用 6 位小数，如同 printf("%g", f)。使用
+|printf()| 函数时可以选择别的格式。示例： >
+	:echo printf('%.15e', atan(1))
+<	7.853981633974483e-01
+
+
+------------------------------------------------------------------------------
+string					*string* *String* *expr-string* *E114*
+
+"string"		string constant		*expr-quote*
+
+注意使用的是双引号。
+
+字符串常量接受这些特殊字符：
+\...	三位八进制数（例如 "\316"）
+\..	两位八进制数（后面必须跟非数字字符）
+\.	一位八进制数（后面必须跟非数字字符）
+\x..	用两个十六进制数字指定的字节（例如 "\x1f"）
+\x.	用一个十六进制数字指定的字节（后面必须跟非十六进制字符）
+\X..	与 \x.. 相同
+\X.	与 \x. 相同
+\u....	用最多 4 个十六进制数字指定的字符，以 UTF-8 存储
+	（例如 "\u02a4"）
+\U....	与 \u 相同，但最多允许 8 个十六进制数字。
+\b	退格 <BS>
+\e	转义 <Esc>
+\f	换页符 0x0C
+\n	换行 <NL>
+\r	回车 <CR>
+\t	制表符 <Tab>
+\\	反斜杠
+\"	双引号
+\<xxx>	名为 "xxx" 的特殊键。例如用 "\<C-W>" 表示 CTRL-W。这用于
+	mappings，0x80 字节会被转义。
+	要使用双引号字符必须转义："<M-\">"。
+	不要用 <Char-xxxx> 获取 UTF-8 字符，请按上面所说使用 \uxxxx。
+\<*xxx>	与 \<xxx> 类似，但把修饰符前置，而不是把它包含在字符中。
+	例如 "\<C-w>" 是一个字符 0x17，而 "\<*C-w>" 是四个字节：
+	3 个字节是 CTRL 修饰符，然后才是字符 "W"。
+
+注意 "\xff" 以字节 255 存储，在某些编码中可能无效。要正确地以 UTF-8
+存储字符 255，请使用 "\u00ff"。
+
+注意 "\000" 和 "\x00" 会强制字符串结束。
+
+
+------------------------------------------------------------------------------
+blob-literal				*blob-literal* *E973*
+
+以 0z 或 0Z 开头的十六进制，字节数任意。
+该序列必须是偶数个十六进制字符。示例： >
+	:let b = 0zFF00ED015DAF
+
+
+------------------------------------------------------------------------------
+literal-string						*literal-string* *E115*
+
+`'string'`		字符串常量			*expr-'*
+
+注意使用的是单引号。
+
+该字符串按原样采用。不会移除反斜杠，反斜杠也没有特殊含义。
+只有一处例外：两个引号代表一个引号。
+
+单引号字符串对 pattern 很有用，这样反斜杠不必写两遍。
+以下两条命令等价： >
+	if a =~ "\\s*"
+	if a =~ '\s*'
+
+
+------------------------------------------------------------------------------
+interpolated-string				*$quote* *interpolated-string*
+
+$"string"		插值字符串常量			*expr-$quote*
+$'string'		插值字面量字符串常量		*expr-$'*
+
+插值字符串是 |string| 与 |literal-string| 的扩展，允许在其中包含
+Vim script 表达式（见 |expr1|）。任何返回值的表达式都可以放在花括号之间。
+其值会被转换为字符串。所有文本与表达式的结果会拼接成一个新字符串。
+							*E1278* *E1279*
+要在字符串内容中包含左花括号 '{' 或右花括号 '}'，请写成两次。
+对双引号字符串使用反斜杠也可以。单独的右花括号 '}' 会导致错误。
+
+示例： >
+	let your_name = input("What's your name? ")
+<	What's your name?  Peter ~
+>
+	echo
+	echo $"Hello, {your_name}!"
+<	Hello, Peter! ~
+>
+	echo $"The square root of {{9}} is {sqrt(9)}"
+<	The square root of {9} is 3.0 ~
+
+						*string-offset-encoding*
+字符串由多个字符组成。UTF-8 对 ASCII 字符使用一个字节，对其他拉丁字符使用
+两个字节，对其他字符使用更多字节。
+
+字符串的偏移量既可以按字符计数，也可以按字节计数。其他程序可能使用
+UTF-16 编码（16 位字）以及按 UTF-16 字计的偏移量。有些函数使用字节偏移，
+通常针对 UTF-8 编码。其他函数使用字符偏移，此时编码无关紧要。
+
+字符串 "a©😊" 的各种偏移量如下：
+
+  UTF-8 偏移：
+      [0]: 61, [1]: C2, [2]: A9, [3]: F0, [4]: 9F, [5]: 98, [6]: 8A
+  UTF-16 偏移：
+      [0]: 0061, [1]: 00A9, [2]: D83D, [3]: DE0A
+  UTF-32（字符）偏移：
+      [0]: 00000061, [1]: 000000A9, [2]: 0001F60A
+
+可以对着一个字符使用 "g8" 和 "ga" 命令查看其十进制/十六进制/八进制值。
+
+函数 |byteidx()|、|utf16idx()| 和 |charidx()| 可用于在这些索引之间转换。
+函数 |strlen()|、|strutf16len()| 和 |strcharlen()| 分别返回字符串中的字节数、
+UTF-16 码元数和字符数。
+
+------------------------------------------------------------------------------
+option						*expr-option* *E112* *E113*
+
+&option			选项值，尽可能取局部值
+&g:option		全局选项值
+&l:option		局部选项值
+
+示例： >
+	echo "tabstop is " .. &tabstop
+	if &expandtab
+
+此处可以使用任何选项名。参见 |options|。使用局部值且不存在 buffer 局部或
+window 局部的值时，无论如何都会使用全局值。
+
+
+------------------------------------------------------------------------------
+register						*expr-register* *@r*
+
+@r			register 'r' 的内容
+
+结果是指定 register 的内容，作为单个字符串。需要时会在其中插入换行。
+要获取未命名 register 的内容，请使用 @" 或 @@。关于可用 register 的说明，
+参见 |registers|。
+
+使用 '=' register 时，得到的是表达式本身，而不是它求值的结果。请使用
+|eval()| 对它求值。
+
+
+nesting							*expr-nesting* *E110*
+-------
+(expr1)			嵌套表达式
+
+
+------------------------------------------------------------------------------
+environment variable					*expr-env*
+
+$VAR			环境变量
+
+任何环境变量的 String 值。未定义时结果为空字符串。
+
+也可以使用函数 `getenv()` 和 `setenv()`，它们对名字中含有非字母数字字符的
+环境变量同样有效。
+函数 `environ()` 可用于获取包含所有环境变量的 Dict。
+
+
+						*expr-env-expand*
+注意，直接使用 $VAR 与使用 expand("$VAR") 有区别。直接使用时只会展开当前
+Vim 会话内部已知的环境变量。expand() 会先尝试使用当前 Vim 会话内部已知的
+环境变量。若失败，则会用一个 shell 来展开该变量。这可能较慢，但它确实会
+展开 shell 所知道的所有变量。示例： >
+	:echo $shell
+	:echo expand("$shell")
+第一条大概什么都不输出，第二条会输出 $shell 变量（如果你的 shell 支持它）。
+
+
+------------------------------------------------------------------------------
+internal variable					*expr-variable*
+
+variable		internal variable
+参见下文 |internal-variables|。
+
+
+------------------------------------------------------------------------------
+function call		*expr-function* *E116* *E118* *E119* *E120*
+
+function(expr1, ...)	函数调用
+参见下文 |functions|。
+
+
+------------------------------------------------------------------------------
+lambda expression				*expr-lambda* *lambda*
+
+`{args -> expr1}`	lambda 表达式				*E451*
+
+lambda 表达式会创建一个新的未命名函数，它返回 |expr1| 求值的结果。
+lambda 表达式与 |user-function| 有以下不同：
+
+1. lambda 表达式的主体是一个 |expr1|，而不是一串 |Ex| 命令。
+2. 参数不应使用前缀 "a:"。例如： >
+	:let F = {arg1, arg2 -> arg1 - arg2}
+	:echo F(5, 2)
+<	3
+
+参数是可选的。示例： >
+	:let F = {-> 'error function'}
+	:echo F('ignored')
+<	error function
+							*closure*
+lambda 表达式可以访问外层作用域的变量和参数。这通常称为闭包。
+下面示例中，"i" 与 "a:arg" 在 lambda 中使用，而它们已经存在于函数作用域中。
+即使在函数返回之后，它们仍然有效： >
+	:function Foo(arg)
+	:  let i = 3
+	:  return {x -> x + i - a:arg}
+	:endfunction
+	:let Bar = Foo(4)
+	:echo Bar(6)
+<	5
+注意，要让这一点生效，这些变量必须在 lambda 定义之前就存在于外层作用域中。
+另见 |:func-closure|。
+
+可以用以下代码检查是否支持 lambda 与闭包： >
+	if has('lambda')
+
+把 lambda 表达式与 |sort()|、|map()| 和 |filter()| 一起使用的示例： >
+	:echo map([1, 2, 3], {idx, val -> val + 1})
+<	[2, 3, 4] >
+	:echo sort([3,7,2,1,4], {a, b -> a - b})
+<	[1, 2, 3, 4, 7]
+
+lambda 表达式对 job 和 timer 也很有用： >
+	:let timer = timer_start(500,
+			\ {-> execute("echo 'Handler called'", "")},
+			\ {'repeat': 3})
+<	Handler called
+	Handler called
+	Handler called
+
+注意，如果闭包被它所依赖的上下文引用，就可能造成内存被占用而不被释放： >
+	function Function()
+	   let x = 0
+	   let F = {-> x}
+	 endfunction
+闭包使用了函数作用域中的 "x"，而同一作用域中的 "F" 又指向该闭包。
+这种循环导致内存不会被释放。建议：不要这样做。
+
+注意这里用 execute() 来执行一条 Ex 命令。不过这种写法很难看。
+
+
+lambda 表达式有类似 '<lambda>42' 这样的内部名字。如果某个 lambda 表达式
+报错，可以用以下命令找出它是什么： >
+	:function <lambda>42
+另见：|numbered-function|
+
+==============================================================================
+3. Internal variable				*internal-variables* *E461*
+
+内部变量名可以由字母、数字和 '_' 组成。但它不能以数字开头。
+也可以使用花括号，见 |curly-braces-names|。
+
+内部变量通过 ":let" 命令创建 |:let|。
+内部变量通过 ":unlet" 命令显式销毁 |:unlet|。
+使用一个并非内部变量的名字，或者引用已被销毁的变量，都会导致错误。
+
+						*variable-scope*
+变量有多个名字空间。使用哪一个由所加的前缀指定：
+
+		（无前缀）在函数中：局部于函数；否则：全局
+|buffer-variable|    b:	  局部于当前 buffer。
+|window-variable|    w:	  局部于当前 window。
+|tabpage-variable|   t:	  局部于当前 tab page。
+|global-variable|    g:	  全局。
+|local-variable|     l:	  局部于函数。
+|script-variable|    s:	  局部于被 |:source| 的 Vim script。
+|function-argument|  a:	  函数参数（仅在函数内部）。
+|vim-variable|       v:	  全局，由 Vim 预定义。
+
+作用域名本身可以当作 |Dictionary| 使用。例如，要删除所有 script 局部的
+变量： >
+	:for k in keys(s:)
+	:    unlet s:[k]
+	:endfor
+<
+						*buffer-variable* *b:var* *b:*
+以 "b:" 开头的变量名局部于当前 buffer。因此你可以有多个 "b:foo" 变量，
+每个 buffer 一个。这类变量在该 buffer 被清除或用 |:bdelete| 删除时也会
+被删除。
+
+有一个 buffer 局部变量是预定义的：
+					*b:changedtick* *changetick*
+b:changedtick	当前 buffer 的改动总数。每次改动都会使其递增。在此情形下，
+		撤销命令也算一次改动。写 buffer 时重置 'modified' 也计入在内。
+		这可用于只在 buffer 发生变化时执行某个动作。示例： >
+		    :if my_changedtick != b:changedtick
+		    :	let my_changedtick = b:changedtick
+		    :	call My_Update()
+		    :endif
+<		你不能修改或删除 b:changedtick 变量。
+
+						*window-variable* *w:var* *w:*
+以 "w:" 开头的变量名局部于当前 window。它在 window 关闭时被删除。
+
+						*tabpage-variable* *t:var* *t:*
+以 "t:" 开头的变量名局部于当前 tab page，它在 tab page 关闭时被删除。
+
+						*global-variable* *g:var* *g:*
+在函数内部，通过 "g:" 访问全局变量。省略它访问的则是局部于函数的变量。
+不过如果你愿意，"g:" 也可以用在任何其他地方。
+
+						*local-variable* *l:var* *l:*
+在函数内部，不加任何前缀就可以访问局部变量。不过如果你愿意，也可以加
+"l:" 前缀。但不加 "l:" 时，可能会撞上保留的变量名。例如 "count"。
+它本身指的是 "v:count"。使用 "l:count" 就可以拥有一个同名的局部变量。
+
+						*script-variable* *s:var*
+在 Vim script 中可以使用以 "s:" 开头的变量。它们无法从 script 外部访问，
+因此局部于该 script。
+
+它们可用于：
+- 该 script 被 source 时执行的命令
+- 该 script 中定义的函数
+- 该 script 中定义的 autocommand
+- 在该 script 中定义的函数和 autocommand 里定义（递归地）的函数和
+  autocommand
+- 该 script 中定义的用户自定义命令
+因此不能用于：
+- 从该 script source 的其他 script
+- mappings
+- menus
+- 等等。
+
+script 变量可用于避免与全局变量名冲突。看这个例子： >
+
+	let s:counter = 0
+	function MyCounter()
+	  let s:counter = s:counter + 1
+	  echo s:counter
+	endfunction
+	command Tick call MyCounter()
+
+现在你可以从任何 script 调用 "Tick"，而那个 script 中的 "s:counter"
+变量不会被修改，使用的只是定义 "Tick" 的那个 script 中的 "s:counter"。
+
+另一个效果相同的例子： >
+
+	let s:counter = 0
+	command Tick let s:counter = s:counter + 1 | echo s:counter
+
+调用函数和执行用户自定义命令时，script 变量的上下文被设为定义该函数或
+命令的那个 script。
+
+如果函数是在某个 script 中定义的函数内部定义的，script 变量同样可用。
+示例： >
+
+	let s:counter = 0
+	function StartCounting(incr)
+	  if a:incr
+	    function MyCounter()
+	      let s:counter = s:counter + 1
+	    endfunction
+	  else
+	    function MyCounter()
+	      let s:counter = s:counter - 1
+	    endfunction
+	  endif
+	endfunction
+
+这样，调用 StartCounting() 时，MyCounter() 函数要么用于向上计数，要么用于
+向下计数。无论从何处调用 StartCounting()，在 MyCounter() 中都能访问
+s:counter 变量。
+
+同一个 script 再次被 source 时会使用同一批 script 变量。只要 Vim 还在运行，
+它们就一直有效。这可用于维护计数器： >
+
+	if !exists("s:counter")
+	  let s:counter = 1
+	  echo "script executed for the first time"
+	else
+	  let s:counter = s:counter + 1
+	  echo "script executed " .. s:counter .. " times now"
+	endif
+
+注意，这意味着 filetype 插件对每个 buffer 并不会得到另一套 script 变量。
+请改用 buffer 局部变量 |b:var|。
+
+
+PREDEFINED VIM VARIABLES			*vim-variable* *v:var* *v:*
+								*E963*
+
+所有内建变量的字母序列表和细节在另一个 help 文件中：|vvars|。
+
+==============================================================================
+4. Builtin Functions				*vim-function* *functions*
+
+Vimscript 子系统（内部称为 "eval"）提供内建函数。script 也可以定义
+|user-function|。
+
+要按主题浏览函数，见 |function-list|。
+
+所有内建函数的字母序列表和细节在另一个 help 文件中：|vimscript-functions|。
+
+==============================================================================
+5. Defining functions					*user-function*
+
+可以定义新函数。它们可以像内建函数一样被调用。函数接收参数、执行一串
+Ex 命令，并可以返回一个值。
+
+关于定义函数的绝大部分信息可以在 |userfunc.txt| 中找到。
+
+==============================================================================
+6. Curly braces names					*curly-braces-names*
+
+在大多数可以使用变量的地方，都可以使用「花括号名字」变量。这是普通的变量
+名，其中有一个或多个用花括号 {} 包起来的表达式，像这样： >
+	my_{adjective}_variable
+
+当 Vim 遇到这种写法时，会求值花括号内的表达式，用该结果替换表达式，
+然后把整体重新解释为变量名。因此在上面的示例中，如果变量 "adjective" 被设为
+"noisy"，那么引用就会指向 "my_noisy_variable"；而如果 "adjective" 被设为
+"quiet"，则指向 "my_quiet_variable"。
+
+它的一个应用场景是创建一组由选项值决定的变量。例如，语句 >
+	echo my_{&background}_message
+
+会根据 'background' 的当前值输出 "my_dark_message" 或 "my_light_message" 的
+内容。
+
+可以使用多对花括号： >
+	echo my_{adverb}_{adjective}_message
+..甚至嵌套它们： >
+	echo my_{ad{end_of_word}}_message
+其中 "end_of_word" 是 "verb" 或 "jective"。
+
+然而，花括号内的表达式求值结果必须是一个有效的单个变量名，例如下面是
+无效的： >
+	:let foo='a + b'
+	:echo c{foo}d
+..因为展开的结果是 "ca + bd"，这不是一个变量名。
+
+						*curly-braces-function-names*
+可以用类似的方式按求值后的名字调用和定义函数。
+示例： >
+	:let func_end='whizz'
+	:call my_func_{func_end}(parameter)
+
+这会调用函数 "my_func_whizz(parameter)"。
+
+这样则不行： >
+  :let i = 3
+  :let @{i} = ''  " error
+  :echo @{i}      " error
+
+==============================================================================
+7. Commands						*expression-commands*
+
+:let {var-name} = {expr1}				*:let* *E18*
+			把内部变量 {var-name} 设为表达式 {expr1} 的结果。
+			变量会从 {expr} 获得类型。如果 {var-name} 此前
+			不存在，则会创建它。
+
+:let {var-name}[{idx}] = {expr1}			*E689*
+			把列表项设为表达式 {expr1} 的结果。
+			{var-name} 必须指向一个列表，且 {idx} 必须是该列表中
+			有效的索引。对于嵌套列表，索引可以重复。
+			这不能用来向 |List| 添加项。
+			这不能用来设置 String 中的某个字节。你可以这样做： >
+				:let var = var[0:2] .. 'X' .. var[4:]
+<			当 {var-name} 是 |Blob| 时，{idx} 可以是 blob
+			的长度，此时会追加一个字节。
+
+							*E711* *E719*
+:let {var-name}[{idx1}:{idx2}] = {expr1}		*E708* *E709* *E710*
+			把 |List| 中的一串项设为表达式 {expr1} 的结果，
+			该表达式必须是一个项数正确的列表。
+			{idx1} 可以省略，此时使用 0。
+			{idx2} 可以省略，表示列表末尾。
+			当选中的项范围部分超出列表末尾时，会添加新的项。
+
+			*:let+=* *:let-=* *:letstar=*
+			*:let/=* *:let%=* *:let.=* *:let..=* *E734*
+:let {var} += {expr1}	等同于 ":let {var} = {var} + {expr1}"。
+:let {var} -= {expr1}	等同于 ":let {var} = {var} - {expr1}"。
+`:let {var} *= {expr1}`	等同于 ":let {var} = {var} * {expr1}"。
+:let {var} /= {expr1}	等同于 ":let {var} = {var} / {expr1}"。
+:let {var} %= {expr1}	等同于 ":let {var} = {var} % {expr1}"。
+:let {var} .= {expr1}	等同于 ":let {var} = {var} . {expr1}"。
+:let {var} ..= {expr1}	等同于 ":let {var} = {var} .. {expr1}"。
+			若 {var} 尚未设置，或者 {var} 的类型与 {expr1}
+			不符合该运算符，这些形式会失败。
+			`+=` 会原地修改 |List| 或 |Blob|，而不是创建一个
+			新的。
+
+
+:let ${env-name} = {expr1}			*:let-environment* *:let-$*
+			把环境变量 {env-name} 设为表达式 {expr1} 的结果。
+			类型始终是 String。
+:let ${env-name} .= {expr1}
+:let ${env-name} ..= {expr1}
+			把 {expr1} 追加到环境变量 {env-name}。
+			如果该环境变量此前不存在，其效果等同于 "="。
+
+:let @{reg-name} = {expr1}			*:let-register* *:let-@*
+			把表达式 {expr1} 的结果写入 register {reg-name}。
+			{reg-name} 必须是单个字母，且必须是可写 register 的名字
+			（见 |registers|）。"@@" 可用于未命名 register，"@/"
+			用于搜索模式。
+			如果 {expr1} 的结果以 <CR> 或 <NL> 结尾，register 将是
+			行型的，否则会被设为字符型的。
+			这可用于清除上一次的搜索模式： >
+				:let @/ = ""
+<			这与搜索空字符串不同，后者会在任何地方都匹配。
+
+:let @{reg-name} .= {expr1}
+:let @{reg-name} ..= {expr1}
+			把 {expr1} 追加到 register {reg-name}。如果该 register
+			原本为空，则等同于把它设为 {expr1}。
+
+:let &{option-name} = {expr1}			*:let-option* *:let-&*
+			把选项 {option-name} 设为表达式 {expr1} 的结果。
+			String 或 Number 值总会被转换为该选项的类型。
+			对于 window 或 buffer 局部的选项，效果与使用 |:set|
+			命令一样：局部值和全局值都会改变。
+			示例： >
+				:let &path = &path .. ',/usr/local/include'
+
+:let &{option-name} .= {expr1}
+:let &{option-name} ..= {expr1}
+			对字符串选项：把 {expr1} 追加到其值上。
+			不会像 |:set+=| 那样插入逗号。
+
+:let &{option-name} += {expr1}
+:let &{option-name} -= {expr1}
+			对数值或布尔选项：加上或减去 {expr1}。
+
+:let &l:{option-name} = {expr1}
+:let &l:{option-name} += {expr1}
+:let &l:{option-name} -= {expr1}
+:let &l:{option-name} .= {expr1}
+:let &l:{option-name} ..= {expr1}
+			同上，但只设置选项的局部值（如果存在的话）。
+			效果如同 |:setlocal|。
+
+:let &g:{option-name} = {expr1}
+:let &g:{option-name} += {expr1}
+:let &g:{option-name} -= {expr1}
+:let &g:{option-name} .= {expr1}
+:let &g:{option-name} ..= {expr1}
+			同上，但只设置选项的全局值（如果存在的话）。
+			效果如同 |:setglobal|。
+
+:let [{name1}, {name2}, ...] = {expr1}		*:let-unpack* *E687* *E688*
+			{expr1} 必须求值为一个 |List|。列表中的第一项赋给
+			{name1}，第二项赋给 {name2}，依此类推。
+			名字的个数必须与 |List| 中的项数一致。
+			每个名字都可以是上文提到的 ":let" 命令的项之一。
+			示例： >
+				:let [s, item] = GetItem(s)
+<			细节：先求值 {expr1}，然后按顺序执行赋值。
+			如果 {name2} 依赖于 {name1}，这一点很重要。示例： >
+				:let x = [0, 1]
+				:let i = 0
+				:let [i, x[i]] = [1, 2]
+				:echo x
+<			结果是 [0, 2]。
+
+:let [{name1}, {name2}, ...] += {expr1}
+:let [{name1}, {name2}, ...] -= {expr1}
+`:let [{name1}, {name2}, ...] *= {expr1}`
+:let [{name1}, {name2}, ...] /= {expr1}
+:let [{name1}, {name2}, ...] %= {expr1}
+:let [{name1}, {name2}, ...] .= {expr1}
+:let [{name1}, {name2}, ...] ..= {expr1}
+			同上，但对每个 |List| 项加上、减去、乘、除、取模或
+			追加该值。
+
+:let [{name}, ..., ; {lastname}] = {expr1}				*E452*
+			与上面的 |:let-unpack| 类似，但 |List| 的项数可以比
+			名字多。剩余项的列表会赋给 {lastname}。如果没有
+			剩余项，{lastname} 被设为空列表。
+			示例： >
+				:let [a, b; rest] = ["aval", "bval", 3, 4]
+<
+:let [{name}, ..., ; {lastname}] += {expr1}
+:let [{name}, ..., ; {lastname}] -= {expr1}
+:let [{name}, ..., ; {lastname}] .= {expr1}
+:let [{name}, ..., ; {lastname}] ..= {expr1}
+			同上，但对每个 |List| 项加上/减去/追加该值。
+
+						*:let=<<* *:let-heredoc*
+					*E990* *E991* *E172* *E221* *E1145*
+:let {var-name} =<< [trim] [eval] {endmarker}
+text...
+text...
+{endmarker}
+			把内部变量 {var-name} 设为一个 |List|，其中包含以字符串
+			{endmarker} 为界的各行文本。
+
+			如果未指定 "eval"，则每行文本都被当作 |literal-string|，
+			只是单引号不需要写成两个。
+			如果指定了 "eval"，则 {expr} 形式的 Vim 表达式会被求值，
+			其结果替换该表达式，类似于 |interpolated-string|。
+			下面这个示例中 $HOME 被展开： >
+				let lines =<< trim eval END
+				  some text
+				  See the file {$HOME}/.vimrc
+				  more text
+				END
+<			单行中可以有多个 Vim 表达式，但表达式不能跨越多行。
+			如果任何表达式求值失败，则赋值失败。
+
+			{endmarker} 中不得含空白。
+			{endmarker} 不能以小写字符开头。
+			最后一行应当只以 {endmarker} 字符串结束，不带任何其他
+			字符。当心 {endmarker} 之后的空白！
+
+			不加 "trim" 时，各行文本中的任何空白字符都会被保留。
+			如果在 {endmarker} 之前指定 "trim"，则会去掉缩进，这样
+			你就可以这样写： >
+				let text =<< trim END
+				   if ok
+				     echo 'done'
+				   endif
+				END
+<			结果为：`["if ok", "  echo 'done'", "endif"]`
+			结束标记必须与 "let" 对齐，且第一行的缩进会从所有文本行
+			中移除。
+			具体来说：与第一个非空文本行的前导缩进完全一致的前导缩进
+			会从输入行中被去掉。与 `let` 之前的前导缩进完全一致的前导
+			缩进会从包含 {endmarker} 的那一行中被去掉。注意此处空格
+			与制表符的差别很重要。
+
+			如果 {var-name} 此前不存在，则会创建它。
+			其后面不能跟另一条命令，但可以跟注释。
+
+			为避免应用行续接，请考虑
+			在 'cpoptions' 中加入 'C'： >
+				set cpo+=C
+				let var =<< END
+				   \ leading backslash
+				END
+				set cpo-=C
+<
+			示例： >
+				let var1 =<< END
+				Sample text 1
+				    Sample text 2
+				Sample text 3
+				END
+
+				let data =<< trim DATA
+					1 2 3 4
+					5 6 7 8
+				DATA
+
+				let code =<< trim eval CODE
+				   let v = {10 + 20}
+				   let h = "{$HOME}"
+				   let s = "{Str1()} abc {Str2()}"
+				   let n = {MyFunc(3, 4)}
+				CODE
+<
+									*E121*
+:let {var-name}	...	列出变量 {var-name} 的值。可给出多个
+			变量名。此处可识别的特殊名称：				*E738*
+			  g:	全局变量
+			  b:	局部的 buffer 变量
+			  w:	局部的 window 变量
+			  t:	局部的 tab page 变量
+			  s:	脚本局部变量
+			  l:	局部函数变量
+			  v:	Vim 变量。
+
+:let			列出所有变量的值。值的类型标在
+			值之前：
+			    <nothing>	String
+				#	Number
+				*	Funcref
+
+:unl[et][!] {name} ...				*:unlet* *:unl* *E108* *E795*
+			删除内部变量 {name}。可给出多个变量
+			名，它们都会被删除。名称也可以是一个
+			|List| 或 |Dictionary| 的项。
+			带 [!] 时，对不存在的变量不给出错误
+			消息。
+			可以从 |List| 中删除一个或多个项： >
+				:unlet list[3]	  " remove fourth item
+				:unlet list[3:]   " remove fourth item to last
+<			一次可从 |Dictionary| 中删除一项： >
+				:unlet dict['two']
+				:unlet dict.two
+<			这在清理用过的全局变量和脚本局部变量时
+			特别有用（这些变量在脚本结束时不会
+			被删除）。函数局部变量在函数结束时
+			会被自动删除。
+
+:unl[et] ${env-name} ...			*:unlet-environment* *:unlet-$*
+			删除环境变量 {env-name}。
+			可在一条 :unlet 命令中混用 {name} 与 ${env-name}。
+			对不存在的变量不给出错误消息，即使没有 !。
+			若系统不支持删除环境变量，则该变量被置为空。
+
+					*:cons* *:const*
+:cons[t] {var-name} = {expr1}
+:cons[t] [{name1}, {name2}, ...] = {expr1}
+:cons[t] [{name}, ..., ; {lastname}] = {expr1}
+:cons[t] {var-name} =<< [trim] [eval] {endmarker}
+text...
+text...
+{endmarker}
+			类似 |:let|，但会在设置值之后锁定该变量。
+			这与在 |:let| 之后立即用 |:lockvar| 锁定
+			该变量相同，因此： >
+				:const x = 1
+<			等价于： >
+				:let x = 1
+				:lockvar! x
+<			如果你想确保该变量不被修改，这很有用。
+			若值是 List 或 Dictionary 字面量，则其各项
+			也不能被修改： >
+				const ll = [1, 2, 3]
+				let ll[1] = 5  " Error!
+<			嵌套引用不会被锁定： >
+				let lvar = ['a']
+				const lconst = [0, lvar]
+				let lconst[0] = 2  " Error!
+				let lconst[1][0] = 'b'  " OK
+<							*E995*
+			用 |:const| 指定一个已存在的变量是错误。 >
+				:let x = 1
+				:const x = 1  " Error!
+<							*E996*
+			注意此处不能使用环境变量、选项值和
+			register 的值，因为它们无法被锁定。
+
+:cons[t]
+:cons[t] {var-name}
+			若未给出参数或只给出 {var-name}，
+			其行为与 |:let| 相同。
+
+:lockv[ar][!] [depth] {name} ...			*:lockvar* *:lockv*
+			锁定内部变量 {name}。锁定意味着
+			它不能再被更改（直到被解锁）。
+			被锁定的变量可以被删除： >
+				:lockvar v
+				:let v = 'asdf'	  " fails!
+				:unlet v	  " works
+<							*E741* *E940* *E1122*
+			若你试图更改一个被锁定的变量，会得到
+			错误消息："E741: Value is locked: {name}"。
+			若你试图锁定或解锁一个内建变量，会得到
+			错误消息 "E940: Cannot lock or unlock
+			variable {name}"。
+
+			[depth] 在锁定 |List| 或 |Dictionary| 时
+			才有意义。它指定锁定的深度：
+				0	锁定变量 {name}，但不锁定其值。
+				1	锁定 |List| 或 |Dictionary| 本身，
+					不能增删项，但仍可更改它们的值。
+				2	同时锁定值，不能更改各项。
+					若某一项是 |List| 或
+					|Dictionary|，则不能增删
+					项，但仍可更改其中的值。
+				3	同 2，但作用于 |List| /
+					|Dictionary| 中的 |List| /
+					|Dictionary|，再深一层。
+			默认的 [depth] 是 2，因此当 {name} 是 |List|
+			或 |Dictionary| 时，值不能被更改。
+
+			使用 [depth] 0 的示例： >
+				let mylist = [1, 2, 3]
+				lockvar 0 mylist
+				let mylist[0] = 77	" OK
+				call add(mylist, 4)	" OK
+				let mylist = [7, 8, 9]  " Error!
+<							*E743*
+			要使用不限深度，请用 [!] 并省略 [depth]。
+			不过最大深度为 100，以防止出现循环。
+
+			注意，当两个变量引用同一个 |List| 时，
+			锁定其中一个，该 |List| 通过另一个变量
+			使用时也会处于锁定状态。
+			示例： >
+				:let l = [0, 1, 2, 3]
+				:let cl = l
+				:lockvar l
+				:let cl[1] = 99		" won't work!
+<			你可能想复制一份 list 来避免这种情况。
+			参见 |deepcopy()|。
+
+
+:unlo[ckvar][!] [depth] {name} ...			*:unlockvar* *:unlo*
+			解锁内部变量 {name}。执行 |:lockvar| 的
+			相反操作。
+
+			若 {name} 不存在，不给出错误。
+
+:if {expr1}			*:if* *:end* *:endif* *:en* *E171* *E579* *E580*
+:en[dif]		若 {expr1} 求值为非零，则执行命令直到下一个
+			匹配的 `:else` 或 `:endif`。
+			虽然短形式也能用，但建议始终使用 `:endif`，
+			以避免混淆，并让自动缩进正常工作。
+
+			从 Vim 4.5 到 5.0，`:if` 与 `:endif` 之间的每一条
+			Ex 命令都被忽略。这两条命令只是为了以
+			向后兼容的方式允许将来的扩展。允许嵌套。
+			注意任何 `:else` 或 `:elseif` 都被忽略，
+			`else` 部分也不会执行。
+
+			可利用这一点保持与旧版本的兼容性： >
+				:if version >= 500
+				:  version-5-specific-commands
+				:endif
+<			这些命令仍需要被解析以找到 `endif`。
+			有时旧版 Vim 会对新命令出错。例如，
+			`:silent` 会被当作 `:substitute` 命令。
+			这种情况下可以用 `:execute` 来避免问题： >
+				:if version >= 600
+				:  execute "silent 1,$delete"
+				:endif
+<
+			注意：`:append` 与 `:insert` 命令在 `:if` 与
+			`:endif` 之间无法正常工作。
+
+				*:else* *:el* *E581* *E583*
+:el[se]			若此前一直未执行，则执行命令直到下一个匹配的
+			`:else` 或 `:endif`。
+
+				*:elseif* *:elsei* *E582* *E584*
+:elsei[f] {expr1}	` :else` `:if` 的简写，区别在于不需要额外的
+			`:endif`。
+
+:wh[ile] {expr1}			*:while* *:endwhile* *:wh* *:endw*
+				*E170* *E585* *E588* *E733*
+:endw[hile]		只要 {expr1} 求值为非零，就重复 `:while` 与
+			`:endwhile` 之间的命令。
+			当检测到循环内部某条命令出错时，执行从
+			`endwhile` 之后继续。
+			示例： >
+				:let lnum = 1
+				:while lnum <= line("$")
+				   :call FixLine(lnum)
+				   :let lnum = lnum + 1
+				:endwhile
+<
+			注意：`:append` 与 `:insert` 命令在 `:while` 和
+			`:for` 循环内部无法正常工作。
+
+:for {var} in {object}			*:for* *E690* *E732*
+:endfo[r]			*:endfo* *:endfor*
+			对 {object} 中的每一项，重复 `:for` 与
+			`:endfor` 之间的命令。{object} 可以是 |List|、
+			|Blob| 或 |String|。
+
+			变量 {var} 被设为每一项的值。
+
+			当检测到循环内部某条命令出错时，执行从
+			`endfor` 之后继续。
+			在循环内部更改 {object} 会影响所用的项。
+			如果不希望如此，请复制一份： >
+				:for item in copy(mylist)
+<
+			当 {object} 是 |List| 且未复制时，Vim 会在
+			用当前项执行命令之前，保存到 |List| 中
+			下一项的引用。因此当前项可以被删除而不影响
+			结果。删除任何后面的项则意味着它不会被找到。
+			因此下面的示例可行（一种低效的清空 |List|
+			的方法）： >
+				for item in mylist
+				   call remove(mylist, 0)
+				endfor
+<			注意重排 |List|（例如用 sort() 或 reverse()）
+			可能有出乎意料的后果。
+
+			当 {object} 是 |Blob| 时，Vim 总是复制一份来
+			迭代。与 |List| 不同，修改 |Blob| 不影响
+			迭代。
+
+			当 {object} 是 |String| 时，每一项都是
+			一个字符组成的字符串，外加任何组合字符。
+
+:for [{var1}, {var2}, ...] in {listlist}
+:endfo[r]
+			与上面的 `:for` 类似，但 {listlist} 中的每项
+			必须是一个 list，其中的每一项分别赋给
+			{var1}、{var2} 等。示例： >
+				:for [lnum, col] in [[1, 3], [2, 5], [3, 8]]
+				   :echo getline(lnum)[col]
+				:endfor
+<
+
+						*:continue* *:con* *E586*
+:con[tinue]		在 `:while` 或 `:for` 循环内部使用时，跳回循环
+			的开头。
+
+			若在循环内 `:try` 之后、但匹配的 `:finally`
+			（如果存在）之前使用，则先执行 `:finally` 之后
+			直到匹配的 `:endtry` 的命令。这一过程适用于
+			循环内所有嵌套的 `:try`。最外层的 `:endtry`
+			随后跳回循环的开头。
+
+					*:break* *:brea* *E587*
+:brea[k]		在 `:while` 或 `:for` 循环内部使用时，跳到
+			匹配的 `:endwhile` 或 `:endfor` 之后的
+			命令。
+			若在循环内 `:try` 之后、但匹配的 `:finally`
+			（如果存在）之前使用，则先执行 `:finally`
+			之后直到匹配的 `:endtry` 的命令。这一过程
+			适用于循环内所有嵌套的 `:try`。最外层的
+			`:endtry` 随后跳回循环之后再执行。
+
+:try				*:try* *:endt* *:endtry* *E600* *E601* *E602*
+:endt[ry]		更改 `:try` 与 `:endtry` 之间命令的错误
+			处理方式，包括跨越 `:source` 命令、函数调用
+			或 autocommand 调用而执行的所有内容。
+
+			当检测到错误或中断，且有后续的 `:finally`
+			命令时，执行从 `:finally` 之后继续。否则，
+			或在随后到达 `:endtry` 时，会检查下一个
+			（动态）外层的 `:try` 是否有对应的
+			`:finally` 等。然后脚本处理被终止。
+			函数定义是否带 "abort" 参数无关紧要。
+			示例： >
+		try | call Unknown() | finally | echomsg "cleanup" | endtry
+		echomsg "not reached"
+<
+			此外，`:try` 与 `:endtry` 内部（动态）的
+			错误或中断会被转换为异常。可以像它是由
+			`:throw` 命令抛出的一样去捕获（见 `:catch`）。
+			这种情况下，脚本处理不会被终止。
+
+			中断异常使用值 "Vim:Interrupt"。Vim 命令中
+			的错误会转换为 "Vim({command}):{errmsg}"
+			形式的值，其它错误转换为 "Vim:{errmsg}"
+			形式的值。{command} 是完整的命令名，
+			{errmsg} 是错误异常未被捕获时显示的消息，
+			总是以错误号开头。
+			示例： >
+		try | sleep 100 | catch /^Vim:Interrupt$/ | endtry
+		try | edit | catch /^Vim(edit):E\d\+/ | echo "error" | endtry
+<
+					*:cat* *:catch*
+					*E603* *E604* *E605* *E654*
+:cat[ch] [/{pattern}/]	当一个匹配 {pattern} 的异常被抛出、且尚未被
+			先前的 `:catch` 捕获时，执行后续命令，直到
+			下一个属于同一 `:try` 的 `:catch`、`:finally`
+			或 `:endtry`。否则这些命令被跳过。
+			Pattern 可以以 "Vim({cmd})" 开头，表示执行
+			Ex 命令 {cmd} 时发生的异常。省略 {pattern}
+			时捕获所有错误。示例： >
+		:catch /^Vim:Interrupt$/	 " catch interrupts (CTRL-C)
+		:catch /^Vim\%((\S\+)\)\=:E/	 " catch all Vim errors
+		:catch /^Vim\%((\S\+)\)\=:/	 " catch errors and interrupts
+		:catch /^Vim(write):/		 " catch all errors in :write
+		:catch /^Vim(!):/		 " catch all errors in :!
+		:catch /^Vim\%((\S\+)\)\=:E123:/ " catch error E123
+		:catch /my-exception/		 " catch user exception
+		:catch /.*/			 " catch everything
+		:catch				 " same as /.*/
+<
+			可以用其它字符代替 / 括住 {pattern}，
+			只要它没有特殊含义（例如 '|' 或 '"'），
+			且不出现在 {pattern} 内部。
+			异常的信息可在 |v:exception| 中获得。
+			另见 |throw-variables|。
+			注意：用 ":catch" 捕获错误消息的 TEXT 是不可靠
+			的，因为它在不同 locale 下可能不同。
+
+				*:fina* *:finally* *E606* *E607*
+:fina[lly]		只要离开匹配的 `:try` 与 `:finally` 之间的
+			部分，就执行后续命令直到匹配的 `:endtry`：
+			无论是顺次落到 `:finally`，还是由 `:continue`、
+			`:break`、`:finish`、`:return`，或由错误、
+			中断、异常（见 `:throw`）离开。
+
+					*:th* *:throw* *E608*
+:th[row] {expr1}	{expr1} 被求值并作为异常抛出。
+			若 `:throw` 用在 `:try` 之后、第一个对应的
+			`:catch` 之前，则命令被跳过，直到到达第一个
+			匹配 {expr1} 的 `:catch`。
+			若没有这样的 `:catch`，或 `:throw` 用在
+			`:catch` 之后、`:finally` 之前，则执行
+			`:finally`（如果存在）之后直到匹配的
+			`:endtry` 的命令。若 `:throw` 在 `:finally`
+			之后，则直到 `:endtry` 的命令被跳过。
+			在 `:endtry` 处，这一过程再次作用于下一个
+			（动态）外层的 `:try`（可能位于调用它的函数
+			或 source 它的脚本中），直到找到匹配的
+			`:catch`。若异常未被捕获，命令处理被终止。
+			示例： >
+		:try | throw "oops" | catch /^oo/ | echo "caught" | endtry
+<			注意，为应对错误导致解析跳过整行、因而
+			看不到分隔命令的 "|" 的情况，"catch" 可能
+			需要单独占一行。
+
+					*:ec* *:echo*
+:ec[ho] {expr1} ...	输出每个 {expr1}，之间用空格分隔。
+			第一个 {expr1} 从新行开始。
+			另见 |:comment|。
+			用 "\n" 开始新行。用 "\r" 将 cursor 移到
+			第一列。
+			使用由 `:echohl` 命令设置的高亮。
+			其后不能跟注释。
+			示例： >
+		:echo "the value of 'shell' is" &shell
+<				*:echo-redraw*
+			稍后的重绘可能让消息再次消失。
+			而且由于 Vim 通常会把重绘推迟到一系列命令
+			执行完毕之后，这种情况相当常见。为避免
+			`:echo` 之前的某条命令随后触发了重绘
+			（重绘常常被推迟到你输入某些内容），
+			请用 `:redraw` 命令强制重绘。示例： >
+		:new | redraw | echo "there is a new window"
+<				*:echo-self-refer*
+			打印嵌套容器时，echo 会用
+			"[...@level]"（自引用的 |List|）或
+			"{...@level}"（自引用的 |Dict|）来表示
+			自引用容器第二次出现： >
+		:let l = []
+		:call add(l, l)
+		:let l2 = []
+		:call add(l2, [l2])
+		:echo l l2
+<			会输出 "[[...@0]] [[[...@0]]]"。输出 "[l]" 则会
+			输出 "[[[...@1]]]"，因为 l 首次出现是在第二层。
+
+				*:echon*
+:echon {expr1} ...	输出每个 {expr1}，不附加任何内容。另见
+			|:comment|。
+			使用由 `:echohl` 命令设置的高亮。
+			其后不能跟注释。
+			示例： >
+				:echon "the value of 'shell' is " &shell
+<
+			注意 `:echo`（Vim 命令）与 `:!echo`（外部 shell
+			命令）之间的区别： >
+		:!echo %		--> filename
+<			":!" 的参数会被展开，见 |:_%|。 >
+		:!echo "%"		--> filename or "filename"
+<			与上一个示例类似。你是否看到双引号取决于
+			你的 'shell'。 >
+		:echo %			--> nothing
+<			'%' 在表达式中是非法字符。 >
+		:echo "%"		--> %
+<			这只是输出 '%' 字符。 >
+		:echo expand("%")	--> filename
+<			这调用 expand() 函数来展开 '%'。
+
+				*:echoh* *:echohl*
+:echoh[l] {name}	对后续的 `:echo`、`:echon` 与 `:echomsg`
+			命令使用高亮组 {name}。它也用于 `input()`
+			提示。示例： >
+		:echohl WarningMsg | echo "Don't panic!" | echohl None
+<			别忘了把高亮组设回 "None"，否则后续所有
+			echo 都会被高亮。
+
+				*:echom* *:echomsg*
+:echom[sg] {expr1} ...	把表达式作为真正的消息输出，并保存到
+			|message-history| 中。
+			与 `:echo` 命令一样，参数之间会放置空格。
+			但不可打印字符会被显示出来，而不是被解释。
+			其解析方式与 `:echo` 略有不同，更像
+			`:execute`。所有表达式会先求值并拼接，
+			然后才输出任何内容。
+			若表达式求值结果不是 Number 或 String，
+			则用 string() 将其转换为字符串。
+			使用由 `:echohl` 命令设置的高亮。
+			示例： >
+		:echomsg "It's a Zizzer Zazzer Zuzz, as you can plainly see."
+<			参见 |:echo-redraw|，以避免消息在屏幕重绘时
+			消失。
+
+				*:echoe* *:echoerr*
+:echoe[rr] {expr1} ...	把表达式作为错误消息输出，并保存到
+			|message-history| 中。在脚本或函数中使用
+			时会加上行号。
+			与 `:echomsg` 命令一样，参数之间会放置空格。
+			在 try 条件内部使用时，消息会改以错误异常
+			的形式抛出（见 |try-echoerr|）。
+			示例： >
+		:echoerr "This script just failed!"
+<			如果你只想要高亮的消息，请用 `:echohl`。
+			要发出 beep 声： >
+		:exe "normal \<Esc>"
+<
+				*:eval*
+:eval {expr}		求值 {expr} 并丢弃结果。示例： >
+				:eval Getlist()->Filter()->append('$')
+
+<
+			该表达式应当带有副作用，因为结果值不会被使用。
+			示例中 `append()` 调用把 List 连同文本追加到
+			buffer。这类似 `:call`，但适用于任何表达式。
+
+			该命令可缩写为 `:ev` 或 `:eva`，但这些缩写
+			难以识别，因此不宜使用。
+
+			该命令后面不能跟 "|" 和另一条命令，因为
+			"|" 会被视为表达式的一部分。
+
+				*:exe* *:execute*
+:exe[cute] {expr1} ...	把 {expr1} 求值所得的字符串作为 Ex 命令执行。
+			多个参数被拼接起来，之间加一个空格。
+			若要避免多余的空格，请用 ".." 运算符把字符串
+			拼接成一个参数。
+			{expr1} 被用作处理后的命令，命令行编辑按键不被
+			识别。
+			其后不能跟注释。
+			示例： >
+		:execute "buffer" nextbuf
+		:execute "normal" count .. "w"
+<
+			":execute" 可用于把命令追加到不接受 '|' 的
+			命令之后。示例： >
+		:execute '!ls' | echo "theend"
+
+<
+			":execute" 也是避免在 Vim 脚本中为 ":normal"
+			命令键入控制字符的好办法： >
+		:execute "normal ixxx\<Esc>"
+<			这里有一个 <Esc> 字符，见 |expr-string|。
+
+			注意正确转义文件名中的特殊字符。|fnameescape()|
+			函数可用于 Vim 命令，|shellescape()| 可用于 |:!|
+			命令。示例： >
+		:execute "e " .. fnameescape(filename)
+		:execute "!ls " .. shellescape(filename, 1)
+<
+			注意：被执行的字符串可以是任何命令行，但
+			开始或结束 "if"、"while" 和 "for" 并不总是
+			有效，因为命令被跳过时 ":execute" 不会被求值，
+			Vim 会丢失块的开始与结束位置。另外 "break" 和
+			"continue" 不应放在 ":execute" 内部。
+			下面的示例无效，因为 ":execute" 未被求值，
+			Vim 看不到 "while"，并因为在 `:endwhile` 处
+			而报错： >
+		:if 0
+		: execute 'while i > 5'
+		:  echo "test"
+		: endwhile
+		:endif
+<
+			允许把 "while" 或 "if" 命令完整地放在被执行的
+			字符串中： >
+		:execute 'while i < 5 | echo i | let i = i + 1 | endwhile'
+<
+				*:exe-comment*
+			":execute"、":echo" 与 ":echon" 后面不能直接跟
+			注释，因为它们会把 '"' 视为字符串的开头。
+			不过，你可以用 '|' 后接注释。示例： >
+		:echo "foo" | "this is a comment
+
+==============================================================================
+8. 异常处理				*exception-handling*
+
+Vim 脚本语言包含异常处理特性。本节说明如何在 Vim 脚本中使用它。
+
+异常可以由 Vim 在出错或中断时抛出，见 |catch-errors| 与
+|catch-interrupt|。你也可以用 ":throw" 命令显式抛出异常，见
+|throw-catch|。
+
+
+TRY 条件					*try-conditionals*
+
+异常可以被捕获，也可以触发清理代码的执行。你可以用 try 条件来指定
+catch 子句（捕获异常）和/或 finally 子句（用于清理）。
+   try 条件以 |:try| 命令开始，到匹配的 |:endtry| 命令结束。其间
+可以用 |:catch| 命令开始一个 catch 子句，或用 |:finally| 命令开始
+一个 finally 子句。catch 子句可以没有，也可以有多个，但 finally 子句
+至多一个，且其后不能再跟任何 catch 子句。catch 子句与 finally 子句
+之前的那些行称为 try 块。 >
+
+     :try
+     :	...
+     :	...				TRY BLOCK
+     :	...
+     :catch /{pattern}/
+     :	...
+     :	...				CATCH CLAUSE
+     :	...
+     :catch /{pattern}/
+     :	...
+     :	...				CATCH CLAUSE
+     :	...
+     :finally
+     :	...
+     :	...				FINALLY CLAUSE
+     :	...
+     :endtry
+
+try 条件可以监视代码中的异常并采取适当的动作。try 块中的异常可以被
+捕获。try 块中的异常，以及 catch 子句中的异常，都可能触发清理动作。
+   当 try 块执行期间没有抛出异常时，控制权转给 finally 子句（如果
+存在）。执行完它之后，脚本从 ":endtry" 之后的那一行继续。
+   当 try 块执行期间发生异常时，try 块中剩余的行被跳过。该异常会与
+":catch" 命令作为参数给出的那些模式进行匹配。第一个匹配的 ":catch"
+之后的 catch 子句被采用，其它 catch 子句不执行。catch 子句在遇到
+下一个 ":catch"、":finally" 或 ":endtry" 命令时结束——以先遇到者为准。
+然后执行 finally 子句（如果存在）。当到达 ":endtry" 时，脚本执行
+照常从其后的那一行继续。
+   当 try 块中抛出的异常不匹配 ":catch" 命令指定的任何模式时，该异常
+不会被这个 try 条件捕获，也不会执行任何 catch 子句。只执行 finally
+子句（如果存在）。该异常会在 finally 子句执行期间挂起。它在 ":endtry"
+处被恢复，因此 ":endtry" 之后的命令不会执行，而该异常可能在其他地方
+被捕获，见 |try-nesting|。
+   当 catch 子句执行期间抛出另一个异常时，该 catch 子句剩余的行不执行。
+新异常不会与同一个 try 条件的任何 ":catch" 命令中的模式匹配，其任何
+catch 子句都不会被采用。然而，如果存在 finally 子句，它会被执行，
+而该异常会在它执行期间挂起。":endtry" 之后的命令不执行。不过，这个
+新异常可能在其他地方被捕获，见 |try-nesting|。
+   当 finally 子句（如果存在）执行期间抛出异常时，finally 子句剩余
+的行被跳过。如果该 finally 子句是因为 try 块或某个 catch 子句中的异常
+而被采用的，原来的（挂起的）异常被丢弃。":endtry" 之后的命令不执行，
+而来自 finally 子句的异常被传播出去，并可在其他地方被捕获，见
+|try-nesting|。
+
+当从 try 块或 catch 子句中对包围整个 try 条件的 ":while" 循环执行
+":break" 或 ":continue" 时，finally 子句也会执行。或者当从函数或被
+source 的脚本中某个 try 条件的 try 块或 catch 子句执行 ":return" 或
+":finish" 时，也会执行。":break"、":continue"、":return" 或 ":finish"
+会在 finally 子句执行期间挂起，并在到达 ":endtry" 时被恢复。不过，
+若从 finally 子句抛出异常，它会被丢弃。
+   当在 finally 子句中遇到对包围整个 try 条件的 ":while" 循环的
+":break" 或 ":continue"，或遇到 ":return" 或 ":finish" 时，finally
+子句的其余部分被跳过，而 ":break"、":continue"、":return" 或
+":finish" 照常执行。如果该 finally 子句是因为异常，或因为 try 块或
+catch 子句先前的一次 ":break"、":continue"、":return" 或 ":finish"
+而被采用的，这个挂起的异常或命令被丢弃。
+
+示例见 |throw-catch| 与 |try-finally|。
+
+
+TRY 条件的嵌套				*try-nesting*
+
+try 条件可以任意嵌套。也就是说，一个完整的 try 条件可以放在另一个
+try 条件的 try 块、catch 子句或 finally 子句中。若内层 try 条件没有
+捕获其 try 块中抛出的异常，或从其某个 catch 子句或其 finally 子句
+抛出新的异常，则按上述规则检查外层 try 条件。若内层 try 条件位于
+外层 try 条件的 try 块中，则检查其 catch 子句；否则只执行 finally
+子句。内层 try 条件是直接包含在外层中，还是外层 source 了一个脚本
+或调用了一个包含该内层 try 条件的函数，对嵌套没有影响。
+
+当所有活动的 try 条件都没有捕获到异常时，只执行它们的 finally 子句。
+此后，脚本处理终止。对于由 ":throw" 命令显式抛出的未捕获异常，会显示
+错误消息。对于由 Vim 隐式引发的未捕获错误异常和中断异常，错误消息或
+中断消息照常显示。
+
+示例见 |throw-catch|。
+
+
+检查异常处理代码				*except-examine*
+
+异常处理代码可能变得很棘手。若不确定发生了什么，可把 'verbose' 设为
+13，或在 source 脚本文件时使用 ":13verbose" 命令修饰符。然后你就能
+看到异常何时被抛出、丢弃、捕获或结束。使用至少 14 的 verbose 级别时，
+还会显示在 finally 子句中挂起的东西。这些信息在调试模式下也会给出
+（见 |debug-scripts|）。
+
+
+抛出与捕获异常				*throw-catch*
+
+你可以抛出任意数字或字符串作为异常。使用 |:throw| 命令，并把要抛出的值作为参数
+传入： >
+	:throw 4711
+	:throw "string"
+<							*throw-expression*
+你也可以指定一个表达式参数。此时会先对该表达式求值，然后抛出其结果： >
+	:throw 4705 + strlen("string")
+	:throw strpart("strings", 0, 6)
+
+在求值 ":throw" 命令的参数期间，可能抛出异常。若没有在那里被捕获，表达式求值
+即被放弃。随后 ":throw" 命令不会再抛出新的异常。
+   示例： >
+
+	:function! Foo(arg)
+	:  try
+	:    throw a:arg
+	:  catch /foo/
+	:  endtry
+	:  return 1
+	:endfunction
+	:
+	:function! Bar()
+	:  echo "in Bar"
+	:  return 4710
+	:endfunction
+	:
+	:throw Foo("arrgh") + Bar()
+
+这里抛出的是 "arrgh"，而且不显示 "in Bar"，因为 Bar() 没有执行。 >
+	:throw Foo("foo") + Bar()
+但改成这样就会显示 "in Bar"，并抛出 4711。
+
+任何其它以表达式为参数的命令，也可能因表达式求值期间出现（未被捕获的）异常
+而被放弃。此时异常会传播给该命令的调用者。
+   示例： >
+
+	:if Foo("arrgh")
+	:  echo "then"
+	:else
+	:  echo "else"
+	:endif
+
+这里 "then" 与 "else" 都不会显示。
+
+							*catch-order*
+异常可以由带有一个或多个 |:catch| 命令的 try 条件捕获，见 |try-conditionals|。
+每个 ":catch" 命令要捕获的值可用模式参数指定。一旦捕获到匹配的异常，紧接其后的
+catch 子句就会执行。
+   示例： >
+
+	:function! Foo(value)
+	:  try
+	:    throw a:value
+	:  catch /^\d\+$/
+	:    echo "Number thrown"
+	:  catch /.*/
+	:    echo "String thrown"
+	:  endtry
+	:endfunction
+	:
+	:call Foo(0x1267)
+	:call Foo('string')
+
+第一次调用 Foo() 显示 "Number thrown"，第二次显示 "String thrown"。
+异常按 ":catch" 命令的指定顺序与之匹配。只有第一个匹配项算数。因此应把更具体的
+":catch" 放在前面。下面这个顺序毫无意义： >
+
+	:  catch /.*/
+	:    echo "String thrown"
+	:  catch /^\d\+$/
+	:    echo "Number thrown"
+
+这里的第一个 ":catch" 总是匹配，因此第二个 catch 子句永远不会被执行。
+
+							*throw-variables*
+若你用通用模式捕获异常，可以通过变量 |v:exception| 取得确切的值： >
+
+	:  catch /^\d\+$/
+	:    echo "Number thrown.  Value is" v:exception
+
+|v:throwpoint|。此外还可以从 |v:stacktrace| 取得调用栈。
+需注意，"v:exception"、"v:stacktrace" 和 "v:throwpoint" 仅在最近捕获的那个异常
+尚未结束时对它有效。
+   示例： >
+
+	:function! Caught()
+	:  if v:exception != ""
+	:    echo 'Caught "' .. v:exception .. '" in ' .. v:throwpoint
+	:  else
+	:    echo 'Nothing caught'
+	:  endif
+	:endfunction
+	:
+	:function! Foo()
+	:  try
+	:    try
+	:      try
+	:	 throw 4711
+	:      finally
+	:	 call Caught()
+	:      endtry
+	:    catch /.*/
+	:      call Caught()
+	:      throw "oops"
+	:    endtry
+	:  catch /.*/
+	:    call Caught()
+	:  finally
+	:    call Caught()
+	:  endtry
+	:endfunction
+	:
+	:call Foo()
+
+这会显示 >
+
+	Nothing caught
+	Caught "4711" in function Foo, line 4
+	Caught "oops" in function Foo, line 10
+	Nothing caught
+
+一个实际例子：下面的 ":LineNumber" 命令会显示它在脚本或函数中被使用的那一行的
+行号： >
+
+	:function! LineNumber()
+	:    return substitute(v:throwpoint, '.*\D\(\d\+\).*', '\1', "")
+	:endfunction
+	:command! LineNumber try | throw "" | catch | echo LineNumber() | endtry
+<
+							*try-nested*
+未被某个 try 条件捕获的异常，可以被外层的 try 条件捕获： >
+
+	:try
+	:  try
+	:    throw "foo"
+	:  catch /foobar/
+	:    echo "foobar"
+	:  finally
+	:    echo "inner finally"
+	:  endtry
+	:catch /foo/
+	:  echo "foo"
+	:endtry
+
+内层 try 条件并不捕获该异常，只是执行了它的 finally 子句。随后该异常被外层 try
+条件捕获。该示例显示 "inner finally"，然后显示 "foo"。
+
+							*throw-from-catch*
+你可以在 catch 子句中捕获一个异常，并抛出一个新的异常让别处去捕获： >
+
+	:function! Foo()
+	:  throw "foo"
+	:endfunction
+	:
+	:function! Bar()
+	:  try
+	:    call Foo()
+	:  catch /foo/
+	:    echo "Caught foo, throw bar"
+	:    throw "bar"
+	:  endtry
+	:endfunction
+	:
+	:try
+	:  call Bar()
+	:catch /.*/
+	:  echo "Caught" v:exception
+	:endtry
+
+这会显示 "Caught foo, throw bar"，然后显示 "Caught bar"。
+
+							*rethrow*
+Vim script 语言里没有真正的重新抛出（rethrow），不过你可以改为抛出
+"v:exception"： >
+
+	:function! Bar()
+	:  try
+	:    call Foo()
+	:  catch /.*/
+	:    echo "Rethrow" v:exception
+	:    throw v:exception
+	:  endtry
+	:endfunction
+<							*try-echoerr*
+注意，该方法不能用于「重新抛出」Vim 错误异常或中断异常，因为无法伪造 Vim 内部
+异常。试图这么做会引发一个错误异常。你应当抛出你自己的异常来表示该情形。如果你
+想引发一个携带原始错误异常值的 Vim 错误异常，可以使用 |:echoerr| 命令： >
+
+	:try
+	:  try
+	:    asdf
+	:  catch /.*/
+	:    echoerr v:exception
+	:  endtry
+	:catch /.*/
+	:  echo v:exception
+	:endtry
+
+这段代码会显示
+
+	Vim(echoerr):Vim:E492: Not an editor command:	asdf ~
+
+
+清理代码						*try-finally*
+
+脚本常常会改动全局设置，并在结束时把它们恢复。然而，如果用户按下 CTRL-C 中断了
+脚本，这些设置就会停留在不一致的状态。在脚本的开发阶段，当出现错误或你显式抛出
+异常却没有捕获它时，也可能遇到同样的情况。你可以用带 finally 子句的 try 条件
+来恢复设置，从而解决这些问题。无论在正常控制流、出错时、显式 ":throw" 时还是
+中断时，该子句的执行都有保证。（注意，try 条件内部产生的错误和中断会被转换成
+异常。若没有被捕获，它们会在 finally 子句执行完之后终止脚本。）
+示例： >
+
+	:try
+	:  let s:saved_ts = &ts
+	:  set ts=17
+	:
+	:  " Do the hard work here.
+	:
+	:finally
+	:  let &ts = s:saved_ts
+	:  unlet s:saved_ts
+	:endtry
+
+每当函数或脚本的一部分要改动全局设置，而这些设置在失败或正常退出时必须恢复时，
+就应当在局部使用这种做法。
+
+							*break-finally*
+当 try 块或 catch 子句被 ":continue"、":break"、":return" 或 ":finish" 提前
+离开时，清理代码同样会执行。
+   示例： >
+
+	:let first = 1
+	:while 1
+	:  try
+	:    if first
+	:      echo "first"
+	:      let first = 0
+	:      continue
+	:    else
+	:      throw "second"
+	:    endif
+	:  catch /.*/
+	:    echo v:exception
+	:    break
+	:  finally
+	:    echo "cleanup"
+	:  endtry
+	:  echo "still in while"
+	:endwhile
+	:echo "end"
+
+这会显示 "first"、"cleanup"、"second"、"cleanup" 和 "end"。 >
+
+	:function! Foo()
+	:  try
+	:    return 4711
+	:  finally
+	:    echo "cleanup\n"
+	:  endtry
+	:  echo "Foo still active"
+	:endfunction
+	:
+	:echo Foo() "returned by Foo"
+
+这会显示 "cleanup" 和 "4711 returned by Foo"。你不需要在 finally 子句里额外
+加一个 ":return"。（最重要的是，那样会覆盖返回值。）
+
+							*except-from-finally*
+在 finally 子句中使用 ":continue"、":break"、":return"、":finish" 或 ":throw"
+中的任何一个都是可行的，但不推荐，因为这会放弃该 try 条件的清理动作。当然，
+中断异常和错误异常有可能从 finally 子句中被引发出来。
+   示例：finally 子句中的一个错误使中断无法正常工作： >
+
+	:try
+	:  try
+	:    echo "Press CTRL-C for interrupt"
+	:    while 1
+	:    endwhile
+	:  finally
+	:    unlet novar
+	:  endtry
+	:catch /novar/
+	:endtry
+	:echo "Script still running"
+	:sleep 1
+
+如果你必须把可能失败的命令放进 finally 子句，就应当考虑在该命令中捕获或忽略
+这些错误，见 |catch-errors| 和 |ignore-errors|。
+
+
+捕获错误						*catch-errors*
+
+如果你想捕获特定的错误，只需把要监视的代码放进 try 块，并为该错误消息添加一个
+catch 子句。try 条件的存在会把所有错误转换成异常。此时不显示任何消息，也不会设置
+|v:errmsg|。要给 ":catch" 命令找到正确的模式，你必须了解错误异常的格式。
+   错误异常具有如下格式： >
+
+	Vim({cmdname}):{errmsg}
+或者 >
+	Vim:{errmsg}
+
+{cmdname} 是失败的命令名；第二种形式用于命令名未知的情形。{errmsg} 是在 try
+条件之外出错时通常产生的错误消息。它总是以大写 "E" 开头，后接两位或三位数字的
+错误号、一个冒号和一个空格。
+
+示例：
+
+命令 >
+	:unlet novar
+通常会产生错误消息 >
+	E108: No such variable: "novar"
+而在 try 条件内部它会被转换成异常 >
+	Vim(unlet):E108: No such variable: "novar"
+
+命令 >
+	:dwim
+通常会产生错误消息 >
+	E492: Not an editor command: dwim
+而在 try 条件内部它会被转换成异常 >
+	Vim:E492: Not an editor command: dwim
+
+你可以用 >
+	:catch /^Vim(unlet):/
+捕获所有 ":unlet" 错误，或用 >
+	:catch /^Vim:E492:/
+
+捕获命令名拼错时的所有错误。
+有些错误消息可能由不同的命令产生： >
+	:function nofunc
+和 >
+	:delfunction nofunc
+都会产生错误消息 >
+	E128: Function name must start with a capital: nofunc
+而在 try 条件内部它会被转换成异常 >
+	Vim(function):E128: Function name must start with a capital: nofunc
+或者 >
+	Vim(delfunction):E128: Function name must start with a capital: nofunc
+（分别对应）。如果你使用下面的模式，就可以按错误号捕获该错误，而不依赖于引发它的
+命令： >
+	:catch /^Vim(\a\+):E128:/
+
+有些命令，例如 >
+	:let x = novar
+会产生多条错误消息，这里是： >
+	E121: Undefined variable: novar
+	E15: Invalid expression:  novar
+只有第一条被用作异常的值，因为它是最具体的那条（见 |except-several-errors|）。
+所以你可以用 >
+	:catch /^Vim(\a\+):E121:/
+
+捕获它。
+你可以用 >
+	:catch /\<nofunc\>/
+
+捕获与名字 "nofunc" 有关的所有错误。
+你可以用 >
+	:catch /^Vim(\(write\|read\)):E\d\+:/
+
+捕获 ":write" 和 ":read" 命令中的所有 Vim 错误。
+你可以用下面的模式捕获所有 Vim 错误 >
+	:catch /^Vim\((\a\+)\)\=:E\d\+:/
+<
+							*catch-text*
+注意：绝不要直接捕获错误消息的文本本身： >
+	:catch /No such variable/
+这仅在英文 locale 下有效，一旦用户通过 |:language| 命令选择了别的语言就不管用。
+不过，在注释中引用消息文本仍然是有帮助的： >
+	:catch /^Vim(\a\+):E108:/   " No such variable
+
+
+忽略错误						*ignore-errors*
+
+你可以通过在局部捕获错误，来忽略某个特定 Vim 命令中的错误： >
+
+	:try
+	:  write
+	:catch
+	:endtry
+
+但强烈建议你**不要**使用这种简单形式，因为它可能捕获到比你想要捕获的更多的错误。
+例如，使用 ":write" 命令时，某些 autocommand 可能被执行并引发与写入无关的错误： >
+
+	:au BufWritePre * unlet novar
+
+甚至可能出现些不该由你这脚本作者负责的错误：你的脚本用户可能定义了这类
+autocommand。那样你就会把错误对用户隐藏起来。
+   更好的做法是使用 >
+
+	:try
+	:  write
+	:catch /^Vim(write):/
+	:endtry
+
+它只捕获真正的写入错误。所以，只捕获你确实想有意忽略的错误。
+
+对于不会触发 autocommand 执行的单个命令，你甚至可以用 ":silent!" 命令抑制错误
+到异常的转换： >
+	:silent! nunmap k
+这在 try 条件处于活动状态时同样有效。
+
+
+捕获中断						*catch-interrupt*
+
+当存在活动的 try 条件时，中断（CTRL-C）会被转换成异常 "Vim:Interrupt"。你可以
+像捕获其它任何异常那样捕获它。此时脚本不会被终止。
+   示例： >
+
+	:function! TASK1()
+	:  sleep 10
+	:endfunction
+
+	:function! TASK2()
+	:  sleep 20
+	:endfunction
+
+	:while 1
+	:  let command = input("Type a command: ")
+	:  try
+	:    if command == ""
+	:      continue
+	:    elseif command == "END"
+	:      break
+	:    elseif command == "TASK1"
+	:      call TASK1()
+	:    elseif command == "TASK2"
+	:      call TASK2()
+	:    else
+	:      echo "\nIllegal command:" command
+	:      continue
+	:    endif
+	:  catch /^Vim:Interrupt$/
+	:    echo "\nCommand interrupted"
+	:    " Caught the interrupt.  Continue with next prompt.
+	:  endtry
+	:endwhile
+
+你可以在这里按 CTRL-C 中断某个任务；随后脚本会请求输入新的命令。如果你在提示符
+处按 CTRL-C，脚本就被终止。
+
+若要测试在脚本的某个特定行上按 CTRL-C 会发生什么，请使用调试模式，并在该行执行
+|>quit| 或 |>interrupt| 命令。见 |debug-scripts|。
+
+捕获全部						*catch-all*
+
+这些命令 >
+
+	:catch /.*/
+	:catch //
+	:catch
+
+会捕获一切：错误异常、中断异常以及由 |:throw| 命令显式抛出的异常。这在脚本的
+顶层很有用，用来捕获意料之外的情况。
+   示例： >
+
+	:try
+	:
+	:  " do the hard work here
+	:
+	:catch /MyException/
+	:
+	:  " handle known problem
+	:
+	:catch /^Vim:Interrupt$/
+	:    echo "Script interrupted"
+	:catch /.*/
+	:  echo "Internal error (" .. v:exception .. ")"
+	:  echo " - occurred at " .. v:throwpoint
+	:endtry
+	:" end of script
+
+注意：捕获一切可能捕获到比你想要的更多的东西。因此强烈建议只捕获你确实能处理的
+问题，办法是给 ":catch" 指定模式参数。
+   示例：捕获一切可能使脚本几乎无法通过按 CTRL-C 来中断： >
+
+	:while 1
+	:  try
+	:    sleep 1
+	:  catch
+	:  endtry
+	:endwhile
+
+
+异常与 AUTOCOMMAND				*except-autocmd*
+
+异常可以在 autocommand 执行期间使用。示例： >
+
+	:autocmd User x try
+	:autocmd User x   throw "Oops!"
+	:autocmd User x catch
+	:autocmd User x   echo v:exception
+	:autocmd User x endtry
+	:autocmd User x throw "Arrgh!"
+	:autocmd User x echo "Should not be displayed"
+	:
+	:try
+	:  doautocmd User x
+	:catch
+	:  echo v:exception
+	:endtry
+
+这会显示 "Oops!" 和 "Arrgh!"。
+
+							*except-autocmd-Pre*
+对某些命令，autocommand 会在命令的主要动作发生之前执行。如果在这串 autocommand
+中抛出异常且未被捕获，这串执行以及引发它执行的那个命令都会被放弃，异常则传播给
+该命令的调用者。
+   示例： >
+
+	:autocmd BufWritePre * throw "FAIL"
+	:autocmd BufWritePre * echo "Should not be displayed"
+	:
+	:try
+	:  write
+	:catch
+	:  echo "Caught:" v:exception "from" v:throwpoint
+	:endtry
+
+这里 ":write" 命令并没有写入当前正在编辑的文件（你可以通过检查 'modified' 看到
+这一点），因为 BufWritePre autocommand 抛出的异常放弃了 ":write"。随后该异常被
+捕获，脚本显示： >
+
+	Caught: FAIL from BufWrite Auto commands for "*"
+<
+							*except-autocmd-Post*
+对某些命令，autocommand 会在命令的主要动作发生之后执行。如果该主要动作失败，而
+命令又处于活动的 try 条件内部，这些 autocommand 会被跳过，并抛出一个错误异常，
+可以被该命令的调用者捕获。
+   示例： >
+
+	:autocmd BufWritePost * echo "File successfully written!"
+	:
+	:try
+	:  write /i/m/p/o/s/s/i/b/l/e
+	:catch
+	:  echo v:exception
+	:endtry
+
+这只会显示： >
+
+	Vim(write):E212: Can't open file for writing (/i/m/p/o/s/s/i/b/l/e)
+
+如果你确实需要在主要动作失败时也执行这些 autocommand，就在 catch 子句中触发
+该事件。
+   示例： >
+
+	:autocmd BufWritePre  * set noreadonly
+	:autocmd BufWritePost * set readonly
+	:
+	:try
+	:  write /i/m/p/o/s/s/i/b/l/e
+	:catch
+	:  doautocmd BufWritePost /i/m/p/o/s/s/i/b/l/e
+	:endtry
+<
+你也可以使用 ":silent!"： >
+
+	:let x = "ok"
+	:let v:errmsg = ""
+	:autocmd BufWritePost * if v:errmsg != ""
+	:autocmd BufWritePost *   let x = "after fail"
+	:autocmd BufWritePost * endif
+	:try
+	:  silent! write /i/m/p/o/s/s/i/b/l/e
+	:catch
+	:endtry
+	:echo x
+
+这会显示 "after fail"。
+
+如果命令的主要动作没有失败，autocommand 抛出的异常就能被该命令的调用者捕获： >
+
+	:autocmd BufWritePost * throw ":-("
+	:autocmd BufWritePost * echo "Should not be displayed"
+	:
+	:try
+	:  write
+	:catch
+	:  echo v:exception
+	:endtry
+<
+							*except-autocmd-Cmd*
+对某些命令，正常的动作可以被一串 autocommand 取代。这一串 autocommand 抛出的
+异常可以被该命令的调用者捕获。
+   示例：对于 ":write" 命令，调用者无法知道异常发生时文件究竟有没有真的被写入。
+你需要以某种方式告诉它。 >
+
+	:if !exists("cnt")
+	:  let cnt = 0
+	:
+	:  autocmd BufWriteCmd * if &modified
+	:  autocmd BufWriteCmd *   let cnt = cnt + 1
+	:  autocmd BufWriteCmd *   if cnt % 3 == 2
+	:  autocmd BufWriteCmd *     throw "BufWriteCmdError"
+	:  autocmd BufWriteCmd *   endif
+	:  autocmd BufWriteCmd *   write | set nomodified
+	:  autocmd BufWriteCmd *   if cnt % 3 == 0
+	:  autocmd BufWriteCmd *     throw "BufWriteCmdError"
+	:  autocmd BufWriteCmd *   endif
+	:  autocmd BufWriteCmd *   echo "File successfully written!"
+	:  autocmd BufWriteCmd * endif
+	:endif
+	:
+	:try
+	:	write
+	:catch /^BufWriteCmdError$/
+	:  if &modified
+	:    echo "Error on writing (file contents not changed)"
+	:  else
+	:    echo "Error after writing"
+	:  endif
+	:catch /^Vim(write):/
+	:    echo "Error on writing"
+	:endtry
+
+当这个脚本在做过修改之后被多次 source 时，它依次显示 >
+	File successfully written!
+然后 >
+	Error on writing (file contents not changed)
+然后 >
+	Error after writing
+等等。
+
+							*except-autocmd-ill*
+你不能把一个 try 条件分散到针对不同事件的 autocommand 上。下面这段代码是
+不合式的： >
+
+	:autocmd BufWritePre  * try
+	:
+	:autocmd BufWritePost * catch
+	:autocmd BufWritePost *   echo v:exception
+	:autocmd BufWritePost * endtry
+	:
+	:write
+
+
+异常层次与参数化异常				*except-hier-param*
+
+有些编程语言允许使用异常类的层次结构，或者让异常类的对象携带附加信息。在 Vim
+里也能做类似的事情。
+   为了从层次结构中抛出异常，直接抛出完整的类名，各个组成部分之间用冒号分隔
+即可，例如在数学库中发生溢出时抛出字符串 "EXCEPT:MATHERR:OVERFLOW"。
+   当你想让异常类携带附加信息时，把信息写在圆括号里，例如在写入 "myfile" 出错
+时抛出字符串 "EXCEPT:IO:WRITEERR(myfile)"。
+   用 ":catch" 命令中合适的模式，你可以按层次结构中的基类或派生类来捕获。圆括号
+里的附加信息可以用 ":substitute" 命令从 |v:exception| 中截取出来。
+   示例： >
+
+	:function! CheckRange(a, func)
+	:  if a:a < 0
+	:    throw "EXCEPT:MATHERR:RANGE(" .. a:func .. ")"
+	:  endif
+	:endfunction
+	:
+	:function! Add(a, b)
+	:  call CheckRange(a:a, "Add")
+	:  call CheckRange(a:b, "Add")
+	:  let c = a:a + a:b
+	:  if c < 0
+	:    throw "EXCEPT:MATHERR:OVERFLOW"
+	:  endif
+	:  return c
+	:endfunction
+	:
+	:function! Div(a, b)
+	:  call CheckRange(a:a, "Div")
+	:  call CheckRange(a:b, "Div")
+	:  if (a:b == 0)
+	:    throw "EXCEPT:MATHERR:ZERODIV"
+	:  endif
+	:  return a:a / a:b
+	:endfunction
+	:
+	:function! Write(file)
+	:  try
+	:    execute "write" fnameescape(a:file)
+	:  catch /^Vim(write):/
+	:    throw "EXCEPT:IO(" .. getcwd() .. ", " .. a:file .. "):WRITEERR"
+	:  endtry
+	:endfunction
+	:
+	:try
+	:
+	:  " something with arithmetic and I/O
+	:
+	:catch /^EXCEPT:MATHERR:RANGE/
+	:  let function = substitute(v:exception, '.*(\(\a\+\)).*', '\1', "")
+	:  echo "Range error in" function
+	:
+	:catch /^EXCEPT:MATHERR/	" catches OVERFLOW and ZERODIV
+	:  echo "Math error"
+	:
+	:catch /^EXCEPT:IO/
+	:  let dir = substitute(v:exception, '.*(\(.\+\),\s*.\+).*', '\1', "")
+	:  let file = substitute(v:exception, '.*(.\+,\s*\(.\+\)).*', '\1', "")
+	:  if file !~ '^/'
+	:    let file = dir .. "/" .. file
+	:  endif
+	:  echo 'I/O error for "' .. file .. '"'
+	:
+	:catch /^EXCEPT/
+	:  echo "Unspecified error"
+	:
+	:endtry
+
+Vim 自身抛出的异常（出错时或按下 CTRL-C 时）使用扁平的层次结构：它们都属于
+"Vim" 类。你不能自己抛出带 "Vim" 前缀的异常；那是为 Vim 保留的。
+   Vim 错误异常会以失败命令的名字作为参数（如果已知的话）。参见
+|catch-errors|。
+
+
+特殊性
+							*except-compat*
+异常处理概念要求：引发异常的命令序列必须立即中止，控制权转移到 finally 子句
+和/或 catch 子句。
+
+在 Vim script 语言中，有些情况下脚本和函数会在出错后继续执行：在没有 "abort"
+标志的函数里，或在 ":silent!" 之后的命令里，控制流会走到下一行；而在函数之外，
+控制流会走到最外层 ":endwhile" 或 ":endif" 之后的那一行。另一方面，错误又应该
+能作为异常被捕获（因此需要立即中止）。
+
+这个问题是通过把错误转换成异常、并且只在 try 条件处于活动状态时才使用立即中止
+（除非被 ":silent!" 抑制）来解决的。这不算限制，因为（错误）异常只能从活动的
+try 条件中捕获。如果你想在捕获错误的同时立即终止，只要用一个不带 catch 子句的
+try 条件即可。（通过指定 finally 子句，可以让清理代码在终止之前执行。）
+
+当没有活动的 try 条件时，使用的是通常的中止与继续行为，而不是立即中止。这样
+保证了为 Vim 6.1 及更早版本编写的脚本的兼容性。
+
+然而，当从新脚本的活动 try 条件内部 source 一个不使用异常处理命令的已有脚本
+（或调用它的某个函数）时，你可能会改变该已有脚本出错时的控制流。出错时你会得到
+立即中止，并且可以在新脚本中捕获这个错误。但如果被 source 的脚本用 ":silent!"
+命令抑制了错误消息（必要时通过测试 |v:errmsg| 来判断是否出错），它的执行路径
+就不会改变。错误不会被转换成异常。（参见 |:silent|。）所以剩下唯一会出现这种
+情况的，是那些不关心错误、会产生错误消息的脚本。你大概不会想在新脚本里使用
+这样的代码。
+
+							*except-syntax-err*
+异常处理命令中的语法错误，永远不会被它们所属 try 条件的任何 ":catch" 命令捕获。
+不过它的 finally 子句仍会执行。
+   示例： >
+
+	:try
+	:  try
+	:    throw 4711
+	:  catch /\(/
+	:    echo "in catch with syntax error"
+	:  catch
+	:    echo "inner catch-all"
+	:  finally
+	:    echo "inner finally"
+	:  endtry
+	:catch
+	:  echo 'outer catch-all caught "' .. v:exception .. '"'
+	:  finally
+	:    echo "outer finally"
+	:endtry
+
+它会显示： >
+    inner finally
+    outer catch-all caught "Vim(catch):E54: Unmatched \("
+    outer finally
+原来的异常被丢弃，取而代之的是抛出一个错误异常。
+
+							*except-single-line*
+":try"、":catch"、":finally" 和 ":endtry" 命令可以放在同一行里，但那样一来
+语法错误可能让人难以辨认 "catch" 那一行，因此最好避免这样做。
+   示例： >
+	:try | unlet! foo # | catch | endtry
+会为 ":unlet!" 参数之后的尾随字符抛出错误异常，但看不到 ":catch" 和 ":endtry"
+命令，于是错误异常被丢弃，并显示出 "E488: Trailing characters" 消息。
+
+							*except-several-errors*
+同一条命令中出现多个错误时，第一条错误消息通常是最具体的，因此被转换成错误
+异常。
+   示例： >
+	echo novar
+会导致 >
+	E121: Undefined variable: novar
+	E15: Invalid expression: novar
+try 条件内部错误异常的值是： >
+	Vim(echo):E121: Undefined variable: novar
+<							*except-syntax-error*
+但当同一条命令中在普通错误之后检测到语法错误时，抛出异常用的是那个语法错误。
+   示例： >
+	unlet novar #
+会导致 >
+	E108: No such variable: "novar"
+	E488: Trailing characters
+try 条件内部错误异常的值是： >
+	Vim(unlet):E488: Trailing characters
+这样做是因为语法错误可能会以用户没有预计到的方式改变执行路径。示例： >
+	try
+	    try | unlet novar # | catch | echo v:exception | endtry
+	catch /.*/
+	    echo "outer catch:" v:exception
+	endtry
+这会显示 "outer catch: Vim(unlet):E488: Trailing characters"，随后给出
+"E600: Missing :endtry" 错误消息，参见 |except-single-line|。
+
+==============================================================================
+9. 示例						*eval-examples*
+
+以二进制打印 ~
+>
+  :" The function Nr2Bin() returns the binary string representation of a number.
+  :func Nr2Bin(nr)
+  :  let n = a:nr
+  :  let r = ""
+  :  while n
+  :    let r = '01'[n % 2] .. r
+  :    let n = n / 2
+  :  endwhile
+  :  return r
+  :endfunc
+
+  :" The function String2Bin() converts each character in a string to a
+  :" binary string, separated with dashes.
+  :func String2Bin(str)
+  :  let out = ''
+  :  for ix in range(strlen(a:str))
+  :    let out = out .. '-' .. Nr2Bin(char2nr(a:str[ix]))
+  :  endfor
+  :  return out[1:]
+  :endfunc
+
+它的用法示例： >
+  :echo Nr2Bin(32)
+结果： "100000" >
+  :echo String2Bin("32")
+结果： "110011-110010"
+
+
+对行排序 ~
+
+这个示例用特定的比较函数对行进行排序。 >
+
+  :func SortBuffer()
+  :  let lines = getline(1, '$')
+  :  call sort(lines, function("Strcmp"))
+  :  call setline(1, lines)
+  :endfunction
+
+写成一行： >
+  :call setline(1, sort(getline(1, '$'), function("Strcmp")))
+<
+
+scanf() 的替代品 ~
+							*sscanf*
+Vim 中没有 sscanf() 函数。如果你需要从一行中提取各部分，可以用 matchstr() 和
+substitute() 来做。这个示例展示如何从形如 "foobar.txt, 123, 45" 的一行中取出
+文件名、行号和列号。 >
+   :" Set up the match bit
+   :let mx='\(\f\+\),\s*\(\d\+\),\s*\(\d\+\)'
+   :"get the part matching the whole expression
+   :let l = matchstr(line, mx)
+   :"get each item out of the match
+   :let file = substitute(l, mx, '\1', '')
+   :let lnum = substitute(l, mx, '\2', '')
+   :let col = substitute(l, mx, '\3', '')
+
+输入在变量 "line" 中，结果在变量 "file"、"lnum" 和 "col" 中。（想法来自
+Michael Geddes）
+
+
+用 Dictionary 取得 scriptnames ~
+						*scriptnames-dictionary*
+`:scriptnames` 命令可以用来获取所有已被 source 的脚本文件列表。此外还有
+`getscriptinfo()` 函数，但它返回的信息并不完全相同。若你需要处理 `scriptnames`
+的输出，可以使用下面这段代码： >
+    " Get the output of ":scriptnames" in the scriptnames_output variable.
+    let scriptnames_output = ''
+    redir => scriptnames_output
+    silent scriptnames
+    redir END
+
+    " Split the output into lines and parse each line.	Add an entry to the
+    " "scripts" dictionary.
+    let scripts = {}
+    for line in split(scriptnames_output, "\n")
+      " Only do non-blank lines.
+      if line =~ '\S'
+	" Get the first number in the line.
+	let nr = matchstr(line, '\d\+')
+	" Get the file name, remove the script number " 123: ".
+	let name = substitute(line, '.\+:\s*', '', '')
+	" Add an item to the Dictionary
+	let scripts[nr] = name
+      endif
+    endfor
+    unlet scriptnames_output
+
+==============================================================================
+sandbox					*eval-sandbox* *sandbox* *E523*
+
+'foldexpr'、'formatexpr'、'includeexpr'、'indentexpr'、'statusline' 和
+'foldtext' 这些选项可能在 sandbox 中求值。这意味着你可以免受这些表达式带来的
+恶劣副作用影响。当这些选项是从 modeline 设置时，这提供了一些安全性。从 tags
+文件执行命令时以及命令行中的 CTRL-R = 也会用到它。|:sandbox| 命令同样使用
+sandbox。
+
+								*E48*
+以下条目在 sandbox 中是不允许的：
+	- 修改 buffer 文本
+	- 定义或修改 mapping、autocommands、用户命令
+	- 设置某些选项（见 |option-summary|）
+	- 设置某些 v: 变量（见 |v:var|）  *E794*
+	- 执行 shell 命令
+	- 读写文件
+	- 跳转到另一个 buffer 或编辑文件
+	- 执行 Python、Perl 等命令
+这不能保证 100% 安全，但应该能挡住大多数攻击。
+
+							*:san* *:sandbox*
+:san[dbox] {cmd}	在 sandbox 中执行 {cmd}。用于对可能来自 modeline 的选项
+			求值，例如 'foldexpr'。
+
+							*sandbox-option*
+有些选项包含表达式。对该表达式求值时可能必须在 sandbox 中进行，以避免安全
+风险。但 sandbox 是受限的，因此只有当选项是从不安全的位置设置时才会这样做。
+这里所说的不安全是：
+- 在当前目录 source 一个 .nvimrc 或 .exrc
+- 在 sandbox 中执行时
+- 值来自 modeline
+- 执行在 sandbox 中定义的函数
+
+注意，在 sandbox 中保存某个选项值再恢复它时，该选项仍然会被标记为是在 sandbox
+中设置的。
+
+==============================================================================
+Textlock							*textlock*
+
+在少数情况下，不允许修改 buffer 中的文本、跳转到另一个 window，以及做其它一些
+可能干扰或破坏 Vim 当前所做事情的操作。这主要适用于 Vim 实际上正在做别的事情
+时发生的情况。例如，TextYankPost autocommand 不能编辑它正在 yank 的文本。
+
+当 textlock 处于活动状态时，不允许：
+	- 修改 buffer 文本
+	- 跳转到另一个 buffer 或 window
+	- 编辑另一个文件
+	- 关闭一个 window 或退出 Vim
+	- 等等。
+
+==============================================================================
+Vim script 库						*vimscript-library*
+
+Vim 自带一个 Vim script 库，可供 runtime 和脚本作者使用。目前它只包含很少几个
+函数，但以后可能会增多。
+
+								*dist#vim*
+这些函数使用自动加载前缀 "dist#vim"。
+
+以下函数可用：
+
+dist#vim#IsSafeExecutable(filetype, executable) ~
+
+这个函数接收一个 filetype 和一个 executable，检查执行给定的 executable 是否
+安全。出于安全考虑，用户可能不希望 Vim 执行随机的可执行文件，或者可能已经
+通过设置 "<filetype>_exec" 变量（|plugin_exec|）禁止了对特定 filetype 这样做。
+
+它返回 |TRUE| 或 |FALSE| 来表明插件是否应该运行给定的 executable。它接收以下
+参数：
+
+	argument	type ~
+
+	filetype	string
+	executable	string
+
+==============================================================================
+命令行表达式高亮					*expr-highlight*
+
+用户在 |i_CTRL-R_=|、|c_CTRL-\_e|、|quote=| 中输入的表达式由内置的表达式解析器
+高亮。它使用下表中描述的高亮组，这些组可以被 colorscheme 覆盖。
+							*hl-NvimInvalid*
+除了下文描述的 "Nvim" 前缀高亮组之外，还有 "NvimInvalid" 前缀的高亮组，它们
+含义相同，但表示该 token 含有错误，或者紧接在它之前发生了错误。它们大体上具有
+相同的层次结构，只是（默认情况下）在原本非 Nvim 前缀的组的位置上使用了链接到
+`Error` 的 NvimInvalid，并且还多了一些其它中间组。
+
+Group                              默认链接                彩色表达式 ~
+*hl-NvimInternalError*              None, red/red          解析器缺陷
+
+*hl-NvimAssignment*                 Operator                通用赋值
+*hl-NvimPlainAssignment*            NvimAssignment          |:let| 中的 `=`
+*hl-NvimAugmentedAssignment*        NvimAssignment          通用的 `+=`/`-=`/`.=`
+*hl-NvimAssignmentWithAddition*     NvimAugmentedAssignment |:let+=| 中的 `+=`
+*hl-NvimAssignmentWithSubtraction*  NvimAugmentedAssignment |:let-=| 中的 `-=`
+*hl-NvimAssignmentWithConcatenation* NvimAugmentedAssignment |:let.=| 中的 `.=`
+
+*hl-NvimOperator*                   Operator                通用运算符
+
+*hl-NvimUnaryOperator*              NvimOperator            通用一元运算符
+*hl-NvimUnaryPlus*                  NvimUnaryOperator       |expr-unary-+|
+*hl-NvimUnaryMinus*                 NvimUnaryOperator       |expr-unary--|
+*hl-NvimNot*                        NvimUnaryOperator       |expr-!|
+
+*hl-NvimBinaryOperator*             NvimOperator            通用二元运算符
+*hl-NvimComparison*                 NvimBinaryOperator      任意 |expr4| 运算符
+*hl-NvimComparisonModifier*         NvimComparison          |expr4| 运算符附近的 `#`/`?`
+*hl-NvimBinaryPlus*                 NvimBinaryOperator      |expr-+|
+*hl-NvimBinaryMinus*                NvimBinaryOperator      |expr--|
+*hl-NvimConcat*                     NvimBinaryOperator      |expr-.|
+*hl-NvimConcatOrSubscript*          NvimConcat              |expr-.| 或 |expr-entry|
+*hl-NvimOr*                         NvimBinaryOperator      |expr-barbar|
+*hl-NvimAnd*                        NvimBinaryOperator      |expr-&&|
+*hl-NvimMultiplication*             NvimBinaryOperator      |expr-star|
+*hl-NvimDivision*                   NvimBinaryOperator      |expr-/|
+*hl-NvimMod*                        NvimBinaryOperator      |expr-%|
+
+*hl-NvimTernary*                    NvimOperator            |expr1| 中的 `?`
+*hl-NvimTernaryColon*               NvimTernary             |expr1| 中的 `:`
+
+*hl-NvimParenthesis*                Delimiter               通用括号
+*hl-NvimLambda*                     NvimParenthesis         |lambda| 中的 `{`/`}`
+*hl-NvimNestingParenthesis*         NvimParenthesis         |expr-nesting| 中的 `(`/`)`
+*hl-NvimCallingParenthesis*         NvimParenthesis         |expr-function| 中的 `(`/`)`
+
+*hl-NvimSubscript*                  NvimParenthesis         通用下标
+*hl-NvimSubscriptBracket*           NvimSubscript           |expr-[]| 中的 `[`/`]`
+*hl-NvimSubscriptColon*             NvimSubscript           |expr-[:]| 中的 `:`
+*hl-NvimCurly*                      NvimSubscript           |curly-braces-names| 中的 `{`/`}`
+
+*hl-NvimContainer*                  NvimParenthesis        通用容器
+*hl-NvimDict*                       NvimContainer          |dict| 字面量中的 `{`/`}`
+*hl-NvimList*                       NvimContainer          |list| 字面量中的 `[`/`]`
+
+*hl-NvimIdentifier*                 Identifier              通用标识符
+*hl-NvimIdentifierScope*            NvimIdentifier          |internal-variables| 中 `:` 之前的命名空间字母
+*hl-NvimIdentifierScopeDelimiter*   NvimIdentifier          命名空间字母之后的 `:`
+*hl-NvimIdentifierName*             NvimIdentifier          标识符的其余部分
+*hl-NvimIdentifierKey*              NvimIdentifier          |expr-entry| 之后的标识符
+
+*hl-NvimColon*                      Delimiter               |dict| 字面量中的 `:`
+*hl-NvimComma*                      Delimiter               |dict| 或 |list| 字面量或 |expr-function| 中的 `,`
+*hl-NvimArrow*                      Delimiter               |lambda| 中的 `->`
+
+*hl-NvimRegister*                   SpecialChar             |expr-register|
+*hl-NvimNumber*                     Number                  整数 |expr-number| 中的非前缀数字
+*hl-NvimNumberPrefix*               Type                    |octal-number| 的 `0`、|hex-number| 的 `0x`、|binary-number| 的 `0b`
+*hl-NvimFloat*                      NvimNumber             浮点数
+
+*hl-NvimOptionSigil*                Type                    |expr-option| 中的 `&`
+*hl-NvimOptionScope*                NvimIdentifierScope     选项作用域（如果有）
+*hl-NvimOptionScopeDelimiter*       NvimIdentifierScopeDelimiter
+                                                           选项作用域之后的 `:`
+*hl-NvimOptionName*                 NvimIdentifier          选项名
+
+*hl-NvimEnvironmentSigil*           NvimOptionSigil         |expr-env| 中的 `$`
+*hl-NvimEnvironmentName*            NvimIdentifier          环境变量名
+
+*hl-NvimString*                     String                  通用字符串
+*hl-NvimStringBody*                 NvimString              通用字符串字面量主体
+*hl-NvimStringQuote*                NvimString              通用字符串引号
+*hl-NvimStringSpecial*              SpecialChar            通用字符串非字面量主体
+
+*hl-NvimSingleQuote*                NvimStringQuote         |expr-'| 中的 `'`
+*hl-NvimSingleQuotedBody*           NvimStringBody          |expr-'| 字符串主体的字面量部分
+*hl-NvimSingleQuotedQuote*          NvimStringSpecial       |expr-'| 字符串主体中的 `''`
+
+*hl-NvimDoubleQuote*                NvimStringQuote         |expr-quote| 中的 `"`
+*hl-NvimDoubleQuotedBody*           NvimStringBody          |expr-quote| 主体的字面量部分
+*hl-NvimDoubleQuotedEscape*         NvimStringSpecial       合法的 |expr-quote| 转义序列
+*hl-NvimDoubleQuotedUnknownEscape*  NvimInvalidValue        无法识别的 |expr-quote| 转义序列
+
+ vim:tw=78:ts=8:noet:ft=help:norl:

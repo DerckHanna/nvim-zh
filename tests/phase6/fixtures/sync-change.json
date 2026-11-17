@@ -1,0 +1,17 @@
+{
+  "before": {
+    "sources": {"lua/demo.lua": {"sha256": "old"}},
+    "entries": [
+      {"context": "menu", "msgid": "Open", "msgstr": "打开", "references": ["lua/demo.lua"]},
+      {"context": "", "msgid": "Old", "msgstr": "旧"}
+    ]
+  },
+  "after": {
+    "sources": {"lua/demo.lua": {"sha256": "new"}, "lua/new.lua": {"sha256": "added"}},
+    "entries": [
+      {"context": "menu", "msgid": "Open File", "msgstr": "打开", "references": ["lua/demo.lua"]},
+      {"context": "", "msgid": "New", "msgstr": ""},
+      {"context": "menu", "msgid": "Renamed", "msgstr": "改名"}
+    ]
+  }
+}

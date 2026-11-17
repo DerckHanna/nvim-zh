@@ -1,0 +1,369 @@
+{
+  "schema": 1,
+  "recorded_at": "2026-11-03T22:38:11.289615+00:00",
+  "clangd": {
+    "version_text": "clangd version 23.1.4\nFeatures: linux\nPlatform: x86_64-pc-linux-gnu",
+    "distribution": "Arch Linux extra/clang 23.1.4-1; llvmorg-23.1.4",
+    "upstream_commit": "7a941dfb2877a0b8cf30323fefa85ad019e0b0f5",
+    "command": [
+      "/tmp/dsh-nvim-zh-phase7-20261104T0635/toolchain/usr/bin/clangd",
+      "--background-index=false",
+      "--log=error"
+    ],
+    "ld_library_path": "/tmp/dsh-nvim-zh-phase7-20261104T0635/toolchain/usr/lib",
+    "package_sha256": {
+      "clang-23.1.4-1-x86_64.pkg.tar.zst": "382e6b98109a2f4f4a5a8e35a86ea90375bb8ecca3f44b9a83091e4fe61afed0",
+      "clang-libs-23.1.4-1-x86_64.pkg.tar.zst": "1e93ad8dddbb4e89fd6a3ae6cb57266be3969d7b7d3d5a39d65c0e99337a98ee",
+      "llvm-libs-23.1.4-1-x86_64.pkg.tar.zst": "033a4c9b70686f2dca142087961add7db81ae816d85eb060bee91d05461ec5bd",
+      "libedit-20260512_3.1-1-x86_64.pkg.tar.zst": "70cb736e4fdee330cd0dfab45875f6ea378ae819958dd15748c300b8d7285b42"
+    }
+  },
+  "initialize_result": {
+    "id": 1,
+    "jsonrpc": "2.0",
+    "result": {
+      "capabilities": {
+        "astProvider": true,
+        "callHierarchyProvider": true,
+        "clangdInlayHintsProvider": true,
+        "codeActionProvider": true,
+        "compilationDatabase": {
+          "automaticReload": true
+        },
+        "completionProvider": {
+          "resolveProvider": false,
+          "triggerCharacters": [
+            ".",
+            "<",
+            ">",
+            ":",
+            "\"",
+            "/",
+            "*"
+          ]
+        },
+        "declarationProvider": true,
+        "definitionProvider": true,
+        "documentFormattingProvider": true,
+        "documentHighlightProvider": true,
+        "documentLinkProvider": {
+          "resolveProvider": false
+        },
+        "documentOnTypeFormattingProvider": {
+          "firstTriggerCharacter": "\n",
+          "moreTriggerCharacter": []
+        },
+        "documentRangeFormattingProvider": {
+          "rangesSupport": true
+        },
+        "documentSymbolProvider": true,
+        "executeCommandProvider": {
+          "commands": [
+            "clangd.applyFix",
+            "clangd.applyRename",
+            "clangd.applyTweak"
+          ]
+        },
+        "foldingRangeProvider": true,
+        "hoverProvider": true,
+        "implementationProvider": true,
+        "inactiveRegionsProvider": true,
+        "inlayHintProvider": true,
+        "memoryUsageProvider": true,
+        "positionEncoding": "utf-8",
+        "referencesProvider": true,
+        "renameProvider": true,
+        "selectionRangeProvider": true,
+        "semanticTokensProvider": {
+          "full": {
+            "delta": true
+          },
+          "legend": {
+            "tokenModifiers": [
+              "declaration",
+              "definition",
+              "deprecated",
+              "deduced",
+              "readonly",
+              "static",
+              "abstract",
+              "virtual",
+              "dependentName",
+              "defaultLibrary",
+              "usedAsMutableReference",
+              "usedAsMutablePointer",
+              "constructorOrDestructor",
+              "userDefined",
+              "functionScope",
+              "classScope",
+              "fileScope",
+              "globalScope"
+            ],
+            "tokenTypes": [
+              "variable",
+              "variable",
+              "parameter",
+              "function",
+              "method",
+              "function",
+              "property",
+              "variable",
+              "class",
+              "interface",
+              "enum",
+              "enumMember",
+              "type",
+              "type",
+              "unknown",
+              "namespace",
+              "typeParameter",
+              "concept",
+              "type",
+              "macro",
+              "modifier",
+              "operator",
+              "bracket",
+              "label",
+              "comment"
+            ]
+          },
+          "range": false
+        },
+        "signatureHelpProvider": {
+          "triggerCharacters": [
+            "(",
+            ")",
+            "{",
+            "}",
+            "<",
+            ">",
+            ","
+          ]
+        },
+        "standardTypeHierarchyProvider": true,
+        "textDocumentSync": {
+          "change": 2,
+          "openClose": true,
+          "save": true
+        },
+        "typeDefinitionProvider": true,
+        "typeHierarchyProvider": true,
+        "workspaceSymbolProvider": true
+      },
+      "offsetEncoding": "utf-8",
+      "serverInfo": {
+        "name": "clangd",
+        "version": "clangd version 23.1.4 linux x86_64-pc-linux-gnu"
+      }
+    }
+  },
+  "corpus_sha256": {
+    "expected_semicolon.cpp": "5628e198698e26f0aefeac86391db55365ad54afbf003c294396bce163fb002b",
+    "redefinition.cpp": "fa31e8f3b0504e272b4dab67fcd6fd24f000091cabce3e5e9825a24d2de77d1e",
+    "undeclared.cpp": "0c19ce2e652400708aed86bc4a8f6cf6c780ede8a32002b2e9f22ab32d2c5768",
+    "unknown_type.cpp": "07efbbab3f3500f6d003ba862389d2a123978ff31d0023fa98737df8deb0dbc4"
+  },
+  "push": [
+    {
+      "jsonrpc": "2.0",
+      "method": "textDocument/publishDiagnostics",
+      "params": {
+        "diagnostics": [
+          {
+            "code": "expected_lparen_after_type",
+            "message": "Expected '(' for function-style cast or type construction",
+            "range": {
+              "end": {
+                "character": 8,
+                "line": 2
+              },
+              "start": {
+                "character": 7,
+                "line": 2
+              }
+            },
+            "relatedInformation": [],
+            "severity": 1,
+            "source": "clang"
+          },
+          {
+            "code": "expected_semi_declaration",
+            "message": "Expected ';' at end of declaration (fix available)",
+            "range": {
+              "end": {
+                "character": 14,
+                "line": 2
+              },
+              "start": {
+                "character": 8,
+                "line": 2
+              }
+            },
+            "relatedInformation": [],
+            "severity": 1,
+            "source": "clang"
+          }
+        ],
+        "uri": "file:///tmp/dsh-nvim-zh-clangd-smoke-xnw6r5mi/expected_semicolon.cpp",
+        "version": 1
+      }
+    },
+    {
+      "jsonrpc": "2.0",
+      "method": "textDocument/publishDiagnostics",
+      "params": {
+        "diagnostics": [
+          {
+            "code": "redefinition",
+            "message": "Redefinition of 'repeated'",
+            "range": {
+              "end": {
+                "character": 12,
+                "line": 1
+              },
+              "start": {
+                "character": 4,
+                "line": 1
+              }
+            },
+            "relatedInformation": [
+              {
+                "location": {
+                  "range": {
+                    "end": {
+                      "character": 12,
+                      "line": 0
+                    },
+                    "start": {
+                      "character": 4,
+                      "line": 0
+                    }
+                  },
+                  "uri": "file:///tmp/dsh-nvim-zh-clangd-smoke-xnw6r5mi/redefinition.cpp"
+                },
+                "message": "Previous definition is here"
+              }
+            ],
+            "severity": 1,
+            "source": "clang"
+          }
+        ],
+        "uri": "file:///tmp/dsh-nvim-zh-clangd-smoke-xnw6r5mi/redefinition.cpp",
+        "version": 1
+      }
+    },
+    {
+      "jsonrpc": "2.0",
+      "method": "textDocument/publishDiagnostics",
+      "params": {
+        "diagnostics": [
+          {
+            "code": "undeclared_var_use",
+            "message": "Use of undeclared identifier 'missing_name'",
+            "range": {
+              "end": {
+                "character": 14,
+                "line": 1
+              },
+              "start": {
+                "character": 2,
+                "line": 1
+              }
+            },
+            "relatedInformation": [],
+            "severity": 1,
+            "source": "clang"
+          },
+          {
+            "code": "undeclared_var_use",
+            "message": "Use of undeclared identifier '路径变量'",
+            "range": {
+              "end": {
+                "character": 14,
+                "line": 2
+              },
+              "start": {
+                "character": 2,
+                "line": 2
+              }
+            },
+            "relatedInformation": [],
+            "severity": 1,
+            "source": "clang"
+          }
+        ],
+        "uri": "file:///tmp/dsh-nvim-zh-clangd-smoke-xnw6r5mi/undeclared.cpp",
+        "version": 1
+      }
+    },
+    {
+      "jsonrpc": "2.0",
+      "method": "textDocument/publishDiagnostics",
+      "params": {
+        "diagnostics": [
+          {
+            "code": "unknown_typename",
+            "message": "Unknown type name 'MissingType'",
+            "range": {
+              "end": {
+                "character": 11,
+                "line": 0
+              },
+              "start": {
+                "character": 0,
+                "line": 0
+              }
+            },
+            "relatedInformation": [],
+            "severity": 1,
+            "source": "clang"
+          }
+        ],
+        "uri": "file:///tmp/dsh-nvim-zh-clangd-smoke-xnw6r5mi/unknown_type.cpp",
+        "version": 1
+      }
+    }
+  ],
+  "pull": [
+    {
+      "error": {
+        "code": -32601,
+        "message": "method not found"
+      },
+      "id": 2,
+      "jsonrpc": "2.0"
+    },
+    {
+      "error": {
+        "code": -32601,
+        "message": "method not found"
+      },
+      "id": 3,
+      "jsonrpc": "2.0"
+    },
+    {
+      "error": {
+        "code": -32601,
+        "message": "method not found"
+      },
+      "id": 4,
+      "jsonrpc": "2.0"
+    },
+    {
+      "error": {
+        "code": -32601,
+        "message": "method not found"
+      },
+      "id": 5,
+      "jsonrpc": "2.0"
+    }
+  ],
+  "pull_status": "unsupported_method_not_found",
+  "coverage": {
+    "static_entries": 4,
+    "corpus_translated": 5,
+    "corpus_entries": 7,
+    "runtime_observed": 18,
+    "runtime_translated": 12
+  }
+}

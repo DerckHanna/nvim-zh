@@ -1,0 +1,244 @@
+*channel.txt*    Nvim
+
+
+		 NVIM 参考手册	  by Thiago de Arruda
+
+
+Nvim 异步 IO                                                     *channel*
+
+				      输入 |gO| 查看目录。
+
+==============================================================================
+1. 简介                                                      *channel-intro*
+
+通道（channel）是 Nvim 与外部进程通信的方式。
+
+打开通道有以下几种途径：
+
+1. 当 `nvim` 以 `--headless` 启动，并且启动脚本或 `--cmd` 命令用 |stdioopen()|
+   打开 stdio 通道时，经由 stdin/stdout。
+2. 经由 |jobstart()| 所启动进程的 stdin、stdout 和 stderr。
+3. 经由 `jobstart(…, {'pty': v:true})` 打开的 PTY master 端。
+4. 用 |sockconnect()| 连接到一个 TCP/IP socket 或命名管道。
+5. 由另一个进程连接到 Nvim 正在监听的 socket。这种方式只支持 RPC 通道，见
+   |rpc-connecting|。
+
+通道支持多种模式或协议。在最基本的操作模式下，原始字节在通道上读写。基于
+msgpack-rpc 标准的 |RPC| 协议，使 nvim 与另一端的进程能够互相发送远程调用和
+事件。内置的 |terminal-emulator| 同样是在 PTY 通道之上实现的。
+
+通道 Id                                                          *channel-id*
+
+每个通道由一个整数 id 标识，该 id 在当前 Nvim 会话的整个生存期内唯一。像
+|stdioopen()| 这样的函数返回通道 id；像 |chansend()| 这样的函数接受通道 id。
+
+==============================================================================
+2. 读写原始字节                                              *channel-bytes*
+
+由 Vimscript 函数打开的通道默认按原始字节运作。对于使用 RPC 的 job 通道，仍然
+可以经由它的 stderr 读取字节。同样地，写入 Nvim 自己的 stderr 也只能写入字节。
+
+					*channel-callback* *E904* *E906* *E921* *E5407*
+- on_stdout({chan-id}, {data}, {name})		*on_stdout*
+- on_stderr({chan-id}, {data}, {name})		*on_stderr*
+- on_stdin({chan-id}, {data}, {name})		*on_stdin*
+- on_data({chan-id}, {data}, {name})		*on_data*
+
+    脚本可以通过指派给 `on_stdout`、`on_stderr`、`on_stdin` 或 `on_data` 选项
+    键值的回调函数来对通道活动（收到的数据）作出反应。回调应当很快：避免可能
+    很慢或很昂贵的工作。
+
+    参数： ~
+      - {chan-id}   通道句柄。|channel-id|
+      - {data}      从通道读到的原始数据（|readfile()| 风格的字符串列表）。EOF
+                    是一个单元素列表：`['']`。首项和末项都可能是不完整的行！
+                    |channel-lines|
+      - {name}      流名（字符串），如 "stdout"，因此同一个函数可以处理
+                    多个流。事件名取决于通道是以何种方式、何种模式/协议
+                    打开的。
+
+						*channel-buffered*
+    回调在有数据可用时立即被调用，其中单元素列表 `['']` 表示 EOF（流已关闭）。
+    另一种做法是设置 `stdout_buffered`、`stderr_buffered`、`stdin_buffered`
+    或 `data_buffered` 选项键值，使回调只在全部输出收集完毕且流已关闭之后
+    才被调用。
+						*E5210*
+    如果使用了缓冲模式却没有回调，数据会被保存到选项字典中以该流 {name} 为键的
+    键值里。若该键值已经存在，则视为错误。
+
+							      *channel-lines*
+    流事件处理函数会在操作系统提供数据时立即收到它，因此 {data} 列表中的
+    首项和末项都可能是不完整的行。空字符串会补全上一个不完整的行。示例
+    （不包括在 EOF 时发出的最后一个 `['']`）：
+      - `foobar` 可能以 `['fo'], ['obar']` 的形式到达
+      - `foo\nbar` 可能以
+        - `['foo','bar']`
+        - 或 `['foo',''], ['bar']`
+        - 或 `['foo'], ['','bar']`
+        - 或 `['fo'], ['o','bar']`
+
+    有两种办法来处理这种情况：
+    - 1. 要等待全部输出，使用 |channel-buffered| 模式。
+    - 2. 要逐行读取，可使用下面的代码： >vim
+	let s:lines = ['']
+	func! s:on_event(job_id, data, event) dict
+	  let eof = (a:data == [''])
+	  " Complete the previous line.
+	  let s:lines[-1] .= a:data[0]
+	  " Append (last item may be a partial line, until EOF).
+	  call extend(s:lines, a:data[1:])
+	endf
+<
+
+如果回调函数是 |Dictionary-function|，那么 |self| 指向含有这些回调的选项字典。
+|Partial| 也可以用作回调。
+
+可以用 |chansend()| 函数向通道发送数据。下面是一个简单的示例，经由一个 cat
+进程回显一些数据： >vim
+    function! s:OnEvent(id, data, event) dict
+      let str = join(a:data, "\n")
+      echomsg str
+    endfunction
+    let id = jobstart(['cat'], {'on_stdout': function('s:OnEvent') } )
+    call chansend(id, "hello!")
+<
+
+下面是把 grep 的结果设置进 buffer 的示例，要等到全部数据处理完毕之后： >vim
+    function! s:OnEvent(id, data, event) dict
+      call nvim_buf_set_lines(2, 0, -1, v:true, a:data)
+    endfunction
+    let id = jobstart(['grep', '^[0-9]'], { 'on_stdout': function('s:OnEvent'),
+					  \ 'stdout_buffered':v:true } )
+
+    call chansend(id, "stuff\n10 PRINT \"NVIM\"\nxx")
+    " no output is received, buffer is empty
+
+    call chansend(id, "xx\n20 GOTO 10\nzz\n")
+    call chanclose(id, 'stdin')
+    " now buffer has result
+<
+关于 job 的更多示例，见 |job-control|。
+
+							      *channel-pty*
+特殊情况：用 `jobstart(..., {'pty': v:true})` 打开的 PTY 通道不会预处理 ANSI
+转义序列，这些序列会原封不动地发送给回调。不过，PTY 尺寸的变化可以用
+|jobresize()| 通知给 slave 端。另见 |terminal-emulator|。
+
+|:terminal| 和 PTY 通道的终端特性（termios）从宿主的 TTY 复制而来；如果 Nvim
+是 |--headless| 的，则使用默认值： >vim
+    :echo system('nvim --headless +"te stty -a" +"sleep 1" +"1,/^$/print" +q')
+
+==============================================================================
+3. 用 msgpack RPC 通信                                        *channel-rpc*
+
+当通道以 `rpc` 选项设为 true 打开时，该通道可以用于双向的远程方法调用，见
+|msgpack-rpc|。注意 rpc 通道是隐式受信任的，另一端的进程可以调用任意 |API|
+函数！
+
+==============================================================================
+4. 标准输入输出通道                                        *channel-stdio*
+
+Nvim 用 stdin/stdout 通过终端接口（TUI）与用户交互。如果 Nvim 是 |--headless|
+的，则不会启动 TUI，stdin/stdout 可以作为一个通道使用。另见 |--embed|。
+
+在 |startup| 期间调用 |stdioopen()|，会以 |channel-id| 1 打开 stdio 通道。
+Nvim 的 stderr 始终可用，即 |v:stderr|，一个只写的字节通道。
+
+示例： >vim
+    func! OnEvent(id, data, event)
+      if a:data == [""]
+        quit
+      end
+      call chansend(a:id, map(a:data, {i,v -> toupper(v)}))
+    endfunc
+    call stdioopen({'on_stdin': 'OnEvent'})
+<
+把这段放进 `uppercase.vim` 并运行： >bash
+    nvim --headless --cmd "source uppercase.vim"
+
+==============================================================================
+5. 使用 prompt buffer                                      *prompt-buffer*
+
+prompt buffer 提供了一种 "prompt"（提示）接口：它们和普通 buffer 一样，只是
+buffer 中只有最后一段可以编辑，而且用户可以按 Enter 来 "submit"（提交）提示。
+它适合用来实现：
+
+- 聊天 UI
+- REPL 或 shell 插件
+- 高级的 "picker" 插件
+
+创建 prompt buffer 的方式是把 'buftype' 设为 "prompt"。通常你只会在一个新建
+的空 buffer 里这样做： >vim
+
+    :set buftype=prompt
+
+prompt buffer 不会在用户输入或其他改动时隐式设置 'modified'。但用户或插件可以
+显式设置 'modified'，以防该 buffer 被轻易关闭。
+
+用户可以在 buffer 末尾编辑和输入文本。在输入区按下 Enter 会调用
+|prompt_setcallback()| 回调，通常预期由它处理提示，并通过向 buffer 追加内容来
+显示结果。要输入多行文本，使用 *Shift-<Enter>* 在不提交提示的情况下添加
+新行，或者直接 |put| 或 |paste| 多行文本。
+
+只有以标记 |':| 开始的 buffer 区段（提示之后）可以编辑。buffer 的其余部分不能
+用 Normal 模式命令修改，不过可以由 |append()| 这样的函数修改。使用其他命令可能
+会弄坏这个 buffer。
+
+设置 `buftype=prompt` 之后：
+- Nvim 会取消 'comments' 选项。
+- Nvim 不会自动进入 Insert 模式（想进入 Insert 模式请使用 `:startinsert`）
+
+提示前缀默认为 "% "，但可以用 |prompt_setprompt()| 设置。你可以用
+|prompt_getprompt()| 取得实际生效的提示前缀。
+
+用户可以进入 Normal 模式并在 buffer 中移动。这对查看较早的输出或复制文本
+很有用。
+
+默认在 prompt 的 insert 模式下，CTRL-W 键可用来启动一个 window 命令，例如
+CTRL-W w 切换到下一个 window。（要删除一个单词请用 Shift-CTRL-W。）离开 window
+时 Insert 模式会停止。回到 prompt window 时 Insert 模式会被恢复。
+
+任何启动 Insert 模式的命令，例如 "a"、"i"、"A" 和 "I"，都会把光标移到
+最后一行。"A" 会移到行尾，"I" 移到行首。
+
+示例：在后台启动一个 shell，提示输入下一条 shell 命令，并把 shell 的输出显示在
+提示的上方： >lua
+
+    local shell_job
+
+    -- Handles a line of user input.
+    local function on_submit(text)
+      -- Send the text to the shell with Enter appended.
+      vim.api.nvim_chan_send(shell_job, text .. "\n")
+    end
+
+    -- Handles output from the shell.
+    local function on_output(_, msg, _)
+      -- Add shell output above the prompt.
+      local buf = vim.api.nvim_get_current_buf()
+      vim.fn.prompt_appendbuf(buf, msg)
+    end
+
+    -- Handles the shell exit.
+    local function on_exit(_, _, _)
+      vim.cmd("quit!")
+    end
+
+    -- Start a shell in the background.
+    shell_job = vim.fn.jobstart({ "/bin/sh" }, {
+      on_stdout = on_output,
+      on_stderr = on_output,
+      on_exit = on_exit,
+    })
+
+    vim.cmd("new")
+    vim.bo.buftype = "prompt"
+    local buf = vim.api.nvim_get_current_buf()
+    vim.fn.prompt_setcallback(buf, on_submit)
+    vim.fn.prompt_setprompt(buf, "shell command: ")
+
+    -- Start accepting shell commands.
+    vim.cmd("startinsert")
+<
+
+ vim:tw=78:ts=8:et:sw=4:ft=help:norl:

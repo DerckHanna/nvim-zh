@@ -1,0 +1,593 @@
+*usr_40.txt*	Nvim
+
+
+		     VIM USER MANUAL	by Bram Moolenaar
+
+
+			      创建新的命令
+
+
+Vim 是一个可扩展的编辑器。你可以把经常要用的一串命令做成一条新命令，也可以
+重新定义已有的命令。自动命令（autocommand）则能让命令自动执行。
+
+|40.1|	键映射
+|40.2|	定义命令行命令
+|40.3|	自动命令
+
+     下一章：|usr_41.txt|  编写 Vim script
+ 上一章：|usr_32.txt|  撤销树
+目录：|usr_toc.txt|
+
+==============================================================================
+*40.1*	键映射
+
+|05.3| 一节解释过一个简单的映射。其原理是把一串按键转换成另一串按键。这是一
+种简单却强大的机制。
+   最简单的形式，是把一个键映射成一串键。功能键除 <F1> 外在 Vim 中没有预定义
+的含义，所以很适合用来做映射。例如： >
+
+	:map <F2> GoDate: <Esc>:read !date<CR>kJ
+
+这个例子用到了三种模式。先用 "G" 走到最后一行，"o" 命令打开一个新行并进入
+Insert 模式。插入文本 "Date: "，再由 <Esc> 退出 Insert 模式。
+   注意 <> 之中特殊键的写法。这叫做尖括号记法。这些键要作为单独的字符敲进去，
+而不是真的去按那个键。这样映射更易读，复制粘贴文本也不会有问题。
+   ":" 字符让 Vim 进入命令行。":read !date" 命令读取 "date" 命令的输出，并把它
+追加到当前行下面。要执行 ":read" 命令必须按 <CR>。
+   执行到这一步，文本看起来是这样的：
+
+	Date:  ~
+	Fri Jun 15 12:54:34 CEST 2001 ~
+
+接着 "kJ" 把光标上移，再把两行连接起来。
+   至于该用哪个键或哪些键做映射，见 |map-which-keys|。
+
+
+映射与模式
+
+":map" 命令为 Normal 模式下的键定义重映射。你也可以为其它模式定义映射。例如
+":imap" 作用于 Insert 模式。可以用它在光标下方插入一个日期： >
+
+	:imap <F2> <CR>Date: <Esc>:read !date<CR>kJ
+
+它看上去很像 Normal 模式下为 <F2> 做的映射，只是开头不同。Normal 模式下的
+<F2> 映射依然存在。因此同一个键可以在不同模式下分别映射。
+   注意，这个映射虽然从 Insert 模式开始，却在 Normal 模式下结束。如果希望它
+继续留在 Insert 模式，就在映射末尾加一个 "a"。
+
+下面是映射命令及其生效模式的概览：
+
+	:map		Normal、Visual 与 Operator-pending
+	:vmap		Visual
+	:nmap		Normal
+	:omap		Operator-pending
+	:map!		Insert 与 Command-line
+	:imap		Insert
+	:cmap		Command-line
+
+Operator-pending 模式，指的是你敲下运算符字符（如 "d" 或 "y"）之后，正等着
+再敲一个动作命令或文本对象的那个时刻。所以当你敲 "dw" 时，"w" 是在
+Operator-pending 模式下输入的。
+
+假设你想定义 <F7>，让命令 d<F7> 删除一个 C 语言程序块（即用花括号 {} 括起来
+的文本）。同样地，y<F7> 会把这个程序块拉入无名 register。因此你要做的事就是
+定义 <F7> 去选取当前的程序块。可以用下面的命令做到： >
+
+	:omap <F7> a{
+
+这使 <F7> 在 Operator-pending 模式下执行选取块的命令 "a{"，就像你真的敲了
+它一样。如果你在键盘上敲 { 有点费劲，这个映射就很有用。
+
+
+列出映射
+
+要查看当前已定义的映射，不带参数使用 ":map"。或者用带模式的那些变体。输出
+可能像这样：
+
+	   _g		 :call MyGrep(1)<CR> ~
+	v  <F2>		 :s/^/> /<CR>:noh<CR>`` ~
+	n  <F2>		 :.,$s/^/> /<CR>:noh<CR>`` ~
+	   <xHome>	 <Home>
+	   <xEnd>	 <End>
+
+
+列表的第一列显示该映射在哪个模式下生效。Normal 模式下是 "n"，Insert 模式下
+是 "i"，等等。用 ":map" 定义的映射这一列是空白，也就是说它在 Normal 和
+Visual 模式下都生效。
+   列出映射的一个有用之处，是检查 <> 形式的特殊键有没有被识别出来（这只有在
+支持颜色时才有效）。例如，当 <Esc> 以彩色显示时，它代表的就是转义字符。当它
+的颜色与其它文本相同时，它就只是五个字符。
+
+
+重映射
+
+映射的结果会被检查，看其中是否还有别的映射。例如上面为 <F2> 做的映射可以
+简写成： >
+
+	:map <F2> G<F3>
+	:imap <F2> <Esc><F3>
+	:map <F3>  oDate: <Esc>:read !date<CR>kJ
+
+对 Normal 模式来说，<F2> 被映射为走到最后一行，然后表现得好像按了 <F3>。
+在 Insert 模式下，<F2> 用 <Esc> 结束 Insert 模式，然后同样使用 <F3>。而 <F3>
+被映射去完成真正的工作。
+
+假设你几乎不用 Ex 模式，想把 "Q" 命令用来排版文本（旧版本的 Vim 就是如此）。
+这个映射可以做到： >
+
+	:map Q gq
+
+但在少数情况下，你终究还是需要用 Ex 模式。我们把 "gQ" 映射成 Q，这样仍能
+进入 Ex 模式： >
+
+	:map gQ Q
+
+现在的情况是：你敲 "gQ"，它被映射成 "Q"。到这里一切正常。但 "Q" 又被映射成
+"gq"，于是敲 "gQ" 的结果成了 "gq"，你根本进不了 Ex 模式。
+   要避免键被再次映射，就用 ":noremap" 命令： >
+
+	:noremap gQ Q
+
+现在 Vim 知道不该再去检查 "Q" 上适用的映射。每个模式都有类似的命令：
+
+	:noremap	Normal、Visual 与 Operator-pending
+	:vnoremap	Visual
+	:nnoremap	Normal
+	:onoremap	Operator-pending
+	:noremap!	Insert 与 Command-line
+	:inoremap	Insert
+	:cnoremap	Command-line
+
+
+递归映射
+
+当映射触发它自己时，就会永远运行下去。这可以用来把一个动作重复无限多次。
+   例如，你有一批文件，每个文件的第一行含有一个版本号。你用 `vim *.txt` 编辑
+这些文件。现在你在编辑第一个文件。定义这个映射： >
+
+	:map ,, :s/5.1/5.2/<CR>:wnext<CR>,,
+
+现在你敲 ",,"。这会触发该映射。它把第一行中的 "5.1" 换成 "5.2"。然后执行
+":wnext" 写出该文件并编辑下一个文件。映射以 ",," 结尾。这又触发了同一个映射，
+于是继续做替换，依此类推。
+   这会一直继续到出现错误为止。在这里，错误可能是某个文件里替换命令找不到
+"5.1" 的匹配。这时你可以做一处修改，把 "5.1" 插进去，然后再敲 ",," 继续。
+也可能是 ":wnext" 失败，因为你在列表中的最后一个文件里。
+   当映射中途遇到错误时，映射剩下的部分就被丢弃。CTRL-C 可以中断映射
+（MS-Windows 上是 CTRL-Break）。
+
+
+删除映射
+
+要移除一个映射，用 ":unmap" 命令。同样地，解除映射作用于哪个模式取决于所用
+的命令：
+
+	:unmap		Normal、Visual 与 Operator-pending
+	:vunmap		Visual
+	:nunmap		Normal
+	:ounmap		Operator-pending
+	:unmap!		Insert 与 Command-line
+	:iunmap		Insert
+	:cunmap		Command-line
+
+有个窍门可以定义一个在 Normal 和 Operator-pending 模式下生效、但在 Visual
+模式下不生效的映射。先为三种模式都定义，再删除 Visual 模式下的那一个： >
+
+	:map <C-A> /---><CR>
+	:vunmap <C-A>
+
+注意那五个字符 "<C-A>" 代表的是单个键 CTRL-A。
+
+要移除所有映射，用 |:mapclear| 命令。各种模式下的变体你现在应该能猜到了。
+使用这条命令要当心，它无法撤销。
+
+
+特殊字符
+
+":map" 命令后面可以跟另一条命令。一个 | 字符把这两条命令分开。这也意味着一个
+| 字符不能用在映射命令内部。要包含这样一个字符，就用 <Bar>（五个字符）。例如：
+>
+	:map <F8> :write <Bar> !checkin %:S<CR>
+
+同样的问题也适用于 ":unmap" 命令，另外还要当心行尾的空白。下面这两条命令是
+不同的：
+>
+	:unmap a | unmap b
+	:unmap a| unmap b
+
+第一条命令试图解除 "a " 的映射，末尾带着一个空格。
+
+在映射中使用空格时，要用 <Space>（七个字符）： >
+
+	:map <Space> W
+
+这使空格键把光标向前移到下一个以空白分隔的单词。
+
+不能直接在映射后面加注释，因为 " 字符会被当作映射的一部分。你可以用 `|"`，
+它以一条带注释的空命令开头。例如： >
+
+	:map <Space> W|     " Use spacebar to move forward a word
+
+
+映射与缩写
+
+缩写（abbreviation）很像 Insert 模式的映射。参数的处理方式也一样。主要区别
+在于触发方式。缩写在单词后面再敲一个非单词字符时触发。映射则在敲下最后一个
+字符时就触发。
+   另一个区别是：敲缩写时，你敲的那些字符会先插入文本中。当缩写被触发时，这些
+字符被删掉，替换成缩写所产生的内容。而敲映射的字符时，在你敲下触发它的最后
+一个字符之前什么都不会插入。如果设置了 'showcmd' 选项，已敲的字符会显示在
+Vim window 的最后一行。
+   有一个例外，就是映射有歧义的时候。假设你做了两个映射： >
+
+	:imap aa foo
+	:imap aaa bar
+
+现在你敲 "aa"，Vim 不知道该用第一个还是第二个映射。它会等待你再敲一个字符。
+如果敲的是 "a"，就应用第二个映射，结果是 "bar"。如果敲的是空格之类的字符，
+就应用第一个映射，得到 "foo"，然后再插入那个空格。
+
+
+此外……
+
+<script> 关键字可用来让映射局部于某个脚本。见 |:map-<script>|。
+
+<buffer> 关键字可用来让映射局部于某个特定的 buffer。见 |:map-<buffer>|
+
+<unique> 关键字可用来让定义新映射在它已存在时失败。否则新映射会直接覆盖旧的
+映射。见 |:map-<unique>|。
+
+要让某个键什么也不做，把它映射成 <Nop>（五个字符）。这会让 <F7> 键完全不起
+作用： >
+
+	:map <F7> <Nop>| map! <F7> <Nop>
+
+<Nop> 后面不能有空格。
+
+==============================================================================
+*40.2*	定义命令行命令
+
+Vim 编辑器让你可以定义自己的命令。执行这些命令的方式，与执行任何其它
+Command-line 模式命令完全一样。
+   要定义一条命令，用 ":command" 命令，像这样： >
+
+	:command DeleteFirst 1delete
+
+现在你执行命令 ":DeleteFirst" 时，Vim 会执行 ":1delete"，也就是删除第一行。
+
+	注意：
+	用户定义的命令必须以大写字母开头。你不能用 ":Next"。也不能用下划线！
+	可以用数字，但不推荐。
+
+要列出用户定义的命令，执行下面这条命令： >
+
+	:command
+
+与内建命令一样，用户定义的命令也可以缩写。你只要敲到足以把这条命令与另一条
+区分开就行。命令行补全可以用来补出完整名称。
+
+
+参数个数
+
+用户定义的命令可以带一系列参数。参数个数必须由 -nargs 选项指定。例如，前面
+那个 :DeleteFirst 命令不带参数，本来可以这样定义： >
+
+	:command -nargs=0 DeleteFirst 1delete
+
+不过，因为零参数是默认值，你不需要额外写 "-nargs=0"。-nargs 的其它取值如下：
+
+	-nargs=0	无参数
+	-nargs=1	一个参数
+	-nargs=*	任意个参数
+	-nargs=?	零个或一个参数
+	-nargs=+	一个或多个参数
+
+
+使用参数
+
+在命令定义内部，参数由 <args> 关键字表示。例如： >
+
+	:command -nargs=+ Say :echo "<args>"
+
+那么当你敲 >
+
+	:Say Hello World
+
+时，Vim 会回显 "Hello World"。可是，如果你加上一个双引号，它就不管用了。
+例如： >
+
+	:Say he said "hello"
+
+要把特殊字符转成字符串、并正确转义以便用作表达式，就用 "<q-args>"： >
+
+	:command -nargs=+ Say :echo <q-args>
+
+现在上面那条 ":Say" 命令会导致执行下面这一条： >
+
+	:echo "he said \"hello\""
+
+<f-args> 关键字包含与 <args> 关键字相同的信息，只是格式适合用作函数调用的
+参数。例如：
+>
+	:command -nargs=* DoIt :call AFunction(<f-args>)
+	:DoIt a b c
+
+执行的是下面这条命令： >
+
+	:call AFunction("a", "b", "c")
+
+
+行范围
+
+有些命令把范围作为参数。要告诉 Vim 你定义的是这样的命令，需要指定 -range
+选项。这个选项的取值如下：
+
+	-range		允许范围；默认是当前行。
+	-range=%	允许范围；默认是整个文件。
+	-range={count}	允许范围；其中的最后一个数字被当作一个默认值为
+			{count} 的单个数字。
+
+指定范围时，关键字 <line1> 和 <line2> 会得到该范围首行和末行的行号。例如，
+下面的命令定义 SaveIt 命令，它把指定范围写出到文件 "save_file"： >
+
+	:command -range=% SaveIt :<line1>,<line2>write! save_file
+
+
+其它选项
+
+其它一些选项和关键字如下：
+
+	-count={number}		命令可以带一个计数，其默认值为 {number}。得到的
+				计数可以通过 <count> 关键字使用。
+	-bang			你可以使用 !。如果用了它，<bang> 就会得到
+				一个 !。
+	-register		你可以指定一个 register。（默认是无名
+				register。）register 的指定内容可通过
+				<reg>（又称 <register>）获得。
+	-complete={type}	所用的命令行补全类型。可能取值的列表见
+				|:command-completion|。
+	-bar			命令后面可以跟 | 和另一条命令，或者跟 "
+				和一条注释。
+	-buffer			该命令只对当前 buffer 可用。
+
+最后还有 <lt> 关键字。它代表字符 <。用它来转义上面提到的 <> 各项的特殊
+含义。
+
+
+重新定义与删除
+
+要重新定义同一条命令，使用 ! 参数： >
+
+	:command -nargs=+ Say :echo "<args>"
+	:command! -nargs=+ Say :echo <q-args>
+
+要删除一条用户命令，用 ":delcommand"。它只取一个参数，即命令名。例如： >
+
+	:delcommand SaveIt
+
+要删除所有用户命令： >
+
+	:comclear
+
+当心，这无法撤销！
+
+关于这一切的更多细节见参考手册：|user-commands|。
+
+==============================================================================
+*40.3*	自动命令
+
+自动命令（autocommand）是响应某个事件而自动执行的命令，比如读取或写入文件、
+或者 buffer 发生变化。借助自动命令，你可以把 Vim 训练成会编辑压缩文件的
+编辑器。|gzip| plugin 就是这么用的。
+   自动命令非常强大。谨慎使用，它们能帮你省去敲很多命令。漫不经心地使用，它们
+会惹来一堆麻烦。
+
+假设你希望每次写入文件时，都把文件末尾的日期戳替换掉。先定义一个函数： >
+
+	:function DateInsert()
+	:  $delete
+	:  read !date
+	:endfunction
+
+你希望每次在把 buffer 写入文件之前都调用这个函数。下面这条命令就能做到： >
+
+	:autocmd BufWritePre *  call DateInsert()
+
+"BufWritePre" 是触发这个自动命令的事件：就在把 buffer 写入文件之前（pre）。
+"*" 是用来匹配文件名的模式。在这里它匹配所有文件。
+   启用这条命令后，当你执行 ":write" 时，Vim 会检查有没有匹配的 BufWritePre
+自动命令并执行它们，然后才真正执行 ":write"。
+   :autocmd 命令的一般形式如下： >
+
+	:autocmd [group] {events} {file-pattern} [++nested] {command}
+
+[group] 名称是可选的。它用于管理和调用这些命令（后面还会细说）。{events}
+参数是一个事件列表（以逗号分隔），用来触发该命令。
+   {file-pattern} 是一个文件名，通常带通配符。例如，用 "*.txt" 能让这条自动
+命令作用于所有名字以 ".txt" 结尾的文件。可选的 [++nested] 标志允许自动命令
+嵌套（见下文），最后，{command} 是要执行的命令。
+
+添加自动命令时，已经存在的那些会保留下来。要避免重复添加同一条自动命令，应该
+用这种形式： >
+
+	:augroup updateDate
+	:  autocmd!
+	:  autocmd BufWritePre *  call DateInsert()
+	:augroup END
+
+这会在定义新命令之前，用 `:autocmd!` 删除此前定义过的自动命令。组（group）
+在后面解释。
+
+
+事件
+
+最有用的事件之一是 BufReadPost。它在开始编辑一个新文件之后被触发。它常用来
+设置选项值。例如，你知道 "*.gsm" 文件是 GNU 汇编语言。为了让语法文件正确生效，
+定义这条自动命令： >
+
+	:autocmd BufReadPost *.gsm  set filetype=asm
+
+如果 Vim 能检测出文件类型，它会替你设置 'filetype' 选项。这会触发 Filetype
+事件。可以用它在编辑某一类型的文件时做点什么。例如，为文本文件加载一组缩写： >
+
+	:autocmd Filetype text  source ~/.config/nvim/abbrevs.vim
+
+在开始编辑新文件时，你可以让 Vim 插入一个模板： >
+
+	:autocmd BufNewFile *.[ch]  0read ~/skeletons/skel.c
+
+完整的事件列表见 |autocmd-events|。
+
+
+文件模式
+
+{file-pattern} 参数实际上可以是一个以逗号分隔的文件模式列表。例如：
+`*.c,*.h` 匹配以 ".c" 和 ".h" 结尾的文件。
+   常用的文件通配符都可以用。下面是最常用的一些的汇总：
+
+	*		匹配任意字符任意多次
+	?		匹配任意一个字符
+	[abc]		匹配字符 a、b 或 c
+	.		匹配一个点
+	a{b,c}		匹配 "ab" 和 "ac"
+
+当模式中含有斜杠（/）时，Vim 会比较目录名。不含斜杠时只用文件名的最后一部分。
+例如，"*.txt" 匹配 "/home/biep/readme.txt"。模式 "/home/biep/*" 也会匹配它。
+但 "home/foo/*.txt" 不会。
+   含斜杠时，Vim 会用模式分别与文件的完整路径（"/home/biep/readme.txt"）和
+相对路径（例如 "biep/readme.txt"）做匹配。
+
+	注意：
+	在使用反斜杠作为文件分隔符的系统（例如 MS-Windows）上，自动命令中仍然
+	要用正斜杠。这样写模式更容易，因为反斜杠有特殊含义。这也让自动命令
+	可以跨平台使用。
+
+
+删除
+
+要删除一条自动命令，用定义它时用的同一条命令，但省掉末尾的 {command}，
+并加上 !。例如： >
+
+	:autocmd! FileWritePre *
+
+这会删除 "FileWritePre" 事件中所有使用 "*" 模式的自动命令。
+
+
+列出
+
+要列出当前定义的所有自动命令，用这条命令： >
+
+	:autocmd
+
+这个列表可能很长，尤其是在启用了文件类型检测的时候。要只列出其中一部分，就
+指定组、事件和/或模式。例如，列出所有 BufNewFile 自动命令： >
+
+	:autocmd BufNewFile
+
+要列出模式 "*.c" 的所有自动命令： >
+
+	:autocmd * *.c
+
+事件用 "*" 会列出所有事件。要列出 cprograms 组的所有自动命令： >
+
+	:autocmd cprograms
+
+
+组
+
+定义自动命令时用到的 {group} 项，把相关的自动命令编成一组。例如，这可以用来
+删除某个组里的所有自动命令。
+   要为某个组定义若干条自动命令，使用 ":augroup" 命令。例如，我们为 C 程序
+定义一些自动命令： >
+
+	:augroup cprograms
+	:  autocmd BufReadPost *.c,*.h :set sw=4 sts=4
+	:  autocmd BufReadPost *.cpp   :set sw=3 sts=3
+	:augroup END
+
+这与下面这样写作用相同： >
+
+	:autocmd cprograms BufReadPost *.c,*.h :set sw=4 sts=4
+	:autocmd cprograms BufReadPost *.cpp   :set sw=3 sts=3
+
+要删除 "cprograms" 组里的所有自动命令： >
+
+	:autocmd! cprograms
+
+
+嵌套
+
+一般来说，作为自动命令事件结果而执行的命令不会再触发新的事件。例如，如果你
+响应 FileChangedShell 事件去读一个文件，它不会触发那些会设置语法的自动命令。
+要让事件被触发，加上 "++nested" 标志： >
+
+	:autocmd FileChangedShell * ++nested  edit
+
+
+执行自动命令
+
+可以通过假装某个事件发生了来触发自动命令。这在一个自动命令触发另一个自动命令
+时很有用。例如： >
+
+	:autocmd BufReadPost *.new  execute "doautocmd BufReadPost " .. expand("<afile>:r")
+
+这定义了一条在编辑新文件后被触发的自动命令。文件名必须以 ".new" 结尾。
+":execute" 命令用表达式求值来拼出一条新命令并执行它。当编辑文件
+"tryout.c.new" 时，执行的命令将是： >
+
+	:doautocmd BufReadPost tryout.c
+
+expand() 函数取 "<afile>" 参数，它代表这条自动命令是为哪个文件名执行的，并用
+":r" 取文件名的根部分。
+
+":doautocmd" 在当前 buffer 上执行。":doautoall" 命令与 "doautocmd" 作用相同，
+只是它在所有 buffer 上执行。
+
+
+使用 Normal 模式的命令
+
+自动命令所执行的是 Command-line 命令。如果你想用 Normal 模式的命令，可以用
+":normal" 命令。例如： >
+
+	:autocmd BufReadPost *.log normal G
+
+这会在你开始编辑 `*.log` 文件时，让光标跳到该文件的最后一行。
+   使用 ":normal" 命令有点麻烦。首先，要确保它的参数是一条完整的命令，包括
+所有参数。当你用 "i" 进入 Insert 模式时，后面还必须有一个 <Esc> 再退出
+Insert 模式。如果你用 "/" 开始一个搜索模式，后面必须有一个 <CR> 去执行它。
+   ":normal" 命令把它后面的所有文本都当作命令。因此后面不能再有 | 和另一条
+命令。要绕过这一点，把 ":normal" 命令放进一条 ":execute" 命令里。这也使得
+以方便的方式传入不可打印字符成为可能。例如： >
+
+	:autocmd BufReadPost *.chg execute "normal ONew entry:\<Esc>" |
+		\ 1read !date
+
+这也演示了用反斜杠把一条长命令拆成多行。这可以用在 Vim script 中（不能用在
+命令行上）。
+
+当你希望自动命令做一些复杂的事，比如在文件中跳来跳去然后再回到原来的位置，
+你可能会想恢复文件上的视图。示例见 |restore-position|。
+
+
+忽略事件
+
+有时你不会希望触发自动命令。'eventignore' 选项含有一个会被完全忽略的事件
+列表。例如，下面这条命令让进入和离开某个 window 的事件被忽略： >
+
+	:set eventignore=WinEnter,WinLeave
+
+要忽略所有事件，用下面这条命令： >
+
+	:set eventignore=all
+
+要把设置恢复为正常行为，把 'eventignore' 置空：
+>
+	:set eventignore=
+<
+==============================================================================
+
+下一章：|usr_41.txt|  编写 Vim script
+
+版权：见 |manual-copyright|
+
+vim:tw=78:ts=8:noet:ft=help:norl:

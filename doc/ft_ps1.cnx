@@ -1,0 +1,61 @@
+*ft_ps1.txt*  A Windows PowerShell syntax plugin for Vim
+
+                            适用于 Vim 的 Windows PowerShell 语法插件
+
+作者：   Peter Provost <https://www.github.com/PProvost>
+许可证：Apache 2.0
+URL：    https://github.com/PProvost/vim-ps1
+
+简介                                                            *ps1-syntax*
+
+该插件为 Windows PowerShell 脚本、模块和 XML 配置文件提供 Vim 语法、
+缩进和文件类型检测。
+
+
+关于                                                            *ps1-about*
+
+在 GitHub 上获取最新版本或报告 bug：
+
+https://github.com/PProvost/vim-ps1
+
+
+折叠                                                            *ps1-folding*
+
+ps1 语法文件为脚本中的脚本块和数字签名提供语法折叠（见 |:syn-fold|）。
+
+当 'foldmethod' 设为 "syntax" 时，函数脚本块会被折叠，除非你在 .vimrc 中
+或打开脚本之前使用以下设置： >
+
+    :let g:ps1_nofold_blocks = 1
+<
+脚本中的数字签名也会被折叠，除非你使用： >
+
+    :let g:ps1_nofold_sig = 1
+<
+注意：语法折叠可能会显著拖慢语法高亮，对大型文件尤其如此。
+
+
+编译器                                                          *ps1-compiler*
+
+PowerShell 的 `:compiler` 脚本配置 |:make|，以便在 PowerShell 中执行脚本。
+
+它会尝试挑选一个智能的默认 PowerShell 命令：如果可用则用 `pwsh`，否则用
+`powershell`，但你可以自定义该命令： >
+
+    :let g:ps1_makeprg_cmd = '/path/to/pwsh'
+<
+要配置是否显示异常类型信息： >
+
+    :let g:ps1_efm_show_error_categories = 1
+<
+
+关键字查询                                                      *ps1-keyword*
+
+要使用 PowerShell 的 Get-Help 查询关键字，请按 |K| 键。为了翻页更方便，
+应当安装分页器 `less`，它包含在许多 Linux 发行版和 macOS 中。
+
+Windows 上还可以使用许多其他发行渠道，例如
+https://chocolatey.org/packages/less/。请确保 `less` 位于 `PATH` 环境变量
+所列的目录中，上面的 chocolatey 就会这样做。
+
+ vim:ft=help:

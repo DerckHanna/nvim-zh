@@ -1,0 +1,131 @@
+*nvim-zh.txt*	nvim-zh
+
+nvim-zh                                                         *nvim-zh*
+                    *nvim-zh-phase8* *nvim-zh-phase7* *nvim-zh-phase6* *nvim-zh-phase5*
+                    *nvim-zh-phase4* *nvim-zh-phase3* *nvim-zh-phase2* *nvim-zh-phase1*
+
+nvim-zh is a Chinese localization plugin for Neovim. Phase 8 extends it with
+translations for surfaces users actually see: native core/gettext integration, a
+standalone translation engine, deterministic catalog tooling, local statistics,
+Neovim UI public seams, and pinned Neovim help translations (see |nvim-zh-help|).
+Diagnostic/LSP protocol data, third-party private buffers, and external tool byte
+streams are never taken over.
+
+SETUP                                                       *nvim-zh-setup*
+
+Call setup from your plugin manager: >lua
+
+    require('nvim-zh').setup({
+      modules = {
+        core = { enabled = true, apply_language = false },
+        help = { enabled = true, lang = { 'cn', 'en' }, vimcdoc = false },
+        ui = { notify = true, prompts = true, select_items = false, echo = false },
+        plugins = { auto = true, lazy_load = true, disabled = {} },
+      },
+      terminology = 'preserve',
+      missing = { enabled = true, max_entries = 2000 },
+    })
+<
+The plugin never applies the OS locale automatically. Use |:NvimZhCheck| to
+inspect the existing Neovim gettext catalog and zh_CN.UTF-8 locale. Vimcdoc is
+an optional, separately installed dependency; it is not vendored.
+
+ENGINE                                                     *nvim-zh-engine*
+
+`require('nvim-zh').translate(spec)` accepts domain, optional context, msgid,
+optional args, and formatted. It returns text, status, and entry_id. Exact
+entries take priority over anchored templates. Named arguments are preferred;
+non-positional printf arguments are never reordered. Missing or invalid data
+always falls back to the original msgid.
+
+User overrides are data tables indexed by explicit domain and context: >lua
+
+    overrides = {
+      ['my-plugin'] = {
+        [''] = { Save = '保存' },
+        menu = { Open = '展开' },
+      },
+    }
+<
+Functions and executable user rules are not catalog data. Catalogs load lazily
+and merge built-in entries before overrides. No fuzzy runtime matching or
+global terminology substitution is performed.
+
+COMMANDS                                                 *nvim-zh-commands*
+
+*:NvimZhInfo*    Show Neovim version, setup state, locale, MO and helplang.
+*:NvimZhCheck*   Read-only core/help checks. Also available through
+                 `:checkhealth nvim-zh`.
+*:NvimZhMissing* Show bounded, local missing statistics. Dynamic values,
+                 paths, and long source strings are redacted by default.
+*:NvimZhReload*  Reload catalogs/overrides, then safely rebuild UI adapters.
+
+Static catalog coverage and runtime observed coverage are separate. Neither is
+a claim of complete Neovim coverage. Statistics are memory-only by default.
+
+*nvim-zh-ui*
+UI ADAPTERS~
+
+notify/notify_once translate messages while retaining source-message deduplication.
+input/select translate prompt/title only and preserve opts, callbacks, async order,
+raw input, and original item/index. select_items is off by default; when enabled it
+wraps format_item without replacing items.
+
+echo is opt-in. It preserves chunk highlights/metadata, history, opts and message id.
+Fast events bypass translation. Output streams, terminal bytes, private buffers,
+diagnostics, LSP and third-party private UI are not adapted.
+
+Adapted real text also covers what Neovim itself shows through vim.notify while a
+user drives LSP features (e.g. "No information available", "No locations found",
+"No code actions available") and the vim.ui.input/select prompts for rename, code
+actions and code lenses. Only literals that exist in the pinned 0.12.6 sources are
+covered; other text, dynamic payloads and protocol fields stay in English.
+
+Setup is idempotent. Later external replacements are never overwritten on teardown or
+reclaimed on reload; Info and checkhealth report external_override. Translation errors
+fall back to the source text, while original implementation errors propagate.
+
+*nvim-zh-plugins*
+THIRD-PARTY PLUGINS~
+
+plugins.auto adapts loaded, API-compatible which-key/Telescope modules without forcing
+require. If a plugin loads later, run nvim-zh setup after its setup or :NvimZhReload.
+
+which-key uses public replace.desc and preserves key/rhs/mapping. Telescope wraps
+pickers.new and translates prompt/results/preview titles only, preserving finder,
+entry_maker, attach_mappings and entries. Use disabled = { "which-key", "telescope" }
+to disable either adapter. Pinned commits and source hashes are in upstreams.json.
+lazy.nvim reuses the public vim.notify seam and the User LazyLoad event. nvim-tree
+chains public setup/on_attach and translates mapping desc only. nvim-cmp and external
+tools remain inventory_only; private buffers are excluded.
+
+HELP DOCUMENTS                                            *nvim-zh-help*
+Translations ship as `.cnx` files and are reachable through doc/tags-cn.
+'helplang' becomes `cn,en`, so any tag without a translation falls back to the
+English runtime document. Documents translated completely (status=complete):
+
+- |help.txt|       the default `:help` landing page and topic index.
+- |nvim.txt|       getting started with Nvim and migrating from Vim.
+- |lua-guide|      the complete guide to configuring Nvim with Lua.
+- |diagnostic-api| the diagnostic framework and vim.diagnostic Lua API.
+- |terminal|      the embedded terminal emulator and the :Termdebug plugin.
+
+For every document manifests/upstreams.json records the upstream repository, full
+commit, source path, SHA-256, local translation path and complete/partial status.
+Translations keep every English help tag, `|link|`, example block and default-value
+note; example code is preserved byte-for-byte so it stays copy-pasteable. The
+English text remains reachable through `:help <tag>@en`.
+
+MAINTENANCE                                           *nvim-zh-maintenance*
+
+Run `make check-translations` to validate PO syntax, UTF-8, duplicate keys,
+placeholder parity, protected code spans, and glossary rules. Run `make build`
+to generate stable, domain-split pure Lua catalogs. The runtime does not need
+msgfmt. Buffer, Window, and Register are preserved English terms by default.
+
+Run `make test-phase8` to verify every help document: bidirectional tag parity,
+tags-cn matching Neovim's own `:helptags` output, unchanged example blocks and
+links, pinned-baseline hash equality, and that `:help` opens Chinese while
+untranslated documents still fall back to English.
+
+ vim:tw=78:ts=8:et:ft=help:norl:

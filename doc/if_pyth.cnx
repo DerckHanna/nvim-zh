@@ -1,0 +1,645 @@
+*if_pyth.txt*   Nvim
+
+
+		  NVIM REFERENCE MANUAL
+
+
+NVim 的 Python 接口				*if_pyth* *python* *Python*
+
+更多信息见 |provider-python|。
+
+                                      输入 |gO| 查看目录。
+
+==============================================================================
+命令						*python-commands*
+
+					*:python* *:py* *E263* *E264* *E887*
+:[range]py[thon] {stmt}
+			执行 Python 语句 {stmt}。 一个简单检查
+			`:python` 命令是否工作的方法： >vim
+				:python print("Hello")
+
+:[range]py[thon] << [trim] [{endmarker}]
+{script}
+{endmarker}
+			执行 Python 脚本 {script}。 便于在 Vim script
+			中内嵌 python 代码。 需要 Python，见
+			|script-here|。
+
+如果 "<<" 之后省略了 [endmarker]，那么 {script} 之后必须用一个点
+'.'，就像 |:append| 和 |:insert| 命令那样。 更多信息见
+|:let-heredoc|。
+
+示例： >vim
+	function! IcecreamInitialize()
+	python << EOF
+	class StrawberryIcecream:
+		def __call__(self):
+			print('EAT ME')
+	EOF
+	endfunction
+
+要看你用的是哪个版本的 Python： >vim
+	:python print(sys.version)
+
+不需要 "import sys"，它默认已经导入。
+
+							*python-environment*
+在 Vim 中设置的环境变量在 Python 里并不总是可用。 这取决于 Vim 和
+Python 是如何构建的。 另见
+https://docs.python.org/3/library/os.html#os.environ
+
+注意：Python 对缩进非常敏感。 确保 "class" 行和
+"EOF" 没有任何缩进。
+
+							*:pydo*
+:[range]pydo {body}	对 [range] 中的每一行执行 Python 函数
+			"def _vim_pydo(line, linenr): {body}"，函数参数
+			依次设为该行的文本（不含行尾 <EOL>）和当前
+			行号。 该函数应当返回字符串或 None。 若返回
+			字符串，它就成为本轮该行的文本。[range] 的
+			默认值是整个文件："1,$"。
+
+示例：
+>vim
+	:pydo return "%s\t%d" % (line[::-1], len(line))
+	:pydo if line: return "%4d: %s" % (linenr, line)
+<
+可以用 `:pydo` 配合 `:py` 以 python 过滤一个 range。 例如： >vim
+
+	:py3 << EOF
+	needle = vim.eval('@a')
+	replacement = vim.eval('@b')
+
+	def py_vim_string_replace(str):
+		return str.replace(needle, replacement)
+	EOF
+	:'<,'>py3do return py_vim_string_replace(line)
+<
+							*:pyfile* *:pyf*
+:[range]pyf[ile] {file}
+			执行 {file} 中的 Python 脚本。 整个
+			参数被当作单个文件名。
+
+这两个命令大体上做同一件事——它们执行一段 Python 代码，
+并把 "current range" |python-range| 设为给定的行 range。
+
+就 :python 而言，要执行的代码在命令行上。
+就 :pyfile 而言，要执行的代码是给定文件的内容。
+
+Python 命令不能在 |sandbox| 中使用。
+
+要传参数需要显式设置 sys.argv[]。 示例： >vim
+
+	:python sys.argv = ["foo", "bar"]
+	:pyfile myscript.py
+
+这里有些例子					*python-examples*
+>vim
+	:python from vim import *
+	:python current.line = str.upper(current.line)
+	:python print("Hello")
+	:python str = current.buffer[42]
+
+注意改动（例如 "import" 语句）会从一条命令延续到下一条，
+就像 Python REPL 那样。
+
+							*script-here*
+在使用内联脚本语言时，你也许想在语言不被支持时跳过它。
+>vim
+   if has('python')
+     python << EOF
+       print("python works")
+   EOF
+   endif
+<
+注意 "EOF" 必须位于行首，前面不能有空白。
+
+==============================================================================
+vim 模块						*python-vim*
+
+Python 代码对 vim 的所有访问（有一个例外——见下方
+|python-output|）都通过 "vim" 模块完成。 vim 模块实现了两个
+方法、三个常量和一种错误对象。 使用它之前需要先 import vim
+模块： >vim
+	:python import vim
+
+概览 >vim
+	:py print("Hello")		# displays a message
+	:py vim.command(cmd)		# execute an Ex command
+	:py w = vim.windows[n]		# gets window "n"
+	:py cw = vim.current.window	# gets the current window
+	:py b = vim.buffers[n]		# gets buffer "n"
+	:py cb = vim.current.buffer	# gets the current buffer
+	:py w.height = lines		# sets the window height
+	:py w.cursor = (row, col)	# sets the window cursor position
+	:py pos = w.cursor		# gets a tuple (row, col)
+	:py name = b.name		# gets the buffer file name
+	:py line = b[n]			# gets a line from the buffer
+	:py lines = b[n:m]		# gets a list of lines
+	:py num = len(b)		# gets the number of lines
+	:py b[n] = str			# sets a line in the buffer
+	:py b[n:m] = [str1, str2, str3]	# sets a number of lines at once
+	:py del b[n]			# deletes a line
+	:py del b[n:m]			# deletes a number of lines
+
+
+"vim" 模块的方法
+
+vim.command(str)					*python-command*
+	执行 vim（ex 模式）命令 str。 返回 None。
+	示例： >vim
+	    :py vim.command("set tw=72")
+	    :py vim.command("%s/aaa/bbb/g")
+<	下面的定义用于执行 Normal 模式命令： >python
+		def normal(str):
+			vim.command("normal "+str)
+		# Note the use of single quotes to delimit a string containing
+		# double quotes
+		normal('"a2dd"aP')
+
+vim.eval(str)						*python-eval*
+	用 vim 内部表达式求值器求值表达式 str
+	（见 |expression|）。 结果按如下方式返回：
+	- 若 Vim 表达式求值得到字符串或数字，则为字符串
+	- 若 Vim 表达式求值得到 Vim |list|，则为列表
+	- 若 Vim 表达式求值得到 Vim |dict|，则为字典
+	- 若 Vim 表达式求值为 |v:true| 或 |v:false|，则为布尔值
+	- 若 Vim 表达式求值为 |v:null|，则为 `None`
+	字典和列表会被递归展开。
+	示例： >vim
+	    :py text_width = vim.eval("&tw")
+	    :py str = vim.eval("12+12")		# NB result is a string! Use
+						# int() to convert to a
+						# number.
+
+vim.strwidth(str)					*python-strwidth*
+	类似 |strwidth()|：返回 str 占用的显示单元数，tab
+	按一个单元计算。
+
+vim.foreach_rtp(callable)				*python-foreach_rtp*
+	对 'runtimepath' 中的每个路径调用给定的 callable，直到
+	callable 返回除 None 以外的值、抛出异常，或者
+	没有更多路径为止。 若因 callable 返回非 None 而停止，
+	vim.foreach_rtp 函数返回 callable 返回的那个值。
+
+`vim.chdir(*args, **kwargs)`				*python-chdir*
+`vim.fchdir(*args, **kwargs)`				*python-fchdir*
+	运行 os.chdir 或 os.fchdir，然后执行所有相应的 vim 操作。
+	注意：你不应直接使用这些函数，而应使用 os.chdir 和
+	      os.fchdir。 若 os.fchdir 不存在，vim.fchdir 的行为
+	      未定义。
+
+"vim" 模块的错误对象
+
+vim.error						*python-error*
+	遇到 Vim 错误时，Python 抛出一个类型为
+	vim.error 的异常。
+	示例： >python
+		try:
+			vim.command("put a")
+		except vim.error:
+			# nothing in register a
+
+"vim" 模块的常量
+
+	注意这些实际上不是常量——你可以重新给它们赋值。
+	但那样做很傻，因为你会失去对变量所引用的 vim 对象的
+	访问。
+
+vim.buffers						*python-buffers*
+	一个映射对象，提供对 vim buffer 列表的访问。 该
+	对象支持以下操作： >vim
+	    :py b = vim.buffers[i]	# Indexing (read-only)
+	    :py b in vim.buffers	# Membership test
+	    :py n = len(vim.buffers)	# Number of elements
+	    :py for b in vim.buffers:	# Iterating over buffer list
+<
+vim.windows						*python-windows*
+	一个序列对象，提供对 vim window 列表的访问。 该
+	对象支持以下操作： >vim
+	    :py w = vim.windows[i]	# Indexing (read-only)
+	    :py w in vim.windows	# Membership test
+	    :py n = len(vim.windows)	# Number of elements
+	    :py for w in vim.windows:	# Sequential access
+<	注意：vim.windows 对象始终访问当前 tab page。
+	|python-tabpage|.windows 对象绑定到父 |python-tabpage|
+	对象，并且始终使用该 tab page 中的 window（若 tab page 已被
+	删除则抛出 vim.error）。 你可以同时保留对两者的引用，
+	而不保留对 vim 模块对象或 |python-tabpage| 的引用，
+	在此情况下它们不会失去其属性。
+
+vim.tabpages						*python-tabpages*
+	一个序列对象，提供对 vim tab page 列表的访问。 该
+	对象支持以下操作： >vim
+	    :py t = vim.tabpages[i]	# Indexing (read-only)
+	    :py t in vim.tabpages	# Membership test
+	    :py n = len(vim.tabpages)	# Number of elements
+	    :py for t in vim.tabpages:	# Sequential access
+<
+vim.current						*python-current*
+	一个对象，通过特定属性访问 vim 中可用的各种
+	"current" 对象：
+		vim.current.line	当前行 (RW)		String
+		vim.current.buffer	当前 buffer (RW)		Buffer
+		vim.current.window	当前 window (RW)		Window
+		vim.current.tabpage	当前 tab page (RW)	TabPage
+		vim.current.range	当前行 range (RO)	Range
+
+	最后一种情况值得稍作解释。 当 :python 或
+	:pyfile 命令指定了 range 时，这个行 range 就成为
+	"current range"。 range 有点像一个 buffer，但所有访问
+	都被限制在若干行的子集上。 更多细节见 |python-range|。
+
+	注意：给 vim.current.{buffer,window,tabpage} 赋值时，它要求
+	相应的有效 |python-buffer|、|python-window| 或 |python-tabpage|
+	对象。 赋值会触发正常的（带 |autocommand|）切换到给定
+	buffer、window 或 tab page。 这是用 python 切换 UI 对象
+	的唯一方式：你不能给 |python-tabpage|.window 属性赋值。
+	要在不触发 autocommand 的情况下切换，请用 >vim
+	    py << EOF
+	    saved_eventignore = vim.options['eventignore']
+	    vim.options['eventignore'] = 'all'
+	    try:
+	        vim.current.buffer = vim.buffers[2] # Switch to buffer 2
+	    finally:
+	        vim.options['eventignore'] = saved_eventignore
+	    EOF
+<
+vim.vars						*python-vars*
+vim.vvars						*python-vvars*
+	类似字典的对象，分别持有全局（|g:|）变量字典和
+	vim（|v:|）变量字典。
+
+vim.options						*python-options*
+	部分支持映射协议的对象（支持获取和设置项），
+	提供对全局选项的读写访问。
+	注意：与 |:set| 不同，它只提供对全局选项的访问。 你
+	不能用这个对象获取或设置局部选项的值，也不能以任何方式
+	访问仅限局部的选项。 若不存在同名的全局选项则抛出 KeyError
+	（即对 |global-local| 选项和仅限全局的选项不抛出 KeyError，
+	但对仅限 window 和 buffer 的选项会抛出）。 用
+	|python-buffer| 对象访问 buffer 局部选项，用 |python-window|
+	对象访问 window 局部选项。
+
+	该对象的类型可通过 vim 模块的 "Options" 属性获得。
+
+Python 的输出						*python-output*
+	Vim 在 Vim 消息区域显示所有 Python 代码的输出。 正常
+	输出以信息消息形式出现，错误输出则以错误消息
+	形式出现。
+
+	从实现上说，这意味着所有输出到 sys.stdout 的内容
+	（包括 print 语句的输出）都以信息消息形式出现，
+	而所有输出到 sys.stderr 的内容（包括错误回溯）
+	都以错误消息形式出现。
+
+							*python-input*
+	输入（通过 sys.stdin，包括 input() 和 raw_input()）不受
+	支持，并且可能导致程序崩溃。 这一点大概是
+	应该修好的。
+
+				  *python3-directory* *pythonx-directory*
+Python 的 'runtimepath' 处理				*python-special-path*
+
+在 python 中，vim.VIM_SPECIAL_PATH 特殊目录被当作 'runtimepath' 中
+找到的路径列表的替代：当 sys.path 中有这个目录且 sys.path_hooks 中
+有 vim.path_hooks 时，python 会尝试对 'runtimepath' 中
+找到的每个 {rtp} 从 {rtp}/python3 和 {rtp}/pythonx 加载模块。
+
+实现方式类似下面这样： >python
+
+    from imp import find_module, load_module
+    import vim
+    import sys
+
+    class VimModuleLoader(object):
+        def __init__(self, module):
+            self.module = module
+
+        def load_module(self, fullname, path=None):
+            return self.module
+
+    def _find_module(fullname, oldtail, path):
+        idx = oldtail.find('.')
+        if idx > 0:
+            name = oldtail[:idx]
+            tail = oldtail[idx+1:]
+            fmr = find_module(name, path)
+            module = load_module(fullname[:-len(oldtail)] + name, *fmr)
+            return _find_module(fullname, tail, module.__path__)
+        else:
+            fmr = find_module(fullname, path)
+            return load_module(fullname, *fmr)
+
+    # It uses vim module itself in place of VimPathFinder class: it does not
+    # matter for python which object has find_module function attached to as
+    # an attribute.
+    class VimPathFinder(object):
+        @classmethod
+        def find_module(cls, fullname, path=None):
+            try:
+                return VimModuleLoader(_find_module(fullname, fullname, path or vim._get_paths()))
+            except ImportError:
+                return None
+
+        @classmethod
+        def load_module(cls, fullname, path=None):
+            return _find_module(fullname, fullname, path or vim._get_paths())
+
+    def hook(path):
+        if path == vim.VIM_SPECIAL_PATH:
+            return VimPathFinder
+        else:
+            raise ImportError
+
+    sys.path_hooks.append(hook)
+
+vim.VIM_SPECIAL_PATH				*python-VIM_SPECIAL_PATH*
+	与 vim path hook 配合使用的字符串常量。 若由 vim 安装的
+	path hook 被要求处理任何不等于 vim.VIM_SPECIAL_PATH
+	常量的路径，它会抛出 ImportError。 在
+	唯一其它情况下它使用特殊加载器。
+
+	注意：你绝不能直接使用这个常量的值，始终使用
+	      vim.VIM_SPECIAL_PATH 对象。
+
+vim.find_module(...)					*python-find_module*
+vim.path_hook(path)					*python-path_hook*
+	用于实现上述路径加载的方法或对象。
+	除在你需要对 sys.meta_path 做些事情时需要 vim.path_hook
+	之外，你不应直接使用其中任何一个。 不保证任何对象在未来的 vim
+	版本中存在。
+
+vim._get_paths						*python-_get_paths*
+	返回将被 path hook 搜索的路径列表的方法。
+	你不应依赖这个方法在未来的版本中存在，但可以用它来调试。
+
+	它返回 'runtimepath' 中每个 {rtp} 对应的 {rtp}/python3 和
+	{rtp}/pythonx 目录的列表。
+
+==============================================================================
+Buffer 对象						*python-buffer*
+
+Buffer 对象表示 vim buffer。 可以通过多种方式
+获得它们：
+	- 通过 vim.current.buffer（|python-current|）
+	- 从 vim.buffers 索引（|python-buffers|）
+	- 从 window 的 "buffer" 属性（|python-window|）
+
+Buffer 对象有两个只读属性——name——buffer 的完整文件名，
+和 number——buffer 编号。 它们还有三个方法
+（append、mark 和 range；见下文）。
+
+你也可以把 Buffer 对象当作序列对象。 在这种语境下，它们
+表现得好像字符串列表（是的，它们是可变的），每个
+元素是 buffer 的一行。 所有通常的序列操作，
+包括索引、索引赋值、切片和切片赋值，都按
+你预期的方式工作。 注意对 Buffer 索引（切片）的结果是
+字符串（字符串列表）。 这有一个不寻常的后果——b[:] 与 b
+不同。 具体来说，"b[:] = None" 删除整个
+buffer，而 "b = None" 只是更新变量 b，对
+buffer 没有影响。
+
+Buffer 索引从零开始，这在 Python 中是正常的。 这与 vim
+行号不同，后者从 1 开始。 在处理
+mark（见下文）时这一点尤其相关，因为 mark 使用 vim 行号。
+
+Buffer 对象的属性有：
+	b.vars		类似字典的对象，用于访问
+			|buffer-variable|。
+	b.options	映射对象（支持获取、设置和删除项），
+			提供对 buffer 局部选项以及
+			|global-local| 选项的 buffer 局部值的访问。
+			若选项是 window 局部的，请用
+			|python-window|.options，此对象会抛出
+			KeyError。 若选项是
+			|global-local| 且局部值缺失，获取它
+			将返回 None。
+	b.name		字符串，RW。 包含 buffer 名（完整路径）。
+			注意：给 b.name 赋值时会启动 |BufFilePre| 和
+			|BufFilePost| autocommand。
+	b.number	Buffer 编号。 可用作 |python-buffers| 的键。
+			只读。
+	b.valid		True 或 False。 当对应的 buffer 被
+			删除（wiped out）时，Buffer 对象变为无效。
+
+Buffer 对象的方法有：
+	b.append(str)	向 buffer 追加一行
+	b.append(str, nr)  同上，在 "nr" 行之下
+	b.append(list)	向 buffer 追加一个行列表
+			注意向 append 方法提供字符串列表的选项
+			与 Python 内建 list 对象的等价方法
+			不同。
+	b.append(list, nr)  同上，在 "nr" 行之下
+	b.mark(name)	返回一个表示指定 mark 位置的元组 (row,col)
+			（也可以获取 []"<> mark）
+	b.range(s,e)	返回一个 range 对象（见 |python-range|），它
+			表示给定 buffer 中行号 s 和 e 之间的部分
+			|inclusive|。
+
+注意添加一行时该行不能包含换行符 '\n'。
+允许并忽略末尾的 '\n'，因此你可以这样做： >vim
+	:py b.append(f.readlines())
+
+Buffer 对象类型可通过 vim 模块的 "Buffer" 属性获得。
+
+示例（假定 b 是当前 buffer） >vim
+	:py print(b.name)		# write the buffer file name
+	:py b[0] = "hello!!!"		# replace the top line
+	:py b[:] = None			# delete the whole buffer
+	:py del b[:]			# delete the whole buffer
+	:py b[0:0] = [ "a line" ]	# add a line at the top
+	:py del b[2]			# delete a line (the third)
+	:py b.append("bottom")		# add a line at the bottom
+	:py n = len(b)			# number of lines
+	:py (row,col) = b.mark('a')	# named mark
+	:py r = b.range(1,5)		# a sub-range of the buffer
+	:py b.vars["foo"] = "bar"	# assign b:foo variable
+	:py b.options["ff"] = "dos"	# set fileformat
+	:py del b.options["ar"]		# same as :set autoread<
+
+==============================================================================
+Range 对象						*python-range*
+
+Range 对象表示 vim buffer 的一部分。 可以通过多种方式
+获得它们：
+	- 通过 vim.current.range（|python-current|）
+	- 从 Buffer 的 range() 方法（|python-buffer|）
+
+Range 对象在操作上与 Buffer 对象几乎相同。 但是，
+所有操作都被限制在 range 内的行（这个行 range
+当然会因切片赋值、行删除或 range.append()
+方法而改变）。
+
+Range 对象的属性有：
+	r.start		在 buffer 中首行的索引
+	r.end		在 buffer 中末行的索引
+
+Range 对象的方法有：
+	r.append(str)	向 range 追加一行
+	r.append(str, nr)  同上，在 "nr" 行之后
+	r.append(list)	向 range 追加一个行列表
+			注意向 append 方法提供字符串列表的选项
+			与 Python 内建 list 对象的等价方法
+			不同。
+	r.append(list, nr)  同上，在 "nr" 行之后
+
+Range 对象类型可通过 vim 模块的 "Range" 属性获得。
+
+示例（假定 r 是当前 range）：
+	# Send all lines in a range to the default printer
+	vim.command("%d,%dhardcopy!" % (r.start+1,r.end+1))
+
+==============================================================================
+Window 对象						*python-window*
+
+Window 对象表示 vim window。 可以通过多种方式
+获得它们：
+	- 通过 vim.current.window（|python-current|）
+	- 从 vim.windows 索引（|python-windows|）
+	- 从 tab page 的 "windows" 属性索引（|python-tabpage|）
+	- 从 tab page 的 "window" 属性（|python-tabpage|）
+
+你只能通过 Window 对象的属性来操作它们。 它们没有
+方法，也没有序列或其它接口。
+
+Window 属性有：
+	buffer（只读）	此 window 中显示的 buffer
+	cursor（读写）	window 中当前光标位置
+				这是一个元组 (row,col)。
+	height（读写）	window 高度，以行计
+	width（读写）	window 宽度，以列计
+	vars（只读）	window 的 |w:| 变量。 该属性
+				不可赋值，但你可以这样改变 window
+				变量
+	options（只读）	window 局部选项。 该属性
+				不可赋值，但你可以这样改变 window
+				选项。 只提供对
+				window 局部选项的访问；buffer 局部的用
+				|python-buffer|，全局的用
+				|python-options|。 若选项是 |global-local|
+				且局部值缺失，获取它将
+				返回 None。
+	number（只读）	Window 编号。 第一个 window 编号为 1。
+				若无法确定则为零
+				（例如当该 window 对象属于其它
+				tab page 时）。
+	row, col（只读）	window 在屏幕上的位置，以显示单元计。
+				第一个位置为零。
+	tabpage（只读）	Window 的 tab page。
+	valid（读写）	True 或 False。 当对应的 window
+				被关闭时，Window 对象变为无效。
+
+只有屏幕被水平分割时，height 属性才可写。
+只有屏幕被垂直分割时，width 属性才可写。
+
+Window 对象类型可通过 vim 模块的 "Window" 属性获得。
+
+==============================================================================
+Tab page 对象					*python-tabpage*
+
+Tab page 对象表示 vim tab page。可以通过多种方式
+获得它们：
+	- 通过 vim.current.tabpage（|python-current|）
+	- 从 vim.tabpages 索引（|python-tabpages|）
+
+你可以用这个对象访问 tab page 的 window。它们没有方法，
+也没有序列或其它接口。
+
+Tab page 属性有：
+	number		该 tab page 编号，类似于
+			|tabpagenr()| 返回的那个。
+	windows		类似 |python-windows|，但针对当前 tab page。
+	vars		该 tab page 的 |t:| 变量。
+	window		当前 tabpage 的 window。
+	valid		True 或 False。 当对应的 tab page
+			被关闭时，Tab page 对象变为无效。
+
+TabPage 对象类型可通过 vim 模块的 "TabPage" 属性获得。
+
+==============================================================================
+pyeval() 和 py3eval() Vim 函数			*python-pyeval*
+
+为了便于双向接口，你可以用 |pyeval()| 和 |py3eval()|
+函数求值 Python 表达式并把它们的值传给 Vim script。
+|pyxeval()| 也可用。
+
+==============================================================================
+Python 3						*python3*
+
+由于 Python 3 是 Nvim 中唯一支持的版本，在当前版本中 "python" 与
+"python3" 同义。不过，若代码打算支持较老
+版本的 Nvim 以及 Vim，在需要 Python 3 时应当显式
+优先使用 "python3" 变体。
+
+							*:py3* *:python3*
+:[range]py3 {stmt}
+:[range]py3 << [trim] [{endmarker}]
+{script}
+{endmarker}
+
+:[range]python3 {stmt}
+:[range]python3 << [trim] [{endmarker}]
+{script}
+{endmarker}
+	`:py3` 和 `:python3` 命令的工作方式与 `:python` 类似。 一个
+	简单检查 `:py3` 命令是否工作的方法： >vim
+		:py3 print("Hello")
+<
+	要看你用的是哪个版本的 Python： >vim
+		:py3 import sys
+		:py3 print(sys.version)
+<							*:py3file*
+:[range]py3f[ile] {file}
+	`:py3file` 命令的工作方式与 `:pyfile` 类似。
+							*:py3do*
+:[range]py3do {body}
+	`:py3do` 命令的工作方式与 `:pydo` 类似。
+
+							*E880*
+在 python 中抛出 SystemExit 异常并不是退出 vim 的受认可方式，请用：
+>vim
+	:py vim.command("qall!")
+<
+							*has-python*
+你可以这样测试 Python 是否可用： >vim
+	if has('pythonx')
+	  echo 'there is Python'
+	endif
+	if has('python3')
+	  echo 'there is Python 3.x'
+	endif
+
+不再支持 Python 2。因此出于向后兼容的考虑，`has('python')` 始终返回
+零。
+
+==============================================================================
+Python X						*python_x* *pythonx*
+
+"pythonx" 和 "pyx" 前缀是为兼容 Python 2.6+ 和 Python 3 的 python 代码
+引入的。由于 Nvim 只支持 Python 3，
+所有这些命令现在都与其 "python3" 对应命令同义。
+
+							*:pyx* *:pythonx*
+`:pyx` 和 `:pythonx` 与 `:python3` 用法相同。 要检查 `:pyx` 是否可用： >vim
+	:pyx print("Hello")
+
+要查看正在使用的是哪个版本的 Python： >vim
+	:pyx import sys
+	:pyx print(sys.version)
+<
+					*:pyxfile* *python_x-special-comments*
+`:pyxfile` 与 `:py3file` 用法相同。
+
+							*:pyxdo*
+`:pyxdo` 与 `:py3do` 用法相同。
+
+							*has-pythonx*
+要检查 `pyx*` 函数和命令是否可用： >vim
+	if has('pythonx')
+	  echo 'pyx* commands are available. (Python ' .. &pyx .. ')'
+	endif
+<
+
+ vim:tw=78:ts=8:noet:ft=help:norl:

@@ -1,0 +1,5086 @@
+*syntax.txt*	Nvim
+
+
+		  VIM REFERENCE MANUAL	  by Bram Moolenaar
+
+
+语法高亮		*syntax* *syntax-highlighting* *coloring*
+
+语法高亮（Syntax highlighting）让 Vim 能用另一种字体或颜色显示文本的某些部分。
+这些部分可以是特定的关键字，也可以是匹配某个模式的文本。Vim 不会解析整个文件
+（为了保持速度），所以高亮有其局限。称作「词法高亮」（lexical highlighting）
+可能更贴切，但既然大家都叫它语法高亮，我们就沿用这个说法。
+
+Vim 在所有终端上支持语法高亮。不过由于大多数普通终端的高亮能力非常有限，
+它在 GUI 版本 gvim 里效果最好。
+
+在用户手册中：
+|usr_06.txt| 介绍语法高亮。
+|usr_44.txt| 介绍如何编写 syntax 文件。
+
+                                       Type |gO| to see the table of contents.
+
+==============================================================================
+1. 快速上手						*:syn-qstart*
+
+				*:syn-enable* *:syntax-enable* *:syn-on* *:syntax-on*
+语法高亮默认启用。如果你需要在它被关闭后（见下文）重新启用，请用： >
+
+	:syntax enable
+
+或者： >
+
+	:syntax on
+
+这条命令实际做的事是执行下面这条命令 >
+	:source $VIMRUNTIME/syntax/syntax.vim
+
+如果 VIM 环境变量没有设置，Vim 会尝试用别的方式找到路径（见 |$VIMRUNTIME|）。
+通常这样也能工作正常。如果不行，试着把 VIM 环境变量设成 Vim 文件所在的目录。
+例如，如果你的 syntax 文件在 "/usr/vim/vim82/syntax" 目录里，就把 $VIMRUNTIME
+设为 "/usr/vim/vim82"。你必须在 shell 里、在启动 Vim 之前做这件事。
+当 GUI 正在运行或即将启动时，这条命令还会 source |menu.vim| 脚本。
+
+					*:hi-normal* *:highlight-normal*
+如果你在 GUI 中运行，可以用下面的方式得到黑底白字： >
+	:highlight Normal guibg=Black guifg=White
+彩色终端请见 |:hi-normal-cterm|。
+
+注意：MS-Windows 上的 syntax 文件有一些行以 <CR><NL> 结尾。Unix 的文件以
+<NL> 结尾。这意味着你该为你的系统使用正确的文件类型。不过在 MS-Windows 上，
+只要 'fileformats' 选项不为空，正确的格式会被自动选中。
+
+注意：使用反显（"gvim -fg white -bg black"）时，直到 GUI window 打开之后
+'background' 的默认值才会被设置，而那是在读取 |gvimrc| 之后。这会导致使用错误
+的默认高亮。要在打开高亮之前设置 'background' 的默认值，请在 |gvimrc| 里加入
+":gui" 命令： >
+
+   :gui		" open window and set default for 'background'
+   :syntax on	" start highlighting, use 'background' to set colors
+
+注意：在 |gvimrc| 里使用 ":gui" 意味着 "gvim -f" 不会在前台启动！那就改用
+":gui -f"。
+
+							*g:syntax_on*
+你可以用这条命令来回切换 syntax 的开关： >
+   :if exists("g:syntax_on") | syntax off | else | syntax enable | endif
+
+要把这段写进一个映射，可以这样用： >
+   :map <F7> :if exists("g:syntax_on") <Bar>
+	\   syntax off <Bar>
+	\ else <Bar>
+	\   syntax enable <Bar>
+	\ endif <CR>
+[使用 |<>| 记法，照字面输入]
+
+细节：
+":syntax" 命令是通过 source 一个文件实现的。想弄清楚它具体是怎么工作的，
+看这个文件：
+    command		file ~
+    :syntax enable	$VIMRUNTIME/syntax/syntax.vim
+    :syntax on		$VIMRUNTIME/syntax/syntax.vim
+    :syntax manual	$VIMRUNTIME/syntax/manual.vim
+    :syntax off		$VIMRUNTIME/syntax/nosyntax.vim
+另见 |syntax-loading|。
+
+注意：如果显示长行很慢，而关闭语法高亮就变快，可以考虑把 'synmaxcol' 选项
+设成较小的值。
+
+==============================================================================
+2. Syntax 文件						*:syn-files*
+
+一种语言的 syntax 与 highlighting 命令通常存在一个 syntax 文件里。命名
+约定是："{name}.vim"。其中 {name} 是语言名，或一个缩写（为了把名字塞进
+8.3 个字符，这样可以放进 DOS 文件系统）。示例：
+	c.vim		perl.vim	java.vim	html.vim
+	cpp.vim		sh.vim		csh.vim
+
+syntax 文件可以包含任意 Ex 命令，就像 vimrc 文件一样。但思路是只放针对某一
+特定语言的命令。当一种语言是另一种语言的超集时，它可以 include 另一种的，
+例如 cpp.vim 文件可以 include c.vim 文件： >
+   :so $VIMRUNTIME/syntax/c.vim
+
+.vim 文件通常由一个 autocommand 加载。例如： >
+   :au Syntax c	    runtime! syntax/c.vim
+   :au Syntax cpp   runtime! syntax/cpp.vim
+这些命令通常放在文件 $VIMRUNTIME/syntax/synload.vim 里。
+
+
+制作你自己的 SYNTAX 文件				*mysyntaxfile*
+
+当你编写自己的 syntax 文件，并希望 Vim 在 ":syntax enable" 时自动使用它们，
+这样做：
+
+1. 创建你的用户 runtime 目录。你通常会用 'runtimepath' 选项的第一项。
+   Unix 上的示例： >
+	mkdir ~/.config/nvim
+
+2. 在里面创建一个名为 "syntax" 的目录。Unix 上： >
+	mkdir ~/.config/nvim/syntax
+
+3. 编写 Vim syntax 文件。或者从网上下载一个。然后把它写进你的 syntax 目录。
+   例如，对于 "mine" 这种 syntax： >
+	:w ~/.config/nvim/syntax/mine.vim
+
+现在你就能手动使用自己的 syntax 文件了： >
+	:set syntax=mine
+你不需要退出 Vim 才能用这个。
+
+如果你还想让 Vim 检测文件类型，见 |new-filetype|。
+
+如果你在搭建一个多用户系统，而不希望每个用户都添加相同的 syntax 文件，
+你可以使用 'runtimepath' 里的另一个目录。
+
+
+添加到已有的 SYNTAX 文件		*mysyntaxfile-add*
+
+如果你对现有的 syntax 文件大体满意，但想增加几项或更改高亮，请按这些步骤：
+
+1. 从 'runtimepath' 创建你的用户目录，见上文。
+
+2. 在里面创建一个名为 "after/syntax" 的目录。Unix 上： >
+	mkdir -p ~/.config/nvim/after/syntax
+
+3. 编写一个包含你想用的命令的 Vim 脚本。例如，要更改 C syntax 的颜色： >
+	highlight cComment ctermfg=Green guifg=Green
+
+4. 把那个文件写进 "after/syntax" 目录。使用 syntax 的名字，加上 ".vim"。
+   对于我们说的 C syntax： >
+	:w ~/.config/nvim/after/syntax/c.vim
+
+就是这样。下次你编辑 C 文件时，Comment 的颜色就会不同。你甚至不用重启 Vim。
+
+如果你有多个文件，可以用 filetype 作为目录名。这个目录里所有的 "*.vim"
+文件都会被使用，例如：
+	~/.config/nvim/after/syntax/c/one.vim
+	~/.config/nvim/after/syntax/c/two.vim
+
+
+替换已有的 SYNTAX 文件			*mysyntaxfile-replace*
+
+如果你不喜欢某个随附的 syntax 文件，或者你下载了一个新版本，按上面
+|mysyntaxfile| 的同样步骤做。只要保证你把 syntax 文件写进 'runtimepath' 中
+靠前的一个目录。Vim 只会加载它找到的第一个 syntax 文件，前提是这个文件设置了
+b:current_syntax。
+
+
+命名约定		    *group-name* *{group-name}* *E669* *E5248*
+
+syntax 组名用于归拢那些匹配同一类东西的 syntax 条目。它们随后被链接到一个
+指定颜色的 highlight 组。syntax 组名本身不指定任何颜色或属性。
+
+highlight 组或 syntax 组的名字必须由 ASCII 字母、数字、下划线、点、连字符或
+`@` 组成。作为正则：`[a-zA-Z0-9_.@-]*`。组名的最大长度约为 200 字节。 *E1249*
+
+为了让每个用户都能挑选自己喜欢的配色，必须为许多语言共有的 highlight 组准备
+推荐名称。下面是建议的组名（如果 syntax highlighting 工作正常，你能看到实际
+颜色，除了 "Ignore"）：
+
+Comment		任何注释
+
+Constant	任何常量
+String		字符串常量："this is a string"
+Character	字符常量：'c', '\n'
+Number		数字常量：234, 0xff
+Boolean		布尔常量：TRUE, false
+Float		浮点常量：2.3e10
+
+Identifier	任何变量名
+Function	函数名（也用于类的方法）
+
+Statement	任何语句
+Conditional	if, then, else, endif, switch 等
+Repeat		for, do, while 等
+Label		case, default 等
+Operator	"sizeof", "+", "*" 等
+Keyword		任何其它关键字
+Exception	try, catch, throw
+
+PreProc		通用预处理器
+Include		预处理器 #include
+Define		预处理器 #define
+Macro		与 Define 相同
+PreCondit	预处理器 #if, #else, #endif 等
+
+Type		int, long, char 等
+StorageClass	static, register, volatile 等
+Structure	struct, union, enum 等
+Typedef		一个 typedef
+
+Special		任何特殊符号
+SpecialChar	常量中的特殊字符
+Tag		你可以对它用 CTRL-]
+Delimiter	需要注意的字符
+SpecialComment	注释内的特殊内容
+Debug		调试语句
+
+Underlined	突出显示的文本、HTML 链接
+
+Ignore		留空、隐藏 |hl-Ignore|
+
+Error		任何错误构造
+
+Todo		任何需要额外注意的东西；多半是
+		关键字 TODO FIXME 和 XXX
+
+Added		diff 中新增的行
+Changed		diff 中改动的行
+Removed		diff 中删除的行
+
+注意 highlight 组名不区分大小写。"String" 和 "string" 可用于同一个组。
+
+下面这些名字是保留的，不能用作组名：
+	NONE   ALL   ALLBUT   contains	 contained
+
+							*hl-Ignore*
+使用 Ignore 组时，你也许还可以考虑使用 conceal 机制。见 |conceal|。
+
+==============================================================================
+3. Syntax 加载流程				*syntax-loading*
+
+这里说明发出 ":syntax enable" 命令时发生的细节。当 Vim 初始化自身时，它会
+查明 runtime 文件位于何处。这里用变量 |$VIMRUNTIME| 表示它。
+
+":syntax enable" 和 ":syntax on" 做下面这些事：
+
+    Source $VIMRUNTIME/syntax/syntax.vim
+    |
+    +-	source $VIMRUNTIME/syntax/nosyntax.vim，清掉所有旧的 syntax
+    |
+    +-	按顺序 source 'runtimepath' 里第一个 syntax/synload.vim
+    |	|
+    |	+-  设置 syntax autocmd，在 'syntax' 选项被设置时加载合适的
+    |	|   syntax 文件。 *synload-1*
+    |	|
+    |	+-  从 |mysyntaxfile| 变量 source 用户的可选文件。
+    |	    仅为兼容 Vim 5.x。 *synload-2*
+    |
+    +-	执行 ":filetype on"，也就是执行 ":runtime! filetype.vim"。它会
+    |	加载找到的所有 filetype.vim。它应当总是 source
+    |	$VIMRUNTIME/filetype.vim，后者做下面这些事。
+    |	|
+    |	+-  安装基于后缀的 autocmd，用来设置 'filetype' 选项
+    |	|   已知文件类型的文件名与文件类型，就在这里建立关联。 *synload-3*
+    |	|
+    |	+-  从 *myfiletypefile* 变量 source 用户的可选文件。
+    |	|   仅为兼容 Vim 5.x。 *synload-4*
+    |	|
+    |	+-  安装一个 autocommand，在尚未检测出文件类型时
+    |	|   source scripts.vim。 *synload-5*
+    |	|
+    |	+-  source $VIMRUNTIME/menu.vim，以建立 Syntax 菜单。 |menu.vim|
+    |
+    +-	安装一个 FileType autocommand，在检测出文件类型后设置
+    |	'syntax' 选项。 *synload-6*
+    |
+    +-	执行 syntax autocommands，为每个已加载的 buffer 启动语法高亮。
+
+
+加载一个文件时，Vim 按下面这样找到相关的 syntax 文件：
+
+    加载文件会触发 BufReadPost autocommands。
+    |
+    +-	如果与 |synload-3|（已知文件类型）或 |synload-4|（用户的文件
+    |	类型）中的某个 autocommand 匹配，就把 'filetype' 选项设为该
+    |	文件类型。
+    |
+    +-	触发 |synload-5| 处的 autocommand。如果还没找到文件类型，
+    |	就在 'runtimepath' 里查找 scripts.vim。它应当总是加载
+    |	$VIMRUNTIME/scripts.vim，后者做下面这些事。
+    |	|
+    |	+-  从 *myscriptsfile* 变量 source 用户的可选文件。
+    |	|   仅为兼容 Vim 5.x。
+    |	|
+    |	+-  如果文件类型仍然未知，就检查文件内容，同样用
+    |	    "getline(1) =~ pattern" 这类检查来判断是否能识别文件类型，
+    |	    然后设置 'filetype'。
+    |
+    +-	当文件类型已确定、'filetype' 已设置时，这会触发上面的
+    |	FileType autocommand |synload-6|。它把 'syntax' 设为检测到的
+    |	文件类型。
+    |
+    +-	当上面的 'syntax' 选项被设置时，这会触发来自 |synload-1|
+    |	（以及 |synload-2|）的 autocommand。它用下面这条命令在
+    |	'runtimepath' 里找到主 syntax 文件：
+    |		runtime! syntax/<name>.vim
+    |
+    +-	其它由用户安装的 FileType 或 Syntax autocommands 也会被
+    	触发。可以用它们来更改某个特定 syntax 的高亮。
+
+==============================================================================
+4. 转换为 HTML				*convert-to-HTML* *2html.vim*
+
+旧的 to html 转换器已被 Lua 版本取代，相关文档已移到 |:TOhtml|。
+==============================================================================
+5. Syntax 文件说明					*:syn-file-remarks*
+
+						*b:current_syntax-variable*
+Vim 把已加载的 syntax 名字保存在 "b:current_syntax" 变量里。如果你想根据当前
+激活的是哪个 syntax 来加载其它设置，可以用这个变量。示例： >
+   :au BufReadPost * if b:current_syntax == "csh"
+   :au BufReadPost *   do-some-things
+   :au BufReadPost * endif
+
+
+
+ABEL							*ft-abel-syntax*
+
+ABEL 高亮提供一些用户自定义选项。要启用它们，给相应的变量赋任意值。
+例如： >
+	:let abel_obsolete_ok=1
+要禁用它们，用 ":unlet"。例如： >
+	:unlet abel_obsolete_ok
+
+变量				高亮 ~
+abel_obsolete_ok		过时的关键字算语句，不算错误
+abel_cpp_comments_illegal	不把 '//' 解释为行内注释引导符
+
+
+ADA
+
+见 |ft-ada-syntax|
+
+
+ANT							*ft-ant-syntax*
+
+ant syntax 文件默认提供 javascript 和 python 的语法高亮。其它脚本语言的
+语法高亮可以用函数 AntSyntaxScript() 安装，它的第一个参数是 tag 名，第二个
+参数是脚本 syntax 文件名。例如： >
+
+	:call AntSyntaxScript('perl', 'perl.vim')
+
+将给下面这段 ant 代码安装 perl 的 syntax 高亮 >
+
+	<script language = 'perl'><![CDATA[
+	    # everything inside is highlighted as perl
+	]]></script>
+
+如何永久安装脚本语言，见 |mysyntaxfile-add|。
+
+
+APACHE							*ft-apache-syntax*
+
+apache syntax 文件提供 Apache HTTP server 2.2.3 版的语法高亮。
+
+
+ASSEMBLY	*asm68k* *ft-asm-syntax* *ft-asmh8300-syntax* *ft-nasm-syntax*
+		*ft-masm-syntax* *ft-asm68k-syntax*
+
+匹配 "*.i" 的文件可能是 Progress，也可能是 Assembly。如果自动检测对你不管用，
+或者你根本不编辑 Progress，就把下面这行放进你的启动 vimrc： >
+   :let filetype_i = "asm"
+把 "asm" 换成你用的汇编类型。
+
+汇编语言有很多种，它们都用相同的文件扩展名。因此你得自己选择类型，或者在
+汇编文件里加一行 Vim 能识别的标记。目前包含这些 syntax 文件：
+	asm		GNU 汇编（通常扩展名是 .s 或 .S，且已经用 GCC 或 CLANG
+			这类 C 编译器构建过）
+	asm68k		Motorola 680x0 汇编
+	asmh8300	Hitachi H-8300 版的 GNU 汇编
+	ia64		Intel Itanium 64
+	fasm		Flat 汇编（https://flatassembler.net）
+	masm		Microsoft 汇编（.masm 文件用 Microsoft 的 Macro Assembler
+			编译。只支持 x86、x86_64、ARM 和 AARCH64 CPU 家族）
+	nasm		Netwide 汇编
+	tasm		Turbo 汇编（带 80x86 直到 Pentium 以及 MMX 的操作码）
+	pic		PIC 汇编（目前针对 PIC16F84）
+
+最灵活的做法是在你的汇编文件里加一行： >
+	asmsyntax=nasm
+把 "nasm" 换成真正的汇编 syntax 名字。这一行必须是文件前五行之一。这段文本
+前后紧邻处不能有非空白文本。注意，指定 asmsyntax=foo 等价于在 |modeline| 里
+设置 ft=foo，并且在这两个设置冲突时，modeline 里的那个会优先（具体来说，如果
+你的 modeline 里有 ft=asm，不管你 asmsyntax 里指定什么，你都会得到 GNU 的
+syntax 高亮）。
+
+对特定 buffer，总是可以通过设置 b:asmsyntax 变量来覆盖 syntax 类型： >
+	:let b:asmsyntax = "nasm"
+
+如果没有设置 b:asmsyntax（无论是自动还是手动），就使用全局变量 asmsyntax 的
+值。这可以看作默认的汇编语言： >
+	:let asmsyntax = "nasm"
+
+作为最后的兜底，如果什么都没定义，就使用 "asm" syntax。
+
+
+Netwide 汇编器（nasm.vim）可选高亮 ~
+
+要启用某个特性： >
+	:let   {variable}=1|set syntax=nasm
+要禁用某个特性： >
+	:unlet {variable}  |set syntax=nasm
+
+变量			高亮 ~
+nasm_loose_syntax	非官方 parser 允许的 syntax 不当作 Error
+			  （依赖于 parser；不推荐）
+nasm_ctx_outside_macro	macro 之外的 context 不当作 Error
+nasm_no_warn		有潜在风险的 syntax 不当作 ToDo
+
+ASTRO							*ft-astro-syntax*
+
+配置
+
+下面这些变量控制某些语法高亮特性。你可以把它们加进你的 .vimrc。
+
+为 ".astro" 文件启用 TypeScript 和 TSX（默认 "disable"）： >
+	let g:astro_typescript = "enable"
+<
+为 ".astro" 文件启用 Stylus（默认 "disable"）： >
+	let g:astro_stylus = "enable"
+<
+注意：你需要安装一个外部 plugin，才能在 astro 文件里支持 stylus。
+
+
+ASPPERL							*ft-aspperl-syntax*
+ASPVBS							*ft-aspvbs-syntax*
+
+`*.asp` 和 `*.asa` 文件可能是 Perl 脚本，也可能是 Visual Basic 脚本。因为很难
+检测，你可以设置两个全局变量来告诉 Vim 你用的是哪种。Perl 脚本请用： >
+	:let g:filetype_asa = "aspperl"
+	:let g:filetype_asp = "aspperl"
+Visual Basic 请用： >
+	:let g:filetype_asa = "aspvbs"
+	:let g:filetype_asp = "aspvbs"
+
+ASYMPTOTE						*ft-asy-syntax*
+
+默认只高亮基本的 Asymptote 关键字。要高亮扩展的几何关键字： >
+
+	:let g:asy_syn_plain = 1
+
+要高亮与 3D 构造相关的关键字： >
+
+	:let g:asy_syn_three = 1
+
+默认情况下，Asymptote 定义的颜色（例如 lightblue）会被高亮。要高亮 TeX 定义的
+颜色（例如 BlueViolet）请用： >
+
+	:let g:asy_syn_texcolors = 1
+
+或者高亮 Xorg 的颜色（例如 AliceBlue）： >
+
+	:let g:asy_syn_x11colors = 1
+
+BAAN								*baan-syntax*
+
+baan.vim 为 BaanC 提供 syntax 支持，从 BaanIV 版本一直到 SSA ERP LN，涵盖
+3 GL 和 4 GL 编程。支持大量标准的 defines/常量。
+
+如果你在自己的 |init.vim| 里指定，某些违反编码规范的情况会被提示： >
+	let baan_code_stds=1
+
+*baan-folding*
+
+可以通过下面提到的变量在各种层级启用 syntax folding（在 |init.vim| 里设置
+它们）。对源码块和 SQL 做更复杂的 folding 可能很吃 CPU。
+
+要允许任何 folding 并在函数层级启用 folding，请用： >
+	let baan_fold=1
+folding 可以在源码块层级启用，如 if、while、for……  begin/end 关键字前面的
+缩进必须匹配（空格不算等于一个 tab）。 >
+	let baan_fold_block=1
+folding 可以为嵌入的 SQL 块启用，如 SELECT、SELECTDO、SELECTEMPTY……
+begin/end 关键字前面的缩进必须匹配（空格不算等于一个 tab）。 >
+	let baan_fold_sql=1
+注意：块 folding 可能导致很多小的 fold。建议在 |init.vim| 里 |:set| 选项
+'foldminlines' 和 'foldnestmax'，或者在 .../after/syntax/baan.vim 里使用
+|:setlocal|（见 |after-directory|）。例如： >
+	set foldminlines=5
+	set foldnestmax=6
+
+
+BASIC					*ft-basic-syntax* *ft-vb-syntax*
+
+Visual Basic 和「普通」BASIC 都用扩展名 ".bas"。为了判断该用哪个，Vim 检查
+文件前五行里有没有字符串 "VB_Name"。如果没找到，filetype 就是 "basic"，否则
+是 "vb"。扩展名为 ".frm" 的文件总是被当作 Visual Basic。
+
+如果自动检测对你不管用，或者你只编辑例如 FreeBASIC 文件，就把下面这行放进
+你的启动 vimrc： >
+   :let filetype_bas = "freebasic"
+
+
+C								*ft-c-syntax*
+
+C 高亮中有几项是可选的。要启用它们，给相应的变量赋任意值（包括零）。
+例如： >
+	:let c_comment_strings = 1
+	:let c_no_bracket_error = 0
+要禁用它们，用 `:unlet`。例如： >
+	:unlet c_comment_strings
+把值设成零是不起作用的！
+
+另一种选择是切换到 C++ 的高亮： >
+	:set filetype=cpp
+
+变量			高亮 ~
+*c_gnu*			GNU gcc 特有的条目
+*c_comment_strings*	注释内的字符串和数字
+*c_space_errors*	行尾空白以及 <Tab> 前的空格
+*c_no_trail_space_error*   ……但不管行尾空格
+*c_no_tab_space_error*	 ……但不管 <Tab> 前的空格
+*c_no_bracket_error*	不把 [] 内的 {}; 高亮为错误
+*c_no_curly_error*	不把 [] 和 () 内的 {}; 高亮为错误；
+			 ……除了第一列的 { 和 }
+			默认是把它们高亮，否则你无法发现
+			缺少的 ")"。
+*c_curly_error*		通过查找所有配对来高亮缺失的 }；这会
+			强制从文件开头同步，可能很慢
+*c_no_ansi*		不做标准 ANSI 类型和常量
+*c_ansi_typedefs*	 ……但做标准 ANSI 类型
+*c_ansi_constants*	 ……但做标准 ANSI 常量
+*c_no_utf*		不高亮字符串里的 \u 和 \U
+*c_syntax_for_h*	对 `*.h` 文件用 C syntax 而不是 C++，并用 objc
+			syntax 而不是 objcpp
+*c_no_if0*		不把 "#if 0" 块高亮为注释
+*c_no_cformat*		不高亮字符串里的 % 格式
+*c_no_c99*		不高亮 C99 标准条目
+*c_no_c11*		不高亮 C11 标准条目
+*c_no_c23*		不高亮 C23 标准条目
+*c_no_bsd*		不高亮 BSD 特有的类型
+*c_functions*		高亮函数调用和定义
+*c_function_pointers*	高亮函数指针的定义
+
+当 'foldmethod' 设为 "syntax" 时，`/* */` 注释和 { } 块会成为 fold。
+如果你不想让注释成为 fold，请用： >
+	:let c_no_comment_fold = 1
+"#if 0" 块也会被 fold，除非： >
+	:let c_no_if0_fold = 1
+
+如果你在向后滚动时发现高亮错误，而用 CTRL-L 重绘后就正常了，试着把
+"c_minlines" 内部变量设成更大的数： >
+	:let c_minlines = 100
+这会让 syntax 同步从首个显示行之前 100 行处开始。默认值是 50（设置了 c_no_if0
+时是 15）。用更大数字的缺点是重绘可能变慢。
+
+使用 "#if 0" / "#endif" 注释高亮时要注意，这只在 "#if 0" 位于距 window 顶部
+"c_minlines" 行以内时才有效。如果你的 "#if 0" 构造很长，它不会被正确高亮。
+
+要在注释里匹配额外的条目，使用 cCommentGroup cluster。例如： >
+   :au Syntax c call MyCadd()
+   :function MyCadd()
+   :  syn keyword cMyItem contained Ni
+   :  syn cluster cCommentGroup add=cMyItem
+   :  hi link cMyItem Title
+   :endfun
+
+ANSI 常量会用 "cConstant" 组高亮。这包括 "NULL"、"SIG_IGN" 等。但不包括例如
+"TRUE"，因为它不在 ANSI 标准里。如果你觉得这容易混淆，就移除 cConstant 的
+高亮： >
+	:hi link cConstant NONE
+
+如果你看到 '{' 和 '}' 在它们本来没问题的地方被高亮成错误，就重置 cErrInParen
+和 cErrInBracket 的高亮。
+
+如果你想在 C 文件里使用 folding，可以把这些行加进 'runtimepath' 中 "after"
+目录里的一个文件。Unix 上就是 ~/.config/nvim/after/syntax/c.vim。 >
+    syn sync fromstart
+    set foldmethod=syntax
+
+CANGJIE						*ft-cangjie-syntax*
+
+这个文件为仓颉（Cangjie）编程语言提供语法高亮，它是一种面向全场景智能的
+新一代语言。
+
+所有高亮默认启用。要禁用某个特定组的高亮，在 |vimrc| 里把相应的变量设为 0。
+所有用于禁用高亮的选项是： >
+	:let g:cangjie_builtin_color = 0
+	:let g:cangjie_comment_color = 0
+	:let g:cangjie_identifier_color = 0
+	:let g:cangjie_keyword_color = 0
+	:let g:cangjie_macro_color = 0
+	:let g:cangjie_number_color = 0
+	:let g:cangjie_operator_color = 0
+	:let g:cangjie_string_color = 0
+	:let g:cangjie_type_color = 0
+
+CH							*ft-ch-syntax*
+
+C/C++ 解释器。Ch 的高亮与 C 相似，并建立在 C syntax 文件之上。C 可用的所有
+设置见 |ft-c-syntax|。
+
+通过设置一个变量，你可以告诉 Vim 对 `*.h` 文件使用 Ch syntax，而不是 C 或
+C++： >
+	:let ch_syntax_for_h = 1
+
+
+CHILL							*ft-chill-syntax*
+
+Chill 的语法高亮与 C 相似。可用的所有设置见 |ft-c-syntax|。此外还有：
+
+chill_space_errors	像 c_space_errors
+chill_comment_string	像 c_comment_strings
+chill_minlines		像 c_minlines
+
+
+CHANGELOG					*ft-changelog-syntax*
+
+ChangeLog 支持把行首的空格高亮出来。如果你不喜欢这样，把下面这行加进你的
+vimrc： >
+	let g:changelog_spacing_errors = 0
+这在你下次编辑 changelog 文件时生效。你也可以用
+"b:changelog_spacing_errors" 按 buffer 设置（在加载 syntax 文件之前）。
+
+你可以更改所用的高亮，例如把空格标记为错误： >
+	:hi link ChangelogError Error
+或者避免高亮： >
+	:hi link ChangelogError NONE
+这会立即生效。
+
+
+CLOJURE							*ft-clojure-syntax*
+
+						*g:clojure_syntax_keywords*
+
+默认提供 "clojure.core" 里 public var 的语法高亮，但可以通过把额外符号加到
+|g:clojure_syntax_keywords| 变量来高亮它们。值应当是一个 |Dictionary|，
+其中的 syntax 组名各含一个标识符的 |List|。
+>
+	let g:clojure_syntax_keywords = {
+	    \   'clojureMacro': ["defproject", "defcustom"],
+	    \   'clojureFunc': ["string/join", "string/replace"]
+	    \ }
+<
+有关有效的 syntax 组名，请参考 Clojure 的 syntax 脚本。
+此外还有 *b:clojure_syntax_keywords*  ，它是该变量的 buffer 局部变体，供插件
+作者动态高亮符号时使用。
+
+通过设置 *b:clojure_syntax_without_core_keywords*  变量，来自 "clojure.core"
+的 var 默认不会被高亮。这对已经设置了 `(:refer-clojure :only [])` 的
+namespace 很有用。
+
+
+							*g:clojure_fold*
+
+把 |g:clojure_fold| 设为 `1` 会启用 Clojure 代码的折叠。任何跨多行的 list、
+vector 或 map 都可以用标准的 Vim |fold-commands| 折叠。
+
+
+						*g:clojure_discard_macro*
+
+把该变量设为 `1` 可启用对 Clojure 的「discard reader macro」的基本高亮。
+>
+	#_(defn foo [x]
+	    (println x))
+<
+注意该选项不会正确高亮叠加的 discard macro（例如 `#_#_`）。
+
+
+COBOL							*ft-cobol-syntax*
+
+COBOL 高亮对遗留代码的需求与全新开发不同。这是因为所做的事情（维护与开发）
+以及其他因素存在差异。	要启用遗留代码高亮，把下面这行加进你的 vimrc： >
+	:let cobol_legacy_code = 1
+要再次禁用它，用这个： >
+	:unlet cobol_legacy_code
+
+
+COLD FUSION				*ft-coldfusion-syntax*
+
+ColdFusion 有自己版本的 HTML 注释。要打开 ColdFusion 注释高亮，把下面这行
+加进你的启动文件： >
+
+	:let html_wrong_comments = 1
+
+ColdFusion 的 syntax 文件基于 HTML syntax 文件。
+
+
+CPP							*ft-cpp-syntax*
+
+大部分内容与 |ft-c-syntax| 相同。
+
+变量		高亮 ~
+cpp_no_cpp11		不高亮 C++11 标准条目
+cpp_no_cpp14		不高亮 C++14 标准条目
+cpp_no_cpp17		不高亮 C++17 标准条目
+cpp_no_cpp20		不高亮 C++20 标准条目
+
+
+CSH							*ft-csh-syntax*
+
+本节覆盖名为 "csh" 的 shell。注意在某些系统上实际使用的是 tcsh。
+
+要判断一个文件是 csh 还是 tcsh 出了名的难。有些系统把 /bin/csh 符号链接到
+/bin/tcsh，使得几乎无法区分 csh 与 tcsh。如果 VIM 猜错了，你可以设置
+"filetype_csh" 变量。要使用 csh：  *g:filetype_csh*
+>
+	:let g:filetype_csh = "csh"
+
+要使用 tcsh： >
+
+	:let g:filetype_csh = "tcsh"
+
+任何以 tcsh 为扩展名或是标准 tcsh 文件名（.tcshrc、tcsh.tcshrc、tcsh.login）
+的脚本，其 filetype 都会是 tcsh。所有其它 tcsh/csh 脚本都会被归类为 tcsh，
+除非 "filetype_csh" 变量存在。如果 "filetype_csh" 变量存在，filetype 就会被
+设为该变量的值。
+
+CSV							*ft-csv-syntax*
+
+如果你改动了 CSV 文件的分隔符，它的语法高亮将不再匹配改动后的文件内容。
+你需要 unlet 下面这个变量： >
+
+	:unlet b:csv_delimiter
+
+之后保存并重新加载该文件： >
+
+	:w
+	:e
+
+现在 syntax 引擎应该能判断新改的 CSV 分隔符了。
+
+
+CYNLIB							*ft-cynlib-syntax*
+
+Cynlib 文件是用 Cynlib 类库实现硬件建模与 C++ 仿真的 C++ 文件。通常 Cynlib
+文件带 .cc 或 .cpp 扩展名，这使得它们很难与普通 C++ 文件区分。因此，要为
+.cc 文件启用 Cynlib 高亮，把下面这行加进你的 vimrc 文件： >
+
+	:let cynlib_cyntax_for_cc=1
+
+cpp 文件同理（该扩展名通常只在 Windows 上使用） >
+
+	:let cynlib_cyntax_for_cpp=1
+
+要再次禁用它们，用这个： >
+
+	:unlet cynlib_cyntax_for_cc
+	:unlet cynlib_cyntax_for_cpp
+<
+
+CWEB							*ft-cweb-syntax*
+
+匹配 "*.w" 的文件可能是 Progress 也可能是 cweb。如果自动检测对你不起作用，
+或者你根本不编辑 Progress，就在你的启动 vimrc 里用这个： >
+   :let filetype_w = "cweb"
+
+CSHARP								*ft-cs-syntax*
+
+C# 的原始字符串字面量可以用任意数量的引号包住整个块，而原始插值字符串
+字面量可以用任意数量的大括号包住插值部分，例如 >
+
+    $$$""""Hello {{{name}}}""""
+<
+默认情况下，Vim 高亮 3 到 8 个引号，以及 1 到 8 个插值大括号。可识别的引号
+与大括号的最大数量可以用下面这些变量配置：
+
+    变量				默认值 ~
+    g:cs_raw_string_quote_count			8
+    g:cs_raw_string_interpolation_brace_count	8
+
+DART							*ft-dart-syntax*
+
+Dart 是一门面向对象、带类型、以类定义、带垃圾回收的语言，用于开发移动端、
+桌面端、Web 端和后端应用。Dart 使用由 C、Java 和 JavaScript 衍生的类 C
+语法，并采用了来自 Smalltalk、Python、Ruby 等语言的特性。
+
+关于该语言及其开发环境的更多信息见 Dart 官方语言网站 https://dart.dev
+
+dart.vim syntax 会检测并高亮 Dart 的语句、保留字、类型声明、存储类、条件、
+循环、插值值和注释。不支持来自 Flutter 或任何其它 Dart 框架的习惯用法。
+
+有改动、修复？请通过下面地址提交 issue 或 pull request：
+
+https://github.com/pr3d4t0r/dart-vim-syntax/
+
+
+DESKTOP							   *ft-desktop-syntax*
+
+这个 syntax 文件的主要目标，是按照 freedesktop.org 标准高亮 .desktop 和
+.directory 文件：
+https://specifications.freedesktop.org/desktop-entry-spec/latest/
+要高亮不以 X- 开头的非标准扩展，设置 >
+	let g:desktop_enable_nonstd = 1
+注意这可能导致错误的高亮。
+要高亮 KDE 保留的特性，设置 >
+	let g:desktop_enable_kde = 1
+如果未提供，g:desktop_enable_kde 会沿用 g:desktop_enable_nonstd
+
+
+DIFF							*diff.vim*
+
+diff 高亮通常会查找翻译过的头部。如果文件里有非常长的行，这可能很慢。
+要禁用翻译： >
+
+	:let diff_translations = 0
+
+另见 |diff-slow|。
+
+DIRCOLORS						   *ft-dircolors-syntax*
+
+dircolors 工具的 highlighting 定义有一个选项。它存在是为了兼容 Slackware
+GNU/Linux 发行版里该命令的版本。它增加了几个大多数版本都会忽略的关键字。
+不过在 Slackware 系统上，该工具接受这些关键字并用它们进行处理。要启用
+Slackware 关键字，把下面这行加进你的启动文件： >
+	let dircolors_is_slackware = 1
+
+
+DOCBOOK						*ft-docbk-syntax* *docbook*
+DOCBOOK XML					*ft-docbkxml-syntax*
+DOCBOOK SGML					*ft-docbksgml-syntax*
+
+DocBook 文件有两种类型：SGML 和 XML。要指明你在用哪一种，应当设置
+"b:docbk_type" 变量。如果 Vim 能识别出类型，它会自动帮你设置。当 Vim 猜不
+出来时，类型默认为 XML。
+你可以手动设置类型： >
+	:let docbk_type = "sgml"
+或者： >
+	:let docbk_type = "xml"
+你需要在加载 syntax 文件之前做这件事，而这比较麻烦。更简单的做法是把
+filetype 设为 "docbkxml" 或 "docbksgml"： >
+	:set filetype=docbksgml
+或者： >
+	:set filetype=docbkxml
+
+你可以指定 DocBook 版本： >
+	:let docbk_ver = 3
+未设置时使用 4。
+
+
+DOSBATCH					*ft-dosbatch-syntax*
+
+用变量 dosbatch_cmdextversion 选择应当支持的那一组 Windows 命令解释器扩展。
+对 Windows NT 的各版本（Windows 2000 之前）该值应为 1。对 Windows 2000 及
+以后应为 2。
+用下面这行选择你想要的版本： >
+
+   :let dosbatch_cmdextversion = 1
+
+如果该变量未定义，它默认为 2，以支持 Windows 2000 及以后。
+
+原版 MS-DOS 支持一种习惯用法：用双冒号（::）作为输入注释行的另一种方式。
+这种用法在当前的 Windows 命令解释器里也能用，但如果在 ( ... ) 命令块内部
+使用，可能引发问题。你可以在 Stack Overflow 上找到关于此事的讨论——
+
+https://stackoverflow.com/questions/12407800/which-comment-style-should-i-use-in-batch-files
+
+要允许在 Windows 命令解释器的命令块里用 :: 这种注释用法，把
+dosbatch_colons_comment 变量设为任意值： >
+
+   :let dosbatch_colons_comment = 1
+
+如果设置了该变量，那么位于命令块最后一行的 :: 注释会被高亮为错误。
+
+有一个选项决定 `*.btm` 文件应被检测为 "dosbatch" 类型（MS-DOS 批处理文件）
+还是 "btm" 类型（4DOS 批处理文件）。默认使用后者。你可以用下面这行选择
+前者： >
+
+   :let g:dosbatch_syntax_for_btm = 1
+
+如果该变量未定义或为零，则选用 btm syntax。
+
+
+DOXYGEN							*doxygen-syntax*
+
+Doxygen 用一种专门的文档格式（类似 Javadoc）生成代码文档。这个 syntax 脚本
+为 c、cpp、idl 和 php 文件加上 doxygen 高亮，对 java 也应该有效。
+
+有几种方式可以打开 doxygen 格式。可以显式指定，也可以在 modeline 里给该文件
+的 syntax 追加 '.doxygen'。例如： >
+	:set syntax=c.doxygen
+或者 >
+	// vim:syntax=c.doxygen
+
+对 C、C++、C#、IDL 和 PHP 文件，还可以通过设置全局或 buffer 局部的变量
+load_doxygen_syntax 来自动打开。把下面这段加进你的 vimrc 即可。 >
+	:let g:load_doxygen_syntax=1
+
+还有几个变量会影响语法高亮，它们与一些非标准的高亮选项有关。
+
+变量			默认值	作用 ~
+g:doxygen_enhanced_color
+g:doxygen_enhanced_colour	0	对 doxygen 注释使用非标准高亮。
+
+doxygen_my_rendering		0	禁用 HTML 粗体、斜体和
+					html_my_rendering 下划线的渲染。
+
+doxygen_javadoc_autobrief	1	设为 0 可禁用 javadoc autobrief
+					的彩色高亮。
+
+doxygen_end_punctuation		'[.]'	设为用于匹配 brief 结尾
+					标点的 regexp
+
+还有几个 highlight 组值得一提，因为它们在配置时可能有用。
+
+Highlight			作用 ~
+doxygenErrorComment		当 code、verbatim 或 dot 段落中缺少
+				标点时 end-comment 的颜色
+doxygenLinkError		当 \link 段落中缺少 \endlink 时
+				end-comment 的颜色。
+
+
+DTD							*ft-dtd-syntax*
+
+DTD 的语法高亮默认区分大小写。要禁用区分大小写的高亮，把下面这行加进你的
+启动文件： >
+
+	:let dtd_ignore_case=1
+
+DTD syntax 文件会把未知的 tag 高亮为错误。如果这让你觉得烦，可以通过设置
+下面的选项关掉： >
+
+	:let dtd_no_tag_errors=1
+
+要在 source dtd.vim syntax 文件之前设置。
+参数实体名在定义处会用 'Type' highlight 组高亮，标点和 '%' 用 'Comment'
+高亮。参数实体实例会用 'Constant' highlight 组高亮，而分隔符 % 和 ; 用
+'Type' highlight 组高亮。要关掉这些，可以设置： >
+
+	:let dtd_no_param_entities=1
+
+DTD syntax 文件也会被 xml.vim 引入，用来高亮被包含的 dtd。
+
+
+EIFFEL						*ft-eiffel-syntax*
+
+Eiffel 本身不区分大小写，但它的风格指南区分，而 syntax 高亮文件鼓励遵循
+这些指南。这也使得能以不同方式高亮类名。如果你想禁用区分大小写的高亮，把
+下面这行加进你的启动文件： >
+
+	:let eiffel_ignore_case=1
+
+对类名和注释里的 TODO 标记而言，大小写仍然重要。
+
+反过来说，如果要更严格的检查，就加上下面这些行中的一行： >
+
+	:let eiffel_strict=1
+	:let eiffel_pedantic=1
+
+设置 eiffel_strict 只会对五个预定义词 "Current"、"Void"、"Result"、
+"Precursor" 和 "NONE" 的不正确大小写形式报错，以警告不要把它们误当作特性
+名或类名。
+
+设置 eiffel_pedantic 会相当严格地强制遵循 Eiffel 风格指南（例如大小写字母
+的任意混用，以及过时的关键字大小写写法）。
+
+如果你想用 "Current"、"Void"、"Result" 和 "Precursor" 的小写形式，可以用 >
+
+	:let eiffel_lower_case_predef=1
+
+而不必完全关掉区分大小写的高亮。
+
+对 ISE 提议的新 creation syntax（有些编译器已经在试验性地处理它）的支持可以
+通过下面的设置启用： >
+
+	:let eiffel_ise=1
+
+最后，有些厂商支持十六进制常量。要处理它们，就把 >
+
+	:let eiffel_hex_constants=1
+
+加进你的启动文件。
+
+
+EUPHORIA						     *ft-euphoria-syntax*
+
+Euphoria 有两个 syntax 高亮文件。一个是给 Euphoria 3.1.1 版用的，也是默认的
+syntax 高亮文件；另一个是给 Euphoria 4.0.5 或更新版本用的。
+
+Euphoria 3.1.1 版（https://www.rapideuphoria.com/ 这个链接似乎已失效）在开发
+面向 DOS 平台的应用程序时仍然必要，而 Euphoria 4 版
+（https://www.openeuphoria.org/）不支持该平台。
+
+下列文件扩展名会被自动检测为 Euphoria 文件类型： >
+
+	*.e, *.eu, *.ew, *.ex, *.exu, *.exw
+	*.E, *.EU, *.EW, *.EX, *.EXU, *.EXW
+
+要为 Euphoria 选择 syntax 高亮文件，并把 `*.e` 和 `*.E` 扩展名自动检测为
+Euphoria 文件类型，把下面这行加进你的启动文件： >
+
+	:let g:filetype_euphoria = "euphoria3"
+
+<	or >
+
+	:let g:filetype_euphoria = "euphoria4"
+
+Elixir 与 Euphoria 共用 `*.ex` 扩展名。如果已用 g:filetype_euphoria 变量把
+filetype 明确指定为 Euphoria，或者根据文件中的关键字判定该文件为 Euphoria，
+那么 filetype 就会被设为 Euphoria。否则 filetype 默认为 Elixir。
+
+
+ERLANG							*ft-erlang-syntax*
+
+Erlang 是 Ericsson 开发的一门函数式编程语言。带下列扩展名的文件会被识别为
+Erlang 文件：erl、hrl、yaws。
+
+默认情况下，Vim 把三引号 docstring 高亮为注释。
+
+如果你想让三引号 docstring 按 Markdown 高亮，把下面这行加进你的 |vimrc|： >
+
+	:let g:erlang_use_markdown_for_docs = 1
+
+docstring 内部的纯文本（也就是那些没有被 Markdown syntax 高亮的字符）仍然
+会被高亮为注释。
+
+如果你想用别的 highlight 组来高亮 docstring 内部的纯文本，就把下面这行加进
+你的 |vimrc|（这个例子用 String highlight 组高亮纯文本）： >
+
+	:let g:erlang_docstring_default_highlight = 'String'
+
+如果你没有启用 Markdown，这行会按指定的 highlight 组高亮整个 docstring。
+
+用下面这行可以禁用对纯文本的高亮： >
+
+	:let g:erlang_docstring_default_highlight = ''
+
+配置示例： >
+
+	" Highlight docstrings as Markdown.
+	:let g:erlang_use_markdown_for_docs = 1
+
+	" 1. Highlight Markdown elements in docstrings as Markdown.
+	" 2. Highlight the plain text in docstrings as String.
+	:let g:erlang_use_markdown_for_docs = 1
+	:let g:erlang_docstring_default_highlight = 'String'
+
+	" Highlight docstrings as strings (no Markdown).
+	:let g:erlang_docstring_default_highlight = 'String'
+
+	" 1. Highlight Markdown elements in docstrings as Markdown.
+	" 2. Don't highlight the plain text in docstrings.
+	:let g:erlang_use_markdown_for_docs = 1
+	:let g:erlang_docstring_default_highlight = ''
+<
+
+ELIXIR							*ft-elixir-syntax*
+
+Elixir 是一门动态的函数式语言，用于构建可扩展、易维护的应用程序。
+
+下列文件扩展名会被自动检测为 Elixir 文件类型： >
+
+	*.ex, *.exs, *.eex, *.leex, *.lock
+
+Elixir 与 Euphoria 共用 `*.ex` 扩展名。如果已用 g:filetype_euphoria 变量把
+filetype 明确指定为 Euphoria，或者根据文件中的关键字判定该文件为 Euphoria，
+那么 filetype 就会被设为 Euphoria。否则 filetype 默认为 Elixir。
+
+
+FLEXWIKI					*ft-flexwiki-syntax*
+
+FlexWiki 是基于 ASP.NET 的 wiki 软件包，可从 www.flexwiki.com 获取。
+注意：该站点目前无法访问，Wikipedia 上提到其开发已于 2009 年停止。
+
+FlexWiki syntax 中常见的条目都有 syntax 高亮。配套的 ftplugin 脚本会设置一些
+buffer 局部选项，让编辑 FlexWiki 页面更方便。FlexWiki 把换行视为新段落的
+开始，因此该 ftplugin 设置了 'tw'=0（不限行长）、'wrap'（折行显示长行，而
+不是用横向滚动）、'linebreak'（在 'breakat' 中的字符处折行，而不是在屏幕
+上最后一个字符处折行）等等。它还包含一些默认禁用的 keymap。
+
+如果你想让使 "j" 和 "k" 以及光标键按显示行上下移动的 keymap 生效，就把下面
+这段加进你的 vimrc： >
+	:let flexwiki_maps = 1
+
+
+FORM							*ft-form-syntax*
+
+FORM 文件中语法元素的配色方案使用默认模式 Conditional、Number、Statement、
+Comment、PreProc、Type 和 String，遵循 J.A.M. Vermaseren 所著《Symbolic
+Manipulation with FORM》（CAN，荷兰，1991）中的语言规范。
+
+如果你想加入自己对默认颜色的改动，必须重新定义下列 syntax 组：
+
+    - formConditional
+    - formNumber
+    - formStatement
+    - formHeaderStatement
+    - formComment
+    - formPreProc
+    - formDirective
+    - formType
+    - formString
+
+注意 form.vim syntax 文件默认把 FORM 的预处理器命令与指令实现为同一个
+syntax 组。
+
+FORM 有一个预定义的增强颜色模式，用来区分头部语句与 FORM 程序正文中的语句。
+要激活该模式，就在你的 vimrc 文件里定义下面这个变量 >
+
+	:let form_enhanced_color=1
+
+增强模式还利用了针对深色 gvim 显示的额外颜色特性。这里语句会被着色为
+LightYellow 而不是 Yellow，条件则用 LightBlue，以便更好地区分。
+
+Visual Basic 和 FORM 都使用 ".frm" 扩展名。要判断该用哪一个，Vim 会检查文件
+前五行中是否出现字符串 "VB_Name"。如果找到了，filetype 就是 "vb"，否则就是
+"form"。
+
+如果自动检测对你不起作用，或者你只编辑例如 FORM 文件，就在你的启动 vimrc
+里用这个： >
+   :let filetype_frm = "form"
+
+
+FORTH							*ft-forth-syntax*
+
+匹配 "*.f" 的文件可能是 Fortran 也可能是 Forth，匹配 "*.fs" 的可能是 F# 也
+可能是 Forth。如果自动检测对你不起作用，或者你根本不编辑 F# 或 Fortran，
+就在你的启动 vimrc 里用这个： >
+   :let filetype_f  = "forth"
+   :let filetype_fs = "forth"
+
+
+FORTRAN						*ft-fortran-syntax*
+
+默认高亮与方言 ~
+Vim 按 Fortran 2023（最新的标准）进行高亮。这个选择对大多数用户、大多数时候
+都合适，因为 Fortran 2023 几乎是之前各版本（Fortran 2018、2008、2003、95、
+90、77 和 66）的超集。近期 Fortran 标准中分别被删除或被声明为过时的少数遗留
+构造，会被高亮为错误和 todo 条目。
+
+该 syntax 脚本不再支持 Fortran 方言。变量 fortran_dialect 现在会被静默忽略。
+由于现在的计算机快得多，变量 fortran_more_precise 也不再需要，会被静默忽略。
+
+Fortran 源码形式 ~
+Fortran 代码可以是固定源码形式，也可以是自由源码形式。注意如果形式设置错误，
+语法高亮就不会正确。
+
+当你新建一个 Fortran 文件时，syntax 脚本假定为固定源码形式。如果你总是使用
+自由源码形式，那么 >
+    :let fortran_free_source=1
+如果你总是使用固定源码形式，那么 >
+    :let fortran_fixed_source=1
+
+如果源码形式以某种非标准方式取决于文件扩展名，那么最方便的做法是在 ftplugin
+文件里设置 fortran_free_source。关于 ftplugin 文件的更多信息见 |ftplugin|。
+注意这只有在你的 .vimrc 文件里 "filetype plugin indent on" 命令位于
+"syntax on" 命令之前时才有效。
+
+
+当你编辑一个已有的 Fortran 文件时，如果 fortran_free_source 变量已设置，该
+syntax 脚本会假定为自由源码形式；如果 fortran_fixed_source 变量已设置，则
+假定为固定源码形式。假设这两个变量都没有设置。在这种情况下，syntax 脚本会
+通过检查文件扩展名来尝试判断用的是哪种源码形式，所用约定与 ifort、gfortran、
+Cray、NAG 和 PathScale 编译器通用（.f、.for、.f77 表示固定源码，
+.f90、.f95、.f03、.f08 表示自由源码）。对 .fpp 和 .ftn 扩展名不使用默认值，
+因为不同编译器对它们的处理方式不同。如果这些都不管用，脚本会检查文件前 500
+行的前五列。如果没有检测到自由源码形式的迹象，就假定该文件为固定源码形式。
+该算法在绝大多数情况下都应当有效。在某些情况下，例如文件开头是 500 行或更多
+整行注释，脚本可能会错误地判定代码是固定形式。如果出现这种情况，只需在前
+二十五行的前五列内任意位置加一条非注释语句，保存（:w），然后重新加载（:e!）
+该文件。
+
+厂商扩展 ~
+固定形式 Fortran 要求行长最多 72 个字符，但该脚本像近三十年来的所有编译器
+一样，允许行长最多 80 个字符。如果你用类似这样的命令设置变量
+fortran_extended_line_length，甚至允许 132 个字符的更长行 >
+    :let fortran_extended_line_length=1
+
+如果你想对 CUDA Fortran 扩展做额外的高亮，应当用类似这样的命令设置变量
+fortran_CUDA >
+    :let fortran_CUDA=1
+
+要激活对某些常见的、非标准的、厂商提供的 intrinsic 的识别，应当用类似这样的
+命令设置变量 fortran_vendor_intrinsics >
+    :let fortran_vendor_intrinsics=1
+
+Fortran 文件中的 Tab ~
+Tab 不被 Fortran 标准认可。在要求固定列边界的固定格式 Fortran 源码里使用 Tab
+不是个好主意。因此 Tab 会被标记为错误。尽管如此，有些程序员喜欢用 Tab。如果
+你的 Fortran 文件含有 Tab，就应当用类似这样的命令在你的 vimrc 里设置变量
+fortran_have_tabs >
+    :let fortran_have_tabs=1
+不幸的是，使用 Tab 意味着 syntax 文件将无法检测错误的边距。
+
+Fortran 文件的语法折叠 ~
+如果你用类似这样的命令在你的 .vimrc 里设置变量 fortran_fold，Vim 就会用
+foldmethod=syntax 折叠你的文件 >
+    :let fortran_fold=1
+以便指示 syntax 脚本为程序单元定义 fold 区域，也就是以 program 语句开头的
+主程序、子程序、函数子程序、module、submodule、注释行块以及 block data 单元。
+block、interface、associate、critical、类型定义和 change team 构造也会被
+折叠。如果你还用类似这样的命令设置变量 fortran_fold_conditionals >
+    :let fortran_fold_conditionals=1
+那么也会为 do 循环、if 块、select case、select type 和 select rank 构造
+定义 fold 区域。注意对大型文件而言，定义 fold 区域可能很慢。
+
+syntax/fortran.vim 脚本里内嵌了注释，告诉你如何去注释和/或取消注释某些行，
+以便 (a) 激活对某些非标准的、厂商提供的 intrinsic 的识别，以及 (b) 防止在
+2008 标准中被删除或被声明为过时的特性被高亮为 todo 条目。
+
+局限 ~
+括号检查抓不住闭合括号太少的情况。Hollerith 字符串不会被识别。有些关键字
+可能被错误高亮，因为 Fortran90 没有保留字。
+
+关于 Fortran 的更多信息，见 |ft-fortran-indent| 和 |ft-fortran-plugin|。
+
+FREEBASIC					*ft-freebasic-syntax*
+
+FreeBASIC 文件会按四种可用方言 "fb"、"qb"、"fblite" 和 "deprecated" 分别
+以不同方式高亮。关于如何选择正确的方言，见 |ft-freebasic-plugin|。
+
+高亮还可以通过下面这些变量进一步配置。
+
+变量			高亮 ~
+*freebasic_no_comment_fold*	禁用多行注释折叠
+*freebasic_operators*		非字母运算符
+*freebasic_space_errors*	行尾空白以及 <Tab> 前的空格
+*freebasic_type_suffixes*	QuickBASIC 风格的类型后缀
+
+
+
+FVWM CONFIGURATION FILES				*ft-fvwm-syntax*
+
+为了让 Vim 识别不匹配 *fvwmrc* 或 *fvwm2rc* 模式的 Fvwm 配置文件，你必须把
+适合你系统的额外模式放进你的 myfiletypes.vim 文件。对这些模式，你必须把变量
+"b:fvwm_version" 设为 Fvwm 的主版本号，并把 'filetype' 选项设为 fvwm。
+
+例如，要让 Vim 把 /etc/X11/fvwm2/ 下的所有文件都识别为 Fvwm2 配置文件，
+就加上下面这段： >
+
+  :au! BufNewFile,BufRead /etc/X11/fvwm2/*  let b:fvwm_version = 2 |
+					 \ set filetype=fvwm
+
+
+GSP							*ft-gsp-syntax*
+
+GSP 页面的默认配色风格由 |ft-html-syntax| 定义，而 java 代码（位于 java 标签
+内或反引号之间的内联代码）的配色由 |ft-java-syntax| 定义。|ft-html-syntax|
+中定义的下列 HTML 组被重新定义，以纳入并高亮内联 java 代码：
+
+    htmlString
+    htmlValue
+    htmlEndTag
+    htmlTag
+    htmlTagN
+
+在你会看到内联 java 代码的大多数地方，高亮看起来都没问题，但在某些特殊情况下
+可能不是。要再加一个含有内联 java 代码、但高亮不正确的 HTML 组，只需从
+|ft-html-syntax| 里复制你想要的那一行，并把 gspJava 加到 contains 子句里。
+
+内联 java 的反引号会按 htmlError 组高亮，以便更容易看清。
+
+
+GDB							*ft-gdb-syntax*
+
+GDB syntax 文件为注释和块语句提供语法 |folding|（见 |:syn-fold|）。这可以
+通过下面的设置启用： >
+
+	:set foldmethod=syntax
+
+
+GROFF							*ft-groff-syntax*
+
+groff syntax 文件是 |ft-nroff-syntax| 的一层包装，用法与配置的示例见该标题
+下的说明。这层包装的用途是：通过 |modeline| 或个人的 filetype 定义文件
+（见 |filetype.txt|）设置 filetype，从而装配起 groff 的语法扩展。
+
+
+HASKELL							   *ft-haskell-syntax*
+
+Haskell 的 syntax 文件既支持普通 Haskell 代码，也支持文学式（literate）
+Haskell 代码，后者包含 Bird 风格与 TeX 风格两种。Haskell 的语法高亮还会
+高亮 C 预处理指令。
+
+如果你想高亮分隔符字符（在浅色背景下有用），把下面这行加到 vimrc 里： >
+	:let hs_highlight_delimiters = 1
+要把 True 和 False 当作关键字、而不是普通标识符处理，加上： >
+	:let hs_highlight_boolean = 1
+要连基本类型的名字也当作关键字处理： >
+	:let hs_highlight_types = 1
+要进一步把更多相对常见的类型名也当作关键字处理： >
+	:let hs_highlight_more_types = 1
+如果你想高亮调试函数的名字，把下面这行放进 vimrc： >
+	:let hs_highlight_debug = 1
+
+Haskell 的语法高亮还会高亮 C 预处理指令，并把以 # 开头但不是合法指令的
+行标记为错误。这与 Haskell 中运算符的语法相冲突，因为运算符可能以 # 开头。
+如果你想把这类内容当作运算符而不是错误来高亮，把下面这行放进 vimrc： >
+	:let hs_allow_hash_operator = 1
+
+针对文学式 Haskell 代码的语法高亮会尝试自动猜测你的代码里是否含有 TeX
+标记，并相应地高亮 TeX 结构或干脆什么都不高亮。你可以在全局层面覆盖这个
+行为，把下面这行放进 vimrc >
+	:let lhs_markup = none
+这样完全不进行高亮；或者 >
+	:let lhs_markup = tex
+强制高亮始终尝试高亮 TeX 标记。若想要更多灵活性，你也可以使用这个变量的
+buffer 局部版本，例如 >
+	:let b:lhs_markup = tex
+这样就会对某个特定 buffer 强制启用 TeX 高亮。这必须在为该 buffer 打开
+语法高亮之前、或者加载文件之前设置。
+
+
+HTML							*ft-html-syntax*
+
+HTML 文件中 tag 的配色方案是这样工作的。
+
+开始 tag 的 <> 与结束 tag 的 </> 颜色不同。这是有意的！对开始 tag 使用
+'Function' 颜色，而对结束 tag 使用 'Identifier' 颜色（想看它们具体是怎么
+定义的，请看 syntax.vim）
+
+已知的 tag 名与 C 里的语句用同一种颜色。未知的 tag 名则分别与 <> 或 </>
+用同一种颜色，这样容易发现错误
+
+注意参数（或属性）名也一样：已知的属性名与未知的属性名颜色不同。
+
+有些 HTML tag 用来改变文本的呈现方式。html.vim 语法配色文件认得下面这些
+tag，并会改变普通文本的显示方式：<B> <I> <U> <EM> <STRONG>（<EM> 用作
+<I> 的别名，而 <STRONG> 用作 <B> 的别名）、<H1> - <H6>、<HEAD>、<TITLE>
+和 <A>，但 <A> 只有在作为链接使用时才算（也就是说，其中必须含有 href，
+形如 <A href="somefile.html">）。
+
+如果你想改变这类文本的呈现方式，就必须重新定义下面这些语法组：
+
+    - htmlBold
+    - htmlBoldUnderline
+    - htmlBoldUnderlineItalic
+    - htmlUnderline
+    - htmlUnderlineItalic
+    - htmlItalic
+    - htmlTitle（用于标题）
+    - htmlH1 - htmlH6（用于各级标题）
+
+要让这种重新定义生效，你必须把它们全部重新定义（最后两项 htmlTitle 和
+htmlH[1-6] 除外，那是可选的），并在 vimrc 里定义下面这个变量（这是由
+初始化过程中文件的读取顺序决定的） >
+	:let html_my_rendering=1
+
+如果你想看例子，可以从下面地址下载 mysyntax.vim
+https://web.archive.org/web/20241129015117/https://www.fleiner.com/vim/download.html
+
+你也可以把下面这行加到 vimrc 文件里，从而禁用这种呈现： >
+	:let html_no_rendering=1
+
+默认情况下，Vim 会把语法同步到第一个显示行之前的 250 行。这可以这样配置： >
+	:let html_minlines = 500
+<
+HTML 注释相当特殊（细节请参考 HTML 的参考文档），语法配色方案会把所有
+错误都高亮出来。不过，如果你更喜欢用那种错误的写法（以 <!-- 开始、以
+--> 结束），可以这样定义 >
+	:let html_wrong_comments=1
+
+嵌在 HTML 文档里的 JavaScript 和 Visual Basic 会按 'Special' 高亮，其中的
+语句、注释、字符串等等则像标准编程语言那样着色。注意目前只支持 JavaScript
+和 Visual Basic，尚未加入其它脚本语言。
+
+嵌入的和内联的层叠样式表（CSS）也会被高亮。
+
+外面的 html 预处理器语言有好几种。html.vim 的写法使得把一种预处理器语言
+包含进来应当是件轻而易举的事。要做到这点，把下面两行加到那种语言的语法
+配色文件里（这个例子来自 asp.vim 文件）：
+>
+    runtime! syntax/html.vim
+    syn cluster htmlPreproc add=asp
+
+现在你只需确保把所有含有该预处理器语言的区域都加到 htmlPreproc 簇里。
+
+							*html-folding*
+HTML 的 syntax 文件在开始 tag 与结束 tag 之间提供语法 |folding|（见
+|:syn-fold|）。这可以这样打开： >
+
+	:let g:html_syntax_folding = 1
+	:set foldmethod=syntax
+
+注意：语法 folding 可能显著拖慢语法高亮，尤其是在大文件上。
+
+
+HTML/OS (BY AESTIVA)					*ft-htmlos-syntax*
+
+HTML/OS 的配色方案是这样工作的：
+
+函数名与变量名默认是同一个颜色，因为 VIM 并没有为 Function 和 Identifier
+指定不同的颜色。要改变这一点（如果你想让函数名能以不同颜色辨认出来，推荐
+这么做），你需要把下面这行加到 vimrc 里： >
+  :hi Function cterm=bold ctermfg=LightGray
+
+当然，ctermfg 你可以自己选成别的颜色。
+
+HTML/OS 遇到的另一个问题是：并没有一种专门的 filetype 来表明这是采用
+HTML/OS 编码的文件。你可以打开一个文件，然后这样打开 HTML/OS 语法来改变
+这种局面： >
+  :set syntax=htmlos
+
+最后应当注意：HTML/OS 代码块的起始与结束字符分别可以是 << 或 [[，以及
+>> 或 ]]。
+
+
+IA64					*intel-itanium* *ft-ia64-syntax*
+
+针对 Intel Itanium 64 汇编语言的 highlighting。要了解如何识别这种
+filetype，见 |ft-asm-syntax|。
+
+要让 `*.inc` 文件被识别为 IA64，把下面这行加到 vimrc 文件里： >
+	:let g:filetype_inc = "ia64"
+
+
+INFORM							*ft-inform-syntax*
+
+Inform 的 highlighting 包含 Inform Library 提供的符号，因为大多数程序都
+大量使用它。如果你不希望高亮 Library 符号，把下面这行加到 vim 启动序列： >
+	:let inform_highlight_simple=1
+
+默认假定 Inform 程序的目标是 Z-machine，并会相应高亮 Z-machine 汇编语言的
+符号。如果你打算让程序的目标是 Glulx/Glk 环境，你需要把下面这行加到启动
+序列里： >
+	:let inform_highlight_glulx=1
+
+这样就会改为高亮 Glulx 操作码，同时还会把 glk() 加进被高亮的系统函数集合。
+
+Inform 编译器在遇到某些过时的关键字时会将它们标记为错误。这些关键字通常
+被 Vim 高亮为错误。要避免这种错误高亮，你必须把下面这行加到启动序列里： >
+	:let inform_suppress_obsolete=1
+
+默认情况下，被高亮的语言特性符合 Compiler 6.30 版和 Library 6.11 版。如果
+你用的是一套更老的 Inform 开发环境，你也许想把下面这行加到启动序列里： >
+	:let inform_highlight_old=1
+
+IDL								*idl-syntax*
+
+IDL（Interface Definition Language，接口定义语言）文件用来定义 RPC 调用。
+在 Microsoft 的世界里，它也被用来定义 COM 接口和调用。
+
+IDL 的结构足够简单，可以采用完全基于语法的做法，而不必只用几条启发式规则。
+结果就是文件很大、有些重复，但似乎能用。
+
+这里还收录了一些针对 idl 文件的 Microsoft 扩展。其中一部分可以通过定义
+idl_no_ms_extensions 来禁用。
+
+较复杂的那部分扩展则通过定义 idl_no_extensions 来禁用。
+
+变量			作用 ~
+
+idl_no_ms_extensions		禁用一部分 Microsoft 特有的
+				扩展
+idl_no_extensions		禁用复杂的扩展
+idlsyntax_showerror		显示 IDL 错误（可能相当扰人，但
+				很有帮助）
+idlsyntax_showerror_soft	默认对错误使用更柔和的颜色
+
+
+JAVA							*ft-java-syntax*
+
+java.vim 语法高亮文件提供了若干选项。
+
+在 Java 1.0.2 中，括号里放花括号从来都是不允许的，所以这会被标记为错误。
+从 Java 1.1 起这是允许的（通过匿名类）；因此它不再被标记为错误。如果你
+更喜欢老做法，把下面这行放进 Vim 启动文件： >
+	:let g:java_mark_braces_in_parens_as_errors = 1
+
+在 `java.lang` 中声明的所有（导出的）public 类型总是会被自动导入，并以
+简单名字的形式可用。要高亮它们，请用： >
+	:let g:java_highlight_java_lang_ids = 1
+你也可以为其它 public 和 protected 类型生成语法项，并选择性地高亮其中
+某些名字；见 |java-package-info-url|。
+
+带缩进的函数声明的头部可以被高亮（连同 lambda 表达式和方法引用表达式的
+一部分），但这取决于你写 Java 代码的方式。可以识别两种格式：
+
+1) 如果你的函数声明始终缩进一个 tab，或者一个空格……又或者八个空格字符，
+你也许想设置下面之一 >
+	:let g:java_highlight_functions = "indent"
+	:let g:java_highlight_functions = "indent1"
+	:let g:java_highlight_functions = "indent2"
+	:let g:java_highlight_functions = "indent3"
+	:let g:java_highlight_functions = "indent4"
+	:let g:java_highlight_functions = "indent5"
+	:let g:java_highlight_functions = "indent6"
+	:let g:java_highlight_functions = "indent7"
+	:let g:java_highlight_functions = "indent8"
+注意就 'shiftwidth' 而言，这里指的是最左侧的那一级缩进。
+
+2) 不过，如果你遵循 Java 关于函数和类型应如何命名（就大小写而言）的
+准则，并且缩进量是任意多少，你也许想设置 >
+	:let g:java_highlight_functions = "style"
+
+此外，你可以把 "g:java_highlight_functions" 的任何取值与下面这行组合起来 >
+	:let g:java_highlight_signature = 1
+这样函数名连同其参数表的圆括号，就会与它的类型参数、返回类型和形式参数
+区分开来高亮；lambda 表达式带箭头的参数表圆括号，也会与它的形式参数或
+标识符区分开来高亮。
+
+如果这两种设置对你都不管用，但你仍然想高亮函数声明的头部，那就修改当前
+的语法定义，或者编写新的语法定义。
+
+高阶函数类型用肉眼解析起来可能很吃力，所以把它们某些组成部分的颜色统一
+调淡也许是有价值的。只要这类类型名符合 Java 的命名准则，你就可以这样安排 >
+	:let g:java_highlight_generics = 1
+
+在 Java 1.1 中，函数 `System.out.println()` 和 `System.err.println()` 只应
+用于调试。可以考虑在你的启动文件里加上下面这个定义： >
+	:let g:java_highlight_debug = 1
+这样这些语句的主体部分就会被着色为
+	`*Debug`	调试语句，
+并让其中某些自身的项进一步分组并链接：
+	`*Special`	作为 DebugSpecial，
+	`*String`	作为 DebugString，
+	`*Boolean`	作为 DebugBoolean，
+	`*Type`		作为 DebugType，
+它们分别用于字符串中出现的特殊字符、字符串本身、布尔字面量，以及特殊的
+实例引用（`super`、`this`、`null`）。
+
+Javadoc 是一个从 Java 程序文件中抽出特殊注释、生成 HTML 页面的程序。标准
+配置会像对待 HTML 文件那样高亮这些 HTML 代码（见 |ft-html-syntax|）。你
+甚至可以在这段代码里加入 JavaScript 和 CSS（见下文）。HTML 呈现与 Markdown
+呈现的区别如下：
+  1. 第一句（到第一个句点 `.` 为止的所有字符，该句点后面必须跟空白字符
+     或行终止符；或者到第一个块 tag 为止，例如 `@param`、`@return`）被着色
+     为
+	`*SpecialComment`	特殊注释。
+  2. 正文被着色为
+	`*Comment`	注释。
+  3. HTML 注释被着色为
+	`*Special`	特殊符号。
+  4. 标准的 Javadoc tag（`@code`、`@see` 等）被着色为
+	`*Special`	特殊符号
+     而其中某些参数被着色为
+	`*Function`	函数名。
+要同时对 HTML 和 Markdown 关掉这个特性，把下面这行加到你的启动文件： >
+	:let g:java_ignore_javadoc = 1
+或者，只压制 HTML 注释或 Markdown 注释： >
+	:let g:java_ignore_html = 1
+	:let g:java_ignore_markdown = 1
+Markdown 注释方面还有额外支持，见 |ft-java-plugin|。
+
+如果你使用了上面描述的特殊 Javadoc 注释高亮，你也可以为 JavaScript、
+Visual Basic 脚本以及嵌入的 CSS（样式表）打开特殊高亮。只有当这些语言
+确实出现在 Javadoc 注释里时，这样做才有意义。要用的变量是 >
+	:let g:java_javascript = 1
+	:let g:java_css = 1
+	:let g:java_vb = 1
+注意这三个变量是维护在 HTML 的 syntax 文件里的。
+
+在非 Javadoc 注释中，数字和字符串也可以被识别，用 >
+	:let g:java_comment_strings = 1
+
+当 'foldmethod' 被设为 "syntax" 时，多行的代码块（"b"）、普通注释（"c"）、
+Javadoc 注释（"d"），以及相邻的 "import" 声明（"i"）默认会被折叠。任何被
+支持的类别的语法项，在通过下面这条命令把它的缩写名从名单里去掉之后，都会
+保持为不可折叠 >
+	:let g:java_ignore_folding = "bcdi"
+多行注释的第一行通常不写任何文本，这使得默认的 'foldtext' 取值下折叠起来
+的 Javadoc 注释内容信息量不足；你可以选择对这种写法的注释显示第二行的内容，
+而在其它情况下显示第一行的内容，用 >
+	:let g:java_foldtext_show_first_or_second_line = 1
+Javadoc 注释里的 HTML tag 还可以进一步折叠，办法是遵循 |html-folding| 下
+列出的说明，并明确表示同意，用 >
+	:let g:java_consent_to_html_syntax_folding = 1
+除非 Javadoc 注释里所有开始 tag 和可选的结束 tag 都是配对的，否则不要把
+这种折叠设为默认；不然就等着面对会产生失控折叠、破坏语法高亮的情况吧。
+
+行尾的空白字符，或 tab 字符之前连续的一串空格字符，可以被标记为错误，用 >
+	:let g:java_space_errors = 1
+但这两类错误中的任意一类也可以再定义下面之一来压制 >
+	:let g:java_no_trail_space_error = 1
+	:let g:java_no_tab_space_error = 1
+
+为了用不同颜色高亮嵌套的圆括号，为 `javaParen`、`javaParen1` 和
+`javaParen2` 定义颜色。例如， >
+	:hi link javaParen Comment
+或者 >
+	:hi javaParen ctermfg=blue guifg=#0000ff
+
+某些修饰符彼此不兼容，例如 `abstract` 与 `final`： >
+	:syn list javaConceptKind
+而它可以作为一个组、与其它修饰符区别开来高亮，用 >
+	:hi link javaConceptKind NonText
+
+在语法项定义中所使用的变长 lookbehind 断言（|/\@<!| 和 |/\@<=|）的所有
+实例，都被限制在任意的字节数上。对于相关的一组定义，可以另外选一个任意的
+值。例如： >
+	:let g:java_lookbehind_byte_counts = {'javaMarkdownCommentTitle': 240}
+其中这个字典的每个键名都是一个语法项的名字。这些断言在语法项中的用法可能
+会随修订版变化，因此并不承诺支持一组确定的键名。
+
+如果你在往回滚动时注意到高亮错误，而用 CTRL-L 重绘之后就恢复正常，试着把
+"g:java_minlines" 变量设成更大的数： >
+	:let g:java_minlines = 50
+这会使语法同步从第一个显示行之前的 50 行开始。默认值是 10。用较大数值的
+缺点是重绘可能变慢。
+
+Java 平台的重大变更会以 JDK Enhancement Proposal（JEP）的形式逐步引入，
+这些提案可以为某个发行版实现，并作为该发行版的预览特性提供。这类特性往往
+要经过好几个 JEP 和几个发行周期，才会最终整合进平台，或者从这项工作中撤出。
+为了照顾早期采用者，Vim 对已经实现的、与语法相关的预览特性提供了可选支持。
+你可以像下面这样指定一串预览特性编号来请求它： >
+	:let g:java_syntax_previews = [530]
+
+所支持的 JEP 编号要从这张表里取：
+	`430`：String Templates [JDK 21]
+	`530`：Primitive types in Patterns, instanceof, and switch
+
+注意一旦某个预览特性被整合进 Java 平台，它的条目就会从表里删掉，相关的
+可选支持也会停止。
+						*java-package-info-url*
+https://github.com/zzzyxwvut/java-vim/blob/master/tools/javaid/src/javaid/package-info.java
+
+JSON				*ft-json-syntax* *g:vim_json_conceal*
+						*g:vim_json_warnings*
+
+json 的 syntax 文件默认提供带 conceal 支持的语法高亮。要禁用 conceal： >
+	let g:vim_json_conceal = 0
+
+要禁用错误的语法高亮： >
+	let g:vim_json_warnings = 0
+
+
+JQ					*jq_quote_highlight* *ft-jq-syntax*
+
+要让数字不再有自己独立的颜色，把下面这行加到 vimrc 里： >
+	hi link jqNumber Normal
+
+如果你想让引号与字符串有不同的高亮 >
+	let g:jq_quote_highlight = 1
+
+KCONFIG							*ft-kconfig-syntax*
+
+Kconfig 的语法高亮语言。对于语法同步，你可以配置下面这个变量（默认值：
+50）： >
+
+	let kconfig_minlines = 50
+
+要配置略多一点（更重）的高亮，设置下面这个变量： >
+
+	let kconfig_syntax_heavy = 1
+
+LACE							*ft-lace-syntax*
+
+Lace（Language for Assembly of Classes in Eiffel）不区分大小写，但风格
+指南里的那些行区分。如果你更喜欢不区分大小写的高亮，只需在启动文件里定义
+vim 变量 'lace_case_insensitive'： >
+	:let lace_case_insensitive=1
+
+
+LF (LFRC)			*ft-lf-syntax* *g:lf_shell_syntax*
+						*b:lf_shell_syntax*
+
+对于 lf 文件管理器的配置文件（lfrc），shell 命令的语法高亮可以通过用这些
+变量设置不同的 'include' 命令搜索模式，来在全局层面和逐 buffer 地改变： >
+	let g:lf_shell_syntax = "syntax/dosbatch.vim"
+	let b:lf_shell_syntax = "syntax/zsh.vim"
+
+这些变量默认未设置。
+
+默认的 'include' 命令搜索模式是 'syntax/sh.vim'。
+
+
+LEX							*ft-lex-syntax*
+
+Lex 采用暴力式同步，因为 "^%%$" 这样的分节定界符没法给出任何线索说明后面
+是哪个分节。因此，下面这个值 >
+	:syn sync minlines=300
+如果用户遇到同步方面的困难（就像在很大的 lex 文件上可能发生的那样），可以
+把它改掉。
+
+
+LIFELINES					*ft-lifelines-syntax*
+
+要把已废弃的函数高亮为错误，在 vimrc 里加上： >
+
+	:let g:lifelines_deprecated = 1
+<
+
+LISP							*ft-lisp-syntax*
+
+lisp 的语法高亮提供两个选项： >
+
+	g:lisp_instring : If it exists, then "(...)" strings are highlighted
+			  as if the contents of the string were lisp.
+			  Useful for AutoLisp.
+	g:lisp_rainbow  : If it exists and is nonzero, then differing levels
+			  of parenthesization will receive different
+			  highlighting.
+<
+g:lisp_rainbow 选项为圆括号和反引号化圆括号提供 10 级单独的着色。由于着色
+级别数量众多，与不带 rainbow 的高亮不同，rainbow 模式是用 ctermfg 和 guifg
+指定其高亮的，从而绕过了通常用标准高亮组来控制配色的做法。实际使用的高亮
+取决于 dark/bright 设置（见 'bg'）。
+
+
+LITE							*ft-lite-syntax*
+
+lite 的语法高亮有两个选项。
+
+如果你喜欢在 String 内部也做 SQL 语法高亮，用这个： >
+
+	:let lite_sql_query = 1
+
+就同步而言，minlines 默认为 100。如果你更喜欢别的值，可以把 "lite_minlines"
+设成你想要的值。例如： >
+
+	:let lite_minlines = 200
+
+LOG							*ft-log-syntax*
+
+日志文件格式太过通用，Vim 自带的高亮很朴素、也很泛用。正因为日志文件格式
+太过通用，高亮默认不启用，因为它可能分散注意力。如果你想要启用它，只要手动
+把 filetype 设成 "log"： >
+
+	:set ft=log
+
+要为 "*.log" 文件自动启用它，把下面这段加到你的个人 `filetype.vim` 文件里
+（在 Unix 上通常位于 `~/.config/nvim/filetype.vim`，另见 |new-filetype|）： >
+
+	augroup filetypedetect
+	  au! BufNewFile,BufRead *.log	setfiletype log
+	augroup END
+
+LPC							*ft-lpc-syntax*
+
+LPC 代表一种简单、内存高效的 Lars Pensjö C。LPC 的文件名通常是 `*.c`。把这些
+文件识别为 LPC 会打扰那些只写 C 程序的用户。如果你在 Vim 里想用 LPC 语法，
+应该在你的 vimrc 文件里设置一个变量： >
+
+	:let lpc_syntax_for_c = 1
+
+如果它对某些特定的 C 或 LPC 文件不能正常工作，那就用 modeline。对一个
+LPC 文件： >
+
+	// vim:set ft=lpc:
+
+对一个被识别为 LPC 的 C 文件： >
+
+	// vim:set ft=c:
+
+如果你不想设置这个变量，那就给每一个 LPC 文件都用 modeline。
+
+LPC 有好几种实现，我们打算支持其中最广泛使用的一些。这里的默认 LPC 语法
+针对 MudOS 系列；对 MudOS v22 及其之前的版本，你应当关掉那些合理的修饰符，
+而这也将把 v22 之后新增的 efuns 断言为不合法；如果你用的是最新版的 MudOS，
+就不要设置这个变量： >
+
+	:let lpc_pre_v22 = 1
+
+对于 LpMud 3.2 系列的 LPC： >
+
+	:let lpc_compat_32 = 1
+
+对于 LPC4 系列的 LPC： >
+
+	:let lpc_use_lpc4_syntax = 1
+
+对于 uLPC 系列的 LPC：
+uLPC 已经发展为 Pike，所以你应当改用 Pike 语法，
+而你的源文件名应当是 `*.pike`
+
+
+LUA							*ft-lua-syntax*
+
+Lua 的 syntax 文件可用于 4.0、5.0+ 各版本。你可以用全局变量
+|g:lua_version| 和 |g:lua_subversion| 来选择其中一个版本。
+
+
+MAIL							*ft-mail.vim*
+
+Vim 会高亮一封邮件里所有的标准元素（头部、签名、引用的文本以及 URL / 邮件
+地址）。依照通行的惯例，签名以只含 "--" 的一行开始，其后可以跟空白字符，
+并以一个换行结束。
+
+Vim 把以 "]"、"}"、"|"、">" 开头的行，或以一个词后跟 ">" 的行，当作被引用的
+文本。不过，只有在文本是用 ">"（后面可以跟一个空格）引用的情况下，Vim 才
+会高亮引用文本里的头部和签名。
+
+默认情况下 mail.vim 会把语法同步到第一个显示行之前的 100 行。如果你有一台
+慢机器，而且通常处理的是头部很短的邮件，你可以把这个值改小： >
+
+	:let mail_minlines = 30
+
+
+MAKE							*ft-make-syntax*
+
+在 makefile 里，命令通常会被高亮，好让你容易发现错误。不过，这样的着色
+对你说可能太多。你可以用下面这条命令关掉这个特性： >
+
+	:let make_no_commands = 1
+
+注释默认也会被高亮。你可以用下面这条命令关掉它： >
+
+	:let make_no_comments = 1
+
+Make 有各种实现，它们在 POSIX 规范之外还加了扩展，因此彼此互不兼容。如果
+文件名是 BSDmakefile 或 GNUmakefile，对应的实现会被自动判定；否则 vim 会
+尝试根据文件内容来识别它。如果你因此看到任何错误的高亮，你可以通过设置
+下面之一来强制指定一种风味： >
+
+	:let g:make_flavor = 'bsd'  " or
+	:let g:make_flavor = 'gnu'  " or
+	:let g:make_flavor = 'microsoft'
+
+
+MAPLE							*ft-maple-syntax*
+
+Maple V 由 Waterloo Maple Inc 出品，支持符号代数。该语言支持许多函数包，
+由用户选择性地加载。随 Maple V release 4 提供的标准函数包集合可以按用户的
+意愿被高亮。用户可以在自己的 vimrc 文件里写： >
+
+	:let mvpkg_all= 1
+
+这样就能高亮所有函数包里的函数；或者用户也可以从下表中挑一个变量/包，把
+该变量设为 1，同样写在 vimrc 文件里（要在 source
+$VIMRUNTIME/syntax/syntax.vim 之前）。
+
+	Table of Maple V Package Function Selectors >
+  mv_DEtools	 mv_genfunc	mv_networks	mv_process
+  mv_Galois	 mv_geometry	mv_numapprox	mv_simplex
+  mv_GaussInt	 mv_grobner	mv_numtheory	mv_stats
+  mv_LREtools	 mv_group	mv_orthopoly	mv_student
+  mv_combinat	 mv_inttrans	mv_padic	mv_sumtools
+  mv_combstruct mv_liesymm	mv_plots	mv_tensor
+  mv_difforms	 mv_linalg	mv_plottools	mv_totorder
+  mv_finance	 mv_logic	mv_powseries
+
+
+MARKDOWN			*ft-markdown-syntax* *g:markdown_minlines*
+		 *g:markdown_fenced_languages* *g:markdown_syntax_conceal*
+
+如果你有很长的区域，可能会出现错误的高亮。以拖慢显示为代价，你可以让引擎
+往回查找更远，以便在区域的起点处同步，例如 500 行（默认是 50）： >
+
+	:let g:markdown_minlines = 500
+
+如果你想在 Markdown 文档里启用带围栏的代码块语法高亮，设置下面这个变量： >
+
+	:let g:markdown_fenced_languages = ['html', 'python', 'bash=sh']
+
+要禁用 Markdown 的 syntax conceal，把下面这行加到 vimrc 里： >
+
+	:let g:markdown_syntax_conceal = 0
+
+若想要带扩展功能的 Markdown 支持，例如引文、脚注、数学公式、学术写作元素
+以及内嵌代码块的高亮，可以考虑使用 pandoc 的 syntax 插件。把
+`g:filetype_md` 设为 "pandoc"，并参阅 |ft-pandoc-syntax| 了解配置细节。
+
+MATHEMATICA			*ft-mma-syntax* *ft-mathematica-syntax*
+
+空的 `*.m` 文件会被自动假定为 Matlab 文件，除非你的 vimrc 里有下面这行： >
+
+	let filetype_m = "mma"
+
+MBSYNC						*ft-mbsync-syntax*
+
+mbsync 应用程序用一个配置文件来设置邮箱名、用户和密码。所有以 `.mbsyncrc`
+结尾、或名为 `isyncrc` 的文件都会被识别为 mbsync 配置文件。
+
+MEDIAWIKI					*ft-mediawiki-syntax*
+
+默认情况下，语法高亮包含像 style 和头部这样的基本 HTML tag
+（|ft-html-syntax|）。若要用严格的 Mediawiki 语法高亮： >
+
+	let g:html_no_rendering = 1
+
+如果希望有 HTML 的高亮，那么基于终端的文本格式（例如粗体和斜体）可以这样
+实现： >
+
+	let g:html_style_rendering = 1
+
+MODULA2						*ft-modula2-syntax*
+
+Vim 会识别带方言标记的注释，从而自动选择指定的方言。
+
+方言标记注释的语法为： >
+
+	taggedComment :=
+	  '(*!' dialectTag '*)'
+	  ;
+
+	dialectTag :=
+	  m2pim | m2iso | m2r10
+	  ;
+
+	reserved words
+	  m2pim = 'm2pim', m2iso = 'm2iso', m2r10 = 'm2r10'
+
+Vim 只在源文件前 200 行之内识别方言标记注释。只有第一个此类注释会被识别，
+额外的方言标记注释一律忽略。
+
+示例： >
+
+	DEFINITION MODULE FooLib; (*!m2pim*)
+	...
+
+变量 g:modula2_default_dialect 用于在无法从 Modula-2 文件内容判断方言时，
+设定默认的 Modula-2 方言：若已定义并设为 'm2pim'，默认方言即为 PIM。
+
+示例： >
+
+	let g:modula2_default_dialect = 'm2pim'
+
+
+每种方言还可通过下列变量进一步配置高亮。
+
+变量			高亮 ~
+*modula2_iso_allow_lowline*	允许标识符中包含下划线
+*modula2_iso_disallow_octals*	禁止八进制整数字面量
+*modula2_iso_disallow_synonyms*	禁止 "@"、"&" 和 "~" 同义词
+
+*modula2_pim_allow_lowline*	允许标识符中包含下划线
+*modula2_pim_disallow_octals*	禁止八进制整数字面量
+*modula2_pim_disallow_synonyms*	禁止 "&" 和 "~" 同义词
+
+*modula2_r10_allow_lowline*	允许标识符中包含下划线
+
+MOO							*ft-moo-syntax*
+
+若你在表达式内使用 C 风格注释，并发现它把高亮弄乱了，不妨对 C 风格注释
+改用扩展（较慢！）匹配： >
+
+	:let moo_extended_cstyle_comments = 1
+
+要禁用字符串内代词替换模式的高亮： >
+
+	:let moo_no_pronoun_sub = 1
+
+要禁用正则表达式运算符 "%|" 以及字符串内 "%(" 与 "%)" 匹配的高亮： >
+
+	:let moo_no_regexp = 1
+
+未配对的双引号可以被识别并高亮为错误： >
+
+	:let moo_unmatched_quotes = 1
+
+要高亮内置属性（.name、.location、.programmer 等）： >
+
+	:let moo_builtin_properties = 1
+
+未知的内置函数可以被识别并高亮为错误。若使用该选项，请把你的扩展加入
+mooKnownBuiltinFunction 组。要启用该选项： >
+
+	:let moo_unknown_builtin_functions = 1
+
+把 sprintf() 加入已知内置函数列表的示例： >
+
+	:syn keyword mooKnownBuiltinFunction sprintf contained
+
+
+MSQL							*ft-msql-syntax*
+
+msql 语法高亮有两个选项。
+
+若你喜欢在字符串内部也用 SQL 语法高亮，请用： >
+
+	:let msql_sql_query = 1
+
+同步时 minlines 默认为 100。若想改用其它值，可以把 "msql_minlines" 设为
+你想要的值。示例： >
+
+	:let msql_minlines = 200
+
+
+NEOMUTT						*ft-neomuttrc-syntax*
+					*ft-neomuttlog-syntax*
+
+要禁用 NeoMutt 日志的默认颜色： >
+
+	:let g:neolog_disable_default_colors = 1
+
+N1QL							*ft-n1ql-syntax*
+
+N1QL 是一种类似 SQL 的声明式语言，用于操作 Couchbase Server 数据库中的
+JSON 文档。
+
+Vim 语法会高亮 N1QL 的语句、关键字、运算符、类型、注释和特殊值。Vim 忽略
+SQL 及其众多方言特有的语法元素（如 COLUMN 或 CHAR），这些元素在 N1QL 中
+并不存在。
+
+
+NCF							*ft-ncf-syntax*
+
+NCF 语法高亮有一个选项。
+
+若你希望把（ncf.vim 无法识别的）语句高亮为错误，请用： >
+
+	:let ncf_highlight_unknowns = 1
+
+若不想高亮这些错误，就不要设置它。
+
+
+NROFF							*ft-nroff-syntax*
+
+nroff 语法文件可以直接处理 AT&T n/troff。若要支持 GNU troff（groff）——
+Linux 和 BSD 发行版默认用它作为排版工具，请设法让文件被识别为 groff 输入
+（见 |ft-groff-syntax|），或在启动文件中加入下列选项： >
+
+  :let nroff_is_groff = 1
+
+GNU troff 与更早的 AT&T n/troff 程序（在 Solaris 或 Plan 9 里可能还能找到）
+不同，它扩展了 "*roff" 语言的语法。例如在 AT&T troff 中，用转义序列 \n(yr
+可以取到自 1900 年起的年数。在 groff 中你也能照做（为兼容而支持），或者
+改用 groff 的扩展语法 \n[yr]。AT&T troff 的文档称 yr register 存放的是
+"当前年份的最后两位数字"，但存在 Y2K 问题；而在 groff 中，可以正确地取到
+公历年：\n[year]。在 groff 中，font、register、macro、string 和 request 的
+名称可以超过两个字符；例如用 groff 的 mm 宏包时，控制行 ".VERBON" 和
+".VERBOFF" 会调用同名宏，为 "verbatim" 内容的显示划定范围。
+
+为了得到 g/troff 所能给出的最佳排版输出，你应当遵守几条关于间距和标点的
+简单规则。
+
+1. 在每个句子的末尾断行（换行）。不要在新行之前留下行尾空格。
+
+2. 若某行以并不结束句子的句号、问号或感叹号结尾，请在其后加上哑字符
+   转义序列 \&。
+
+3. 若你使用宏包，请用它的分段宏来实现段落缩进和段间间距。
+
+4. 可以随意使用空请求（即单独一行的一个 '.'），以便在视觉上分隔内容，
+   方便维护文档。
+
+这些提示的原因是，g/n/troff 会尝试检测句子的结尾，并用该信息施加句间间距。
+采用这些做法还能减小 diff 的体积——那些行仅仅因为要在文本编辑器中重新折行
+而变化。宏包通常采用不同于一个 vee（即一个空输入行的效果）的段间间距量，
+并通常把该间距量和段落缩进量存放在用户可配置的 register 中，以使页面排版
+保持一致。
+
+与 TeX 不同，troff 逐行填充文本，而不是逐段填充。若你希望格式化输出中词与
+句之间的间距保持一致，就必须在输入文本中保持一致的间距。要把行尾空格以及
+标点之后两个或更多空格都标记为错误，请用： >
+
+  :let nroff_space_errors = 1
+
+另一项技术用于检测多余间距以及其它会干扰文件正确排版的错误：在配置文件中
+为语法组 "nroffDefinition" 和 "nroffDefSpecial" 定义一个醒目的高亮。例如： >
+
+  hi def nroffDefinition cterm=italic gui=reverse
+  hi def nroffDefSpecial cterm=italic,bold gui=reverse,bold
+
+若你想像跳转节标记那样，轻松地在源文件中遍历预处理器条目，可以在 vimrc
+文件中激活下列选项： >
+
+	let b:preprocs_as_sections = 1
+
+此外，语法文件为 ms 宏包中的 XP 分段宏（Berkeley 与 GNU 的扩展）额外添加
+了一个段落标记。
+
+最后，还有一个 |ft-groff-syntax| 文件，可用于按单文件启用，或全局默认启用
+groff 语法高亮。
+
+
+OCAML							*ft-ocaml-syntax*
+
+OCaml 语法文件处理具有下列前缀的文件：.ml、.mli、.mll 和 .mly。通过设置
+下列变量 >
+
+	:let ocaml_revised = 1
+
+你可以从标准 OCaml 语法切换到 camlp4 预处理器所支持的修订语法。设置
+变量 >
+
+	:let ocaml_noend_error = 1
+
+可避免把 "end" 高亮为错误，这在源文件包含非常长的结构、Vim 已不再同步时
+很有用。
+
+PANDOC						*ft-pandoc-syntax*
+
+默认情况下，markdown 文件会被检测为 filetype "markdown"。另一种选择是让它
+们被检测为 filetype "pandoc"。为此，请设置 *g:filetype_md* 变量： >
+
+	:let g:filetype_md = 'pandoc'
+
+pandoc 语法插件用 |conceal| 做美化高亮。默认为 1 >
+
+	:let g:pandoc#syntax#conceal#use = 1
+
+要指定不应被 conceal 的元素，请设置下列变量： >
+
+	:let g:pandoc#syntax#conceal#blacklist = []
+
+下面是可以在此使用的规则列表：
+
+  - titleblock
+  - image
+  - block
+  - subscript
+  - superscript
+  - strikeout
+  - atx
+  - codeblock_start
+  - codeblock_delim
+  - footnote
+  - definition
+  - list
+  - newline
+  - dashes
+  - ellipses
+  - quotes
+  - inlinecode
+  - inlinemath
+
+你可以自定义 conceal 的工作方式。例如，若你更喜欢用 `*` 符号标记脚注： >
+
+	:let g:pandoc#syntax#conceal#cchar_overrides = {"footnote" : "*"}
+
+要 conceal 链接中的 url，请用： >
+
+	:let g:pandoc#syntax#conceal#urls = 1
+
+阻止高亮特定代码块类型，使它们保持 Normal。代码块类型包括 "definition"
+（用于定义块内部的代码块）和 "delimited"（用于定界代码块）。默认 = [] >
+
+	:let g:pandoc#syntax#codeblocks#ignore = ['definition']
+
+对指定了语言的定界代码块启用内嵌高亮。默认 = 1 >
+
+	:let g:pandoc#syntax#codeblocks#embeds#use = 1
+
+用于指定内嵌内容用哪些语言名、哪些语法文件来高亮。这是一个语言名列表。
+当 pandoc 和 vim 使用的语言名不一致时，可以用 "PANDOC=VIM" 语法。例如： >
+
+	:let g:pandoc#syntax#codeblocks#embeds#langs = ["ruby", "bash=sh"]
+
+要在强调中使用斜体和粗体。默认 = 1 >
+
+	:let g:pandoc#syntax#style#emphases = 1
+
+"0" 会把 "block" 加入 g:pandoc#syntax#conceal#blacklist，否则你就无法分辨
+样式作用在哪里。
+
+要为下标、上标和删除线文本添加下划线样式。默认 = 1 >
+
+	:let g:pandoc#syntax#style#underline_special = 1
+
+检测并高亮定义列表。禁用它可以提升性能。默认 = 1（即默认启用） >
+
+	:let g:pandoc#syntax#style#use_definition_lists = 1
+
+pandoc 语法脚本还提供下列命令： >
+
+	:PandocHighlight LANG
+
+为代码块中的 LANG 语言启用内嵌高亮。使用 g:pandoc#
+syntax#codeblocks#embeds#langs 中各项对应的语法。 >
+
+	:PandocUnhighlight LANG
+
+禁用代码块中 LANG 语言的内嵌高亮。
+
+PAPP							*ft-papp-syntax*
+
+PApp 语法文件处理 .papp 文件，并在较小程度上处理 .pxml 和 .pxsl 文件——它们
+都是以 xml 作为顶层文件格式的 perl/xml/html/其它语言的混合。默认情况下，
+phtml 或 pxml 节内的一切都被当作带有内嵌预处理器命令的字符串。若你在启动
+文件中设置变量： >
+
+	:let papp_include_html=1
+
+它就会尝试对 phtml 节内部的 html 代码做语法高亮，但这相对较慢，而且色彩
+过于丰富，无法清醒地编辑。;)
+
+papp.vim 语法文件的最新版本通常可以在 http://papp.plan9.de 找到。
+
+
+PASCAL							*ft-pascal-syntax*
+
+匹配 "*.p" 的文件可能是 Progress，也可能是 Pascal；匹配 "*.pp" 的可能是
+Puppet，也可能是 Pascal。若自动检测对你不适用，或者你只编辑 Pascal 文件，
+请在启动 vimrc 中这样写： >
+
+   :let filetype_p  = "pascal"
+   :let filetype_pp = "pascal"
+
+Pascal 语法文件已经过扩展，以顾及 Turbo Pascal、Free Pascal Compiler 和
+GNU Pascal Compiler 提供的部分扩展。同时也支持 Delphi 关键字。默认启用了
+Turbo Pascal 7.0 的特性。若你更愿意坚持标准 Pascal 关键字，请在启动文件中
+加入下列一行： >
+
+   :let pascal_traditional=1
+
+要开启 Delphi 特有的结构（诸如单行注释、关键字等）： >
+
+   :let pascal_delphi=1
+
+
+选项 pascal_symbol_operator 控制诸如 +、`*`、.. 等符号运算符是否用
+Operator 颜色显示。要给符号运算符上色，请在启动文件中加入下列一行： >
+
+   :let pascal_symbol_operator=1
+
+有些函数默认会被高亮。要关掉： >
+
+   :let pascal_no_functions=1
+
+此外，针对某些编译器还有专用变量。除 pascal_delphi 之外，还有 pascal_gpc
+和 pascal_fpc。默认的扩展尽量与 Turbo Pascal 匹配。 >
+
+   :let pascal_gpc=1
+
+或 >
+
+   :let pascal_fpc=1
+
+若要确保字符串被定义在单一行内，可以定义 pascal_one_line_string 变量。 >
+
+   :let pascal_one_line_string=1
+
+若你不喜欢 <Tab> 字符，可以设置 pascal_no_tabs 变量。Tab 会被高亮为
+Error。 >
+
+   :let pascal_no_tabs=1
+
+
+
+PERL							*ft-perl-syntax*
+
+perl 语法高亮有若干可选选项。
+
+行内 POD 高亮现在默认开启。若你不希望为了高亮 Perl 文件内嵌的 POD 而增加
+的复杂性，可以把 'perl_include_pod' 选项设为 0： >
+
+	:let perl_include_pod = 0
+
+要降低解析的复杂度（并提升性能），你可以关掉变量名与变量内容解析中的两个
+元素。 >
+
+要（不把变量名与函数名中的包引用当作特例，而）与名称的其余部分同等处理
+（例如 '$PkgName::VarName' 中的 'PkgName::'）： >
+
+	:let perl_no_scope_in_variables = 1
+
+（在 Vim 6.x 中恰好相反：是用 "perl_want_scope_in_variables" 来启用的。）
+
+若你不希望 `@{${"foo"}}` 这类复杂结构被解析： >
+
+	:let perl_no_extended_vars = 1
+
+（在 Vim 6.x 中恰好相反：是用 "perl_extended_vars" 来启用的。）
+
+字符串的着色可以改变。默认情况下，字符串以及 qq 之类的会被高亮得像第一行。
+若你设置了变量 perl_string_as_statement，则会像第二行那样高亮。
+
+   "hello world!"; qq|hello world|;
+   ^^^^^^^^^^^^^^NN^^^^^^^^^^^^^^^N	  (unlet perl_string_as_statement)
+   S^^^^^^^^^^^^SNNSSS^^^^^^^^^^^SN	  (let perl_string_as_statement)
+
+(^ = perlString，S = perlStatement，N = 完全不出现)
+
+同步有 3 个选项。前两个会关掉某些同步触发，只应在同步无法正常工作时才需要
+它们。若在滚动时整个屏幕突然完全变色，你就该试着关掉其中一个。若你能找出
+造成错误的那一行，请告知开发者。
+
+一个在 "^\s*sub\s*" 上触发，另一个大致在 "^[$@%]" 上触发。 >
+
+	:let perl_no_sync_on_sub
+	:let perl_no_sync_on_global_var
+
+下面可以设置 VIM 在语法高亮中寻找起始点时应回溯的最大距离。 >
+
+	:let perl_sync_dist = 100
+
+若你想对 perl 使用折叠，请设置 perl_fold： >
+
+	:let perl_fold = 1
+
+若你还想折叠 if 语句等结构中的块，请再设置下列项： >
+
+	:let perl_fold_blocks = 1
+
+若设置了 'perl_fold'，子程序默认会被折叠。若你不想要这样，可以设置
+'perl_nofold_subs'： >
+
+	:let perl_nofold_subs = 1
+
+匿名子程序默认不折叠；你可以通过 'perl_fold_anonymous_subs' 启用其折叠： >
+
+	:let perl_fold_anonymous_subs = 1
+
+若设置了 'perl_fold'，包（package）默认也会被折叠。要禁用该行为，请设置
+'perl_nofold_packages'： >
+
+	:let perl_nofold_packages = 1
+
+PHP3 与 PHP4				*ft-php-syntax* *ft-php3-syntax*
+
+[注意：以前它叫 "php3"，但由于现在也支持 php4，已改名为 "php"]
+
+php 语法高亮有下列选项。
+
+若你喜欢在字符串内部也用 SQL 语法高亮： >
+
+  let php_sql_query = 1
+
+要高亮 Baselib 的方法： >
+
+  let php_baselib = 1
+
+启用字符串内部的 HTML 语法高亮： >
+
+  let php_htmlInStrings = 1
+
+使用旧的配色风格： >
+
+  let php_oldStyle = 1
+
+启用 ASP 风格的短标签高亮： >
+
+  let php_asp_tags = 1
+
+禁用短标签： >
+
+  let php_noShortTags = 1
+
+要高亮括号配对错误 ] 或 )： >
+
+  let php_parent_error_close = 1
+
+若存在一个未闭合的 ( 或 [ 就跳过 php 结束标签： >
+
+  let php_parent_error_open = 1
+
+为类与函数启用折叠： >
+
+  let php_folding = 1
+
+选择同步方式： >
+
+  let php_sync_method = x
+
+x = -1 表示按搜索同步（默认），
+x > 0 表示至少向后同步 x 行，
+x = 0 表示从头同步。
+
+
+PLAINTEX					*ft-plaintex-syntax*
+
+TeX 是一种排版语言，而 plaintex 是 TeX 的 "plain" 变体对应的 filetype。若你
+从不希望你的 `*.tex` 文件被识别为 plain TeX，见 |ft-tex-plugin|。
+
+该语法文件有选项 >
+
+	let g:plaintex_delimiters = 1
+
+若你想高亮方括号 "[]" 和花括号 "{}"。
+
+
+PPWIZARD						*ft-ppwiz-syntax*
+
+PPWizard 是用于 HTML 和 OS/2 INF 文件的预处理器
+
+该语法文件有这些选项：
+
+- ppwiz_highlight_defs : 决定 PPWizard 各项定义的 highlighting 模式。
+  可能的取值有
+
+  ppwiz_highlight_defs = 1：PPWizard 的 #define 语句保留其内容的颜色
+    （例如 PPWizard 宏和变量）。
+
+  ppwiz_highlight_defs = 2：预处理器 #define 与 #evaluate 语句以单一颜色
+    显示，行接续符号除外。
+
+  ppwiz_highlight_defs 的默认设置为 1。
+
+- ppwiz_with_html：若值为 1（默认），则高亮字面 HTML 代码；若为 0，则把
+  HTML 代码当作普通文本处理。
+
+
+PHTML							*ft-phtml-syntax*
+
+phtml 语法高亮有两个选项。
+
+若你喜欢在字符串内部也用 SQL 语法高亮，请用： >
+
+	:let phtml_sql_query = 1
+
+同步时 minlines 默认为 100。若想改用其它值，可以把 "phtml_minlines" 设为你
+想要的值。示例： >
+
+	:let phtml_minlines = 200
+
+
+POSTSCRIPT					*ft-postscr-syntax*
+
+高亮 PostScript 时有若干选项。
+
+首先要选高亮 PostScript 语言的哪个版本。目前定义了三个语言版本，或称级别。
+第 1 级是最初的基础版本，包含第 2 级发布之前的全部扩展。第 2 级是最常见的
+版本，包含自己的、第 3 级发布之前的一套扩展。第 3 级是目前支持的最高级别。
+通过如下定义 postscr_level 变量，即可选择要高亮 PostScript 语言的哪一级： >
+
+	:let postscr_level=2
+
+若未定义该变量，则默认为 2（第 2 级），因为这是目前最流行的版本。
+
+注意：并非所有 PS 解释器都支持某个语言级别的全部语言特性。特别是 PS 文件
+开头的 %!PS-Adobe-3.0 并不表示该 PostScript 就是第 3 级 PostScript！
+
+若你在处理 Display PostScript，可以通过如下定义 postscr_display 变量，
+把 Display PS 语言特性的高亮也包含进来： >
+
+	:let postscr_display=1
+
+若你在处理 Ghostscript，可以通过如下定义 postscr_ghostscript 变量，
+把 Ghostscript 特有的语言特性高亮也包含进来： >
+
+	:let postscr_ghostscript=1
+
+PostScript 是一门庞大的语言，有许多预定义元素。把这些元素全部高亮固然有用，
+但在较慢的机器上会让 Vim 变慢。为了对机器友好，font 名称和字符编码默认不
+高亮。除非你明确在处理这两者之一，否则这样应该没问题。若希望它们也高亮，
+应当设置下列变量中的一个或两个： >
+
+	:let postscr_fonts=1
+	:let postscr_encodings=1
+
+对 and、or 和 not 的高亮有一个风格选项。在 PostScript 中，这些运算符的功能
+取决于其操作数的类型——若操作数是布尔值，它们就是逻辑运算符；若操作数是
+整数，它们就是二元运算符。由于二元运算符与逻辑运算符可以被区分高亮，它们
+就得二选其一。默认情况下它们被当作逻辑运算符。可以通过如下定义
+postscr_andornot_binary 变量，把它们高亮为二元运算符： >
+
+	:let postscr_andornot_binary=1
+<
+
+				*ft-printcap-syntax*
+PRINTCAP + TERMCAP	*ft-ptcap-syntax* *ft-termcap-syntax*
+
+该语法文件适用于 printcap 和 termcap 数据库。
+
+为了让 Vim 识别不匹配 "*printcap*" 或 "*termcap*" 模式的 printcap/termcap
+文件，你必须在自己的 |myfiletypefile| 文件中放入适合你系统的额外模式。
+对这些模式，你必须把变量 "b:ptcap_type" 设为 "print" 或 "term"，然后把
+'filetype' 选项设为 ptcap。
+
+例如，要让 Vim 把 /etc/termcaps/ 中的所有文件都识别为 termcap 文件，请加入
+如下内容： >
+
+   :au BufNewFile,BufRead /etc/termcaps/* let b:ptcap_type = "term" |
+				       \ set filetype=ptcap
+
+若你在向后滚动时注意到高亮错误，而用 CTRL-L 重绘后就恢复正常，请尝试把
+"ptcap_minlines" 这个内部变量设得更大： >
+
+   :let ptcap_minlines = 50
+
+（默认是 20 行。）
+
+
+PROGRESS					*ft-progress-syntax*
+
+匹配 "*.w" 的文件可能是 Progress，也可能是 cweb。若自动检测对你不适用，
+或者你根本不编辑 cweb，请在启动 vimrc 中这样写： >
+   :let filetype_w = "progress"
+"*.i"（可能是汇编）和 "*.p"（可能是 Pascal）也是如此。若你不使用汇编和
+Pascal，请用： >
+   :let filetype_i = "progress"
+   :let filetype_p = "progress"
+
+
+PYTHON							*ft-python-syntax*
+
+有七个选项用于控制 Python 语法高亮。
+
+要高亮数字： >
+	:let python_no_number_highlight = 1
+
+要高亮内置函数： >
+	:let python_no_builtin_highlight = 1
+
+要高亮标准异常： >
+	:let python_no_exception_highlight = 1
+
+要高亮 doctest 及其内部代码： >
+	:let python_no_doctest_highlight = 1
+或 >
+	:let python_no_doctest_code_highlight = 1
+第一个选项蕴含第二个。
+
+要高亮行尾空格以及空格与 Tab 混用： >
+	:let python_space_error_highlight = 1
+
+要高亮与其它关键字区分开的内置常量： >
+	:let python_constant_highlight = 1
+
+若你需要所有可能的 Python 高亮： >
+	:let python_highlight_all = 1
+其效果等同于设置 python_space_error_highlight、python_constant_highlight，
+并取消设置所有其它选项。
+
+若你使用 Python 2 或兼容二者的代码（同时兼容 Python 2 和 3），可以强制使用
+支持 Python 2 至 Python 3.5 的旧版语法文件。 >
+	:let python_use_python2_syntax = 1
+该选项会排除所有 Python 3.6 及以上的现代特性。
+
+注意：这些选项只在意是否存在，而不在意其取值。
+      你可以把上面的 1 换成任何值。
+
+
+QUAKE							*ft-quake-syntax*
+
+Quake 语法定义应当适用于大多数基于某个 Quake 引擎的 FPS（第一人称射击）游戏。
+不过三个游戏（Quake、Quake 2 和 Quake 3 Arena）的命令名略有差异，所以该语法
+定义会检查三个全局变量是否存在，以便用户指定其文件里哪些命令是合法的。这
+三个变量可分别设置，产生下列效果：
+
+设为高亮仅在 Quake 中可用的命令： >
+	:let quake_is_quake1 = 1
+
+设为高亮仅在 Quake 2 中可用的命令： >
+	:let quake_is_quake2 = 1
+
+设为高亮仅在 Quake 3 Arena 中可用的命令： >
+	:let quake_is_quake3 = 1
+
+这三个变量的任意组合都合法，但可能高亮出比游戏中实际可用更多的命令。
+
+
+R								*ft-r-syntax*
+
+R 代码的语法高亮解析会从往前 40 行处开始，但你可以用 |vimrc| 把该值改成
+别的数字。例如： >
+	let r_syntax_minlines = 60
+
+也可以关掉 ROxygen 的语法高亮： >
+	let r_syntax_hl_roxygen = 0
+
+对由圆括号、方括号和花括号界定的代码启用折叠： >
+	let r_syntax_folding = 1
+
+并把后面紧跟左括号的关键字统统高亮为函数： >
+	let r_syntax_fun_pattern = 1
+
+
+R MARKDOWN						*ft-rmd-syntax*
+
+要禁用 YAML 文件头的语法高亮，就在 |vimrc| 中加入： >
+	let rmd_syn_hl_yaml = 0
+
+要禁用引用键的语法高亮： >
+	let rmd_syn_hl_citations = 0
+
+要高亮 knitr 代码块头中的 R 代码： >
+	let rmd_syn_hl_chunk = 1
+
+默认情况下，R 代码块会按 R 语言的规则高亮。此外，只要 buffer 被保存，Vim
+就会扫描该 buffer，并把新出现的代码块里其它语言也高亮出来。LaTeX 代码同样
+会在 buffer 被保存时被自动识别并高亮。这一行为可由变量
+`rmd_dynamic_fenced_languages` 和 `rmd_include_latex` 控制，它们的合法取值
+为： >
+	let rmd_dynamic_fenced_languages = 0 " No autodetection of languages
+	let rmd_dynamic_fenced_languages = 1 " Autodetection of languages
+	let rmd_include_latex = 0 " Don't highlight LaTeX code
+	let rmd_include_latex = 1 " Autodetect LaTeX code
+	let rmd_include_latex = 2 " Always include LaTeX highlighting
+
+如果 `rmd_dynamic_fenced_languages` 的值为 0，你仍然可以设置一张语言列表，
+让其中各语言的代码块被正确高亮，如下例所示： >
+	let rmd_fenced_languages = ['r', 'python']
+
+
+R RESTRUCTURED TEXT					*ft-rrst-syntax*
+
+要高亮 knitr 代码块头中的 R 代码，就在 |vimrc| 中加入： >
+	let rrst_syn_hl_chunk = 1
+
+
+RASI						*ft-rasi-syntax*
+
+Rasi 是 Rofi Advanced Style Information 的缩写。程序 rofi 用它来设定搜索
+window 的渲染样式。该语言深受 CSS 样式表启发。下列扩展名的文件会被识别为
+rasi 文件：.rasi。
+
+READLINE					*ft-readline-syntax*
+
+readline 库主要由 BASH shell 使用，而后者在已有命令和选项之外又加了不少。
+要把这些也一并高亮，可以在 |vimrc| 里加入下面的设置，或者在加载带 readline
+语法的文件之前直接在命令行中输入它： >
+	let readline_has_bash = 1
+
+这样就会为 BASH（2.05a 及之后的版本，以及早前的一部分版本）新增的命令加上
+高亮。
+
+
+REGO							*ft-rego-syntax*
+
+Rego 是由 Styra 开发的一种查询语言。它主要被用作 kubernetes 的策略语言，
+但几乎可以套用到任何东西上。下列扩展名的文件会被识别为 rego 文件：.rego。
+
+
+RESTRUCTURED TEXT				*ft-rst-syntax*
+
+对选定的一部分文件类型，文档内的代码块会启用语法高亮。默认的语法列表见
+$VIMRUNTIME/syntax/rst.vim。
+
+要设置自定义的代码块语法高亮列表： >
+	let rst_syntax_code_list = ['vim', 'lisp', ...]
+
+要把多种代码块类型指定给同一个语法，可把 `rst_syntax_code_list` 定义成
+映射： >
+	let rst_syntax_code_list = {
+		\ 'cpp': ['cpp', 'c++'],
+		\ 'bash': ['bash', 'sh'],
+		...
+	\ }
+
+要对强调文本使用彩色高亮： >
+	let rst_use_emphasis_colors = 1
+
+要启用按章节折叠： >
+	let rst_fold_enabled = 1
+
+注意，折叠在某些平台上可能引起性能问题。
+
+最小行语法同步设为 50。要修改这个数字： >
+	let rst_minlines = 100
+
+
+REXX							*ft-rexx-syntax*
+
+如果你在向后滚动时看到高亮错误，而用 CTRL-L 重绘后这些错误就消失了，可以
+试着把内部变量 "rexx_minlines" 设成更大的数： >
+	:let rexx_minlines = 50
+这会让语法同步从第一个被显示的行之前 50 行处开始。默认值是 10。用更大数值
+的缺点是重绘可能变慢。
+
+Vim 会尝试猜测 ".r" 文件属于哪种类型。如果（从注释行）判断不出来，默认是
+"r"。要让默认变成 rexx，就把下面这行加进你的 vimrc：		*g:filetype_r*
+>
+	:let g:filetype_r = "r"
+
+
+RUBY							*ft-ruby-syntax*
+
+    Ruby: 运算符高亮			|ruby_operators|
+    Ruby: 空白字符错误			|ruby_space_errors|
+    Ruby: 折叠				|ruby_fold| |ruby_foldable_groups|
+    Ruby: 减少开销大的操作		|ruby_no_expensive| |ruby_minlines|
+    Ruby: 对字符串做拼写检查		|ruby_spellcheck_strings|
+
+						*ruby_operators*
+ Ruby: 运算符高亮 ~
+
+通过定义 "ruby_operators" 就可以高亮运算符： >
+
+	:let ruby_operators = 1
+<
+						*ruby_space_errors*
+ Ruby: 空白字符错误 ~
+
+通过定义 "ruby_space_errors" 就可以高亮空白字符错误： >
+
+	:let ruby_space_errors = 1
+<
+这样会把行尾空白以及前面带一个空格字符的 Tab 高亮为错误。这还可以再细分：
+定义 "ruby_no_trail_space_error" 和 "ruby_no_tab_space_error" 能分别忽略行尾
+空白和空格之后的 Tab。
+
+					*ruby_fold* *ruby_foldable_groups*
+ Ruby: 折叠 ~
+
+通过定义 "ruby_fold" 可以启用折叠： >
+
+	:let ruby_fold = 1
+<
+这会把当前 buffer 或 window 的 'foldmethod' 局部设为 "syntax"，从而在编辑
+Ruby filetype 时启用基于语法的折叠。
+
+默认的折叠相当细，也就是说，像 "if"、"do"、"%w[]" 这样小的语法单元都可能
+产生相应的折叠层级。
+
+你可以设置 "ruby_foldable_groups" 来限制哪些组可折叠： >
+
+	:let ruby_foldable_groups = 'if case %'
+<
+其值是以空格分隔的关键字列表：
+
+    关键字      含义 ~
+    --------  ------------------------------------- ~
+    ALL        大多数块语法（默认）
+    NONE       什么都不算
+    if	       "if" 或 "unless" 块
+    def        "def" 块
+    class      "class" 块
+    module     "module" 块
+    do	       "do" 块
+    begin      "begin" 块
+    case       "case" 块
+    for        "for"、"while"、"until" 循环
+    {	       花括号块或哈希字面量
+    [	       数组字面量
+    %	       用 "%" 记法的字面量，例如 %w(STRING)、%!STRING!
+    /	       正则表达式
+    string     字符串与 shell 命令输出（由 '、"、` 包围）
+    :	       符号
+    #	       多行注释
+    <<	       此处文档（here document）
+    __END__    "__END__" 指令之后的源代码
+
+						*ruby_no_expensive*
+ Ruby: 减少开销大的操作 ~
+
+默认情况下，"end" 关键字按它所闭合的那个块的开始语句来着色。这虽然有
+用，但开销可能很大；如果你遇到重绘变慢（或者你用的终端色彩支持较差），
+也许想通过定义 "ruby_no_expensive" 变量把它关掉： >
+
+	:let ruby_no_expensive = 1
+<
+这种情况下，所有控制关键字都会使用同一种颜色。
+
+						*ruby_minlines*
+
+如果你确实想启用这项特性，但在向后滚动时看到高亮错误、而用 CTRL-L 重绘就
+修好了，可以试着把 "ruby_minlines" 变量设成大于 50 的值： >
+
+	:let ruby_minlines = 100
+<
+理想情况下，这个值应当大到足以涵盖你最大的 class 或 module。
+
+						*ruby_spellcheck_strings*
+ Ruby: 对字符串做拼写检查 ~
+
+如果你定义了 "ruby_spellcheck_strings"，Ruby 语法就会对字符串做拼写检查： >
+
+	:let ruby_spellcheck_strings = 1
+<
+
+SCHEME							*ft-scheme-syntax*
+
+默认只会高亮并正确缩进 R7RS 的关键字。
+
+scheme.vim 还支持 CHICKEN Scheme->C 编译器的扩展。如果需要，就定义
+b:is_chicken 或 g:is_chicken。
+
+
+SDL							*ft-sdl-syntax*
+
+SDL 的高亮大概漏掉了几个关键字，但 SDL 的关键字实在太多，几乎不可能顾全。
+
+新标准 SDL-2000 规定所有标识符区分大小写（以前不是这样），并且所有关键字
+既可以全部用小写、也可以全部用大写。要让高亮体现这一点，可以设置下面的
+变量： >
+	:let sdl_2000=1
+
+这同时还会设定许多新的关键字。如果你想禁用旧的关键字（这大概是个好主意），
+就用： >
+	:let SDL_no_96=1
+
+
+缩进大概也不完整，不过就我自己的项目而言，目前我对它非常满意。
+
+
+SED							*ft-sed-syntax*
+
+要让 Tab 与普通空格明显区分开（办法是对 Tab 使用 Todo 高亮），可以这样
+定义 "g:sed_highlight_tabs"： >
+
+	:let g:sed_highlight_tabs = 1
+<
+也就是把它放进 vimrc 文件里。（这种特殊高亮只适用于搜索模式、替换文本、
+地址，或由 Append/Change/Insert 命令带入的文本内部的 Tab。）如果你启用了
+这个选项，顺便把 Tab 宽度设成一个字符也是个好主意；这样一来，你就能轻易
+数出字符串里有几个 Tab。
+
+GNU sed 允许在同一行里于文本之后加注释。BSD sed 只允许 "#" 作为行首字符
+出现的位置有注释。要强制 BSD 风格，也就是把行尾注释标记为错误，就用： >
+
+	:let g:sed_dialect = "bsd"
+<
+注意 GNU sed 与 BSD sed 之间还有别的差异，这些差异（目前）不受该设置影响。
+
+Bugs（缺陷）：
+
+  transform 命令（y）被完全当作 substitute 命令来处理。这意味着，就此
+  语法文件而言，transform 接受与 substitute 相同的标志，而这是错的。
+  （transform 不接受任何标志。）我容忍这个缺陷，因为涉及的命令需要
+  极其复杂的处理（95 个模式，每个可能的模式分隔符各一个）。
+
+
+SGML							*ft-sgml-syntax*
+
+SGML 文件里 tag 的着色方案如下。
+
+开标签的 <> 与闭标签的 </> 着上不同的颜色。这是故意的！开标签用
+'Function' 颜色，闭标签用 'Type' 颜色（参见 syntax.vim 以了解它们为你
+是如何定义的）。
+
+已知的 tag 名与 C 中的语句着同样的颜色。未知的 tag 名不着色，这样一眼就能
+看出错误。
+
+注意，参数（或属性）名也是如此。已知的属性名与未知的属性名着色不同。
+
+有些 SGML tag 用于改变文本的渲染方式。下列 tag 会被 sgml.vim 语法着色文件
+识别，并改变普通文本的显示方式：<varname> <emphasis> <command> <function>
+<literal> <replaceable> <ulink> 和 <link>。
+
+如果你想改变这类文本的渲染方式，就必须重新定义下列语法组：
+
+    - sgmlBold
+    - sgmlBoldItalic
+    - sgmlUnderline
+    - sgmlItalic
+    - sgmlLink（用于链接）
+
+要让这种重新定义生效，你必须把它们全部重新定义，并在你的 vimrc 里定义下面
+这个变量（这是由初始化期间读取文件的顺序决定的） >
+   let sgml_my_rendering=1
+
+你也可以把下面这行加进 vimrc 文件来禁用这种渲染： >
+   let sgml_no_rendering=1
+
+（改编自 Claudio Fleiner <claudio@fleiner.com> 编写的 html.vim 帮助文本）
+
+
+		*ft-posix-syntax* *ft-dash-syntax*
+SH		*ft-sh-syntax*  *ft-bash-syntax*  *ft-ksh-syntax*
+
+这里涵盖较老的 Unix（Bourne）sh，以及 bash、dash、posix 和 Korn shell 等
+较新的 shell 的语法高亮。
+
+Vim 会尝试通过指明各种文件名属于特定类型（例如下面这些）来判断当前用的是
+哪种 shell： >
+
+    ksh : .kshrc* *.ksh
+    bash: .bashrc* bashrc bash.bashrc .bash_profile* *.bash
+<
+完整的模式列表见 $VIMRUNTIME/filetype.vim。如果这些情况都不适用，就会检查
+文件的第一行（例如查找 /bin/sh  /bin/ksh  /bin/bash）。如果第一行指明了
+shell 类型，就采用该类型。然而有些文件（例如 .profile）已知是 shell 文件，
+却看不出来具体是哪种类型。此外，在很多系统上 sh 是 "bash"（Linux、
+Windows+cygwin）或 "ksh"（POSIX）的符号链接。
+
+可以在 vimrc 中实例化下面这些变量之一来指定全局默认值：
+
+   ksh: >
+	let g:is_kornshell = 1
+<   posix:（默认） >
+	let g:is_posix     = 1
+<   bash: >
+	let g:is_bash	   = 1
+<   dash: >
+	let g:is_dash	   = 1
+<   sh: Bourne shell >
+	let g:is_sh	   = 1
+
+具体 shell 的哪些特性会自动启用，取决于从 shebang 行（"#! ..."）检测到的
+shell。对于 KornShell，Vim 会针对 mksh、ksh88、ksh93、ksh93u、ksh93v 和
+ksh2020 检测不同的 shell 特性。
+
+如果没有 "#! ..." 行，而用户又没有像刚才所示那样设置 sh.vim 的默认语法，
+syntax/sh.vim 就会假定使用 POSIX shell 语法。在错误报告里不必引用 RFC 或
+市场占有率统计，谢谢——只需选中你系统所用 sh 的默认版本，并把相应的
+"let..." 装进你的 <.vimrc> 里即可。
+
+syntax/sh.vim 文件提供几档基于语法的折叠： >
+
+	let g:sh_fold_enabled= 0     (default, no syntax folding)
+	let g:sh_fold_enabled= 1     (enable function folding)
+	let g:sh_fold_enabled= 2     (enable heredoc folding)
+	let g:sh_fold_enabled= 4     (enable if/do/for folding)
+
+这时各种语法项（也就是 HereDocument 和函数体）就变得可按语法折叠（见
+|:syn-fold|）。你也可以把这些数值相加，以获得多种类型的折叠： >
+
+	let g:sh_fold_enabled= 3     (enables function and heredoc folding)
+
+如果你在向后滚动时看到高亮错误、而用 CTRL-L 重绘一次就好，可以试着把
+"sh_minlines" 内部变量设成更大的数。例如： >
+
+	let sh_minlines = 500
+
+这会让语法同步从第一个被显示的行之前 500 行处开始。默认值是 200。用更大
+数值的缺点是重绘可能变慢。
+
+如果可供同步的内容不多，显示可能非常慢。为减轻这一点，可以设置
+"sh_maxlines" 内部变量。例如： >
+
+	let sh_maxlines = 100
+<
+默认取 sh_minlines 的两倍。把它设成更小的数可以加快显示。缺点是可能出现
+高亮错误。
+
+syntax/sh.vim 会试着把某些问题标记为错误；通常是"["、"done"、"fi" 之类
+没有配对的情形。如果你觉得这种错误处理对自己的用途有妨碍，可以通过在
+.vimrc 里加入下面这行来抑制这类错误高亮： >
+
+	let g:sh_no_error= 1
+<
+
+						*sh-embed*  *sh-awk*
+ Sh: 嵌入语言~
+
+你也许希望把别的语言嵌入 sh。这里给出一个由 Lorance Stinson 提供的例子，
+说明怎样以 awk 为例做到这一点。请把下面这个文件放到
+$HOME/.config/nvim/after/syntax/sh/awkembed.vim： >
+
+    " AWK Embedding:
+    " ==============
+    " Shamelessly ripped from aspperl.vim by Aaron Hope.
+    if exists("b:current_syntax")
+      unlet b:current_syntax
+    endif
+    syn include @AWKScript syntax/awk.vim
+    syn region AWKScriptCode matchgroup=AWKCommand start=+[=\\]\@<!'+ skip=+\\'+ end=+'+ contains=@AWKScript contained
+    syn region AWKScriptEmbedded matchgroup=AWKCommand start=+\<awk\>+ skip=+\\$+ end=+[=\\]\@<!'+me=e-1 contains=@shIdList,@shExprList2 nextgroup=AWKScriptCode
+    syn cluster shCommandSubList add=AWKScriptEmbedded
+    hi def link AWKCommand Type
+<
+这段代码之后就会让单引号中的 awk 代码： >
+	awk '...awk code here...'
+使用 awk 的高亮语法来高亮。显然，这也可以推广到其它语言。
+
+
+SPEEDUP							*ft-spup-syntax*
+（AspenTech 工厂模拟器）
+
+Speedup 的语法文件有几个选项：
+
+- strict_subsections：若定义了这个变量，只有 section 与 subsection 的
+  关键字会被高亮为语句，其它关键字（如 OPERATION 段里的 WITHIN）则不会。
+
+- highlight_types：定义这个变量会让温度、压力之类的流类型被高亮为
+  Type，而不是普通的 Identifier。其中包含通常出现在 DECLARE 段里的
+  类型；如果你定义了自己的类型，就必须把它们加进语法文件里。
+
+- oneline_comments：该值从 1 到 3，决定 # 风格注释的高亮方式。
+
+  oneline_comments = 1：在偶数个 # 之后允许正常 Speedup 代码。
+
+  oneline_comments = 2：把从第二个 # 开始的代码显示为错误。这是默认
+  设置。
+
+  oneline_comments = 3：若一行里含多于一个 #，则把整行显示为错误。
+
+由于 OPERATION 段常常因为 PRESET 各种变量而变得极大，同步可能很关键。
+如果你的计算机足够快，可以在语法文件末尾附近把 minlines 和/或 maxlines
+调大。
+
+
+SQL							*ft-sql-syntax*
+					*ft-sqlinformix-syntax*
+					*ft-sqlanywhere-syntax*
+
+虽然 SQL 有 ANSI 标准，但大多数数据库引擎都会加上自己的扩展。Vim 目前
+支持 SQL 的 Oracle 和 Informix 方言。Vim 默认把 "*.sql" 文件当作 Oracle
+SQL。
+
+Vim 目前通过语法脚本支持众多不同厂商的 SQL。你可以把 Vim 的默认从 Oracle
+改成当前支持的任何 SQL 类型。你也可以轻易地逐 buffer 地改变所用的 SQL
+方言。
+
+更详细的操作说明见 |ft_sql.txt|。
+
+
+SQUIRREL					*ft-squirrel-syntax*
+
+Squirrel 是一门高层的命令式面向对象编程语言，设计目标是成为一种轻量的
+脚本语言，以契合电子游戏之类应用在体积、内存带宽和实时性方面的要求。下列
+扩展名的文件会被识别为 squirrel 文件：.nut。
+
+
+TCSH							*ft-tcsh-syntax*
+
+这里涵盖名为 "tcsh" 的 shell。它是 csh 的超集。filetype 是如何检测出来
+的，见 |ft-csh-syntax|。
+
+除非设置了 "backslash_quote" shell 变量，tcsh 不允许字符串中出现 \"。如果
+你想让 VIM 假定不存在反斜杠引号结构，就把下面这行加进你的 vimrc： >
+
+	:let tcsh_backslash_quote = 0
+
+如果你在向后滚动时看到高亮错误、而用 CTRL-L 重绘就好，可以试着把
+"tcsh_minlines" 内部变量设成更大的数： >
+
+	:let tcsh_minlines = 1000
+
+这会让语法同步从第一个被显示的行之前 1000 行处开始。若把 "tcsh_minlines"
+设为 "fromstart"，则从文件开头开始同步。tcsh_minlines 的默认值是 100。
+用更大数值的缺点是重绘可能变慢。
+
+
+TEX					*ft-tex-syntax* *latex-syntax*
+				*syntax-tex* *syntax-latex*
+
+			Tex 目录~
+	Tex: 想要语法折叠？				|tex-folding|
+	Tex: 不想要拼写检查				|g:tex_nospell|
+	Tex: 不想要对注释做拼写检查？			|tex-nospell|
+	Tex: 想对 Verbatim 区域做拼写检查？		|tex-verb|
+	Tex: Run-on 注释或 MathZone			|tex-runon|
+	Tex: 语法高亮慢？				|tex-slow|
+	Tex: 想高亮更多命令？				|tex-morecommands|
+	Tex: 错误高亮过多？				|tex-error|
+	Tex: 需要一个新 Math 组？			|tex-math|
+	Tex: 要开始一种新 Style？			|tex-style|
+	Tex: 利用 Conceal 模式				|tex-conceal|
+	Tex: 选择性 Conceal 模式			|g:tex_conceal|
+	Tex: 控制 iskeyword				|g:tex_isk|
+	Tex: 精细控制上下标				|tex-supersub|
+	Tex: 控制 Match 检查				|tex-matchcheck|
+
+				*tex-folding* *g:tex_fold_enabled*
+ Tex: 想要语法折叠？ ~
+
+从 <syntax/tex.vim> 的第 28 版起，支持对 part、chapter、section、subsection
+等按语法折叠。把 >
+	let g:tex_fold_enabled=1
+放进你的 vimrc，并 :set fdm=syntax。我建议后者通过 LaTeX 文件末尾的
+modeline 来做： >
+	% vim: fdm=syntax
+如果你的系统变得太慢，那么不妨看看 >
+	https://vimhelp.org/vim_faq.txt.html#faq-29.7
+<
+						*g:tex_nospell*
+ Tex: 不想要拼写检查~
+
+如果你不想在 LaTeX 文档的任何地方做拼写检查，就把 >
+	let g:tex_nospell=1
+放进你的 vimrc。如果你只是想抑制注释内部的拼写检查，见
+|g:tex_comment_nospell|。
+
+				*tex-nospell* *g:tex_comment_nospell*
+ Tex: 不想要对注释做拼写检查？ ~
+
+有些人喜欢在注释里放源代码之类的东西，因而希望 LaTeX 文件中的注释禁用
+拼写检查。要做到这一点，就把下面这行放进你的 vimrc： >
+      let g:tex_comment_nospell= 1
+如果你想抑制 LaTeX 文档内部任何位置的拼写检查，见 |g:tex_nospell|。
+
+				*tex-verb* *g:tex_verbspell*
+ Tex: 想对 Verbatim 区域做拼写检查？~
+
+verbatim 区域常常被用来放源代码之类的东西；很少有人希望源代码被拼写检查。
+不过，如果你确实想让 verbatim 区域也做拼写检查，就把下面这行放进你的
+vimrc： >
+	let g:tex_verbspell= 1
+<
+					*tex-runon* *tex-stopzone*
+ Tex: Run-on 注释或 MathZone ~
+
+<syntax/tex.vim> 的高亮支持 TeX、LaTeX 以及部分 AmsTeX。该高亮支持三个主要
+的 zone/region：normal、texZone 和 texMathZone。尽管为了让这些 zone 正确
+终止已经付出了相当大的努力，但由 $..$ 和 $$..$$ 界定的 zone 无法同步，因为
+其开始与结束模式没有区别。于是提供了一条特殊的 "TeX 注释" >
+	%stopzone
+用来强制终止 texZone 或 texMathZone 的高亮。
+
+					*tex-slow* *tex-sync*
+ Tex: 语法高亮慢？ ~
+
+如果你的计算机较慢，可以调低下面这些值 >
+	:syn sync maxlines=200
+	:syn sync minlines=50
+（尤其是后一项）。如果你的计算机很快，也可以把它们调大。这主要影响同步
+（也就是说，屏幕顶端的文本究竟应当属于哪个组，如果有的话）。
+
+另一处导致高亮变慢的原因是语法驱动的折叠；绕开它的办法见 |tex-folding|。
+
+					*g:tex_fast*
+
+最后，如果语法高亮仍然太慢，你可以设置 >
+
+	:let g:tex_fast= ""
+
+（放在你的 vimrc 里）。这样使用的话，g:tex_fast 变量会让语法高亮脚本不去
+定义任何 region 及相应的同步。结果将是快得多的语法高亮；代价是：你不再
+拥有那么多高亮，也没有基于语法的折叠，并且会失去基于语法的错误检查。
+
+你或许觉得保留一部分语法是可以接受的；你可以有选择地用下表来只启用一部分
+语法高亮： >
+
+    b : allow bold and italic syntax
+    c : allow texComment syntax
+    m : allow texMatcher syntax (ie. {...} and [...])
+    M : allow texMath syntax
+    p : allow parts, chapter, section, etc syntax
+    r : allow texRefZone syntax (nocite, bibliography, label, pageref, eqref)
+    s : allow superscript/subscript regions
+    S : allow texStyle syntax
+    v : allow verbatim syntax
+    V : allow texNewEnv and texNewCmd syntax
+<
+举例来说，let g:tex_fast= "M" 会启用与数学相关的高亮，但抑制其它所有基于
+region 的语法高亮。（另见：|g:tex_conceal| 和 |tex-supersub|）
+
+					*tex-morecommands* *tex-package*
+ Tex: 想高亮更多命令？ ~
+
+LaTeX 是一门可编程的语言，因而有成千上万个包，里面满是专用的 LaTeX 命令、
+语法和字体。如果你正在用这样的包，往往就会希望发行版自带的 syntax/tex.vim
+能支持它。然而这显然不现实。所以请考虑使用 |mysyntaxfile-add| 中的技巧来
+扩展或修改 syntax/tex.vim 提供的高亮。
+
+我在自己的网站上收录了对若干流行包的一些支持： >
+
+	https://www.drchip.org/astronaut/vim/index.html#LATEXPKGS
+<
+那里的语法文件放进你的 .../after/syntax/tex/ 目录即可。
+
+					*tex-error* *g:tex_no_error*
+ Tex: 错误高亮过多？ ~
+
+<tex.vim> 支持多种词法错误检查。因此，尽管这种错误检查常常很有用，它也会
+在根本没有错误的地方报出错误。如果这对你构成了问题，可以把下面这条语句
+放进你的 vimrc： >
+	let g:tex_no_error=1
+这样 <syntax/tex.vim> 的所有错误检查都会被抑制。
+
+								*tex-math*
+ Tex: 需要一个新 Math 组？ ~
+
+如果你想在自己 LaTeX 里加入一个新的 math 组，下面的代码给你演示了可以怎么
+做： >
+	call TexNewMathZone(sfx,mathzone,starform)
+你要给这个新 math 组提供一个唯一的后缀（目前 A-L 和 V-Z 已被
+<syntax/tex.vim> 自己占用了）。举个例子，看看 eqnarray 在
+<syntax/tex.vim> 里是怎么设置的： >
+	call TexNewMathZone("D","eqnarray",1)
+你需要把 "mathzone" 改成新 math 组的名字，然后在 .vim/after/syntax/tex.vim
+里调用它。"starform" 变量若为真，意味着你的新 math 组有带星号的形式
+（即 eqnarray*）。
+
+					*tex-style* *b:tex_stylish*
+ Tex: 要开始一种新 Style？ ~
+
+可以在 `*.tex` 文件里使用 "\makeatletter"，从而让命令中的 "@" 可用。然而，
+由于 `*.tex` 文件并不具有下列后缀之一：sty cls clo dtx ltx，语法高亮会把
+这种 @ 的使用标记为错误。要解决这个问题： >
+
+	:let b:tex_stylish = 1
+	:set ft=tex
+
+把 "let g:tex_stylish=1" 放进你的 vimrc，就会让 <syntax/tex.vim> 总是接受
+这种 @ 的使用。
+
+					*tex-cchar* *tex-cole* *tex-conceal*
+ Tex: 利用 Conceal 模式~
+
+如果你把 'conceallevel' 设成 2，并且编码是 utf-8，那么许多字符序列都可以
+被转换成合适的 utf-8 字形，包括各种带重音的字符、MathZone 里的希腊字符，
+以及 MathZone 里的上标和下标。并非所有字符都能变成上标或下标；这一限制
+源于 utf-8 所支持的范围。事实上，只有少数几个字符支持作为下标。
+
+使用它的一种办法是开垂直分割的 window（见 |CTRL-W_v|）；一个的
+'conceallevel' 设为 0，另一个设为 2；两者都用 'scrollbind'。
+
+					*g:tex_conceal*
+ Tex: 选择性 Conceal 模式~
+
+你可以在 vimrc 里设置 g:tex_conceal，从而有选择地使用 conceal 模式。
+默认情况下，g:tex_conceal 被设成 "admgs"，以便对下面这几组字符启用
+conceal： >
+
+	a = accents/ligatures
+	b = bold and italic
+	d = delimiters
+	m = math symbols
+	g = Greek
+	s = superscripts/subscripts
+<
+只要把其中一项或几项去掉，与之对应的 conceal 字符替换就不会发生。
+
+						*g:tex_isk* *g:tex_stylish*
+ Tex: 控制 iskeyword~
+
+通常 LaTeX 关键字只支持 0-9、a-z、A-z 和 192-255。Latex 关键字不支持
+下划线——除非是在 `*.sty` 文件里。syntax 高亮脚本用下面的逻辑处理这件事：
+
+	* 如果 g:tex_stylish 存在且为 1
+		那么该文件被当作 "sty" 文件处理，因此 "_" 会被允许
+		作为关键字的一部分
+		（与 g:tex_isk 无关）
+	* 否则，如果文件后缀是 sty、cls、clo、dtx 或 ltx，
+		那么该文件被当作 "sty" 文件处理，因此 "_" 会被允许
+		作为关键字的一部分
+		（与 g:tex_isk 无关）
+
+	* 如果 g:tex_isk 存在，那么它会被用作本地的 'iskeyword'
+	* 否则本地的 'iskeyword' 会被设成 48-57,a-z,A-Z,192-255
+
+			*tex-supersub* *g:tex_superscripts* *g:tex_subscripts*
+ Tex: 精细控制上下标~
+
+	关于如何启用 conceal 字符替换，见 |tex-conceal|。
+
+	关于如何有选择地 conceal 重音符、粗体/斜体、数学符号、希腊字母以及
+	上标/下标，见 |g:tex_conceal|。
+
+	对于想让哪些上标和下标使用基于 syntax 的 conceal，你还可以做更精细的
+	控制（见 |:syn-cchar|）。由于并非所有字体都支持所有字符，你也可以
+	覆盖 conceal 替换列表；默认情况下这些列表由下面给出： >
+
+	    let g:tex_superscripts= "[0-9a-zA-W.,:;+-<>/()=]"
+	    let g:tex_subscripts= "[0-9aehijklmnoprstuvx,+-/().]"
+<
+	举个例子，我用的是 Luxi Mono Bold；它不支持 "hklmnpst" 这些下标
+	字符，所以我在 ~/.config/nvim/ftplugin/tex/tex.vim 里写上 >
+		let g:tex_subscripts= "[0-9aeijoruvx,+-/().]"
+<	以避免出现难以辨认的 utf-8 字形。
+
+					*tex-matchcheck* *g:tex_matchcheck*
+ Tex: 控制 Match 检查~
+
+	有时你确实想要不配对的圆括号、方括号或花括号；例如 \text{(1,10]}
+	表示从但不包括 1 到且包括 10 的区间。当然，这种愿望与提供定界符不配对
+	检测的愿望是冲突的。为了兼顾这两个相互冲突的目标，syntax/tex.vim 提供 >
+		g:tex_matchcheck = '[({[]'
+<	上面一并给出了它的默认设置。所以，如果你不想对 [] 和 () 做
+	不配对检查，可以试试用 >
+		let g:tex_matchcheck= '[{}]'
+<	如果你不想让配对检查发生在粗体和斜体区域内部，那么 >
+		let g:tex_excludematcher= 1
+<	会阻止 texMatcher 组被包含到那些区域里。
+
+TF							*ft-tf-syntax*
+
+tf 的 syntax 高亮有一个选项。
+
+对于同步来说，minlines 默认为 100。如果你更喜欢别的值，可以把
+"tf_minlines" 设成你想要的值。例如： >
+
+	:let tf_minlines = your choice
+<
+TYPESCRIPT		     *ft-typescript-syntax* *ft-typescriptreact-syntax*
+
+控制 TypeScript syntax 高亮的选项只有一个。
+
+						*g:typescript_host_keyword*
+当把这个变量设成 1 时，诸如 `addEventListener` 这类宿主特有的 API 会被
+高亮。要禁用它，就在你的 .vimrc 里把它设成 0： >
+
+	let g:typescript_host_keyword = 0
+<
+默认值是 1。
+
+TYPST						    *ft-typst-syntax*
+
+						*g:typst_embedded_languages*
+通过设置 |g:typst_embedded_languages| 变量，Typst 文件可以内嵌对其他语言的
+syntax 高亮。该变量是一个语言名列表，这些语言的 syntax 定义会被包含进
+Typst 文件里。例如： >
+
+    let g:typst_embedded_languages = ['python', 'r']
+
+VIM		    *ft-vim-syntax* *g:vimsyn_minlines* *g:vimsyn_maxlines*
+
+在更精确的 syntax 高亮与屏幕更新速度之间需要权衡。为了提高准确性，你也许
+想调大 g:vimsyn_minlines 变量。g:vimsyn_maxlines 变量可用于改善屏幕更新
+速率（更多相关内容见 |:syn-sync|）。 >
+
+	g:vimsyn_minlines : used to set synchronization minlines
+	g:vimsyn_maxlines : used to set synchronization maxlines
+<
+	（g:vim_minlines 和 g:vim_maxlines 是这两个选项的弃用变体）
+
+						*g:vimsyn_embed*
+g:vimsyn_embed 选项让用户选择是否要内嵌脚本的 syntax 高亮，以及要哪几种。 >
+
+   g:vimsyn_embed == 0       : disable (don't embed any scripts)
+   g:vimsyn_embed ==# 'lpPr' : support embedded Lua, Perl, Python and Ruby
+<
+默认情况下 g:vimsyn_embed 未设置，并且支持内嵌的 Lua 脚本。
+
+						*g:vimsyn_folding*
+当 'foldmethod' 设成 "syntax" 时，现在支持某些折叠： >
+
+   g:vimsyn_folding == 0 or doesn't exist: no syntax-based folding
+   g:vimsyn_folding =~# 'a' : fold augroups
+   g:vimsyn_folding =~# 'f' : fold functions
+   g:vimsyn_folding =~# 'h' : fold let heredocs
+   g:vimsyn_folding =~# 'l' : fold Lua      heredocs
+   g:vimsyn_folding =~# 'p' : fold Perl     heredocs
+   g:vimsyn_folding =~# 'P' : fold Python   heredocs
+   g:vimsyn_folding =~# 'r' : fold Ruby     heredocs
+<
+
+默认情况下 g:vimsyn_folding 未设置。把指明的字符连起来写，就能支持对多种
+syntax 构造的折叠（例如 g:vimsyn_folding = "fh" 会同时启用对函数和 heredoc
+的折叠）。
+
+						*g:vimsyn_comment_strings*
+默认情况下，字符串在注释内部也会被高亮。把 g:vimsyn_comment_strings 设成
+false 可以禁用这一点。
+
+						*g:vimsyn_noerror*
+syntax/vim.vim 做的错误高亮未必都正确；Vim script 是一种很难正确高亮的
+语言。要抑制错误高亮，可以把下面这行放进你的 |vimrc|： >
+
+	let g:vimsyn_noerror = 1
+<
+
+
+WDL								*wdl-syntax*
+
+Workflow Description Language 是一种用人类可读可写的语法来描述数据处理
+工作流的方式。它在生物信息学里用得很多。关于该规范的更多信息可在这里找到：
+https://github.com/openwdl/wdl
+
+
+XF86CONFIG					*ft-xf86conf-syntax*
+
+XF86Config 文件的语法在 XFree86 v3.x 和 v4.x 中有所不同。两种变体都支持。
+程序会做自动检测，但远非完美。你可能需要手动指明版本。根据你的 XFree86
+版本，在你的 vimrc 里把 xf86conf_xfree86_version 变量设成 3 或 4。例如： >
+	:let xf86conf_xfree86_version=3
+当混用多个版本时，请设置 b:xf86conf_xfree86_version 变量。
+
+注意选项名里的空格和下划线不被支持。如果你想让选项名被高亮，请用
+"SyncOnGreen"，而不是 "__s yn con gr_e_e_n"。
+
+
+XML							*ft-xml-syntax*
+
+Xml 命名空间默认会被高亮。设置一个全局变量可以禁止这一点： >
+
+	:let g:xml_namespace_transparent=1
+<
+							*xml-folding*
+xml syntax 文件在开始标签与结束标签之间提供了语法 |folding|（见
+|:syn-fold|）。可以通过下面这行来开启 >
+
+	:let g:xml_syntax_folding = 1
+	:set foldmethod=syntax
+
+注意：语法折叠可能显著拖慢 syntax 高亮，尤其是在大型文件里。
+
+
+X Pixmaps (XPM)						*ft-xpm-syntax*
+
+xpm.vim 会根据 XPM 文件的内容动态创建它的 syntax 项。因此，如果你做了改动
+（例如改动颜色描述字符串），就必须重新 source 它，例如用 ":set syn=xpm"。
+
+要用其中某一种颜色复制一个像素，可以用 "yl" 复制一个 "pixel"，再用 "P"
+把它插入到别处。
+
+想用鼠标画画吗？试试下面的做法： >
+   :function! GetPixel()
+   :   let c = getline(".")[col(".") - 1]
+   :   echo c
+   :   exe "noremap <LeftMouse> <LeftMouse>r" .. c
+   :   exe "noremap <LeftDrag>	<LeftMouse>r" .. c
+   :endfunction
+   :noremap <RightMouse> <LeftMouse>:call GetPixel()<CR>
+   :set guicursor=n:hor20	   " to see the color beneath the cursor
+这会把右键变成一个滴管，把左键变成一支笔。它只对每个像素对应一个字符的
+XPM 文件有效，且你不能点击像素字符串之外的地方，不过欢迎自行改进。
+
+如果使用方格尺寸的字体会好看得多，例如对 X 来说： >
+	:set guifont=-*-clean-medium-r-*-*-8-*-*-*-*-80-*
+
+
+YAML							*ft-yaml-syntax*
+
+					*g:yaml_schema* *b:yaml_schema*
+YAML schema 是一组 tag 与一种解析非特定 tag 的机制的组合。对用户而言，这
+意味着 YAML 解析器可能会依据纯标量的内容，把纯标量（其实它只能是字符串，
+别的什么都不是）当作其它类型的值：null、布尔值、浮点数、整数。
+`g:yaml_schema` 选项决定了按哪个 schema 来对某些值做特殊高亮。受支持的
+schema 有
+
+Schema		说明 ~
+failsafe	没有额外的高亮。
+json		支持 JSON 风格的数值、布尔值和 null。
+core		支持更多种类的数值、布尔值和 null 风格。
+pyyaml		除 core schema 之外，还支持高亮时间戳，但在数值的识别上
+		有些差异，并且支持许多 core schema 里没有的布尔值。
+
+默认 schema 是 `core`。
+
+注意 schema 实际上并不限于纯标量，但这是 YAML 规范中定义的各 schema 之间
+唯一的差别，也是该 syntax 文件中定义的唯一差别。
+
+
+ZSH							       *ft-zsh-syntax*
+
+zsh 的 syntax 脚本允许使用基于语法的折叠： >
+
+	:let g:zsh_fold_enable = 1
+
+==============================================================================
+6. 定义 syntax					*:syn-define* *E410*
+
+Vim 理解三种类型的 syntax 项：
+
+1. Keyword
+   它只能包含关键字字符，具体是 |:syn-iskeyword| 或 'iskeyword' 选项所
+   指定的那些字符。它不能包含其它 syntax 项。它只在匹配一个完整单词时才
+   算匹配（匹配之前和之后都没有关键字字符）。关键字 "if" 会在 "if(a=b)"
+   中匹配，但不会在 "ifdef x" 中匹配，因为 "(" 不是关键字字符而 "d" 是。
+
+2. Match
+   这是一次对单个正则表达式模式的匹配。
+
+3. Region
+   它从 "start" 正则表达式模式的匹配处开始，到 "end" 正则表达式模式的匹配处
+   结束。中间可以出现任何其它文本。"skip" 正则表达式模式可用来避免匹配
+   "end" 模式。
+
+多个 syntax ITEM 可以放进同一个 syntax GROUP。对一个 syntax group，你可以
+给出高亮属性。例如，你可以有一个 item 定义 `/* ... */` 注释，另一个定义
+"// ..." 注释，把两者都放进 "Comment" group。然后你可以指定 "Comment" 使用
+粗体字并带蓝色。你可以自在地为一个 syntax item 建一个 highlight group，或者
+把所有 item 放进一个 group。这取决于你想怎么指定高亮属性。把每个 item 放进
+它自己的 group，会导致你得为很多 group 指定高亮。
+
+注意 syntax group 与 highlight group 是相似的。对一个 highlight group，你会
+给它高亮属性。这些属性会被用于同名的 syntax group。
+
+如果有多个 item 在同一位置匹配，那么最后定义的那个胜出。因此你可以用一个
+匹配相同文本的 item 覆盖先前定义的 syntax item。但 keyword 总是优先于 match
+或 region。而区分大小写的 keyword 总是优先于忽略大小写的 keyword。
+
+
+优先级							*:syn-priority*
+
+当可能有多个 syntax item 匹配时，使用下列规则：
+
+1. 当多个 Match 或 Region item 起始于同一位置时，最后定义的那个 item
+   具有优先权。
+2. Keyword 优先于 Match 和 Region item。
+3. 起始位置更靠前的 item 优先于起始位置更靠后的 item。
+
+
+定义大小写						*:syn-case* *E390*
+
+:sy[ntax] case [match | ignore]
+	这定义了后续的 ":syntax" 命令在使用 "match" 时是否区分大小写，在
+	使用 "ignore" 时是否忽略大小写。注意，此前的任何 item 都不受影响，
+	直到下一条 ":syntax case" 命令为止的所有 item 都受影响。
+
+:sy[ntax] case
+	显示 "syntax case match" 或 "syntax case ignore"。
+
+
+定义 foldlevel						*:syn-foldlevel*
+
+:sy[ntax] foldlevel start
+:sy[ntax] foldlevel minimum
+	这定义了在使用 foldmethod=syntax（见 |fold-syntax| 和 |:syn-fold|）时，
+	如何计算一行的 foldlevel：
+
+	start:		使用包含行首的那个 item 的级别。
+	minimum:	使用行上各 item 的最低局部最小级别。
+
+	默认是 "start"。用 "minimum" 可以在一行里水平地查找该行上包含的、
+	后面跟着更高级别的那个最低级别。当 syntax item 可能在一行内水平地
+	关闭和开启时，这样会产生更自然的折叠。
+
+:sy[ntax] foldlevel
+	显示当前的 foldlevel 方法，即 "syntax foldlevel start" 或
+	"syntax foldlevel minimum"。
+
+拼写检查						*:syn-spell*
+
+:sy[ntax] spell toplevel
+:sy[ntax] spell notoplevel
+:sy[ntax] spell default
+	这定义了不在 syntax item 里的文本在何处做拼写检查：
+
+	toplevel:	文本做拼写检查。
+	notoplevel:	文本不做拼写检查。
+	default:	当存在 @Spell cluster 时不作拼写检查。
+
+	对 syntax item 里的文本，使用 @Spell 和 @NoSpell cluster
+	|spell-syntax|。当既没有 @Spell 也没有 @NoSpell cluster 时，
+	"default" 和 "toplevel" 会做拼写检查。
+
+	要激活拼写检查，必须设置 'spell' 选项。
+
+:sy[ntax] spell
+	显示当前的 syntax 拼写检查方法，即 "syntax spell toplevel"、
+	"syntax spell notoplevel" 或 "syntax spell default"。
+
+
+syntax iskeyword 设置					*:syn-iskeyword*
+
+:sy[ntax] iskeyword [clear | {option}]
+	这定义了关键字字符。它类似 'iskeyword' 选项，但只对 syntax 高亮
+	生效。
+
+	clear:		syntax 专用的 iskeyword 设置被禁用，改用 buffer 局部的
+			'iskeyword' 设置。
+	{option}	把 syntax 的 'iskeyword' 选项设成新值。
+
+	示例： >
+  :syntax iskeyword @,48-57,192-255,$,_
+<
+	这会把 syntax 专用的 iskeyword 选项设成包含所有字母字符，加上数字
+	字符、所有带重音的字符，并且还包含 "_" 和 "$"。
+
+	如果不给参数，则输出当前值。
+
+	设置该选项会影响 |/\k| 在 syntax 模式中匹配什么，也会决定在何处
+	对 |:syn-keyword| 检查新的匹配。
+
+	建议在编写 syntax 文件时用这条命令为具体的 syntax 语言设置正确的
+	值，而不要去改 'iskeyword' 选项。
+
+定义关键字					*:syn-keyword*
+
+:sy[ntax] keyword {group-name} [{options}] {keyword} ... [{options}]
+
+	这定义若干关键字。
+
+	{group-name}	是一个 syntax group 名，例如 "Comment"。
+	[{options}]	见下面的 |:syn-arguments|。
+	{keyword} ...	是属于这个 group 的关键字列表。
+
+	示例： >
+  :syntax keyword   Type   int long char
+<
+	{options} 可以给在行里任何位置。它们会作用于给出的所有关键字，包括
+	出现在某个关键字之后的 options。
+	下面这些例子做的事情完全相同： >
+  :syntax keyword   Type   contained int long char
+  :syntax keyword   Type   int long contained char
+  :syntax keyword   Type   int long char contained
+<								*E789* *E890*
+	当你有一个带可选尾部的关键字（像 Vim 里的 Ex 命令）时，可以把可选
+	字符放进 [] 里，一次定义出所有变体： >
+  :syntax keyword   vimCommand	 ab[breviate] n[ext]
+<
+	别忘了，只有所有字符都包含在 'iskeyword' 选项里，关键字才能被识别。
+	只要有一个字符不在里面，该关键字就永远不会被识别。
+	也可以使用多字节字符。这些字符不必在 'iskeyword' 里。
+	关于定义 syntax 专用的 iskeyword 设置，见 |:syn-iskeyword|。
+
+	关键字总是比 match 或 region 具有更高的优先权，如果有多个 item
+	匹配，则使用关键字。关键字不嵌套，且关键字不能包含任何别的东西。
+
+	注意，当你有一个与某个选项同名的关键字（即使该选项在此处不被允许）
+	时，你就不能使用它。改用 match。
+
+	关键字的最大长度是 80 个字符。
+
+	同一个关键字可以被定义多次，只要它的包含关系不同。例如，你可以把该
+	关键字定义一次为不含在内并使用一个 highlight group，再定义一次为
+	含在内并使用另一个 highlight group。示例： >
+  :syn keyword vimCommand tag
+  :syn keyword vimSetting contained tag
+<	在任何一个 syntax item 之外找到 "tag" 时，使用 "vimCommand" highlight
+	group。在包含 "vimSetting" 的 syntax item 里找到 "tag" 时，使用
+	"vimSetting" group。
+
+
+定义匹配						*:syn-match*
+
+:sy[ntax] match {group-name} [{options}]
+		[excludenl]
+		[keepend]
+		{pattern}
+		[{options}]
+
+	这定义一个 match。
+
+	{group-name}		syntax group 名，例如 "Comment"。
+	[{options}]		见下面的 |:syn-arguments|。
+	[excludenl]		不要让带行尾 "$" 的模式延伸一个包含它的
+				match 或 region。必须给在模式之前。
+				|:syn-excludenl|
+	keepend			不让被包含的 match 越过带 end 模式的
+				匹配处。见 |:syn-keepend|。
+	{pattern}		定义该 match 的搜索模式。
+				见下面的 |:syn-pattern|。
+				注意该模式可能匹配不止一行，这会使该
+				match 取决于 Vim 从何处开始搜索该模式。
+				你需要确保同步机制处理了这一点。
+
+	示例（匹配一个字符常量）： >
+  :syntax match Character /'.'/hs=s+1,he=e-1
+定义区域	*:syn-region* *:syn-start* *:syn-skip* *:syn-end*
+							*E398* *E399*
+:sy[ntax] region {group-name} [{options}]
+		[matchgroup={group-name}]
+		[keepend]
+		[extend]
+		[excludenl]
+		start={start-pattern} ...
+		[skip={skip-pattern}]
+		end={end-pattern} ...
+		[{options}]
+
+	这定义一个 region。它可以跨若干行。
+
+	{group-name}		syntax group 名，例如 "Comment"。
+	[{options}]		见下面的 |:syn-arguments|。
+	[matchgroup={group-name}]  只用于随后那些 start 或 end 模式匹配的
+				syntax group。不用于匹配到的 start 与 end
+				模式之间的文本。用 NONE 可重置为不对
+				start 或 end 匹配使用不同的 group。
+				见 |:syn-matchgroup|。
+	keepend			不让被包含的 match 越过带 end 模式的
+				匹配处。见 |:syn-keepend|。
+	extend			覆盖该 region 所被包含于其中的那个 item 的
+				"keepend"。见 |:syn-extend|。
+	excludenl		不要让带行尾 "$" 的模式延伸一个包含它的
+				match 或 item。只对 end 模式有用。必须给
+				在它所适用的模式之前。|:syn-excludenl|
+	start={start-pattern}	定义该 region 起点的搜索模式。
+				见下面的 |:syn-pattern|。
+	skip={skip-pattern}	定义该 region 内部不去查找 end 模式的
+				那些文本的搜索模式。见下面的 |:syn-pattern|。
+	end={end-pattern}	定义该 region 终点的搜索模式。
+				见下面的 |:syn-pattern|。
+
+	示例： >
+  :syntax region String   start=+"+  skip=+\\"+  end=+"+
+<
+	start/skip/end 模式与 options 可以按任意顺序给出。skip 模式可以有
+	零个或一个。start 和 end 模式必须各有一个或多个。这意味着你可以省
+	略 skip 模式，但至少要给一个 start 和一个 end 模式。允许在等号前后
+	有空白（不过没有空白时通常更好看）。
+
+	当给出多于一个 start 模式时，与其中某一个匹配就足够了。这意味着这些
+	start 模式之间是 OR 关系。使用最后匹配的那一个。end 模式同理。
+
+	对 end 模式的搜索紧接在 start 模式之后开始。这里不使用偏移量。这意味
+	着 end 模式的匹配永远不会与 start 模式重叠。
+
+	skip 和 end 模式可以跨行结束符匹配，但既然该模式的搜索可以从任何一行
+	开始，它往往并不能做到你想要的事。skip 模式不会避免下一行里的 end 模式
+	匹配。请使用单行模式以免麻烦。
+
+	注意：是否开始一个 region 只取决于是否有 start 模式匹配。不会去检查是
+	否有 end 模式匹配。下面这样不行： >
+		:syn region First  start="("  end=":"
+		:syn region Second start="("  end=";"
+<	Second 总是先于 First 匹配（最后定义的模式优先权更高）。然后 Second
+	region 会一直延续到下一个 ';'，无论它前面有没有 ':'。改用 match 是可以的： >
+		:syn match First  "(\_.\{-}:"
+		:syn match Second "(\_.\{-};"
+<	这个模式用 "\_." 匹配任何字符或换行，并用 "\{-}"（尽可能少地重复）
+	重复它。
+
+							*:syn-keepend*
+	默认情况下，一个被包含的 match 可以遮蔽 end 模式的匹配。这对嵌套很有
+	用。例如，一个以 "{" 开始、以 "}" 结束的 region 可以包含另一个 region。
+	那么遇到的 "}" 会结束那个被包含的 region，但不会结束外层 region：
+	    {		开始外层 "{}" region
+		{	开始被包含的 "{}" region
+		}	结束被包含的 "{}" region
+	    }		结束外层 "{}" region
+	如果你不想要这样，"keepend" 参数会让外层 region 的 end 模式匹配也结束
+	任何被包含的 item。这使同一个 region 无法嵌套，但允许被包含的 item 高亮
+	end 模式的某些部分，而不会因此跳过与 end 模式的匹配。示例： >
+  :syn match  vimComment +"[^"]\+$+
+  :syn region vimCommand start="set" end="$" contains=vimComment keepend
+<	"keepend" 使 vimCommand 总是在行尾结束，即使被包含的 vimComment 含有一个
+	与 <EOL> 的匹配。
+
+	当不使用 "keepend" 时，每次被包含的 match 之后都会重新尝试 end 模式的
+	匹配。当使用 "keepend" 时，使用第一个遇到的 end 模式匹配，并截断任何被
+	包含的 match。
+							*:syn-extend*
+	"keepend" 的行为可以通过 "extend" 参数改变。当一个带 "extend" 的 item
+	被包含在一个使用 "keepend" 的 item 里时，"keepend" 被忽略，包含它的那个
+	region 会被延伸。
+	这可以用来让某些被包含的 item 延伸一个 region，而另一些不延伸。示例： >
+
+   :syn region htmlRef start=+<a>+ end=+</a>+ keepend contains=htmlItem,htmlScript
+   :syn match htmlItem +<[^>]*>+ contained
+   :syn region htmlScript start=+<script+ end=+</script[^>]*>+ contained extend
+
+<	这里 htmlItem item 不会让 htmlRef item 继续往下延伸，它只用于高亮 <> 那些
+	item。htmlScript item 确实会延伸 htmlRef item。
+
+	另一个例子： >
+   :syn region xmlFold start="<a>" end="</a>" fold transparent keepend extend
+<	这定义了一个带 "keepend" 的 region，使它的终点不能被被包含的 item 改变，
+	比如当 "</a>" 被匹配到并以不同方式高亮它时。但当 xmlFold region 被嵌套
+	时（它包含自身），"extend" 会生效，这样一个嵌套 region 的 "</a>" 只结束
+	那个 region，而不结束包含它的那个。
+
+							*:syn-excludenl*
+	当一个 match 的模式或一个 region 的 end 模式里含有用于匹配行尾的 '$'
+	时，会让包含它的 region item 在下一行继续。例如，一个匹配 "\\$"（行尾
+	反斜杠）的 match 可以让一个本来会在行尾停止的 region 继续下去。这是默认
+	行为。如果不想要这样，有两种办法避免它：
+	1. 对包含它的 item 使用 "keepend"。这会阻止所有被包含的 match 延伸该
+	   match 或 region。当所有被包含的 item 都不得延伸包含它的 item 时，
+	   可以用它。
+	2. 在被包含的 item 里使用 "excludenl"。这会阻止那个 match 延伸包含它的
+	   match 或 region。如果只有某些被包含的 item 不得延伸包含它的 item，
+	   可以用它。"excludenl" 必须给在它所适用的模式之前。
+
+							*:syn-matchgroup*
+	"matchgroup" 可以用来以不同于 region 主体的方式高亮 start 和/或 end
+	模式。示例： >
+  :syntax region String matchgroup=Quote start=+"+  skip=+\\"+	end=+"+
+<	这会把引号用 "Quote" group 高亮，把中间的文本用 "String" group 高亮。
+	"matchgroup" 用于其后所有 start 和 end 模式，直到下一个 "matchgroup"。
+	用 "matchgroup=NONE" 可回到不使用 matchgroup。
+
+	在用 "matchgroup" 高亮的 start 或 end 模式里，该 region 的被包含 item
+	不被使用。这可以用来避免某个被包含 item 在 start 或 end 模式匹配中匹配。
+	当使用 "transparent" 时，这不对用 "matchgroup" 高亮的 start 或 end 模式
+	匹配生效。
+
+	下面是一个例子，它用不同颜色高亮三层括号： >
+   :sy region par1 matchgroup=par1 start=/(/ end=/)/ contains=par2
+   :sy region par2 matchgroup=par2 start=/(/ end=/)/ contains=par3 contained
+   :sy region par3 matchgroup=par3 start=/(/ end=/)/ contains=par1 contained
+   :hi par1 ctermfg=red guifg=red
+   :hi par2 ctermfg=blue guifg=blue
+   :hi par3 ctermfg=darkgreen guifg=darkgreen
+<
+										*E849*
+系统里最多可以有 19999 个 syntax group。
+
+==============================================================================
+7. :syntax 参数						*:syn-arguments*
+
+定义 syntax item 的那些 :syntax 命令接受若干参数。这里说明其中常见的那些。
+参数可以按任意顺序给出，也可以与模式混在一起。
+
+并非所有命令都接受所有参数。下面这张表说明哪些参数不能用于所有命令：
+							*E395*
+		    contains  oneline	fold  display  extend concealends~
+:syntax keyword		 -	 -	 -	 -	 -      -
+:syntax match		yes	 -	yes	yes	yes     -
+:syntax region		yes	yes	yes	yes	yes    yes
+
+下面这些参数三种命令都可以用：
+	conceal
+	cchar
+	contained
+	containedin
+	nextgroup
+	transparent
+	skipwhite
+	skipnl
+	skipempty
+
+conceal						*conceal* *:syn-conceal*
+
+当给出 "conceal" 参数时，该 item 被标记为可 conceal 的。它是否真的被 conceal
+取决于 'conceallevel' 选项的值。'concealcursor' 选项用于决定当前行里的可
+conceal item 是否以未 conceal 的形式显示，以便能编辑该行。
+
+conceal 文本的另一种方式是用 |matchadd()|，但在内部它的工作方式略有不同
+|syntax-vs-match|。
+
+concealends						*:syn-concealends*
+
+当给出 "concealends" 参数时，该 region 的 start 与 end 匹配处（而不是该
+region 的内容）被标记为可 conceal 的。它们是否真的被 conceal 取决于
+'conceallevel' 选项的设置。只有当地 region 的两端通过 "matchgroup" 拥有自己
+的高亮时，才能这样分别 conceal。|synconcealed()| 函数可用来获取关于被
+conceal item 的信息。
+
+cchar							*:syn-cchar*
+							*E844*
+"cchar" 参数定义该 item 被 conceal 时显示在它位置上的字符（设置 "cchar"
+只有同时给出 conceal 参数才有意义）。如果没有设置 "cchar"，则使用
+'listchars' 选项里定义的默认 conceal 字符。该字符不能是像 Tab 这样的控制
+字符。示例： >
+   :syntax match Entity "&amp;" conceal cchar=&
+关于高亮，见 |hl-Conceal|。
+
+contained						*:syn-contained*
+
+当给出 "contained" 参数时，该 item 不会在顶层被识别，只有当它在另一个
+match 的 "contains" 字段里被提到时才被识别。示例： >
+   :syntax keyword Todo    TODO    contained
+   :syntax match   Comment "//.*"  contains=Todo
+
+
+display							*:syn-display*
+
+如果给出了 "display" 参数，那么当探测到的高亮不会被显示时，这一个 item
+就会被跳过。这可以加快高亮速度：只在为需要显示的文本查找 syntax 状态时
+就跳过这个 item。
+
+一般地，可以对符合下列条件的 match 与 region item 使用 "display"：
+- 该 item 不会越过行尾继续。C 语言的示例：为 "/*" 注释写的 region 不能
+  包含 "display"，因为它会延续到下一行。
+- 该 item 不含会越过行尾继续、或使其延续到下一行的 item。
+- 该 item 不会改变它所包含于其中的任何 item 的大小。C 语言的示例：在
+  preprocessor match 中用 "\\$" 的 match 不能带 "display"，因为它可能让
+  那个 preprocessor match 变短。
+- 该 item 不允许本来不匹配的其他 item 匹配，而后者可能把匹配延伸得过远。
+  C 语言的示例：为 "//" 注释写的 match 不能使用 "display"，因为那条注释
+  内部的 "/*" 届时会匹配，并开启一条越过行尾的注释。
+
+对 C 语言，可以使用 "display" 的示例：
+- 匹配一个数字的 match
+- 匹配一个标签的 match
+
+
+transparent						*:syn-transparent*
+
+如果给出了 "transparent" 参数，这个 item 自身不会被高亮，而是取它所包含
+于其中的 item 的高亮。这对那些不需要任何高亮、只用于跳过一段文本的
+syntax item 很有用。
+
+除非对 transparent item 本身给出了 "contains" 参数，否则 "contains="
+参数也会从它所包含于其中的 item 继承。要避免不想要的 item 被包含，用
+"contains=NONE"。下面的示例高亮 String 里的单词，但为 "vim" 做例外： >
+	:syn match myString /'[^']*'/ contains=myWord,myVim
+	:syn match myWord   /\<[a-z]*\>/ contained
+	:syn match myVim    /\<vim\>/ transparent contained contains=NONE
+	:hi link myString String
+	:hi link myWord   Comment
+由于 "myVim" match 排在 "myWord" 之后，它是优先的匹配（同一位置上的后
+一个 match 会压过前一个）。"transparent" 参数让 "myVim" match 使用与
+"myString" 相同的高亮。但它不包含任何东西。如果省掉 "contains=NONE"
+参数，那么 "myVim" 会使用来自 myString 的 contains 参数并允许 "myWord"
+被包含，后者会被高亮成 Comment。之所以这样，是因为被包含的 match 不会
+在同一位置上匹配它自身内部，因此 "myVim" match 在这里压不过 "myWord"
+match。
+
+当你看着有颜色的文本时，就像在看一层层被包含的 item。被包含的 item 位于
+它所包含于其中的 item 之上，因此你看到的是被包含的 item。当被包含的 item
+是 transparent 时，你可以看穿它，因此你看到的是它所包含于其中的 item。
+用一张图来说：
+
+		look from here
+
+	    |	|   |	|   |	|
+	    V	V   V	V   V	V
+
+	       xxxx	  yyy		more contained items
+	    ....................	contained item (transparent)
+	=============================	first item
+
+'x'、'y' 和 '=' 代表被高亮的 syntax item。'.' 代表 transparent group。
+
+你看到的是：
+
+	=======xxxx=======yyy========
+
+因此你看穿了那层透明的 "...."。
+
+
+oneline							*:syn-oneline*
+
+"oneline" 参数表示该 region 不跨越行边界。它必须在当前行内完整匹配。
+不过，当该 region 有一个跨越行边界的被包含 item 时，它仍然会续到下一行。
+被包含 item 可用来识别行延续模式。但 "end" 模式仍必须匹配在首行中，否则
+该 region 根本不会开始。
+
+当 start 模式含一个 "\\n" 以匹配行尾时，end 模式必须找到在 start 模式
+结束的同一行里。end 模式也可以含一个行尾。因此 "oneline" 参数的意思是：
+start 模式的末尾与 end 模式的起始必须在一行之内。这一点无法被一个匹配
+换行的 skip 模式改变。
+
+
+fold							*:syn-fold*
+
+"fold" 参数使这个 item 的 fold 级别增加一。示例： >
+   :syn region myFold start="{" end="}" transparent fold
+   :syn sync fromstart
+   :set foldmethod=syntax
+这会使每个 {} 块形成一个 fold。
+
+fold 会开始于该 item 起始的那一行，结束于该 item 结束之处。如果 start 与
+end 在同一行内，则没有 fold。'foldnestmax' 选项限制 syntax fold 的嵌套。
+要让一行的 foldlevel 如何由它的 syntax item 计算得出，见
+|:syn-foldlevel|。
+
+
+			*:syn-contains* *E405* *E406* *E407* *E408* *E409*
+contains={group-name},...
+
+"contains" 参数后面跟一个 syntax group 名列表。这些 group 将被允许在该
+item 内部开始（它们可以延伸超过包含它们那个 group 的终点）。这允许 match
+与 region 的递归嵌套。如果没有 "contains" 参数，则不会有任何 group 被
+包含在这个 item 里。这些 group 名不需要先定义才能在这里使用。
+
+contains=ALL
+		如果 contains 列表里只有 "ALL" 这一项，那么所有 group 都会
+		被接受在该 item 内部。
+
+contains=ALLBUT,{group-name},...
+		如果 contains 列表的第一项是 "ALLBUT"，那么所有 group 都会被
+		接受在该 item 内部，除了列出的那些。示例： >
+  :syntax region Block start="{" end="}" ... contains=ALLBUT,Function
+
+contains=TOP
+		如果 contains 列表的第一项是 "TOP"，那么所有不带 "contained"
+		参数的 group 都会被接受。
+contains=TOP,{group-name},...
+		与 "TOP" 一样，但排除列出的那些 group。
+
+contains=CONTAINED
+		如果 contains 列表的第一项是 "CONTAINED"，那么所有带
+		"contained" 参数的 group 都会被接受。
+contains=CONTAINED,{group-name},...
+		与 "CONTAINED" 一样，但排除列出的那些 group。
+
+
+"contains" 列表里的 {group-name} 可以是一个模式。所有匹配该模式的 group
+名都会被包含（若用了 "ALLBUT"，则是被排除）。该模式不能含空白或 ','。
+示例： >
+   ... contains=Comment.*,Keyw[0-3]
+匹配会在语法命令执行的那一刻进行。之后才定义的 group 不会被匹配。另外，
+如果当前的语法命令定义了一个新 group，它也不会被匹配。小心：把语法命令
+写进文件时，你不能指望某些 group 尚未被定义，因为该文件也许此前已经被
+source 过，而 ":syn clear" 并不会移除 group 名。
+
+被包含的 group 也会在一个 region 的 start 与 end 模式里匹配。若不希望
+如此，可以用 "matchgroup" 参数 |:syn-matchgroup|。"ms=" 与 "me=" 偏移可
+用来改变被包含 item 确实匹配的区域。注意这也许还会限制被高亮的区域
+
+
+containedin={group-name},...				*:syn-containedin*
+
+"containedin" 参数后面跟一个 syntax group 名列表。该 item 将被允许在这些
+group 内部开始。这相当于包含它的 item 有一个把该 item 也算在内的
+"contains=" 参数一样。
+
+只有紧邻的包含者 item（syntax 栈顶那个）会被考虑。Vim 不会搜索其他祖先。
+如果紧邻的包含者既没有通过 |:syn-contains| 包含该 item，也没有被列在该
+item 的 "containedin=" 里，那么即使某个祖先会允许，该匹配也不会开始。
+注意一个 |:syn-transparent| region 仍然会强制执行它自己的 |:syn-contains|
+列表。
+
+{group-name},... 的用法与 "contains" 完全相同，如前所述。
+
+这在事后添加 syntax item 时很有用。可以让一个 item 被包含进一个已经存在的
+item 中，而不改动那个 item 的定义。例如，要在加载 C syntax 之后高亮 C 注释
+里的一个单词： >
+	:syn keyword myword HELP containedin=cComment contained
+注意这里也用了 "contained"，以避免该 item 在顶层匹配。
+
+"containedin" 的匹配会被加到该 item 可以出现的其他位置。也可以像往常一样
+再加一个 "contains" 参数。别忘了 keyword 从来不含另一个 item，因此把
+keyword 加到 "containedin" 里不会起作用。
+另见：|:syn-contains|，|:syn-transparent|。
+
+
+nextgroup={group-name},...				*:syn-nextgroup*
+
+"nextgroup" 参数后面跟一个 syntax group 名列表，以逗号分隔（和 "contains"
+一样，因此你也可以用模式）。
+
+如果给出了 "nextgroup" 参数，那么在 match 或 region 结束之后，会尝试让所列
+的 syntax group 匹配。如果这些 group 都没有匹配，高亮照常继续。如果有匹配，
+就会使用该 group，即使它没有被列在当前 group 的 "contains" 字段里。这相当于
+让所列的 group 优先于所有其他 group。示例： >
+   :syntax match  ccFoobar  "Foo.\{-}Bar"  contains=ccFoo
+   :syntax match  ccFoo     "Foo"	    contained nextgroup=ccFiller
+   :syntax region ccFiller  start="."  matchgroup=ccBar  end="Bar"  contained
+
+这会以不同方式高亮 "Foo" 与 "Bar"，且只在 "Foo" 之后有 "Bar" 时才如此。
+在下面这行文本里，"f" 表示 ccFoo 用于高亮之处，"bbb" 表示 ccBar 用于高亮
+之处。 >
+
+   Foo asdfasd Bar asdf Foo asdf Bar asdf
+   fff	       bbb	fff	 bbb
+
+注意这里用了 ".\{-}" 以便尽量少地跳过内容、直到下一个 Bar 为止。若用 `.*`，
+则 "Bar" 与 "Foo" 之间的 "asdf" 会按 "ccFoobar" group 被高亮，因为 ccFooBar
+匹配会把行里第一个 "Foo" 与最后一个 "Bar" 一并包含（见 |pattern|）。
+
+
+skipwhite						*:syn-skipwhite*
+skipnl							*:syn-skipnl*
+skipempty						*:syn-skipempty*
+
+这些参数只与 "nextgroup" 搭配使用。它们可用来让下一个 group 在跳过一些文本
+之后匹配：
+	skipwhite	跳过空格与 Tab 字符
+	skipnl		跳过行尾
+	skipempty	跳过空行（隐含一个 "skipnl"）
+
+当存在 "skipwhite" 时，只有当没有下一个 group 匹配该空白时，才会跳过空白。
+
+当存在 "skipnl" 时，与 nextgroup 的匹配可能会找到在下一行。这只会在当前
+item 结束于当前行的行尾时发生！当不存在 "skipnl" 时，nextgroup 只会在当前
+item 之后、同一行里找到。
+
+在寻找下一个 group 而跳过文本时，其他 group 的匹配会被忽略。只有当没有
+下一个 group 匹配时，才会再次尝试其他 item 匹配。这意味着匹配 nextgroup
+并跳过空白与 <EOL> 比其他 item 具有更高的优先级。
+
+示例： >
+  :syn match ifstart "\<if.*"	  nextgroup=ifline skipwhite skipempty
+  :syn match ifline  "[^ \t].*" nextgroup=ifline skipwhite skipempty contained
+  :syn match ifline  "endif"	contained
+注意 `[^ \t].*` match 会匹配所有非空白文本。因此它也会匹配 "endif"。所以
+把 "endif" match 放在最后，以便让它优先。
+注意这个示例对嵌套的 "if" 不起作用。你需要加上 "contains" 参数才能让它工作
+（为了示例的简洁这里省略了）。
+
+IMPLICIT CONCEAL					*:syn-conceal-implicit*
+
+:sy[ntax] conceal [on|off]
+	这定义了后续的 ":syntax" 命令是否会把 keyword、match 或 region 设为带
+	"conceal" 标志。在 ":syn conceal on" 之后，后续定义的所有 ":syn
+	keyword"、":syn match" 或 ":syn region" 都会隐式地带上 "conceal" 标志。
+	":syn conceal off" 会回到正常状态，此时必须显式给出 "conceal" 标志。
+
+:sy[ntax] conceal
+	显示 "syntax conceal on" 还是 "syntax conceal off"。
+
+==============================================================================
+8. Syntax patterns				*:syn-pattern* *E401* *E402*
+
+在 syntax 命令中，一个模式必须被两个相同的字符包围。这就像 ":s" 命令的
+用法一样。最常用的是双引号。但如果模式里含一个双引号，你可以用另一个不在
+该模式里出现的字符。示例： >
+  :syntax region Comment  start="/\*"  end="\*/"
+  :syntax region String   start=+"+    end=+"+	 skip=+\\"+
+
+关于什么是模式，见 |pattern|。syntax 模式总是按 'magic' 选项已设置来解释，
+不管 'magic' 的实际值是什么。而且这些模式是按 'cpoptions' 里不含 'l' 标志
+来解释的。这样做是为了让 syntax 文件可移植、不受 'magic' 设置的影响。
+
+尽量避免可能匹配空字符串的模式，例如 "[a-z]*"。这会大幅拖慢高亮，因为它
+会到处都匹配。
+
+						*:syn-pattern-offset*
+模式后面可以跟一个字符偏移。这可以用来改变被高亮的范围，也可以改变被包含
+在 match 或 region 里的文本区域（这只在尝试匹配其他 item 时才相关）。两者
+都相对于所匹配的模式。skip 模式的字符偏移可用来指出到哪里继续寻找 end
+模式。
+
+偏移的形式是 "{what}={offset}"
+{what} 可以是七种字符串之一：
+
+ms	Match Start	匹配文本开头的偏移
+me	Match End	匹配文本末尾的偏移
+hs	Highlight Start	高亮起始处的偏移
+he	Highlight End	高亮结束处的偏移
+rs	Region Start	region 主体起始处的偏移
+re	Region End	region 主体结束处的偏移
+lc	Leading Context	越过模式的 "leading context" 的偏移
+
+{offset} 可以是：
+
+s	所匹配模式的开头
+s+{nr}	所匹配模式的开头往右 {nr} 个字符
+s-{nr}	所匹配模式的开头往左 {nr} 个字符
+e	所匹配模式的末尾
+e+{nr}	所匹配模式的末尾往右 {nr} 个字符
+e-{nr}	所匹配模式的末尾往左 {nr} 个字符
+{nr}	（只对 "lc"）：从开头往右 {nr} 个字符处开始匹配
+
+示例："ms=s+1"、"hs=e-2"、"lc=3"。
+
+虽然任何模式后面都接受所有偏移，但它们并非总是有意义。下表列出实际会被
+用到的偏移：
+
+		    ms	 me   hs   he	rs   re	  lc ~
+match item	    yes  yes  yes  yes	-    -	  yes
+region item start   yes  -    yes  -	yes  -	  yes
+region item skip    -	 yes  -    -	-    -	  yes
+region item end     -	 yes  -    yes	-    yes  yes
+
+偏移可以用 ',' 串接起来。示例： >
+  :syn match String  /"[^"]*"/hs=s+1,he=e-1
+<
+    some "string" text
+	  ^^^^^^		highlighted
+
+注意：
+- 模式与字符偏移之间不能有空白。
+- 被高亮的区域绝不会落在匹配文本之外。
+- end 模式的负偏移并不总是有效，因为 end 模式可能在该停止高亮时已经被
+  探测到。
+- 在 Vim 7.2 之前，偏移是按字节而不是按字符计数的。这对多字节字符效果不好，
+  所以在 Vim 7.2 版本发布时改掉了。
+- 一个 match 的开头不能落在与模式匹配所在行不同的另一行。这样不行：
+  "a\nb"ms=e。你可以让高亮起始于另一行，这样是有效的："a\nb"hs=e。
+
+示例（匹配一条注释但不高亮 `/* and */`）： >vim
+  :syntax region Comment start="/\*"hs=e+1 end="\*/"he=s-1
+< >
+	/* this is a comment */
+	  ^^^^^^^^^^^^^^^^^^^	  highlighted
+<
+一个更复杂的示例： >vim
+  :syn region Exa matchgroup=Foo start="foo"hs=s+2,rs=e+2 matchgroup=Bar end="bar"me=e-1,he=e-1,re=s-1
+< >
+	 abcfoostringbarabc
+	    mmmmmmmmmmm	    match
+	      sssrrreee	    highlight start/region/end ("Foo", "Exa" and "Bar")
+<
+Leading context			*:syn-lc* *:syn-leading* *:syn-context*
+
+注意：这是一个过时的特性，只是为了向后兼容才保留
+了与先前 Vim 版本的兼容性而保留。现在建议在模式里使用 |/\@<=| 结构。你也
+常常可以使用 |/\zs|。
+
+"lc" 偏移指定 leading context —— 模式里必须存在、但不被算作匹配的一部分的
+那部分。偏移 "lc=n" 会让 Vim 在尝试该模式匹配之前回退 n 列，从而允许在先前
+模式里已经匹配过的字符也被用作这次匹配的 leading context。例如，这可以用
+来规定一个"转义"字符不能出现在该匹配之前： >
+
+  :syn match ZNoBackslash "[^\\]z"ms=s+1
+  :syn match WNoBackslash "[^\\]w"lc=1
+  :syn match Underline "_\+"
+<
+  :syn match ZNoBackslash "[^\\]z"ms=s+1
+  :syn match WNoBackslash "[^\\]w"lc=1
+  :syn match Underline "_\+"
+<
+	  ___zzzz ___wwww
+	  ^^^	  ^^^	  matches Underline
+	      ^ ^	  matches ZNoBackslash
+		     ^^^^ matches WNoBackslash
+
+除非你显式设置 "ms"，否则 "ms" 偏移会自动被设成与 "lc" 偏移相同的值。
+
+
+Multi-line patterns					*:syn-multi-line*
+
+模式里可以包含 "\n" 以匹配一个行尾。大多数情况下这按预期工作，但有少数
+例外。
+
+当 start 模式带偏移时，匹配的开头不允许在后一行开始。不过高亮可以从后一行
+开始。使用 "\zs" 项同样要求匹配的开头不移动到另一行。
+
+skip 模式可以包含 "\n"，但对 end 模式的搜索会在下一行的第一个字符继续，
+即使那个字符是被 skip 模式匹配的也如此。这是因为重绘可能从一个 region
+中途的任何一行开始，而且没有检查 skip 模式是否从前一行开始。例如，如果
+skip 模式是 "a\nb" 而 end 模式是 "b"，则 end 模式确实会在下面这个内容的
+第二行匹配： >
+	 x x a
+	 b x x
+一般地，这意味着 skip 模式不应该匹配 "\n" 之后的任何字符。
+
+
+External matches					*:syn-ext-match*
+
+这些额外的正则表达式项可用于 region 模式：
+
+					*/\z(* */\z(\)* *E50* *E52* *E879*
+    \z(\)	把该子表达式标记为 "external"，意思是它可以从另一个模式匹配
+		中被访问。目前只能在定义 syntax region 的 start 模式时使用。
+
+					*/\z1* */\z2* */\z3* */\z4* */\z5*
+    \z1  ...  \z9			*/\z6* */\z7* */\z8* */\z9* *E66* *E67*
+		匹配与先前某个 start 模式匹配中相应子表达式所匹配的相同字符串。
+
+有时一个 region 的 start 与 end 模式需要共享一个公共子表达式。一个常见的
+例子是 Perl 与许多 Unix shell 里的 "here" 文档。这个效果可以用 "\z" 特殊
+正则表达式项实现，它把一个子表达式标记为 "external"，意思是可以从定义它的
+那个模式之外引用它。例如，here-document 的例子可以这样写： >
+  :syn region hereDoc start="<<\z(\I\i*\)" end="^\z1$"
+
+从这里可以看出，\z 其实有双重作用。在 start 模式里，它把 "\(\I\i*\)"
+子表达式标记为 external；在 end 模式里，它把 \z1 back-reference 变成一个
+外部引用，指向 start 模式里第一个 external 子表达式。外部引用也可以用在 skip
+模式里： >
+  :syn region foo start="start \z(\I\i*\)" skip="not end \z1" end="end \z1"
+
+注意普通子表达式与 external 子表达式完全是正交的，且分别索引；例如，如果
+把模式 "\z(..\)\(..\)" 应用到字符串 "aabb"，那么 \1 会指向 "bb"，而 \z1
+会指向 "aa"。还要注意 external 子表达式不能像普通子表达式那样在同一个模式
+内作为 back-reference 被访问。如果你想把一个子表达式同时用作普通子表达式和
+external 子表达式，可以把两者嵌套起来，如 "\(\z(...\)\)"。
+
+注意只有单行之内的匹配才能被使用。多行匹配无法被引用。
+
+==============================================================================
+9. Syntax clusters					*:syn-cluster* *E400*
+
+:sy[ntax] cluster {cluster-name} [contains={group-name},...]
+				 [add={group-name},...]
+				 [remove={group-name},...]
+
+这条命令让你把一组 syntax group 归到一个名字之下。
+
+	contains={group-name},...
+		该 cluster 被设成指定的 group 列表。
+	add={group-name},...
+		指定的 group 被加到该 cluster 里。
+	remove={group-name},...
+		指定的 group 被从该 cluster 里移除。
+
+这样定义的 cluster 可以在 contains=...、containedin=...、nextgroup=...、
+add=... 或 remove=... 列表中以 "@" 前缀引用。你也可以用这个写法在指定
+cluster 内容之前就隐式声明它。
+
+示例： >
+   :syntax match Thing "# [^#]\+ #" contains=@ThingMembers
+   :syntax cluster ThingMembers contains=ThingMember1,ThingMember2
+
+正如上一个示例所暗示的，对 cluster 的改动实际上是追溯生效的；cluster 的
+成员资格是在最后一刻才检查的，可以这么说： >
+   :syntax keyword A aaa
+   :syntax keyword B bbb
+   :syntax cluster AandB contains=A
+   :syntax match Stuff "( aaa bbb )" contains=@AandB
+   :syntax cluster AandB add=B	  " now both keywords are matched in Stuff
+
+这对嵌套的 cluster 也有影响： >
+   :syntax keyword A aaa
+   :syntax keyword B bbb
+   :syntax cluster SmallGroup contains=B
+   :syntax cluster BigGroup contains=A,@SmallGroup
+   :syntax match Stuff "( aaa bbb )" contains=@BigGroup
+   :syntax cluster BigGroup remove=B	" no effect, since B isn't in BigGroup
+   :syntax cluster SmallGroup remove=B	" now bbb isn't matched within Stuff
+<
+						*E848*
+cluster 的最大数量是 9767。
+
+==============================================================================
+10. Including syntax files				*:syn-include* *E397*
+
+让一个语言的 syntax 文件包含一个相关语言的 syntax 文件常常很有用。取决于
+确切的关系，可以用两种不同的方式来做：
+
+	- 如果被包含 syntax 文件里的顶层 syntax item 要在包含它的 syntax 里
+	  也被允许在顶层出现，你可以简单地用 |:runtime| 命令： >
+
+  " In cpp.vim:
+  :runtime! syntax/c.vim
+  :unlet b:current_syntax
+
+<	- 如果被包含 syntax 文件里的顶层 syntax item 要包含在包含它的 syntax
+	  里的一个 region 内，你可以用 ":syntax include" 命令：
+
+:sy[ntax] include [@{grouplist-name}] {file-name}
+
+	  被包含文件里声明的所有 syntax item 都会被加上 "contained" 标志。
+	  此外，如果指定了一个 group 列表，被包含文件里所有顶层 syntax item
+	  都会被加到那个列表里。 >
+
+   " In perl.vim:
+   :syntax include @Pod <script>:p:h/pod.vim
+   :syntax region perlPOD start="^=head" end="^=cut" contains=@Pod
+<
+	  当 {file-name} 是绝对路径（以 "/"、"c:"、"$VAR" 或 "<script>" 开头）
+	  时，该文件会被 source。当它是相对路径（例如 "syntax/pod.vim"）时，
+	  会在 'runtimepath' 里搜索该文件。所有匹配的文件都会被加载。推荐使用
+	  相对路径，因为这样用户可以替换被包含的文件为他们自己的版本，而不必
+	  替换那个做 ":syn include" 的文件。
+
+						*E847*
+include 的最大数量是 999。
+
+==============================================================================
+11. Synchronizing				*:syn-sync* *E403* *E404*
+
+Vim 希望能从文档中的任意位置开始重绘。为做到这一点，它需要知道重绘开始
+那个位置上的 syntax 状态。
+
+:sy[ntax] sync [ccomment [group-name] | minlines={N} | ...]
+
+同步有四种方式：
+1. 始终从文件开头开始解析。
+   |:syn-sync-first|
+2. 基于 C 风格注释。Vim 了解 C 注释的工作方式，因而能判断当前行是从注释
+   内部还是外部开始的。
+   |:syn-sync-second|
+3. 向后跳过一定行数并从那里开始解析。
+   |:syn-sync-third|
+4. 在文本中向后搜索一个用于同步的 pattern。
+   |:syn-sync-fourth|
+
+				*:syn-sync-maxlines* *:syn-sync-minlines*
+对于后三种方式，可以开始解析的行范围受 "minlines" 和 "maxlines" 的限制。
+
+若给出了 "minlines={N}" 参数，解析总是至少向前回退这么多行开始。当解析需要
+若干行才能正确，或者无法使用 syncing 时，可以使用它。
+
+若给出了 "maxlines={N}" 参数，则为查找注释或 syncing pattern 而搜索的行数
+被限制为向后 N 行（在加上 "minlines" 之后）。当需要同步的内容很少而机器
+较慢时，这很有用。示例： >
+   :syntax sync maxlines=500 ccomment
+<
+						*:syn-sync-linebreaks*
+使用能匹配多行的 pattern 时，某一行的改动可能导致 pattern 无法再匹配前面的
+某一行。这意味着必须从改动位置之上开始。可以用 "linebreaks" 参数指定要回退
+的行数。例如，当 pattern 可能包含一个换行时，这样写： >
+   :syntax sync linebreaks=1
+结果是重绘总是至少从改动位置的前一行开始。"linebreaks" 的默认值为零。
+通常 "minlines" 的值会大于 "linebreaks"。
+
+
+第一种同步方式：			*:syn-sync-first*
+>
+   :syntax sync fromstart
+
+文件将从开头开始解析。这使语法高亮准确，但对长文件可能很慢。Vim 会缓存
+先前解析过的文本，因此只有第一次解析文本时才慢。不过，做修改时文本的某些
+部分需要重新解析（最坏情况：直到文件末尾）。
+
+使用 "fromstart" 等价于用 "minlines" 指定一个非常大的数字。
+
+
+第二种同步方式：			*:syn-sync-second* *:syn-sync-ccomment*
+
+对于第二种方式，只需给出 "ccomment" 参数。
+示例： >
+   :syntax sync ccomment
+
+当 Vim 发现开始显示的那一行位于 C 风格注释内部时，将使用最后一个
+group-name 为 "Comment" 的 region 语法项。这要求存在一个 group-name 为
+"Comment" 的 region！也可以指定另一个组名，例如： >
+   :syntax sync ccomment javaComment
+这表示用于识别出的 C 注释区域的，是最后用 "syn region javaComment" 指定的
+项。只有当该 region 确实具有起始 pattern "\/*" 和结束 pattern "*\/" 时才
+能正常工作。
+
+"maxlines" 参数可用于把搜索限制在若干行内。"minlines" 参数可用于至少向前
+回退若干行开始（例如，当某种构造只占几行但很难在其上同步时）。
+
+注意：当使用的字符串跨行且包含 "*/" 时，按 C 注释同步无法正常工作。既然
+让字符串跨行是糟糕的编程习惯（许多编译器会给出警告），而 "*/" 出现在注释
+内部的机会又极小，这个限制几乎不会被注意到。
+
+
+第三种同步方式：				*:syn-sync-third*
+
+对于第三种方式，只需给出 "minlines={N}" 参数。Vim 会从行号中减去 {N} 并从
+那里开始解析。这意味着要多解析 {N} 行，因而这种方式稍慢一些。
+示例： >
+   :syntax sync minlines=50
+
+"lines" 等价于 "minlines"（旧版本使用）。
+
+
+第四种同步方式：				*:syn-sync-fourth*
+
+其思路是在若干特定 region 的结尾处同步，这种结尾称为 sync pattern。只有
+region 才能跨行，所以当我们找到某个 region 的结尾时，也许就能知道自己
+处于哪个语法项中。搜索从开始重绘的那一行的上一行开始，然后继续向文件的
+前方搜索。
+
+它的工作方式与非同步的语法项完全一样。你可以使用 contained 匹配、
+nextgroup 等。但有一些区别：
+- 不能使用 keyword。
+- 带有 "sync" 关键字的语法项组成一个完全独立的语法项组。你不能把同步组与
+  非同步组混用。
+- 匹配是在 buffer 中向后（逐行）进行的，而不是向前。
+- 可以给出一个续行 pattern。它用于决定哪些行需要像一行那样被搜索。这表示
+  对指定项的匹配搜索，要从包含续行 pattern 的连续行中的第一行开始。
+- 使用 "nextgroup" 或 "contains" 时，这只在一行（或一组续行）内有效。
+- 使用 region 时，它必须在同一行（或同一组续行）内开始并结束。否则就假定
+  结束位置在该行（或该组续行）的末尾。
+- 当找到与 sync pattern 的匹配时，会继续在该行（或该组续行）的剩余部分搜索
+  另一个匹配。使用的是最后一个匹配。当一行中同时包含某个 region 的开始和
+  结束时（例如 C 注释 `/* this */` 中，使用最后的 "*/"），就会用到这一点。
+
+可以用两种方式使用与 sync pattern 的匹配：
+1. 高亮解析从开始重绘的位置（也就是开始搜索 sync pattern 的位置）开始。
+   必须指定期望在该处生效的语法组。当跨行的 region 不能包含其它 region 时，
+   这种方式效果很好。
+2. 高亮解析在匹配之后紧接的位置继续。必须指定期望在匹配之后紧接存在的
+   语法组。当前一种方式效果不佳时可以使用。这种方式要慢得多，因为需要解析
+   更多的文本。
+两种 sync pattern 可以同时使用。
+
+除了 sync pattern，还可以指定其它匹配和 region，以避免找到不想要的匹配。
+
+[之所以把 sync pattern 单独给出，是因为多数情况下寻找同步点的搜索可以比
+弄清高亮简单得多。pattern 数量减少意味着速度会（大大）加快。]
+
+					    *syn-sync-grouphere* *E393* *E394*
+    :syntax sync match {sync-group-name} grouphere {group-name} "pattern" ...
+
+	定义一个用于同步的匹配。{group-name} 是紧跟在匹配之后的语法组名。
+	对文本的高亮解析从匹配之后紧接的位置开始。必须存在与这个 {group-name}
+	对应的 region。将使用其中最先定义的那一个。当匹配之后没有语法组时，
+	可以使用 "NONE"。
+
+						*syn-sync-groupthere*
+    :syntax sync match {sync-group-name} groupthere {group-name} "pattern" ...
+
+	类似 "grouphere"，但 {group-name} 是要在开始搜索同步点的那一行的
+	行首使用的语法组名。从匹配处到开始搜索 sync pattern 之间的文本，被
+	假定不会改变语法高亮。例如在 C 中，你可以向后搜索 "/*" 和 "*/"。
+	如果先找到 "/*"，你就知道自己处于注释内部，所以 "groupthere" 是
+	"cComment"。如果先找到 "*/"，你就知道自己不在注释中，所以
+	"groupthere" 是 "NONE"。（实际上还稍微复杂一些，因为 "/*" 和 "*/"
+	可能出现在字符串内部。这留给读者作为练习……）。
+
+    :syntax sync match ...
+    :syntax sync region ...
+
+	不带 "groupthere" 参数。定义一个在搜索同步点时会被跳过的 region
+	或匹配。
+
+						*syn-sync-linecont*
+    :syntax sync linecont {pattern}
+
+	当 {pattern} 在一行中匹配时，就认为它延续到下一行。这表示搜索同步点
+	时会把这几行视为连接在一起。
+
+如果还给出了 "maxlines={N}" 参数，则搜索匹配的行数被限制为 N。当需要同步
+的内容非常少而机器又慢时，这很有用。示例： >
+   :syntax sync maxlines=100
+
+你可以用下面的命令清除所有同步设置： >
+   :syntax sync clear
+
+你可以用下面的命令清除特定的 sync pattern： >
+   :syntax sync clear {sync-group-name} ...
+
+==============================================================================
+12. 列出语法项		*:syntax* *:sy* *:syn* *:syn-list*
+
+这条命令列出所有语法项： >
+
+    :sy[ntax] [list]
+
+要显示某一个语法组的语法项： >
+
+    :sy[ntax] list {group-name}
+
+要列出一个 cluster 中的语法组：			*E392*	 >
+
+    :sy[ntax] list @{cluster-name}
+
+":syntax" 命令的其它参数见上文。
+
+注意 ":syntax" 命令可以缩写为 ":sy"，不过最常用的还是 ":syn"，因为它看起来
+更好。
+
+==============================================================================
+13. Highlight 命令			*:highlight* *:hi* *E28* *E411* *E415*
+
+Nvim 使用一系列 highlight group，它们分为两类：编辑器界面与语法高亮。按
+大致的重要性排序，它们是：
+- 基本的编辑器组 |highlight-groups|
+- 标准语法组 |group-name|（此外，语法文件还可以定义语言特定的组，这些组
+  以语言名为前缀）
+- |diagnostic-highlights|
+- |treesitter-highlight-groups|
+- |lsp-semantic-highlight| 组
+- 符号与引用的 |lsp-highlight| 组
+
+在合适的情况下，highlight group 会默认链接到某个更基本的组，但 colorscheme
+应当覆盖它们全部。在每个 tag 之下，相应的 highlight group 都使用当前
+colorscheme 高亮显示。
+
+						*:colo* *:colorscheme* *E185*
+:colo[rscheme]		输出当前生效的颜色方案名。这基本上等同于 >
+				:echo g:colors_name
+<			如果 g:colors_name 尚未定义，:colo 将输出 "default"。
+
+:colo[rscheme] {name}	加载颜色方案 {name}。它会在 'runtimepath' 中查找文件
+			"colors/{name}.{vim,lua}"。找到的第一个会被加载。
+			注意：先尝试 "colors/{name}.vim"。
+			还会搜索 'packpath' 中的所有 plugin，先搜索 "start" 下，
+			再搜索 "opt" 下。
+
+			不递归工作，因此你不能在颜色方案脚本中使用
+			":colorscheme"。
+
+			要自定义颜色方案，请使用另一个名字，例如
+			"~/.config/nvim/colors/mine.vim"，并用 `:runtime`
+			加载原来的颜色方案： >
+				runtime colors/evening.vim
+				hi Statement ctermfg=Blue guifg=Blue
+
+<			在颜色方案加载之前，会触发 |ColorSchemePre|
+			autocommand 事件。在颜色方案加载之后，会触发
+			|ColorScheme| autocommand 事件。
+			关于如何编写颜色方案文件： >
+				:edit $VIMRUNTIME/colors/README.txt
+
+:hi[ghlight]		列出所有设置了属性的当前 highlight group。
+
+:hi[ghlight] {group-name}
+			列出一个 highlight group。
+
+						*highlight-clear* *:hi-clear*
+:hi[ghlight] clear	把所有高亮重置为默认值。移除用户添加的组的全部高亮。
+			使用 'background' 的当前值来决定使用哪些默认颜色。
+			如果原来有默认链接，则恢复它。|:hi-link|
+
+:hi[ghlight] clear {group-name}
+:hi[ghlight] {group-name} NONE
+			禁用某一个 highlight group 的高亮。它_不会_被恢复为
+			默认颜色。
+
+:hi[ghlight] [default] {group-name} {key}={arg} ...
+			添加一个 highlight group，或修改已有组的 highlight
+			设置。{key}={arg} 参数见 |highlight-args|。可选的
+			[default] 参数见 |:highlight-default|。
+
+通常一个 highlight group 会在启动时添加一次。这会设置高亮的默认值。之后，
+你可以使用额外的 highlight 命令，把想要改为非默认值的参数改掉。取值 "NONE"
+可用于关闭该值或恢复默认值。
+
+改变颜色的一个简单方法是使用 |:colorscheme| 命令。它会加载一个包含
+":highlight" 命令的文件，例如： >
+
+   :hi Comment	gui=bold
+
+注意，所有未包含的设置都保持不变，只使用指定的字段，并且设置会与先前的
+设置合并。因此，结果就像使用了这样一条命令： >
+   :hi Comment	ctermfg=Cyan guifg=#80a0ff gui=bold
+<
+							*:highlight-verbose*
+列出某个 highlight group 且 'verbose' 非零时，列表还会说明它最后是在哪里
+设置的。示例： >
+	:verbose hi Comment
+<	Comment        xxx ctermfg=4 guifg=Blue ~
+	   Last set from /home/mool/vim/vim7/runtime/syntax/syncolor.vim ~
+
+使用 ":hi clear" 时，默认值会标注为使用该命令的脚本。更多信息见
+|:verbose-cmd|。
+
+					*highlight-args* *E416* *E417* *E423*
+高亮有两类 UI：
+cterm	终端 UI（|TUI|）
+gui	GUI 或支持 RGB 的 TUI（'termguicolors'）
+
+每种类型都可以给出高亮设置。这使得同一个语法文件可用于所有 UI。
+
+1. TUI highlight 参数
+
+					*bold* *underline* *undercurl*
+					*underdouble* *underdotted*
+					*underdashed* *inverse* *italic*
+					*standout* *strikethrough* *altfont*
+					*dim* *blink* *hl-conceal* *overline* *nocombine*
+cterm={attr-list}			*attr-list* *highlight-cterm* *E418*
+	attr-list 是下列各项以逗号分隔的列表（不含空格，顺序任意）：
+		bold
+		underline
+		undercurl	波浪下划线
+		underdouble	双下划线
+		underdotted	点线下划线
+		underdashed	虚线下划线
+		strikethrough
+		reverse
+		inverse		与 reverse 相同
+		italic
+		standout
+		altfont
+		dim		半亮/黯淡文本
+		blink		闪烁文本
+		conceal		隐藏/不显示文本
+		overline	上划线文本
+		nocombine	覆盖属性而不是合并它们
+		NONE		不使用任何属性（用于重置）
+
+	注意 "bold" 在这里可用，也可以通过使用粗体字体实现。二者效果相同。
+	"undercurl"、"underdouble"、"underdotted" 和 "underdashed" 在不支持
+	它们的终端中会回退为 "underline"。颜色用 |guisp| 设置。
+
+start={term-list}				*highlight-start* *E422*
+stop={term-list}				*term-list* *highlight-stop*
+	这些终端代码列表可用于在终端上获得非标准属性。
+
+	用 "start" 参数指定的转义序列会写在被高亮区域的字符之前。它可以是
+	任何你想发送给终端以高亮该区域的内容。用 "stop" 参数指定的转义序列
+	写在被高亮区域之后。它应当撤销 "start" 参数的效果。否则屏幕看起来
+	会一团糟。
+
+        {term-list} 是一个带转义序列的字符串。它可以是任意字符串，只是不能
+        以 "t_" 开头，也不允许有空白。这里能识别 <> 记法，所以你可以使用
+        "<Esc>" 和 "<Space>" 这类写法。示例：
+		start=<Esc>[27h;<Esc>[<Space>r;
+
+ctermfg={color-nr}				*ctermfg* *E421*
+ctermbg={color-nr}				*ctermbg*
+	{color-nr} 参数是一个颜色编号。其范围从零到可用的 |tui-colors| 数目
+	（不包括该数目）。该编号对应的实际颜色取决于终端的类型及其设置。
+	有时颜色还取决于 "cterm" 的设置。例如在某些系统上
+	"cterm=bold ctermfg=3" 会得到另一种颜色，在另一些系统上你只会得到
+	颜色 3。
+
+	可以识别下列名称（不区分大小写）：
+
+							*cterm-colors*
+	    NR-16   NR-8    颜色名 ~
+	    0	    0	    Black
+	    1	    4	    DarkBlue
+	    2	    2	    DarkGreen
+	    3	    6	    DarkCyan
+	    4	    1	    DarkRed
+	    5	    5	    DarkMagenta
+	    6	    3	    Brown, DarkYellow
+	    7	    7	    LightGray, LightGrey, Gray, Grey
+	    8	    0*	    DarkGray, DarkGrey
+	    9	    4*	    Blue, LightBlue
+	    10	    2*	    Green, LightGreen
+	    11	    6*	    Cyan, LightCyan
+	    12	    1*	    Red, LightRed
+	    13	    5*	    Magenta, LightMagenta
+	    14	    3*	    Yellow, LightYellow
+	    15	    7*	    White
+
+	"NR-16" 下方的编号用于 16 色终端（'t_Co' 大于或等于 16）。"NR-8" 下方
+	的编号用于 8 色终端（'t_Co' 小于 16）。"*" 表示对 ctermfg 设置了 bold
+	属性。在许多 8 色终端（例如 "linux"）中，这会让亮色显示出来。这对
+	背景色不起作用！没有 "*" 时 bold 属性会被移除。如果你想以别的方式
+	设置 bold 属性，请把 "cterm=" 参数放在 "ctermfg=" 或 "ctermbg=" 参数
+	之后。或者使用编号而不是颜色名。
+
+	注意，对于 16 色 ansi 风格终端（包括 xterm），使用的是 NR-8 列中的
+	编号。这里的 "*" 表示 "加 8"，因此 Blue 是 12，DarkGray 是 8，等等。
+
+	注意，对于某些彩色终端，这些名称可能导致错误的颜色！
+
+	你也可以使用 "NONE" 来移除颜色。
+
+							*:hi-normal-cterm*
+	为 Normal 组设置 "ctermfg" 或 "ctermbg" 颜色时，这些颜色会成为
+	非高亮文本所用的颜色。
+	示例： >
+		:highlight Normal ctermfg=grey ctermbg=darkblue
+<	为 Normal 组设置 "ctermbg" 颜色时，'background' 选项会自动调整，
+	前提是该颜色能够被识别且 'background' 未被显式设置过。这会导致依赖
+	'background' 的 highlight group 发生变化！这意味着你应当先设置
+	Normal 的颜色，再设置其它颜色。
+	使用颜色方案时，改变 'background' 会导致它被重新加载，这可能重置
+	所有颜色（包括 Normal）。如果你不想要这样，请先删除
+	"g:colors_name" 变量。
+
+	当你为 Normal 组设置了 "ctermfg" 或 "ctermbg" 时，Vim 需要在退出时
+	重置颜色。这是通过 "orig_pair" |terminfo| 项完成的。
+							*E419* *E420*
+	当 Vim 知道正常的前景和背景颜色时，"fg" 和 "bg" 可以作为颜色名使用。
+	这只在设置了 Normal 组的颜色以及 MS-Windows 控制台的颜色之后才能
+	生效。例如，用于反显： >
+	    :highlight Visual ctermfg=bg ctermbg=fg
+<	注意，使用的是给出该命令时有效的颜色。如果之后改变了 Normal 组的
+	颜色，"fg" 和 "bg" 颜色不会被调整。
+
+
+2. GUI highlight 参数
+
+gui={attr-list}						*highlight-gui*
+	这些给出 GUI 模式下要使用的属性。说明见 |attr-list|。
+	注意 "bold" 在这里可用，也可以通过使用粗体字体实现。二者效果相同。
+	注意这些属性对 "Normal" 组会被忽略。
+
+font={font-name}					*highlight-font*
+	font-name 是字体的名称，与 Vim 所运行系统上的用法一致。对于 X11，
+	这是一个复杂的名称，例如： >
+   font=-misc-fixed-bold-r-normal--14-130-75-75-c-70-iso8859-1
+<
+	font-name "NONE" 可用于恢复默认字体。为 "Normal" 组设置字体时，这
+	会成为默认字体（直到 'guifont' 选项被改变；以最后设置的那个为准）。
+	以下只对 Motif 有效，对其它 GUI 无效：为 "Menu" 组设置字体时，菜单
+	会被改变。为 "Tooltip" 组设置字体时，tooltip 会被改变。
+	除 Menu 和 Tooltip 外，使用的所有字体都应与默认字体具有相同字符
+	尺寸！否则会出现重绘问题。
+	要使用带嵌入空格或其它特殊字符的字体名，请把它放在单引号中。此时
+	不能使用单引号本身。
+	示例： >
+	    :hi comment font='Monospace 10'
+
+guifg={color-name}					*guifg*
+guibg={color-name}					*guibg*
+guisp={color-name}					*guisp*
+	这些给出 GUI 中要使用的前景（guifg）、背景（guibg）和特殊（guisp）
+	颜色。"guisp" 用于各种下划线。
+	有几个特殊名称：
+		NONE		无颜色（透明）
+		bg		使用正常背景色
+		background	使用正常背景色
+		fg		使用正常前景色
+		foreground	使用正常前景色
+	要使用带嵌入空格或其它特殊字符的颜色名，请把它放在单引号中。此时不能
+	使用单引号本身。
+	示例： >
+	    :hi comment guifg='salmon pink'
+<
+							*gui-colors*
+	建议使用的颜色名（大多数系统上都可用）：
+	    Red		LightRed	DarkRed
+	    Green	LightGreen	DarkGreen	SeaGreen
+	    Blue	LightBlue	DarkBlue	SlateBlue
+	    Cyan	LightCyan	DarkCyan
+	    Magenta	LightMagenta	DarkMagenta
+	    Yellow	LightYellow	Brown		DarkYellow
+	    Gray	LightGray	DarkGray
+	    Black	White
+	    Orange	Purple		Violet
+
+	定义 Nvim 默认颜色方案的颜色：
+	    NvimDarkBlue    NvimLightBlue
+	    NvimDarkCyan    NvimLightCyan
+	    NvimDarkGray1   NvimLightGray1
+	    NvimDarkGray2   NvimLightGray2
+	    NvimDarkGray3   NvimLightGray3
+	    NvimDarkGray4   NvimLightGray4
+	    NvimDarkGreen   NvimLightGreen
+	    NvimDarkMagenta NvimLightMagenta
+	    NvimDarkRed     NvimLightRed
+	    NvimDarkYellow  NvimLightYellow
+
+	你也可以用 RGB（红、绿、蓝）值来指定颜色。格式是 "#rrggbb"，其中
+		"rr"	是红色值
+		"gg"	是绿色值
+		"bb"	是蓝色值
+	所有值都是十六进制，范围从 "00" 到 "ff"。示例： >
+	    :highlight Comment guifg=#11f0c3 guibg=#ff00ff
+<
+blend={integer}					*highlight-blend* *opacity*
+	覆盖 popupmenu 或浮动 window 中某个 highlight group 的混合程度。仅当
+	为菜单或 window 设置了 'pumblend' 或 'winblend' 时才生效。参见相应
+	选项的帮助。
+
+	另见 |nvim_buf_set_extmark()| 的 "blend" 标志。
+
+					*highlight-groups* *highlight-default*
+这些是内置的 highlight 组。注意 highlight 效果取决于 'background' 的值。
+用 ":highlight" 命令可以查看当前的设置。
+							*hl-ColorColumn*
+ColorColumn	用于 'colorcolumn' 所设置的列。
+							*hl-Conceal*
+Conceal		替换被隐藏文本的占位字符（见 'conceallevel'）。
+							*hl-CurSearch*
+CurSearch	最近一次搜索模式的当前匹配（见 'hlsearch'）。
+		注意：搜索之后这是正确的，但如果做了改动或屏幕被重绘，它可能
+		会过时。
+						*hl-Cursor* *hl-lCursor*
+Cursor		光标之下的字符。
+lCursor		使用 |language-mapping| 时光标之下的字符（见 'guicursor'）。
+							*hl-CursorIM*
+CursorIM	类似 Cursor，但用于 IME 模式。 *CursorIM*
+							*hl-CursorColumn*
+CursorColumn	设置了 'cursorcolumn' 时光标所在的屏幕列。
+							*hl-CursorLine*
+CursorLine	设置了 'cursorline' 时光标所在的屏幕行。
+		如果未设置前景色（ctermfg 或 guifg），则为低优先级。
+							*hl-Directory*
+Directory	目录名（以及列表中其它特殊名称）。
+							*hl-DiffAdd*
+DiffAdd		diff 模式：新增的行。 |diff.txt|
+							*hl-DiffChange*
+DiffChange	diff 模式：改变的行。 |diff.txt|
+							*hl-DiffDelete*
+DiffDelete	diff 模式：删除的行。 |diff.txt|
+							*hl-DiffText*
+DiffText	diff 模式：改变的行中被改变的文本。 |diff.txt|
+							*hl-DiffTextAdd*
+DiffTextAdd	diff 模式：改变的行中新增的文本。默认链接到
+		|hl-DiffText|。 |diff.txt|
+							*hl-EndOfBuffer*
+EndOfBuffer	buffer 中最后一行之后的填充行（~）。默认情况下，它像
+		|hl-NonText| 那样高亮。
+							*hl-TermCursor*
+TermCursor	处于焦点的 terminal 中的光标。
+							*hl-OkMsg*
+OkMsg		成功消息。
+							*hl-WarningMsg*
+WarningMsg	警告消息。
+							*hl-ErrorMsg*
+ErrorMsg	错误消息。
+							*hl-StderrMsg*
+StderrMsg	shell 命令发往 stderr 的消息。
+							*hl-StdoutMsg*
+StdoutMsg	shell 命令发往 stdout 的消息。
+							*hl-WinSeparator*
+WinSeparator	window 分割之间的分隔线。
+							*hl-Folded*
+Folded		用于已关闭折叠的行。
+							*hl-FoldColumn*
+FoldColumn	'foldcolumn'
+							*hl-SignColumn*
+SignColumn	显示 |signs| 的列。
+							*hl-IncSearch*
+IncSearch	'incsearch' 的高亮；也用于被 ":s///c" 替换的文本。
+							*hl-Substitute*
+Substitute	|:substitute| 替换文本的高亮。
+							*hl-LineNr*
+LineNr		用于 ":number" 和 ":#" 命令，以及设置了 'number' 或
+		'relativenumber' 选项时的行号。
+							*hl-LineNrAbove*
+LineNrAbove	设置了 'relativenumber' 选项时，光标行上方的行号。
+							*hl-LineNrBelow*
+LineNrBelow	设置了 'relativenumber' 选项时，光标行下方的行号。
+							*hl-CursorLineNr*
+CursorLineNr	设置了 'cursorline' 且 'cursorlineopt' 包含 "number" 或是
+		"both" 时，光标行上的行号类似于 LineNr。
+							*hl-CursorLineFold*
+CursorLineFold	为光标行设置了 'cursorline' 时，类似 FoldColumn。
+							*hl-CursorLineSign*
+CursorLineSign	为光标行设置了 'cursorline' 时，类似 SignColumn。
+							*hl-MatchParen*
+MatchParen	光标之下的字符，或者紧挨在光标之前且成对的括号字符及其
+		匹配项。 |pi_paren.txt|
+							*hl-ModeMsg*
+ModeMsg		'showmode' 消息（例如 "-- INSERT --"）。
+							*hl-MsgArea*
+MsgArea		消息和命令行所在的区域，另见 'cmdheight'。
+							*hl-MsgSeparator*
+MsgSeparator	滚动消息的分隔符 |msgsep|。
+							*hl-MoreMsg*
+MoreMsg		|more-prompt|
+							*hl-NonText*
+NonText		window 末尾的 '@'、来自 'showbreak' 的字符，以及其它其实
+		并不存在于文本中的字符（例如当双宽字符放不下行尾时显示的
+		">"）。另见 |hl-EndOfBuffer|。
+							*hl-Normal*
+Normal		普通文本。
+							*hl-NormalFloat*
+NormalFloat	浮动 window 中的普通文本。
+							*hl-FloatBorder*
+FloatBorder	浮动 window 的边框。
+							*hl-FloatShadow*
+FloatShadow	边框为 "shadow" 时的混合区域。
+							*hl-FLoatShadowThrough*
+FloatShadowThrough
+		边框为 "shadow" 时的阴影角。
+							*hl-FloatTitle*
+FloatTitle	浮动 window 的标题。
+							*hl-FloatFooter*
+FloatFooter	浮动 window 的页脚。
+							*hl-NormalNC*
+NormalNC	非当前 window 中的普通文本。
+							*hl-Pmenu*
+Pmenu		弹出菜单：普通项。
+							*hl-PmenuSel*
+PmenuSel	弹出菜单：选中项。与 |hl-Pmenu| 合并。
+							*hl-PmenuKind*
+PmenuKind	弹出菜单：普通项的 "kind"。
+							*hl-PmenuKindSel*
+PmenuKindSel	弹出菜单：选中项的 "kind"。
+							*hl-PmenuExtra*
+PmenuExtra	弹出菜单：普通项的 "extra text"。
+							*hl-PmenuExtraSel*
+PmenuExtraSel	弹出菜单：选中项的 "extra text"。
+							*hl-PmenuSbar*
+PmenuSbar	弹出菜单：滚动条。
+							*hl-PmenuThumb*
+PmenuThumb	弹出菜单：滚动条的滑块。
+							*hl-PmenuMatch*
+PmenuMatch	弹出菜单：普通项中匹配的文本。与
+		|hl-Pmenu| 合并。
+							*hl-PmenuMatchSel*
+PmenuMatchSel	弹出菜单：选中项中匹配的文本。与
+		|hl-PmenuMatch| 和 |hl-PmenuSel| 合并。
+							*hl-PmenuBorder*
+PmenuBorder	弹出菜单：弹出菜单的边框。
+							*hl-PmenuShadow*
+PmenuShadow	弹出菜单：'pumborder' 为 "shadow" 时的混合区域。
+							*hl-PmenuShadowThrough*
+PmenuShadowThrough
+		弹出菜单：'pumborder' 为 "shadow" 时的阴影角。
+							*hl-ComplMatchIns*
+ComplMatchIns	当前插入的补全中匹配的文本。
+							*hl-PreInsert*
+PreInsert	'completeopt' 中含有 "preinsert" 时插入的文本。
+							*hl-ComplHint*
+ComplHint	当前选中的补全的虚拟文本。
+							*hl-ComplHintMore*
+ComplHintMore	虚拟文本的附加信息。
+							*hl-Question*
+Question	|hit-enter| 提示和是/否问题。
+							*hl-QuickFixLine*
+QuickFixLine	quickfix window 中当前的 |quickfix| 项。光标在那里时与
+		|hl-CursorLine| 合并。
+							*hl-Search*
+Search		最近一次搜索模式的高亮（见 'hlsearch'）。
+		也用于需要突出的类似项。
+							*hl-SnippetTabstop*
+SnippetTabstop	snippet 中的制表位。 |vim.snippet|
+							*hl-SnippetTabstopActive*
+SnippetTabstopActive
+		当前活动的制表位。 |vim.snippet|
+							*hl-SpecialKey*
+SpecialKey	不可打印字符：显示得与其实际内容不同的文本。但不包括
+		'listchars' 空白。 |hl-Whitespace|
+							*hl-SpellBad*
+SpellBad	拼写检查器不认识的单词。 |spell|
+		与其它情况下使用的高亮合并。
+							*hl-SpellCap*
+SpellCap	应当以大写字母开头的单词。 |spell|
+		与其它情况下使用的高亮合并。
+							*hl-SpellLocal*
+SpellLocal	拼写检查器认为是在另一地区使用的单词。 |spell|
+		与其它情况下使用的高亮合并。
+							*hl-SpellRare*
+SpellRare	拼写检查器认为是几乎不用的单词。 |spell|
+		与其它情况下使用的高亮合并。
+							*hl-StatusLine*
+StatusLine	当前 window 的状态行。
+							*hl-StatusLineNC*
+StatusLineNC	非当前 window 的状态行。
+							*hl-StatusLineTerm*
+StatusLineTerm	|terminal| window 的状态行。
+							*hl-StatusLineTermNC*
+StatusLineTermNC
+		非当前 |terminal| window 的状态行。
+							*hl-TabLine*
+TabLine		标签页行，非活动标签页的标签。
+							*hl-TabLineFill*
+TabLineFill	标签页行，没有标签的地方。
+							*hl-TabLineSel*
+TabLineSel	标签页行，活动标签页的标签。
+							*hl-Title*
+Title		用于 ":set all"、":autocmd" 等输出的标题。
+							*hl-Visual*
+Visual		可视模式的选择。
+							*hl-VisualNOS*
+VisualNOS	vim "不拥有选择" 时的可视模式选择。
+							*hl-Whitespace*
+Whitespace	'listchars' 中的 "nbsp"、"space"、"tab"、"multispace"、
+		"lead" 和 "trail"。
+							*hl-WildMenu*
+WildMenu	'wildmenu' 补全中的当前匹配。
+							*hl-WinBar*
+WinBar		当前 window 的 window 栏。
+							*hl-WinBarNC*
+WinBarNC	非当前 window 的 window 栏。
+
+					*hl-User1* *hl-User1..9* *hl-User9*
+'statusline' 语法允许在状态行和标尺（通过 'rulerformat'）中使用 9 种不同的
+highlight。名称是 User1 到 User9。
+
+对于 GUI，你可以用下面这些组来设置菜单、滚动条和工具提示的颜色。它们没有
+默认值。这在 Win32 GUI 上不起作用。这里只有三个 highlight 参数有效：font、
+guibg 和 guifg。
+
+							*hl-Menu*
+Menu		菜单当前的字体、背景色和前景色。
+		也用于工具栏。
+		适用的 highlight 参数：font、guibg、guifg。
+
+							*hl-Scrollbar*
+Scrollbar	主 window 滚动条当前的背景色和前景色。
+		适用的 highlight 参数：guibg、guifg。
+
+							*hl-Tooltip*
+Tooltip		工具提示当前的字体、背景色和前景色。
+		适用的 highlight 参数：font、guibg、guifg。
+
+==============================================================================
+14. 链接组		*:hi-link* *:highlight-link* *E412* *E413*
+
+当你想为多个 syntax 组使用相同的 highlight 时，可以更简便地把这些组链接到
+一个共同的 highlight 组，并且只给那个组设置颜色属性。
+
+设置一个链接：
+
+    :hi[ghlight][!] [default] link {from-group} {to-group}
+
+移除一个链接：
+
+    :hi[ghlight][!] [default] link {from-group} NONE
+
+注意：							*E414*
+- 如果 {from-group} 和/或 {to-group} 不存在，它会被创建。对于不存在的组你
+  不会收到错误消息。
+- 一旦你对某个已链接的组使用 ":highlight" 命令，该链接就会被移除。
+- 如果 {from-group} 已经有 highlight 设置，则不会建立链接，除非给出 '!'。
+  对于被 source 的文件中的 ":highlight link" 命令，你不会收到错误消息。
+  这可以用来跳过那些已经有设置的组的链接。
+
+					*:hi-default* *:highlight-default*
+[default] 参数用于设置某个组的默认 highlight。如果该组已经指定了 highlight，
+该命令会被忽略。存在已有的链接时也一样。
+
+使用 [default] 对于覆盖特定 syntax 文件的 highlight 特别有用。例如，C 的
+syntax 文件包含： >
+	:highlight default link cComment Comment
+如果你喜欢用 Question 来高亮 C 注释，把下面这行放进你的 vimrc 文件： >
+	:highlight link cComment Question
+如果 C 的 syntax 文件里没有 "default"，那么加载该 syntax 文件时这个
+highlight 就会被覆盖。
+
+要让一个链接在 `:highlight clear` 之后仍然保留——当你为某个特定 filetype
+设置了 highlight，并想在切换到另一个配色方案时保留它时，这很有用——可以把
+类似下面这样的命令放进 "after/syntax/{filetype}.vim" 文件： >
+    highlight! default link cComment Question
+
+==============================================================================
+15. 清理						*:syn-clear* *E391*
+
+如果你想清除当前 buffer 的 syntax 内容，可以使用这个命令： >
+  :syntax clear
+
+当你想要关闭 syntax highlighting，或者想切换到使用另一种 syntax 时，应该
+使用这条命令。在 syntax 文件自身里通常不需要它，因为加载 syntax 文件的
+autocommand 会清除 syntax。
+这条命令还会删除 "b:current_syntax" 变量，因为在此命令之后没有加载任何
+syntax。
+
+要清理当前 buffer 的特定 syntax 组： >
+  :syntax clear {group-name} ...
+这会移除 {group-name} 的所有模式和关键字。
+
+要清理当前 buffer 的特定 syntax 组列表： >
+  :syntax clear @{grouplist-name} ...
+这会把 {grouplist-name} 的内容设为一个空列表。
+
+						*:syntax-off* *:syn-off*
+如果你想为所有 buffer 禁用 syntax highlighting，需要移除那些加载 syntax
+文件的 autocommand： >
+  :syntax off
+
+这条命令实际做的事情是执行命令 >
+  :source $VIMRUNTIME/syntax/nosyntax.vim
+详情见 "nosyntax.vim" 文件。注意要让这生效，$VIMRUNTIME 必须有效。
+见 |$VIMRUNTIME|。
+
+						*:syntax-reset* *:syn-reset*
+如果你改动了颜色并把它弄乱了，用这条命令恢复默认值： >
+
+  :syntax reset
+
+这个名字有点不准确，因为它并不重置任何 syntax item，只影响 highlight。
+
+注意你在 vimrc 文件中设置的 syntax 颜色也会被重置回 Vim 默认值。
+注意如果你在使用配色方案，该配色方案为 syntax highlighting 定义的颜色
+会丢失。
+
+注意使用配色方案时，可能分不清到底该用你定义的颜色还是配色方案里的颜色。
+这取决于配色方案文件。见 |:colorscheme|。
+
+==============================================================================
+16. 高亮标签					*tag-highlight*
+
+如果你想高亮文件中的所有标签，可以使用下面的映射。
+
+	<F11>	-- 生成 tags.vim 文件，并高亮标签。
+	<F12>	-- 只根据已有的 tags.vim 文件高亮标签。
+>
+  :map <F11>  :sp tags<CR>:%s/^\([^	:]*:\)\=\([^	]*\).*/syntax keyword Tag \2/<CR>:wq! tags.vim<CR>/^<CR><F12>
+  :map <F12>  :so tags.vim<CR>
+
+WARNING: tags 文件越长，这个操作就越慢，Vim 消耗的内存也越多。
+
+也可以只高亮 typedef、union 和 struct。为此你必须使用 Universal Ctags
+(https://ctags.io) 或 Exuberant ctags。
+
+把这些行放进你的 Makefile： >
+
+    # Make a highlight file for types.  Requires Universal/Exuberant ctags and awk
+    types: types.vim
+    types.vim: *.[ch]
+	    ctags --c-kinds=gstu -o- *.[ch] |\
+		    awk 'BEGIN{printf("syntax keyword Type\t")}\
+			    {printf("%s ", $$1)}END{print ""}' > $@
+
+再把这些行放进你的 vimrc： >
+
+   " load the types.vim highlighting file, if it exists
+   autocmd BufRead,BufNewFile *.[ch] let fname = expand('<afile>:p:h') .. '/types.vim'
+   autocmd BufRead,BufNewFile *.[ch] if filereadable(fname)
+   autocmd BufRead,BufNewFile *.[ch]   exe 'so ' .. fname
+   autocmd BufRead,BufNewFile *.[ch] endif
+
+==============================================================================
+17. 彩色 xterm				*xterm-color* *color-xterm*
+
+							*colortest.vim*
+为了测试你的颜色设置，Vim 发行版中包含了一个文件。
+要使用它，执行这条命令： >
+   :runtime syntax/colortest.vim
+
+Nvim 尽可能使用 256 色和 |true-color| 终端能力。
+
+==============================================================================
+18. 当 syntax 很慢时					*:synti* *:syntime*
+
+本文面向 syntax 文件的作者。
+
+如果你的 syntax 导致重绘变慢，这里有一些让它变快的提示。要观察慢的情况，
+可以打开一些通常会干扰的功能，比如 'relativenumber' 和 |folding|。
+
+要找出哪些模式最耗时，用下面这个序列来获得概览： >
+	:syntime on
+	[ redraw the text at least once with CTRL-L ]
+	:syntime report
+
+这会显示一个用过的 syntax 模式列表，按它们与文本匹配所花的时间排序。
+
+:synti[me] on		开始测量 syntax 时间。这会增加一些开销，用于计算
+			花在 syntax 模式匹配上的时间。
+
+:synti[me] off		停止测量 syntax 时间。
+
+:synti[me] clear	把所有计数器清零，重新开始测量。
+
+:synti[me] report	显示自 ":syntime on" 以来在当前 window 中使用过的
+			syntax item。使用更宽的显示可以看到更多输出。
+
+			列表按总时间排序。各列分别是：
+			TOTAL		匹配该模式所花的总时间（秒）。
+			COUNT		该模式被使用的次数。
+			MATCH		该模式实际匹配的次数
+			SLOWEST		一次尝试的最长时间。
+			AVERAGE		一次尝试的平均时间。
+			NAME		syntax item 的名称。注意它并不唯一。
+			PATTERN		使用的模式。
+
+当模式需要尝试许多备选时，匹配会变慢。尽量包含尽可能多的字面文本，以减少
+模式“不匹配”的方式的数量。
+
+使用 "\@<=" 和 "\@<!" 项时，加上最大长度，以避免在当前行和上一行的所有位置
+都进行尝试。例如，如果该项是字面文本，就指定该文本的长度（以字节计）：
+
+"<\@<=span"	匹配 "<span" 中的 "span"。它会在很多位置尝试用 "<" 匹配。
+"<\@1<=span"	匹配结果相同，但只在 "span" 之前的一个字节处尝试。
+
+
+ vim:tw=78:sw=4:ts=8:noet:ft=help:norl:

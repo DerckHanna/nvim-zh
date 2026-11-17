@@ -1,0 +1,1091 @@
+{
+  "schema_version": 1,
+  "upstreams": {
+    "neovim": {
+      "repository": "https://github.com/neovim/neovim",
+      "version": "0.12.6",
+      "commit": "779c36969e31080503be2dfccbcc3f999e289606",
+      "documents": {
+        "help.txt": {
+          "source": "runtime/doc/help.txt",
+          "translation": "doc/help.cnx",
+          "status": "complete",
+          "sha256": "407793fd3f922f69fc0294f0968606c72cf498482545fb32efa4bb53467de94a",
+          "notes": "Whole document translated; every section list line, the local-additions anchor and the tags-example section are preserved."
+        },
+        "nvim.txt": {
+          "source": "runtime/doc/nvim.txt",
+          "translation": "doc/nvim.cnx",
+          "status": "complete",
+          "sha256": "8cdbfcac8ffdc35db31c7bd8569e8c6bf4f2a86afbf1df64484d24951e502706",
+          "notes": "Whole document translated, including the portable-config section and the Vim migration steps."
+        },
+        "lua-guide.txt": {
+          "source": "runtime/doc/lua-guide.txt",
+          "translation": "doc/lua-guide.cnx",
+          "status": "complete",
+          "sha256": "21e441222289383be9dae21009fc6ac2a4b293701df5e8d089340d1ff1560af0",
+          "notes": "Whole document translated; all 57 Lua/Vimscript example blocks are byte-identical to upstream so every snippet stays copy-pasteable."
+        },
+        "diagnostic.txt": {
+          "source": "runtime/doc/diagnostic.txt",
+          "translation": "doc/diagnostic.cnx",
+          "status": "complete",
+          "sha256": "c0ddc2a2d800ed82d55899e4af785d484d7d0073facf7fcdbfa9673c87c13c39",
+          "notes": "Whole document translated, including the vim.diagnostic Lua API reference; all 23 example blocks and 83 tags (with the hl-Diagnostic* group names) are preserved verbatim."
+        },
+        "terminal.txt": {
+          "source": "runtime/doc/terminal.txt",
+          "translation": "doc/terminal.cnx",
+          "status": "complete",
+          "sha256": "da9955974620e51be3f25a44c76db628182139513e74451efae79d96cba61ee4",
+          "notes": "Whole document translated, including the :Termdebug plugin reference; all 70 example blocks and 73 tags are preserved verbatim."
+        },
+        "quickfix.txt": {
+          "source": "runtime/doc/quickfix.txt",
+          "translation": "doc/quickfix.cnx",
+          "status": "complete",
+          "sha256": "e21b6d11eb11bd33adf0fcf27cb19ceef8c3179a1572832b00cd0c8560852091",
+          "notes": "Whole document translated, including every :c* / :l* command, 'errorformat' item tables and the compiler-plugin reference; all 98 example blocks and 273 tags are preserved verbatim."
+        },
+        "lsp.txt": {
+          "source": "runtime/doc/lsp.txt",
+          "translation": "doc/lsp.cnx",
+          "status": "complete",
+          "sha256": "216192b1664acc0f430e4c91ba5fc3de77a3b602af3c5772cbc0c7503c952cfa",
+          "notes": "Whole document translated, including every vim.lsp module reference, the seven Lsp* events and the semantic-highlight capture tables; all 79 example blocks and 204 tags are preserved verbatim."
+        },
+        "windows.txt": {
+          "source": "runtime/doc/windows.txt",
+          "translation": "doc/windows.cnx",
+          "status": "complete",
+          "sha256": "dc3d681ce8275752136d517f5e8fca1992835f5f9f50bbcda7ba3dbe370e5e8d",
+          "notes": "Whole document translated, including every CTRL-W command, the argument/buffer list tables and the CursorHold preview example; all 26 example blocks (two ASCII tables and the long PreviewWord() function included) and 267 tags are preserved verbatim."
+        },
+        "cmdline.txt": {
+          "source": "runtime/doc/cmdline.txt",
+          "translation": "doc/cmdline.cnx",
+          "status": "complete",
+          "sha256": "016e31cd1556daa4c29c8d5ebc65412bf7042a314f8555244e15ae191c128e4f",
+          "notes": "Whole document translated, including every c_* key binding, the command-list tables, the full line-specifier table and the command-line window chapter; all 50 example blocks and 239 tags are preserved verbatim."
+        },
+        "motion.txt": {
+          "source": "runtime/doc/motion.txt",
+          "translation": "doc/motion.cnx",
+          "status": "complete",
+          "sha256": "c47195456ad1f97fd51ff205d2a868bccb552188f9beff3b6cf17533184ff966",
+          "notes": "Whole document translated, including every motion key, the operator/text-object tables, the mark-jump reference and the jumplist/changelist sections; all 19 example blocks (including the six jumplist listings) and 305 tags are preserved verbatim."
+        },
+        "editing.txt": {
+          "source": "runtime/doc/editing.txt",
+          "translation": "doc/editing.cnx",
+          "status": "complete",
+          "sha256": "c2dbae8cd919f97a5acabec222be3071347c35212b977d158c4735802577b733",
+          "notes": "Whole document translated, including the argument-list commands, the [++opt]/[+cmd] reference, file formats and EOL/EOF handling, writing/backup/ACL/xattr, quitting, dialogs, directory scopes, binary files, timestamps, file searching and trusted files; all 62 example blocks and 248 tags are preserved verbatim."
+        },
+        "support.txt": {
+          "source": "runtime/doc/support.txt",
+          "translation": "doc/support.cnx",
+          "status": "complete",
+          "sha256": "4f16e0614903d11801a056266b8934d1674c20ba3450f72224cf9fa430327928",
+          "notes": "Whole document translated; the supported-platform tier table, the Tier 1/2/3 definitions and the CMake platform-port rules are preserved, along with all 3 help tags and 0 example blocks verbatim., with all 3 help tags, 0 example blocks and 2 help links preserved."
+        },
+        "pi_tutor.txt": {
+          "source": "runtime/doc/pi_tutor.txt",
+          "translation": "doc/pi_tutor.cnx",
+          "status": "complete",
+          "sha256": "fa77d972661b12c817e7fbe6884ee3fcd12b168f73be0a97244a6929808c0149",
+          "notes": "Whole document translated; the :Tutor command, the tutor.tutor format example and the runtimepath discovery rule are preserved, along with all 5 help tags and 1 example blocks verbatim., with all 5 help tags, 1 example blocks and 0 help links preserved."
+        },
+        "pi_gzip.txt": {
+          "source": "runtime/doc/pi_gzip.txt",
+          "translation": "doc/pi_gzip.cnx",
+          "status": "complete",
+          "sha256": "bb70f2b79046775d8d44fcb9aa69b07688a6acc2d70ed2007de6ce0c77699a96",
+          "notes": "Whole document translated; the loaded_gzip / g:gzip_exec variables and the gzip-autocmd extension table are preserved, along with all 6 help tags and 3 example blocks verbatim., with all 6 help tags, 3 example blocks and 2 help links preserved."
+        },
+        "pi_paren.txt": {
+          "source": "runtime/doc/pi_paren.txt",
+          "translation": "doc/pi_paren.cnx",
+          "status": "complete",
+          "sha256": "d5548684424ae2c9329d288a020673d32f09614786d1e510c23f7fb049d76bbd",
+          "notes": "Whole document translated; the matchparen plugin, its two commands and the search-limit list are preserved, along with all 4 help tags and 5 example blocks verbatim., with all 4 help tags, 5 example blocks and 4 help links preserved."
+        },
+        "ft_ps1.txt": {
+          "source": "runtime/doc/ft_ps1.txt",
+          "translation": "doc/ft_ps1.cnx",
+          "status": "complete",
+          "sha256": "d1b4d16ed6cd45a768bb439a56420ee6c6bbe2bcc24eafa963847c9da8cdec30",
+          "notes": "Whole document translated; the ps1-syntax, ps1-about, ps1-folding, ps1-compiler and ps1-keyword sections are preserved, along with all 6 help tags and 4 example blocks verbatim., with all 6 help tags, 4 example blocks and 3 help links preserved."
+        },
+        "job_control.txt": {
+          "source": "runtime/doc/job_control.txt",
+          "translation": "doc/job_control.cnx",
+          "status": "complete",
+          "sha256": "9b38315d007bab1a170863f9bab2740fb0ff81bca5d0861c03cf3685d2e32692",
+          "notes": "Whole document translated; the :terminal job-control chapter and its public job API notes are preserved, along with all 10 help tags and 7 example blocks verbatim., with all 10 help tags, 7 example blocks and 22 help links preserved."
+        },
+        "scroll.txt": {
+          "source": "runtime/doc/scroll.txt",
+          "translation": "doc/scroll.cnx",
+          "status": "complete",
+          "sha256": "2b7cbc5928e3901d88f768197a27cdcbc9efe793880daa01bd0f118261371949",
+          "notes": "Whole document translated; the scrolling commands, scroll-related options and the mouse/scroll binding reference are preserved, along with all 48 help tags and 1 example blocks verbatim., with all 48 help tags, 1 example blocks and 2 help links preserved."
+        },
+        "plugins.txt": {
+          "source": "runtime/doc/plugins.txt",
+          "translation": "doc/plugins.cnx",
+          "status": "complete",
+          "sha256": "5486f2478f1a550a8458a89464fd453aa5af21a8a018bf40139d8bc5e45b94bc",
+          "notes": "Whole document translated; the standard-plugin and package/plugin loading chapters are preserved, along with all 31 help tags and 8 example blocks verbatim., with all 31 help tags, 8 example blocks and 35 help links preserved."
+        },
+        "remote.txt": {
+          "source": "runtime/doc/remote.txt",
+          "translation": "doc/remote.cnx",
+          "status": "complete",
+          "sha256": "0adac56b8dfcc9b34db710e4839e6a6261610c95f25e43274af76628406af705",
+          "notes": "Whole document translated; the remote editing chapter, the --remote* arguments and the client-server model are covered, with all 20 help tags, 5 example blocks and 5 help links preserved."
+        },
+        "undo.txt": {
+          "source": "runtime/doc/undo.txt",
+          "translation": "doc/undo.cnx",
+          "status": "complete",
+          "sha256": "cf26c8cce11828dde34252c6215d7b774a9dbf176d60225089c3c5f1604347ef",
+          "notes": "Whole document translated; the undo tree, the :undo/:redo commands and undo persistence are covered, with all 48 help tags, 6 example blocks and 16 help links preserved."
+        },
+        "tui.txt": {
+          "source": "runtime/doc/tui.txt",
+          "translation": "doc/tui.cnx",
+          "status": "complete",
+          "sha256": "5bea51571d64334f35512f29b887bb9fa1e5ca87e31f7182948e1c853368347a",
+          "notes": "Whole document translated; the built-in TUI, terminal capabilities and truecolor handling are covered, with all 27 help tags, 13 example blocks and 24 help links preserved."
+        },
+        "provider.txt": {
+          "source": "runtime/doc/provider.txt",
+          "translation": "doc/provider.cnx",
+          "status": "complete",
+          "sha256": "1d579fe553cefe0a23020c49ee3e58898900d88fa0fac590988dfe67abb313c8",
+          "notes": "Whole document translated; the Python/Ruby/Perl/Node.js/clipboard providers and g:clipboard are covered, with all 34 help tags, 25 example blocks and 37 help links preserved."
+        },
+        "helphelp.txt": {
+          "source": "runtime/doc/helphelp.txt",
+          "translation": "doc/helphelp.cnx",
+          "status": "complete",
+          "sha256": "3ee3456161a3bbd4746e6bbb613345b03dc64300ff7134a9397a8ef8d593015c",
+          "notes": "Whole document translated; the :help workflow, help window navigation and the tags/helptags reference are covered, with all 54 help tags, 18 example blocks and 36 help links preserved."
+        },
+        "fold.txt": {
+          "source": "runtime/doc/fold.txt",
+          "translation": "doc/fold.cnx",
+          "status": "complete",
+          "sha256": "891c0bc642ecb2722f5fba5f8e41899a0b351b385727602d61e08d4f521a43cf",
+          "notes": "Whole document translated; fold methods, the fold commands and the fold-related options are covered, with all 63 help tags, 18 example blocks and 39 help links preserved."
+        },
+        "visual.txt": {
+          "source": "runtime/doc/visual.txt",
+          "translation": "doc/visual.cnx",
+          "status": "complete",
+          "sha256": "aef449bf8f2f65208c34a696b0be00a43c1a996baa662ac17a4d9fe7dff1b168",
+          "notes": "Whole document translated; Visual mode, block selection and the v_* commands are covered, with all 65 help tags, 6 example blocks and 80 help links preserved."
+        },
+        "diff.txt": {
+          "source": "runtime/doc/diff.txt",
+          "translation": "doc/diff.cnx",
+          "status": "complete",
+          "sha256": "41d41e59211c4e26af3b43aebc6052b07b256cb21fcc581ae99d497bf0077f7b",
+          "notes": "Whole document translated; diff mode, the :diff* commands and the diff-related options are covered, with all 48 help tags, 25 example blocks and 25 help links preserved."
+        },
+        "l10n-russian.txt": {
+          "source": "runtime/doc/l10n-russian.txt",
+          "translation": "doc/l10n-russian.cnx",
+          "status": "complete",
+          "sha256": "df400d2ae6b3953f44815cf4efe651977dda8ec3f1a43435b4f6c8944a35b2e5",
+          "notes": "Whole document translated; Russian keymaps, localization and known issues are covered, with all 7 help tags, 2 example blocks and 2 help links preserved."
+        },
+        "l10n-vietnamese.txt": {
+          "source": "runtime/doc/l10n-vietnamese.txt",
+          "translation": "doc/l10n-vietnamese.cnx",
+          "status": "complete",
+          "sha256": "3d6c2e947eb10aa13156148343bd74d38f3fd25f6ec08f4a8650f218d6aa32ee",
+          "notes": "Whole document translated; Vietnamese keymaps, input-method differences and localization are covered, with all 8 help tags, 3 example blocks and 16 help links preserved."
+        },
+        "ft_hare.txt": {
+          "source": "runtime/doc/ft_hare.txt",
+          "translation": "doc/ft_hare.cnx",
+          "status": "complete",
+          "sha256": "31fd227037cb8c2556ea48a7e5ac92433eb5e1d07e96ce24ceaeb03ca53d2370",
+          "notes": "Whole document translated; the Hare filetype plugin, its variables and defaults are covered, with all 9 help tags, 5 example blocks and 7 help links preserved."
+        },
+        "health.txt": {
+          "source": "runtime/doc/health.txt",
+          "translation": "doc/health.cnx",
+          "status": "complete",
+          "sha256": "7104e713a6a84a6eadd343377af09f41afd830246a05e8d2bd9fd7f818c87542",
+          "notes": "Whole document translated; the :checkhealth framework and the vim.health API are covered, with all 15 help tags, 7 example blocks and 5 help links preserved."
+        },
+        "remote_plugin.txt": {
+          "source": "runtime/doc/remote_plugin.txt",
+          "translation": "doc/remote_plugin.cnx",
+          "status": "complete",
+          "sha256": "ca210f05efba45d671dc5dc8445f84b90f9e1c64b30e95060f8c37289bc70c3d",
+          "notes": "Whole document translated; remote plugin hosts, the manifest and :UpdateRemotePlugins are covered, with all 8 help tags, 1 example blocks and 12 help links preserved."
+        },
+        "pi_msgpack.txt": {
+          "source": "runtime/doc/pi_msgpack.txt",
+          "translation": "doc/pi_msgpack.cnx",
+          "status": "complete",
+          "sha256": "79e4f716caedf483f871cdd4ce60a01d27177611d614dd9b81de4d87260c6891",
+          "notes": "Whole document translated; the msgpack.vim utility functions and argument types are covered, with all 21 help tags, 0 example blocks and 39 help links preserved."
+        },
+        "rileft.txt": {
+          "source": "runtime/doc/rileft.txt",
+          "translation": "doc/rileft.cnx",
+          "status": "complete",
+          "sha256": "0ed8142133449f2e15a13813063d5348b1805e8e2203f3234d5f7c76e114fcfc",
+          "notes": "Whole document translated; right-to-left display mode, the related options and known bugs are covered, with all 3 help tags, 0 example blocks and 3 help links preserved."
+        },
+        "tabpage.txt": {
+          "source": "runtime/doc/tabpage.txt",
+          "translation": "doc/tabpage.cnx",
+          "status": "complete",
+          "sha256": "f2478d3408d06f9f4224d41e1270c14e7b787b2f4eb961b8771b035a00f817fa",
+          "notes": "Whole document translated; tabpages, their commands and tab-local behaviour are covered, with all 56 help tags, 15 example blocks and 42 help links preserved."
+        },
+        "sign.txt": {
+          "source": "runtime/doc/sign.txt",
+          "translation": "doc/sign.cnx",
+          "status": "complete",
+          "sha256": "147ce087bb9ec1c283521b07b80efe3f0709d3c3262c4d588f8ef109fe8f2adb",
+          "notes": "Whole document translated; signs, the sign API and the sign-related options are covered, with all 32 help tags, 9 example blocks and 33 help links preserved."
+        },
+        "userfunc.txt": {
+          "source": "runtime/doc/userfunc.txt",
+          "translation": "doc/userfunc.cnx",
+          "status": "complete",
+          "sha256": "91dcc1a23e19ae8693413a24ee87a6acffb72e36eb8ddb035816d0941e3ea8b7",
+          "notes": "Whole document translated; user-defined functions, :function, funcref and lambda are covered, with all 62 help tags, 33 example blocks and 40 help links preserved."
+        },
+        "vvars.txt": {
+          "source": "runtime/doc/vvars.txt",
+          "translation": "doc/vvars.cnx",
+          "status": "complete",
+          "sha256": "68dd958a662fa0642648cefead65babeed833146f423812e2c892dc62f66d431",
+          "notes": "Whole document translated; the v: variables are covered, with all 199 help tags, 19 example blocks and 201 help links preserved."
+        },
+        "gui.txt": {
+          "source": "runtime/doc/gui.txt",
+          "translation": "doc/gui.cnx",
+          "status": "complete",
+          "sha256": "032fe3eba83c153eb26a2c30d94dacb30962504451981ff8504806446af49399",
+          "notes": "Whole document translated; the GUI hosts, gui startup/detach/restart and the mouse/menu reference are covered, with all 162 help tags, 57 example blocks and 80 help links preserved."
+        },
+        "message.txt": {
+          "source": "runtime/doc/message.txt",
+          "translation": "doc/message.cnx",
+          "status": "complete",
+          "sha256": "03f30bfbc265e51bb585f1eebf509368c33ae9341a54bcf43f659cf6842cb7c4",
+          "notes": "Whole document translated; message display, :messages, hit-enter prompts and the message-related options are covered, with all 137 help tags, 116 example blocks and 54 help links preserved."
+        },
+        "repeat.txt": {
+          "source": "runtime/doc/repeat.txt",
+          "translation": "doc/repeat.cnx",
+          "status": "complete",
+          "sha256": "6e91d697f2fa0a934b5fca6b3a84c3e060f441d9fab28e0814c105067215df37",
+          "notes": "Whole document translated; the . command, :normal, :global and the repeat-related commands are covered, with all 86 help tags, 42 example blocks and 83 help links preserved."
+        },
+        "pattern.txt": {
+          "source": "runtime/doc/pattern.txt",
+          "translation": "doc/pattern.cnx",
+          "status": "complete",
+          "sha256": "5a62f3741dd5e81a57d391669e9fa1504f8b773304e779c1158789362d8a118e",
+          "notes": "Whole document translated; search patterns, the pattern atoms and the regexp syntax are covered, with all 278 help tags, 38 example blocks and 202 help links preserved."
+        },
+        "starting.txt": {
+          "source": "runtime/doc/starting.txt",
+          "translation": "doc/starting.cnx",
+          "status": "complete",
+          "sha256": "3a86ad49fc75ec99e98e794df33d69cf9e4070cae0a98abd5236ae03473fe1fe",
+          "notes": "Whole document translated; the startup sequence, the command-line arguments and the initialization files are covered, with all 154 help tags, 58 example blocks and 213 help links preserved."
+        },
+        "tagsrch.txt": {
+          "source": "runtime/doc/tagsrch.txt",
+          "translation": "doc/tagsrch.cnx",
+          "status": "complete",
+          "sha256": "51d6ca30d4d27d21890a078c5d4263a2665a9a32f2cd9f7d5969421061d7ca13",
+          "notes": "Whole document translated; tag files, :tag/:tselect and the tag search reference are covered, with all 145 help tags, 22 example blocks and 80 help links preserved."
+        },
+        "change.txt": {
+          "source": "runtime/doc/change.txt",
+          "translation": "doc/change.cnx",
+          "status": "complete",
+          "sha256": "cc2e10af894313c379c201c14d4bf6ebef62b064094586ec07b9bce4e5fc32a9",
+          "notes": "Whole document translated; deleting/changing/yanking, the put commands, the numbered registers and the text-object reference are covered, with all 346 help tags, 53 example blocks and 175 help links preserved."
+        },
+        "usr_01.txt": {
+          "source": "runtime/doc/usr_01.txt",
+          "translation": "doc/usr_01.cnx",
+          "status": "complete",
+          "sha256": "228604294ab4de28f6312fc0aff64e250376a90110d415a88222850a4cbf7e18",
+          "notes": "Whole document translated; the user-manual introduction, the notation and jumping-around sections, the vimrc/tutor instructions and the copyright chapter are covered, with all 10 help tags, 3 example blocks and 16 help links preserved."
+        },
+        "autocmd.txt": {
+          "source": "runtime/doc/autocmd.txt",
+          "translation": "doc/autocmd.cnx",
+          "status": "complete",
+          "sha256": "20cdf68bd1e46e2f9b19d36212639c1689ec68c799a3b23bee20a92f79997317",
+          "notes": "Whole document translated; the autocommand reference, the full event table and the :au/:augroup commands are covered, with all 206 help tags, 48 example blocks and 312 help links preserved."
+        },
+        "map.txt": {
+          "source": "runtime/doc/map.txt",
+          "translation": "doc/map.cnx",
+          "status": "complete",
+          "sha256": "d029920354fa90adf446de7892adc085b000d1c5565aaa1809adb0a1bc266d77",
+          "notes": "Whole document translated; key mapping, the :map family, <Plug>/<expr>/<script> and the special-key notation are covered, with all 288 help tags, 73 example blocks and 185 help links preserved."
+        },
+        "indent.txt": {
+          "source": "runtime/doc/indent.txt",
+          "translation": "doc/indent.cnx",
+          "status": "complete",
+          "sha256": "97e9247ddeb9feef04a4b858ff4e65a858ea6a132f8f6595167b62ede9c2b9ff",
+          "notes": "Whole document translated; the indent options, cinkeys/cinoptions and the per-filetype indent plugins are covered, with all 87 help tags, 100 example blocks and 35 help links preserved."
+        },
+        "filetype.txt": {
+          "source": "runtime/doc/filetype.txt",
+          "translation": "doc/filetype.cnx",
+          "status": "complete",
+          "sha256": "5222af472bac3c284bdc054028c614b112f2f52bf2067ec7f4cfdd6b355d7237",
+          "notes": "Whole document translated; filetype detection and the per-filetype plugin settings are covered, with all 90 help tags, 115 example blocks and 97 help links preserved."
+        },
+        "vim_diff.txt": {
+          "source": "runtime/doc/vim_diff.txt",
+          "translation": "doc/vim_diff.cnx",
+          "status": "complete",
+          "sha256": "5600e99aa80e5dc245dc29f5086a8e83f6f17ca44216c4341aa834e3359ebd62",
+          "notes": "Whole document translated; the differences between Nvim and Vim, including changed defaults and removed features are covered, with all 173 help tags, 10 example blocks and 368 help links preserved."
+        },
+        "treesitter.txt": {
+          "source": "runtime/doc/treesitter.txt",
+          "translation": "doc/treesitter.cnx",
+          "status": "complete",
+          "sha256": "687576c0c43d9cde830e77217263c12475b6a9dab8b937ad4cf323255fab9b42",
+          "notes": "Whole document translated; the vim.treesitter API, queries, captures and the highlight/indent integration are covered, with all 146 help tags, 46 example blocks and 89 help links preserved."
+        },
+        "insert.txt": {
+          "source": "runtime/doc/insert.txt",
+          "translation": "doc/insert.cnx",
+          "status": "complete",
+          "sha256": "6c2d179f3157e441ed5697681900c4e67256ab1d7fc8c4fa889d294752bb7305",
+          "notes": "Whole document translated; Insert mode, the i_* commands and the insert-mode options are covered, with all 199 help tags, 55 example blocks and 141 help links preserved."
+        },
+        "usr_41.txt": {
+          "source": "runtime/doc/usr_41.txt",
+          "translation": "doc/usr_41.cnx",
+          "status": "complete",
+          "sha256": "812eaf2ac14f04f6c5e5afbecdb389702a8755a3ebfbeee17d573bd187ce77bb",
+          "notes": "Whole document translated; user manual chapter 41, writing Vim scripts are covered, with all 73 help tags, 146 example blocks and 109 help links preserved."
+        },
+        "spell.txt": {
+          "source": "runtime/doc/spell.txt",
+          "translation": "doc/spell.cnx",
+          "status": "complete",
+          "sha256": "202ec3e2c36557bd616dd8ddce73437896eee2a292eed9f9f4f61d78d8d01b27",
+          "notes": "Whole document translated; spelling, 'spelllang', the spell file format and the spell API are covered, with all 161 help tags, 10 example blocks and 84 help links preserved."
+        },
+        "usr_02.txt": {
+          "source": "runtime/doc/usr_02.txt",
+          "translation": "doc/usr_02.cnx",
+          "status": "complete",
+          "sha256": "ca3cffa89d41bf1ee8617d25073469dd50be0cf4bc59bd93cf435966b6809630",
+          "notes": "Whole document translated; user manual chapter 2, running Vim for the first time, inserting text, moving around, quitting and the jump-around ASCII diagram are covered, with all 11 help tags, 80 example blocks and 29 help links preserved."
+        },
+        "usr_04.txt": {
+          "source": "runtime/doc/usr_04.txt",
+          "translation": "doc/usr_04.cnx",
+          "status": "complete",
+          "sha256": "9000d63e8bf82ec4c852e80d35fe90b8947571de041510a5ecb44cf5946d8355",
+          "notes": "Whole document translated; user manual chapter 4, making small changes: deleting, inserting, substitute and the copy/paste commands are covered, with all 11 help tags, 2 example blocks and 19 help links preserved."
+        },
+        "usr_10.txt": {
+          "source": "runtime/doc/usr_10.txt",
+          "translation": "doc/usr_10.cnx",
+          "status": "complete",
+          "sha256": "c44fd818e7b68f3a4ba44db961059c0e77f2127407710678ad26e32f702cf647",
+          "notes": "Whole document translated; user manual chapter 10, making big changes: the substitute, global commands, formatting and automated editing are covered, with all 11 help tags, 49 example blocks and 19 help links preserved."
+        },
+        "dev_theme.txt": {
+          "source": "runtime/doc/dev_theme.txt",
+          "translation": "doc/dev_theme.cnx",
+          "status": "complete",
+          "sha256": "d52e268f6bd3f9fab8bfc0ef0f0ac49a50424dc955f132fa76fe3aaf80190002",
+          "notes": "Whole document translated; the palette tiers, the contrast ratios (7 and 4.5), the Oklch guidance and every NvimDark*/NvimLight* and Diff* group name are kept verbatim, with all 2 help tags, 0 example blocks and 22 help links preserved."
+        },
+        "pi_spec.txt": {
+          "source": "runtime/doc/pi_spec.txt",
+          "translation": "doc/pi_spec.cnx",
+          "status": "complete",
+          "sha256": "fa93fc1aa59396e899b72d77aa0787f5daa462e5af547856f236f338549e58f2",
+          "notes": "Whole document translated; the %changelog workflow, the <LocalLeader>c mapping, the spec_chglog_format/prepend/release_info/never_increase_release variables and the strftime() note are covered, with all 7 help tags, 5 example blocks and 6 help links preserved."
+        },
+        "l10n-hebrew.txt": {
+          "source": "runtime/doc/l10n-hebrew.txt",
+          "translation": "doc/l10n-hebrew.cnx",
+          "status": "complete",
+          "sha256": "5b5e78705089d3956b6c067d63a8b4b778d836975ed44007bb5221fcf6454756",
+          "notes": "Whole document translated; the Hebrew keymaps, the RTL option list, the encoding notes and the reverse-insert section are covered, while the keyboard mapping demo rows stay verbatim as demonstrated text, with all 2 help tags, 0 example blocks and 1 help link preserved."
+        },
+        "ft_raku.txt": {
+          "source": "runtime/doc/ft_raku.txt",
+          "translation": "doc/ft_raku.cnx",
+          "status": "complete",
+          "sha256": "36c521045f0daf0bed5f6357252096b32943afe96b44f11a9882f6c43b507bce",
+          "notes": "Whole document translated; the vim-raku plugin overview, the Unicode-operator prose and both documentation URLs are covered, while the digraph, exec-digraph and Greek-letter demo blocks stay verbatim, with all 3 help tags, 4 example blocks and 2 help links preserved."
+        },
+        "recover.txt": {
+          "source": "runtime/doc/recover.txt",
+          "translation": "doc/recover.cnx",
+          "status": "complete",
+          "sha256": "6fbcd9720fe1f91bc77f938a4d9ec02552096641d5f4842f47354cc8153b653c",
+          "notes": "Whole document translated; the swap-file naming rules, the directory placement advice, the ATTENTION prompt handling, the :recover/:preserve commands and the E325/E326/E313/E1364/W325 error tags are covered, with all 26 help tags, 0 example blocks and 11 help links preserved."
+        },
+        "usr_43.txt": {
+          "source": "runtime/doc/usr_43.txt",
+          "translation": "doc/usr_43.cnx",
+          "status": "complete",
+          "sha256": "5affd3316bbdab7bfaf5fc25da5d101c8794f68b23cb7ba81168a8624976b416",
+          "notes": "Whole document translated; the extended-match chapter covering the \\zs/\\ze atoms, back-references, the filetype-detection-by-contents steps and the xyz filetype-plugin walk-through are covered, with the shell and autocmd demo lines kept verbatim, with all 5 help tags, 9 example blocks and 14 help links preserved."
+        },
+        "if_ruby.txt": {
+          "source": "runtime/doc/if_ruby.txt",
+          "translation": "doc/if_ruby.cnx",
+          "status": "complete",
+          "sha256": "1939448f79105fb78eb9107f5295dbaaa3f7fbba4f69a18eacf9cb645771632e",
+          "notes": "Whole document translated; the legacy Ruby interface, the VIM::Buffer/VIM::Window class members, the :ruby/:rubydo/:rubyfile commands, the heredoc example and the E265-E273 error tags are covered, with all Ruby code blocks byte-identical, with all 29 help tags, 4 example blocks and 11 help links preserved."
+        },
+        "usr_32.txt": {
+          "source": "runtime/doc/usr_32.txt",
+          "translation": "doc/usr_32.cnx",
+          "status": "complete",
+          "sha256": "b7a3b4a2fa036146a24f95a6a713dffb54f729801734565909f5a796307a68f8",
+          "notes": "Whole document translated; the undo-file chapter covering the undofile/undodir options, the three undo-tree ASCII diagrams, :earlier/:later, g-/g+ and the :undolist output are covered, with the tree diagrams and command output kept verbatim, with all 5 help tags, 8 example blocks and 27 help links preserved."
+        },
+        "pi_tar.txt": {
+          "source": "runtime/doc/pi_tar.txt",
+          "translation": "doc/pi_tar.cnx",
+          "status": "complete",
+          "sha256": "2e5d3f55d257b5fa574182a1ba951b139f4e3f30eb0a07816bcf6386e21e53bf",
+          "notes": "Whole document translated; the :tar/:untar commands, the loaded_tarPlugin and g:loaded_tar guard variables, the tar contents/options sections and the charityware closing note are covered, with the vimrc code block byte-identical, with all 15 help tags, 1 example block and 8 help links preserved."
+        },
+        "usr_06.txt": {
+          "source": "runtime/doc/usr_06.txt",
+          "translation": "doc/usr_06.cnx",
+          "status": "complete",
+          "sha256": "6c84aa1432c57793f68f0578db772d5f8414f695c9772486749afad87f2548b4",
+          "notes": "Whole document translated; the syntax-highlighting chapter covering :syntax on/off, :highlight/:colorscheme, the Comment/Constant/Identifier group hierarchy, cterm/gui colour attributes and the evening/mine example files are covered, with all command examples and colour/group names kept verbatim, with all 8 help tags, 16 example blocks and 21 help links preserved."
+        },
+        "usr_31.txt": {
+          "source": "runtime/doc/usr_31.txt",
+          "translation": "doc/usr_31.cnx",
+          "status": "complete",
+          "sha256": "822aa7ad4458d5113de209539bd91af1dc23a5b25088ff857ecf2555b9485cd6",
+          "notes": "Whole document translated; the programmer-choice chapter covering the indentexpr option, the Vimscript indent functions and the dialog/Window-position examples are covered, with the ASCII dialog wireframe and every Save-changes prompt kept verbatim, with all 6 help tags, 15 example blocks and 11 help links preserved."
+        },
+        "mlang.txt": {
+          "source": "runtime/doc/mlang.txt",
+          "translation": "doc/mlang.cnx",
+          "status": "complete",
+          "sha256": "adca8da3e99754e749884a3f744c0304654d005dc67fe1854ca51748ca97f302",
+          "notes": "Whole document translated; the multi-language reference covering message/menu/script locales, the :language and :menutranslate signatures, the LC_MESSAGES/LC_CTYPE/LC_TIME/LC_COLLATE names and the alias-locale table are covered, with every locale string and path kept verbatim, with all 13 help tags, 9 example blocks and 12 help links preserved."
+        },
+        "pi_zip.txt": {
+          "source": "runtime/doc/pi_zip.txt",
+          "translation": "doc/pi_zip.cnx",
+          "status": "complete",
+          "sha256": "0a0a4031cfeb38092df99caf547f57dd3978f7b0f3c67bec26ee2ee938c092c5",
+          "notes": "Whole document translated; the zip plugin browser, the x extract binding, zip#Browse/zip#Read/zip#Write, the g:zipPlugin_ext pattern table and the loaded_zipPlugin guard are covered, with the ASCII box title and every code block byte-identical, with all 16 help tags, 8 example blocks and 8 help links preserved."
+        },
+        "various.txt": {
+          "source": "runtime/doc/various.txt",
+          "translation": "doc/various.cnx",
+          "status": "complete",
+          "sha256": "241889a3ea24a9fc0f8eb384674b3201ccc44beaeecb505156f8e5c804e10852",
+          "notes": "Whole document translated; the miscellaneous command and function reference covering :version, :revim, the v: and g: variables, the system()/job/async group, the RPC and msgpack entries and every E-number note is covered, with all 86 help tags, 21 example blocks and 92 help links preserved."
+        },
+        "channel.txt": {
+          "source": "runtime/doc/channel.txt",
+          "translation": "doc/channel.cnx",
+          "status": "complete",
+          "sha256": "736720165f02ddb04af8c341d4d8f183c31eb5ba071a3e08addae0531e7093e3",
+          "notes": "Whole document translated; the channel and buffer mechanism reference covering channel buffers, the on_stdout/on_stderr/on_exit callbacks, buffered mode, block-size and close-count semantics and the job-channel interaction is covered, with all Lua and Vimscript examples byte-identical, with all 22 help tags, 8 example blocks and 37 help links preserved."
+        },
+        "usr_09.txt": {
+          "source": "runtime/doc/usr_09.txt",
+          "translation": "doc/usr_09.cnx",
+          "status": "complete",
+          "sha256": "b3dfca0f2e1c7f6debc53fe2852d2d3360136f258dc1a7793fe5e55037e8f82b",
+          "notes": "Whole document translated; the GUI chapter covering guioptions, the toolbar and scrollbar toggles, the mouse option, the selection/selectmode/keymodel set and the menu reference are covered, with the ASCII window wireframe and every menu path byte-identical, with all 5 help tags, 8 example blocks and 10 help links preserved."
+        },
+        "usr_26.txt": {
+          "source": "runtime/doc/usr_26.txt",
+          "translation": "doc/usr_26.cnx",
+          "status": "complete",
+          "sha256": "ccd1cd24dbeb85a6017e651641425fe2109d6449693e0a04b400ab3d41b2ae63",
+          "notes": "Whole document translated; the relative-line-numbers chapter covering relativenumber and number, the financial-figures and list examples and the :windo/:bufdo notes are covered, with the demonstrated ASCII figures kept verbatim, with all 5 help tags, 12 example blocks and 9 help links preserved."
+        },
+        "intro.txt": {
+          "source": "runtime/doc/intro.txt",
+          "translation": "doc/intro.cnx",
+          "status": "complete",
+          "sha256": "34827aa98e622f353ce26a42b4b65155a74775326ed762e597bd019deda66085",
+          "notes": "Whole document translated; the introduction covering the mode-switching chapter, the jargon definitions, the Ex/Ex-mode tags and the resource/book references are covered, with the ASCII diagrams and the type-comparison table byte-identical, with all 123 help tags, 13 example blocks and 32 help links preserved."
+        },
+        "quickref.txt": {
+          "source": "runtime/doc/quickref.txt",
+          "translation": "doc/quickref.cnx",
+          "status": "complete",
+          "sha256": "42f1483cf64a83f702f3651c6ad852d861588a5f1c18ab12db60665786c8afb6",
+          "notes": "Whole document translated; the quick-reference two-column tables covering every mode, command, option and key are covered, with all command/key/option names kept verbatim in the left column and all 44 help tags, 0 example blocks and 643 help links preserved."
+        },
+        "usr_12.txt": {
+          "source": "runtime/doc/usr_12.txt",
+          "translation": "doc/usr_12.cnx",
+          "status": "complete",
+          "sha256": "8d1c4bef96bd16a2c0e7dbdc925a7ee7640a568e04a0962182f8ff474b6b5146",
+          "notes": "Whole document translated; the user-manual chapter on efficient editing covering the yank/put registers, the :registers listing and the visual-selection chapters is covered, with all 10 help tags, 20 example blocks and 23 help links preserved."
+        },
+        "usr_22.txt": {
+          "source": "runtime/doc/usr_22.txt",
+          "translation": "doc/usr_22.cnx",
+          "status": "complete",
+          "sha256": "1e301252851a7ed3147b803e37d0acc3d8f0326c87f32038f08734ab61802455",
+          "notes": "Whole document translated; the user-manual chapter on other file formats covering binary files, the :r !command filtering, the fileencoding and fileformat handling is covered, with all 5 help tags, 26 example blocks and 17 help links preserved."
+        },
+        "usr_toc.txt": {
+          "source": "runtime/doc/usr_toc.txt",
+          "translation": "doc/usr_toc.cnx",
+          "status": "complete",
+          "sha256": "13e3e1218d0a23eccce21ca2d6ea996089b71fd08786c441a103b69dca25f042",
+          "notes": "User-manual table of contents translated; all 268 |links| preserved verbatim so every chapter jump still resolves, and the *usr_toc.txt* header plus modeline are byte-identical to upstream."
+        },
+        "news-0.9.txt": {
+          "source": "runtime/doc/news-0.9.txt",
+          "translation": "doc/news-0.9.cnx",
+          "status": "complete",
+          "sha256": "62c6f35e5c39abf590540bc97758ed4b395b240a542f4474d5a8e6a970e8b611",
+          "notes": "Neovim 0.9 release notes translated end to end; the unchanged/deprecated option tables and the feature descriptions keep every command, option and event name in ASCII, all 74 |links| are preserved, and the 5 example blocks are byte-identical to upstream."
+        },
+        "usr_11.txt": {
+          "source": "runtime/doc/usr_11.txt",
+          "translation": "doc/usr_11.cnx",
+          "status": "complete",
+          "sha256": "ef252b54d7ed94569d60dfa9b0130fc0e0d24ae64d546f930575f963048cb945",
+          "notes": "User manual chapter 11 (recovering from a crash) translated whole, including the swap-file and undo-file explanations and the recovery walkthrough; the *usr_11.txt* header and the noet modeline are byte-identical to upstream."
+        },
+        "lua-plugin.txt": {
+          "source": "runtime/doc/lua-plugin.txt",
+          "translation": "doc/lua-plugin.cnx",
+          "status": "complete",
+          "sha256": "9d3b39ac5299db4182c939b4fe83f56654b0b9d6d8d9e27ff8d991f3f6bf19f0",
+          "notes": "Nvim Lua plugin-development guide translated whole, including the plugin layout, the lua-plugin *tags*, and the :command/:autocmd guidance; all 8 Lua example blocks are byte-identical to upstream so snippets stay runnable."
+        },
+        "l10n-arabic.txt": {
+          "source": "runtime/doc/l10n-arabic.txt",
+          "translation": "doc/l10n-arabic.cnx",
+          "status": "complete",
+          "sha256": "fc2b5990650467b7c6e0ea2a1ad59224c9188d92407cf844da5b0b783e48c723",
+          "notes": "Arabic right-to-left editing chapter translated whole; the Arabic glyph/character tables in the example blocks (including U+064E/U+064F and the presentation forms) stay byte-identical to upstream, as do the W17 font tags and the noet modeline."
+        },
+        "dev_vimpatch.txt": {
+          "source": "runtime/doc/dev_vimpatch.txt",
+          "translation": "doc/dev_vimpatch.cnx",
+          "status": "complete",
+          "sha256": "24ff6f960783fbf76dd5a71a0260c4122f89d9fb91d64135e9d32b620605f14f",
+          "notes": "Developer chapter on porting Vim patches to Nvim translated whole, including the patch workflow, the not-applicable list and the test expectations; all 11 example blocks with their diff tables are byte-identical to upstream."
+        },
+        "if_perl.txt": {
+          "source": "runtime/doc/if_perl.txt",
+          "translation": "doc/if_perl.cnx",
+          "status": "complete",
+          "sha256": "c4c96c20cf85b843a5cc6319893bf51a91195235ba772aa70a8bdc7e93f8e66d",
+          "notes": "Perl interface reference translated whole: the :perl/:perldo/:perlfile commands, the VIM::Buffer/VIM::Window Perl API tables and the eval examples; all 8 example blocks (embedding scripts and Perl API samples) are byte-identical to upstream, and the 29 tags keep their *perl-\u2026* names unchanged."
+        },
+        "usr_23.txt": {
+          "source": "runtime/doc/usr_23.txt",
+          "translation": "doc/usr_23.cnx",
+          "status": "complete",
+          "sha256": "2dd6a32912854f0a9f49d61cb54aad3a0d1313faff8884400214529f54ae0b77",
+          "notes": "User manual chapter 23 (non-English languages) translated whole, including the encoding table, the langmap/language-keymap sections and the cpoptions nuances; all 15 example blocks (hex dumps included) are byte-identical to upstream."
+        },
+        "digraph.txt": {
+          "source": "runtime/doc/digraph.txt",
+          "translation": "doc/digraph.cnx",
+          "status": "complete",
+          "sha256": "7a94c68ba201c4e36bff1cb0535d4c0e562bf9ef1f7be9085f22ef9f2c90ed1d",
+          "notes": "Digraph reference translated whole: the prose, the digraph-commands section and the 8 example blocks; the 1308-line digraph table inside a block is byte-identical to upstream so every \"insert this digraph\" recipe still matches."
+        },
+        "dev_style.txt": {
+          "source": "runtime/doc/dev_style.txt",
+          "translation": "doc/dev_style.cnx",
+          "status": "complete",
+          "sha256": "cd8fea8b4db9876cd753ca570627df4da35fe1e23aaa46fb4fda5665dff95524",
+          "notes": "Developer style guide translated whole, keeping every C code sample verbatim; all 42 example blocks (including the integer-type tables and the tab/comma rules) are byte-identical to upstream, and the et modeline matches upstream."
+        },
+        "dev.txt": {
+          "source": "runtime/doc/dev.txt",
+          "translation": "doc/dev.cnx",
+          "status": "complete",
+          "sha256": "bce24c24ebf89ef796f82870aba96610d5f92f68dcec4781d9e85b6b12b41ce5",
+          "notes": "Developer overview translated whole: build, test, clint/lint, the provider architecture notes and the contribution flow; all 21 example blocks and 61 |links| are preserved, modeline byte-identical to upstream."
+        },
+        "mbyte.txt": {
+          "source": "runtime/doc/mbyte.txt",
+          "translation": "doc/mbyte.cnx",
+          "status": "complete",
+          "sha256": "d9690a9949e5ed22d394cd39463e8f2d04a95f352d48395f55ae563885f9b919",
+          "notes": "Multi-byte and encoding chapter translated whole, including the encoding tables, the input/digraph interaction and the case-conversion rules; the 17 example blocks keep their byte tables verbatim."
+        },
+        "pack.txt": {
+          "source": "runtime/doc/pack.txt",
+          "translation": "doc/pack.cnx",
+          "status": "complete",
+          "sha256": "06d7673a7cee076e8eda15822547bdeba6f4b4b7e12fc5a843459f449ed4d71a",
+          "notes": "Package reference translated whole: pack/*/start|opt layout, :packadd semantics, load order and the opt/start rules; all 19 example blocks (directory trees) and 73 |links| are byte-preserved."
+        },
+        "dev_test.txt": {
+          "source": "runtime/doc/dev_test.txt",
+          "translation": "doc/dev_test.cnx",
+          "status": "complete",
+          "sha256": "9caf18b800e7990dfbf3f1caea82f3e7b85f6d21e0db3bf402e900d665053a1c",
+          "notes": "Testing chapter translated whole: the busted unit-test setup, the functional-test (screen.f.lua) harness, the :filter-test helpers and the debugging tips; all 28 example blocks and the shell/Lua commands are byte-identical to upstream."
+        },
+        "usr_30.txt": {
+          "source": "runtime/doc/usr_30.txt",
+          "translation": "doc/usr_30.cnx",
+          "status": "complete",
+          "sha256": "f5dbf68f4645184698f692e48b928c691802badf235a1261df9c22d986ed38e9",
+          "notes": "User manual chapter 30 (writing Vim scripts) translated whole: variables, expressions, the :execute and function basics, and the autocommand/syntax examples; all 45 example blocks are byte-identical to upstream."
+        },
+        "vi_diff.txt": {
+          "source": "runtime/doc/vi_diff.txt",
+          "translation": "doc/vi_diff.cnx",
+          "status": "complete",
+          "sha256": "80ce38068e258c95992877aeeb62e03d1d89ae99e5c36bf27850ba15cfd9c2f6",
+          "notes": "Vi/Vim difference reference translated whole: the incompatibility list, the limits table and the Nvim additions; all 104 |links| and the 6 tags are preserved and the noet modeline matches upstream."
+        },
+        "api-ui-events.txt": {
+          "source": "runtime/doc/api-ui-events.txt",
+          "translation": "doc/api-ui-events.cnx",
+          "status": "complete",
+          "sha256": "88e86b4c3a20264884beeb5ba0d974ff7c0848df03a0c885f36c3acf8b8123a7",
+          "notes": "UI-events reference translated whole: every nvim_ui_* event, its JSON parameters and the grid/multigrid rules; all 24 tags, the 8 example blocks (event payload samples) and the 142 |links| are preserved byte-for-byte where the contract requires it."
+        },
+        "usr_44.txt": {
+          "source": "runtime/doc/usr_44.txt",
+          "translation": "doc/usr_44.cnx",
+          "status": "complete",
+          "sha256": "610beb9d560f4d09e45b37bd39a348364d92f8818f00725f066b89de0714ce8d",
+          "notes": "User manual chapter 44 (writing your own syntax highlighting) translated whole, from the :syntax basics through the sync/highlight-group sections; all 48 example blocks are byte-identical to upstream so the recipes stay copy-pasteable."
+        },
+        "usr_42.txt": {
+          "source": "runtime/doc/usr_42.txt",
+          "translation": "doc/usr_42.cnx",
+          "status": "complete",
+          "sha256": "08fada911c167d3c4c62ffb3a411fea38efe24ac5fc7e58c1348188a27528f36",
+          "notes": "User manual chapter 42 (adding menu entries) translated whole: the :menu/:amenu family, the .vim menu files and the toolbar/icon notes; all 18 example blocks are byte-identical to upstream."
+        },
+        "index.txt": {
+          "source": "runtime/doc/index.txt",
+          "translation": "doc/index.cnx",
+          "status": "complete",
+          "sha256": "cb40843ab29b40768f07e7d4acbc78c9b3f17bdc955c45d2f0cbec02c431297e",
+          "notes": "The help index page translated whole: every command, option, function and ex-entry row keeps its ASCII tag column and gets a Chinese description, so all 1328 |links| and 27 tags still resolve exactly as upstream."
+        },
+        "usr_45.txt": {
+          "source": "runtime/doc/usr_45.txt",
+          "translation": "doc/usr_45.cnx",
+          "status": "complete",
+          "sha256": "476e4dfd5b325e0d52e66ebd3d311797f3c68ebcd6c38a6b16d13bae49439e7f",
+          "notes": "User manual chapter 45 (selecting the language/locale) translated whole, including the :language menu strings and the locale tables; all 18 example blocks keep their exact Tab alignment."
+        },
+        "news-0.10.txt": {
+          "source": "runtime/doc/news-0.10.txt",
+          "translation": "doc/news-0.10.cnx",
+          "status": "complete",
+          "sha256": "7efa5df72c8f934fb8ce0865787d7a84576c7a590156502c7da6dbd199fa1d14",
+          "notes": "Neovim 0.10 release notes translated whole: the new features, the changed defaults and the deprecations; all 185 |links| resolve as upstream and the 5 example blocks are byte-identical."
+        },
+        "deprecated.txt": {
+          "source": "runtime/doc/deprecated.txt",
+          "translation": "doc/deprecated.cnx",
+          "status": "complete",
+          "sha256": "8e49eda935b49d586c9140ee68c9ee4f1c732c0a2fa7b5538a4890b05dc486eb",
+          "notes": "The deprecated-features page translated whole with all 179 tag lines kept verbatim (ASCII tag column, Chinese description), so every |deprecated| entry still resolves; the 162 |links| and the 2 example blocks match upstream."
+        },
+        "ft_sql.txt": {
+          "source": "runtime/doc/ft_sql.txt",
+          "translation": "doc/ft_sql.cnx",
+          "status": "complete",
+          "sha256": "dcdabc8f4530ed847b881f9358a3aebbed2bac4f07769dbd4a18e329cd904f8a",
+          "notes": "SQL filetype plugin reference translated whole: the :SQLJ / :SQLSetType commands, the dialect tables and the omni-completion notes; all 63 example blocks are byte-identical to upstream."
+        },
+        "lua-bit.txt": {
+          "source": "runtime/doc/lua-bit.txt",
+          "translation": "doc/lua-bit.cnx",
+          "status": "complete",
+          "sha256": "37fb070c9c50932a980127de88bb630049c41208afb70e0bd2f6f3670d5aebe9",
+          "notes": "The Lua bit library reference (bit.* operators) translated whole; all 24 function *tags* and the 20 example blocks with their numeric results are byte-identical to upstream."
+        },
+        "usr_20.txt": {
+          "source": "runtime/doc/usr_20.txt",
+          "translation": "doc/usr_20.cnx",
+          "status": "complete",
+          "sha256": "3210d6708a10308648939d0c8d5b840f484a333725370cc0df5ee9dcd549ffd6",
+          "notes": "User manual chapter 20 (command-line editing) translated whole: the completion, history and command-line window sections; all 21 example blocks keep their exact alignment and the 15 |links| resolve as upstream."
+        },
+        "usr_28.txt": {
+          "source": "runtime/doc/usr_28.txt",
+          "translation": "doc/usr_28.cnx",
+          "status": "complete",
+          "sha256": "8fd52ca802281fcd8a79001767ba0c8551bc31eea08d1ad8dc7757507e7c4dd5",
+          "notes": "User manual chapter 28 (folding) translated whole, from :manual folding through foldmethod and foldtext; all 47-style example blocks and the 53 |links| are preserved."
+        },
+        "ft_rust.txt": {
+          "source": "runtime/doc/ft_rust.txt",
+          "translation": "doc/ft_rust.cnx",
+          "status": "complete",
+          "sha256": "120b4ed89ba73b61e85cb58a9ab4b4b0a4377479763afd6b3c9fe1c1693d84e0",
+          "notes": "Rust filetype plugin reference translated whole: the rustc/rustfmt integration, the :Rust* commands and the LSP notes; all 69 tags keep their names and the 26 example blocks are byte-identical."
+        },
+        "usr_07.txt": {
+          "source": "runtime/doc/usr_07.txt",
+          "translation": "doc/usr_07.cnx",
+          "status": "complete",
+          "sha256": "3387e00f5aa10b5a90d731d8802c97ac5b2db418ea7ba49db0e33afa115e0824",
+          "notes": "User manual chapter 7 (editing more than one file) translated whole: the argument list, :next/:prev, the buffer list and the register tricks; all 47 example blocks (including screen dumps that must stay English) are byte-identical."
+        },
+        "tips.txt": {
+          "source": "runtime/doc/tips.txt",
+          "translation": "doc/tips.cnx",
+          "status": "complete",
+          "sha256": "6ada7b4d40bc4e1bac850661fb2bf76a38feb5210911d28aab59ab73ed09aaa9",
+          "notes": "The tips collection translated whole: each tip keeps its tag, commands and example block intact while the explanatory prose is Chinese; all 25 tags, 25 example blocks and 53 |links| match upstream."
+        },
+        "ft_ada.txt": {
+          "source": "runtime/doc/ft_ada.txt",
+          "translation": "doc/ft_ada.cnx",
+          "status": "complete",
+          "sha256": "391cb420fd962a4800d1f424b07f6a8866708029f9d5dd6fdbcac3cc10842744",
+          "notes": "Ada filetype plugin reference translated whole: the GNAT project integration, the omni-completion and the :Ada* commands; all 77 tags keep their names, the 3 example blocks and the 43 |links| are byte-preserved."
+        },
+        "news.txt": {
+          "source": "runtime/doc/news.txt",
+          "translation": "doc/news.cnx",
+          "status": "complete",
+          "sha256": "6c9d21b6e8c4e10d85a14bdb58c02e78945df4f2b2b476d97ea85d42a368eccc",
+          "notes": "Current-version news overview translated whole: the 0.12 highlights, the changed defaults and the removal notes; all 251 |links| resolve and the 3 example blocks are byte-identical."
+        },
+        "dev_arch.txt": {
+          "source": "runtime/doc/dev_arch.txt",
+          "translation": "doc/dev_arch.cnx",
+          "status": "complete",
+          "sha256": "37d6e669d343ca593096b589563563c3636fd74274834510048f069f2bc3eaad",
+          "notes": "Nvim architecture chapter translated whole: the source-tree map, the Luv/Lua boundary, events, the UI protocol and the howto for new ex-commands/functions/events; the 6 example blocks are byte-identical."
+        },
+        "news-0.11.txt": {
+          "source": "runtime/doc/news-0.11.txt",
+          "translation": "doc/news-0.11.cnx",
+          "status": "complete",
+          "sha256": "500faf16a5f90c0f8ff3dccc6b3b7ab65e80ca1452242c93d85caf9a6d7fbdd6",
+          "notes": "Neovim 0.11 release notes translated whole: the new features, the changed defaults and the deprecations; all 234 |links| and 4 example blocks match upstream."
+        },
+        "usr_24.txt": {
+          "source": "runtime/doc/usr_24.txt",
+          "translation": "doc/usr_24.cnx",
+          "status": "complete",
+          "sha256": "391ad4198d35b6768d61960d026bb9d73809b7834b2430f551297a03dfb20076",
+          "notes": "User manual chapter 24 (insert mode commands) translated whole: the special keys, the digraph/insert-mode completion and the replace-mode notes; all 33 example blocks are byte-identical."
+        },
+        "usr_21.txt": {
+          "source": "runtime/doc/usr_21.txt",
+          "translation": "doc/usr_21.cnx",
+          "status": "complete",
+          "sha256": "cb2c2e03c056faba0880fdb6fad3369607570e71b21983880dffe9860b754685",
+          "notes": "User manual chapter 21 (suspend/sessions/shada) translated whole, including :mksession examples and the viminfo/shada-file behaviour; all 36 example blocks are byte-identical to upstream."
+        },
+        "faq.txt": {
+          "source": "runtime/doc/faq.txt",
+          "translation": "doc/faq.cnx",
+          "status": "complete",
+          "sha256": "77a65a207fce1f2e4e639eda72d398a68e4e96757a26d6cf831f96b27cb48c7a",
+          "notes": "FAQ page translated whole: every question keeps its tag and its answer structure, the runtime/build/design sections included; all 20 example blocks and 33 |links| are preserved."
+        },
+        "dev_tools.txt": {
+          "source": "runtime/doc/dev_tools.txt",
+          "translation": "doc/dev_tools.cnx",
+          "status": "complete",
+          "sha256": "a08631fa3f46d88713b0ee7d3a5b5f01a864f7ebeb9798623d3f037231c0e66b",
+          "notes": "Developer tools chapter translated whole: clint, uncrustify, ASAN/gdb/bpftrace invocations and the log/TUI helpers; all 37 example blocks are byte-identical and the 4 |links| match upstream."
+        },
+        "usr_27.txt": {
+          "source": "runtime/doc/usr_27.txt",
+          "translation": "doc/usr_27.cnx",
+          "status": "complete",
+          "sha256": "e2610fbcbbb5519d38a8b8f3309d0938162a62f816c6a5f3eeafa018a4fef509",
+          "notes": "User manual chapter 27 (search commands and patterns) translated whole: the search commands, / and ? motions, pattern atoms and the offsets; all 45 example blocks and the 25 |links| match upstream."
+        },
+        "usr_25.txt": {
+          "source": "runtime/doc/usr_25.txt",
+          "translation": "doc/usr_25.cnx",
+          "status": "complete",
+          "sha256": "a2b6315765d3242a1bdd1c9a6bd565786691823998f5108d42f176649b48e89e",
+          "notes": "User manual chapter 25 (editing formatted text) translated whole: wrapping, alignment, spelling and the paragraph motions; all 48 example blocks and the 15 |links| match upstream."
+        },
+        "usr_08.txt": {
+          "source": "runtime/doc/usr_08.txt",
+          "translation": "doc/usr_08.cnx",
+          "status": "complete",
+          "sha256": "d5d728cb42cfc3a8454d75ad311cf657c4f003eb13465daa05b5eff2f976a5e4",
+          "notes": "User manual chapter 8 (splitting windows) translated whole: :split/:vsplit, window movement, resizing and the :close/only rules; all 41 example blocks are byte-identical."
+        },
+        "usr_05.txt": {
+          "source": "runtime/doc/usr_05.txt",
+          "translation": "doc/usr_05.cnx",
+          "status": "complete",
+          "sha256": "77b63e278bf12bf1c5b6730333a5c0eb74b63c607c156649efc029a532cfed38",
+          "notes": "User manual chapter 5 (set options and init) translated whole: the vimrc, plugins, mappings and the defaults chain; all 43 example blocks and 42 |links| match upstream."
+        },
+        "if_pyth.txt": {
+          "source": "runtime/doc/if_pyth.txt",
+          "translation": "doc/if_pyth.cnx",
+          "status": "complete",
+          "sha256": "3a8e570e2bffefd7eb19f6a174f0e996d3ba15207daa72a7e10ae6fc35574101",
+          "notes": "Python interface reference translated whole: :python3, the pynvim API and the buffer/window-level helpers; all 60 tags keep their names and the 28 example blocks are byte-identical."
+        },
+        "usr_03.txt": {
+          "source": "runtime/doc/usr_03.txt",
+          "translation": "doc/usr_03.cnx",
+          "status": "complete",
+          "sha256": "6578bba7e837f3e8a487901794e8fadb848978bfaa4c7217bf7b84e5e93caf1e",
+          "notes": "User manual chapter 3 (moving around) translated whole: the character/word/line and screen motions, the ( ) { } and % jumps plus the mark navigation; all 27 example blocks are byte-identical."
+        },
+        "usr_29.txt": {
+          "source": "runtime/doc/usr_29.txt",
+          "translation": "doc/usr_29.cnx",
+          "status": "complete",
+          "sha256": "8c7b20a32bdf45fd0e019fbca08d7952c78f76647216570e591931c0ab4ba743",
+          "notes": "User manual chapter 29 (moving through programs) translated whole: the ( ) { } % jumps, the :tag/:tselect definition lookup and the marks; all 44 example blocks are byte-identical."
+        },
+        "usr_40.txt": {
+          "source": "runtime/doc/usr_40.txt",
+          "translation": "doc/usr_40.cnx",
+          "status": "complete",
+          "sha256": "60905255c81bf3f1fe5efcdcbe7c94ddd4ea4cd4430ccb3da845b6580ca28ef7",
+          "notes": "User manual chapter 40 (creating new commands) translated whole: :command with -nargs/-complete/-range/-bang and the user-command tables; all 52 example blocks are byte-identical."
+        },
+        "luaref.txt": {
+          "source": "runtime/doc/luaref.txt",
+          "translation": "doc/luaref.cnx",
+          "status": "complete",
+          "sha256": "83d5cc5f581138c2703f11475ace80f477bcfd76a4fd171853210c753150af32",
+          "notes": "The Lua 5.1 reference manual chapter translated whole: the language reference, the C API reference and the standard-library reference, with all 411 tags and 237 example blocks byte-preserved; the Lua 5.1 license and the bibliography citations stay in English as quoted reference text."
+        },
+        "lua.txt": {
+          "source": "runtime/doc/lua.txt",
+          "translation": "doc/lua.cnx",
+          "status": "complete",
+          "sha256": "482f76c7bb2d5b63c356c60d8ca86a4f0a7e502d344ed90c396dd9de34bef247",
+          "notes": "The Nvim Lua guide translated whole: the vim.* API overview, the Lua-stdlib extensions (vim.fs, vim.iter, vim.lpeg, vim.regex, vim.system, ...) and the UI2 section; all 327 tags and 181 example blocks are byte-preserved and the modeline matches upstream."
+        },
+        "api.txt": {
+          "source": "runtime/doc/api.txt",
+          "translation": "doc/api.cnx",
+          "status": "complete",
+          "sha256": "7f6f2d5a1fcc16b46b91c737175f24106c10c1d72d7d36acf7470a22aeefcc85",
+          "notes": "The Nvim API reference translated whole: the API conventions, the floating-window and extmark sections, every nvim_* function with its parameters/since metadata, and the API quick reference; all 222 tags and 60 example blocks are byte-preserved."
+        },
+        "luvref.txt": {
+          "source": "runtime/doc/luvref.txt",
+          "translation": "doc/luvref.cnx",
+          "status": "complete",
+          "sha256": "cd0452c33e4aafce370d0b0e3dfb543315a3bb6756e7381c68bde4e857aab7b7",
+          "notes": "Whole document translated: the luv/libuv API reference (every uv.* function, the handle / stream / process / thread / filesystem / DNS / metrics chapters and the CREDITS block). All 23 example blocks are byte-identical to upstream and the 295 help tags keep their names."
+        },
+        "syntax.txt": {
+          "source": "runtime/doc/syntax.txt",
+          "translation": "doc/syntax.cnx",
+          "status": "complete",
+          "sha256": "a23cdf21c9ab2d9af75443bc19bf99ffbee83e694371e7d2cfd333737e78b53d",
+          "notes": "Whole document translated: the :syntax command reference, every group/keyword/match/region argument, the highlighting-group catalogue, the per-language syntax notes and the :syn-sync / linebreaks chapters. All 437 example blocks are byte-identical to upstream and the 552 help tags keep their names."
+        },
+        "vimeval.txt": {
+          "source": "runtime/doc/vimeval.txt",
+          "translation": "doc/vimeval.cnx",
+          "status": "complete",
+          "sha256": "2aaaa968fdb9e728573600d28dc3a329e5e2cfe10b87260d593264016ca75097",
+          "notes": "Whole document translated: the expression syntax reference, the try/catch/finally exception chapters, the throw/v:exception/v:throwpoint variables and the example hierarchies. All 293 example blocks are byte-identical to upstream and the 519 help tags keep their names."
+        },
+        "options.txt": {
+          "source": "runtime/doc/options.txt",
+          "translation": "doc/options.cnx",
+          "status": "complete",
+          "sha256": "22d23358a0c3f349d56fed119968d522fd58b1f54c347dd16ad350597aab8da0",
+          "notes": "Whole document translated: every option description from A to Z (including the *'option'* tag aliases, boolean/number/string defaults and the global/local scope lines) plus the :set / :setlocal command chapters. All 183 example blocks are byte-identical to upstream and the 1115 help tags keep their names."
+        },
+        "vimfn.txt": {
+          "source": "runtime/doc/vimfn.txt",
+          "translation": "doc/vimfn.cnx",
+          "status": "complete",
+          "sha256": "baf756ef9aa7973480b577577ebd481764f3391488d1faf7d568a9a678bdcc8a",
+          "notes": "Whole document translated: every vim.fn builtin from abs() to xor() with its signature, parameters and return tables, plus the deprecation notes. All 522 example blocks are byte-identical to upstream and the 581 help tags keep their names; literal API error strings stay in English."
+        }
+      },
+      "validation": {
+        "0.12.6": {
+          "scope": "full_phase0_9",
+          "status": "pass",
+          "lua": "LuaJIT"
+        },
+        "0.11.5": {
+          "scope": "full_phase0_9",
+          "status": "pass",
+          "commit": "9fa7c0a04638ee3d5fefbdcec347b1c07a5ce9ce",
+          "note": "help/parity comparisons are pinned to 0.12.6; 10 pinned documents are absent from this runtime and reported upstream_absent; downloaded archive MO probe skipped"
+        },
+        "nightly_2026-11-03": {
+          "scope": "warning_only",
+          "status": "pass_full_phase0_7_warning_only",
+          "version": "0.13.0-dev-2009+g6332ba64fe",
+          "commit": "6332ba64fe56f922c5cd2d93e4cfa23673966b6d",
+          "note": "pull contract uses documented in-process vim.lsp.start client lifecycle"
+        },
+        "nightly_2026-11-14": {
+          "scope": "full_phase0_9",
+          "status": "pass_warning_only",
+          "version": "0.13.0-dev-2081+g5a53f3bb9e",
+          "note": "pi_zip.txt is absent from this runtime and reported upstream_absent; help/parity comparisons are pinned to 0.12.6; nightly stays advisory only"
+        },
+        "0.10.4": {
+          "scope": "foundation_only",
+          "status": "pass",
+          "commit": "e96f75a4e60c9082e89c7f61e2ce0647e4ebdf43"
+        }
+      }
+    },
+    "which-key": {
+      "repository": "https://github.com/folke/which-key.nvim",
+      "commit": "3aab2147e74890957785941f0c1ad87d0a44c15a",
+      "adapter": {
+        "status": "implemented",
+        "seam": "replace.desc",
+        "domain": "which-key",
+        "writes": "desc_display_only"
+      },
+      "sources": {
+        "lua/which-key/config.lua": {
+          "sha256": "babf424328f261c7334868a55af8573bb70d8cba7e4928700cedecce39c5db69"
+        },
+        "lua/which-key/view.lua": {
+          "sha256": "4c7b445633ce97f36a6422b31aea981d56babc245e4d32d74d65571e7f430b45"
+        }
+      }
+    },
+    "telescope": {
+      "repository": "https://github.com/nvim-telescope/telescope.nvim",
+      "commit": "40aedd8a68c78a656a10a8d62d80c54af59420fb",
+      "adapter": {
+        "status": "implemented",
+        "seam": "pickers.new",
+        "domain": "telescope",
+        "writes": "picker_titles_only"
+      },
+      "sources": {
+        "lua/telescope/pickers.lua": {
+          "sha256": "a9d66b553c399c175a5c2190c6f6aa035ebb80d048978bb5e9df02172198a6f6"
+        },
+        "lua/telescope/pickers/window.lua": {
+          "sha256": "61d0c06419de8ebee6755164a5d53ec01cefe0dc9ec65158e72a8b30b674f90b"
+        }
+      }
+    },
+    "lazy.nvim": {
+      "repository": "https://github.com/folke/lazy.nvim",
+      "commit": "306a05526ada86a7b30af95c5cc81ffba93fef97",
+      "adapter": {
+        "status": "implemented",
+        "public_path": "notifications via vim.notify; documentation",
+        "excluded": "private view Buffer/render lines",
+        "seam": "vim.notify; User LazyLoad",
+        "domain": "nvim-ui",
+        "writes": "notifications_and_late_load_only"
+      },
+      "sources": {
+        "lua/lazy/core/loader.lua": {
+          "sha256": "b8054b8e9ef8ddbeb744d2fb9731467e68375dfdd2ebcea296b4f2e69262badb"
+        },
+        "lua/lazy/core/util.lua": {
+          "sha256": "c8c6c2dc395bf1e3d36c3228a4d418eb2dd3810d8f5842fefbace199f0578925"
+        }
+      }
+    },
+    "nvim-tree": {
+      "repository": "https://github.com/nvim-tree/nvim-tree.lua",
+      "commit": "69eb0c34ed3d836d5a0d92d913b77dd73b054f2f",
+      "adapter": {
+        "status": "implemented",
+        "public_path": "notifications via vim.notify; on_attach mapping desc",
+        "excluded": "private renderer Buffer",
+        "seam": "setup.on_attach",
+        "domain": "nvim-tree",
+        "writes": "mapping_desc_display_only"
+      },
+      "sources": {
+        "lua/nvim-tree.lua": {
+          "sha256": "e4b7c864eb1dfb645b8dfd6cc5025825d503ec8f352f11300d0ec36321d4fafd"
+        },
+        "lua/nvim-tree/keymap.lua": {
+          "sha256": "af946146d813d266a75c4e714b7f17f509c907f0af11c15d0b17903f18a6a918"
+        }
+      }
+    },
+    "nvim-cmp": {
+      "repository": "https://github.com/hrsh7th/nvim-cmp",
+      "commit": "2ffe79f1f021def8dd1fcd81deb16f1bb0d989f3",
+      "adapter": {
+        "status": "inventory_only",
+        "public_path": "formatting.format for cmp-owned labels only",
+        "excluded": "completion abbr, kind/menu labels, source data and documentation: no fixed cmp-owned label safe to translate",
+        "reviewed_in_phase": "7C"
+      },
+      "sources": {
+        "lua/cmp/init.lua": {
+          "sha256": "f6070a511d27c9dc39bea910ba3078a84651025bbd1657ce291680aa3bf108aa"
+        },
+        "lua/cmp/config/default.lua": {
+          "sha256": "2c6ec1dac07f4cf5de74e844915a3fef02f5dd8376980ec0a3039b74e3a4c0cc"
+        },
+        "lua/cmp/entry.lua": {
+          "sha256": "810422a540f640ba6783d1adfddc1c6d9600d3c397a0dd495ff21ea669e756b5"
+        }
+      }
+    },
+    "clangd": {
+      "repository": "https://github.com/llvm/llvm-project",
+      "version": "llvmorg-23.1.4",
+      "commit": "7a941dfb2877a0b8cf30323fefa85ad019e0b0f5",
+      "adapter": {
+        "status": "implemented",
+        "seam": "vim.diagnostic display formatters",
+        "domain": "clangd",
+        "writes": "display_strings_only",
+        "static_entries": 4,
+        "corpus_coverage": "5/7",
+        "real_smoke": "push passed; pull unsupported_method_not_found",
+        "distribution": "Arch Linux extra/clang 23.1.4-1"
+      },
+      "sources": {
+        "clang-tools-extra/clangd/ClangdLSPServer.cpp": {
+          "sha256": "166463c6638e6c9002784f9cd6aff3d6c7782a610f7b890f99917818ded1f0c0"
+        }
+      }
+    }
+  }
+}

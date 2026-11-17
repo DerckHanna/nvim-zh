@@ -1,0 +1,509 @@
+*dev_test.txt*          Nvim
+
+
+                            NVIM 参考手册
+
+
+为 Nvim 编写测试                                                    *dev-test*
+
+                                  输入 |gO| 查看目录。
+
+==============================================================================
+为 Nvim 编写测试
+
+Nvim 拥有一套强大又简单的测试框架。它大约比你工作中所用的任何框架好 7 倍。
+
+每个测试都会启动一个新的 Nvim 进程（10-30ms），测试结束后该进程即被丢弃。
+你用 `t.eq()` 和 `screen:expect()`（后者会按需自动等待）来做断言。差不多就
+这么简单。
+
+TODO: 把测试框架暴露为公开接口，以供第三方插件使用：
+https://github.com/neovim/neovim/issues/34592
+
+==============================================================================
+测试框架
+
+测试大致分为单元测试（`test/unit/`）、功能测试（`test/functional/`）
+和旧式测试（`test/old/testdir/`）。
+
+- 单元测试的做法是把测试编译成共享库，由 [LuaJit FFI](https://luajit.org/ext_ffi.html)
+  加载并调用。
+- 功能测试由 RPC 驱动，因此不需要 LuaJit（与 Lua 不同）。它们本质上是
+  "integration"（集成）测试，测试的是整个系统。但它们很快。
+
+你可以花 [15 分钟学点 Lua 概念](https://learnxinyminutes.com/docs/lua/)，另见
+|lua-guide|。把任何现成的测试当作模板来写新测试，或者看 |dev-quickstart|。
+
+测试由 `/cmake/RunTests.cmake` 脚本运行，使用仓库内的 Lua 测试 harness
+`/test/harness.lua`。
+某些失败情形下，`./build/nvim.log`（或 `$NVIM_LOG_FILE`）可能提供线索。
+
+取决于某些二进制是否存在（例如 `xclip`），部分测试会被跳过。
+
+harness 隔离                                       *dev-test-harness-isolation*
+
+Lua harness 在单个底层 `nvim -ll` 进程中运行所有选中的 spec 文件，然后在每个
+文件之前恢复一份基线。每一次 suite 迭代中，文件边界的基线是在 `--helper` 加载
+之后捕获的，所以由 helper 提供的模块与默认值会跨文件保留。
+helper 文件只做预加载：它们可以 require 模块、设置默认值、注册 suite 结束时的
+清理，但它们不定义测试或 hook。
+
+harness 以与 busted 相同的浅层文件边界模型，恢复 `_G`、`package.loaded`、
+`package.preload`、`arg` 以及进程环境。
+
+==============================================================================
+测试布局
+
+- `/test/benchmark` : 基准测试
+- `/test/functional` : 功能测试
+- `/test/unit` : 单元测试
+- `/test/old/testdir` : 旧式测试（来自 Vim）
+- `/test/config` : 含有 `*.in` 文件，这些文件由 `configure_file` CMake 命令
+  转换成 `*.lua` 文件：这是为了在 Lua 测试里访问 CMake 变量。
+- `/test/includes` : 供 luajit 的 `ffi.cdef` C 定义解析器使用的 include 文件：
+  通常用来让那些无法经由该机制访问的宏能以另一种方式访问。
+- `/test/*/preload.lua` : 由 harness 的 `--helper` 选项预加载的模块与默认值
+- `/test/**/testutil.lua` : 测试运行器语境下的通用工具函数
+- `/test/**/testnvim.lua` : 测试会话语境下的通用工具函数（指向 clear() 为每个
+  测试所创建的 Nvim 子进程的 RPC 通道）
+- `/test/*/**/*_spec.lua` : 真正的测试。不以 `_spec.lua` 结尾的文件是库，例如
+  `/test/**/testutil.lua`，只不过它们围绕某个共同主题。
+
+
+==============================================================================
+运行测试                                                   *dev-run-test*
+
+执行测试
+
+要运行所有测试（「旧式」测试除外）： >
+    make test
+
+要只运行 _unit_ 测试： >
+    make unittest
+
+要只运行 _functional_ 测试： >
+    make functionaltest
+
+要并行运行功能测试（CI 中使用）： >
+    cmake --build build --target functionaltest-parallel -j2
+    cmake --build build --target functionaltest-summary
+
+
+旧式测试
+
+要运行所有旧式 Vim 测试： >
+    make oldtest
+
+要运行 _单个_ 旧式测试文件，你可以任选一种： >
+    # Specify only the test file name, not the full path.
+    make oldtest TEST_FILE=test_syntax.vim
+或者： >
+    make test/old/testdir/test_syntax.vim
+
+
+调试测试
+
+- 每个测试都会得到一个形如 "T123" 的测试 id。它也会出现在日志文件里。从测试
+  派生出的子进程在日志里显示为 _parent_ 名称，后面跟 "/c"。示例： >
+
+    DBG 2022-06-15T18:37:45.226 T57.58016.0   UI: flush
+    DBG 2022-06-15T18:37:45.226 T57.58016.0   inbuf_poll:442: blocking... events_enabled=0 events_pending=0
+    DBG 2022-06-15T18:37:45.227 T57.58016.0/c UI: stop
+    INF 2022-06-15T18:37:45.227 T57.58016.0/c os_exit:595: Nvim exit: 0
+    DBG 2022-06-15T18:37:45.229 T57.58016.0   read_cb:118: closing Stream (0x7fd5d700ea18): EOF (end of file)
+    INF 2022-06-15T18:37:45.229 T57.58016.0   on_proc_exit:400: exited: pid=58017 status=0 stoptime=0
+
+- 你可以设置 `$GDB` 以 [在 gdbserver 下运行功能测试](https://github.com/neovim/neovim/pull/1527): >sh
+    GDB=1 TEST_FILE=test/functional/api/buffer_spec.lua TEST_FILTER='nvim_buf_set_text works$' make functionaltest
+<
+  阅读更多关于 |dev-filter-test| 的内容。
+
+  然后，在另一个终端里： >sh
+    gdb -ex 'target remote localhost:7777' build/bin/nvim
+<
+  如果 `$VALGRIND` 也被设置，它会向 valgrind 传递 `--vgdb=yes`，而不是直接
+  启动 gdbserver。
+
+  参见 `test/functional/testnvim.lua` 中的 `nvim_argv`。
+
+- 测试挂起可能由意外的模态提示引起（在等待用户输入）。默认 screen 宽度为
+  50 列。
+  - 在 cmdline 里尝试打印超过 50 列的行，例如 `:edit very...long...path`，会触发
+    hit-enter 提示。试着用更短的路径，或者用 `:silent edit`。
+- 如果搞不清到底发生了什么，试着把 screen 可视化。把下面这段放到测试开头： >
+    local Screen = require('test.functional.ui.screen')
+    local screen = Screen.new()
+    screen:attach()
+<  然后在测试的任何位置放上 `screen:snapshot_util()`。更多信息见
+  `test/functional/ui/screen.lua` 里的注释。
+
+调试 LUA 测试代码
+
+调试 Lua 测试代码有点麻烦。把你的购物清单准备好，下面这些需要安装并配置：
+
+1. [nvim-dap](https://github.com/mfussenegger/nvim-dap)
+2. [local-lua-debugger-vscode](https://github.com/mfussenegger/nvim-dap/wiki/Debug-Adapter-installation#local-lua-debugger-vscode)
+3. [nlua](https://github.com/mfussenegger/nlua)
+4. [one-small-step-for-vimkind](https://github.com/jbyuki/one-small-step-for-vimkind)（称为 `osv`）
+5. `$PATH` 里的一条 `nlua` 命令。
+
+
+整套设置大致像这样： >
+
+    ┌─────────────────────────┐
+    │ nvim used for debugging │◄────┐
+    └─────────────────────────┘     │
+               │                    │
+               ▼                    │
+      ┌─────────────────┐           │
+      │ local-lua-debug │           │
+      └─────────────────┘           │
+              │                     │
+              ▼                     │
+         ┌─────────┐                │
+         │   nlua  │                │
+         └─────────┘                │
+              │                     │
+              ▼                     │
+         ┌───────────┐              │
+         │ test-case │              │
+         └───────────┘              │
+              │                     │
+              ▼                     │
+      ┌────────────────────┐        │
+      │ nvim test-instance │        │
+      └────────────────────┘        │
+        │   ┌─────┐                 │
+        └──►│ osv │─────────────────┘
+            └─────┘
+
+
+装好这些之后，你就可以使用这样一份配置： >
+
+    local dap = require("dap")
+
+
+    local function free_port()
+      local tcp = vim.loop.new_tcp()
+      assert(tcp)
+      tcp:bind('127.0.0.1', 0)
+      local port = tcp:getsockname().port
+      tcp:shutdown()
+      tcp:close()
+      return port
+    end
+
+
+    local name = "nvim-test-case" -- arbitrary name
+    local config = {
+      name = name,
+
+      -- value of type must match the key used in `dap.adapters["local-lua"] = ...` from step 2)
+      type = "local-lua",
+
+      request = "launch",
+      cwd = "${workspaceFolder}",
+      program = {
+        command = "nlua",
+      },
+      args = {
+        "-ll",
+        "test/runner.lua",
+        "--helper=test/functional/preload.lua",
+        "--lpath=build/?.lua",
+        "--lpath=?.lua",
+
+        -- path to file to debug, could be replaced with a hardcoded string
+        function()
+          return vim.api.nvim_buf_get_name(0)
+        end,
+
+        -- You can filter to specific test-case by adding:
+        -- '--filter="' .. test_case_name .. '"',
+      },
+      env = {
+        OSV_PORT = free_port
+      }
+    }
+
+    -- Whenever the config is used it needs to launch a second debug session that attaches to `osv`
+    -- This makes it possible to step into `exec_lua` code blocks
+    setmetatable(config, {
+
+      __call = function(c)
+        ---@param session dap.Session
+        dap.listeners.after.event_initialized["nvim_debug"] = function(session)
+          if session.config.name ~= name then
+            return
+          end
+          dap.listeners.after.event_initialized["nvim_debug"] = nil
+          vim.defer_fn(function()
+            dap.run({
+              name = "attach-osv",
+              type = "nlua", -- value must match the `dap.adapters` definition key for osv
+              request = "attach",
+              port = session.config.env.OSV_PORT,
+            })
+          end, 500)
+        end
+
+        return c
+      end,
+    })
+
+
+你可以把这份配置加进 `dap.configurations.lua` 列表（如 `:help dap-configuration`
+中所述），也可以在你的用户命令或函数里动态创建它，并通过 `dap.run(config)`
+直接调用。后者很实用：如果你用 treesitter 配合下面这样的查询找到光标位置附近的
+测试用例，并把 `--filter` 属性设成它。 >query
+
+    (function_call
+      name: (identifier) @name (#any-of? @name "describe" "it")
+      arguments: (arguments
+        (string) @str
+      )
+    )
+
+限制：
+
+- 你需要把下面这段样板代码加进每一个你希望能停留在测试用例代码中的断点的 spec
+  文件： >
+    if os.getenv("LOCAL_LUA_DEBUGGER_VSCODE") == "1" then
+      require("lldebugger").start()
+    end
+<  这是 local-lua-debugger 的限制。
+- 你无法步入那些被烘焙进 nvim 二进制里的文件中的代码（例如 `_core/*.lua`
+  和 `inspect.lua`）。
+
+
+------------------------------------------------------------------------------
+过滤测试                                              *dev-filter-test*
+
+按名称过滤
+
+可以通过把测试名称的模式设到 `TEST_FILTER` 或 `TEST_FILTER_OUT`，来过滤测试。 >
+
+    it('foo api',function()
+      ...
+    end)
+    it('bar api',function()
+      ...
+    end)
+
+要只运行名称匹配过滤条件的测试： >
+    TEST_FILTER='foo.*api' make functionaltest
+
+要运行除匹配过滤条件之外的所有测试： >
+    TEST_FILTER_OUT='foo.*api' make functionaltest
+
+按文件过滤
+
+要运行 _特定的_ 单元测试： >
+    TEST_FILE=test/unit/foo.lua make unittest
+
+或者 >
+    cmake -E env "TEST_FILE=test/unit/foo.lua" cmake --build build --target unittest
+
+要运行 _特定的_ 功能测试： >
+    TEST_FILE=test/functional/foo.lua make functionaltest
+
+或者 >
+    cmake -E env "TEST_FILE=test/functional/foo.lua" cmake --build build --target functionaltest
+
+要 _重复_ 运行一个测试： >
+    TEST_ARGS="--repeat=100 --no-keep-going" TEST_FILE=test/functional/foo_spec.lua make functionaltest
+
+或者 >
+    cmake -E env "TEST_FILE=test/functional/foo_spec.lua" cmake -E env TEST_ARGS="--repeat=100 --no-keep-going" cmake --build build --target functionaltest
+
+按 tag 过滤
+
+可以通过在测试描述里某个词元前加上 `#`，给测试打上「tag」。 >
+
+    it('#foo bar baz', function()
+      ...
+    end)
+    it('#foo another test', function()
+      ...
+    end)
+
+要只运行打了 tag 的测试： >
+    TEST_TAG=foo make functionaltest
+
+注意：
+
+- `TEST_FILE` 不是 `TEST_TAG` 或 `TEST_FILTER` 那样的模式字符串。传给 `TEST_FILE`
+  的值必须是指向一个现有文件的路径。
+- `TEST_TAG` 与 `TEST_FILTER` 都会依据 `it()` 和 `describe()` 里找到的字符串描述
+  来过滤测试。
+
+
+==============================================================================
+编写测试                                                 *dev-write-test*
+
+准则
+
+- CI 通过 `functionaltest-parallel` cmake 目标并行运行测试。
+- Nvim 测试实例的 CWD 按「测试组」隔离（见 `cmake/RunTests.cmake` 中的
+  `WORKING_DIRECTORY`），因此测试可以向 CWD 写文件，而不会干扰并行运行的其它
+  测试。
+- Luajit 需要知道函数原型中使用的类型与常量声明。
+  [testutil.lua](https://github.com/neovim/neovim/blob/master/test/unit/testutil.lua)
+  文件会自动解析 `types.h`，所以被测函数中使用的类型可以被移进该文件，从而不必在
+  测试文件里重写这些声明。
+  - `#define` 常量必须改写为 `const` 或 `enum`，它们才能对测试「可见」。
+- 用 `pending()` 或 `t.skip()` 来跳过测试。
+  - 示例： https://github.com/neovim/neovim/commit/5c1dc0fbe7388528875aff9d7b5055ad718014de#diff-bf80b24c724b0004e8418102f68b0679R18
+  - 注意：如果一个测试因为不可采取行动的原因而被跳过，我们不希望它出现在
+    "pending" 列表里。在跳过描述里包含 "N/A"，它就不会被加入 "pending" 列表。
+    例如，某个测试因为在非 LuaJit 系统上运行而被跳过，把它放进 "pending" 列表
+    纯属噪音。因此它的 pending 理由应当写 "N/A"： >
+    pending('N/A: missing LuaJIT FFI')
+<
+  - 不要用 `if-else` 悄悄跳过测试。如果某个功能测试依赖某个外部因素（例如
+    `$PATH` 上是否存在 `md5sum`），_并且_ 你无法 mock 或伪造该依赖，那么在
+    该外部因素缺失时，就通过 `pending()` 跳过测试。这样能保证 _总的_
+    测试计数（success + fail + error + pending）在所有环境中都相同。
+    - 注意：如果 `pending()` 缺少参数，它会被忽略，除非它
+      [被包含在 `it()` 块里](https://github.com/neovim/neovim/blob/d21690a66e7eb5ebef18046c7a79ef898966d786/test/functional/ex_cmds/grep_spec.lua#L11)。
+      如果 `pending()` 调用在 `it()` 之外，请提供空函数参数
+      示例： https://github.com/neovim/neovim/commit/5c1dc0fbe7388528875aff9d7b5055ad718014de#diff-bf80b24c724b0004e8418102f68b0679R18
+
+测试放在哪里
+
+`/test/unit` 与 `/test/functional` 中的测试，按它们所测的语义组件分组。
+
+- 单元测试（`test/unit/`）应当与 `src/nvim/` 的结构一一对应，因为它们直接测试
+  函数。例如，`src/nvim/undo.c` 的单元测试应当放在 `test/unit/undo_spec.lua`。
+- 功能测试（`test/functional/`）比单元测试层次更高（插件、UI、用户输入）；它们
+  按概念组织。
+    - 在创建新组之前，先试着找找有没有现成的、合理的
+      `test/functional/*/*_spec.lua` 组。
+
+
+------------------------------------------------------------------------------
+修复测试                                                    *dev-fix-test*
+
+修复 HARNESS 警告
+
+> Nvim session T123 took 2000 milliseconds to exit
+> This indicates a likely problem with the test even if it passed!
+
+这可能表示存在泄漏，因为 Nvim 在退出前会等待 uv 句柄。示例：
+https://github.com/neovim/neovim/pull/35768
+
+
+修复 lint 失败
+
+`make lint`（以及 `make lintlua`）会对测试代码运行
+[LuaLS](https://github.com/LuaLS/lua-language-server/wiki/Annotations)。
+
+如果必须忽略某条 LuaLS/EmmyLS 警告，就指定该警告代码。示例： >lua
+
+    ---@diagnostic disable-next-line: unused-vararg
+
+https://github.com/LuaLS/lua-language-server/wiki/Annotations#diagnostic
+
+忽略尽可能小的适用作用域（例如在函数内部，而不是在文件顶部）。
+
+
+==============================================================================
+配置                                                        *dev-test-config*
+
+（TODO: 清理一下这里，变量太多，其中一些已经不再使用了。）
+
+测试行为受环境变量影响。当前支持（功能性、单元、基准测试）（当已定义时；当设为
+_1_ 时；当已定义时按 Integer 处理；当已定义时按 String 处理；当已定义时按
+Number 处理；!必须定义才能正常工作)：
+
+- `TEST_ARGS` (F) (U): 转发给本地测试 harness 的参数。
+
+- `CC` (U) (S): 指定使用哪个 C 编译器来预处理文件。目前只支持与 gcc 兼容参数的
+  编译器。
+
+- `GDB` (F) (D): 让 nvim 实例在 `gdbserver` 下运行。它可在 `localhost:7777` 上
+  访问：使用 `gdb build/bin/nvim`，在其中输入 `target remote :7777`。
+
+- `GDBSERVER_PORT` (F) (I): 覆盖 `GDB` 所用的端口。
+
+- `LOG_DIR` (FU) (S!): 指定到哪里寻找 valgrind 和 ASAN 日志文件。
+
+- `VALGRIND` (F) (D): 让 nvim 实例在 `valgrind` 下运行。这种情况下日志文件名为
+  `valgrind-%p.log`。注意，非空的 valgrind 日志可能让测试失败。valgrind 的参数
+  可以在 `/test/functional/testnvim.lua` 中看到。可以与 `GDB` 一起使用。
+
+- `VALGRIND_LOG` (F) (S): 覆盖 `VALGRIND` 所用的 valgrind 日志文件名。
+
+- `TEST_COLORS` (F) (U) (D): 在测试运行器里启用彩色输出。默认设为 true。
+
+- `TEST_SKIP_FRAGILE` (F) (D): 让测试套件跳过一些脆弱的测试。
+
+- `TEST_TIMEOUT` (FU) (I): 指定测试套件运行被终止前的最长秒数
+
+- `NVIM_TEST` (FU) (D): 让 Nvim 进程检测到它正在测试中运行。
+
+- `NVIM_LUA_NOTRACK` (F) (D): 禁用 Lua 对象的引用计数
+
+- `NVIM_PRG` (F) (S): Nvim 可执行文件的路径（默认：`build/bin/nvim`）。
+
+- `NVIM_TEST_MAIN_CDEFS` (U) (1): 让 `ffi.cdef` 在主进程中运行。尽管有计数器，
+  这会因头文件定义冲突而引入出 bug 的可能，但它通过免去 `ffi.cdef` 对含有 C 定义
+  的大字符串做解析，大幅加快单元测试。
+
+- `NVIM_TEST_PRINT_I` (U) (1): 让 `cimport` 打印经过预处理的、尚未经 `formatc`
+  过滤的头文件。用于调试 `formatc`。打印时会带上行号。
+
+- `NVIM_TEST_PRINT_CDEF` (U) (1): 让 `cimport` 打印最终的行，这些行随后会被传给
+  `ffi.cdef`。用于调试 `ffi.cdef` 有时会抛出的错误。
+
+- `NVIM_TEST_PRINT_SYSCALLS` (U) (1): 让它在 syscall 包装函数被调用时把调用与
+  返回值打印到 stderr。用于调试那些让单元测试在独立进程中执行的代码。
+
+- `NVIM_TEST_RUN_FAILING_TESTS` (U) (1): 让 `itp` 运行那些已知会失败的测试（通过
+  把第三个参数设为 `true` 来标记）。
+
+- `NVIM_TEST_CORE_*` (FU) (S): 一组环境变量，用于指定到哪里搜索 core 文件。应当
+  一次性全部定义。
+
+- `NVIM_TEST_CORE_GLOB_DIRECTORY` (FU) (S): core 文件所在的目录。可以是 `.`。
+  随后会在该目录中递归搜索 core 文件。注意：必须定义该变量，后面的任何变量才会
+  生效。
+
+- `NVIM_TEST_CORE_GLOB_RE` (FU) (S): core 文件名必须匹配的正则表达式。例如
+  `/core[^/]*$`。可以缺省，缺省时任何文件都视为匹配。
+
+- `NVIM_TEST_CORE_EXC_RE` (FU) (S): 把某些目录排除在 core 文件搜索之外的正则
+  表达式。例如用 `^/%.deps$` 来不搜索 `/.deps` 内部。若缺省，则不排除任何内容。
+
+- `NVIM_TEST_CORE_DB_CMD` (FU) (S): 从调试器获取回溯的命令。例如
+  `gdb -n -batch -ex "thread apply all bt full"
+  "$_NVIM_TEST_APP" -c "$_NVIM_TEST_CORE"`。默认为该示例命令。
+  该调试命令可以使用环境变量 `_NVIM_TEST_APP`（被调试应用的路径：通常是 nvim
+  或 luajit）与 `_NVIM_TEST_CORE`（要从中获取回溯的 core 文件）。
+
+- `NVIM_TEST_CORE_RANDOM_SKIP` (FU) (D): 让 `check_cores` 在大约 90% 的测试之后
+  不再检查 core 文件。当因某种原因很难找到 core 文件时应当使用。正常情况下（在
+  OS X 上，或者当 `NVIM_TEST_CORE_GLOB_DIRECTORY` 已定义而该变量未定义时），
+  每个测试之后都会检查 core 文件。
+
+- `NVIM_TEST_INTEG` (F) (D): 启用会发起真实网络调用的集成测试。默认情况下这些
+  测试会被跳过。当设为 `1` 时，需要外部 HTTP 请求（例如 `vim.net.request()`）
+  的测试将会运行。
+
+- `NVIM_TEST_RUN_TESTTEST` (U) (1): 允许运行 `test/unit/testtest_spec.lua`，它
+  用于检查测试基础设施本身如何工作。
+
+- `NVIM_TEST_TRACE_LEVEL` (U) (N): 指定单元测试的跟踪级别：
+  - `0` 禁用跟踪（最快，但测试崩溃且没有生成 core dump 时你拿不到任何数据），
+  - `1` 在跟踪中只保留 C 函数调用与返回（比记录所有内容更快），
+  - `2` 记录所有函数调用、返回以及执行过的 Lua 源码行。
+
+- `NVIM_TEST_TRACE_ON_ERROR` (U) (1): 让单元测试在出错时除常规错误信息之外还
+  输出跟踪内容。
+
+- `NVIM_TEST_MAXTRACE` (U) (N): 指定要保留的跟踪行的最大数目。默认为 1024。
+
+- `OSV_PORT`: (F): 在 nvim 测试实例内启动监听给定端口的 `osv`。
+
+
+ vim:tw=78:ts=8:sw=4:et:ft=help:norl:

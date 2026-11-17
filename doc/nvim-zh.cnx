@@ -1,0 +1,120 @@
+*nvim-zh.txt*	nvim-zh
+
+nvim-zh                                                         *nvim-zh*
+                    *nvim-zh-phase8* *nvim-zh-phase7* *nvim-zh-phase6* *nvim-zh-phase5*
+                    *nvim-zh-phase4* *nvim-zh-phase3* *nvim-zh-phase2* *nvim-zh-phase1*
+
+nvim-zh 是 Neovim 简体中文汉化插件。阶段 8 在其上扩展真实使用界面与 Help 文档翻译：
+原生 core/gettext 集成、独立翻译引擎、可重复目录构建工具、本地缺失统计、Neovim UI
+公共接缝，以及固定的 Neovim Help 译文（见 |nvim-zh-help|）。不接管诊断/LSP 协议
+数据、第三方插件私有 Buffer 或外部工具字节流。
+
+安装与配置                                                  *nvim-zh-setup*
+
+通过插件管理器调用 setup： >lua
+
+    require('nvim-zh').setup({
+      modules = {
+        core = { enabled = true, apply_language = false },
+        help = { enabled = true, lang = { 'cn', 'en' }, vimcdoc = false },
+        ui = { notify = true, prompts = true, select_items = false, echo = false },
+        plugins = { auto = true, lazy_load = true, disabled = {} },
+      },
+      terminology = 'preserve',
+      missing = { enabled = true, max_entries = 2000 },
+    })
+<
+插件不会自动应用操作系统 locale。使用 |:NvimZhCheck| 检查现有 Neovim
+gettext 目录和 zh_CN.UTF-8 locale。Vimcdoc 是单独安装的可选依赖，不会
+随 nvim-zh 内嵌分发。
+
+翻译引擎                                                   *nvim-zh-engine*
+
+`require('nvim-zh').translate(spec)` 接受 domain、可选 context、msgid、可选
+args 和 formatted，返回 text、status、entry_id。精确条目优先于锚定模板；
+优先使用命名参数，无 positional 语义的 printf 参数不会换序。缺失或异常时
+始终回退原始 msgid。
+
+用户 override 是必须显式指定 domain/context 的纯数据 Table： >lua
+
+    overrides = {
+      ['my-plugin'] = {
+        [''] = { Save = '保存' },
+        menu = { Open = '展开' },
+      },
+    }
+<
+函数和可执行用户规则不是合法目录数据。目录按 domain 懒加载，先合并内置
+条目再应用 override。运行时不做模糊匹配或全局术语替换。
+
+命令                                                       *nvim-zh-commands*
+
+*:NvimZhInfo*    显示 Neovim 版本、setup 状态、locale、MO 和 helplang。
+*:NvimZhCheck*   只读检查核心消息与帮助；也可执行 `:checkhealth nvim-zh`。
+*:NvimZhMissing* 显示有容量上限的本地缺失统计；动态值、路径和超长原文
+                 默认脱敏。
+*:NvimZhReload*  先重载目录和 override，再安全重建 UI 适配器。
+
+静态目录覆盖率与运行时观察覆盖率分别报告，都不是全 Neovim 覆盖率。统计
+默认只保存在内存中。
+
+*nvim-zh-ui*
+UI 适配~
+
+notify/notify_once 仅翻译消息；notify_once 继续按英文原文去重。input/select 仅翻译
+prompt/title，保留 opts、回调、异步顺序、原始输入和 item/index。select_items 默认
+关闭；启用后只包装 format_item，不替换 items。
+
+当前适配的真实文本包括 Neovim 自身通过 vim.notify 显示的 LSP 交互提示（例如"没有
+可用的信息"、"未找到位置"、"没有可用的代码操作"），以及 vim.ui.input/select 的
+改名与代码操作、代码透镜提示。这些条目只覆盖固定 0.12.6 源码中存在的原文字面量；
+其他文本、动态载荷和协议字段保持原文。
+
+echo 默认关闭。启用后仅处理 nvim-ui 目录允许的字符串 chunk，保留高亮、元数据、
+history、opts 和 message id。fast event 直接回退原实现。不处理 out_write、终端流、
+私有 Buffer、诊断、LSP 或第三方插件私有 UI。
+
+重复 setup 不叠加 wrapper。外部插件后替换函数时不抢回；Info 和 checkhealth 报告
+external_override。翻译失败始终回退原文，原实现异常不被吞掉。
+
+*nvim-zh-plugins*
+第三方插件~
+
+plugins.auto 只适配已加载且 API 兼容的 which-key/Telescope，不强制 require。插件后
+加载时，在目标 setup 后再次调用 nvim-zh setup 或 :NvimZhReload。
+
+which-key 使用公开 replace.desc，仅转换显示描述，保留 key/rhs/mapping。Telescope
+使用 pickers.new，仅转换 prompt/results/preview title，保留 finder、entry_maker、
+attach_mappings 和 entry。disabled = { "which-key", "telescope" } 可分别禁用。
+
+固定验证 commit 与源码 hash 位于 manifests/upstreams.json。lazy.nvim 复用公开
+vim.notify 与 User LazyLoad 事件；nvim-tree 链式公开 setup/on_attach，只翻译 mapping
+desc；nvim-cmp 与外部工具继续 inventory_only。不实现私有 Buffer/renderer 后处理。
+
+Help 文档                                                *nvim-zh-help*
+译文以 `.cnx` 形式随插件分发，并由 doc/tags-cn 提供中文 tag；'helplang' 设为
+`cn,en`，缺失的 tag 自动回退到英文 runtime 文档。当前完整翻译（status=complete）
+的文档：
+
+- |help.txt|       默认 `:help` 落地页与主题索引。
+- |nvim.txt|       Nvim 入门与从 Vim 迁移。
+- |lua-guide|      使用 Lua 配置 Nvim 的完整指南。
+- |diagnostic-api| 诊断框架与 vim.diagnostic Lua API。
+- |terminal|       内嵌终端模拟器与 :Termdebug 插件。
+
+每份文档在 manifests/upstreams.json 记录上游 repository、完整 commit、源文件路径、
+SHA-256、本地译文路径和 complete/partial 状态。译文保留全部英文 help tag、`|链接|`、
+示例块与默认值说明；示例代码逐字节保留，可直接复制执行。英文原文仍可通过
+`:help <tag>@en` 访问。
+
+资源维护                                                 *nvim-zh-maintenance*
+
+执行 `make check-translations` 检查 PO、UTF-8、重复键、占位符、代码保护
+和术语规则；执行 `make build` 生成稳定排序、按 domain 拆分的纯 Lua 目录。
+运行时无需 msgfmt。Buffer、Window、Register 默认保留英文。
+
+执行 `make test-phase8` 验证全部 Help 文档：tag 双向一致、tags-cn 与 Neovim
+`:helptags` 输出一致、示例块与链接不变、固定基线 hash 匹配，并确认 `:help` 打开
+中文、未翻译文档回退英文。
+
+ vim:tw=78:ts=8:et:ft=help:norl:

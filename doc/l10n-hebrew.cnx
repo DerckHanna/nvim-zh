@@ -1,0 +1,106 @@
+*l10n-hebrew.txt*    Nvim
+
+
+		  VIM REFERENCE MANUAL	  by Ron Aaron and Avner Lottem
+
+
+Vim 的希伯来语支持（选项与映射）		*hebrew*
+
+对 'rightleft' 的支持功能最初由 Avner Lottem 创建
+<alottem at gmail dot com>。Ron Aaron <ron at ronware dot org> 目前正在协助
+维护这些功能。
+
+
+------------------------------------------------------------------------------
+简介
+
+希伯来语专用的 'keymap' 取值为 "hebrew" 和 "hebrewp"。
+对希伯来语有用的选项有 'delcombine'、'allowrevins'、'revins'、'rightleft'
+和 'rightleftcmd'。
+
+'rightleft' 模式会反转显示顺序，因此字符按从右到左而不是通常的从左到右
+显示。这在编辑希伯来语或其他中东语言时尤其有用。更多细节见 |rileft.txt|。
+
+------------------------------------------------------------------------------
+详情
+
++  选项：
+   +  'rightleft' ('rl') 把 window 的方向设为从右到左。这意味着逻辑上
+      的文本 'ABC' 会被显示为 'CBA'，而且绘制从 window 的右边缘开始，
+      而不是左边缘。
+   +  'keymap' ('kmp') 设置键盘映射。取值使用 "hebrew" 或 "hebrewp"
+      （后一个取值启用按发音的映射）。
+   +  'delcombine' ('deco')，布尔值，允许通过在带有相应 niqud 的字符上
+      按 'x'，删除该字符的 niqud（元音点）或 te`amim（诵经符号）。
+
+   +  'rightleftcmd' ('rlc') 让搜索用的命令行提示出现在右侧。只有当
+      window 处于 'rightleft' 时它才会生效。
+
++  编码：
+   +  在 Unix 下，使用 ISO 8859-8 编码（希伯来字母编码：224-250）。
+   +  在 MS DOS 下，使用 PC 编码（希伯来字母编码：128-154）。
+   +  你应当优先使用 UTF8，因为它支持组合字符（若未启用 UTF8 编码，
+      'deco' 不会起任何作用）。
+
++  Vim 参数：
+   +  `vim -H file` 开始编辑一个希伯来语文件，也就是设置 'rightleft'
+      并把 'keymap' 设为 "hebrew"。
+
++  键盘：
+   +  'allowrevins' 选项允许在 Insert 模式中使用 CTRL-_ 命令。
+
+   +  在 Insert 模式中，CTRL-_ 切换 'revins'。
+
+      CTRL-_ 会把光标移动到已输入文本的末尾。
+
+      注意：在某些键盘上，CTRL-_ 被映射为 CTRL-?。
+
+   +  'keymap' 为 "hebrew" 时的键盘映射（标准以色列键盘）：
+
+	q w e r t y u i o p
+	/ ' ק ר א ט ו ן ם פ
+
+	 a s d f g h j k l ; '
+	 ש ד ג כ ע י ח ל ך ף ,
+
+	  z x c v b n m , . /
+	  ז ס ב ה נ מ צ ת ץ .
+
+      'keymap' 键盘也能插入 niqud 和 te`amim。要查看这些映射是什么，
+      请查看键盘映射文件 hebrew.vim 等。
+
+
+反向输入
+
+如果设置了 'revins'（反向插入）选项，插入会反向进行。这可以用来输入希伯来
+语。插入字符时光标不移动，而是文本向右移动。<BS> 删除光标下的字符。
+CTRL-W 和 CTRL-U 也按相反的方向工作。无论 'backspace' 选项如何设置，
+<BS>、CTRL-W 和 CTRL-U 都不会在插入起点或行尾停下来。
+
+目前没有反向替换模式。
+
+如果设置了 'showmode' 选项，当反向 Insert 模式处于激活状态时，状态行会
+显示 "-- REVERSE INSERT --"。
+
+当设置了 'allowrevins' 选项时，也可以通过 CTRL-_ 进入和退出反向 Insert
+模式。
+
+
+------------------------------------------------------------------------------
+在 rightleft window 中粘贴
+
+用鼠标剪切文本并把它粘贴到 rightleft window 中时，文本会被反转，因为这些
+字符按从左到右的顺序来自剪切 buffer，而插入文件时是从右到左的。为避免这种
+情况，请在粘贴前切换 'revins'（按 CTRL-? 或 CTRL-_）。
+
+
+------------------------------------------------------------------------------
+希伯来语字符与 'isprint' 变量
+
+有时希伯来语字符的编码位于 'isprint' 变量所定义的非可打印范围之内。例如在
+Linux 控制台中，希伯来语字体编码从 128 开始，而默认的 'isprint' 变量是
+@,161-255。结果是所有希伯来语字符都显示为 ~x。要解决这个问题，请设置
+isprint=@,128-255。
+
+
+ vim:tw=78:ts=8:noet:ft=help:norl:

@@ -1,0 +1,15 @@
+# 术语约束只供离线检查；运行时不会执行全局替换。
+[[term]]
+source = "Buffer"
+policy = "preserve"
+forbidden = ["缓冲区"]
+
+[[term]]
+source = "Window"
+policy = "preserve"
+forbidden = ["窗口"]
+
+[[term]]
+source = "Register"
+policy = "preserve"
+forbidden = ["寄存器"]

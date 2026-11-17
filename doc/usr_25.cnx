@@ -1,0 +1,535 @@
+*usr_25.txt*	Nvim
+
+
+		     VIM USER MANUAL	by Bram Moolenaar
+
+
+			     编辑排版的文本
+
+
+文本很少能做到一行一句。本章讲的是如何拆分句子以适配页面，以及其他排版
+方式。Vim 也有用于编辑单行段落和表格的实用功能。
+
+|25.1|	拆行
+|25.2|	对齐文本
+|25.3|	缩进与制表符
+|25.4|	处理长行
+|25.5|	编辑表格
+
+     下一章：|usr_26.txt|  重复
+ 上一章：|usr_24.txt|  快速插入
+目录：|usr_toc.txt|
+
+==============================================================================
+*25.1*	拆行
+
+Vim 有许多让文本处理更省事的功能。默认情况下，编辑器不会自动换行。换句话说，
+你得自己按 <Enter>。这在写程序时很有用，因为你想自己决定一行在哪结束。而在
+编写文档、希望每行最多 70 个字符宽时，它就不太合适。
+   如果你设置了 'textwidth' 选项，Vim 会自动插入换行。例如你想要一个只有 30
+个字符宽的窄栏，就需要执行下面的命令： >
+
+	:set textwidth=30
+
+现在开始输入（加上了标尺）： >
+
+		 1	   2	     3
+	12345678901234567890123456789012345
+	I taught programming for a whi
+
+接着键入 "l"，这使该行超过 30 字符的限制。Vim 看到这一点，插入一个换行，
+你得到如下结果： >
+
+		 1	   2	     3
+	12345678901234567890123456789012345
+	I taught programming for a
+	whil
+
+继续下去，你可以把这段剩下的内容敲完： >
+
+		 1	   2	     3
+	12345678901234567890123456789012345
+	I taught programming for a
+	while. One time, I was stopped
+	by the Fort Worth police,
+	because my homework was too
+	hard. True story.
+
+你不必自己敲换行；Vim 会自动加上。
+
+	注意：
+	'wrap' 选项让 Vim 显示时折行，但并不会在文件里插入换行。
+
+
+重新排版
+
+Vim 编辑器不是文字处理器。在文字处理器里，如果你删掉段落开头的东西，换行
+会重新排布。在 Vim 里不会；所以如果你从第一行删掉 "programming" 这个词，
+得到的只是一个很短的行： >
+
+		 1	   2	     3
+	12345678901234567890123456789012345
+	I taught for a
+	while. One time, I was stopped
+	by the Fort Worth police,
+	because my homework was too
+	hard. True story.
+
+这看起来不好。要让这段恢复形态，你用 "gq" 操作符。
+   我们先在可视选择上用它。从第一行开始，键入： >
+
+	v4jgq
+
+"v" 启动可视模式，"4j" 移到段落末尾，然后是 "gq" 操作符。结果是： >
+
+		 1	   2	     3
+	12345678901234567890123456789012345
+	I taught for a while. One
+	time, I was stopped by the
+	Fort Worth police, because my
+	homework was too hard. True
+	story.
+
+注意：对特定类型的文本版式有一种自动排版的办法，见 |auto-format|。
+
+"gq" 是一个操作符，所以你可以用三种方式之一来选择它作用的文本：可视模式、
+移动命令和文本对象。
+   上面的例子也可以用 "gq4j" 完成。敲的键更少，但你得知道行数。更有用的移动
+命令是 "}"。它移动到段落末尾。于是 "gq}" 从光标处排版到当前段落末尾。
+   与 "gq" 配合非常有用的文本对象是段落。试试这个： >
+
+	gqap
+
+"ap" 代表 "a-paragraph"（一个段落）。它排版一个段落（段落之间以空行分隔）
+的文本，光标之前的部分也包括在内。
+   如果你的段落之间用空行分隔，你可以键入这个来排版整个文件： >
+
+	gggqG
+
+"gg" 移到第一行，"gqG" 一直排版到最后一行。
+   警告：如果你的段落分隔不当，它们会被拼在一起。一个常见错误是某行里有
+空格或制表符。那是空白行，而不是空行。
+
+Vim 能排版的不仅仅是纯文本。改变这一点的方法见 |fo-table|。句号之后用几个
+空格，可以用 'joinspaces' 选项改变。
+   也可以用外部程序来排版。当你的文本无法用 Vim 的内建命令妥善排版时，这很
+有用。见 'formatprg' 选项。
+
+==============================================================================
+*25.2*	对齐文本
+
+要让一段行居中，用下面的命令： >
+
+	:{range}center [width]
+
+{range} 是通常的命令行范围。[width] 是居中时使用的可选行宽。如果未指定
+[width]，默认为 'textwidth' 的值。（如果 'textwidth' 为 0，默认是 80。）
+   例如： >
+
+	:1,5center 40
+
+得到如下结果： >
+
+       I taught for a while. One
+       time, I was stopped by the
+     Fort Worth police, because my
+      homework was too hard. True
+		 story.
+
+
+右对齐
+
+类似地，":right" 命令把文本右对齐： >
+
+	:1,5right 37
+
+得到如下结果： >
+
+	    I taught for a while. One
+	   time, I was stopped by the
+	Fort Worth police, because my
+	  homework was too hard. True
+			       story.
+
+左对齐
+
+最后是这个命令： >
+
+	:{range}left [margin]
+
+不过，与 ":center" 和 ":right" 不同，":left" 的参数不是行宽，而是左边距。
+如果省略，文本会贴着屏幕左边（用零边距效果相同）。如果边距是 5，文本就缩进
+5 个空格。例如，用下面这些命令： >
+
+	:1left 5
+	:2,5left
+
+得到如下结果： >
+
+	     I taught for a while. One
+	time, I was stopped by the
+	Fort Worth police, because my
+	homework was too hard. True
+	story.
+
+
+两端对齐文本			*justify* *:Justify* *Justify()* *package-justify*
+
+Vim 没有内建的两端对齐文本的办法。不过有一个很利落的宏包可以干这活儿。要用
+这个包，执行下面的命令： >
+
+	:packadd justify
+
+或者把这行放进你的 |vimrc|： >
+
+	:packadd! justify
+
+这个 Vim 脚本文件定义了一个新的可视命令 "_j"。要对齐一段文本，在可视模式下
+高亮这段文本，然后执行 "_j"。
+   文件里有更多解释。要过去看，在这个名字上用 "gf"：
+$VIMRUNTIME/pack/dist/opt/justify/plugin/justify.vim。
+
+另一种办法是用外部程序过滤文本。例如： >
+
+	:%!fmt
+
+==============================================================================
+*25.3*	缩进与制表符
+
+缩进可以用来让文本从其余内容中凸显出来。例如本手册里的示例文本就缩进了八列。
+你通常会通过在每行开头按 <Tab> 来输入。取这段文本： >
+	the first line
+	the second line
+
+它是这样输入的：<Tab>、一些文本、<Enter>、<Tab> 和更多文本。
+   'autoindent' 选项会自动插入缩进： >
+
+	:set autoindent
+
+开始新的一行时，它会得到与上一行相同的缩进。在上面的例子里，<Enter> 之后
+再按 <Tab> 键就不需要了。
+
+
+增加缩进
+
+要增加一行的缩进量，在普通模式下用 ">" 操作符。通常写成 ">>"，它为当前行
+增加缩进。在插入模式下用 <C-t>。
+   增加的缩进量由 'shiftwidth' 选项指定。默认值是 8。例如，要让 ">>" 插入
+相当于四列的缩进，键入这个： >
+
+	:set shiftwidth=4
+
+用在示例文本的第二行上，就得到这样： >
+
+	the first line
+	    the second line
+
+"4>>" 会增加四行的缩进。
+
+
+软制表位
+
+如果你想让缩进是 4 的倍数，把 'shiftwidth' 设为 4。但按 <Tab> 时你得到
+的缩进仍然相当于 8 列。要改变这一点，设置 'softtabstop' 选项： >
+
+	:set softtabstop=4
+
+现在 Vim 为你的光标每 4 列建立一个不可见的制表位；按 <Tab> 会跳到下一个
+制表位，并插入恰好所需的空格或制表符组合。
+
+	注意：
+	你可以把 'tabstop' 选项设为 4。然而，如果你在另一时间编辑该文件，
+	并把 'tabstop' 设为默认值 8，它看起来就会不对。在其他程序里以及打印
+	时，缩进也会不对。因此建议始终把 'tabstop' 保持在八。这是所有类 UNIX
+	系统上的标准值。
+
+
+==============================================================================
+*25.4*	处理长行
+
+有时你编辑的文件比 window 的列数还要宽。这种情况发生时，Vim 折行以便一切都能
+放在屏幕上。
+   如果你把 'wrap' 选项关掉，文件里的每一行就都在屏幕上显示为一行。那么长行
+的末尾就消失在屏幕右侧之外。
+   当你把光标移到一个看不到的字符上时，Vim 会滚动文本以显示它。这就像在水平
+方向上让一个视口在文本上移动。
+   默认情况下，Vim 不在 GUI 中显示水平滚动条。如果你想启用它，用下面的命令： >
+
+	:set guioptions+=b
+
+Vim window 底部会出现一个水平滚动条。
+
+如果你没有滚动条或者不想用它，用这些命令来滚动文本。光标会留在原地，但必要时
+会被移回可见文本之内。
+
+	zh		向右滚动
+	4zh		向右滚动四个字符
+	zH		向右滚动半个 window 宽
+	ze		向右滚动，把光标放在末尾
+	zl		向左滚动
+	4zl		向左滚动四个字符
+	zL		向左滚动半个 window 宽
+	zs		向左滚动，把光标放在开头
+
+我们用一行文本来试着说明这一点。光标在 "which" 的 "w" 上。该行上方的
+"current window" 表示当前可见的文本。文本下方的 "window" 表示其左边那条命令
+执行后可见的文本。 >
+
+			      |<-- current window -->|
+		some long text, part of which is visible in the window
+	ze	  |<--	   window     -->|
+	zH	   |<--     window     -->|
+	4zh		  |<--	   window     -->|
+	zh		     |<--     window	 -->|
+	zl		       |<--	window	   -->|
+	4zl			  |<--	   window     -->|
+	zL				|<--	 window     -->|
+	zs			       |<--	window	   -->|
+
+
+在关闭折行的情况下移动
+
+当 'wrap' 关闭且文本已水平滚动时，你可以用下面的命令把光标移到一个你看得见的
+字符上。这样 window 左右的文本就被忽略了。这些命令从不会导致文本滚动： >
+
+	g0		to first visible character in this line
+	g^		to first non-blank visible character in this line
+	gm		to middle of screen line
+	gM		to middle of the text in this line
+	g$		to last visible character in this line
+
+		|<--	  window     -->|
+	some long    text, part of which is visible in one line
+		 g0  g^    gm	   gM g$
+
+
+在单词处断行				*edit-no-break*
+
+在为另一个程序准备文本时，你可能得做成不含换行的段落。使用 'nowrap' 的一个
+缺点是你看不到你正在处理的整句话。当 'wrap' 打开时，单词被从中间断开，这使
+它们难以阅读。
+   编辑这类段落的一个好办法是设置 'linebreak' 选项。这样 Vim 在显示该行时
+会在合适的地方断行。文件中的文本则保持不变。
+   没有 'linebreak' 时，文本可能看起来像这样：
+ >
+	+---------------------------------+
+	|letter generation program for a b|
+	|ank.  They wanted to send out a s|
+	|pecial, personalized letter to th|
+	|eir richest 1000 customers.  Unfo|
+	|rtunately for the programmer, he |
+	+---------------------------------+
+<
+之后： >
+
+	:set linebreak
+
+它看起来像这样：
+ >
+	+---------------------------------+
+	|letter generation program for a  |
+	|bank.  They wanted to send out a |
+	|special, personalized letter to  |
+	|their richest 1000 customers.    |
+	|Unfortunately for the programmer,|
+	+---------------------------------+
+<
+相关选项：
+'breakat' 指定可以在哪些字符处断行。
+'showbreak' 指定在断行开头显示的字符串。
+把 'textwidth' 设为零可避免段落被拆分。
+
+
+按可见行移动
+
+"j" 和 "k" 命令移到下一行和上一行。用在一个长行上时，这意味着一次移动很多
+个屏幕行。
+   要只移动一个屏幕行，用 "gj" 和 "gk" 命令。当一行不折行时，它们与 "j" 和
+"k" 作用相同。当该行确实折行时，它们移到下面或上面一行显示的那个字符。
+   你或许喜欢用这些映射，把这两个移动命令绑到光标键上： >
+
+	:map <Up> gk
+	:map <Down> gj
+
+
+把段落变成一行				*edit-paragraph-join*
+
+如果你想导入文本到像 MS-Word 这样的程序，每个段落就该是一行。如果你的段落
+目前是用空行分隔的，下面就是把每个段落变成一行的办法： >
+
+	:g/./,/^$/join
+
+这看起来挺复杂。我们把它拆成几块来看：
+
+	:g/./		一条 ":global" 命令，找出所有至少含一个字符的行。
+	     ,/^$/	一个范围，从当前行（那个非空行）直到一个空行。
+		  join	":join" 命令把该范围内的行并成一行。
+
+从这段文本开始，它含八行，在第 30 列处断开：
+ >
+	+----------------------------------+
+	|A letter generation program	   |
+	|for a bank.  They wanted to	   |
+	|send out a special,		   |
+	|personalized letter.		   |
+	|				   |
+	|To their richest 1000		   |
+	|customers.  Unfortunately for	   |
+	|the programmer,		   |
+	+----------------------------------+
+<
+你最终得到两行：
+ >
+	+----------------------------------+
+	|A letter generation program for a |
+	|bank.	They wanted to send out a s|
+	|pecial, personalized letter.	   |
+	|To their richest 1000 customers.  |
+	|Unfortunately for the programmer, |
+	+----------------------------------+
+<
+注意，当分隔行是空白行而不是空行时；当它含有空格和/或制表符时，这个办法不
+管用。这条命令对空白行确实有效：
+ >
+	:g/\S/,/^\s*$/join
+
+这仍然需要文件末尾有一个空白行或空行，最后一段才能被并起来。
+
+==============================================================================
+*25.5*	编辑表格
+
+假设你在编辑一个有四列的表格： >
+
+	nice table	  test 1	test 2	    test 3
+	input A		  0.534
+	input B		  0.913
+
+你需要在第三列里输入数字。你可以移到第二行，用 "A"，敲一大堆空格，再键入
+文本。
+   对这类编辑，有一个专门的选项： >
+
+	set virtualedit=all
+
+现在你可以把光标移到根本没有文本的位置。这叫做 "virtual space"（虚拟空间）。
+这样编辑表格会容易得多。
+   通过搜索最后一列的表头来移动光标： >
+
+	/test 3
+
+现在按 "j"，你就正好处在可以输入 "input A" 值的位置。键入 "0.693" 结果是： >
+
+	nice table	  test 1     test 2	 test 3
+	input A		  0.534			 0.693
+	input B		  0.913
+
+Vim 自动帮你把新文本前面空出的间隙填上了。现在，要输入这一列的下一个字段，
+用 "Bj"。"B" 往回移到一个空白分隔单词的开头。然后 "j" 移到下一个字段可以
+输入的位置。
+
+	注意：
+	你可以把光标移到显示区的任何位置，也可以越过行尾。但 Vim 不会在那里
+	插入空格，直到你在该位置插入一个字符。
+
+
+复制一列
+
+你想加一列，它应该是第三列的副本，放在 "test 1" 列之前。分七步做：
+1.  把光标移到该列的左上角，例如用 "/test 3"。
+2.  按 CTRL-V 进入块状可视模式。
+3.  用 "2j" 把光标下移两行。你现在处在 "virtual space"：即 "test 3" 列的
+    "input B" 那一行。
+4.  把光标右移，把整列纳入选择范围，再加上你希望在列之间留出的空格。"9l"
+    应该就够了。
+5.  用 "y" 抽出选中的矩形。
+6.  把光标移到 "test 1"，新列必须放在那里。
+7.  按 "P"。
+
+结果应该是： >
+
+	nice table	  test 3    test 1     test 2	   test 3
+	input A		  0.693     0.534		   0.693
+	input B			    0.913
+
+注意整个 "test 1" 列都被右移了，包括 "test 3" 列没有文本的那一行。
+
+用这个回到非虚拟的光标移动： >
+
+	:set virtualedit=
+
+
+虚拟替换模式
+
+使用 'virtualedit' 的缺点在于它「感觉」不一样。移动光标时，你无法辨认行尾
+之外的制表符或空格。可以用另一种方法：虚拟替换模式。
+   假设你的表格里有一行同时含有制表符和其他字符。在第一个制表符上用 "rx"： >
+
+	inp	0.693   0.534	0.693
+
+	       |
+	   rx  |
+	       V
+
+	inpx0.693   0.534	0.693
+
+版式被弄乱了。要避免这一点，用 "gr" 命令： >
+
+	inp	0.693   0.534	0.693
+
+	       |
+	  grx  |
+	       V
+
+	inpx	0.693   0.534	0.693
+
+发生的情况是，"gr" 命令确保新字符占据正确数量的屏幕空间。会插入额外的空格
+或制表符来填补间隙。于是实际发生的是：一个制表符被替换成 "x"，然后加上空白
+使它后面的文本保持原位。在这个例子里，插入了一个制表符。
+   当你需要替换多个字符时，你用 "R" 命令进入替换模式（见 |04.9|）。这会弄乱
+版式并替换掉错误的字符： >
+
+	inp	0	0.534	0.693
+
+		|
+	 R0.786 |
+		V
+
+	inp	0.78634	0.693
+
+"gR" 命令使用虚拟替换模式。它保持版式不变： >
+
+	inp	0	0.534	0.693
+
+		|
+	gR0.786 |
+		V
+
+	inp	0.786	0.534	0.693
+
+
+重排表格中的制表符
+
+你编辑一个含有表格数据的文件，而该文件的原始作者决定用制表符（而不是空格）
+来对齐表格数据。唉，他们用的制表位间隔是 4 列，而 Vim 的默认值是 8 列；表格
+看起来不对！能怎么办呢？
+  要在不修改文件的前提下修正外观，临时调整设置： >
+
+	:set tabstop=4
+
+这会更新显示版式，但文件本身保持不变。
+  另一种可能是永久性地重排该文件。为此 Vim 提供了 |:retab| 命令。首先，把
+'tabstop' 设成与原始版式一致（如上），然后运行： >
+
+	:retab 8
+
+":retab" 命令会把 'tabstop' 改成 8，同时改变文本使其看起来一样。为此它把
+一段段空白变成制表符和空格。现在你可以写入文件了。
+   警告：对程序使用 ":retab" 时，它可能改变字符串常量内部的空白。因此，用
+"\t" 而不是真正的制表符是个好习惯。
+
+==============================================================================
+
+下一章：|usr_26.txt|  重复
+
+版权：见 |manual-copyright|
+
+vim:tw=78:ts=8:noet:ft=help:norl:

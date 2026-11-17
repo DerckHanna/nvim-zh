@@ -1,0 +1,575 @@
+# nvim-zh 核心消息译文补充（native supplement）。
+# msgid 逐字取自固定上游 src/nvim/po/zh_CN.UTF-8.po（见 manifests/native.json），
+# 此处只撰写 msgstr；上游标注 “do not translate” 的条目不在本文件内（见 manifests/native.json）。
+msgid ""
+msgstr ""
+"Project-Id-Version: nvim-zh native supplement\n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: 2026-11-17 20:38+0800\n"
+"Last-Translator: nvim-zh maintainers\n"
+"Language-Team: Simplified Chinese\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: zh_CN\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: ../channel.c:499
+msgid "can only be opened in headless mode"
+msgstr "只能在 headless 模式下打开"
+
+#: ../context.c:335
+msgid "E474: Failed to convert list to msgpack string buffer"
+msgstr "E474: 无法将列表转换为 msgpack 字符串缓存"
+
+#: ../eval.c:1095
+msgid "E5700: Expression from 'spellsuggest' must yield lists with exactly two values"
+msgstr "E5700: 'spellsuggest' 的表达式必须返回恰好包含两个值的列表"
+
+#: ../eval/decode.c:398
+#, c-format
+msgid "E474: Only UTF-8 code points up to U+10FFFF are allowed to appear unescaped: %.*s"
+msgstr "E474: 只有不超过 U+10FFFF 的 UTF-8 码点才允许以未转义形式出现：%.*s"
+
+#: ../eval/decode.c:409
+#, c-format
+msgid "E474: Expected string end: %.*s"
+msgstr "E474: 应为字符串结尾：%.*s"
+
+#: ../eval/decode.c:602
+#, c-format
+msgid "E685: internal error: while converting number \"%.*s\" to float string2float consumed %zu bytes in place of %zu"
+msgstr "E685: 内部错误：将数字 \"%.*s\" 转换为浮点数时，string2float 消耗了 %zu 字节，而应为 %zu"
+
+#: ../eval/decode.c:613
+#, c-format
+msgid "E685: internal error: while converting number \"%.*s\" to integer vim_str2nr consumed %i bytes in place of %zu"
+msgstr "E685: 内部错误：将数字 \"%.*s\" 转换为整数时，vim_str2nr 消耗了 %i 字节，而应为 %zu"
+
+#: ../eval/encode.c:123
+#, c-format
+msgid "key %s"
+msgstr "键 %s"
+
+#: ../eval/encode.c:124
+#, c-format
+msgid "key %s at index %i from special map"
+msgstr "来自特殊映射的键 %s（索引 %i）"
+
+#: ../eval/encode.c:128
+msgid "partial self dictionary"
+msgstr "部分自引用字典"
+
+#: ../eval/encode.c:203
+msgid "itself"
+msgstr "其自身"
+
+#: ../eval/encode.c:453 ../eval/encode.c:533
+msgid "E724: unable to correctly dump variable with self-referencing container"
+msgstr "E724: 无法正确转储带有自引用容器的变量"
+
+#: ../eval/encode.c:752
+#, c-format
+msgid "E474: Error while dumping %s, %s: attempt to dump function reference"
+msgstr "E474: 转储 %s、%s 时出错：试图转储函数引用"
+
+#: ../eval/funcs.c:10072
+#, c-format
+msgid "E482: Can't open file %s for writing: %s"
+msgstr "E482: 无法打开文件 %s 进行写入：%s"
+
+#: ../eval/typval.c:2198
+msgid "E6000: Argument is not a function or function name"
+msgstr "E6000: 参数不是函数或函数名"
+
+#: ../ex_getln.c:2939
+#, c-format
+msgid "E5408: Unable to get g:Nvim_color_cmdline callback: %s"
+msgstr "E5408: 无法获取 g:Nvim_color_cmdline 回调：%s"
+
+#: ../ex_getln.c:2973
+#, c-format
+msgid "E5407: Callback has thrown an exception: %s"
+msgstr "E5407: 回调抛出了异常：%s"
+
+#: ../ex_getln.c:3001
+#, c-format
+msgid "E5402: List item %i has incorrect length: %d /= 3"
+msgstr "E5402: 列表项 %i 的长度不正确：%d /= 3"
+
+#: ../ex_getln.c:3011
+msgid "E5403: Chunk %i start %"
+msgstr "E5403: 数据块 %i 的起始位置 %"
+
+#: ../ex_getln.c:3016
+msgid "E5405: Chunk %i start %"
+msgstr "E5405: 数据块 %i 的起始位置 %"
+
+#: ../ex_getln.c:3032
+msgid "E5404: Chunk %i end %"
+msgstr "E5404: 数据块 %i 的结束位置 %"
+
+#: ../ex_getln.c:3039
+msgid "E5406: Chunk %i end %"
+msgstr "E5406: 数据块 %i 的结束位置 %"
+
+#: ../fileio.c:128
+#, c-format
+msgid "E676: No matching autocommands for buftype=%s buffer"
+msgstr "E676: 没有与 buftype=%s 的 buffer 匹配的自动命令"
+
+#: ../fileio.c:3369
+msgid "E513: write error, conversion failed in line %"
+msgstr "E513: 写入错误，行 % 处转换失败"
+
+#: ../globals.h:898
+#, c-format
+msgid "E5210: dict key '%s' already set for buffered stream in channel %<PRIu64>"
+msgstr "E5210: 字典键 '%s' 已为通道 %<PRIu64> 中的缓冲流设置"
+
+#: ../globals.h:998
+msgid "E5521: <Cmd> mapping must end with <CR> before second <Cmd>"
+msgstr "E5521: <Cmd> 映射在第二个 <Cmd> 之前必须以 <CR> 结尾"
+
+#: ../globals.h:1000
+#, c-format
+msgid "E5555: API call: %s"
+msgstr "E5555: API 调用：%s"
+
+#: ../globals.h:1005
+msgid "E5602: Cannot exchange or rotate float"
+msgstr "E5602: 无法交换或轮换浮点数"
+
+#: ../globals.h:1018
+msgid "E5767: Cannot use :undo! to redo or move to a different undo branch"
+msgstr "E5767: 无法使用 :undo! 重做或切换到其他撤销分支"
+
+#: ../lua/converter.c:68 ../lua/converter.c:204 ../lua/converter.c:621
+#, c-format
+msgid "E1502: Lua failed to grow stack to %i"
+msgstr "E1502: Lua 无法将栈扩展到 %i"
+
+#: ../lua/converter.c:380
+msgid "E5100: Cannot convert given lua table: table should either have a sequence of positive integer keys or contain only string keys"
+msgstr "E5100: 无法转换给定的 lua table：table 要么包含正整数键序列，要么只包含字符串键"
+
+#: ../lua/converter.c:409 ../lua/converter.c:415
+msgid "E5101: Cannot convert given lua type"
+msgstr "E5101: 无法转换给定的 lua 类型"
+
+#: ../lua/converter.c:509 ../lua/converter.c:532
+#, c-format
+msgid "E5102: Lua failed to grow stack to %i"
+msgstr "E5102: Lua 无法将栈扩展到 %i"
+
+#: ../lua/executor.c:333
+#, c-format
+msgid "Error executing vim.schedule lua callback: %.*s"
+msgstr "执行 vim.schedule lua 回调时出错：%.*s"
+
+#: ../lua/executor.c:972
+#, c-format
+msgid "E5114: Error while converting print argument #%i: %.*s"
+msgstr "E5114: 转换 print 的第 %i 个参数时出错：%.*s"
+
+#: ../lua/executor.c:1539
+#, c-format
+msgid "Error executing lua callback: %.*s"
+msgstr "执行 lua 回调时出错：%.*s"
+
+#: ../lua/executor.c:1791
+#, c-format
+msgid "Error executing vim._expand_pat: %.*s"
+msgstr "执行 vim._expand_pat 时出错：%.*s"
+
+#: ../lua/executor.c:1928
+#, c-format
+msgid "Error executing  vim.on_key Lua callback: %.*s"
+msgstr "执行 vim.on_key Lua 回调时出错：%.*s"
+
+#: ../lua/executor.c:2149
+#, c-format
+msgid "Error executing Lua callback: %.*s"
+msgstr "执行 Lua 回调时出错：%.*s"
+
+#: ../main.c:1388
+msgid "--embed conflicts with -es/-Es"
+msgstr "--embed 与 -es/-Es 冲突"
+
+#: ../main.c:1916
+#, c-format
+msgid "E5422: Conflicting configs: \"%s\" \"%s\""
+msgstr "E5422: 配置冲突：\"%s\" \"%s\""
+
+#: ../main.c:2127
+msgid "  --embed               Use stdin/stdout as a msgpack-rpc channel\n"
+msgstr "  --embed               使用 stdin/stdout 作为 msgpack-rpc 通道\n"
+
+#: ../main.c:2131
+msgid "  --remote[-subcommand] Execute commands remotely on a server\n"
+msgstr "  --remote[-subcommand] 在服务器上远程执行命令\n"
+
+#: ../main.c:2132
+msgid "  --server <address>    Specify RPC server to send commands to\n"
+msgstr "  --server <address>    指定用于发送命令的 RPC 服务器\n"
+
+#: ../main.c:2134
+msgid "\nSee \":help startup-options\" for all options.\n"
+msgstr "\n所有选项见 \":help startup-options\"。\n"
+
+#: ../match.c:140
+#, c-format
+msgid "E5030: Empty list at position %d"
+msgstr "E5030: 位置 %d 处的列表为空"
+
+#: ../match.c:978
+#, c-format
+msgid "E474: List item %d is either not a dictionary or an empty one"
+msgstr "E474: 列表项 %d 不是字典或为空字典"
+
+#: ../match.c:987
+#, c-format
+msgid "E474: List item %d is missing one of the required keys"
+msgstr "E474: 列表项 %d 缺少某个必需的键"
+
+#: ../memline.c:1452
+msgid "         [garbled strings (not nul terminated)]"
+msgstr "         [字符串乱码（未以 nul 结尾）]"
+
+#: ../ops.c:5528
+#, c-format
+msgid "(+%<PRId64> for BOM)"
+msgstr "(+%<PRId64> 为 BOM)"
+
+#: ../runtime.c:2224
+#, c-format
+msgid "API client (channel id %<PRIu64>)"
+msgstr "API 客户端（通道 id %<PRIu64>）"
+
+#: ../runtime.c:2227
+msgid "anonymous :source"
+msgstr "匿名 :source"
+
+#: ../runtime.c:2231
+#, c-format
+msgid "anonymous :source (script id %d)"
+msgstr "匿名 :source（脚本 id %d）"
+
+#: ../shada.c:699
+msgid "too few bytes read"
+msgstr "读取的字节太少"
+
+#: ../shada.c:721
+#, c-format
+msgid "System error while skipping in ShaDa file: %s"
+msgstr "跳过 ShaDa 文件时发生系统错误：%s"
+
+#: ../shada.c:725 ../shada.c:3271
+#, c-format
+msgid "Error while reading ShaDa file: last entry specified that it occupies %<PRIu64> bytes, but file ended earlier"
+msgstr "读取 ShaDa 文件时出错：最后一个条目声明占用 %<PRIu64> 字节，但文件提前结束"
+
+#: ../shada.c:770
+#, c-format
+msgid "System error while closing ShaDa file: %s"
+msgstr "关闭 ShaDa 文件时发生系统错误：%s"
+
+#: ../shada.c:805
+#, c-format
+msgid "System error while writing ShaDa file: %s"
+msgstr "写入 ShaDa 文件时发生系统错误：%s"
+
+#: ../shada.c:852
+#, c-format
+msgid "System error while opening ShaDa file %s for reading: %s"
+msgstr "以读取方式打开 ShaDa 文件 %s 时发生系统错误：%s"
+
+#: ../shada.c:1536
+msgid "additional elements of ShaDa "
+msgstr "ShaDa 的额外元素 "
+
+#: ../shada.c:1556
+msgid "additional data of ShaDa "
+msgstr "ShaDa 的额外数据 "
+
+#: ../shada.c:1625
+#, c-format
+msgid "Failed to write variable %s"
+msgstr "写入变量 %s 失败"
+
+#: ../shada.c:1914
+#, c-format
+msgid "Failed to parse ShaDa file due to a msgpack parser error at position %<PRIu64>"
+msgstr "因位置 %<PRIu64> 处发生 msgpack 解析器错误，解析 ShaDa 文件失败"
+
+#: ../shada.c:1929
+#, c-format
+msgid "Failed to parse ShaDa file: incomplete msgpack string at position %<PRIu64>"
+msgstr "解析 ShaDa 文件失败：位置 %<PRIu64> 处的 msgpack 字符串不完整"
+
+#: ../shada.c:1936
+#, c-format
+msgid "Failed to parse ShaDa file: extra bytes in msgpack string at position %<PRIu64>"
+msgstr "解析 ShaDa 文件失败：位置 %<PRIu64> 处的 msgpack 字符串有多余字节"
+
+#: ../shada.c:2989
+#, c-format
+msgid "System error while opening ShaDa file %s for reading to merge before writing it: %s"
+msgstr "为在写入前合并而以读取方式打开 ShaDa 文件 %s 时发生系统错误：%s"
+
+#: ../shada.c:3021
+#, c-format
+msgid "E138: All %s.tmp.X files exist, cannot write ShaDa file!"
+msgstr "E138: 所有 %s.tmp.X 文件都已存在，无法写入 ShaDa 文件！"
+
+#: ../shada.c:3032
+#, c-format
+msgid "System error while opening temporary ShaDa file %s for writing: %s"
+msgstr "以写入方式打开临时 ShaDa 文件 %s 时发生系统错误：%s"
+
+#: ../shada.c:3047
+#, c-format
+msgid "Failed to create directory %s for writing ShaDa file: %s"
+msgstr "为写入 ShaDa 文件而创建目录 %s 失败：%s"
+
+#: ../shada.c:3061
+#, c-format
+msgid "System error while opening ShaDa file %s for writing: %s"
+msgstr "以写入方式打开 ShaDa 文件 %s 时发生系统错误：%s"
+
+#: ../shada.c:3124
+#, c-format
+msgid "Can't rename ShaDa file from %s to %s!"
+msgstr "无法将 ShaDa 文件从 %s 重命名为 %s！"
+
+#: ../shada.c:3132
+#, c-format
+msgid "Did not rename %s because %s does not look like a ShaDa file"
+msgstr "未重命名 %s，因为 %s 看起来不像 ShaDa 文件"
+
+#: ../shada.c:3135
+#, c-format
+msgid "Did not rename %s to %s because there were errors during writing it"
+msgstr "未将 %s 重命名为 %s，因为写入过程中出现错误"
+
+#: ../shada.c:3141
+#, c-format
+msgid "Do not forget to remove %s or rename it manually to %s."
+msgstr "别忘了删除 %s，或者手动将其重命名为 %s。"
+
+#: ../shada.c:3267
+#, c-format
+msgid "System error while reading ShaDa file: %s"
+msgstr "读取 ShaDa 文件时发生系统错误：%s"
+
+#: ../shada.c:3304
+#, c-format
+msgid "System error while reading integer from ShaDa file: %s"
+msgstr "从 ShaDa 文件读取整数时发生系统错误：%s"
+
+#: ../shada.c:3308
+#, c-format
+msgid "Error while reading ShaDa file: expected positive integer at position %<PRIu64>, but got nothing"
+msgstr "读取 ShaDa 文件时出错：位置 %<PRIu64> 处应为正整数，但未读到任何内容"
+
+#: ../shada.c:3335
+#, c-format
+msgid "Error while reading ShaDa file: expected positive integer at position %<PRIu64>"
+msgstr "读取 ShaDa 文件时出错：位置 %<PRIu64> 处应为正整数"
+
+#: ../shada.c:3530
+#, c-format
+msgid "Error while reading ShaDa file: there is an item at position %<PRIu64> that is stated to be too long"
+msgstr "读取 ShaDa 文件时出错：位置 %<PRIu64> 处的条目被声明为过长"
+
+#: ../shada.c:3544
+#, c-format
+msgid "Error while reading ShaDa file: there is an item at position %<PRIu64> that must not be there: Missing items are for internal uses only"
+msgstr "读取 ShaDa 文件时出错：位置 %<PRIu64> 处存在本不该有的条目：Missing 条目仅供内部使用"
+
+#: ../shada.c:3914
+#, c-format
+msgid "Error while reading ShaDa file: buffer list at position %<PRIu64> contains entry that is not a dictionary"
+msgstr "读取 ShaDa 文件时出错：位置 %<PRIu64> 处的 buffer 列表包含非字典条目"
+
+#: ../shada.c:3941
+#, c-format
+msgid "Error while reading ShaDa file: buffer list at position %<PRIu64> contains entry with invalid line number"
+msgstr "读取 ShaDa 文件时出错：位置 %<PRIu64> 处的 buffer 列表包含行号无效的条目"
+
+#: ../shada.c:3948
+#, c-format
+msgid "Error while reading ShaDa file: buffer list at position %<PRIu64> contains entry with invalid column number"
+msgstr "读取 ShaDa 文件时出错：位置 %<PRIu64> 处的 buffer 列表包含列号无效的条目"
+
+#: ../shada.c:3955
+#, c-format
+msgid "Error while reading ShaDa file: buffer list at position %<PRIu64> contains entry that does not have a file name"
+msgstr "读取 ShaDa 文件时出错：位置 %<PRIu64> 处的 buffer 列表包含没有文件名的条目"
+
+#: ../viml/parser/expressions.c:292
+#, c-format
+msgid "E15: Invalid control character present in input: %.*s"
+msgstr "E15: 输入中存在无效的控制字符：%.*s"
+
+#: ../viml/parser/expressions.c:678 ../viml/parser/expressions.c:694
+#, c-format
+msgid "E15: Unexpected EOC character: %.*s"
+msgstr "E15: 意外的 EOC 字符：%.*s"
+
+#: ../viml/parser/expressions.c:706
+#, c-format
+msgid "E15: Unidentified character: %.*s"
+msgstr "E15: 无法识别的字符：%.*s"
+
+#: ../viml/parser/expressions.c:1335
+#, c-format
+msgid "E15: Operator is not associative: %.*s"
+msgstr "E15: 运算符不具有结合性：%.*s"
+
+#: ../viml/parser/expressions.c:1440
+#, c-format
+msgid "E15: Missing operator: %.*s"
+msgstr "E15: 缺少运算符：%.*s"
+
+#: ../viml/parser/expressions.c:2081
+#, c-format
+msgid "E15: Expected lambda arguments list or arrow: %.*s"
+msgstr "E15: 应为 lambda 参数列表或箭头：%.*s"
+
+#: ../viml/parser/expressions.c:2101
+#, c-format
+msgid "E15: Expected value part of assignment lvalue: %.*s"
+msgstr "E15: 应为赋值左值的值部分：%.*s"
+
+#: ../viml/parser/expressions.c:2120
+#, c-format
+msgid "E15: Expected assignment operator or subscript: %.*s"
+msgstr "E15: 应为赋值运算符或下标：%.*s"
+
+#: ../viml/parser/expressions.c:2171
+msgid "E15: Unexpected "
+msgstr "E15: 意外的 "
+
+#: ../viml/parser/expressions.c:2181
+#, c-format
+msgid "E15: Unexpected multiplication-like operator: %.*s"
+msgstr "E15: 意外的类乘法运算符：%.*s"
+
+#: ../viml/parser/expressions.c:2259
+#, c-format
+msgid "E15: Expected value, got comparison operator: %.*s"
+msgstr "E15: 应为值，却得到比较运算符：%.*s"
+
+#: ../viml/parser/expressions.c:2286
+#, c-format
+msgid "E15: Expected value, got comma: %.*s"
+msgstr "E15: 应为值，却得到逗号：%.*s"
+
+#: ../viml/parser/expressions.c:2320
+#, c-format
+msgid "E15: Comma outside of call, lambda or literal: %.*s"
+msgstr "E15: 逗号出现在调用、lambda 或字面量之外：%.*s"
+
+#: ../viml/parser/expressions.c:2404
+#, c-format
+msgid "E15: Colon outside of dictionary or ternary operator: %.*s"
+msgstr "E15: 冒号出现在字典或三元运算符之外：%.*s"
+
+#: ../viml/parser/expressions.c:2451
+#, c-format
+msgid "E15: Expected value, got closing bracket: %.*s"
+msgstr "E15: 应为值，却得到右方括号：%.*s"
+
+#: ../viml/parser/expressions.c:2474 ../viml/parser/expressions.c:2609
+#, c-format
+msgid "E15: Unexpected closing figure brace: %.*s"
+msgstr "E15: 意外的右花括号：%.*s"
+
+#: ../viml/parser/expressions.c:2507
+#, c-format
+msgid "E475: Nested lists not allowed when assigning: %.*s"
+msgstr "E475: 赋值时不允许嵌套列表：%.*s"
+
+#: ../viml/parser/expressions.c:2557
+#, c-format
+msgid "E15: Expected value, got closing figure brace: %.*s"
+msgstr "E15: 应为值，却得到右花括号：%.*s"
+
+#: ../viml/parser/expressions.c:2587
+#, c-format
+msgid "E15: Don't know what figure brace means: %.*s"
+msgstr "E15: 无法理解花括号的含义：%.*s"
+
+#: ../viml/parser/expressions.c:2706
+#, c-format
+msgid "E15: Unexpected arrow: %.*s"
+msgstr "E15: 意外的箭头：%.*s"
+
+#: ../viml/parser/expressions.c:2707
+#, c-format
+msgid "E15: Arrow outside of lambda: %.*s"
+msgstr "E15: 箭头出现在 lambda 之外：%.*s"
+
+#: ../viml/parser/expressions.c:2788
+#, c-format
+msgid "E15: Unexpected dot: %.*s"
+msgstr "E15: 意外的点号：%.*s"
+
+#: ../viml/parser/expressions.c:2791
+#, c-format
+msgid "E15: Cannot concatenate in assignments: %.*s"
+msgstr "E15: 赋值中不能拼接：%.*s"
+
+#: ../viml/parser/expressions.c:2813
+#, c-format
+msgid "E15: Expected value, got parenthesis: %.*s"
+msgstr "E15: 应为值，却得到圆括号：%.*s"
+
+#: ../viml/parser/expressions.c:2846
+#, c-format
+msgid "E15: Unexpected closing parenthesis: %.*s"
+msgstr "E15: 意外的右圆括号：%.*s"
+
+#: ../viml/parser/expressions.c:2889
+#, c-format
+msgid "E15: Expected value, got question mark: %.*s"
+msgstr "E15: 应为值，却得到问号：%.*s"
+
+#: ../viml/parser/expressions.c:2931
+#, c-format
+msgid "E475: Expected closing bracket to end list assignment lvalue: %.*s"
+msgstr "E475: 应以右方括号结束列表赋值左值：%.*s"
+
+#: ../viml/parser/expressions.c:2934
+#, c-format
+msgid "E15: Misplaced assignment: %.*s"
+msgstr "E15: 赋值位置错误：%.*s"
+
+#: ../viml/parser/expressions.c:2938
+#, c-format
+msgid "E15: Unexpected assignment: %.*s"
+msgstr "E15: 意外的赋值：%.*s"
+
+#: ../viml/parser/expressions.c:2965
+#, c-format
+msgid "E15: Expected value, got EOC: %.*s"
+msgstr "E15: 应为值，却得到 EOC：%.*s"
+
+#: ../viml/parser/expressions.c:3013
+#, c-format
+msgid "E15: Missing closing figure brace: %.*s"
+msgstr "E15: 缺少右花括号：%.*s"
+
+#: ../viml/parser/expressions.c:3018
+#, c-format
+msgid "E15: Missing closing figure brace for lambda: %.*s"
+msgstr "E15: lambda 缺少右花括号：%.*s"
+
+#: ../../../runtime/optwin.vim:493
+msgid "determines scroll behavior for split windows"
+msgstr "决定分割 window 的滚动行为"
+
+#: ../../../runtime/optwin.vim:959
+msgid "last line in the file followed by CTRL-Z"
+msgstr "文件中最后一行后面跟着 CTRL-Z"

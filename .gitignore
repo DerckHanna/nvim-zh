@@ -1,0 +1,13 @@
+/.agents/
+/.codex/
+/.aws/
+
+.env
+.env.*
+__pycache__/
+*.pyc
+*.pyo
+nvim.log
+.nvimlog
+*.swp
+*.tmp

@@ -1,0 +1,191 @@
+*if_ruby.txt*          Nvim
+
+
+		  VIM REFERENCE MANUAL	  by Shugo Maeda
+
+Vim 的 Ruby 接口				*if_ruby* *ruby* *Ruby*
+
+更多信息见 |provider-ruby|。
+
+			*E266* *E267* *E268* *E269* *E270* *E271* *E272* *E273*
+
+ruby 的主页是 https://www.ruby-lang.org/ ，在那里可以找到下载
+Ruby 的链接。
+
+                                      输入 |gO| 查看目录。
+
+==============================================================================
+1. 命令						*ruby-commands*
+
+							*:ruby* *:rub*
+:rub[y] {cmd}		执行 Ruby 命令 {cmd}。 可以用来试手的命令： >
+				:ruby print "Hello"
+
+:rub[y] << [trim] [{endmarker}]
+{script}
+{endmarker}
+			执行 Ruby 脚本 {script}。
+
+			如果省略了 [endmarker]，它默认是一个点 '.'，
+			就像 |:append| 和 |:insert| 命令那样。 相关
+			信息参见 |:let-heredoc|。
+
+
+			这种形式的 |:ruby| 命令主要用于在 vim 脚本
+			中包含 ruby 代码。
+
+Vim script 示例： >
+
+	function! RedGem()
+	ruby << EOF
+	class Garnet
+		def initialize(s)
+			@buffer = VIM::Buffer.current
+			vimputs(s)
+		end
+		def vimputs(s)
+			@buffer.append(@buffer.count,s)
+		end
+	end
+	gem = Garnet.new("pretty")
+	EOF
+	endfunction
+<
+要查看你的 Ruby 是什么版本： >
+	:ruby print RUBY_VERSION
+<
+
+						*:rubydo* *:rubyd* *E265*
+:[range]rubyd[o] {cmd}	对 [range] 中的每一行依次求值 Ruby
+			命令 {cmd}，其中 $_ 被设为该行文本，不带行尾
+			的 <EOL>。 设置 $_ 会改变文本，但要注意，用
+			这条命令无法添加或删除行。
+			[range] 的默认值是整个文件："1,$"。
+
+							*:rubyfile* *:rubyf*
+:rubyf[ile] {file}	执行 {file} 中的 Ruby 脚本。 这和
+			`:ruby load 'file'` 相同，但允许文件名补全。
+
+在 |sandbox| 中无法执行 Ruby 命令。
+
+==============================================================================
+2. VIM 模块					*ruby-vim*
+
+Ruby 代码对 vim 的所有访问都经由 "VIM" 模块。
+
+概览 >
+	print "Hello"			      # displays a message
+	VIM.command(cmd)		      # execute an Ex command
+	num = VIM::Window.count		      # gets the number of windows
+	w = VIM::Window[n]		      # gets window "n"
+	cw = VIM::Window.current	      # gets the current window
+	num = VIM::Buffer.count		      # gets the number of buffers
+	b = VIM::Buffer[n]		      # gets buffer "n"
+	cb = VIM::Buffer.current	      # gets the current buffer
+	w.height = lines		      # sets the window height
+	w.cursor = [row, col]		      # sets the window cursor position
+	pos = w.cursor			      # gets an array [row, col]
+	name = b.name			      # gets the buffer file name
+	line = b[n]			      # gets a line from the buffer
+	num = b.count			      # gets the number of lines
+	b[n] = str			      # sets a line in the buffer
+	b.delete(n)			      # deletes a line
+	b.append(n, str)		      # appends a line after n
+	line = VIM::Buffer.current.line       # gets the current line
+	num = VIM::Buffer.current.line_number # gets the current line number
+	VIM::Buffer.current.line = "test"     # sets the current line number
+<
+
+模块函数：
+
+							*ruby-message*
+VIM::message({msg})
+	显示消息 {msg}。
+
+							*ruby-set_option*
+VIM::set_option({arg})
+	设置一个 vim 选项。 {arg} 可以是 ":set" 命令所能接受的任意
+	参数。 注意，这意味着参数中不允许有空格！ 参见 |:set|。
+
+							*ruby-command*
+VIM::command({cmd})
+	执行 Ex 命令 {cmd}。
+
+							*ruby-evaluate*
+VIM::evaluate({expr})
+	使用 vim 的内部表达式求值器对 {expr} 求值（参见 |expression|）。
+	把表达式的结果作为字符串返回。
+	|List| 会通过连接各项并插入换行而转成字符串。
+
+==============================================================================
+3. VIM::Buffer 对象				*ruby-buffer*
+
+VIM::Buffer 对象表示 vim Buffer。
+
+类方法：
+
+current		返回当前的 Buffer 对象。
+count		返回 Buffer 的数量。
+self[{n}]	返回编号为 {n} 的 Buffer 对象。 第一个
+		编号是 0。
+
+方法：
+
+name		返回 Buffer 的完整名称。
+number		返回 Buffer 的编号。
+count		返回行数。
+length		返回行数。
+self[{n}]	返回 Buffer 中的一行。 {n} 是行号。
+self[{n}] = {str}
+		设置 Buffer 中的一行。 {n} 是行号。
+delete({n})	删除 Buffer 中的一行。 {n} 是行号。
+append({n}, {str})
+		在 {n} 行之后追加一行。
+line		如果 Buffer 处于活动状态，返回该 Buffer
+		的当前行。
+line = {str}    如果 Buffer 处于活动状态，设置该 Buffer 的当前行。
+line_number     如果 Buffer 处于活动状态，返回该 Buffer
+		当前行的编号。
+
+==============================================================================
+4. VIM::Window 对象				*ruby-window*
+
+VIM::Window 对象表示 vim Window。
+
+类方法：
+
+current		返回当前的 Window 对象。
+count		返回 Window 的数量。
+self[{n}]	返回编号为 {n} 的 Window 对象。 第一个
+		编号是 0。
+
+方法：
+
+buffer		返回该 Window 中显示的 Buffer。
+height		返回 Window 的高度。
+height = {n}	把 Window 的高度设为 {n}。
+width		返回 Window 的宽度。
+width = {n}	把 Window 的宽度设为 {n}。
+cursor		返回一个 [row, col] 数组作为光标位置。
+		第一个行号是 1，第一个列号是 0。
+cursor = [{row}, {col}]
+		把光标位置设为 {row} 和 {col}。
+
+==============================================================================
+5. 全局变量					*ruby-globals*
+
+有两个全局变量。
+
+$curwin		当前的 Window 对象。
+$curbuf		当前的 Buffer 对象。
+
+==============================================================================
+6. rubyeval() Vim 函数				*ruby-rubyeval*
+
+为了支持双向接口，你可以使用 |rubyeval()| 函数来求值 Ruby 表达式，
+并把它们的值传给 Vim script。
+
+Ruby 的值 "true"、"false" 和 "nil" 分别被转换为 v:true、v:false
+和 v:null。
+
+ vim:tw=78:ts=8:noet:ft=help:norl:

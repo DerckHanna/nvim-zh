@@ -1,0 +1,233 @@
+{
+  "binary": "/usr/sbin/nvim",
+  "binary_sha256": "d308f10e416aec90c8794a7a10174777b8262076fc9d5aa3db043fd86e260531",
+  "runtime": "/usr/share/nvim/runtime",
+  "entries": 118,
+  "bare": [
+    "can only be opened in headless mode",
+    "E474: Failed to convert list to msgpack string buffer",
+    "E5700: Expression from 'spellsuggest' must yield lists with exactly two values",
+    "E474: Only UTF-8 code points up to U+10FFFF are allowed to appear unescaped: %.*s",
+    "E474: Expected string end: %.*s",
+    "E685: internal error: while converting number \"%.*s\" to float string2float consumed %zu bytes in place of %zu",
+    "E685: internal error: while converting number \"%.*s\" to integer vim_str2nr consumed %i bytes in place of %zu",
+    "key %s",
+    "key %s at index %i from special map",
+    "partial self dictionary",
+    "itself",
+    "E724: unable to correctly dump variable with self-referencing container",
+    "E474: Error while dumping %s, %s: attempt to dump function reference",
+    "E482: Can't open file %s for writing: %s",
+    "E6000: Argument is not a function or function name",
+    "E5408: Unable to get g:Nvim_color_cmdline callback: %s",
+    "E5407: Callback has thrown an exception: %s",
+    "E5402: List item %i has incorrect length: %d /= 3",
+    "E5403: Chunk %i start %",
+    "E5405: Chunk %i start %",
+    "E5404: Chunk %i end %",
+    "E5406: Chunk %i end %",
+    "E676: No matching autocommands for buftype=%s buffer",
+    "E5210: dict key '%s' already set for buffered stream in channel %<PRIu64>",
+    "E5555: API call: %s",
+    "E5602: Cannot exchange or rotate float",
+    "E5767: Cannot use :undo! to redo or move to a different undo branch",
+    "E1502: Lua failed to grow stack to %i",
+    "E5102: Lua failed to grow stack to %i",
+    "--embed conflicts with -es/-Es",
+    "E5422: Conflicting configs: \"%s\" \"%s\"",
+    "  --embed               Use stdin/stdout as a msgpack-rpc channel\n",
+    "  --remote[-subcommand] Execute commands remotely on a server\n",
+    "\nSee \":help startup-options\" for all options.\n",
+    "E5030: Empty list at position %d",
+    "E474: List item %d is either not a dictionary or an empty one",
+    "E474: List item %d is missing one of the required keys",
+    "         [garbled strings (not nul terminated)]",
+    "(+%<PRId64> for BOM)",
+    "API client (channel id %<PRIu64>)",
+    "anonymous :source",
+    "anonymous :source (script id %d)",
+    "too few bytes read",
+    "E138: All %s.tmp.X files exist, cannot write ShaDa file!",
+    "E15: Invalid control character present in input: %.*s",
+    "E15: Unexpected EOC character: %.*s",
+    "E15: Unidentified character: %.*s",
+    "E15: Operator is not associative: %.*s",
+    "E15: Missing operator: %.*s",
+    "E15: Expected lambda arguments list or arrow: %.*s",
+    "E15: Expected value part of assignment lvalue: %.*s",
+    "E15: Expected assignment operator or subscript: %.*s",
+    "E15: Unexpected ",
+    "E15: Unexpected multiplication-like operator: %.*s",
+    "E15: Expected value, got comparison operator: %.*s",
+    "E15: Expected value, got comma: %.*s",
+    "E15: Comma outside of call, lambda or literal: %.*s",
+    "E15: Colon outside of dictionary or ternary operator: %.*s",
+    "E15: Expected value, got closing bracket: %.*s",
+    "E15: Unexpected closing figure brace: %.*s",
+    "E475: Nested lists not allowed when assigning: %.*s",
+    "E15: Expected value, got closing figure brace: %.*s",
+    "E15: Don't know what figure brace means: %.*s",
+    "E15: Unexpected arrow: %.*s",
+    "E15: Arrow outside of lambda: %.*s",
+    "E15: Unexpected dot: %.*s",
+    "E15: Cannot concatenate in assignments: %.*s",
+    "E15: Expected value, got parenthesis: %.*s",
+    "E15: Unexpected closing parenthesis: %.*s",
+    "E15: Expected value, got question mark: %.*s",
+    "E475: Expected closing bracket to end list assignment lvalue: %.*s",
+    "E15: Misplaced assignment: %.*s",
+    "E15: Unexpected assignment: %.*s",
+    "E15: Expected value, got EOC: %.*s",
+    "E15: Missing closing figure brace: %.*s",
+    "E15: Missing closing figure brace for lambda: %.*s"
+  ],
+  "bare_and_prefixed": [
+    {
+      "msgid": "System error while skipping in ShaDa file: %s",
+      "runtime_msgid": "E886: System error while skipping in ShaDa file: %s",
+      "variant": "System error while skipping in ShaDa file: %s"
+    },
+    {
+      "msgid": "Error while reading ShaDa file: last entry specified that it occupies %<PRIu64> bytes, but file ended earlier",
+      "runtime_msgid": "E576: Error while reading ShaDa file: last entry specified that it occupies %lu bytes, but file ended earlier",
+      "variant": "Error while reading ShaDa file: last entry specified that it occupies %lu bytes, but file ended earlier"
+    },
+    {
+      "msgid": "System error while closing ShaDa file: %s",
+      "runtime_msgid": "E886: System error while closing ShaDa file: %s",
+      "variant": "System error while closing ShaDa file: %s"
+    },
+    {
+      "msgid": "System error while opening ShaDa file %s for reading: %s",
+      "runtime_msgid": "E886: System error while opening ShaDa file %s for reading: %s",
+      "variant": "System error while opening ShaDa file %s for reading: %s"
+    },
+    {
+      "msgid": "Failed to write variable %s",
+      "runtime_msgid": "E574: Failed to write variable %s",
+      "variant": "Failed to write variable %s"
+    },
+    {
+      "msgid": "Failed to parse ShaDa file due to a msgpack parser error at position %<PRIu64>",
+      "runtime_msgid": "E576: Failed to parse ShaDa file due to a msgpack parser error at position %lu",
+      "variant": "Failed to parse ShaDa file due to a msgpack parser error at position %lu"
+    },
+    {
+      "msgid": "Failed to parse ShaDa file: incomplete msgpack string at position %<PRIu64>",
+      "runtime_msgid": "E576: Failed to parse ShaDa file: incomplete msgpack string at position %lu",
+      "variant": "Failed to parse ShaDa file: incomplete msgpack string at position %lu"
+    },
+    {
+      "msgid": "Failed to parse ShaDa file: extra bytes in msgpack string at position %<PRIu64>",
+      "runtime_msgid": "E576: Failed to parse ShaDa file: extra bytes in msgpack string at position %lu",
+      "variant": "Failed to parse ShaDa file: extra bytes in msgpack string at position %lu"
+    },
+    {
+      "msgid": "System error while opening ShaDa file %s for reading to merge before writing it: %s",
+      "runtime_msgid": "E886: System error while opening ShaDa file %s for reading to merge before writing it: %s",
+      "variant": "System error while opening ShaDa file %s for reading to merge before writing it: %s"
+    },
+    {
+      "msgid": "System error while opening temporary ShaDa file %s for writing: %s",
+      "runtime_msgid": "E886: System error while opening temporary ShaDa file %s for writing: %s",
+      "variant": "System error while opening temporary ShaDa file %s for writing: %s"
+    },
+    {
+      "msgid": "Failed to create directory %s for writing ShaDa file: %s",
+      "runtime_msgid": "E886: Failed to create directory %s for writing ShaDa file: %s",
+      "variant": "Failed to create directory %s for writing ShaDa file: %s"
+    },
+    {
+      "msgid": "System error while opening ShaDa file %s for writing: %s",
+      "runtime_msgid": "E886: System error while opening ShaDa file %s for writing: %s",
+      "variant": "System error while opening ShaDa file %s for writing: %s"
+    },
+    {
+      "msgid": "Can't rename ShaDa file from %s to %s!",
+      "runtime_msgid": "E136: Can't rename ShaDa file from %s to %s!",
+      "variant": "Can't rename ShaDa file from %s to %s!"
+    },
+    {
+      "msgid": "Did not rename %s because %s does not look like a ShaDa file",
+      "runtime_msgid": "E136: Did not rename %s because %s does not look like a ShaDa file",
+      "variant": "Did not rename %s because %s does not look like a ShaDa file"
+    },
+    {
+      "msgid": "Did not rename %s to %s because there were errors during writing it",
+      "runtime_msgid": "E136: Did not rename %s to %s because there were errors during writing it",
+      "variant": "Did not rename %s to %s because there were errors during writing it"
+    },
+    {
+      "msgid": "Do not forget to remove %s or rename it manually to %s.",
+      "runtime_msgid": "E136: Do not forget to remove %s or rename it manually to %s.",
+      "variant": "Do not forget to remove %s or rename it manually to %s."
+    },
+    {
+      "msgid": "System error while reading ShaDa file: %s",
+      "runtime_msgid": "E886: System error while reading ShaDa file: %s",
+      "variant": "System error while reading ShaDa file: %s"
+    },
+    {
+      "msgid": "System error while reading integer from ShaDa file: %s",
+      "runtime_msgid": "E886: System error while reading integer from ShaDa file: %s",
+      "variant": "System error while reading integer from ShaDa file: %s"
+    },
+    {
+      "msgid": "Error while reading ShaDa file: expected positive integer at position %<PRIu64>, but got nothing",
+      "runtime_msgid": "E576: Error while reading ShaDa file: expected positive integer at position %lu, but got nothing",
+      "variant": "Error while reading ShaDa file: expected positive integer at position %lu, but got nothing"
+    },
+    {
+      "msgid": "Error while reading ShaDa file: expected positive integer at position %<PRIu64>",
+      "runtime_msgid": "E576: Error while reading ShaDa file: expected positive integer at position %lu",
+      "variant": "Error while reading ShaDa file: expected positive integer at position %lu"
+    },
+    {
+      "msgid": "Error while reading ShaDa file: there is an item at position %<PRIu64> that is stated to be too long",
+      "runtime_msgid": "E576: Error while reading ShaDa file: there is an item at position %lu that is stated to be too long",
+      "variant": "Error while reading ShaDa file: there is an item at position %lu that is stated to be too long"
+    },
+    {
+      "msgid": "Error while reading ShaDa file: there is an item at position %<PRIu64> that must not be there: Missing items are for internal uses only",
+      "runtime_msgid": "E576: Error while reading ShaDa file: there is an item at position %lu that must not be there: Missing items are for internal uses only",
+      "variant": "Error while reading ShaDa file: there is an item at position %lu that must not be there: Missing items are for internal uses only"
+    },
+    {
+      "msgid": "Error while reading ShaDa file: buffer list at position %<PRIu64> contains entry with invalid line number",
+      "runtime_msgid": "E575: Error while reading ShaDa file: buffer list at position %lu contains entry with invalid line number",
+      "variant": "Error while reading ShaDa file: buffer list at position %lu contains entry with invalid line number"
+    },
+    {
+      "msgid": "Error while reading ShaDa file: buffer list at position %<PRIu64> contains entry with invalid column number",
+      "runtime_msgid": "E575: Error while reading ShaDa file: buffer list at position %lu contains entry with invalid column number",
+      "variant": "Error while reading ShaDa file: buffer list at position %lu contains entry with invalid column number"
+    },
+    {
+      "msgid": "Error while reading ShaDa file: buffer list at position %<PRIu64> contains entry that does not have a file name",
+      "runtime_msgid": "E575: Error while reading ShaDa file: buffer list at position %lu contains entry that does not have a file name",
+      "variant": "Error while reading ShaDa file: buffer list at position %lu contains entry that does not have a file name"
+    }
+  ],
+  "prefixed_only": [],
+  "runtime_file": [
+    "determines scroll behavior for split windows",
+    "last line in the file followed by CTRL-Z"
+  ],
+  "unverified": [
+    "E513: write error, conversion failed in line %",
+    "E5521: <Cmd> mapping must end with <CR> before second <Cmd>",
+    "E5100: Cannot convert given lua table: table should either have a sequence of positive integer keys or contain only string keys",
+    "E5101: Cannot convert given lua type",
+    "Error executing vim.schedule lua callback: %.*s",
+    "E5114: Error while converting print argument #%i: %.*s",
+    "Error executing lua callback: %.*s",
+    "Error executing vim._expand_pat: %.*s",
+    "Error executing  vim.on_key Lua callback: %.*s",
+    "Error executing Lua callback: %.*s",
+    "  --server <address>    Specify RPC server to send commands to\n",
+    "System error while writing ShaDa file: %s",
+    "additional elements of ShaDa ",
+    "additional data of ShaDa ",
+    "Error while reading ShaDa file: buffer list at position %<PRIu64> contains entry that is not a dictionary"
+  ]
+}

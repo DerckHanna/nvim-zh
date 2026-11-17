@@ -1,0 +1,2965 @@
+*lsp.txt*   LSP
+
+
+                            NVIM 参考手册
+
+
+LSP 客户端/框架                                  *lsp* *LSP* *vim.lsp*
+
+Nvim 支持语言服务器协议（LSP），也就是说它可以作为 LSP 服务器的客户端，并内置了
+一个 Lua 框架 `vim.lsp`，用于构建增强的 LSP 工具。
+
+    https://microsoft.github.io/language-server-protocol/
+
+LSP 借助语义级的全项目分析来实现转到定义、查找引用、悬停、补全、重命名、格式化、
+重构等功能（与 |ctags| 不同）。
+
+                                    输入 |gO| 查看目录。
+
+==============================================================================
+快速上手                                              *lsp-quickstart*
+
+Nvim 提供了 LSP 客户端，但服务器由第三方提供。按下列步骤即可获得 LSP 功能：
+
+1. 用你的包管理器安装语言服务器，或按照上游的安装说明操作。你可以在这里找到
+   语言服务器：
+   https://microsoft.github.io/language-server-protocol/implementors/servers/
+2. 定义一个新的配置 |lsp-new-config|（或安装 https://github.com/neovim/nvim-lspconfig）。
+   示例： >lua
+     vim.lsp.config['lua_ls'] = {
+       -- Command and arguments to start the server.
+       cmd = { 'lua-language-server' },
+       -- Filetypes to automatically attach to.
+       filetypes = { 'lua' },
+       -- Sets the "workspace" to the directory where any of these files is found.
+       -- Files that share a root directory will reuse the LSP server connection.
+       -- Nested lists indicate equal priority, see |vim.lsp.Config|.
+       root_markers = { { '.luarc.json', '.luarc.jsonc' }, '.git' },
+       -- Specific settings to send to the server. The schema is server-defined.
+       -- Example: https://raw.githubusercontent.com/LuaLS/vscode-lua/master/setting/schema.json
+       settings = {
+         Lua = {
+           runtime = {
+             version = 'LuaJIT',
+           }
+         }
+       }
+     }
+3. 用 |vim.lsp.enable()| 启用该配置。
+   示例： >lua
+     vim.lsp.enable('lua_ls')
+4. 打开一个与配置中 `filetypes` 之一匹配的代码文件。
+   注意：视 LSP 服务器而定，你可能需要确保项目中存在某个 |lsp-root_markers| 文件，
+   工作区才能被识别。
+5. 检查该 buffer 的 LSP 是否已激活（"已附加"）： >vim
+     :checkhealth vim.lsp
+6. 注意：某些 LSP 功能默认被禁用，你可以手动启用它们：
+     - |lsp-codelens|
+     - |lsp-linked_editing_range|
+     - |lsp-inlay_hint|
+     - |lsp-inline_completion|
+7. （可选）配置键位映射和自动命令以使用 LSP 功能。
+   |lsp-attach|
+
+==============================================================================
+默认值                                                *lsp-defaults*
+
+LSP 激活时，默认会启用下列各项 LSP 功能并设置下列选项和键位映射，前提是
+(1) 该语言服务器支持相应功能，且 (2) 这些选项为空或由内置的 runtime（ftplugin）
+文件设置。LSP 客户端停止或分离后，这些选项不会被恢复。
+
+全局默认值                     *gra* *gri* *grn* *grr* *grt* *grx* *i_CTRL-S*
+
+Nvim 启动时会无条件创建这些全局键位映射：
+
+- "gra"（普通模式和可视模式）映射到 |vim.lsp.buf.code_action()|
+- "gri" 映射到 |vim.lsp.buf.implementation()|
+- "grn" 映射到 |vim.lsp.buf.rename()|
+- "grr" 映射到 |vim.lsp.buf.references()|
+- "grt" 映射到 |vim.lsp.buf.type_definition()|
+- "grx" 映射到 |vim.lsp.codelens.run()|
+- "gO" 映射到 |vim.lsp.buf.document_symbol()|
+- CTRL-S（插入模式）映射到 |vim.lsp.buf.signature_help()|
+- 如果 treesitter 未激活，|v_an| 和 |v_in| 回退到 LSP 的
+  |vim.lsp.buf.selection_range()|。
+- |gx| 处理 `textDocument/documentLink`。示例：使用 gopls 时，对下面这段 Go 代码
+  中的 "os" 调用 gx 会在外部打开文档： >
+    package nvim
+    import (
+       "os"
+    )
+<
+这些 LSP 功能默认启用：
+
+- 诊断 |lsp-diagnostic|。自定义见 |vim.diagnostic.config()|。
+- `workspace/didChangeWatchedFiles`（Linux 除外）。如果你在大型工作区中遇到性能
+  不佳，请运行 `:checkhealth vim.lsp` 并查找 "file watching"。可以尝试禁用文件
+  监视： >lua
+    local capabilities = vim.lsp.protocol.make_client_capabilities()
+    if capabilities.workspace then
+      capabilities.workspace.didChangeWatchedFiles = nil
+    end
+    vim.lsp.config('*', {
+      capabilities = capabilities,
+    })
+<
+
+BUFFER 局部默认值
+
+- 'omnifunc' 被设为 |vim.lsp.omnifunc()|，用 |i_CTRL-X_CTRL-O| 触发补全。
+- 'tagfunc' 被设为 |vim.lsp.tagfunc()|。这会让转到定义、|:tjump| 以及
+  |CTRL-]|、|CTRL-W_]|、|CTRL-W_}| 之类的键位映射得以利用语言服务器。
+- 'formatexpr' 被设为 |vim.lsp.formatexpr()|，因此只要语言服务器支持，你就可以用
+  |gq| 格式化行。
+  - 要避免这一行为，请改用 |gw| 而不是 gq，或在 |LspAttach| 时清除 'formatexpr'。
+- |K| 映射到 |vim.lsp.buf.hover()|，除非 'keywordprg' 已被自定义，或已存在 `K` 的
+  自定义键位映射。
+- 默认启用文档颜色（document color），用于高亮文档中的颜色引用。
+  - 要避免这一行为，请在 |LspAttach| 时调用
+    `vim.lsp.document_color.enable(false, { bufnr = ev.buf })`。
+
+禁用默认值                                      *lsp-defaults-disable*
+
+你可以随时用 |vim.keymap.del()| 或 |:unmap| 删除全局键位映射。另见 |gr-default|。
+
+要删除或覆盖 BUFFER 局部默认值，请定义一个 |LspAttach| 处理器： >lua
+
+    vim.api.nvim_create_autocmd('LspAttach', {
+      callback = function(ev)
+        -- Unset 'formatexpr'
+        vim.bo[ev.buf].formatexpr = nil
+        -- Unset 'omnifunc'
+        vim.bo[ev.buf].omnifunc = nil
+        -- Unmap K
+        vim.keymap.del('n', 'K', { buf = ev.buf })
+        -- Disable document colors
+        vim.lsp.document_color.enable(false, { bufnr = ev.buf })
+      end,
+    })
+<
+==============================================================================
+命令                                                 *:lsp* *lsp-commands*
+
+:lsp enable [config_name]                                 *:lsp-enable*
+    为当前和今后的 buffer 激活 LSP。见 |vim.lsp.enable()|。
+
+:lsp disable [config_name]                                *:lsp-disable*
+    为当前和今后的 buffer 禁用 LSP（若正在运行则同时停止）。见
+    |vim.lsp.enable()|。
+
+:lsp restart [client_name]                                *:lsp-restart*
+    重启 LSP 客户端和服务器。如果没有给出客户端名称，则重启附加到当前 buffer 的
+    所有活动客户端。
+
+:lsp stop [client_name]                                   *:lsp-stop*
+    停止 LSP 客户端和服务器。如果没有给出客户端名称，则停止附加到当前 buffer 的
+    所有活动客户端。非交互式使用时请用 |Client:stop()|。
+
+==============================================================================
+配置                                                  *lsp-config*
+
+你可以通过 vim.lsp.config() 静态配置 LSP 行为，也可以通过 |lsp-attach| 或
+|Client:on_attach()| 动态配置。
+
+用 |vim.lsp.config()| 定义或修改 LSP 配置，用 |vim.lsp.enable()| 自动激活它们。
+这基本上是 |vim.lsp.start()| 的封装，让你可以共享和合并配置（由 Nvim、插件以及
+你自己的本地配置提供）。
+
+新配置                                            *lsp-new-config*
+要创建新配置，你可以使用 `vim.lsp.config()`，也可以创建
+`lsp/<config-name>.lua` 文件。
+
+示例：以代码方式定义配置 ~
+
+1. 运行 `:lua vim.lsp.config('foo', {cmd={'true'}})`
+2. 运行 `:lua vim.lsp.enable('foo')`
+3. 运行 `:checkhealth vim.lsp`，查看 "Enabled Configurations"。😎
+
+示例：以文件方式定义配置 ~
+
+1. 在 'runtimepath' 的某处创建文件 `lsp/foo.lua`。 >
+   :exe 'edit' stdpath('config') .. '/lsp/foo.lua'
+2. 把下面的代码加入该文件（或从 https://github.com/neovim/nvim-lspconfig
+   复制一个示例）： >
+   return {
+     cmd = { 'true' },
+   }
+3. 保存该文件（加上 `++p` 以确保其父目录被创建）。 >
+   :write ++p
+4. 启用该配置。 >
+   :lua vim.lsp.enable('foo')
+5. 运行 `:checkhealth vim.lsp`，查看 "Enabled Configurations"。🌈
+
+配置如何合并                                      *lsp-config-merge*
+LSP 客户端启动时，会按优先级从低到高合并下列来源来解析其配置（合并语义由
+|vim.tbl_deep_extend()| 的 "force" 行为定义）：
+
+1. 为 `'*'` 名称定义的配置。
+2. 'runtimepath' 中所有 `lsp/<config>.lua` 文件为名为 `<config>` 的配置合并后的
+   结果。
+3. 'runtimepath' 中所有 `after/lsp/<config>.lua` 文件合并后的结果。
+   - "after/" 目录的这种行为是 Vim 的标准特性 |after-directory|，它让你可以覆盖
+     插件（例如 nvim-lspconfig）提供的 `lsp/*.lua` 配置。
+4. 在其他任何地方定义的配置。
+
+示例：给定下列配置…… >lua
+
+  -- Defined in init.lua
+  vim.lsp.config('*', {
+    capabilities = {
+      textDocument = {
+        semanticTokens = {
+          multilineTokenSupport = true,
+        }
+      }
+    },
+    root_markers = { '.git' },
+  })
+  -- Defined in <rtp>/lsp/clangd.lua
+  return {
+    cmd = { 'clangd' },
+    root_markers = { '.clangd', 'compile_commands.json' },
+    filetypes = { 'c', 'cpp' },
+  }
+  -- Defined in init.lua
+  vim.lsp.config('clangd', {
+    filetypes = { 'c' },
+  })
+<
+……合并后的结果是： >lua
+
+  {
+    -- From the clangd configuration in <rtp>/lsp/clangd.lua
+    cmd = { 'clangd' },
+
+    -- From the clangd configuration in <rtp>/lsp/clangd.lua
+    -- Overrides the "*" configuration in init.lua
+    root_markers = { '.clangd', 'compile_commands.json' },
+
+    -- From the clangd configuration in init.lua
+    -- Overrides the clangd configuration in <rtp>/lsp/clangd.lua
+    filetypes = { 'c' },
+
+    -- From the "*" configuration in init.lua
+    capabilities = {
+      textDocument = {
+        semanticTokens = {
+          multilineTokenSupport = true,
+        }
+      }
+    }
+  }
+<
+附加时配置                                         *lsp-attach*
+要使用 Nvim 自带之外（见 |lsp-buf|）的 LSP 功能，你可以在 |Client:on_attach()| 或
+|LspAttach| 上设置键位映射和选项。并非所有语言服务器都提供相同的能力；请在你的
+LspAttach 处理器中用 `supports_method()` 检查。
+                                                        *lsp-lint* *lsp-format*
+示例：启用自动补全和自动格式化（"linting"）： >lua
+
+    vim.api.nvim_create_autocmd('LspAttach', {
+      group = vim.api.nvim_create_augroup('my.lsp', {}),
+      callback = function(ev)
+        local client = assert(vim.lsp.get_client_by_id(ev.data.client_id))
+        if client:supports_method('textDocument/implementation') then
+          -- Create a keymap for vim.lsp.buf.implementation ...
+        end
+
+        -- Enable auto-completion. Note: Use CTRL-Y to select an item. |complete_CTRL-Y|
+        if client:supports_method('textDocument/completion') then
+          -- Optional: trigger autocompletion on EVERY keypress. May be slow!
+          -- local chars = {}; for i = 32, 126 do table.insert(chars, string.char(i)) end
+          -- client.server_capabilities.completionProvider.triggerCharacters = chars
+
+          vim.lsp.completion.enable(true, client.id, ev.buf, {autotrigger = true})
+        end
+
+        -- Auto-format ("lint") on save.
+        -- Usually not needed if server supports "textDocument/willSaveWaitUntil".
+        if not client:supports_method('textDocument/willSaveWaitUntil')
+            and client:supports_method('textDocument/formatting') then
+          vim.api.nvim_create_autocmd('BufWritePre', {
+            group = vim.api.nvim_create_augroup('my.lsp', {clear=false}),
+            buffer = ev.buf,
+            callback = function()
+              vim.lsp.buf.format({ bufnr = ev.buf, id = client.id, timeout_ms = 1000 })
+            end,
+          })
+        end
+      end,
+    })
+<
+要查看某个服务器具备的能力，请在一个已启用 LSP 的 buffer 中试试： >vim
+
+    :lua =vim.lsp.get_clients()[1].server_capabilities
+
+================================================================================
+常见问题                                               *lsp-faq*
+
+- 问：如何强制重新加载 LSP？
+- 答：使用 `:lsp restart`。你也可以先停止所有客户端，然后重新加载该 buffer： >vim
+     :lsp stop
+     :edit
+<
+- 问：为什么补全不工作？
+- 答：在你想要使用 LSP 的那个 buffer 中，检查 'omnifunc' 是否被设为
+     "v:lua.vim.lsp.omnifunc"：`:verbose set omnifunc?`
+     - 可能有别的插件覆盖了该选项。要避免这种情况，你可以在 |after-directory| 的
+       ftplugin 中设置该选项，例如 "after/ftplugin/python.vim"。
+
+- 问：如何同步执行一个请求（例如在保存文件时格式化）？
+- 答：检查该函数是否有 `async` 参数，并把它的值设为 false。例如代码格式化： >vim
+
+     " Auto-format *.rs (rust) files prior to saving them
+     " (async = false is the default for format)
+     autocmd BufWritePre *.rs lua vim.lsp.buf.format({ async = false })
+<
+
+- 问：如何避免我自己的 lsp/ 文件夹被覆盖？
+- 答：把你的配置放在 "after/lsp/" 下。"after/lsp/" 中的文件在 "nvim/lsp/" 中的
+     文件之后加载，因此你的设置会优先于 nvim-lspconfig 提供的默认值。另见：
+     |after-directory|
+
+                                                        *lsp-vs-treesitter*
+- 问：LSP、Treesitter 和 Ctags 相比如何？
+- 答：LSP 需要一个客户端和一个语言服务器。语言服务器使用语义分析在项目层面理解
+     代码。这使语言服务器能够跨文件重命名、在外部库中查找定义等等。
+
+     |treesitter| 是一个语言解析库，提供了出色的工具来增量解析文本并处理错误。
+     这使得它非常适合编辑器理解当前文件的内容，用于语法高亮、简单的转到定义、
+     作用域分析等。
+
+     类 |ctags| 的程序可以生成 |tags| 文件，让 Nvim 跳到定义，并通过
+     |i_CTRL-X_CTRL-]| 命令提供简单的补全。它的功能没那么丰富，也没有语义理解，
+     但它快速、轻量，对在多语言项目中导航很有用。
+
+================================================================================
+LSP API                                                 *lsp-api*
+
+|lsp-core| API 提供了用于创建和管理客户端的核心函数，
+你甚至可以创建自定义的（进程内）|lsp-server|。
+|lsp-buf| 系列函数操作的是附加到当前 buffer 的 LSP 客户端。
+
+------------------------------------------------------------------------------
+概念
+
+                                                                  *lsp-method*
+LSP 规范中定义的请求和通知被称为"LSP 方法"。它们由 |lsp-handler| 函数处理。
+
+                                                                 *lsp-handler*
+LSP 处理器是处理 Nvim 发给服务器的请求所对应的 |lsp-response| 的函数。
+（与请求相对，通知是"发出即忘"的：没有响应，因此也无法被处理。
+|lsp-notification|）
+
+每个处理器都有下列签名： >
+
+    vim.lsp.ResponseHandler:
+        fun(err, result, ctx)
+
+    vim.lsp.NotificationHandler:
+        fun(err, params, ctx)
+
+    vim.lsp.RequestHandler:
+        fun(err, params, ctx): Result?, lsp.ResponseError?
+
+每个响应处理器都有这样的签名： >
+
+    function(err, result, ctx)
+<
+    参数：~
+      • {err}     (`table|nil`) 错误信息字典；如果请求已完成则为 `nil`。
+      • {result}  (`Result|Params|nil`) |lsp-response| 的 `result` 键；
+                  如果请求失败则为 `nil`。
+      • {ctx}     (`table`) 与处理器关联的调用状态表，含下列键：
+                  • {method}     (`string`) |lsp-method| 名称。
+                  • {client_id}  (`number`) |vim.lsp.Client| 标识符。
+                  • {bufnr}      (`Buffer`) Buffer 句柄。
+                  • {params}     (`table|nil`) 请求参数表。
+                  • {version}    (`number`) 请求时文档的版本。处理器可以把它与
+                                 当前文档版本比较，以检查响应是否"过期"。
+                                 另见 |b:changedtick|。
+
+    返回值（多个）：~
+        • (`Result?`) 成功时为 `result`，出错时为 `nil`。
+        • (`lsp.ResponseError?`) 失败时为 `error`，成功时为 `nil`。
+          RPC 错误的结构： >
+            { code, message, data? }
+<          你可以用 |vim.lsp.rpc.rpc_response_error()| 创建该对象。
+
+        |lsp-response| 和 |lsp-notification| 处理器没有返回值。
+
+                                                      *lsp-handler-resolution*
+处理器可以按下列方式设置（优先级递增）：
+
+                                                            *vim.lsp.handlers*
+- 通过 |Client:request()| 直接调用某个 LSP 方法。这是"覆盖"默认的客户端到服务器
+  请求处理的唯一方式（绕过 `vim.lsp.buf` 及相关接口）。 >lua
+    local client = assert(vim.lsp.get_clients()[1])
+    client:request('textDocument/definition')
+
+- 在 `vim.lsp.handlers` 中设置字段。这个全局表包含 |lsp-method| 名称到处理器的默认
+  映射。（注意：仅用于服务器到客户端的请求/通知，不用于客户端到服务器的。）
+  示例： >lua
+    vim.lsp.handlers['textDocument/publishDiagnostics'] = my_custom_diagnostics_handler
+
+- 向 |vim.lsp.start()| 传入 {handlers} 参数。这会为某个特定服务器设置默认
+  |lsp-handler|。（注意：仅用于服务器到客户端的请求/通知，不用于客户端到服务器的。）
+  示例： >lua
+    vim.lsp.start {
+      ..., -- Other configuration omitted.
+      handlers = {
+        ['textDocument/publishDiagnostics'] = my_custom_diagnostics_handler
+      },
+    }
+
+- 向 |vim.lsp.buf_request_all()| 传入 {handler} 参数。这会仅为给定的请求设置
+  |lsp-handler|。
+  示例： >lua
+    vim.lsp.buf_request_all(
+      0,
+      'textDocument/publishDiagnostics',
+      my_request_params,
+      my_handler
+    )
+<
+
+                                                            *vim.lsp.log_levels*
+日志级别定义在 |vim.log.levels| 中
+
+
+------------------------------------------------------------------------------
+协议                                                    *vim.lsp.protocol*
+
+模块 `vim.lsp.protocol` 定义了 LSP 规范所要求的常量，以及用于创建与协议相关对象
+的辅助函数。
+https://github.com/microsoft/language-server-protocol/raw/gh-pages/_specifications/specification-3-14.md
+
+例如 `vim.lsp.protocol.ErrorCodes` 允许按编号或名称反查： >lua
+
+    vim.lsp.protocol.TextDocumentSyncKind.Full == 1
+    vim.lsp.protocol.TextDocumentSyncKind[1] == "Full"
+<
+
+                                                                *lsp-request*
+LSP 请求的结构： >
+    { id: integer|string, method: string, params?: Params }
+<
+https://microsoft.github.io/language-server-protocol/specifications/specification-current/#requestMessage
+
+                                                                *lsp-response*
+LSP 响应的结构： >
+    { id: integer|string|nil, result: Result, error: nil }       (on success)
+    { id: integer|string|nil, result: nil, error: ResponseError }  (on error)
+<
+https://microsoft.github.io/language-server-protocol/specifications/specification-current/#responseMessage
+
+                                                                *lsp-notification*
+LSP 通知的结构： >
+    { method: string, params?: Params }
+<
+https://microsoft.github.io/language-server-protocol/specifications/specification-current/#notificationMessage
+
+------------------------------------------------------------------------------
+进程内 LSP 服务器                                             *lsp-server*
+
+为了获得最大的灵活性，你可能想创建自己的服务器。这让你可以自动接入 Nvim 的 LSP
+功能。这个"服务器"可以是进程内的 Lua 函数，而不是外部进程。例如参见
+`runtime/lua/vim/pack/_lsp.lua`，它在 vim.pack 的 "Confirm Updates" 界面中提供了
+"docs hover" 之类的功能。
+
+之所以可行，是因为 |vim.lsp.start()| 接受 `cmd` 为 Lua 函数。
+该函数必须接受 `vim.lsp.rpc.Dispatchers`，并返回一个形如
+|vim.lsp.rpc.PublicClient| 的表。用 `dispatchers.on_exit()` 表示服务器已停止。
+
+示例（用 `:lua` 选中并运行这段代码，然后执行 `:che vim.lsp` 并查找 "my-server"）： >lua
+
+  local function cmd_fn(dispatchers)
+    local closing = false
+    local request_id = 0
+
+    local srv = {}
+    function srv.request(method, params, callback)
+      if method == 'initialize' then
+        callback(nil, {
+          capabilities = {
+            hoverProvider = true,
+          },
+        })
+      elseif method == 'shutdown' then
+        callback(nil, nil)
+      end
+      request_id = request_id + 1
+      return true, request_id
+    end
+    function srv.notify(method, params)
+      if method == 'exit' then
+        dispatchers.on_exit(0, 15)
+      end
+    end
+    function srv.is_closing()
+      return closing
+    end
+    function srv.terminate()
+      closing = true
+    end
+
+    return srv
+  end
+
+  -- Define a config for the server, then enable it...
+  vim.lsp.config['my-server'] = {
+    cmd = cmd_fn,
+    filetypes = { 'lua' },
+    root_markers = { '.git' },
+  }
+  vim.lsp.enable('my-server')
+
+  -- ...or call start() directly.
+  vim.lsp.start(
+    { cmd = cmd_fn, name = 'my-server', root_dir = vim.uv.cwd() },
+    { attach = true })
+<
+
+================================================================================
+LSP 高亮                                                    *lsp-highlight*
+
+引用高亮：
+
+这些高亮组供 |vim.lsp.buf.document_highlight()| 使用。
+
+关于各类引用之间的区别，你可以在这里了解更多：
+https://microsoft.github.io/language-server-protocol/specification#textDocument_documentHighlight
+
+                                                         *hl-LspReferenceText*
+LspReferenceText          用于高亮 "text" 类引用
+                                                         *hl-LspReferenceRead*
+LspReferenceRead          用于高亮 "read" 类引用
+                                                        *hl-LspReferenceWrite*
+LspReferenceWrite         用于高亮 "write" 类引用
+                                                       *hl-LspReferenceTarget*
+LspReferenceTarget        用于高亮引用目标（例如悬停范围中的目标）
+                                                             *hl-LspInlayHint*
+LspInlayHint              用于高亮内联提示（inlay hint）
+
+
+                                                      *lsp-highlight-codelens*
+
+与 |lsp-codelens| 功能相关的高亮组。
+
+                                                              *hl-LspCodeLens*
+LspCodeLens
+    用于给代码透镜（codelens）的虚拟文本着色。见
+    |nvim_buf_set_extmark()|。
+
+LspCodeLensSeparator                                 *hl-LspCodeLensSeparator*
+    用于给两个或多个代码透镜之间的分隔符着色。
+
+                                                     *lsp-highlight-signature*
+
+与 |vim.lsp.handlers.signature_help()| 相关的高亮组。
+
+                                              *hl-LspSignatureActiveParameter*
+LspSignatureActiveParameter
+    用于高亮签名帮助中的当前参数。见
+    |vim.lsp.handlers.signature_help()|。
+
+------------------------------------------------------------------------------
+LSP 语义高亮                                          *lsp-semantic-highlight*
+
+在可用时，LSP 客户端会用 |lsp-semantic_tokens| 高亮代码，这是 LSP 服务器提供源
+代码信息的另一种方式。注意这是在 treesitter 语法高亮之外额外进行的；语义高亮不会
+取代语法高亮。
+
+服务器通常为源代码中的每个标识符提供一个 token。该 token 有一个 `type`，例如
+"function" 或 "variable"，以及 0 个或多个 `modifier`，例如 "readonly" 或
+"deprecated"。标准类型和修饰符在这里描述：
+https://microsoft.github.io/language-server-protocol/specification/#textDocument_semanticTokens
+LSP 服务器也可能使用规范之外的类型和修饰符。
+
+LSP 客户端会为每个 token 添加一个或多个高亮。高亮组由 token 的类型和修饰符推导
+而来：
+  • `@lsp.type.<type>.<ft>` 对应类型
+  • `@lsp.mod.<mod>.<ft>` 对应每个修饰符
+  • `@lsp.typemod.<type>.<mod>.<ft>` 对应每个修饰符
+用 |:Inspect| 查看某个 token 的高亮。用 |:hi| 或 |nvim_set_hl()| 更改语义高亮的
+外观： >vim
+
+    hi @lsp.type.function guifg=Yellow        " function names are yellow
+    hi @lsp.type.variable.lua guifg=Green     " variables in lua are green
+    hi @lsp.mod.deprecated gui=strikethrough  " deprecated is crossed out
+    hi @lsp.typemod.function.async guifg=Blue " async functions are blue
+<
+|vim.hl.priorities|`.semantic_tokens` 的值是 `@lsp.type.*` 高亮的优先级。
+`@lsp.mod.*` 和 `@lsp.typemod.*` 高亮的优先级分别比它高一级和两级。
+
+你可以通过清除高亮组来禁用语义高亮： >lua
+
+    -- Hide semantic highlights for functions
+    vim.api.nvim_set_hl(0, '@lsp.type.function', {})
+
+    -- Hide all semantic highlights
+    for _, group in ipairs(vim.fn.getcompletion("@lsp", "highlight")) do
+      vim.api.nvim_set_hl(0, group, {})
+    end
+<
+你多半会想把它们放在 |ColorScheme| 自动命令中。
+
+更复杂的高亮请使用 |LspTokenUpdate| 和 |vim.lsp.semantic_tokens.highlight_token()|。
+
+下面是 Nvim 查询中使用的标准捕获名列表，它们按当前配色方案高亮（对其中一个使用
+|:Inspect| 可查看确切定义）：
+
+@lsp.type.class          声明或引用类类型（class）的标识符
+@lsp.type.comment        表示注释的 token
+@lsp.type.decorator      声明或引用装饰器与注解的标识符
+@lsp.type.enum           声明或引用枚举类型的标识符
+@lsp.type.enumMember     声明或引用枚举属性、常量或成员的标识符
+@lsp.type.event          声明事件属性的标识符
+@lsp.type.function       声明函数的标识符
+@lsp.type.interface      声明或引用接口类型的标识符
+@lsp.type.keyword        表示语言关键字的 token
+@lsp.type.macro          声明宏的标识符
+@lsp.type.method         声明成员函数或方法的标识符
+@lsp.type.modifier       表示修饰符的 token
+@lsp.type.namespace      声明或引用命名空间、模块或包的标识符
+@lsp.type.number         表示数字字面量的 token
+@lsp.type.operator       表示运算符的 token
+@lsp.type.parameter      声明或引用函数或方法参数的标识符
+@lsp.type.property       声明或引用成员属性、成员字段或成员变量的标识符
+@lsp.type.regexp         表示正则表达式字面量的 token
+@lsp.type.string         表示字符串字面量的 token
+@lsp.type.struct         声明或引用结构体类型（struct）的标识符
+@lsp.type.type           声明或引用未被上文涵盖的类型的标识符
+@lsp.type.typeParameter  声明或引用类型参数的标识符
+@lsp.type.variable       声明或引用局部或全局变量的标识符
+
+@lsp.mod.abstract        抽象的类型和成员函数
+@lsp.mod.async           标记为 async 的函数
+@lsp.mod.declaration     符号的声明
+@lsp.mod.defaultLibrary  属于标准库的符号
+@lsp.mod.definition      符号的定义，例如在头文件中
+@lsp.mod.deprecated      不应再被使用的符号
+@lsp.mod.documentation   符号在文档中的出现
+@lsp.mod.modification    对变量赋值的变量引用
+@lsp.mod.readonly        只读变量和成员字段（常量）
+@lsp.mod.static          类成员（静态成员）
+
+================================================================================
+事件                                                            *lsp-events*
+
+LspAttach                                                          *LspAttach*
+    在 LSP 客户端执行 "initialize" 并附加到某个 buffer 之后。|autocmd-pattern|
+    是 buffer 名称。|event-data|（类型：`vim.event.lspattach.data`）中含有客户端
+    ID。
+
+    示例： >lua
+    vim.api.nvim_create_autocmd('LspAttach', {
+      callback = function(ev)
+        local client = vim.lsp.get_client_by_id(ev.data.client_id)
+        -- ...
+      end
+    })
+<
+    注意：如果 LSP 服务器进行动态注册，能力有可能在 LspAttach _之后_ 的任意时刻
+    被注册。这种情况下你可能需要处理 "registerCapability" 事件。
+
+    示例： >lua
+    vim.lsp.handlers['client/registerCapability'] = (function(overridden)
+      return function(err, res, ctx)
+        local result = overridden(err, res, ctx)
+        local client = vim.lsp.get_client_by_id(ctx.client_id)
+        if not client then
+          return
+        end
+        for bufnr, _ in pairs(client.attached_buffers) do
+          -- Call your custom on_attach logic...
+          -- my_on_attach(client, bufnr)
+        end
+        return result
+      end
+    end)(vim.lsp.handlers['client/registerCapability'])
+
+LspDetach                                                          *LspDetach*
+    在 LSP 客户端从某个 buffer 分离之前。|autocmd-pattern| 是 buffer 名称。
+    |event-data|（类型：`vim.event.lspdetach.data`）中含有客户端 ID。
+
+    示例： >lua
+    vim.api.nvim_create_autocmd('LspDetach', {
+      callback = function(ev)
+        -- Get the detaching client
+        local client = vim.lsp.get_client_by_id(ev.data.client_id)
+
+        -- Remove the autocommand to format the buffer on save, if it exists
+        if client:supports_method('textDocument/formatting') then
+          vim.api.nvim_clear_autocmds({
+            event = 'BufWritePre',
+            buffer = ev.buf,
+          })
+        end
+      end,
+    })
+<
+
+LspNotify                                                          *LspNotify*
+    每当成功向 LSP 服务器发送一条通知之后触发该事件。
+
+    |event-data|（类型：`vim.event.lspnotify.data`）中含有 client_id、LSP 方法和
+    参数。
+
+    示例： >lua
+    vim.api.nvim_create_autocmd('LspNotify', {
+      callback = function(ev)
+        local bufnr = ev.buf
+        local client_id = ev.data.client_id
+        local method = ev.data.method
+        local params = ev.data.params
+
+        -- do something with the notification
+        if method == 'textDocument/...' then
+          update_buffer(bufnr)
+        end
+      end,
+    })
+<
+
+LspProgress                                                       *LspProgress*
+    收到来自服务器的进度通知时。可以从 |vim.lsp.Client| 的 `progress` ring buffer
+    中轮询这些通知，或用 |vim.lsp.status()| 取得汇总消息。
+
+    如果服务器发送的是 "work done progress"，`pattern` 会被设为 `kind`
+    （`begin`、`report` 或 `end` 之一）。
+
+    |event-data|（类型：`vim.event.lspprogress.data`）含有 `client_id` 和
+    `params` 属性，其中 `params` 是服务器发来的请求参数（见
+    `lsp.ProgressParams`）。
+
+    示例：
+
+    每当有 LSP 进度消息到达时重绘状态行： >vim
+        autocmd LspProgress * redrawstatus
+<
+    在 LSP 进度事件上发出 |progress-message|： >lua
+        vim.api.nvim_create_autocmd('LspProgress', { buffer = buf, callback = function(ev)
+            local value = ev.data.params.value
+            vim.api.nvim_echo({ { value.message or 'done' } }, false, {
+              id = 'lsp.' .. ev.data.params.token,
+              kind = 'progress',
+              source = 'vim.lsp',
+              title = value.title,
+              status = value.kind ~= 'end' and 'running' or 'success',
+              percent = value.percentage,
+            })
+          end,
+        })
+<
+    另见：~
+      • https://github.com/MicrosoftDocs/terminal/blob/main/TerminalDocs/tutorials/progress-bar-sequences.md
+
+LspRequest                                                        *LspRequest*
+    对于发送给 LSP 服务器的每个请求，该事件在请求状态每次变化时触发。状态可以是
+    `pending`、`complete` 或 `cancel` 之一，并作为 "data" 表上的 {type} 传给
+    回调函数。
+
+    它会在初始请求发出时触发（{type} == `pending`），并在 LSP 服务器响应时触发
+    （{type} == `complete`）。如果通过 `client.cancel_request(request_id)` 请求
+    取消，则该事件会以 {type} == `cancel` 触发。
+
+    |event-data|（类型：`vim.event.lsprequest.data`）含有客户端 ID、请求 ID 和
+    请求（在 |vim.lsp.Client| 的 {requests} 字段中描述）。
+    如果请求类型是 `complete`，则该请求会在事件处理器处理完毕后从客户端的待处理
+    请求表中删除。
+
+    示例： >lua
+    vim.api.nvim_create_autocmd('LspRequest', {
+      callback = function(ev)
+        local bufnr = ev.buf
+        local client_id = ev.data.client_id
+        local request_id = ev.data.request_id
+        local request = ev.data.request
+        if request.type == 'pending' then
+          -- do something with pending requests
+          track_pending(client_id, bufnr, request_id, request)
+        elseif request.type == 'cancel' then
+          -- do something with pending cancel requests
+          track_canceling(client_id, bufnr, request_id, request)
+        elseif request.type == 'complete' then
+          -- do something with finished requests. this pending
+          -- request entry is about to be removed since it is complete
+          track_finish(client_id, bufnr, request_id, request)
+        end
+      end,
+    })
+<
+
+LspTokenUpdate                                                *LspTokenUpdate*
+    当某个可见的语义 token 被 LSP 服务器发送或更新时，或当已有 token 首次变为可见
+    时。|autocmd-pattern| 是 buffer 名称。|event-data|（类型：
+    `vim.event.lsptokenupdate.data`）含有客户端 ID 和 token（见
+    |vim.lsp.semantic_tokens.get_at_pos()|）。
+
+    示例： >lua
+    vim.api.nvim_create_autocmd('LspTokenUpdate', {
+      callback = function(ev)
+        local token = ev.data.token
+        if token.type == 'variable' and not token.modifiers.readonly then
+          vim.lsp.semantic_tokens.highlight_token(
+            token, ev.buf, ev.data.client_id, 'MyMutableVariableHighlight'
+          )
+        end
+      end,
+    })
+<
+    注意：除了调用 |vim.lsp.semantic_tokens.highlight_token()| 之外，做其他任何
+    事情都被视为实验性的。
+
+================================================================================
+Lua 模块：vim.lsp                                      *lsp-core*
+
+*vim.lsp.Config*
+    继承自：|vim.lsp.ClientConfig|
+
+
+    字段：~
+      • {cmd}?           (`string[]|fun(dispatchers: vim.lsp.rpc.Dispatchers, config: vim.lsp.ClientConfig): vim.lsp.rpc.PublicClient`)
+                         见 |vim.lsp.ClientConfig| 中的 `cmd`。另见
+                         `reuse_client`，以（按 buffer）动态决定何时应当重新调用
+                         `cmd`。
+      • {filetypes}?     (`string[]`) 客户端将附加到的文件类型；若要附加到所有
+                         文件类型则为 `nil`。要按文件名、模式或内容匹配文件，你
+                         可以用 |vim.filetype.add()| 定义自定义文件类型： >lua
+                             vim.filetype.add({
+                               filename = {
+                                 ['my_filename'] = 'my_filetype1',
+                               },
+                               pattern = {
+                                 ['.*/etc/my_file_pattern/.*'] = 'my_filetype2',
+                               },
+                             })
+                             vim.lsp.config('…', {
+                               filetypes = { 'my_filetype1', 'my_filetype2' },
+                             })
+<
+      • {reuse_client}?  (`fun(client: vim.lsp.Client, config: vim.lsp.ClientConfig, bufnr: integer): boolean`)
+                         判定某个客户端是否应当被复用的谓词。对所有正在运行的
+                         客户端都适用。默认实现在名称与 root_dir 都匹配时复用
+                         客户端。
+      • {root_dir}?      (`string|fun(bufnr: integer, on_dir:fun(root_dir?:string))`)
+                         *lsp-root_dir()* 决定工作区根目录：LSP 服务器在初始化时
+                         用来作为其 workspaceFolders、rootUri 和 rootPath 依据的
+                         目录。函数形式必须调用 `on_dir` 回调来提供根目录，否则
+                         该 buffer 的 LSP 不会被激活。因此 `root_dir()` 函数可以
+                         按 buffer 动态决定是激活还是跳过 LSP。示例见
+                         |vim.lsp.enable()|。
+      • {root_markers}?  (`(string|string[])[]`)                                    *lsp-root_markers*
+                         用于确定工作区根目录的文件名（".git/"、"package.json"、
+                         ……）。如果定义了 `root_dir` 则不使用。列表顺序决定
+                         优先级。要表示"同等优先级"，请把名称写在一个嵌套列表中
+                         `{ { 'a.txt', 'b.lua' }, ... }`。
+                         • 对每一项，Nvim 都会（从 buffer 文件开始）向上查找该
+                           标记或标记列表；查找到第一个含有该标记的目录即停止，
+                           并以该目录作为根目录（工作区文件夹）。
+                         • 示例：找到第一个含有文件或目录 "stylua.toml" 的祖先
+                           目录；如果没有找到，则找到第一个含有 ".git" 的祖先
+                           目录： >
+                           root_markers = { 'stylua.toml', '.git' }
+<
+                         • 示例：找到第一个含有 "stylua.toml" 或 ".luarc.json"
+                           中 _任意一个_ 的祖先目录；如果没有找到，则找到第一个
+                           含有 ".git" 的祖先目录： >
+                           root_markers = { { 'stylua.toml', '.luarc.json' }, '.git' }
+<
+
+
+buf_attach_client({bufnr}, {client_id})          *vim.lsp.buf_attach_client()*
+    为任意语言服务器实现跟踪某个 buffer 所需的 `textDocument/did…` 通知。
+
+    如果不调用它，服务器就不会收到该 buffer 的改动通知。
+
+    参数：~
+      • {bufnr}      (`integer`) Buffer 句柄，0 表示当前 buffer
+      • {client_id}  (`integer`) 客户端 id
+
+    返回值：~
+        (`boolean`) 如果客户端成功附加则返回成功值 `true`；否则为 `false`
+
+buf_detach_client({bufnr}, {client_id})          *vim.lsp.buf_detach_client()*
+    从指定的 buffer 分离客户端。注意：虽然会通知服务器该文本文档（buffer）已关闭，
+    但如果服务器忽略该通知，它仍然可以发送通知。
+
+    参数：~
+      • {bufnr}      (`integer`) Buffer 句柄，0 表示当前 buffer
+      • {client_id}  (`integer`) 客户端 id
+
+buf_is_attached({bufnr}, {client_id})              *vim.lsp.buf_is_attached()*
+    检查某个 buffer 是否已为特定客户端附加。
+
+    参数：~
+      • {bufnr}      (`integer`) Buffer 句柄，0 表示当前 buffer
+      • {client_id}  (`integer`) 客户端 id
+
+buf_notify({bufnr}, {method}, {params})                 *vim.lsp.buf_notify()*
+    向服务器发送一条通知
+
+    属性：~
+        起始版本：0.5.0
+
+    参数：~
+      • {bufnr}   (`integer?`) buffer 编号
+      • {method}  (`string`) 请求方法名称
+      • {params}  (`any`) 要发送给服务器的参数
+
+    返回值：~
+        (`boolean`) 若有客户端返回 true 则返回成功值 true；否则为 false
+
+                                                   *vim.lsp.buf_request_all()*
+buf_request_all({bufnr}, {method}, {params}, {handler})
+    对所有附加到该 buffer 的活动客户端发送异步请求，并以合并后的结果执行 `handler`
+    回调。
+
+    属性：~
+        起始版本：0.5.0
+
+    参数：~
+      • {bufnr}    (`integer`) Buffer 句柄，0 表示当前 buffer。
+      • {method}   (`string`) LSP 方法名称
+      • {params}   (`table|(fun(client: vim.lsp.Client, bufnr: integer): table?)?`)
+                   要发送给服务器的参数。也可以传入一个返回参数表的函数，以适应
+                   参数因客户端而异的情形。
+      • {handler}  (`function`) 所有请求完成后调用的处理器。各服务器的结果以
+                   `client_id:result` 映射的形式传入。
+
+    返回值：~
+        (`function`) 取消函数，用于取消所有请求。
+
+                                                  *vim.lsp.buf_request_sync()*
+buf_request_sync({bufnr}, {method}, {params}, {timeout_ms})
+    向所有服务器发送请求，并等待它们全部响应。
+
+    调用 |vim.lsp.buf_request_all()|，但在等待结果期间阻塞 Nvim。参数与
+    |vim.lsp.buf_request_all()| 相同，但返回值不同。最多等待 {timeout_ms}。
+
+    属性：~
+        起始版本：0.5.0
+
+    参数：~
+      • {bufnr}       (`integer`) Buffer 句柄，0 表示当前 buffer。
+      • {method}      (`string`) LSP 方法名称
+      • {params}      (`table|(fun(client: vim.lsp.Client, bufnr: integer): table?)?`)
+                      要发送给服务器的参数。也可以传入一个返回参数表的函数，以
+                      适应参数因客户端而异的情形。
+      • {timeout_ms}  (`integer?`, 默认值：`1000`) 等待结果的最长时间，单位为
+                      毫秒。
+
+    返回值（多个）：~
+        (`table<integer, {error: lsp.ResponseError?, result: any}>?`) result
+        client_id:request_result 的映射。
+        (`string?`) err 在超时、取消或出错时，`err` 是描述失败原因的字符串，
+        而 `result` 为 nil。
+
+commands                                                    *vim.lsp.commands*
+    由客户端定义、用于实现服务器可能调用的自定义（规范之外）命令的处理器映射。
+    每个键是一个唯一的命令名称；每个值是一个函数，当某个 LSP 动作（代码操作、
+    代码透镜……）按名称请求该命令时被调用。
+
+    如果某个 LSP 响应请求了客户端未定义的命令，Nvim 会把它作为
+    `workspace/executeCommand` 转发给服务器。
+    • 参数 1 是该 `Command`： >
+      Command
+      title: String
+      command: String
+      arguments?: any[]
+<
+    • 参数 2 是 |lsp-handler| 的 `ctx`。
+
+    示例： >lua
+        vim.lsp.commands['java.action.generateToStringPrompt'] = function(_, ctx)
+          require("jdtls.async").run(function()
+            local _, result = request(ctx.bufnr, 'java/checkToStringStatus', ctx.params)
+            local fields = ui.pick_many(result.fields, 'Include item in toString?', function(x)
+              return string.format('%s: %s', x.name, x.type)
+            end)
+            local _, edit = request(ctx.bufnr, 'java/generateToString', { context = ctx.params; fields = fields; })
+            vim.lsp.util.apply_workspace_edit(edit, offset_encoding)
+          end)
+        end
+<
+
+config({name}, {cfg})                                       *vim.lsp.config()*
+    为某个 LSP 客户端设置默认配置（如果使用特殊名称 "*"，则为所有客户端设置）。
+
+    也可以通过表索引（`vim.lsp.config[…]`）访问，以取得解析后的配置，或重新
+    定义该配置（而不是与配置链"合并"）。
+
+    示例：
+    • 为所有客户端添加根目录标记： >lua
+      vim.lsp.config('*', {
+        root_markers = { '.git', '.hg' },
+      })
+<
+    • 为所有客户端添加能力： >lua
+      vim.lsp.config('*', {
+      capabilities = {
+        textDocument = {
+          semanticTokens = {
+            multilineTokenSupport = true,
+          }
+        }
+      }
+    })
+<
+    • 为 "clangd" 添加根目录标记和能力： >lua
+      vim.lsp.config('clangd', {
+      root_markers = { '.clang-format', 'compile_commands.json' },
+      capabilities = {
+        textDocument = {
+          completion = {
+            completionItem = {
+              snippetSupport = true,
+            }
+          }
+        }
+      }
+    })
+<
+    • （重新）定义 "clangd" 配置（覆盖解析出的配置链）： >lua
+      vim.lsp.config.clangd = {
+      cmd = {
+        'clangd',
+        '--clang-tidy',
+        '--background-index',
+        '--offset-encoding=utf-8',
+      },
+      root_markers = { '.clangd', 'compile_commands.json' },
+      filetypes = { 'c', 'cpp' },
+    }
+<
+    • 取得 "lua_ls" 解析后的配置： >lua
+      local cfg = vim.lsp.config.lua_ls
+<
+
+    属性：~
+        起始版本：0.11.0
+
+    参数：~
+      • {name}  (`string`)
+      • {cfg}   (`vim.lsp.Config`) 见 |vim.lsp.Config|。
+
+enable({name}, {enable})                                    *vim.lsp.enable()*
+    根据 |lsp-config| 的 `filetypes`、`root_markers` 和 `root_dir`，在每个 buffer
+    中自动激活 LSP。
+
+    要禁用，请传入 `enable=false`：停止相关联的客户端和服务器（超时后会强制停止
+    服务器，除非 `exit_timeout=false`）。
+
+    在下列情况下会抛出错误：
+    • `{name}` 不是有效的 LSP 配置名（例如 `'*'`）。
+    • `{name}` 对应的 LSP 配置文件抛出了错误。
+
+    如果提供了多个名称且其中一个抛出错误，该函数不会产生任何副作用；它不会启用或
+    禁用任何配置，包括那些本身没有错误的配置。
+
+    示例： >lua
+        vim.lsp.enable('clangd')
+        vim.lsp.enable({'lua_ls', 'pyright'})
+<
+
+    示例：要动态决定是否激活 LSP，请定义一个 |lsp-root_dir()| 函数，只在你想让
+    该配置激活时才调用 `on_dir()`： >lua
+        vim.lsp.config('lua_ls', {
+          root_dir = function(bufnr, on_dir)
+            if vim.fs.ext(vim.fn.bufname(bufnr)) ~= 'txt' then
+              on_dir(vim.fn.getcwd())
+            end
+          end
+        })
+<
+
+    属性：~
+        起始版本：0.11.0
+
+    参数：~
+      • {name}    (`string|string[]`) 要启用的客户端名称。
+      • {enable}  (`boolean?`) 如果为 `true|nil`，则对当前和今后的 buffer 启用
+                  给定 LSP 配置的自动激活。如果为 `false`，则禁用自动激活，并
+                  停止相关联的 LSP 客户端和服务器（在 `exit_timeout` 毫秒后强制
+                  停止服务器）。
+
+foldclose({kind}, {winid})                               *vim.lsp.foldclose()*
+    关闭 {winid} 这个 window 中所有 {kind} 类型的折叠。
+
+    要在打开文件时自动折叠导入语句，可以使用自动命令： >lua
+        vim.api.nvim_create_autocmd('LspNotify', {
+          callback = function(ev)
+            if ev.data.method == 'textDocument/didOpen' then
+              vim.lsp.foldclose('imports', vim.fn.bufwinid(ev.buf))
+            end
+          end,
+        })
+<
+
+    属性：~
+        起始版本：0.11.0
+
+    参数：~
+      • {kind}   (`lsp.FoldingRangeKind`) 要关闭的类型，"comment"、"imports" 或
+                 "region" 之一。
+      • {winid}  (`integer?`) 默认为当前 window。
+
+foldexpr({lnum})                                          *vim.lsp.foldexpr()*
+    在内置客户端与 `foldexpr` 函数之间提供接口。
+
+    要使用它，请把 'foldmethod' 设为 "expr"，并设置 'foldexpr' 的值： >lua
+        vim.o.foldmethod = 'expr'
+        vim.o.foldexpr = 'v:lua.vim.lsp.foldexpr()'
+<
+
+    或者只在受支持时使用：在 |LspAttach| 自动命令中检查
+    "textDocument/foldingRange" 能力。
+    示例： >lua
+        vim.o.foldmethod = 'expr'
+        -- Default to treesitter folding
+        vim.o.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+        -- Prefer LSP folding if client supports it
+        vim.api.nvim_create_autocmd('LspAttach', {
+          callback = function(ev)
+            local client = vim.lsp.get_client_by_id(ev.data.client_id)
+            if client:supports_method('textDocument/foldingRange') then
+              local win = vim.api.nvim_get_current_win()
+              vim.wo[win][0].foldexpr = 'v:lua.vim.lsp.foldexpr()'
+            end
+          end,
+        })
+<
+
+    参数：~
+      • {lnum}  (`integer`) 行号
+
+foldtext()                                                *vim.lsp.foldtext()*
+    提供一个 `foldtext` 函数，显示所获取的 `collapsedText`，如果未提供
+    `collapsedText`，则默认为折叠后的第一行。
+
+formatexpr({opts})                                      *vim.lsp.formatexpr()*
+    在内置客户端与 `formatexpr` 函数之间提供接口。
+
+    目前只支持单个客户端。可以通过
+    `setlocal formatexpr=v:lua.vim.lsp.formatexpr()` 设置，或（更常见地）在
+    `on_attach` 中通过
+    `vim.bo[bufnr].formatexpr = 'v:lua.vim.lsp.formatexpr(#{timeout_ms:250})'`
+    设置。
+
+    参数：~
+      • {opts}  (`table?`) 含下列字段的表：
+                • {timeout_ms} (`integer`，默认值：500ms) 格式化请求的超时时间。
+
+get_client_by_id({client_id})                     *vim.lsp.get_client_by_id()*
+    按 id 取得客户端；如果 id 无效或该客户端已停止，则返回 nil。返回的客户端可能
+    尚未完全初始化。
+
+    参数：~
+      • {client_id}  (`integer`) 客户端 id
+
+    返回值：~
+        (`vim.lsp.Client?`) 客户端 rpc 对象。见 |vim.lsp.Client|。
+
+get_clients({filter})                                  *vim.lsp.get_clients()*
+    取得活动客户端。
+
+    属性：~
+        起始版本：0.10.0
+
+    参数：~
+      • {filter}  (`table?`) 用于筛选所返回客户端的键值对。
+                  • {bufnr}? (`integer`) 只返回附加到该 buffer 的客户端
+                  • {id}? (`integer`) 只返回具有给定 id 的客户端
+                  • {method}? (`string`) 只返回支持给定方法的客户端
+                  • {name}? (`string`) 只返回具有给定名称的客户端
+
+    返回值：~
+        (`vim.lsp.Client[]`) |vim.lsp.Client| 对象列表
+
+get_configs({filter})                                  *vim.lsp.get_configs()*
+    取得 LSP 配置。
+
+    另见 |vim.lsp.get_clients()|，以取得 `root_dir` 之类动态字段的运行时值，它们
+    取决于当前 buffer/工作区等。
+
+    警告：可能会立即（过早！）求值 'runtimepath' 中的配置文件。
+
+    属性：~
+        起始版本：0.12.0
+
+    参数：~
+      • {filter}  (`table?`) 用于筛选所返回配置的键值对。
+                  • {enabled}? (`boolean`) 如果为 true，只返回已启用的配置。
+                    如果为 false，只返回未启用的配置。
+                  • {filetype}? (`string`) 只返回会附加到给定文件类型的配置。
+
+    返回值：~
+        (`vim.lsp.Config[]`) |vim.lsp.Config| 对象列表
+
+is_enabled({name})                                      *vim.lsp.is_enabled()*
+    检查给定的 LSP 配置是否已启用（全局，而非按 buffer）。
+
+    与 `vim.lsp.config['…']` 不同，这不会产生解析该配置的副作用。
+
+    参数：~
+      • {name}  (`string`) 配置名称
+
+    返回值：~
+        (`boolean`)
+
+omnifunc({findstart}, {base})                             *vim.lsp.omnifunc()*
+    实现与 'omnifunc' 兼容的 LSP 补全。
+
+    参数：~
+      • {findstart}  (`integer`) 0 或 1，决定行为
+      • {base}       (`integer`) findstart=0 时，用于匹配的文本
+
+    返回值：~
+        (`integer|table`) 由 {findstart} 决定：
+        • findstart=1：补全开始的列，或 -2 或 -3
+        • findstart=0：匹配项列表（实际上只是调用 |complete()|）
+
+    另见：~
+      • |complete-functions|
+      • |complete-items|
+      • |CompleteDone|
+
+start({config}, {opts})                                      *vim.lsp.start()*
+    创建一个新的 LSP 客户端并启动语言服务器；如果找到在 `name` 和 `root_dir` 上
+    匹配的已运行客户端，则复用它。并把当前 buffer 附加到该客户端。
+
+    示例： >lua
+        vim.lsp.start({
+           name = 'my-server-name',
+           cmd = {'name-of-language-server-executable'},
+           root_dir = vim.fs.root(0, {'pyproject.toml', 'setup.py'}),
+        })
+<
+
+    所有可用选项见 |vim.lsp.ClientConfig|。最重要的几项是：
+    • `name` 该 LSP 客户端的任意名称。对每个语言服务器应当唯一。
+    • `cmd` 命令字符串数组或函数。另见 |lsp-server|。
+    • `root_dir` 项目根目录的路径。默认用它来决定是否应复用已有的客户端。上面的
+      示例用 |vim.fs.root()| 从当前目录开始向上遍历文件系统，直到找到
+      `pyproject.toml` 或 `setup.py` 文件，以此探测根目录。
+    • `workspace_folders` 一组 `{ uri:string, name: string }` 表，用于指定语言
+      服务器使用的项目根文件夹。如果为 `nil`，为方便起见该属性由 `root_dir` 推导。
+
+    语言服务器利用这些信息来发现诸如项目依赖之类的元数据，并且往往会索引项目文件夹
+    内的内容。
+
+    为确保只为它能处理的编程语言启动语言服务器，请务必在 |FileType| 自动命令中调用
+    |vim.lsp.start()|。可以用 |:au|、|nvim_create_autocmd()|，或把该调用放在
+    `ftplugin/<filetype_name>.lua` 中（见 |ftplugin-name|）
+
+    属性：~
+        起始版本：0.8.0
+
+    参数：~
+      • {config}  (`vim.lsp.ClientConfig`) 该服务器的配置。见
+                  |vim.lsp.ClientConfig|。
+      • {opts}    (`table?`) 可选的关键字参数。
+                  • {attach}? (`boolean`) 是否把该客户端附加到某个 buffer（默认
+                    true）。如果设为 `false`，`reuse_client` 和 `bufnr` 都会被
+                    忽略。
+                  • {bufnr}? (`integer`) 启动或复用客户端时要附加到的 Buffer
+                    句柄（0 表示当前 buffer）。
+                  • {reuse_client}?
+                    (`fun(client: vim.lsp.Client, config: vim.lsp.ClientConfig, bufnr: integer): boolean`)
+                    用于判定是否应复用某个客户端的谓词。对所有正在运行的客户端都
+                    适用。默认实现在名称相同、且给定的工作区文件夹（或 root_dir）
+                    全部被包含在该客户端的工作区文件夹中时复用该客户端。
+                  • {silent}? (`boolean`) 如果 LSP 服务器启动失败，抑制错误报告
+                    （默认 false）。
+
+    返回值：~
+        (`integer?`) client_id
+
+status()                                                    *vim.lsp.status()*
+    消费所有客户端的最新进度消息，并把它们格式化为一个字符串。如果没有客户端，或
+    没有新消息，则为空字符串
+
+    返回值：~
+        (`string`)
+
+tagfunc({pattern}, {flags})                                *vim.lsp.tagfunc()*
+    在内置客户端与 'tagfunc' 之间提供接口。
+
+    与普通模式命令（例如 |CTRL-]|）一起使用时，它会调用
+    "textDocument/definition" LSP 方法来查找光标下的标签。否则使用
+    "workspace/symbol"。如果任何 LSP 服务器都没有返回结果，则回退到使用内置的
+    tags。
+
+    参数：~
+      • {pattern}  (`string`) 用于查找工作区符号的模式
+      • {flags}    (`string`) 见 |tag-function|
+
+    返回值：~
+        (`table[]`) tags 匹配标签的列表
+
+
+==============================================================================
+Lua 模块：vim.lsp.buf                                              *lsp-buf*
+
+`vim.lsp.buf_…` 系列函数为附加到当前 buffer 的 LSP 客户端执行操作。
+
+
+*vim.lsp.ListOpts*
+
+    字段：~
+      • {loclist}?  (`boolean`) 在默认处理器中，是使用 |location-list| 还是
+                    |quickfix| 列表。 >lua
+                        vim.lsp.buf.definition({ loclist = true })
+                        vim.lsp.buf.references(nil, { loclist = false })
+<
+      • {on_list}?  (`fun(t: vim.lsp.LocationOpts.OnList)`) 取代默认处理器的
+                    list 处理器。对任何非空结果都会调用。该表可以与
+                    |setqflist()| 或 |setloclist()| 一起使用。例如： >lua
+                        local function on_list(options)
+                          vim.fn.setqflist({}, ' ', options)
+                          vim.cmd.cfirst()
+                        end
+
+                        vim.lsp.buf.definition({ on_list = on_list })
+                        vim.lsp.buf.references(nil, { on_list = on_list })
+<
+
+*vim.lsp.LocationOpts*
+    继承自：|vim.lsp.ListOpts|
+
+
+    字段：~
+      • {reuse_win}?  (`boolean`) 如果 buffer 已经打开，则跳转到已有的 window。
+
+*vim.lsp.LocationOpts.OnList*
+
+    字段：~
+      • {context}?  (`{ bufnr: integer, method: string }`) |lsp-handler| 中 `ctx`
+                    的子集。
+      • {items}     (`vim.quickfix.entry[]`) 见 |setqflist-what|
+      • {title}?    (`string`) 该列表的标题。
+
+*vim.lsp.buf.hover.Opts*
+    继承自：|vim.lsp.util.open_floating_preview.Opts|
+
+
+    字段：~
+      • {silent}?  (`boolean`)
+
+*vim.lsp.buf.signature_help.Opts*
+    继承自：|vim.lsp.util.open_floating_preview.Opts|
+
+
+    字段：~
+      • {silent}?  (`boolean`)
+
+
+                                          *vim.lsp.buf.add_workspace_folder()*
+add_workspace_folder({workspace_folder})
+    把该路径下的文件夹加入工作区文件夹。如果没有提供 {path}，则用 |input()| 提示
+    用户输入路径。
+
+    参数：~
+      • {workspace_folder}  (`string?`)
+
+clear_references()                            *vim.lsp.buf.clear_references()*
+    从当前 buffer 中移除文档高亮。
+
+code_action({opts})                                *vim.lsp.buf.code_action()*
+    选择光标位置处可用的代码操作（LSP："textDocument/codeAction" 请求）。
+
+    参数：~
+      • {opts}  (`table?`) 含下列字段的表：
+                • {apply}? (`boolean`) 当设为 `true` 且（过滤后）只剩一个操作时，
+                  无需用户询问即直接应用该操作。
+                • {context}? (`table`) 对应 `lsp.CodeActionContext`，但所有字段
+                  都是可选的：
+                  • {diagnostics}? (`lsp.Diagnostic[]`) 如果未提供，则从当前
+                    位置推断。
+                  • {only}? (`lsp.CodeActionKind[]`) 用于过滤代码操作的
+                    `CodeActionKind`。大多数服务器支持 "refactor" 或 "quickfix"
+                    之类的值。
+                  • {triggerKind}? (`lsp.CodeActionTriggerKind`) 请求代码操作的
+                    原因。
+                • {filter}?
+                  (`fun(x: lsp.CodeAction|lsp.Command, client_id: integer):boolean`)
+                  谓词，接收一个代码操作或命令以及提供者的 ID。如果它返回 false，
+                  该操作会被过滤掉。
+                • {range}? (`{start: integer[], end: integer[]}`) 应当请求代码
+                  操作的范围。在可视模式下默认为当前选区。该表必须含有 `start`
+                  和 `end` 键，其值为 {row,col} 元组，使用与标记类似的索引方式。
+                  见 |api-indexing|
+
+    另见：~
+      • https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_codeAction
+      • vim.lsp.protocol.CodeActionTriggerKind
+
+declaration({opts})                                *vim.lsp.buf.declaration()*
+    跳转到光标下符号的声明处。
+
+    注意：~
+      • 许多服务器并未实现该方法。一般请改见 |vim.lsp.buf.definition()|。
+
+    参数：~
+      • {opts}  (`vim.lsp.LocationOpts?`) 见 |vim.lsp.LocationOpts|。
+
+definition({opts})                                  *vim.lsp.buf.definition()*
+    跳转到光标下符号的定义处。
+
+    参数：~
+      • {opts}  (`vim.lsp.LocationOpts?`) 见 |vim.lsp.LocationOpts|。
+
+document_highlight()                        *vim.lsp.buf.document_highlight()*
+    向服务器发送请求，以解析当前文本文档位置处的文档高亮。该请求可以由键位映射或
+    `CursorHold` 之类的事件触发，例如： >vim
+        autocmd CursorHold  <buffer> lua vim.lsp.buf.document_highlight()
+        autocmd CursorHoldI <buffer> lua vim.lsp.buf.document_highlight()
+        autocmd CursorMoved <buffer> lua vim.lsp.buf.clear_references()
+<
+
+    注意：使用 |vim.lsp.buf.document_highlight()| 需要定义下列高亮组，否则你将
+    看不到实际的高亮。 |hl-LspReferenceText| |hl-LspReferenceRead|
+    |hl-LspReferenceWrite|
+
+document_symbol({opts})                        *vim.lsp.buf.document_symbol()*
+    在当前 buffer 的 |location-list| 中列出所有符号。
+
+    参数：~
+      • {opts}  (`vim.lsp.ListOpts?`) 见 |vim.lsp.ListOpts|。
+
+format({opts})                                          *vim.lsp.buf.format()*
+    使用已附加（且可选经过筛选）的语言服务器客户端格式化某个 buffer。
+
+    参数：~
+      • {opts}  (`table?`) 含下列字段的表：
+                • {async}? (`boolean`，默认：false) 如果为 true，该方法不会阻塞。
+                  在异步格式化期间编辑 buffer 可能导致意外改动。
+                • {bufnr}? (`integer`，默认：当前 buffer) 把格式化限制到附加到
+                  给定 buffer 的客户端。
+                • {filter}? (`fun(client: vim.lsp.Client): boolean?`) 用于筛选
+                  客户端的谓词。接收一个客户端作为参数，并且必须返回布尔值。匹配
+                  该谓词的客户端会被包含进来。示例： >lua
+                    -- Never request typescript-language-server for formatting
+                    vim.lsp.buf.format {
+                      filter = function(client) return client.name ~= "ts_ls" end
+                    }
+<
+                • {formatting_options}? (`lsp.FormattingOptions`) 可用于指定
+                  FormattingOptions。某些未指定的选项会从当前 Nvim 选项自动推导。
+                  见
+                  https://microsoft.github.io/language-server-protocol/specification/#formattingOptions
+                • {id}? (`integer`) 把格式化限制到 ID（client.id）与该字段匹配的
+                  客户端。
+                • {name}? (`string`) 把格式化限制到名称（client.name）与该字段
+                  匹配的客户端。
+                • {range}?
+                  (`{start:[integer,integer],end:[integer, integer]}|{start:[integer,integer],end:[integer,integer]}[]`，
+                  默认：可视模式下的当前选区，其他模式下为 `nil`，即格式化整个
+                  buffer）要格式化的范围。该表必须含有 `start` 和 `end` 键，其值
+                  为使用 (1,0) 索引的 {row,col} 元组。也可以是由上述含有 `start`
+                  和 `end` 键的表构成的列表，此时需要服务器支持
+                  `textDocument/rangesFormatting`。
+                • {timeout_ms}? (`integer`，默认：`1000`) 为格式化请求阻塞的
+                  时间，单位为毫秒。async=true 时无效。
+
+hover({config})                                          *vim.lsp.buf.hover()*
+    在 floating window 中显示光标下符号的悬停信息。光标移动时该 window 会被关闭。
+    再次调用该函数会跳入 floating window（因此默认情况下，"KK" 会打开 hover window
+    并让它获得焦点）。在该 floating window 中，所有命令和映射都照常可用，只是
+    "q" 会关闭该 window。你可以像对待其他任何 buffer 一样滚动其内容。
+
+    注意：要禁用悬停高亮，请把下列内容加入你的配置： >lua
+        vim.api.nvim_create_autocmd('ColorScheme', {
+          callback = function()
+            vim.api.nvim_set_hl(0, 'LspReferenceTarget', {})
+          end,
+        })
+<
+
+    参数：~
+      • {config}  (`vim.lsp.buf.hover.Opts?`) 见 |vim.lsp.buf.hover.Opts|。
+
+implementation({opts})                          *vim.lsp.buf.implementation()*
+    在 quickfix window 中列出光标下符号的所有实现。
+
+    参数：~
+      • {opts}  (`vim.lsp.LocationOpts?`) 见 |vim.lsp.LocationOpts|。
+
+incoming_calls()                                *vim.lsp.buf.incoming_calls()*
+    在 |quickfix| window 中列出光标下符号的所有调用点。如果该符号可以解析为
+    多个项，用户可以在 |inputlist()| 中选择一个。
+
+list_workspace_folders()                *vim.lsp.buf.list_workspace_folders()*
+    列出工作区文件夹。
+
+outgoing_calls()                                *vim.lsp.buf.outgoing_calls()*
+    在 |quickfix| window 中列出光标下符号所调用的所有项。如果该符号可以解析为
+    多个项，用户可以在 |inputlist()| 中选择一个。
+
+references({context}, {opts})                       *vim.lsp.buf.references()*
+    在 quickfix window 中列出光标下符号的所有引用。
+
+    参数：~
+      • {context}  (`lsp.ReferenceContext?`) 该请求的上下文
+      • {opts}     (`vim.lsp.ListOpts?`) 见 |vim.lsp.ListOpts|。
+
+    另见：~
+      • https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_references
+
+                                       *vim.lsp.buf.remove_workspace_folder()*
+remove_workspace_folder({workspace_folder})
+    从工作区文件夹中移除该路径下的文件夹。如果没有提供 {path}，则用 |input()| 提示
+    用户输入路径。
+
+    参数：~
+      • {workspace_folder}  (`string?`)
+
+rename({new_name}, {opts})                              *vim.lsp.buf.rename()*
+    重命名光标下符号的所有引用。
+
+    参数：~
+      • {new_name}  (`string?`) 如果未提供，则用 |vim.ui.input()| 提示用户输入
+                    新名称。
+      • {opts}      (`table?`) 附加选项：
+                    • {bufnr}? (`integer`) （默认：当前 buffer）
+                    • {filter}? (`fun(client: vim.lsp.Client): boolean?`) 用于
+                      筛选客户端的谓词。接收一个客户端作为参数，并且必须返回
+                      布尔值。匹配该谓词的客户端会被包含进来。
+                    • {name}? (`string`) 把用于重命名的客户端限制为 client.name
+                      与该字段匹配的客户端。
+
+                                               *vim.lsp.buf.selection_range()*
+selection_range({direction}, {timeout_ms})
+                                                   *lsp-incremental-selection*
+
+    根据 LSP 给出的范围，在光标处扩展或收缩 |Visual| 选区。`direction` 参数指定
+    扩展选区的次数。负值会收缩选区。
+
+    参数：~
+      • {direction}   (`integer`)
+      • {timeout_ms}  (`integer?`) （默认：`1000`）等待结果的最长时间
+                      （毫秒）。
+
+signature_help({config})                        *vim.lsp.buf.signature_help()*
+    在 floating window 中显示光标下符号的签名信息。允许用 `<C-s>` 在多个
+    签名重载之间循环，该键可通过 `<Plug>(nvim.lsp.ctrl-s)` 重新映射
+
+    示例： >lua
+        vim.keymap.set('n', '<C-b>', '<Plug>(nvim.lsp.ctrl-s)')
+<
+
+    参数：~
+      • {config}  (`vim.lsp.buf.signature_help.Opts?`) 见
+                  |vim.lsp.buf.signature_help.Opts|。
+
+type_definition({opts})                        *vim.lsp.buf.type_definition()*
+    跳转到光标下符号的类型的定义处。
+
+    参数：~
+      • {opts}  (`vim.lsp.LocationOpts?`) 见 |vim.lsp.LocationOpts|。
+
+typehierarchy({kind})                            *vim.lsp.buf.typehierarchy()*
+    在 |quickfix| window 中列出光标下符号的所有子类型或超类型。如果该符号可以
+    解析为多个项，用户可以用 |vim.ui.select()| 选择一个。
+
+    参数：~
+      • {kind}  (`"subtypes"|"supertypes"`)
+
+workspace_diagnostics({opts})            *vim.lsp.buf.workspace_diagnostics()*
+    请求整个工作区的诊断。
+
+    参数：~
+      • {opts}  (`table?`) 含下列字段的表：
+                • {client_id}? (`integer`) 只向指定的客户端请求诊断。如果为 nil，
+                  则向所有客户端发送该请求。
+
+    另见：~
+      • https://microsoft.github.io/language-server-protocol/specifications/specification-current/#workspace_dagnostics
+
+workspace_symbol({query}, {opts})             *vim.lsp.buf.workspace_symbol()*
+    在 quickfix window 中列出当前工作区中的所有符号。
+
+    该列表会按 {query} 过滤；如果调用时省略了该参数，则提示用户在命令行上输入一个
+    字符串。空字符串表示不做过滤。
+
+    参数：~
+      • {query}  (`string?`) 可选
+      • {opts}   (`vim.lsp.ListOpts?`) 见 |vim.lsp.ListOpts|。
+
+
+==============================================================================
+Lua 模块：vim.lsp.client                                        *lsp-client*
+
+*vim.lsp.Client*
+
+    字段：~
+      • {attached_buffers}      (`table<integer,string>`) 每个 buffer 上次使用的
+                                `languageId`。
+      • {cancel_request}        (`fun(self: vim.lsp.Client, id: integer): boolean`)
+                                见 |Client:cancel_request()|。
+      • {capabilities}          (`lsp.ClientCapabilities`) 客户端（编辑器或工具）
+                                在启动时提供的能力。
+      • {commands}              (`table<string,fun(command: lsp.Command, ctx: table)>`)
+                                客户端命令。见 |vim.lsp.ClientConfig|。
+      • {config}                (`vim.lsp.ClientConfig`) 传给 |vim.lsp.start()| 的
+                                配置的副本。见 |vim.lsp.ClientConfig|。
+      • {dynamic_capabilities}  (`lsp.DynamicCapabilities`) 运行时（启动之后）
+                                提供的能力。
+      • {exec_cmd}              (`fun(self: vim.lsp.Client, cmd: lsp.Command, context: {bufnr?: integer}?, handler: lsp.Handler?)`)
+                                见 |Client:exec_cmd()|。
+      • {exit_timeout}          (`integer|boolean`，默认：`false`) 见
+                                |vim.lsp.ClientConfig|。
+      • {flags}                 (`table`) 实验性客户端标志：
+                                • {allow_incremental_sync}? (`boolean`，默认：
+                                  `true`) 允许对 buffer 编辑使用增量同步
+                                • {debounce_text_changes}? (`integer`，默认：`150`)
+                                  把发往服务器的 `didChange` 通知按给定毫秒数去抖。
+      • {get_language_id}       (`fun(bufnr: integer, filetype: string): string`)
+                                见 |vim.lsp.ClientConfig|。
+      • {handlers}              (`table<string,lsp.Handler>`) 见
+                                |vim.lsp.ClientConfig|。
+      • {id}                    (`integer`) 分配给该客户端的 id。
+      • {initialized}           (`true?`)
+      • {is_stopped}            (`fun(self: vim.lsp.Client): boolean`) 见
+                                |Client:is_stopped()|。
+      • {name}                  (`string`) 见 |vim.lsp.ClientConfig|。
+      • {notify}                (`fun(self: vim.lsp.Client, method: string, params: table?, bufnr: integer?): boolean`)
+                                见 |Client:notify()|。
+      • {offset_encoding}       (`'utf-8'|'utf-16'|'utf-32'`) 见
+                                |vim.lsp.ClientConfig|。
+      • {on_attach}             (`fun(self: vim.lsp.Client, bufnr: integer)`)
+                                见 |Client:on_attach()|。
+      • {progress}              (`vim.lsp.Client.Progress`) 一个 ring buffer
+                                （|vim.ringbuf()|），含有服务器发来的进度消息。见
+                                |vim.lsp.Client.Progress|。
+      • {request}               (`fun(self: vim.lsp.Client, method: string, params: table?, handler: lsp.Handler?, bufnr: integer?): boolean, integer?`)
+                                见 |Client:request()|。
+      • {request_sync}          (`fun(self: vim.lsp.Client, method: string, params: table, timeout_ms: integer?, bufnr: integer?): {err: lsp.ResponseError?, result:any}?, string?`)
+                                见 |Client:request_sync()|。
+      • {requests}              (`table<integer,{ type: string, bufnr: integer, method: string}?>`)
+                                当前已发出、正在等待服务器响应的请求。这些条目是
+                                键值对，键为请求 id，值为含有 `type`、`bufnr` 和
+                                `method` 键值对的表。`type` 对于活动请求为
+                                "pending"，对于取消请求为 "cancel"。在收到服务器
+                                回复、执行 |LspRequest| 自动命令期间，它会短暂地为
+                                "complete"。
+      • {root_dir}              (`string?`) 见 |vim.lsp.ClientConfig|。
+      • {rpc}                   (`vim.lsp.rpc.PublicClient`) RPC 客户端对象，用于
+                                与该客户端进行底层交互。见 |vim.lsp.rpc.start()|。
+      • {server_capabilities}   (`lsp.ServerCapabilities?`) 服务器在 `initialize`
+                                时发来的响应，描述该服务器具备的能力。
+      • {server_info}           (`lsp.ServerInfo?`) 服务器在 `initialize` 时发来的
+                                响应，描述服务器信息（例如版本）。
+      • {settings}              (`lsp.LSPObject`) 见 |vim.lsp.ClientConfig|。
+      • {stop}                  (`fun(self: vim.lsp.Client, force: integer|boolean?)`)
+                                见 |Client:stop()|。
+      • {supports_method}       (`fun(self: vim.lsp.Client, method: string|string, bufnr: integer?): boolean`)
+                                见 |Client:supports_method()|。
+      • {workspace_folders}     (`lsp.WorkspaceFolder[]?`) 见
+                                |vim.lsp.ClientConfig|。
+
+*vim.lsp.Client.Progress*
+    继承自：|vim.Ringbuf|
+
+
+    字段：~
+      • {pending}  (`table<lsp.ProgressToken,lsp.LSPAny>`)
+
+*vim.lsp.ClientConfig*
+
+    字段：~
+      • {before_init}?         (`fun(params: lsp.InitializeParams, config: vim.lsp.ClientConfig)`)
+                               回调，可在参数发给服务器之前修改它们。在 LSP
+                               "initialize" 阶段之前（`cmd` 被调用之后）调用，其中
+                               `params` 是正要发给服务器的参数，`config` 是传给
+                               |vim.lsp.start()| 的配置。
+
+                               提示：用 |vim.tbl_deep_extend()| 可轻松设置嵌套
+                               字段。 >lua
+                                   before_init = function(_, config)
+                                     config.settings = vim.tbl_deep_extend('force',
+                                       config.settings,
+                                       { tailwindCSS = { experimental = { configFile = find_tailwind_global_css() } } }
+                                     )
+                                   end
+<
+      • {capabilities}?        (`lsp.ClientCapabilities`) 覆盖
+                               |vim.lsp.protocol.make_client_capabilities()| 所定义
+                               默认能力的映射，会在初始化时传给语言服务器。提示：
+                               使用 make_client_capabilities() 并修改其结果。
+                               • 注意：要发送空字典请使用 |vim.empty_dict()|，否则
+                                 它会被编码为数组。
+      • {cmd}                  (`string[]|fun(dispatchers: vim.lsp.rpc.Dispatchers, config: vim.lsp.ClientConfig): vim.lsp.rpc.PublicClient`)
+                               启动语言服务器的命令 `string[]`（按 |jobstart()|
+                               的方式处理，必须是绝对路径或在 `$PATH` 上，像 "~"
+                               这样的 shell 构造不会被展开）；或是创建 RPC 客户端
+                               （或进程内 |lsp-server|）的函数。该函数接收
+                               `dispatchers` 表和解析后的 `config`，并且必须返回
+                               一个形如 |vim.lsp.rpc.PublicClient| 的对象。
+                               • 见 |vim.lsp.rpc.request()|
+                                 |vim.lsp.rpc.notify()|
+                               • 对于 TCP，有一个内置的 RPC 客户端工厂：
+                                 |vim.lsp.rpc.connect()|
+      • {cmd_cwd}?             (`string`，默认：cwd) 启动 `cmd` 进程的目录。与
+                               `root_dir` 无关。
+      • {cmd_env}?             (`table`) 生成 LSP 进程时传给它的环境变量。非字符串
+                               值会被强制转换为字符串。示例： >lua
+                                   { PORT = 8080, HOST = '0.0.0.0' }
+<
+      • {commands}?            (`table<string,fun(command: lsp.Command, ctx: table)>`)
+                               由客户端定义、覆盖全局 |vim.lsp.commands| 的命令
+                               映射。
+      • {detached}?            (`boolean`，默认：`true`）让服务器进程守护化，使其
+                               在与 Nvim 不同的进程组中运行。Nvim 退出时会关闭该
+                               进程，但如果 Nvim 未能干净退出，这可能留下孤立的
+                               服务器进程。
+      • {exit_timeout}?        (`integer|boolean`，默认：`false`) 决定在发送
+                               "shutdown" 请求之后是否/何时强制停止服务器。见
+                               |Client:stop()|。
+                               注意：当 Nvim 自身正在退出时，
+                               • `false`：Nvim 不会强制停止 LSP 服务器。
+                               • `true`：Nvim 会强制停止未响应 "shutdown" 请求的
+                                 LSP 服务器。
+                               • `number`：Nvim 会最多等待 `exit_timeout` 毫秒
+                                 再执行强制停止。
+      • {flags}?               (`table`) 实验性客户端标志：
+                               • {allow_incremental_sync}? (`boolean`，默认：
+                                 `true`) 允许对 buffer 编辑使用增量同步
+                               • {debounce_text_changes}? (`integer`，默认：`150`)
+                                 把发往服务器的 `didChange` 通知按给定毫秒数
+                                 去抖。
+      • {get_language_id}?     (`fun(bufnr: integer, filetype: string): string`)
+                               语言 ID 字符串。默认为该 buffer 的文件类型。
+      • {handlers}?            (`table<string,function>`) LSP 方法名称到
+                               |lsp-handler| 的映射。
+      • {init_options}?        (`lsp.LSPObject`) 作为 `initializationOptions` 放在
+                               初始化请求中传递的值。见 LSP 规范中的 `initialize`。
+      • {name}?                (`string`，默认：client-id) 日志和用户消息中显示的
+                               名称。
+      • {offset_encoding}?     (`'utf-8'|'utf-16'|'utf-32'`) 在 LSP 规范中称为
+                               "position encoding"。它是 LSP 服务器所期望的编码，
+                               用于通信。不做校验。可以在文本发给服务器之前于
+                               `on_init` 中修改。
+      • {on_attach}?           (`elem_or_list<fun(client: vim.lsp.Client, bufnr: integer)>`)
+                               客户端附加到 buffer 时调用的回调。
+      • {on_error}?            (`fun(code: integer, err: string)`) 客户端操作抛出
+                               错误时调用的回调。`code` 是描述该错误的数字。视错误
+                               类型而定，可能会传入其他参数。可能的错误见
+                               `vim.lsp.rpc.client_errors`。用
+                               `vim.lsp.rpc.client_errors[code]` 可取得易读的名称。
+      • {on_exit}?             (`elem_or_list<fun(code: integer, signal: integer, client_id: integer)>`)
+                               客户端退出时调用的回调。
+                               • code：进程的退出码
+                               • signal：描述用于终止（若有）的信号数字
+                               • client_id：客户端句柄
+      • {on_init}?             (`elem_or_list<fun(client: vim.lsp.Client, init_result: lsp.InitializeResult)>`)
+                               LSP "initialize" 之后调用的回调，其中 `result` 是
+                               含有 `capabilities` 以及服务器可能发送的任何其他内容
+                               的表。例如，如果曾向 clangd 发送
+                               `capabilities.offsetEncoding`，它会发送
+                               `init_result.offsetEncoding`。你只能在这里、在任何
+                               通知被发出之前修改 `client.offset_encoding`。
+      • {root_dir}?            (`string`) LSP 服务器在初始化时将以其作为
+                               workspaceFolders、rootUri 和 rootPath 依据的目录。
+      • {settings}?            (`lsp.LSPObject`) 语言服务器特定设置的映射，由客户端
+                               决定。如果服务器通过 `workspace/configuration`
+                               请求，则会发送给它。键区分大小写。
+      • {trace}?               (`'off'|'messages'|'verbose'`，默认："off") 直接放在
+                               初始化请求中传给语言服务器。无效或空值将
+      • {workspace_folders}?   (`lsp.WorkspaceFolder[]`) 传给语言服务器的工作区
+                               文件夹列表。为向后兼容，rootUri 和 rootPath 由该
+                               列表中的第一个工作区文件夹推导而来。如果客户端支持
+                               工作区文件夹但未配置任何工作区文件夹，可以为 `null`。
+                               见 LSP 规范中的 `workspaceFolders`。
+      • {workspace_required}?  (`boolean`，默认：`false`) 服务器要求有工作区（不
+                               支持"单文件"模式）。注意：即使服务器不要求工作区，
+                               在没有工作区时，跨文件功能（导航、悬停）能否工作也
+                               可能因语言服务器而异。
+
+
+Client:cancel_request({id})                          *Client:cancel_request()*
+    取消具有给定请求 id 的请求。
+
+    参数：~
+      • {id}  (`integer`) 要取消的请求的 id
+
+    返回值：~
+        (`boolean`) 表示该通知是否成功发出的状态。
+
+    另见：~
+      • |Client:notify()|
+
+Client:exec_cmd({cmd}, {context}, {handler})               *Client:exec_cmd()*
+    执行 LSP 命令：通过客户端命令函数（如果可用），或通过
+    workspace/executeCommand（如果服务器支持）
+
+    参数：~
+      • {cmd}      (`lsp.Command`)
+      • {context}  (`{bufnr?: integer}?`)
+      • {handler}  (`lsp.Handler?`) 仅在服务器命令时调用
+
+Client:is_stopped()                                      *Client:is_stopped()*
+    检查客户端是否已停止。
+
+    返回值：~
+        (`boolean`) 如果客户端已停止或正在停止则返回 true；否则为 false
+
+Client:notify({method}, {params}, {bufnr})                   *Client:notify()*
+    向 LSP 服务器发送一条通知。
+
+    参数：~
+      • {method}  (`string`) LSP 方法名称。
+      • {params}  (`table?`) LSP 请求参数。
+      • {bufnr}   (`integer?`) 与该通知关联的 Buffer。
+
+    返回值：~
+        (`boolean`) 表示该通知是否成功发出的状态。如果为 false，则该客户端已
+        关闭。
+
+Client:on_attach({bufnr})                                 *Client:on_attach()*
+    如果客户端配置中定义了 on_attach 函数，则运行它。对 buffer 局部的设置很有用。
+
+    参数：~
+      • {bufnr}  (`integer`) Buffer 编号
+
+                                                            *Client:request()*
+Client:request({method}, {params}, {handler}, {bufnr})
+    向服务器发送一个请求。
+
+    这是对 {client.rpc.request} 的轻量封装，额外做了一些关于能力和处理器可用性的
+    检查。
+
+    参数：~
+      • {method}   (`string`) LSP 方法名称。
+      • {params}   (`table?`) LSP 请求参数。
+      • {handler}  (`lsp.Handler?`) 该方法的响应 |lsp-handler|。
+      • {bufnr}    (`integer?`) （默认：0）Buffer 句柄，0 表示当前 buffer。
+
+    返回值（多个）：~
+        (`boolean`) status 表示该请求是否成功。如果为 `false`，那么它将始终为
+        `false`（该客户端已关闭）。
+        (`integer?`) request_id 可与 |Client:cancel_request()| 一起使用。
+        请求失败时为 `nil`。
+
+    另见：~
+      • |vim.lsp.buf_request_all()|
+
+                                                       *Client:request_sync()*
+Client:request_sync({method}, {params}, {timeout_ms}, {bufnr})
+    向服务器发送请求并同步等待响应。
+
+    这是对 |Client:request()| 的封装
+
+    参数：~
+      • {method}      (`string`) LSP 方法名称。
+      • {params}      (`table`) LSP 请求参数。
+      • {timeout_ms}  (`integer?`) 等待结果的最长时间，单位为毫秒。默认为 1000
+      • {bufnr}       (`integer?`) （默认：0）Buffer 句柄，0 表示当前 buffer。
+
+    返回值（多个）：~
+        (`{err: lsp.ResponseError?, result:any}?`) 来自 |lsp-handler| 的 `result`
+        与 `err`。请求不成功时为 `nil`
+        (`string?`) err 在超时、取消或出错时，`err` 是描述失败原因的字符串。
+
+    另见：~
+      • |vim.lsp.buf_request_sync()|
+
+Client:stop({force})                                           *Client:stop()*
+    停止客户端，可选择在超时后施加强制。
+
+    默认情况下，这会向服务器发送一个 "shutdown" 请求，如果服务器在
+    `self.exit_timeout` 毫秒后仍未退出，则升级为强制停止（除非
+    `exit_timeout=false`）。对先前已被请求关闭的客户端调用 stop() 会立即升级为
+    强制停止，不论 `force`（或 `force=nil` 时的 `self.exit_timeout`）如何。
+
+    注意：在服务器正忙于写出项目文件或索引文件时强制关闭，可能导致文件损坏。
+
+    参数：~
+      • {force}  (`integer|boolean?`) （默认：`self.exit_timeout`）决定是否强制
+                 停止服务器。
+                 • `false`：在 "shutdown" 请求之后不强制停止。
+                 • `nil`：默认为 |vim.lsp.ClientConfig| 中的 `exit_timeout`。
+                 • `true`：在 "shutdown" 请求之后强制停止。
+                 • 数字：在强制停止前最多等待 `force` 毫秒。
+
+Client:supports_method({method}, {bufnr})           *Client:supports_method()*
+    检查客户端是否支持给定的方法。对于未知的规范之外的方法，始终返回 true。
+
+    注意：某些语言服务器能力可能是文件特定的。
+
+    参数：~
+      • {method}  (`string|string`)
+      • {bufnr}   (`integer?`)
+
+    返回值：~
+        (`boolean`)
+
+
+==============================================================================
+Lua 模块：vim.lsp.codelens                                    *lsp-codelens*
+
+enable({enable}, {filter})                         *vim.lsp.codelens.enable()*
+    为 {filter} 所限定的范围启用或禁用代码透镜。
+
+    要"切换"，请传入 `is_enabled()` 的相反值： >lua
+        vim.lsp.codelens.enable(not vim.lsp.codelens.is_enabled())
+<
+
+    要运行代码透镜，见 |vim.lsp.codelens.run()|。
+
+    参数：~
+      • {enable}  (`boolean?`) true/nil 表示启用，false 表示禁用
+      • {filter}  (`table?`) 可选筛选条件 |kwargs|，
+                  • {bufnr}? (`integer`，默认：全部) Buffer 编号，0 表示当前
+                    buffer，nil 表示全部。
+                  • {client_id}? (`integer`，默认：全部) 客户端 ID，nil 表示全部。
+
+get({filter})                                         *vim.lsp.codelens.get()*
+    取得 {filter} 所限定范围内的所有代码透镜。
+
+    参数：~
+      • {filter}  (`table?`) 可选筛选条件 |kwargs|：
+                  • {bufnr}? (`integer`，默认：0) Buffer 句柄，0 表示当前 buffer。
+                  • {client_id}? (`integer`，默认：全部) 客户端 ID，nil 表示全部。
+
+    返回值：~
+        (`table[]`) 含下列字段的对象列表：
+        • {client_id} (`integer`)
+        • {lens} (`lsp.CodeLens`)
+
+is_enabled({filter})                           *vim.lsp.codelens.is_enabled()*
+    查询 {filter} 所限定范围内是否启用了代码透镜
+
+    参数：~
+      • {filter}  (`table?`) 可选筛选条件 |kwargs|，
+                  • {bufnr}? (`integer`，默认：全部) Buffer 编号，0 表示当前
+                    buffer，nil 表示全部。
+                  • {client_id}? (`integer`，默认：全部) 客户端 ID，nil 表示全部。
+
+    返回值：~
+        (`boolean`) 是否启用了代码透镜。
+
+run({opts})                                           *vim.lsp.codelens.run()*
+    运行当前光标位置处的代码透镜。
+
+    参数：~
+      • {opts}  (`table?`) 可选参数 |kwargs|：
+                • {client_id}? (`integer`，默认：全部) 客户端 ID，nil 表示全部。
+
+
+==============================================================================
+Lua 模块：vim.lsp.completion                                *lsp-completion*
+
+`vim.lsp.completion` 模块启用由 LSP 服务器驱动的插入模式补全。调用 `enable()` 即可
+让它通过 Nvim 内置补全（经由 |CompleteDone| 事件）使用。指定
+`autotrigger=true` 可在你输入服务器定义的任一 `triggerCharacters` 时激活"自动补全"。
+用 CTRL-Y 从补全菜单中选择一项。|complete_CTRL-Y|
+
+示例：激活由 LSP 驱动的自动补全： >lua
+    -- Works best if 'completeopt' has "noselect".
+    -- Use CTRL-Y to select an item. |complete_CTRL-Y|
+    vim.cmd[[set completeopt+=menuone,noselect,popup]]
+    vim.lsp.start({
+      name = 'ts_ls',
+      cmd = …,
+      on_attach = function(client, bufnr)
+        vim.lsp.completion.enable(true, client.id, bufnr, {
+          autotrigger = true,
+          convert = function(item)
+            return { abbr = item.label:gsub('%b()', '') }
+          end,
+        })
+      end,
+    })
+<
+
+                                                          *lsp-autocompletion*
+
+LSP 的 `triggerCharacters` 字段决定何时触发自动补全。如果你想在每次按键时都触发，
+可以：
+
+• 在 `LspAttach` 时、调用
+  `vim.lsp.completion.enable(… {autotrigger=true})` 之前，扩展
+  `client.server_capabilities.completionProvider.triggerCharacters`。见 |lsp-attach|
+  中的示例。
+• 在 |InsertCharPre| 自动命令中调用 `vim.lsp.completion.get()`。
+
+
+                                                 *vim.lsp.completion.enable()*
+enable({enable}, {client_id}, {bufnr}, {opts})
+    启用或禁用给定语言客户端在给定 buffer 中的补全。启用补全的效果是：
+    • 调用 |vim.lsp.completion.get()| 时，会使用已启用的客户端获取补全候选。
+    • 如果 'completeopt' 含有 "popup"，选择某个补全项时会显示预览弹窗
+      （"completionItem/resolve"）。
+    • 用 `<c-y>` 接受某个补全项时，会应用诸如展开代码片段、文本编辑（例如插入
+      导入语句）以及执行相关命令之类的副作用。这对通过 autotrigger、'omnifunc' 或
+      |vim.lsp.completion.get()| 触发的补全都有效。
+
+    示例：|lsp-attach| |lsp-completion|
+
+    注意：`autotrigger=true` 的行为由 LSP 的 `triggerCharacters` 字段控制。你可以
+    在 LspAttach 时覆盖它，见 |lsp-autocompletion|。
+
+    参数：~
+      • {enable}     (`boolean`) true 表示启用，false 表示禁用
+      • {client_id}  (`integer`) 客户端 ID
+      • {bufnr}      (`integer`) Buffer 句柄，0 表示当前 buffer
+      • {opts}       (`table?`) 含下列字段的表：
+                     • {autotrigger}? (`boolean`) （默认：false）为 true 时，
+                       补全会根据服务器的 `triggerCharacters` 自动触发。
+                     • {cmp}? (`fun(a: table, b: table): boolean`) 用于对来自
+                       所有服务器、已合并的补全项排序的比较函数。
+                     • {convert}? (`fun(item: lsp.CompletionItem): table`) 把
+                       一个 LSP CompletionItem 转换为 |complete-items|。
+
+get({opts})                                         *vim.lsp.completion.get()*
+    如果已启用 LSP 补全（见 |lsp-attach| |lsp-completion|），则在当前 buffer 中
+    触发一次 LSP 补全。
+
+    由默认的 LSP |omnicompletion| 提供者 |vim.lsp.omnifunc()| 使用，因此在已启用
+    LSP 的 buffer 中 |i_CTRL-X_CTRL-O| 会调用它。用 CTRL-Y 从补全菜单中选择一项。
+    |complete_CTRL-Y|
+
+    要用 CTRL-空格 手动调用，请使用这个映射： >lua
+        -- Use CTRL-space to trigger LSP completion.
+        -- Use CTRL-Y to select an item. |complete_CTRL-Y|
+        vim.keymap.set('i', '<c-space>', function()
+          vim.lsp.completion.get()
+        end)
+<
+
+    参数：~
+      • {opts}  (`table?`) 含下列字段的表：
+                • {ctx}? (`lsp.CompletionContext`) 补全上下文。默认为触发类型
+                  `invoked`。
+
+
+==============================================================================
+Lua 模块：vim.lsp.diagnostic                                *lsp-diagnostic*
+
+该模块提供为文档/工作区请求 LSP 诊断、并用 |vim.Diagnostic| 填充它们的功能。
+支持 `DiagnosticRelatedInformation`：它会被包含在
+|vim.diagnostic.open_float()| 所显示的 window 中。当光标位于有相关信息的
+那一行时，|gf| 会跳到问题所在位置。
+
+
+from({diagnostics})                                *vim.lsp.diagnostic.from()*
+    把输入的 `vim.Diagnostic` 转换为 LSP 诊断。
+
+    参数：~
+      • {diagnostics}  (`vim.Diagnostic[]`)
+
+    返回值：~
+        (`lsp.Diagnostic[]`)
+
+                                          *vim.lsp.diagnostic.get_namespace()*
+get_namespace({client_id}, {is_pull}, {pull_id})
+    取得与某个 LSP 客户端相关联的诊断命名空间 |vim.diagnostic|
+
+    参数：~
+      • {client_id}  (`integer`) 该 LSP 客户端的 id
+      • {is_pull}    (`boolean?`) 该命名空间是用于拉取（pull）还是推送（push）
+                     客户端。默认为 `false`（推送）。
+      • {pull_id}    (`string?`) （默认：nil）拉取式诊断提供者的可选标识符。仅在
+                     `is_pull` 为 `true` 时使用。
+
+                                          *vim.lsp.diagnostic.on_diagnostic()*
+on_diagnostic({error}, {result}, {ctx})
+    "textDocument/diagnostic" 方法的 |lsp-handler|
+
+    配置选项见 |vim.diagnostic.config()|。
+
+    参数：~
+      • {error}   (`lsp.ResponseError?`)
+      • {result}  (`lsp.DocumentDiagnosticReport`)
+      • {ctx}     (`lsp.HandlerContext`)
+
+                                 *vim.lsp.diagnostic.on_publish_diagnostics()*
+on_publish_diagnostics({_}, {params}, {ctx})
+    "textDocument/publishDiagnostics" 方法的 |lsp-handler|
+
+    配置选项见 |vim.diagnostic.config()|。
+
+    参数：~
+      • {params}  (`lsp.PublishDiagnosticsParams`)
+      • {ctx}     (`lsp.HandlerContext`)
+
+
+==============================================================================
+Lua 模块：vim.lsp.document_color                        *lsp-document_color*
+
+该模块为在文档中高亮颜色引用提供 LSP 支持。高亮默认启用。
+
+
+color_presentation()             *vim.lsp.document_color.color_presentation()*
+    从光标下颜色的一组呈现方式中进行选择。
+
+enable({enable}, {filter}, {opts})           *vim.lsp.document_color.enable()*
+    为 {filter} 所限定的范围启用或禁用文档颜色高亮。
+
+    要"切换"，请传入 `is_enabled()` 的相反值： >lua
+        vim.lsp.document_color.enable(not vim.lsp.document_color.is_enabled())
+<
+
+    参数：~
+      • {enable}  (`boolean?`) true 表示启用，false 表示禁用。（默认：`true`）
+      • {filter}  (`table?`) 可选筛选条件 |kwargs|，
+                  • {bufnr}? (`integer`，默认：全部) Buffer 编号，0 表示当前
+                    buffer，nil 表示全部。
+                  • {client_id}? (`integer`，默认：全部) 客户端 ID，nil 表示全部。
+      • {opts}    (`table?`) 含下列字段的表：
+                  • {style}?
+                    (`'background'|'foreground'|'virtual'|string|fun(bufnr: integer, range: vim.Range, hex_code: string)`)
+                    高亮样式。它可以是某个预定义样式、用作虚拟文本的字符串，或一个
+                    接收 buffer 句柄、范围（起始行、起始列、结束行、结束列）以及
+                    解析出的十六进制颜色的函数。（默认：`'background'`）
+
+is_enabled({filter})                     *vim.lsp.document_color.is_enabled()*
+    查询 {filter} 所限定范围内是否启用了文档颜色。
+
+    参数：~
+      • {filter}  (`table?`) 可选筛选条件 |kwargs|，
+                  • {bufnr}? (`integer`，默认：全部) Buffer 编号，0 表示当前
+                    buffer，nil 表示全部。
+                  • {client_id}? (`integer`，默认：全部) 客户端 ID，nil 表示全部。
+
+    返回值：~
+        (`boolean`)
+
+
+==============================================================================
+Lua 模块：vim.lsp.inlay_hint                                *lsp-inlay_hint*
+
+enable({enable}, {filter})                       *vim.lsp.inlay_hint.enable()*
+    为 {filter} 所限定的范围启用或禁用内联提示。
+
+    要"切换"，请传入 `is_enabled()` 的相反值： >lua
+        vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
+<
+
+    属性：~
+        起始版本：0.10.0
+
+    参数：~
+      • {enable}  (`boolean?`) true/nil 表示启用，false 表示禁用
+      • {filter}  (`table?`) 可选筛选条件 |kwargs|，或 `nil` 表示全部。
+                  • {bufnr} (`integer?`) Buffer 编号，0 表示当前 buffer，nil 表示
+                    全部。
+
+get({filter})                                       *vim.lsp.inlay_hint.get()*
+    取得内联提示的列表，（可选地）按 buffer 或范围加以限制。
+
+    用法示例： >lua
+        local hint = vim.lsp.inlay_hint.get({ bufnr = 0 })[1] -- 0 for current buffer
+
+        local client = vim.lsp.get_client_by_id(hint.client_id)
+        local resp = client:request_sync('inlayHint/resolve', hint.inlay_hint, 100, 0)
+        local resolved_hint = assert(resp and resp.result, resp.err)
+        vim.lsp.util.apply_text_edits(resolved_hint.textEdits, 0, client.encoding)
+
+        location = resolved_hint.label[1].location
+        client:request('textDocument/hover', {
+          textDocument = { uri = location.uri },
+          position = location.range.start,
+        })
+<
+
+    属性：~
+        起始版本：0.10.0
+
+    参数：~
+      • {filter}  (`table?`) 可选筛选条件 |kwargs|：
+                  • {bufnr} (`integer?`)
+                  • {range} (`lsp.Range?`)
+
+    返回值：~
+        (`table[]`) 含下列字段的对象列表：
+        • {bufnr} (`integer`)
+        • {client_id} (`integer`)
+        • {inlay_hint} (`lsp.InlayHint`)
+
+is_enabled({filter})                         *vim.lsp.inlay_hint.is_enabled()*
+    查询 {filter} 所限定范围内是否启用了内联提示
+
+    属性：~
+        起始版本：0.10.0
+
+    参数：~
+      • {filter}  (`table?`) 可选筛选条件 |kwargs|，或 `nil` 表示全部。
+                  • {bufnr} (`integer?`) Buffer 编号，0 表示当前 buffer，nil 表示
+                    全部。
+
+    返回值：~
+        (`boolean`)
+
+
+==============================================================================
+Lua 模块：vim.lsp.inline_completion                  *lsp-inline_completion*
+
+该模块提供 LSP 的"内联补全"功能，用于补全多行文本（例如整个方法），而不只是补全
+一个词或一行——后者可能产生"语法或语义上不正确"的代码。与常规补全不同，这通常以
+覆盖文本（overlay text）的形式呈现，而不是一个补全候选菜单。
+
+LSP 规范：
+https://microsoft.github.io/language-server-protocol/specifications/lsp/3.18/specification/#textDocument_inlineCompletion
+
+要试用它，下面是一个使用 Copilot 的快速上手示例：       *lsp-copilot*
+1. 安装 Copilot： >sh
+    npm install --global @github/copilot-language-server
+<
+
+2. 定义一个配置（或从 https://github.com/neovim/nvim-lspconfig 复制
+   `lsp/copilot.lua`）： >lua
+    vim.lsp.config('copilot', {
+     cmd = { 'copilot-language-server', '--stdio' },
+     root_markers = { '.git' },
+      init_options = {
+        editorInfo = {
+          name = 'Neovim', version = tostring(vim.version()) },
+          editorPluginInfo = { name = 'Neovim', version = tostring(vim.version()) },
+        },
+   })
+<
+
+3. 激活该配置： >lua
+    vim.lsp.enable('copilot')
+<
+
+4. 登录 Copilot，或使用来自 https://github.com/neovim/nvim-lspconfig 的
+   `:LspCopilotSignIn` 命令
+
+5. 启用内联补全： >lua
+    vim.lsp.inline_completion.enable()
+<
+
+6. 为 `vim.lsp.inline_completion.get()` 设置一个键位映射并调用它。
+
+
+*vim.lsp.inline_completion.Item*
+
+    字段：~
+      • {client_id}    (`integer`) 客户端 ID
+      • {command}?     (`lsp.Command`) 对应的服务器命令。
+      • {insert_text}  (`string|lsp.StringValue`) 要插入的文本，可以是代码片段。
+      • {range}?       (`vim.Range`) 应用该文本的范围。
+
+
+enable({enable}, {filter})                *vim.lsp.inline_completion.enable()*
+    为 {filter} 所限定的范围启用或禁用内联补全，处于插入模式时内联补全会自动刷新。
+
+    要"切换"，请传入 `is_enabled()` 的相反值： >lua
+        vim.lsp.inline_completion.enable(not vim.lsp.inline_completion.is_enabled())
+<
+
+    参数：~
+      • {enable}  (`boolean?`) true/nil 表示启用，false 表示禁用
+      • {filter}  (`table?`) 可选筛选条件 |kwargs|，
+                  • {bufnr}? (`integer`，默认：全部) Buffer 编号，0 表示当前
+                    buffer，nil 表示全部。
+                  • {client_id}? (`integer`，默认：全部) 客户端 ID，nil 表示全部。
+
+get({opts})                                  *vim.lsp.inline_completion.get()*
+    把当前显示的补全候选接受到 buffer 中。
+
+    当没有候选可以接受时返回 false，因此你可以用返回值实现回退： >lua
+         vim.keymap.set('i', '<Tab>', function()
+          if not vim.lsp.inline_completion.get() then
+            return '<Tab>'
+          end
+        end, { expr = true, desc = 'Accept the current inline completion' })
+<
+
+    参数：~
+      • {opts}  (`table?`) 含下列字段的表：
+                • {bufnr}? (`integer`，默认：0) Buffer 句柄，0 表示当前 buffer。
+                • {on_accept}?
+                  (`fun(item: vim.lsp.inline_completion.Item): vim.lsp.inline_completion.Item?`)
+                  补全项被接受时触发的回调。你可以用它修改即将被接受的补全项并返回
+                  它以应用这些改动，或返回 `nil` 以阻止改动被应用到 buffer，从而
+                  实现自定义行为。
+
+    返回值：~
+        (`boolean`) 如果应用了补全则为 `true`，否则为 `false`。
+
+is_enabled({filter})                  *vim.lsp.inline_completion.is_enabled()*
+    查询 {filter} 所限定范围内是否启用了内联补全
+
+    参数：~
+      • {filter}  (`table?`) 可选筛选条件 |kwargs|，
+                  • {bufnr}? (`integer`，默认：全部) Buffer 编号，0 表示当前
+                    buffer，nil 表示全部。
+                  • {client_id}? (`integer`，默认：全部) 客户端 ID，nil 表示全部。
+
+select({opts})                            *vim.lsp.inline_completion.select()*
+    在可用的内联补全候选之间切换。
+
+    参数：~
+      • {opts}  (`table?`) 含下列字段的表：
+                • {bufnr}? (`integer`) （默认：当前 buffer）
+                • {count}? (`integer`，默认：v:count1) 要移动的候选数量。正整数
+                  表示向前移动 {count} 个候选，负整数表示向后移动 {count} 个候选。
+                • {wrap}? (`boolean`，默认：`true`) 是否绕回文件首尾。类似于
+                  'wrapscan'。
+
+
+==============================================================================
+Lua 模块：vim.lsp.linked_editing_range            *lsp-linked_editing_range*
+
+`vim.lsp.linked_editing_range` 模块通过语言服务器的
+`textDocument/linkedEditingRange` 请求启用"关联编辑"。关联编辑范围是同步的文本
+区域，也就是说其中一个区域的改动会被镜像到其他所有区域。例如在 HTML 文件中这很有
+帮助，当开始标签被修改时，语言服务器可以更新结束标签的文本。
+
+LSP 规范：
+https://microsoft.github.io/language-server-protocol/specification/#textDocument_linkedEditingRange
+
+
+enable({enable}, {filter})             *vim.lsp.linked_editing_range.enable()*
+    全局或针对特定客户端启用/禁用关联编辑会话。下面是一个实用的用法示例： >lua
+        vim.lsp.start({
+          name = 'html',
+          cmd = '…',
+          on_attach = function(client)
+            vim.lsp.linked_editing_range.enable(true, { client_id = client.id })
+          end,
+        })
+<
+
+    参数：~
+      • {enable}  (`boolean?`) `true` 或 `nil` 表示启用，`false` 表示禁用。
+      • {filter}  (`table?`) 可选筛选条件 |kwargs|：
+                  • {client_id} (`integer?`) 客户端 ID，或 `nil` 表示全部。
+
+
+==============================================================================
+Lua 模块：vim.lsp.log                                              *lsp-log*
+
+`vim.lsp.log` 模块为 Nvim 的 LSP 客户端提供日志记录。
+
+调试语言服务器时，启用 LSP 客户端 RPC 事件的额外详细日志会很有帮助。示例： >lua
+    vim.lsp.log.set_level 'trace'
+<
+
+然后尝试运行语言服务器，并用下面的方式打开日志： >vim
+    :lua vim.cmd('tabnew ' .. vim.lsp.log.get_filename())
+<
+
+（如果安装了 nvim-lspconfig，也可以使用 `:LspLog`。）
+
+注意：
+• 记得要 _禁用_ 详细日志（"debug" 或 "trace" 级别），否则你可能会遇到性能问题。
+• 含有 "stderr" 的 "ERROR" 消息只是表明该日志被发送到 stderr。许多服务器会通过
+  stderr 发送无害的消息。
+
+
+get_filename()                                    *vim.lsp.log.get_filename()*
+    返回日志文件名。
+
+    返回值：~
+        (`string`) 日志文件名
+
+get_level()                                          *vim.lsp.log.get_level()*
+    取得当前日志级别。
+
+    返回值：~
+        (`integer`) 当前日志级别
+
+set_format_func({handle})                      *vim.lsp.log.set_format_func()*
+    设置用于格式化日志的格式化函数。如果该格式化函数返回 nil，该条目将不会被写入
+    日志文件。
+
+    参数：~
+      • {handle}  (`fun(level:string, ...): string?`) 应用于日志条目的函数。默认
+                  实现会记录级别、日期、来源以及调用者的行号，随后是各个参数。
+
+set_level({level})                                   *vim.lsp.log.set_level()*
+    设置当前日志级别。
+
+    参数：~
+      • {level}  (`string|integer`) |vim.log.levels| 之一
+
+
+==============================================================================
+Lua 模块：vim.lsp.on_type_formatting                *lsp-on_type_formatting*
+
+enable({enable}, {filter})               *vim.lsp.on_type_formatting.enable()*
+    全局或为 {filter} 所限定的范围启用/禁用输入时格式化。下面是一些实用的用法示例： >lua
+        -- Enable for all clients
+        vim.lsp.on_type_formatting.enable()
+
+        -- Enable for a specific client
+        vim.api.nvim_create_autocmd('LspAttach', {
+          callback = function(ev)
+            local client_id = ev.data.client_id
+            local client = assert(vim.lsp.get_client_by_id(client_id))
+            if client.name == 'rust-analyzer' then
+              vim.lsp.on_type_formatting.enable(true, { client_id = client_id })
+            end
+          end,
+        })
+<
+
+    参数：~
+      • {enable}  (`boolean?`) true/nil 表示启用，false 表示禁用。
+      • {filter}  (`table?`) 可选筛选条件 |kwargs|：
+                  • {client_id} (`integer?`) 客户端 ID，或 `nil` 表示全部。
+
+
+==============================================================================
+Lua 模块：vim.lsp.rpc                                              *lsp-rpc*
+
+*vim.lsp.rpc.PublicClient*
+    客户端 RPC 对象
+
+    字段：~
+      • {is_closing}  (`fun(): boolean`) 表示该 RPC 是否正在关闭。
+      • {notify}      (`fun(method: string, params: any): boolean`) 见
+                      |vim.lsp.rpc.notify()|
+      • {request}     (`fun(method: string, params: table?, callback: fun(err?: lsp.ResponseError, result: any, request_id: integer), notify_reply_callback?: fun(message_id: integer)):boolean,integer?`)
+                      见 |vim.lsp.rpc.request()|
+      • {terminate}   (`fun()`) 终止该 RPC 客户端。
+
+
+connect({host_or_path}, {port})                        *vim.lsp.rpc.connect()*
+    创建一个 LSP RPC 客户端工厂，它连接到以下之一：
+    • 命名管道（windows）
+    • 域套接字（unix）
+    • 通过 TCP 的主机和端口
+
+    返回一个可以传给 |vim.lsp.start()| 的 `cmd` 字段的函数。
+
+    参数：~
+      • {host_or_path}  (`string`) 要连接的主机，或管道/域套接字的路径
+      • {port}          (`integer?`) 要连接的 TCP 端口。如果省略，第一个参数必须
+                        是管道
+
+    返回值：~
+        (`fun(dispatchers: vim.lsp.rpc.Dispatchers): vim.lsp.rpc.PublicClient`)
+
+format_rpc_error({err})                       *vim.lsp.rpc.format_rpc_error()*
+    从 LSP 错误对象构造一条错误消息。
+
+    参数：~
+      • {err}  (`table`) 该错误对象
+
+    返回值：~
+        (`string`) error_message 格式化后的错误消息
+
+notify({method}, {params})                              *vim.lsp.rpc.notify()*
+    向 LSP 服务器发送一条通知。
+
+    参数：~
+      • {method}  (`string`) 所调用的 LSP 方法
+      • {params}  (`table?`) 所调用 LSP 方法的参数
+
+    返回值：~
+        (`boolean`) 如果可以发送该通知则为 `true`，否则为 `false`
+
+                                                       *vim.lsp.rpc.request()*
+request({method}, {params}, {callback}, {notify_reply_callback})
+    向 LSP 服务器发送请求，并在收到响应时运行 {callback}。
+
+    参数：~
+      • {method}                 (`string`) 所调用的 LSP 方法
+      • {params}                 (`table?`) 所调用 LSP 方法的参数
+      • {callback}               (`fun(err: lsp.ResponseError?, result: any)`)
+                                 要调用的回调
+      • {notify_reply_callback}  (`fun(message_id: integer)?`) 请求不再处于待处理
+                                 状态时立即调用的回调
+
+    返回值（多个）：~
+        (`boolean`) success 如果可以发送该请求则为 `true`，否则为 `false`
+        (`integer?`) message_id 如果可以发送该请求则为其 id，否则为 `nil`
+
+                                            *vim.lsp.rpc.rpc_response_error()*
+rpc_response_error({code}, {message}, {data})
+    创建一个 RPC 响应的 `error` 表，用于放在 LSP 响应中发送。
+
+    参数：~
+      • {code}     (`integer`) 所定义的 RPC 错误码，见
+                   `vim.lsp.protocol.ErrorCodes`
+      • {message}  (`string?`) 要发送给服务器的任意消息
+      • {data}     (`any?`) 要发送给服务器的任意数据
+
+    返回值：~
+        (`lsp.ResponseError`)
+
+    另见：~
+      • lsp.ErrorCodes 见 `vim.lsp.protocol.ErrorCodes`
+
+start({cmd}, {dispatchers}, {extra_spawn_params})        *vim.lsp.rpc.start()*
+    启动一个 LSP 服务器进程并创建一个用于与它交互的 LSP RPC 客户端对象。与所生成
+    进程的通信通过 stdio 进行。要通过 TCP 通信，请手动生成进程并使用
+    |vim.lsp.rpc.connect()|
+
+    参数：~
+      • {cmd}                 (`string[]`) 用于启动 LSP 服务器的命令。
+      • {dispatchers}         (`table?`) 各类 LSP 消息的分派器。
+                              • {notification}
+                                (`fun(method: string, params: table)`)
+                              • {on_error} (`fun(code: integer, err: any)`)
+                              • {on_exit}
+                                (`fun(code: integer, signal: integer)`)
+                              • {server_request}
+                                (`fun(method: string, params: table): any?, lsp.ResponseError?`)
+      • {extra_spawn_params}  (`table?`) LSP 服务器进程的额外上下文。
+                              • {cwd}? (`string`) LSP 服务器进程的工作目录
+                              • {detached}? (`boolean`) 把 LSP 服务器进程与当前
+                                进程分离
+                              • {env}? (`table<string,string>`) LSP 服务器进程的
+                                额外环境变量。见 |vim.system()|
+
+    返回值：~
+        (`vim.lsp.rpc.PublicClient`) 见 |vim.lsp.rpc.PublicClient|。
+
+
+==============================================================================
+Lua 模块：vim.lsp.semantic_tokens                      *lsp-semantic_tokens*
+
+enable({enable}, {filter})                  *vim.lsp.semantic_tokens.enable()*
+    为 {filter} 所限定的范围启用或禁用语义 token。
+
+    要"切换"，请传入 `is_enabled()` 的相反值： >lua
+        vim.lsp.semantic_tokens.enable(not vim.lsp.semantic_tokens.is_enabled())
+<
+
+    参数：~
+      • {enable}  (`boolean?`) true/nil 表示启用，false 表示禁用
+      • {filter}  (`table?`) 可选筛选条件 |kwargs|，
+                  • {bufnr}? (`integer`，默认：全部) Buffer 编号，0 表示当前
+                    buffer，nil 表示全部。
+                  • {client_id}? (`integer`，默认：全部) 客户端 ID，nil 表示全部。
+
+force_refresh({bufnr})               *vim.lsp.semantic_tokens.force_refresh()*
+    强制刷新所有语义 token
+
+    仅当该 buffer 当前正处于语义 token 高亮活动状态（已为它调用过
+    |vim.lsp.semantic_tokens.enable()|）时才有作用
+
+    参数：~
+      • {bufnr}  (`integer?`) 按 buffer 筛选。nil 表示所有 buffer，0 表示当前
+                 buffer
+
+                                        *vim.lsp.semantic_tokens.get_at_pos()*
+get_at_pos({bufnr}, {row}, {col})
+    返回给定位置处的语义 token。如果调用时不传参数，则返回光标下的 token。
+
+    参数：~
+      • {bufnr}  (`integer?`) Buffer 编号（0 表示当前 buffer，为默认值）
+      • {row}    (`integer?`) 位置所在行（默认光标位置）
+      • {col}    (`integer?`) 位置所在列（默认光标位置）
+
+    返回值：~
+        (`table?`) 该位置处 token 的列表。每个 token 含有下列字段：
+        • line (integer) 行号，从 0 开始
+        • start_col (integer) 起始列，从 0 开始
+        • end_line (integer) 结束行号，从 0 开始
+        • end_col (integer) 结束列，从 0 开始
+        • type (string) token 类型字符串，例如 "variable"
+        • modifiers (table) token 修饰符集合。例如
+          { static = true, readonly = true }
+        • client_id (integer)
+
+                                   *vim.lsp.semantic_tokens.highlight_token()*
+highlight_token({token}, {bufnr}, {client_id}, {hl_group}, {opts})
+    高亮一个语义 token。
+
+    为某个语义 token 应用一个带有给定高亮组的 extmark。语义 token 引擎会在适当
+    时机删除该标记；例如当 LSP 发来更新后的 token 时。该函数旨在 |LspTokenUpdate|
+    回调内部使用。
+
+    参数：~
+      • {token}      (`table`) 语义 token，在 |LspTokenUpdate| 中作为
+                     `ev.data.token` 提供
+      • {bufnr}      (`integer`) 要高亮的 Buffer，或 `0` 表示当前 buffer。
+      • {client_id}  (`integer`) |vim.lsp.Client| 的 ID
+      • {hl_group}   (`string`) 高亮组名称
+      • {opts}       (`table?`) 可选参数：
+                     • {priority}? (`integer`，默认：
+                       `vim.hl.priorities.semantic_tokens + 3`）所应用的
+                       extmark 的优先级。
+
+is_enabled({filter})                    *vim.lsp.semantic_tokens.is_enabled()*
+    查询 {filter} 所限定范围内是否启用了语义 token
+
+    参数：~
+      • {filter}  (`table?`) 可选筛选条件 |kwargs|，
+                  • {bufnr}? (`integer`，默认：全部) Buffer 编号，0 表示当前
+                    buffer，nil 表示全部。
+                  • {client_id}? (`integer`，默认：全部) 客户端 ID，nil 表示全部。
+
+
+==============================================================================
+Lua 模块：vim.lsp.util                                            *lsp-util*
+
+*vim.lsp.util.open_floating_preview.Opts*
+
+    字段：~
+      • {anchor_bias}?   (`'auto'|'above'|'below'`，默认：`'auto'`）调整相对于
+                         光标的位置。
+                         • "auto"：根据光标哪一侧有更多行来决定 window 的位置
+                         • "above"：把 window 放在光标上方，除非没有足够的行
+                           来显示完整的 window 高度。
+                         • "below"：把 window 放在光标下方，除非没有足够的行
+                           来显示完整的 window 高度。
+      • {border}?        (`string|(string|[string,string])[]`) 覆盖 `border`
+      • {close_events}?  (`table`) 用于关闭该 floating window 的事件列表
+      • {focus}?         (`boolean`，默认：`true`）如果为 `true`，且 {focusable}
+                         也为 `true`，则把焦点放到已有且 {focus_id} 相同的
+                         floating window 上
+      • {focus_id}?      (`string`) 如果打开了具有该 id 的弹窗，则让它获得焦点
+      • {focusable}?     (`boolean`，默认：`true`）使 floating window 可获得焦点。
+      • {height}?        (`integer`) floating window 的高度
+      • {max_height}?    (`integer`) floating window 的最大高度
+      • {max_width}?     (`integer`) floating window 的最大宽度
+      • {offset_x}?      (`integer`) 加到 `col` 上的偏移量
+      • {offset_y}?      (`integer`) 加到 `row` 上的偏移量
+      • {relative}?      (`'mouse'|'cursor'|'editor'`）（默认：`'cursor'`）
+      • {title}?         (`string|[string,string][]`)
+      • {title_pos}?     (`'left'|'center'|'right'`)
+      • {width}?         (`integer`) floating window 的宽度
+      • {wrap}?          (`boolean`，默认：`true`）对长行折行
+      • {wrap_at}?       (`integer`) 在启用折行时用于计算高度的折行字符位置
+      • {zindex}?        (`integer`) 覆盖 `zindex`，默认为 50
+
+
+                                     *vim.lsp.util.apply_text_document_edit()*
+apply_text_document_edit({text_document_edit}, {index}, {position_encoding},
+                         {change_annotations})
+    应用一个 `TextDocumentEdit`，即对单个文档的一串改动。
+
+    参数：~
+      • {text_document_edit}  (`lsp.TextDocumentEdit`)
+      • {index}               (`integer?`) 该编辑的可选索引（若来自一组编辑），
+                              否则为 nil
+      • {position_encoding}   (`'utf-8'|'utf-16'|'utf-32'?`)
+      • {change_annotations}  (`table<string, lsp.ChangeAnnotation>?`)
+
+    另见：~
+      • https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocumentEdit
+
+                                             *vim.lsp.util.apply_text_edits()*
+apply_text_edits({text_edits}, {bufnr}, {position_encoding},
+                 {change_annotations})
+    把一组文本编辑应用到某个 buffer。注意：这会改动 `text_edits`（就地排序并添加
+    `_index` 字段）。
+
+    参数：~
+      • {text_edits}          (`(lsp.TextEdit|lsp.AnnotatedTextEdit)[]`)
+      • {bufnr}               (`integer`) Buffer id
+      • {position_encoding}   (`'utf-8'|'utf-16'|'utf-32'`)
+      • {change_annotations}  (`table<string, lsp.ChangeAnnotation>?`)
+
+    另见：~
+      • https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textEdit
+
+                                         *vim.lsp.util.apply_workspace_edit()*
+apply_workspace_edit({workspace_edit}, {position_encoding})
+    应用一个 `WorkspaceEdit`。
+
+    参数：~
+      • {workspace_edit}     (`lsp.WorkspaceEdit`)
+      • {position_encoding}  (`'utf-8'|'utf-16'|'utf-32'`) （必需）
+
+    另见：~
+      • https://microsoft.github.io/language-server-protocol/specifications/specification-current/#workspace_applyEdit
+
+buf_clear_references({bufnr})            *vim.lsp.util.buf_clear_references()*
+    从某个 buffer 中移除文档高亮。
+
+    参数：~
+      • {bufnr}  (`integer?`) Buffer id
+
+                                     *vim.lsp.util.buf_highlight_references()*
+buf_highlight_references({bufnr}, {references}, {position_encoding})
+    为某个 buffer 显示一组文档高亮。
+
+    参数：~
+      • {bufnr}              (`integer`) Buffer id
+      • {references}         (`lsp.DocumentHighlight[]`) 要高亮的对象
+      • {position_encoding}  (`'utf-8'|'utf-16'|'utf-32'`)
+
+    另见：~
+      • https://microsoft.github.io/language-server-protocol/specification/#textDocumentContentChangeEvent
+
+                                             *vim.lsp.util.character_offset()*
+character_offset({buf}, {row}, {col}, {offset_encoding})
+    返回某个 buffer 中某个位置对应的 UTF-32 和 UTF-16 偏移量。
+
+    参数：~
+      • {buf}              (`integer`) buffer 编号（0 表示当前 buffer）
+      • {row}              (`integer`) 从 0 开始的行号
+      • {col}              (`integer`) 行内从 0 开始的字节偏移
+      • {offset_encoding}  (`'utf-8'|'utf-16'|'utf-32'?`) 默认为 `buf` 第一个
+                           客户端的 `offset_encoding`
+
+    返回值：~
+        (`integer`) buffer {buf} 中第 {row} 行第 {col} 列字符的
+        `offset_encoding` 索引
+
+                              *vim.lsp.util.convert_input_to_markdown_lines()*
+convert_input_to_markdown_lines({input}, {contents})
+    把 `MarkedString` | `MarkedString[]` | `MarkupContent` 中的任意一种转换为
+    若干行合法的 markdown。这可用于填充 `textDocument/hover` 的 hover window、解析
+    `textDocument/signatureHelp` 的结果，以及潜在的其他用途。
+
+    注意，如果输入的类型是 `MarkupContent` 且其 kind 为 `plaintext`，则原样返回
+    对应的值，不再做进一步修改。
+
+    参数：~
+      • {input}     (`lsp.MarkedString|lsp.MarkedString[]|lsp.MarkupContent`)
+      • {contents}  (`string[]?`) 用于追加转换后各行的字符串列表。默认为 {}。
+
+    返回值：~
+        (`string[]`) 追加了转换后 markdown 各行的列表。
+
+    另见：~
+      • https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_hover
+
+                     *vim.lsp.util.convert_signature_help_to_markdown_lines()*
+convert_signature_help_to_markdown_lines({signature_help}, {ft}, {triggers})
+    把 `textDocument/signatureHelp` 的响应转换为 markdown 行。
+
+    参数：~
+      • {signature_help}  (`lsp.SignatureHelp`) `textDocument/SignatureHelp` 的
+                          响应
+      • {ft}              (`string?`) 将用作标签 markdown 代码块 `lang` 的文件
+                          类型
+      • {triggers}        (`string[]?`) 来自 lsp 服务器的触发字符列表。用于更好地
+                          确定参数偏移
+
+    返回值（多个）：~
+        (`string[]?`) 转换后的 markdown 行。
+        (`Range4?`) 当前参数的高亮范围
+
+    另见：~
+      • https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_signatureHelp
+
+get_effective_tabstop({bufnr})          *vim.lsp.util.get_effective_tabstop()*
+    返回缩进宽度。
+
+    参数：~
+      • {bufnr}  (`integer?`) Buffer 句柄，默认为当前 buffer
+
+    返回值：~
+        (`integer`) 缩进宽度
+
+    另见：~
+      • 'shiftwidth'
+
+                                          *vim.lsp.util.locations_to_items()*
+locations_to_items({locations}, {position_encoding})
+    返回字节位置计算正确且已排序的条目，用于在 quickfix 和位置列表中显示。
+
+    每个结果条目的 `user_data` 字段会包含它所计算自的原始 `Location` 或
+    `LocationLink`。
+
+    可以把结果传给 |setqflist()| 或 |setloclist()| 的 {list} 参数。
+
+    参数：~
+      • {locations}          (`lsp.Location[]|lsp.LocationLink[]`)
+      • {position_encoding}  (`'utf-8'|'utf-16'|'utf-32'?`) 默认为该 buffer 的
+                             第一个客户端
+
+    返回值：~
+        (`vim.quickfix.entry[]`) 格式见 |setqflist()|
+
+                                  *vim.lsp.util.make_floating_popup_options()*
+make_floating_popup_options({width}, {height}, {opts})
+    创建一个含 floating window 合理默认选项的表。该表可以传给 |nvim_open_win()|。
+
+    参数：~
+      • {width}   (`integer`) window 宽度（以字符单元为单位）
+      • {height}  (`integer`) window 高度（以字符单元为单位）
+      • {opts}    (`vim.lsp.util.open_floating_preview.Opts?`) 见
+                  |vim.lsp.util.open_floating_preview.Opts|。
+
+    返回值：~
+        (`vim.api.keyset.win_config`)
+
+                                      *vim.lsp.util.make_formatting_params()*
+make_formatting_params({options})
+    为当前 buffer 和光标位置创建一个 `DocumentFormattingParams` 对象。
+
+    参数：~
+      • {options}  (`lsp.FormattingOptions?`) 含合法 `FormattingOptions` 条目
+
+    返回值：~
+        (`lsp.DocumentFormattingParams`) 对象
+
+    另见：~
+      • https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocument_formatting
+
+                                      *vim.lsp.util.make_given_range_params()*
+make_given_range_params({start_pos}, {end_pos}, {bufnr}, {position_encoding})
+    使用当前 buffer 中给定的范围，创建一个与
+    |vim.lsp.util.make_range_params()| 类似的对象。
+
+    参数：~
+      • {start_pos}          (`[integer,integer]?`) {row,col} 标记索引位置。默认
+                             为上次可视选区的起始处。
+      • {end_pos}            (`[integer,integer]?`) {row,col} 标记索引位置。默认
+                             为上次可视选区的末尾。
+      • {bufnr}              (`integer?`) buffer 句柄，0 表示当前 buffer，默认为
+                             当前 buffer
+      • {position_encoding}  (`'utf-8'|'utf-16'|'utf-32'`)
+
+    返回值：~
+        (`{ textDocument: { uri: lsp.DocumentUri }, range: lsp.Range }`)
+
+                                        *vim.lsp.util.make_position_params()*
+make_position_params({win}, {position_encoding})
+    为当前 buffer 和光标位置创建一个 `TextDocumentPositionParams` 对象。
+
+    参数：~
+      • {win}                (`integer?`) |window-ID|，0 表示当前 window，默认为
+                             当前 window
+      • {position_encoding}  (`'utf-8'|'utf-16'|'utf-32'`)
+
+    返回值：~
+        (`lsp.TextDocumentPositionParams`)
+
+    另见：~
+      • https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocumentPositionParams
+
+                                           *vim.lsp.util.make_range_params()*
+make_range_params({win}, {position_encoding})
+    使用当前 buffer 中的当前位置，创建一个可用作多种 LSP 请求（例如
+    `textDocument/codeAction`、`textDocument/colorPresentation`、
+    `textDocument/rangeFormatting`）构建块的对象。
+
+    参数：~
+      • {win}                (`integer?`) |window-ID|，0 表示当前 window，默认为
+                             当前 window
+      • {position_encoding}  (`"utf-8"|"utf-16"|"utf-32"`)
+
+    返回值：~
+        (`{ textDocument: { uri: lsp.DocumentUri }, range: lsp.Range }`)
+
+                                   *vim.lsp.util.make_text_document_params()*
+make_text_document_params({bufnr})
+    为当前 buffer 创建一个 `TextDocumentIdentifier` 对象。
+
+    参数：~
+      • {bufnr}  (`integer?`) Buffer 句柄，默认为当前 buffer
+
+    返回值：~
+        (`lsp.TextDocumentIdentifier`)
+
+    另见：~
+      • https://microsoft.github.io/language-server-protocol/specifications/specification-current/#textDocumentIdentifier
+
+                                       *vim.lsp.util.make_workspace_params()*
+make_workspace_params({added}, {removed})
+    创建工作区参数
+
+    参数：~
+      • {added}    (`lsp.WorkspaceFolder[]`)
+      • {removed}  (`lsp.WorkspaceFolder[]`)
+
+    返回值：~
+        (`lsp.DidChangeWorkspaceFoldersParams`)
+
+                                       *vim.lsp.util.open_floating_preview()*
+open_floating_preview({contents}, {syntax}, {opts})
+    在 floating window 中显示内容。
+
+    参数：~
+      • {contents}  (`table`) 要在 window 中显示的各行
+      • {syntax}    (`string`) 为所打开的 buffer 设置的语法
+      • {opts}      (`vim.lsp.util.open_floating_preview.Opts?`) 含可选字段
+                    （额外的键在传给 |nvim_open_win()| 之前会被
+                    |vim.lsp.util.make_floating_popup_options()| 过滤掉）。见
+                    |vim.lsp.util.open_floating_preview.Opts|。
+
+    返回值（多个）：~
+        (`integer`) 新建 float window 的 bufnr
+        (`integer`) 新建 float preview window 的 winid
+
+preview_location({location}, {opts})         *vim.lsp.util.preview_location()*
+    在 floating window 中预览某个位置
+
+    行为取决于位置类型：
+    • 对于 Location，显示其 range（例如函数定义）
+    • 对于 LocationLink，显示其 targetRange（例如函数定义的正文）
+
+    参数：~
+      • {location}  (`lsp.Location|lsp.LocationLink`)
+      • {opts}      (`vim.lsp.util.open_floating_preview.Opts?`) 见
+                    |vim.lsp.util.open_floating_preview.Opts|。
+
+    返回值（多个）：~
+        (`integer?`) float window 的 buffer id
+        (`integer?`) float window 的 window id
+
+rename({old_fname}, {new_fname}, {opts})               *vim.lsp.util.rename()*
+    把 old_fname 重命名为 new_fname
+
+    现有的 buffer 也会一并重命名，同时保持其 bufnr 不变。
+
+    只有当下列条件成立时，才会删除与重命名后文件名冲突的现有 buffer：
+    • `opts` 请求覆盖；或
+    • 冲突的 buffer 未被加载，因此删除它们不会造成数据丢失。
+
+    参数：~
+      • {old_fname}  (`string`)
+      • {new_fname}  (`string`)
+      • {opts}       (`table?`) 选项：
+                     • {ignoreIfExists}? (`boolean`)
+                     • {overwrite}? (`boolean`)
+
+                                               *vim.lsp.util.show_document()*
+show_document({location}, {position_encoding}, {opts})
+    显示文档，并可选地跳到该位置。
+
+    参数：~
+      • {location}           (`lsp.Location|lsp.LocationLink`)
+      • {position_encoding}  (`'utf-8'|'utf-16'|'utf-32'?`)
+      • {opts}               (`table?`) 含下列字段的表：
+                             • {focus}? (`boolean`) 是否在可能时把焦点移到/跳到
+                               该位置。（默认：true）
+                             • {reuse_win}? (`boolean`) 如果 buffer 已经打开，则
+                               跳转到已有的 window。
+
+    返回值：~
+        (`boolean`) `true` 表示成功
+
+                                            *vim.lsp.util.symbols_to_items()*
+symbols_to_items({symbols}, {bufnr}, {position_encoding})
+    把符号转换为 quickfix 列表条目。
+
+    参数：~
+      • {symbols}            (`lsp.DocumentSymbol[]|lsp.SymbolInformation[]|lsp.WorkspaceSymbol[]`)
+                             符号列表
+      • {bufnr}              (`integer?`) buffer 句柄，0 表示当前 buffer，默认为
+                             当前 buffer
+      • {position_encoding}  (`'utf-8'|'utf-16'|'utf-32'?`) 默认为该 buffer 的
+                             第一个客户端
+
+    返回值：~
+        (`vim.quickfix.entry[]`) 格式见 |setqflist()|
+
+
+==============================================================================
+Lua 模块：vim.lsp.protocol                                    *lsp-protocol*
+
+                                *vim.lsp.protocol.make_client_capabilities()*
+make_client_capabilities()
+    取得一个新的 ClientCapabilities 对象，描述 LSP 客户端具备的能力。
+
+    返回值：~
+        (`lsp.ClientCapabilities`)
+
+                                    *vim.lsp.protocol.resolve_capabilities()*
+resolve_capabilities({server_capabilities})
+    创建一个描述 LSP 服务器能力的规范化对象。
+
+    参数：~
+      • {server_capabilities}  (`table`) 该服务器所支持能力的表
+
+    返回值：~
+        (`lsp.ServerCapabilities?`) 规范化后的能力表
+
+
+ vim:tw=78:ts=8:sw=4:sts=4:et:ft=help:norl:

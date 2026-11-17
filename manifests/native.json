@@ -1,0 +1,1130 @@
+{
+  "schema_version": 1,
+  "notes": [
+    "Generated/maintained for nvim-zh; msgids in translations/native/*.po are copied verbatim from the pinned upstream catalog.",
+    "gaps = every entry in the pinned upstream catalog whose msgstr is empty; exemptions are gaps that upstream itself marks as “do not translate”.",
+    "repairs rebuild four msgids whose upstream extraction is truncated, using the pinned C sources as evidence."
+  ],
+  "upstream": {
+    "repository": "https://github.com/neovim/neovim",
+    "version": "0.12.6",
+    "commit": "779c36969e31080503be2dfccbcc3f999e289606",
+    "catalog": "src/nvim/po/zh_CN.UTF-8.po",
+    "sha256": "c653446d8b3eb572b81682f6b7b6975f87de92937d5f11546e1b5efa85aea308",
+    "bytes": 295080,
+    "messages": 1985,
+    "translated": 1855,
+    "untranslated": 130
+  },
+  "supplement": {
+    "po": "translations/native/zh_CN.po",
+    "entries": 118
+  },
+  "repairs": {
+    "po": "translations/native/runtime_repairs.po",
+    "entries": 4,
+    "upstream_msgids": [
+      "E5403: Chunk %i start %",
+      "E5405: Chunk %i start %",
+      "E5404: Chunk %i end %",
+      "E5406: Chunk %i end %"
+    ],
+    "runtime_msgids": [
+      "E5403: Chunk %i start %<PRIdVARNUMBER> not in range [%<PRIdVARNUMBER>, %i)",
+      "E5405: Chunk %i start %<PRIdVARNUMBER> splits multibyte character",
+      "E5404: Chunk %i end %<PRIdVARNUMBER> not in range (%<PRIdVARNUMBER>, %i]",
+      "E5406: Chunk %i end %<PRIdVARNUMBER> splits multibyte character"
+    ]
+  },
+  "exemptions": [
+    {
+      "msgid": "??? from here until ???END lines may be messed up",
+      "refs": [
+        "../memline.c:1038"
+      ],
+      "marker": "do not translate to avoid writing Chinese in files",
+      "reason": "内存/交换文件恢复文本中的结构标记，会被写入恢复输出并供人逐字比对；上游标注“避免把中文写进文件”。"
+    },
+    {
+      "msgid": "??? from here until ???END lines may have been inserted/deleted",
+      "refs": [
+        "../memline.c:1052"
+      ],
+      "marker": "do not translate to avoid writing Chinese in files",
+      "reason": "内存/交换文件恢复文本中的结构标记，会被写入恢复输出并供人逐字比对；上游标注“避免把中文写进文件”。"
+    },
+    {
+      "msgid": "???BLOCK MISSING",
+      "refs": [
+        "../memline.c:1028"
+      ],
+      "marker": "do not translate to avoid writing Chinese in files",
+      "reason": "内存/交换文件恢复文本中的结构标记，会被写入恢复输出并供人逐字比对；上游标注“避免把中文写进文件”。"
+    },
+    {
+      "msgid": "???EMPTY BLOCK",
+      "refs": [
+        "../memline.c:980"
+      ],
+      "marker": "do not translate to avoid writing Chinese in files",
+      "reason": "内存/交换文件恢复文本中的结构标记，会被写入恢复输出并供人逐字比对；上游标注“避免把中文写进文件”。"
+    },
+    {
+      "msgid": "???END",
+      "refs": [
+        "../memline.c:1071"
+      ],
+      "marker": "do not translate to avoid writing Chinese in files",
+      "reason": "内存/交换文件恢复文本中的结构标记，会被写入恢复输出并供人逐字比对；上游标注“避免把中文写进文件”。"
+    },
+    {
+      "msgid": "???LINE COUNT WRONG",
+      "refs": [
+        "../memline.c:974"
+      ],
+      "marker": "do not translate to avoid writing Chinese in files",
+      "reason": "内存/交换文件恢复文本中的结构标记，会被写入恢复输出并供人逐字比对；上游标注“避免把中文写进文件”。"
+    },
+    {
+      "msgid": "???LINES MISSING",
+      "refs": [
+        "../memline.c:1000"
+      ],
+      "marker": "do not translate to avoid writing Chinese in files",
+      "reason": "内存/交换文件恢复文本中的结构标记，会被写入恢复输出并供人逐字比对；上游标注“避免把中文写进文件”。"
+    },
+    {
+      "msgid": "???MANY LINES MISSING",
+      "refs": [
+        "../memline.c:962"
+      ],
+      "marker": "do not translate to avoid writing Chinese in files",
+      "reason": "内存/交换文件恢复文本中的结构标记，会被写入恢复输出并供人逐字比对；上游标注“避免把中文写进文件”。"
+    },
+    {
+      "msgid": "Oldval = \"%s\"",
+      "refs": [
+        "../debugger.c:109"
+      ],
+      "marker": "do not translate",
+      "reason": "调试器原始转储（变量旧值），保留英文以便与调试输出逐字对照。"
+    },
+    {
+      "msgid": "[Command Line]",
+      "refs": [
+        "../ex_getln.c:4223"
+      ],
+      "marker": "do not translate to avoid writing Chinese in files",
+      "reason": "命令行伪缓冲区的名字，可能被写入缓冲区名或文件，翻译会把中文写进文件。"
+    },
+    {
+      "msgid": "command line editing",
+      "refs": [
+        "../../../runtime/optwin.vim:1015"
+      ],
+      "marker": "do not translate to avoid writing Chinese in files",
+      "reason": "内存/交换文件恢复文本中的结构标记，会被写入恢复输出并供人逐字比对；上游标注“避免把中文写进文件”。"
+    },
+    {
+      "msgid": "dlerror = \"%s\"",
+      "refs": [
+        "../os/dl.c:53 ../os/dl.c:61"
+      ],
+      "marker": "do not translate",
+      "reason": "动态链接错误的系统原文转储，保留英文以便与系统/上游报错逐字对照。"
+    }
+  ],
+  "gaps": [
+    {
+      "msgid": "\nSee \":help startup-options\" for all options.\n",
+      "refs": [
+        "../main.c:2134"
+      ]
+    },
+    {
+      "msgid": "         [garbled strings (not nul terminated)]",
+      "refs": [
+        "../memline.c:1452"
+      ]
+    },
+    {
+      "msgid": "  --embed               Use stdin/stdout as a msgpack-rpc channel\n",
+      "refs": [
+        "../main.c:2127"
+      ]
+    },
+    {
+      "msgid": "  --remote[-subcommand] Execute commands remotely on a server\n",
+      "refs": [
+        "../main.c:2131"
+      ]
+    },
+    {
+      "msgid": "  --server <address>    Specify RPC server to send commands to\n",
+      "refs": [
+        "../main.c:2132"
+      ]
+    },
+    {
+      "msgid": "(+%<PRId64> for BOM)",
+      "refs": [
+        "../ops.c:5528"
+      ]
+    },
+    {
+      "msgid": "--embed conflicts with -es/-Es",
+      "refs": [
+        "../main.c:1388"
+      ]
+    },
+    {
+      "msgid": "??? from here until ???END lines may be messed up",
+      "refs": [
+        "../memline.c:1038"
+      ]
+    },
+    {
+      "msgid": "??? from here until ???END lines may have been inserted/deleted",
+      "refs": [
+        "../memline.c:1052"
+      ]
+    },
+    {
+      "msgid": "???BLOCK MISSING",
+      "refs": [
+        "../memline.c:1028"
+      ]
+    },
+    {
+      "msgid": "???EMPTY BLOCK",
+      "refs": [
+        "../memline.c:980"
+      ]
+    },
+    {
+      "msgid": "???END",
+      "refs": [
+        "../memline.c:1071"
+      ]
+    },
+    {
+      "msgid": "???LINE COUNT WRONG",
+      "refs": [
+        "../memline.c:974"
+      ]
+    },
+    {
+      "msgid": "???LINES MISSING",
+      "refs": [
+        "../memline.c:1000"
+      ]
+    },
+    {
+      "msgid": "???MANY LINES MISSING",
+      "refs": [
+        "../memline.c:962"
+      ]
+    },
+    {
+      "msgid": "API client (channel id %<PRIu64>)",
+      "refs": [
+        "../runtime.c:2224"
+      ]
+    },
+    {
+      "msgid": "Can't rename ShaDa file from %s to %s!",
+      "refs": [
+        "../shada.c:3124"
+      ]
+    },
+    {
+      "msgid": "Did not rename %s because %s does not look like a ShaDa file",
+      "refs": [
+        "../shada.c:3132"
+      ]
+    },
+    {
+      "msgid": "Did not rename %s to %s because there were errors during writing it",
+      "refs": [
+        "../shada.c:3135"
+      ]
+    },
+    {
+      "msgid": "Do not forget to remove %s or rename it manually to %s.",
+      "refs": [
+        "../shada.c:3141"
+      ]
+    },
+    {
+      "msgid": "E138: All %s.tmp.X files exist, cannot write ShaDa file!",
+      "refs": [
+        "../shada.c:3021"
+      ]
+    },
+    {
+      "msgid": "E1502: Lua failed to grow stack to %i",
+      "refs": [
+        "../lua/converter.c:68 ../lua/converter.c:204 ../lua/converter.c:621"
+      ]
+    },
+    {
+      "msgid": "E15: Arrow outside of lambda: %.*s",
+      "refs": [
+        "../viml/parser/expressions.c:2707"
+      ]
+    },
+    {
+      "msgid": "E15: Cannot concatenate in assignments: %.*s",
+      "refs": [
+        "../viml/parser/expressions.c:2791"
+      ]
+    },
+    {
+      "msgid": "E15: Colon outside of dictionary or ternary operator: %.*s",
+      "refs": [
+        "../viml/parser/expressions.c:2404"
+      ]
+    },
+    {
+      "msgid": "E15: Comma outside of call, lambda or literal: %.*s",
+      "refs": [
+        "../viml/parser/expressions.c:2320"
+      ]
+    },
+    {
+      "msgid": "E15: Don't know what figure brace means: %.*s",
+      "refs": [
+        "../viml/parser/expressions.c:2587"
+      ]
+    },
+    {
+      "msgid": "E15: Expected assignment operator or subscript: %.*s",
+      "refs": [
+        "../viml/parser/expressions.c:2120"
+      ]
+    },
+    {
+      "msgid": "E15: Expected lambda arguments list or arrow: %.*s",
+      "refs": [
+        "../viml/parser/expressions.c:2081"
+      ]
+    },
+    {
+      "msgid": "E15: Expected value part of assignment lvalue: %.*s",
+      "refs": [
+        "../viml/parser/expressions.c:2101"
+      ]
+    },
+    {
+      "msgid": "E15: Expected value, got EOC: %.*s",
+      "refs": [
+        "../viml/parser/expressions.c:2965"
+      ]
+    },
+    {
+      "msgid": "E15: Expected value, got closing bracket: %.*s",
+      "refs": [
+        "../viml/parser/expressions.c:2451"
+      ]
+    },
+    {
+      "msgid": "E15: Expected value, got closing figure brace: %.*s",
+      "refs": [
+        "../viml/parser/expressions.c:2557"
+      ]
+    },
+    {
+      "msgid": "E15: Expected value, got comma: %.*s",
+      "refs": [
+        "../viml/parser/expressions.c:2286"
+      ]
+    },
+    {
+      "msgid": "E15: Expected value, got comparison operator: %.*s",
+      "refs": [
+        "../viml/parser/expressions.c:2259"
+      ]
+    },
+    {
+      "msgid": "E15: Expected value, got parenthesis: %.*s",
+      "refs": [
+        "../viml/parser/expressions.c:2813"
+      ]
+    },
+    {
+      "msgid": "E15: Expected value, got question mark: %.*s",
+      "refs": [
+        "../viml/parser/expressions.c:2889"
+      ]
+    },
+    {
+      "msgid": "E15: Invalid control character present in input: %.*s",
+      "refs": [
+        "../viml/parser/expressions.c:292"
+      ]
+    },
+    {
+      "msgid": "E15: Misplaced assignment: %.*s",
+      "refs": [
+        "../viml/parser/expressions.c:2934"
+      ]
+    },
+    {
+      "msgid": "E15: Missing closing figure brace for lambda: %.*s",
+      "refs": [
+        "../viml/parser/expressions.c:3018"
+      ]
+    },
+    {
+      "msgid": "E15: Missing closing figure brace: %.*s",
+      "refs": [
+        "../viml/parser/expressions.c:3013"
+      ]
+    },
+    {
+      "msgid": "E15: Missing operator: %.*s",
+      "refs": [
+        "../viml/parser/expressions.c:1440"
+      ]
+    },
+    {
+      "msgid": "E15: Operator is not associative: %.*s",
+      "refs": [
+        "../viml/parser/expressions.c:1335"
+      ]
+    },
+    {
+      "msgid": "E15: Unexpected ",
+      "refs": [
+        "../viml/parser/expressions.c:2171"
+      ]
+    },
+    {
+      "msgid": "E15: Unexpected EOC character: %.*s",
+      "refs": [
+        "../viml/parser/expressions.c:678 ../viml/parser/expressions.c:694"
+      ]
+    },
+    {
+      "msgid": "E15: Unexpected arrow: %.*s",
+      "refs": [
+        "../viml/parser/expressions.c:2706"
+      ]
+    },
+    {
+      "msgid": "E15: Unexpected assignment: %.*s",
+      "refs": [
+        "../viml/parser/expressions.c:2938"
+      ]
+    },
+    {
+      "msgid": "E15: Unexpected closing figure brace: %.*s",
+      "refs": [
+        "../viml/parser/expressions.c:2474 ../viml/parser/expressions.c:2609"
+      ]
+    },
+    {
+      "msgid": "E15: Unexpected closing parenthesis: %.*s",
+      "refs": [
+        "../viml/parser/expressions.c:2846"
+      ]
+    },
+    {
+      "msgid": "E15: Unexpected dot: %.*s",
+      "refs": [
+        "../viml/parser/expressions.c:2788"
+      ]
+    },
+    {
+      "msgid": "E15: Unexpected multiplication-like operator: %.*s",
+      "refs": [
+        "../viml/parser/expressions.c:2181"
+      ]
+    },
+    {
+      "msgid": "E15: Unidentified character: %.*s",
+      "refs": [
+        "../viml/parser/expressions.c:706"
+      ]
+    },
+    {
+      "msgid": "E474: Error while dumping %s, %s: attempt to dump function reference",
+      "refs": [
+        "../eval/encode.c:752"
+      ]
+    },
+    {
+      "msgid": "E474: Expected string end: %.*s",
+      "refs": [
+        "../eval/decode.c:409"
+      ]
+    },
+    {
+      "msgid": "E474: Failed to convert list to msgpack string buffer",
+      "refs": [
+        "../context.c:335"
+      ]
+    },
+    {
+      "msgid": "E474: List item %d is either not a dictionary or an empty one",
+      "refs": [
+        "../match.c:978"
+      ]
+    },
+    {
+      "msgid": "E474: List item %d is missing one of the required keys",
+      "refs": [
+        "../match.c:987"
+      ]
+    },
+    {
+      "msgid": "E474: Only UTF-8 code points up to U+10FFFF are allowed to appear unescaped: %.*s",
+      "refs": [
+        "../eval/decode.c:398"
+      ]
+    },
+    {
+      "msgid": "E475: Expected closing bracket to end list assignment lvalue: %.*s",
+      "refs": [
+        "../viml/parser/expressions.c:2931"
+      ]
+    },
+    {
+      "msgid": "E475: Nested lists not allowed when assigning: %.*s",
+      "refs": [
+        "../viml/parser/expressions.c:2507"
+      ]
+    },
+    {
+      "msgid": "E482: Can't open file %s for writing: %s",
+      "refs": [
+        "../eval/funcs.c:10072"
+      ]
+    },
+    {
+      "msgid": "E5030: Empty list at position %d",
+      "refs": [
+        "../match.c:140"
+      ]
+    },
+    {
+      "msgid": "E5100: Cannot convert given lua table: table should either have a sequence of positive integer keys or contain only string keys",
+      "refs": [
+        "../lua/converter.c:380"
+      ]
+    },
+    {
+      "msgid": "E5101: Cannot convert given lua type",
+      "refs": [
+        "../lua/converter.c:409 ../lua/converter.c:415"
+      ]
+    },
+    {
+      "msgid": "E5102: Lua failed to grow stack to %i",
+      "refs": [
+        "../lua/converter.c:509 ../lua/converter.c:532"
+      ]
+    },
+    {
+      "msgid": "E5114: Error while converting print argument #%i: %.*s",
+      "refs": [
+        "../lua/executor.c:972"
+      ]
+    },
+    {
+      "msgid": "E513: write error, conversion failed in line %",
+      "refs": [
+        "../fileio.c:3369"
+      ]
+    },
+    {
+      "msgid": "E5210: dict key '%s' already set for buffered stream in channel %<PRIu64>",
+      "refs": [
+        "../globals.h:898"
+      ]
+    },
+    {
+      "msgid": "E5402: List item %i has incorrect length: %d /= 3",
+      "refs": [
+        "../ex_getln.c:3001"
+      ]
+    },
+    {
+      "msgid": "E5403: Chunk %i start %",
+      "refs": [
+        "../ex_getln.c:3011"
+      ]
+    },
+    {
+      "msgid": "E5404: Chunk %i end %",
+      "refs": [
+        "../ex_getln.c:3032"
+      ]
+    },
+    {
+      "msgid": "E5405: Chunk %i start %",
+      "refs": [
+        "../ex_getln.c:3016"
+      ]
+    },
+    {
+      "msgid": "E5406: Chunk %i end %",
+      "refs": [
+        "../ex_getln.c:3039"
+      ]
+    },
+    {
+      "msgid": "E5407: Callback has thrown an exception: %s",
+      "refs": [
+        "../ex_getln.c:2973"
+      ]
+    },
+    {
+      "msgid": "E5408: Unable to get g:Nvim_color_cmdline callback: %s",
+      "refs": [
+        "../ex_getln.c:2939"
+      ]
+    },
+    {
+      "msgid": "E5422: Conflicting configs: \"%s\" \"%s\"",
+      "refs": [
+        "../main.c:1916"
+      ]
+    },
+    {
+      "msgid": "E5521: <Cmd> mapping must end with <CR> before second <Cmd>",
+      "refs": [
+        "../globals.h:998"
+      ]
+    },
+    {
+      "msgid": "E5555: API call: %s",
+      "refs": [
+        "../globals.h:1000"
+      ]
+    },
+    {
+      "msgid": "E5602: Cannot exchange or rotate float",
+      "refs": [
+        "../globals.h:1005"
+      ]
+    },
+    {
+      "msgid": "E5700: Expression from 'spellsuggest' must yield lists with exactly two values",
+      "refs": [
+        "../eval.c:1095"
+      ]
+    },
+    {
+      "msgid": "E5767: Cannot use :undo! to redo or move to a different undo branch",
+      "refs": [
+        "../globals.h:1018"
+      ]
+    },
+    {
+      "msgid": "E6000: Argument is not a function or function name",
+      "refs": [
+        "../eval/typval.c:2198"
+      ]
+    },
+    {
+      "msgid": "E676: No matching autocommands for buftype=%s buffer",
+      "refs": [
+        "../fileio.c:128"
+      ]
+    },
+    {
+      "msgid": "E685: internal error: while converting number \"%.*s\" to float string2float consumed %zu bytes in place of %zu",
+      "refs": [
+        "../eval/decode.c:602"
+      ]
+    },
+    {
+      "msgid": "E685: internal error: while converting number \"%.*s\" to integer vim_str2nr consumed %i bytes in place of %zu",
+      "refs": [
+        "../eval/decode.c:613"
+      ]
+    },
+    {
+      "msgid": "E724: unable to correctly dump variable with self-referencing container",
+      "refs": [
+        "../eval/encode.c:453 ../eval/encode.c:533"
+      ]
+    },
+    {
+      "msgid": "Error executing  vim.on_key Lua callback: %.*s",
+      "refs": [
+        "../lua/executor.c:1928"
+      ]
+    },
+    {
+      "msgid": "Error executing Lua callback: %.*s",
+      "refs": [
+        "../lua/executor.c:2149"
+      ]
+    },
+    {
+      "msgid": "Error executing lua callback: %.*s",
+      "refs": [
+        "../lua/executor.c:1539"
+      ]
+    },
+    {
+      "msgid": "Error executing vim._expand_pat: %.*s",
+      "refs": [
+        "../lua/executor.c:1791"
+      ]
+    },
+    {
+      "msgid": "Error executing vim.schedule lua callback: %.*s",
+      "refs": [
+        "../lua/executor.c:333"
+      ]
+    },
+    {
+      "msgid": "Error while reading ShaDa file: buffer list at position %<PRIu64> contains entry that does not have a file name",
+      "refs": [
+        "../shada.c:3955"
+      ]
+    },
+    {
+      "msgid": "Error while reading ShaDa file: buffer list at position %<PRIu64> contains entry that is not a dictionary",
+      "refs": [
+        "../shada.c:3914"
+      ]
+    },
+    {
+      "msgid": "Error while reading ShaDa file: buffer list at position %<PRIu64> contains entry with invalid column number",
+      "refs": [
+        "../shada.c:3948"
+      ]
+    },
+    {
+      "msgid": "Error while reading ShaDa file: buffer list at position %<PRIu64> contains entry with invalid line number",
+      "refs": [
+        "../shada.c:3941"
+      ]
+    },
+    {
+      "msgid": "Error while reading ShaDa file: expected positive integer at position %<PRIu64>",
+      "refs": [
+        "../shada.c:3335"
+      ]
+    },
+    {
+      "msgid": "Error while reading ShaDa file: expected positive integer at position %<PRIu64>, but got nothing",
+      "refs": [
+        "../shada.c:3308"
+      ]
+    },
+    {
+      "msgid": "Error while reading ShaDa file: last entry specified that it occupies %<PRIu64> bytes, but file ended earlier",
+      "refs": [
+        "../shada.c:725 ../shada.c:3271"
+      ]
+    },
+    {
+      "msgid": "Error while reading ShaDa file: there is an item at position %<PRIu64> that is stated to be too long",
+      "refs": [
+        "../shada.c:3530"
+      ]
+    },
+    {
+      "msgid": "Error while reading ShaDa file: there is an item at position %<PRIu64> that must not be there: Missing items are for internal uses only",
+      "refs": [
+        "../shada.c:3544"
+      ]
+    },
+    {
+      "msgid": "Failed to create directory %s for writing ShaDa file: %s",
+      "refs": [
+        "../shada.c:3047"
+      ]
+    },
+    {
+      "msgid": "Failed to parse ShaDa file due to a msgpack parser error at position %<PRIu64>",
+      "refs": [
+        "../shada.c:1914"
+      ]
+    },
+    {
+      "msgid": "Failed to parse ShaDa file: extra bytes in msgpack string at position %<PRIu64>",
+      "refs": [
+        "../shada.c:1936"
+      ]
+    },
+    {
+      "msgid": "Failed to parse ShaDa file: incomplete msgpack string at position %<PRIu64>",
+      "refs": [
+        "../shada.c:1929"
+      ]
+    },
+    {
+      "msgid": "Failed to write variable %s",
+      "refs": [
+        "../shada.c:1625"
+      ]
+    },
+    {
+      "msgid": "Oldval = \"%s\"",
+      "refs": [
+        "../debugger.c:109"
+      ]
+    },
+    {
+      "msgid": "System error while closing ShaDa file: %s",
+      "refs": [
+        "../shada.c:770"
+      ]
+    },
+    {
+      "msgid": "System error while opening ShaDa file %s for reading to merge before writing it: %s",
+      "refs": [
+        "../shada.c:2989"
+      ]
+    },
+    {
+      "msgid": "System error while opening ShaDa file %s for reading: %s",
+      "refs": [
+        "../shada.c:852"
+      ]
+    },
+    {
+      "msgid": "System error while opening ShaDa file %s for writing: %s",
+      "refs": [
+        "../shada.c:3061"
+      ]
+    },
+    {
+      "msgid": "System error while opening temporary ShaDa file %s for writing: %s",
+      "refs": [
+        "../shada.c:3032"
+      ]
+    },
+    {
+      "msgid": "System error while reading ShaDa file: %s",
+      "refs": [
+        "../shada.c:3267"
+      ]
+    },
+    {
+      "msgid": "System error while reading integer from ShaDa file: %s",
+      "refs": [
+        "../shada.c:3304"
+      ]
+    },
+    {
+      "msgid": "System error while skipping in ShaDa file: %s",
+      "refs": [
+        "../shada.c:721"
+      ]
+    },
+    {
+      "msgid": "System error while writing ShaDa file: %s",
+      "refs": [
+        "../shada.c:805"
+      ]
+    },
+    {
+      "msgid": "[Command Line]",
+      "refs": [
+        "../ex_getln.c:4223"
+      ]
+    },
+    {
+      "msgid": "additional data of ShaDa ",
+      "refs": [
+        "../shada.c:1556"
+      ]
+    },
+    {
+      "msgid": "additional elements of ShaDa ",
+      "refs": [
+        "../shada.c:1536"
+      ]
+    },
+    {
+      "msgid": "anonymous :source",
+      "refs": [
+        "../runtime.c:2227"
+      ]
+    },
+    {
+      "msgid": "anonymous :source (script id %d)",
+      "refs": [
+        "../runtime.c:2231"
+      ]
+    },
+    {
+      "msgid": "can only be opened in headless mode",
+      "refs": [
+        "../channel.c:499"
+      ]
+    },
+    {
+      "msgid": "command line editing",
+      "refs": [
+        "../../../runtime/optwin.vim:1015"
+      ]
+    },
+    {
+      "msgid": "determines scroll behavior for split windows",
+      "refs": [
+        "../../../runtime/optwin.vim:493"
+      ]
+    },
+    {
+      "msgid": "dlerror = \"%s\"",
+      "refs": [
+        "../os/dl.c:53 ../os/dl.c:61"
+      ]
+    },
+    {
+      "msgid": "itself",
+      "refs": [
+        "../eval/encode.c:203"
+      ]
+    },
+    {
+      "msgid": "key %s",
+      "refs": [
+        "../eval/encode.c:123"
+      ]
+    },
+    {
+      "msgid": "key %s at index %i from special map",
+      "refs": [
+        "../eval/encode.c:124"
+      ]
+    },
+    {
+      "msgid": "last line in the file followed by CTRL-Z",
+      "refs": [
+        "../../../runtime/optwin.vim:959"
+      ]
+    },
+    {
+      "msgid": "partial self dictionary",
+      "refs": [
+        "../eval/encode.c:128"
+      ]
+    },
+    {
+      "msgid": "too few bytes read",
+      "refs": [
+        "../shada.c:699"
+      ]
+    }
+  ],
+  "prefix_repairs": [
+    {
+      "upstream_msgid": "Can't rename ShaDa file from %s to %s!",
+      "prefix": "E136: ",
+      "runtime_literal": "E136: Can't rename ShaDa file from %s to %s!",
+      "evidence": "编译产物中同时存在带前缀的字面量 E136: …（audit binary_sha256=d308f10e416aec90…）；上游 po 只记录无前缀 msgid，调用点在运行时按带前缀的键查询，故需补一条同前缀条目才能生效。"
+    },
+    {
+      "upstream_msgid": "Did not rename %s because %s does not look like a ShaDa file",
+      "prefix": "E136: ",
+      "runtime_literal": "E136: Did not rename %s because %s does not look like a ShaDa file",
+      "evidence": "编译产物中同时存在带前缀的字面量 E136: …（audit binary_sha256=d308f10e416aec90…）；上游 po 只记录无前缀 msgid，调用点在运行时按带前缀的键查询，故需补一条同前缀条目才能生效。"
+    },
+    {
+      "upstream_msgid": "Did not rename %s to %s because there were errors during writing it",
+      "prefix": "E136: ",
+      "runtime_literal": "E136: Did not rename %s to %s because there were errors during writing it",
+      "evidence": "编译产物中同时存在带前缀的字面量 E136: …（audit binary_sha256=d308f10e416aec90…）；上游 po 只记录无前缀 msgid，调用点在运行时按带前缀的键查询，故需补一条同前缀条目才能生效。"
+    },
+    {
+      "upstream_msgid": "Do not forget to remove %s or rename it manually to %s.",
+      "prefix": "E136: ",
+      "runtime_literal": "E136: Do not forget to remove %s or rename it manually to %s.",
+      "evidence": "编译产物中同时存在带前缀的字面量 E136: …（audit binary_sha256=d308f10e416aec90…）；上游 po 只记录无前缀 msgid，调用点在运行时按带前缀的键查询，故需补一条同前缀条目才能生效。"
+    },
+    {
+      "upstream_msgid": "Error while reading ShaDa file: buffer list at position %<PRIu64> contains entry that does not have a file name",
+      "prefix": "E575: ",
+      "runtime_literal": "E575: Error while reading ShaDa file: buffer list at position %lu contains entry that does not have a file name",
+      "evidence": "编译产物中同时存在带前缀的字面量 E575: …（audit binary_sha256=d308f10e416aec90…）；上游 po 只记录无前缀 msgid，调用点在运行时按带前缀的键查询，故需补一条同前缀条目才能生效。"
+    },
+    {
+      "upstream_msgid": "Error while reading ShaDa file: buffer list at position %<PRIu64> contains entry with invalid column number",
+      "prefix": "E575: ",
+      "runtime_literal": "E575: Error while reading ShaDa file: buffer list at position %lu contains entry with invalid column number",
+      "evidence": "编译产物中同时存在带前缀的字面量 E575: …（audit binary_sha256=d308f10e416aec90…）；上游 po 只记录无前缀 msgid，调用点在运行时按带前缀的键查询，故需补一条同前缀条目才能生效。"
+    },
+    {
+      "upstream_msgid": "Error while reading ShaDa file: buffer list at position %<PRIu64> contains entry with invalid line number",
+      "prefix": "E575: ",
+      "runtime_literal": "E575: Error while reading ShaDa file: buffer list at position %lu contains entry with invalid line number",
+      "evidence": "编译产物中同时存在带前缀的字面量 E575: …（audit binary_sha256=d308f10e416aec90…）；上游 po 只记录无前缀 msgid，调用点在运行时按带前缀的键查询，故需补一条同前缀条目才能生效。"
+    },
+    {
+      "upstream_msgid": "Error while reading ShaDa file: expected positive integer at position %<PRIu64>",
+      "prefix": "E576: ",
+      "runtime_literal": "E576: Error while reading ShaDa file: expected positive integer at position %lu",
+      "evidence": "编译产物中同时存在带前缀的字面量 E576: …（audit binary_sha256=d308f10e416aec90…）；上游 po 只记录无前缀 msgid，调用点在运行时按带前缀的键查询，故需补一条同前缀条目才能生效。"
+    },
+    {
+      "upstream_msgid": "Error while reading ShaDa file: expected positive integer at position %<PRIu64>, but got nothing",
+      "prefix": "E576: ",
+      "runtime_literal": "E576: Error while reading ShaDa file: expected positive integer at position %lu, but got nothing",
+      "evidence": "编译产物中同时存在带前缀的字面量 E576: …（audit binary_sha256=d308f10e416aec90…）；上游 po 只记录无前缀 msgid，调用点在运行时按带前缀的键查询，故需补一条同前缀条目才能生效。"
+    },
+    {
+      "upstream_msgid": "Error while reading ShaDa file: last entry specified that it occupies %<PRIu64> bytes, but file ended earlier",
+      "prefix": "E576: ",
+      "runtime_literal": "E576: Error while reading ShaDa file: last entry specified that it occupies %lu bytes, but file ended earlier",
+      "evidence": "编译产物中同时存在带前缀的字面量 E576: …（audit binary_sha256=d308f10e416aec90…）；上游 po 只记录无前缀 msgid，调用点在运行时按带前缀的键查询，故需补一条同前缀条目才能生效。"
+    },
+    {
+      "upstream_msgid": "Error while reading ShaDa file: there is an item at position %<PRIu64> that is stated to be too long",
+      "prefix": "E576: ",
+      "runtime_literal": "E576: Error while reading ShaDa file: there is an item at position %lu that is stated to be too long",
+      "evidence": "编译产物中同时存在带前缀的字面量 E576: …（audit binary_sha256=d308f10e416aec90…）；上游 po 只记录无前缀 msgid，调用点在运行时按带前缀的键查询，故需补一条同前缀条目才能生效。"
+    },
+    {
+      "upstream_msgid": "Error while reading ShaDa file: there is an item at position %<PRIu64> that must not be there: Missing items are for internal uses only",
+      "prefix": "E576: ",
+      "runtime_literal": "E576: Error while reading ShaDa file: there is an item at position %lu that must not be there: Missing items are for internal uses only",
+      "evidence": "编译产物中同时存在带前缀的字面量 E576: …（audit binary_sha256=d308f10e416aec90…）；上游 po 只记录无前缀 msgid，调用点在运行时按带前缀的键查询，故需补一条同前缀条目才能生效。"
+    },
+    {
+      "upstream_msgid": "Failed to create directory %s for writing ShaDa file: %s",
+      "prefix": "E886: ",
+      "runtime_literal": "E886: Failed to create directory %s for writing ShaDa file: %s",
+      "evidence": "编译产物中同时存在带前缀的字面量 E886: …（audit binary_sha256=d308f10e416aec90…）；上游 po 只记录无前缀 msgid，调用点在运行时按带前缀的键查询，故需补一条同前缀条目才能生效。"
+    },
+    {
+      "upstream_msgid": "Failed to parse ShaDa file due to a msgpack parser error at position %<PRIu64>",
+      "prefix": "E576: ",
+      "runtime_literal": "E576: Failed to parse ShaDa file due to a msgpack parser error at position %lu",
+      "evidence": "编译产物中同时存在带前缀的字面量 E576: …（audit binary_sha256=d308f10e416aec90…）；上游 po 只记录无前缀 msgid，调用点在运行时按带前缀的键查询，故需补一条同前缀条目才能生效。"
+    },
+    {
+      "upstream_msgid": "Failed to parse ShaDa file: extra bytes in msgpack string at position %<PRIu64>",
+      "prefix": "E576: ",
+      "runtime_literal": "E576: Failed to parse ShaDa file: extra bytes in msgpack string at position %lu",
+      "evidence": "编译产物中同时存在带前缀的字面量 E576: …（audit binary_sha256=d308f10e416aec90…）；上游 po 只记录无前缀 msgid，调用点在运行时按带前缀的键查询，故需补一条同前缀条目才能生效。"
+    },
+    {
+      "upstream_msgid": "Failed to parse ShaDa file: incomplete msgpack string at position %<PRIu64>",
+      "prefix": "E576: ",
+      "runtime_literal": "E576: Failed to parse ShaDa file: incomplete msgpack string at position %lu",
+      "evidence": "编译产物中同时存在带前缀的字面量 E576: …（audit binary_sha256=d308f10e416aec90…）；上游 po 只记录无前缀 msgid，调用点在运行时按带前缀的键查询，故需补一条同前缀条目才能生效。"
+    },
+    {
+      "upstream_msgid": "Failed to write variable %s",
+      "prefix": "E574: ",
+      "runtime_literal": "E574: Failed to write variable %s",
+      "evidence": "编译产物中同时存在带前缀的字面量 E574: …（audit binary_sha256=d308f10e416aec90…）；上游 po 只记录无前缀 msgid，调用点在运行时按带前缀的键查询，故需补一条同前缀条目才能生效。"
+    },
+    {
+      "upstream_msgid": "System error while closing ShaDa file: %s",
+      "prefix": "E886: ",
+      "runtime_literal": "E886: System error while closing ShaDa file: %s",
+      "evidence": "编译产物中同时存在带前缀的字面量 E886: …（audit binary_sha256=d308f10e416aec90…）；上游 po 只记录无前缀 msgid，调用点在运行时按带前缀的键查询，故需补一条同前缀条目才能生效。"
+    },
+    {
+      "upstream_msgid": "System error while opening ShaDa file %s for reading to merge before writing it: %s",
+      "prefix": "E886: ",
+      "runtime_literal": "E886: System error while opening ShaDa file %s for reading to merge before writing it: %s",
+      "evidence": "编译产物中同时存在带前缀的字面量 E886: …（audit binary_sha256=d308f10e416aec90…）；上游 po 只记录无前缀 msgid，调用点在运行时按带前缀的键查询，故需补一条同前缀条目才能生效。"
+    },
+    {
+      "upstream_msgid": "System error while opening ShaDa file %s for reading: %s",
+      "prefix": "E886: ",
+      "runtime_literal": "E886: System error while opening ShaDa file %s for reading: %s",
+      "evidence": "编译产物中同时存在带前缀的字面量 E886: …（audit binary_sha256=d308f10e416aec90…）；上游 po 只记录无前缀 msgid，调用点在运行时按带前缀的键查询，故需补一条同前缀条目才能生效。"
+    },
+    {
+      "upstream_msgid": "System error while opening ShaDa file %s for writing: %s",
+      "prefix": "E886: ",
+      "runtime_literal": "E886: System error while opening ShaDa file %s for writing: %s",
+      "evidence": "编译产物中同时存在带前缀的字面量 E886: …（audit binary_sha256=d308f10e416aec90…）；上游 po 只记录无前缀 msgid，调用点在运行时按带前缀的键查询，故需补一条同前缀条目才能生效。"
+    },
+    {
+      "upstream_msgid": "System error while opening temporary ShaDa file %s for writing: %s",
+      "prefix": "E886: ",
+      "runtime_literal": "E886: System error while opening temporary ShaDa file %s for writing: %s",
+      "evidence": "编译产物中同时存在带前缀的字面量 E886: …（audit binary_sha256=d308f10e416aec90…）；上游 po 只记录无前缀 msgid，调用点在运行时按带前缀的键查询，故需补一条同前缀条目才能生效。"
+    },
+    {
+      "upstream_msgid": "System error while reading ShaDa file: %s",
+      "prefix": "E886: ",
+      "runtime_literal": "E886: System error while reading ShaDa file: %s",
+      "evidence": "编译产物中同时存在带前缀的字面量 E886: …（audit binary_sha256=d308f10e416aec90…）；上游 po 只记录无前缀 msgid，调用点在运行时按带前缀的键查询，故需补一条同前缀条目才能生效。"
+    },
+    {
+      "upstream_msgid": "System error while reading integer from ShaDa file: %s",
+      "prefix": "E886: ",
+      "runtime_literal": "E886: System error while reading integer from ShaDa file: %s",
+      "evidence": "编译产物中同时存在带前缀的字面量 E886: …（audit binary_sha256=d308f10e416aec90…）；上游 po 只记录无前缀 msgid，调用点在运行时按带前缀的键查询，故需补一条同前缀条目才能生效。"
+    },
+    {
+      "upstream_msgid": "System error while skipping in ShaDa file: %s",
+      "prefix": "E886: ",
+      "runtime_literal": "E886: System error while skipping in ShaDa file: %s",
+      "evidence": "编译产物中同时存在带前缀的字面量 E886: …（audit binary_sha256=d308f10e416aec90…）；上游 po 只记录无前缀 msgid，调用点在运行时按带前缀的键查询，故需补一条同前缀条目才能生效。"
+    }
+  ],
+  "runtime_audit": {
+    "binary": "/usr/sbin/nvim",
+    "binary_sha256": "d308f10e416aec90c8794a7a10174777b8262076fc9d5aa3db043fd86e260531",
+    "runtime": "/usr/share/nvim/runtime",
+    "entries": 118,
+    "bare_only": 76,
+    "bare_and_prefixed": 25,
+    "prefixed_only": 0,
+    "runtime_file": 2,
+    "runtime_file_msgids": [
+      "determines scroll behavior for split windows",
+      "last line in the file followed by CTRL-Z"
+    ],
+    "unverified": 15,
+    "unverified_msgids": [
+      "E513: write error, conversion failed in line %",
+      "E5521: <Cmd> mapping must end with <CR> before second <Cmd>",
+      "E5100: Cannot convert given lua table: table should either have a sequence of positive integer keys or contain only string keys",
+      "E5101: Cannot convert given lua type",
+      "Error executing vim.schedule lua callback: %.*s",
+      "E5114: Error while converting print argument #%i: %.*s",
+      "Error executing lua callback: %.*s",
+      "Error executing vim._expand_pat: %.*s",
+      "Error executing  vim.on_key Lua callback: %.*s",
+      "Error executing Lua callback: %.*s",
+      "  --server <address>    Specify RPC server to send commands to\n",
+      "System error while writing ShaDa file: %s",
+      "additional elements of ShaDa ",
+      "additional data of ShaDa ",
+      "Error while reading ShaDa file: buffer list at position %<PRIu64> contains entry that is not a dictionary"
+    ],
+    "stale_upstream_msgids": [
+      {
+        "upstream_msgid": "E5100: Cannot convert given lua table: table should either have a sequence of positive integer keys or contain only string keys",
+        "runtime_literal": "E5100: Cannot convert given Lua table: table should contain either only integer keys or only string keys",
+        "note": "上游 po 的 msgid 与固定二进制中的运行时字面量措辞/大小写不一致，按上游键查询不会命中；需要上游更新 po，或在下游增加运行时键条目。"
+      },
+      {
+        "upstream_msgid": "E5101: Cannot convert given lua type",
+        "runtime_literal": "E5101: Cannot convert given Lua type",
+        "note": "上游 po 的 msgid 与固定二进制中的运行时字面量措辞/大小写不一致，按上游键查询不会命中；需要上游更新 po，或在下游增加运行时键条目。"
+      },
+      {
+        "upstream_msgid": "E5114: Error while converting print argument #%i: %.*s",
+        "runtime_literal": "E5114: Converting print argument #%i: %.*s",
+        "note": "上游 po 的 msgid 与固定二进制中的运行时字面量措辞/大小写不一致，按上游键查询不会命中；需要上游更新 po，或在下游增加运行时键条目。"
+      },
+      {
+        "upstream_msgid": "  --server <address>    Specify RPC server to send commands to\n",
+        "runtime_literal": "--server <address>    Connect to this Nvim server\n",
+        "note": "上游 po 的 msgid 与固定二进制中的运行时字面量措辞/大小写不一致，按上游键查询不会命中；需要上游更新 po，或在下游增加运行时键条目。"
+      }
+    ],
+    "notes": [
+      "Audit is host/version specific: it records which literals of one compiled Neovim 0.12.6 (plus its runtime tree) contain each supplement msgid.",
+      "bare_and_prefixed entries get an extra runtime key in prefix_repairs; unverified entries are not claimed to be live.",
+      "stale_upstream_msgids list upstream po keys whose runtime wording changed, so the upstream catalog itself needs an update."
+    ]
+  }
+}

@@ -1,0 +1,273 @@
+*usr_11.txt*	Nvim
+
+
+		     VIM USER MANUAL	by Bram Moolenaar
+
+
+			   从崩溃中恢复
+
+
+电脑崩溃了？而你刚刚花了好几个小时编辑？别慌！Vim 会保存足够的信息，足以把
+你的大部分工作恢复回来。本章讲解怎么把工作找回来，并说明 swap 文件的用法。
+
+|11.1|	基本恢复
+|11.2|	swap 文件在哪里？
+|11.3|	崩溃了还是没崩溃？
+|11.4|	进一步阅读
+
+     下一章：|usr_12.txt|  聪明的技巧
+ 上一章：|usr_10.txt|  做大的改动
+目录：|usr_toc.txt|
+
+==============================================================================
+*11.1*	基本恢复
+
+多数情况下恢复一个文件相当简单，前提是你知道自己当时在编辑哪个文件（而且硬盘
+还能用）。在那个文件上启动 Vim，并加上 "-r" 参数： >
+
+	vim -r help.txt
+
+Vim 会读取 swap 文件（其中存放着你正在编辑的文本），还可能读取原文件的一些
+片段。如果 Vim 恢复了你的改动，你会看到这些消息（文件名当然不同）：
+
+	Using swap file ".help.txt.swp" ~
+	Original file "~/vim/runtime/doc/help.txt" ~
+	Recovery completed. You should check if everything is OK. ~
+	(You might want to write out this file under another name ~
+	and run diff with the original file to check for changes) ~
+	You may want to delete the .swp file now. ~
+
+保险起见，把这个文件写到另一个名字下： >
+
+	:write help.txt.recovered
+
+把该文件与原文件比较，检查结果是否符合你的预期。Diff 模式对此很有用 |08.7|。
+例如： >
+
+	:write help.txt.recovered
+	:edit #
+	:diffsp help.txt
+
+要当心原文件里可能含有更新的版本（你在电脑崩溃前刚保存过文件）。还要检查
+有没有丢失的行（出了某种 Vim 无法恢复的问题）。
+   如果 Vim 在恢复时给出警告消息，仔细阅读它们。不过这种情况很少见。
+
+如果恢复出来的文本与文件内容完全相同，你会看到这条消息：
+
+	Using swap file ".help.txt.swp" ~
+	Original file "~/vim/runtime/doc/help.txt" ~
+	Recovery completed. Buffer contents equals file contents. ~
+	You may want to delete the .swp file now. ~
+
+这通常发生在你已经恢复过改动，或者在改动之后写出了文件的时候。此时删除
+swap 文件是安全的。
+
+最后几处改动无法恢复是正常的。当你大约四秒钟没有输入，或者输完大约两百个
+字符之后，Vim 就把改动刷新到磁盘。这由 'updatetime' 和 'updatecount' 选项
+控制。因此当系统宕机、Vim 没机会保存自己时，最后一次刷新之后的改动就会丢失。
+
+如果你当时编辑的文件没有文件名，就传一个空字符串作为参数： >
+
+	vim -r ""
+
+你必须处在正确的目录里，否则 Vim 找不到 swap 文件。
+
+==============================================================================
+*11.2*	swap 文件在哪里？
+
+Vim 可以把 swap 文件存放在好几个地方。要找到它，先切换到该文件所在的目录，
+然后使用： >
+
+	vim -r
+
+Vim 会列出它能找到的 swap 文件。它还会到其它可能存放当前目录内文件的 swap
+文件的目录里查找。不过它不会在其它任何目录里找 swap 文件，它不搜索目录树。
+   输出可能像这样：
+
+	Swap files found: ~
+	   In current directory: ~
+	1.    .main.c.swp ~
+		  owned by: mool   dated: Tue May 29 21:00:25 2001 ~
+		 file name: ~mool/vim/vim6/src/main.c ~
+		  modified: YES ~
+		 user name: mool   host name: masaka.moolenaar.net ~
+		process ID: 12525 ~
+	   In directory ~/tmp: ~
+	      -- none -- ~
+	   In directory /var/tmp: ~
+	      -- none -- ~
+	   In directory /tmp: ~
+	      -- none -- ~
+
+如果有好几个 swap 文件看起来可能是你要用的那个，就会给出这些 swap 文件的
+列表，并要求你输入想用的那个的编号。仔细看日期，决定用哪一个。
+   万一你不知道该用哪一个，就一个一个试，然后检查得到的文件是否符合预期。
+
+
+使用特定的 swap 文件
+
+如果你知道需要用哪个 swap 文件，可以给出 swap 文件名来恢复。Vim 随后会从该
+swap 文件中找出原文件的名称。
+
+Example: >
+	vim -r .help.txt.swo
+
+当 swap 文件位于与预期不同的目录时，这也很方便。Vim 把符合 "*.s[uvw][a-z]"
+模式的文件识别为 swap 文件。
+
+如果这样仍然不行，看看 Vim 报告的是什么文件名，并把文件相应地重命名。检查
+'directory' 选项，看看 Vim 可能把 swap 文件放到了哪里。
+
+	注意：
+	Vim 通过在 'dir' 选项列出的目录里搜索符合 "filename.sw?" 的文件，来寻找
+	swap 文件。如果通配符展开不起作用（例如 'shell' 选项无效时），Vim 会不顾
+	一切地尝试找到 "filename.swp" 这个文件。如果那也失败了，你就必须给出 swap
+	文件本身的名字，才能恢复该文件。
+
+==============================================================================
+*11.3*	崩溃了还是没崩溃？				*ATTENTION* *E325*
+
+Vim 会尽量保护你不做傻事。假设你天真地开始编辑一个文件，期待文件内容显示出
+来。结果 Vim 却给出了一条很长的消息：
+
+		E325: ATTENTION ~
+	Found a swap file by the name ".main.c.swp" ~
+		  owned by: mool   dated: Tue May 29 21:09:28 2001 ~
+		 file name: ~mool/vim/vim6/src/main.c ~
+		  modified: no ~
+		 user name: mool   host name: masaka.moolenaar.net ~
+		process ID: 12559 (still running) ~
+	While opening file "main.c" ~
+		     dated: Tue May 29 19:46:12 2001 ~
+ ~
+	(1) Another program may be editing the same file. ~
+	    If this is the case, be careful not to end up with two ~
+	    different instances of the same file when making changes. ~
+	    Quit, or continue with caution. ~
+ ~
+	(2) An edit session for this file crashed. ~
+	    If this is the case, use ":recover" or "vim -r main.c" ~
+	    to recover the changes (see ":help recovery"). ~
+	    If you did this already, delete the swap file ".main.c.swp" ~
+	    to avoid this message. ~
+
+你会收到这条消息，是因为在开始编辑文件时，Vim 会检查该文件是否已经存在 swap
+文件。如果存在一个，那一定出了什么问题。可能属于下面两种情况之一。
+
+1. 另一个编辑会话正在操作这个文件。在消息里找带 "process ID" 的那一行。它可
+   能像这样：
+
+		process ID: 12559 (still running) ~
+
+   文本 "(still running)" 表示编辑这个文件的进程运行在同一台电脑上。在非 Unix
+   系统上工作时，你不会得到这个额外的提示。通过网络编辑文件时，你可能看不到
+   这个提示，因为进程可能运行在另一台电脑上。这两种情况下，你都只能自己去弄
+   清楚状况。
+      如果有另一个 Vim 正在编辑同一个文件，继续编辑会产生同一文件的两个版本。
+   最后写出的那个会覆盖另一个，从而导致改动丢失。你最好退出这个 Vim。
+
+2. swap 文件可能是 Vim 或电脑此前崩溃留下的。检查消息中提到的日期。如果 swap
+   文件的日期比你正在编辑的文件新，并且出现这一行：
+
+		modified: YES ~
+
+   那么你很可能有一个崩溃的编辑会话，值得恢复。
+      如果文件的日期比 swap 文件的日期新，那么要么它是在崩溃后被改动过（也许你
+   早就恢复过它，但没有删除 swap 文件？），要么文件是在崩溃前保存的，但晚于
+   swap 文件的最后一次写入（那你就走运了：你根本不需要那个旧的 swap 文件）。
+   Vim 会用下面这一额外的行来提醒你：
+
+      NEWER than swap file! ~
+
+
+要说明的是，在下面这些情形中 Vim 知道 swap 文件没有用处，会自动把它删掉：
+- 该文件是有效的 swap 文件（Magic number 正确）。
+- 表示文件被改动过的标志未置位。
+- 该进程没有在运行。
+
+你可以用 |FileChangedShell| 自动命令事件，以程序方式处理这种情况。
+
+
+无法读取的 swap 文件 ~
+
+有时候，swap 文件的名称下面会出现这样一行
+
+	[cannot be read] ~
+
+这是好事还是坏事，取决于具体情况。
+
+如果此前某个编辑会话崩溃了，但对该文件没有做过任何改动，那就是好事。这时
+查看 swap 文件会看到它是零字节。你可以把它删掉，然后继续。
+
+如果你对该 swap 文件没有读权限，那就有点糟。你可能想以只读方式查看该文件，
+或者退出。在多用户系统上，如果你自己是用另一个登录名做的最后那些改动，先注
+销、再用那个名字登录，也许就能消除这个「read error」。否则你可能想查明是谁最
+后编辑了（或正在编辑）该文件，并和他谈谈。
+
+如果它意味着存放 swap 文件的磁盘上有物理读错误，那就非常糟。幸运的是，这几
+乎从不发生。
+一开始你可能想以只读方式查看该文件（如果可能的话），看看那些「被遗忘」的改动
+有多大。如果你正是负责该文件的人，要做好重做最后那些改动的准备。
+
+
+该怎么办？					*swap-exists-choices*
+
+如果支持对话框，你会被要求从六个选项里选一个：
+
+  Swap file ".main.c.swp" already exists! ~
+  [O]pen Read-Only, (E)dit anyway, (R)ecover, (Q)uit, (A)bort, (D)elete it: ~
+
+O  以只读方式打开文件。当你只想查看文件、不需要恢复它时用它。当你知道别人
+   正在编辑该文件，而你只想看看、不做改动时，也可以用它。
+
+E  仍然编辑该文件。务必小心！如果该文件正在另一个 Vim 中被编辑，你可能会得
+   到该文件的两个版本。发生这种情况时 Vim 会尽量警告你，但稳妥总比后悔好。
+
+R  从 swap 文件恢复该文件。当你知道 swap 文件里含有你想恢复的改动时用它。
+
+Q  退出。这样就避免了开始编辑该文件。如果有另一个 Vim 正在编辑同一个文件，
+   就用它。
+      当你刚刚启动 Vim 时，这会退出 Vim。当用多个 window 启动 Vim 处理若干文
+   件时，只有当第一个文件有 swap 文件时 Vim 才会退出。使用编辑命令时，该文
+   件不会被载入，你会回到此前编辑的文件。
+
+A  中止。像 Quit 一样，但还会中止后续命令。当载入一个会编辑多个文件的脚本
+   时（例如一个包含多个 window 的会话），这很有用。
+
+D  删除 swap 文件。当你确定不再需要它时用它。例如它不含改动，或者文件本身
+   比 swap 文件新的时候。
+      在 Unix 上，只有当创建该 swap 文件的进程看起来没有在运行时，才会提供这
+   个选项。
+
+如果你没有看到对话框（你用的 Vim 版本不支持它），就只能手工处理。要恢复文
+件，使用这条命令： >
+
+	:recover
+
+
+Vim 并不总能检测出一个文件已经存在 swap 文件。当另一种编辑会话把 swap 文件
+放在别的目录时，或者在不同机器上编辑时文件的路径名不同时，就是这种情况。
+因此，不要指望 Vim 总会警告你。
+
+如果你真的不想看到这条消息，可以在 'shortmess' 选项里加上 'A' 标志。但你极
+少需要这么做。
+
+要以程序方式访问 swap 文件，见 |swapinfo()|。
+
+==============================================================================
+*11.4*	进一步阅读
+
+|swap-file|	关于 swap 文件将在哪里创建、它的名称是什么的说明。
+|:preserve|	手动把 swap 文件刷新到磁盘。
+|:swapname|	查看当前文件的 swap 文件名称。
+'updatecount'	经过多少次按键之后把 swap 文件刷新到磁盘。
+'updatetime'	经过多长时间之后把 swap 文件刷新到磁盘。
+'directory'	存放 swap 文件的目录名列表。
+
+==============================================================================
+
+下一章：|usr_12.txt|  聪明的技巧
+
+版权：见 |manual-copyright|
+
+vim:tw=78:ts=8:noet:ft=help:norl:

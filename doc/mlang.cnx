@@ -1,0 +1,175 @@
+*mlang.txt*     Nvim
+
+
+		  VIM REFERENCE MANUAL	  by Bram Moolenaar
+
+
+多语言功能					*multilang* *multi-lang*
+
+本文介绍如何在各种语言下使用消息与菜单。要编辑多字节文本，请参见 |multibyte|。
+
+基础知识见用户手册：|usr_45.txt|。
+
+                                      输入 |gO| 查看目录。
+
+==============================================================================
+1. 消息							*multilang-messages*
+
+Vim 从环境中获取 locale。多数情况下，这意味着 Vim 会使用你所偏好的语言
+（前提是该语言可用）。
+
+要查看你的系统支持哪些 locale 名称，可以查看下列目录之一（对于 Unix）：
+	/usr/lib/locale ~
+	/usr/share/locale ~
+不幸的是，大小写差异是有影响的。也要注意 "-" 和 "_" 的用法。
+
+					    *:lan* *:lang* *:language* *E197*
+:lan[guage]
+:lan[guage] mes[sages]
+:lan[guage] cty[pe]
+:lan[guage] tim[e]
+:lan[guage] col[late]
+			打印当前的语言（也就是 locale）。
+			带有 "messages" 参数时，打印用于消息的语言。
+			技术名称为 LC_MESSAGES。
+			带有 "ctype" 参数时，打印用于字符编码的语言。
+			技术名称为 LC_CTYPE。
+			带有 "time" 参数时，打印用于 strftime()
+			的语言。技术名称为 LC_TIME。
+			带有 "collate" 参数时，打印用于排序规则的语言。
+			技术名称为 LC_COLLATE。
+			不带参数时，打印 locale 的所有部分
+			（这取决于具体系统）。
+			当前语言也可以通过 |v:lang|、|v:ctype|、
+			|v:collate| 和 |v:lc_time| 变量获取。
+
+:lan[guage] {name}
+:lan[guage] mes[sages] {name}
+:lan[guage] cty[pe] {name}
+:lan[guage] tim[e] {name}
+:lan[guage] col[late] {name}
+			把当前语言（也就是 locale）设为 {name}。
+			{name} 必须是你系统上一个有效的 locale。有些
+			系统接受 "en" 或 "en_US" 这样的别名，但有些
+			系统只接受完整的形式，如 "en_US.ISO_8859-1"。
+			在 Unix 系统上，你可以用这条命令查看支持哪些
+			locale： >
+				:!locale -a
+<			带有 "messages" 参数时，设置用于消息的语言。
+			两者可以不同，例如你想用英文消息编辑日文文本。
+			这会设置 $LC_MESSAGES。
+			带有 "ctype" 参数时，设置用于字符编码的语言。
+			这会影响 Vim 所链接的那些库。把它设为不同于
+			'encoding' 或 "C" 的值并不常见。这会设置
+			$LC_CTYPE。
+			带有 "time" 参数时，设置用于时间和日期消息的
+			语言。这会影响 strftime()。这会设置 $LC_TIME。
+			带有 "collate" 参数时，设置用于排序规则的语言。
+			这会影响字符的排序。这会设置 $LC_COLLATE。
+			不带参数时，以上各项都会被设置，另外还会设置
+			$LANG。
+			LC_NUMERIC 的值总是被设为 "C"，这样浮点数使用
+			'.' 作为小数点。这会影响依赖语言的项目，例如
+			某些消息以及时间和日期格式。
+			并非在所有系统上都完全支持。
+			如果失败会有错误消息。成功时则没有消息。例如： >
+				:language
+				Current language: C
+				:language de_DE.ISO_8859-1
+				:language mes
+				Current messages language: de_DE.ISO_8859-1
+				:lang mes en
+<
+
+消息文件（vim.mo）必须放在 "$VIMRUNTIME/lang/xx/LC_MESSAGES" 目录下，
+其中 "xx" 是语言的缩写（多为两个字母）。若自己编写翻译，需要先生成 .po
+文件，再把它转换为 .mo 文件。
+
+要覆盖语言的自动选择，请把 $LANG 变量设为你想要的语言，使用 "en" 可以
+禁用翻译。 >
+
+  :let $LANG = 'ja'
+
+（Windows 部分由 Muraoka Taro 撰写）
+
+==============================================================================
+2. 菜单							*multilang-menus*
+
+基础知识见 |45.2|，尤其是使用 'langmenu'。
+
+注意，如果在翻译完成之后菜单本身又有改动，部分菜单可能仍会以英文显示。
+请尝试联系该翻译的维护者，让他更新。翻译者的姓名与电子邮箱地址可以在
+"$VIMRUNTIME/lang/menu_<lang>.vim" 中找到。
+
+要为菜单设置所用的字体，请使用 |:highlight| 命令。例如： >
+
+	:highlight Menu font=k12,r12
+
+
+别名 locale 名称
+
+不幸的是，即使表示相同的语言和编码，locale 名称在不同系统上也不相同。
+如果你没有得到预期的菜单翻译，请检查这条命令的输出： >
+
+	echo v:lang
+
+接着检查 "$VIMRUNTIME/lang" 目录，寻找语言相近的菜单翻译文件。只要有一
+处 "-" 被写成 "_"，文件就找不到了！另一个常见的差异是 "iso8859-1" 与
+"iso_8859-1"。好在 Vim 会把所有名称转为小写，因此不必担心大小写差异。
+空格会被替换成下划线，这样就不必转义它们。
+
+如果你发现自己的语言对应的菜单翻译文件名称不同，可以在自己的 runtime
+目录中创建一个文件来加载它。该文件的名称可以是： >
+
+	~/.config/nvim/lang/menu_<v:lang>.vim
+
+检查 'runtimepath' 选项，看看会搜索哪些目录。在那个文件中写入一条命令，
+用另一个名称加载菜单文件： >
+
+	runtime lang/menu_<other_lang>.vim
+
+
+翻译菜单
+
+如果你想自己做翻译，可以使用下面介绍的 |:menutrans| 命令。建议把某一种
+语言的翻译放在一个 Vim 脚本中。对于还没有翻译的语言，请考虑成为该语言的
+维护者，把你的翻译开放给所有 Vim 用户。可以发送电子邮件给 Vim 维护者
+<maintainer@vim.org>。
+
+					*:menut* *:menutrans* *:menutranslate*
+:menut[ranslate] clear
+			清除所有菜单翻译。
+
+:menut[ranslate] {english} {mylang}
+			把菜单名称 {english} 翻译为 {mylang}。所有
+			特殊字符，如 "&" 和 "<Tab>" 都需要包含在内。
+			空格和点需要用反斜杠转义，与其他 |:menu| 命令
+			一样。{english} 中的大小写会被忽略。
+
+示例见 $VIMRUNTIME/lang 目录。
+
+要试用你的翻译，必须先移除所有菜单。不必重启 Vim 就能这样做的办法是： >
+	:source $VIMRUNTIME/delmenu.vim
+	:source <your-new-menu-file>
+	:source $VIMRUNTIME/menu.vim
+
+菜单路径的每一部分都会分别翻译。结果是：当 "Help" 被翻译为 "Hilfe"，
+"Overview" 被翻译为 "Überblick" 时，"Help.Overview" 就会被翻译为
+"Hilfe.Überblick"。
+
+==============================================================================
+3. 脚本							*multilang-scripts*
+
+在 Vim 脚本中可以使用 |v:lang| 变量获取当前语言（locale）。默认值为
+"C"，或者来自 $LANG 环境变量。
+
+下面的示例简单地展示这个变量的用法：让一条消息适应用户的语言偏好， >
+
+	:if v:lang =~ "de_DE"
+	:  echo "Guten Morgen"
+	:else
+	:  echo "Good morning"
+	:endif
+<
+
+ vim:tw=78:sw=4:ts=8:noet:ft=help:norl:

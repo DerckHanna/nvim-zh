@@ -1,0 +1,25 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: nvim-zh phase 4\n"
+"PO-Revision-Date: 2026-11-17 20:38+0800\n"
+"Last-Translator: nvim-zh maintainers\n"
+"Language-Team: Simplified Chinese\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: zh_CN\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: lua/which-key/view.lua
+msgctxt "desc"
+msgid "Save File"
+msgstr "保存文件"
+
+#: lua/which-key/view.lua
+msgctxt "desc"
+msgid "Find File"
+msgstr "查找文件"
+
+#: lua/which-key/view.lua
+msgctxt "desc"
+msgid "Open"
+msgstr "打开"

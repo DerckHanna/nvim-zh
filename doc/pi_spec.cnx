@@ -1,0 +1,98 @@
+*pi_spec.txt*   Nvim
+
+作者：Gustavo Niemeyer ~
+
+这是一个用于处理 rpm spec 文件的文件类型插件。
+
+当前，这个 Vim 插件让你能够方便地更新 RPM spec 文件中的 %changelog
+段落。如果该段落还不存在，它甚至会替你创建一个。如果你今天已经插入过
+一个条目，它会让你有机会只往今天的条目里新增一项。如果你没有提供格式
+字符串（|spec_chglog_format|），它会向你询问一个邮件地址，并自行构造
+一个格式字符串。
+
+1. 如何使用		|spec-how-to-use-it|
+2. 自定义		|spec-customizing|
+
+==============================================================================
+1. 如何使用					*spec-how-to-use-it*
+
+spec_chglog 插件提供了如下形式的映射：
+
+	:map <buffer> <LocalLeader>c <Plug>SpecChangelog
+
+这意味着你可以在 spec 文件里按下 maplocalleader 键（默认是 '\'）再加
+上 'c' 来运行该插件。如果你没有设置 |spec_chglog_format|，插件会询问
+你要在本次编辑会话中使用的邮件地址。
+
+每次运行该插件时，它都会检查 changelog 中最后一个条目是否由你在今天
+写入的。若条目相符，它就只插入一条新的 changelog 项；否则会新建一个
+changelog 条目。如果你是在启用了 |spec_chglog_release_info| 的情况下
+运行，它还会检查 name、version 和 release 是否相符。若你尚未更新软件
+包的 release，插件足够聪明，会询问是否要替你更新。
+
+------------------------------------------------------------------------------
+设置映射					*spec-setting-a-map*
+
+如你所知，你可以很容易地设置一个映射来调用任意 Vim 命令（其实任何
+东西都行）。如果你不喜欢 <LocalLeader>c 这个默认映射，尽可以设置自己
+的按键。下面这一行演示了如何在 vimrc 文件中做到这一点，把插件映射到
+<F5> 键上：
+
+	au FileType spec map <buffer> <F5> <Plug>SpecChangelog
+
+注意：插件会尊重你更改默认映射的意愿，不再自行设置那个映射。
+
+这条命令只会在 spec 文件的 Buffer 中添加映射。
+
+
+==============================================================================
+2. 自定义					*spec-customizing*
+
+------------------------------------------------------------------------------
+格式字符串					*spec_chglog_format*
+
+你可以轻松地自定义 spec 文件条目呈现的样子。要做到这一点，只需按下
+面这样设置 vimrc 文件中的 "spec_chglog_format" 变量： >
+
+	let spec_chglog_format = "%a %b %d %Y My Name <my@email.com>"
+
+请注意 "%a %b %d %Y" 是最常用的时间格式。如果你不提供格式字符串，那
+么在第一次运行 SpecChangelog 命令时，它会向你询问一个邮件地址，并替
+你构造好 |spec_chglog_format| 变量。这样，你只需提供一次邮件地址。
+
+想知道可以使用哪些格式选项，请查看 strftime() 函数的 man 手册页。
+
+------------------------------------------------------------------------------
+新项插入的位置					*spec_chglog_prepend*
+
+该插件通常会把新的 %changelog 条目项（注意不是条目本身）插入到已有项
+之后。如果你按下面这样设置 spec_chglog_prepend 变量： >
+
+	let spec_chglog_prepend = 1
+
+它就会把新项插入到已有项之前。
+
+------------------------------------------------------------------------------
+插入 release 信息				*spec_chglog_release_info*
+
+如果你愿意，插件可以在每个 changelog 条目中自动插入 release 信息。开
+启这一功能的一个好处是，它可以控制在上次修改软件包之后 release 是否
+已经更新。如果你尚未更新软件包的 version 或 release，它会询问是否要
+替你更新软件包的 release。要开启此功能，只需在 vimrc 中插入以下代
+码： >
+
+	let spec_chglog_release_info = 1
+
+这样一来，你的 changelog 条目中的第一项就会类似下面这样： >
+
+	+ name-1.0-1cl
+
+如果你不喜欢 release 更新功能，又不想在每次检测到旧的 release 时都回
+答 "No"，可以用下面的设置将其禁用： >
+
+	let spec_chglog_never_increase_release = 1
+
+
+祝你好运！！
+
+vim:tw=78:ts=8:noet:ft=help:norl:

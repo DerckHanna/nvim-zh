@@ -1,0 +1,164 @@
+*usr_43.txt*	Nvim
+
+
+		     VIM USER MANUAL	by Bram Moolenaar
+
+
+			       使用 filetype
+
+
+当你编辑某一类型的文件时，例如一个 C 程序或者一个 shell script，往往会用到
+同样的选项设置和映射。每次都要手动把这些设置好，很快就会让人厌倦。本章解释
+如何自动完成这些事情。
+
+|43.1|	filetype 的 plugin
+|43.2|	添加一种 filetype
+
+     下一章：|usr_44.txt|  自己的语法高亮
+ 上一章：|usr_42.txt|  添加新菜单
+目录：|usr_toc.txt|
+
+==============================================================================
+*43.1*	filetype 的 plugin				*filetype-plugin*
+
+关于如何开始使用 filetype plugin，前面已经讲过了：|add-filetype-plugin|。但
+你可能并不满足于默认设置，因为它们一直保持在最简状态。假设对于 C 文件，你
+想把 'softtabstop' 选项设为 4，并定义一个用来插入三行注释的映射。只要两个
+步骤就能做到：
+
+							*your-runtime-dir*
+1. 创建你自己的 runtime 目录。在 Unix 上这通常是 "~/.config/nvim"。在这个
+   目录里创建 "ftplugin" 目录： >
+
+	mkdir -p ~/.config/nvim/ftplugin
+<
+   如果你用的不是 Unix，检查 'runtimepath' 选项的值，看看 Vim 会到哪里去寻找
+   "ftplugin" 目录： >
+
+	set runtimepath?
+
+<  你通常会使用第一个目录名（第一个逗号之前的那部分）。如果你不喜欢默认值，
+   可以在 |init.vim| 文件中把一个目录名添加到 'runtimepath' 选项的前面。
+
+2. 创建文件 "~/.config/nvim/ftplugin/c.vim"，内容如下： >
+
+	setlocal softtabstop=4
+	noremap <buffer> <LocalLeader>c o/**************<CR><CR>/<Esc>
+	let b:undo_ftplugin = "setl softtabstop< | unmap <buffer> <LocalLeader>c"
+
+试着编辑一个 C 文件。你会注意到 'softtabstop' 选项被设成了 4。但当你编辑另
+一个文件时，它又被重设回默认的 0。这是因为用到了 ":setlocal" 命令。它只把
+'softtabstop' 选项局部地设置到当前 buffer。一旦你去编辑另一个 buffer，它就
+会取那个 buffer 上设定的值。对于新建的 buffer，它得到默认值，或者最后一次
+":set" 命令设定的值。
+
+同样，编辑另一个 buffer 时，"\c" 的映射也会消失。":map <buffer>" 命令创建的
+映射只对当前 buffer 局部有效。这对任何映射命令都适用：":map!"、":vmap" 等
+等。映射中的 |<LocalLeader>| 会被替换成 "maplocalleader" 变量的值。
+
+设置 b:undo_ftplugin 的那一行，用于 filetype 被设成别的值的时候。那种情况下
+你会想要撤销自己的偏好设置。b:undo_ftplugin 变量会作为命令来执行。要小心字
+符串中有特殊含义的字符，例如反斜杠。
+
+你可以在这个目录中找到 filetype plugin 的示例： >
+
+	$VIMRUNTIME/ftplugin/
+
+关于编写 filetype plugin 的更多细节可以在这里找到：|write-plugin|。
+
+==============================================================================
+*43.2*	添加一种 filetype
+
+如果你正在使用的某种文件 Vim 认不出来，下面就是让它认出来的办法。你需要一个
+自己的 runtime 目录，见上面的 |your-runtime-dir|。
+
+创建一个 "filetype.vim" 文件，其中为你的 filetype 写一条 autocommand。（关于
+autocommand 的解释见 |40.3| 一节。）示例： >
+
+	augroup filetypedetect
+	au BufNewFile,BufRead *.xyz	setf xyz
+	augroup END
+
+这会把所有以 ".xyz" 结尾的文件识别为 "xyz" 这一 filetype。":augroup" 命令把
+这条 autocommand 放进 "filetypedetect" 组里。这样在执行 ":filetype off" 时就
+能移除所有用于 filetype 检测的 autocommand。"setf" 命令会把 'filetype' 选项
+设成它的参数，除非它已经被设置过。这就确保了 'filetype' 不会被设置两次。
+
+你可以使用许多不同的模式来匹配你的文件名。目录名也可以包含在内，见
+|autocmd-pattern|。例如，"/usr/share/scripts/" 下面的文件都是 "ruby" 文件，
+却没有预期的文件名扩展。把这一条加到上面的示例里： >
+
+	augroup filetypedetect
+	au BufNewFile,BufRead *.xyz			setf xyz
+	au BufNewFile,BufRead /usr/share/scripts/*	setf ruby
+	augroup END
+
+然而，如果你现在编辑 /usr/share/scripts/README.txt，它并不是一个 ruby 文件。
+以 "*" 结尾的模式，危险之处在于它很快就会匹配到太多文件。为了避免这里的麻
+烦，把 filetype.vim 文件放进另一个目录，也就是位于 'runtimepath' 末尾的那个
+目录。以 Unix 为例，你可以使用 "~/.config/nvim/after/filetype.vim"。
+   现在把对 text 文件的检测写进 ~/.config/nvim/filetype.vim： >
+
+	augroup filetypedetect
+	au BufNewFile,BufRead *.txt			setf text
+	augroup END
+
+那个文件在 'runtimepath' 中最先被找到。然后把下面这条用在
+~/.config/nvim/after/filetype.vim 中，它最后才被找到： >
+
+	augroup filetypedetect
+	au BufNewFile,BufRead /usr/share/scripts/*	setf ruby
+	augroup END
+
+现在发生的事情是：Vim 会在 'runtimepath' 的每个目录中查找 "filetype.vim"
+文件。最先找到 ~/.config/nvim/filetype.vim，捕获 `*.txt` 文件的 autocommand
+就定义在那里。接着 Vim 在 $VIMRUNTIME 中找到 filetype.vim 文件，它位于
+'runtimepath' 的中间。最后找到 ~/.config/nvim/after/filetype.vim，于是添加进
+检测 /usr/share/scripts 下面 ruby 文件的 autocommand。
+   现在当你编辑 /usr/share/scripts/README.txt 时，autocommand 会按照它们被定
+义的先后次序逐条检查。`*.txt` 模式匹配了，于是执行 "setf text" 把 filetype
+设为 "text"。ruby 的模式也匹配，"setf ruby" 同样被执行。但由于 'filetype' 已
+经被设为 "text"，这里什么也不会发生。
+   当你编辑文件 /usr/share/scripts/foobar 时，检查的是同一批 autocommand。只
+有 ruby 那一条匹配，于是 "setf ruby" 把 'filetype' 设为 ruby。
+
+
+按内容识别
+
+如果你的文件无法通过文件名来识别，你也许可以通过它的内容来识别。例如，许多
+script 文件以这样一行开头：
+
+	#!/bin/xyz ~
+
+要识别这种 script，请在你的 runtime 目录中（filetype.vim 也放在那里）创建一
+个 "scripts.vim" 文件。它看起来可能像这样： >
+
+	if did_filetype()
+	  finish
+	endif
+	if getline(1) =~ '^#!.*[/\\]xyz\>'
+	  setf xyz
+	endif
+
+开头用 did_filetype() 做的检查，是为了避免你去检查这样一些文件：它们的
+filetype 已经由文件名检测出来了。这样就避免了在 "setf" 命令什么也不会做的时
+候还花时间去检查文件。
+   scripts.vim 文件由默认 filetype.vim 文件中的一条 autocommand 来 source。因
+此，检查的次序是：
+
+	1. 'runtimepath' 中位于 $VIMRUNTIME 之前的 filetype.vim 文件
+	2. $VIMRUNTIME/filetype.vim 的前半部分
+	3. 'runtimepath' 中所有的 scripts.vim 文件
+	4. $VIMRUNTIME/filetype.vim 的其余部分
+	5. 'runtimepath' 中位于 $VIMRUNTIME 之后的 filetype.vim 文件
+
+如果这对你还不够用，就添加一条匹配所有文件的 autocommand，让它 source 一个
+脚本，或者执行一个函数来检查文件的内容。
+
+==============================================================================
+
+下一章：|usr_44.txt|  自己的语法高亮
+
+版权：见 |manual-copyright|
+
+vim:tw=78:ts=8:noet:ft=help:norl:

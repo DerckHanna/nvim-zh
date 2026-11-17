@@ -1,0 +1,18 @@
+{
+  "upstream": "https://github.com/llvm/llvm-project",
+  "version": "llvmorg-18.1.8",
+  "source": "clang-tools-extra/clangd/test/diagnostics-notes.test",
+  "diagnostics": [
+    {
+      "context": "redefinition",
+      "message": "Redefinition of 'x'",
+      "code": "redefinition",
+      "source_line": 10
+    },
+    {
+      "context": "previous_definition",
+      "message": "Previous definition is here",
+      "source_line": 36
+    }
+  ]
+}

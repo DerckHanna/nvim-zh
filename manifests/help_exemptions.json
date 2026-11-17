@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "notes": [
+    "Documents that are deliberately NOT translated, with the evidence that puts",
+    "them outside the project's translation scope. Everything else in",
+    "$VIMRUNTIME/doc/*.txt is normal user-facing help and must become complete.",
+    "Normal reference or tutorial documents must NOT be listed here just because",
+    "they are large or low-traffic."
+  ],
+  "exemptions": [
+    {
+      "file": "credits.txt",
+      "reason": "Attribution and licensing record, not user documentation: it is a list of contributor names plus copyright credits.",
+      "evidence": "runtime/doc/credits.txt:1 '*credits.txt*  Nvim'; :10 'Most of Vim was written by Bram Moolenaar <Bram@vim.org> |Bram-Moolenaar|.'; the body is a column of personal names (':18-:40') that must not be translated, and the license itself is referenced, not restated (|manual-copyright|)."
+    },
+    {
+      "file": "uganda.txt",
+      "reason": "Charityware appeal and license text, not Neovim user documentation; translating legal/licence wording would change its meaning.",
+      "evidence": "runtime/doc/uganda.txt:6 '*uganda* *Uganda* *copying* *copyright* *license*'; :12 'Vim is Charityware.'; :30 'The Open Publication License applies to the Vim documentation, see |manual-copyright|.' The page defines the copy/licence terms and a donation appeal, not editor behaviour."
+    }
+  ]
+}

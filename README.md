@@ -42,7 +42,7 @@ Help 译文固定上游 0.12.6；每份文档的 commit、源文件路径与 SHA
 
 ```lua
 {
-  'your-name/nvim-zh',
+  'DerckHanna/nvim-zh',
   lazy = false,
   priority = 1000,
   config = function()

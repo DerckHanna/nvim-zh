@@ -65,7 +65,7 @@ return {
     {
       context = "notification",
       msgid = "[telescope.%s]: No buffers found with the provided options",
-      msgstr = "[telescope.%s]: 没有找到符合所给选项的Buffer",
+      msgstr = "[telescope.%s]: 没有找到符合所给选项的 Buffer",
       references = {
         "lua/telescope/builtin/__internal.lua",
         "lua/telescope/utils.lua",
@@ -110,7 +110,7 @@ return {
     {
       context = "notification",
       msgid = "[telescope.%s]: No locals query for the current buffer",
-      msgstr = "[telescope.%s]: 当前Buffer没有 locals 查询",
+      msgstr = "[telescope.%s]: 当前 Buffer 没有 locals 查询",
       references = {
         "lua/telescope/builtin/__files.lua",
         "lua/telescope/utils.lua",
@@ -146,7 +146,7 @@ return {
     {
       context = "notification",
       msgid = "[telescope.%s]: No parser for the current buffer",
-      msgstr = "[telescope.%s]: 当前Buffer没有可用的解析器",
+      msgstr = "[telescope.%s]: 当前 Buffer 没有可用的解析器",
       references = {
         "lua/telescope/builtin/__files.lua",
         "lua/telescope/utils.lua",
@@ -358,7 +358,7 @@ return {
     {
       context = "title",
       msgid = "Git BCommits",
-      msgstr = "Git Buffer提交",
+      msgstr = "Git Buffer 提交",
       references = {
         "lua/telescope/builtin/__git.lua",
       },
@@ -366,7 +366,7 @@ return {
     {
       context = "title",
       msgid = "Git BCommits in range",
-      msgstr = "范围内的 Git Buffer提交",
+      msgstr = "范围内的 Git Buffer 提交",
       references = {
         "lua/telescope/builtin/__git.lua",
       },
@@ -647,7 +647,7 @@ return {
     {
       context = "title",
       msgid = "Packages",
-      msgstr = "插件包",
+      msgstr = "Lua 包",
       references = {
         "lua/telescope/builtin/__internal.lua",
       },

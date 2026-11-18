@@ -47,8 +47,8 @@ equal(view.replace('desc', 'last yank'), '上次复制', 'register label')
 equal(view.replace('desc', 'Spelling Suggestions'), '拼写建议', 'spelling entry')
 equal(view.replace('desc', 'window'), 'Window', 'window terminology')
 equal(view.replace('desc', 'registers'), 'Register', 'registers terminology')
-equal(view.replace('desc', 'Last change in current buffer'), '当前Buffer最后修改', 'buffer terminology')
-equal(view.replace('desc', 'alternate buffer'), '备用Buffer', 'alternate buffer terminology')
+equal(view.replace('desc', 'Last change in current buffer'), '当前 Buffer 最后一次修改的位置', 'buffer terminology')
+equal(view.replace('desc', 'alternate buffer'), '备用 Buffer', 'alternate buffer terminology')
 
 local rhs = function() return 'original-rhs' end
 local mapping = { lhs = '<leader>d', rhs = rhs, desc = 'Delete', buffer = 7 }

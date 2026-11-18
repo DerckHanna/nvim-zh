@@ -132,7 +132,7 @@ msgstr "手册"
 #: lua/telescope/builtin/__internal.lua
 msgctxt "title"
 msgid "Packages"
-msgstr "插件包"
+msgstr "Lua 包"
 
 #: lua/telescope/builtin/__internal.lua
 msgctxt "title"
@@ -207,12 +207,12 @@ msgstr "Git 储藏"
 #: lua/telescope/builtin/__git.lua
 msgctxt "title"
 msgid "Git BCommits"
-msgstr "Git Buffer提交"
+msgstr "Git Buffer 提交"
 
 #: lua/telescope/builtin/__git.lua
 msgctxt "title"
 msgid "Git BCommits in range"
-msgstr "范围内的 Git Buffer提交"
+msgstr "范围内的 Git Buffer 提交"
 
 #: lua/telescope/builtin/__git.lua
 msgctxt "title"
@@ -382,7 +382,7 @@ msgstr "[telescope.%s]: 没有位置列表项"
 #: lua/telescope/builtin/__internal.lua lua/telescope/utils.lua
 msgctxt "notification"
 msgid "[telescope.%s]: No buffers found with the provided options"
-msgstr "[telescope.%s]: 没有找到符合所给选项的Buffer"
+msgstr "[telescope.%s]: 没有找到符合所给选项的 Buffer"
 
 #: lua/telescope/builtin/__internal.lua lua/telescope/utils.lua
 msgctxt "notification"
@@ -402,12 +402,12 @@ msgstr "[telescope.%s]: 未找到诊断"
 #: lua/telescope/builtin/__files.lua lua/telescope/utils.lua
 msgctxt "notification"
 msgid "[telescope.%s]: No parser for the current buffer"
-msgstr "[telescope.%s]: 当前Buffer没有可用的解析器"
+msgstr "[telescope.%s]: 当前 Buffer 没有可用的解析器"
 
 #: lua/telescope/builtin/__files.lua lua/telescope/utils.lua
 msgctxt "notification"
 msgid "[telescope.%s]: No locals query for the current buffer"
-msgstr "[telescope.%s]: 当前Buffer没有 locals 查询"
+msgstr "[telescope.%s]: 当前 Buffer 没有 locals 查询"
 
 #: lua/telescope/builtin/__files.lua lua/telescope/utils.lua
 msgctxt "notification"

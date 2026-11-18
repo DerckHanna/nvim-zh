@@ -142,7 +142,7 @@ msgstr "展开全部"
 #: lua/nvim-tree/keymap.lua
 msgctxt "mapping"
 msgid "Rename: Basename"
-msgstr "重命名：文件名"
+msgstr "重命名：主文件名"
 
 #: lua/nvim-tree/keymap.lua
 msgctxt "mapping"
@@ -177,7 +177,7 @@ msgstr "复制绝对路径"
 #: lua/nvim-tree/keymap.lua
 msgctxt "mapping"
 msgid "Copy Basename"
-msgstr "复制文件名"
+msgstr "复制主文件名"
 
 #: lua/nvim-tree/keymap.lua
 msgctxt "mapping"

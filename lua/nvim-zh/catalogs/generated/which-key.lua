@@ -59,6 +59,22 @@ return {
     },
     {
       context = "desc",
+      msgid = "Add empty line above cursor",
+      msgstr = "在光标上方添加空行",
+      references = {
+        "../../../neovim/runtime/lua/vim/_core/defaults.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Add empty line below cursor",
+      msgstr = "在光标下方添加空行",
+      references = {
+        "../../../neovim/runtime/lua/vim/_core/defaults.lua",
+      },
+    },
+    {
+      context = "desc",
       msgid = "Add word to spell list",
       msgstr = "将单词加入拼写列表",
       references = {
@@ -68,7 +84,7 @@ return {
     {
       context = "desc",
       msgid = "Back to line in current buffer where jumped from",
-      msgstr = "返回当前Buffer跳转前的行",
+      msgstr = "返回当前 Buffer 跳转前的行",
       references = {
         "lua/which-key/plugins/marks.lua",
       },
@@ -76,7 +92,7 @@ return {
     {
       context = "desc",
       msgid = "Back to position in current buffer where jumped from",
-      msgstr = "返回当前Buffer跳转前的位置",
+      msgstr = "返回当前 Buffer 跳转前的位置",
       references = {
         "lua/which-key/plugins/marks.lua",
       },
@@ -132,7 +148,7 @@ return {
     {
       context = "desc",
       msgid = "Close all other windows",
-      msgstr = "关闭其他所有Window",
+      msgstr = "关闭其他所有 Window",
       references = {
         "lua/which-key/plugins/presets.lua",
       },
@@ -143,6 +159,14 @@ return {
       msgstr = "关闭光标下折叠",
       references = {
         "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Comment textobject",
+      msgstr = "注释文本对象",
+      references = {
+        "../../../neovim/runtime/lua/vim/_core/defaults.lua",
       },
     },
     {
@@ -316,7 +340,7 @@ return {
     {
       context = "desc",
       msgid = "Go to the down window",
-      msgstr = "转到下方Window",
+      msgstr = "转到下方 Window",
       references = {
         "lua/which-key/plugins/presets.lua",
       },
@@ -324,7 +348,7 @@ return {
     {
       context = "desc",
       msgid = "Go to the left window",
-      msgstr = "转到左侧Window",
+      msgstr = "转到左侧 Window",
       references = {
         "lua/which-key/plugins/presets.lua",
       },
@@ -332,7 +356,7 @@ return {
     {
       context = "desc",
       msgid = "Go to the right window",
-      msgstr = "转到右侧Window",
+      msgstr = "转到右侧 Window",
       references = {
         "lua/which-key/plugins/presets.lua",
       },
@@ -340,7 +364,7 @@ return {
     {
       context = "desc",
       msgid = "Go to the up window",
-      msgstr = "转到上方Window",
+      msgstr = "转到上方 Window",
       references = {
         "lua/which-key/plugins/presets.lua",
       },
@@ -364,7 +388,7 @@ return {
     {
       context = "desc",
       msgid = "Home line of window (top)",
-      msgstr = "Window首行（顶部）",
+      msgstr = "Window 首行（顶部）",
       references = {
         "lua/which-key/plugins/presets.lua",
       },
@@ -411,8 +435,56 @@ return {
     },
     {
       context = "desc",
+      msgid = "Jump [count] shell prompts backward",
+      msgstr = "向后跳转 [count] 个 shell 提示符",
+      references = {
+        "../../../neovim/runtime/lua/vim/_core/defaults.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Jump [count] shell prompts forward",
+      msgstr = "向前跳转 [count] 个 shell 提示符",
+      references = {
+        "../../../neovim/runtime/lua/vim/_core/defaults.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Jump to the first diagnostic in the current buffer",
+      msgstr = "跳到当前 Buffer 的第一个诊断",
+      references = {
+        "../../../neovim/runtime/lua/vim/_core/defaults.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Jump to the last diagnostic in the current buffer",
+      msgstr = "跳到当前 Buffer 的最后一个诊断",
+      references = {
+        "../../../neovim/runtime/lua/vim/_core/defaults.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Jump to the next diagnostic in the current buffer",
+      msgstr = "跳到当前 Buffer 的下一个诊断",
+      references = {
+        "../../../neovim/runtime/lua/vim/_core/defaults.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Jump to the previous diagnostic in the current buffer",
+      msgstr = "跳到当前 Buffer 的上一个诊断",
+      references = {
+        "../../../neovim/runtime/lua/vim/_core/defaults.lua",
+      },
+    },
+    {
+      context = "desc",
       msgid = "Last change in current buffer",
-      msgstr = "当前Buffer最后修改",
+      msgstr = "当前 Buffer 最后一次修改的位置",
       references = {
         "lua/which-key/plugins/marks.lua",
       },
@@ -420,7 +492,7 @@ return {
     {
       context = "desc",
       msgid = "Last exited current buffer",
-      msgstr = "最后退出当前Buffer的位置",
+      msgstr = "最后退出当前 Buffer 的位置",
       references = {
         "lua/which-key/plugins/marks.lua",
       },
@@ -436,7 +508,7 @@ return {
     {
       context = "desc",
       msgid = "Last line of window",
-      msgstr = "Window末行",
+      msgstr = "Window 末行",
       references = {
         "lua/which-key/plugins/presets.lua",
       },
@@ -516,7 +588,7 @@ return {
     {
       context = "desc",
       msgid = "Middle line of window",
-      msgstr = "Window中间行",
+      msgstr = "Window 中间行",
       references = {
         "lua/which-key/plugins/presets.lua",
       },
@@ -556,7 +628,7 @@ return {
     {
       context = "desc",
       msgid = "Move window to far bottom",
-      msgstr = "将Window移到最底部",
+      msgstr = "将 Window 移到最底部",
       references = {
         "lua/which-key/plugins/presets.lua",
       },
@@ -564,7 +636,7 @@ return {
     {
       context = "desc",
       msgid = "Move window to far left",
-      msgstr = "将Window移到最左侧",
+      msgstr = "将 Window 移到最左侧",
       references = {
         "lua/which-key/plugins/presets.lua",
       },
@@ -572,7 +644,7 @@ return {
     {
       context = "desc",
       msgid = "Move window to far right",
-      msgstr = "将Window移到最右侧",
+      msgstr = "将 Window 移到最右侧",
       references = {
         "lua/which-key/plugins/presets.lua",
       },
@@ -580,7 +652,7 @@ return {
     {
       context = "desc",
       msgid = "Move window to far top",
-      msgstr = "将Window移到最顶部",
+      msgstr = "将 Window 移到最顶部",
       references = {
         "lua/which-key/plugins/presets.lua",
       },
@@ -723,6 +795,14 @@ return {
     },
     {
       context = "desc",
+      msgid = "Opens filepath or URI under cursor with the system handler (file explorer, web browser, …)",
+      msgstr = "使用系统处理程序打开光标下的文件或 URI（文件管理器、网页浏览器等）",
+      references = {
+        "../../../neovim/runtime/lua/vim/_core/defaults.lua",
+      },
+    },
+    {
+      context = "desc",
       msgid = "Prev WORD",
       msgstr = "上一个 WORD",
       references = {
@@ -820,7 +900,7 @@ return {
     {
       context = "desc",
       msgid = "Quit a window",
-      msgstr = "退出Window",
+      msgstr = "退出 Window",
       references = {
         "lua/which-key/plugins/presets.lua",
       },
@@ -891,10 +971,66 @@ return {
     },
     {
       context = "desc",
+      msgid = "Select child (inner) node",
+      msgstr = "选择子（内层）节点",
+      references = {
+        "../../../neovim/runtime/lua/vim/_core/defaults.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Select next node",
+      msgstr = "选择下一个节点",
+      references = {
+        "../../../neovim/runtime/lua/vim/_core/defaults.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Select next sibling node",
+      msgstr = "选择下一个同级节点",
+      references = {
+        "../../../neovim/runtime/lua/vim/_core/defaults.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Select parent (outer) node",
+      msgstr = "选择父（外层）节点",
+      references = {
+        "../../../neovim/runtime/lua/vim/_core/defaults.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Select previous node",
+      msgstr = "选择上一个节点",
+      references = {
+        "../../../neovim/runtime/lua/vim/_core/defaults.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Select previous sibling node",
+      msgstr = "选择上一个同级节点",
+      references = {
+        "../../../neovim/runtime/lua/vim/_core/defaults.lua",
+      },
+    },
+    {
+      context = "desc",
       msgid = "Show cursor line",
       msgstr = "显示光标行",
       references = {
         "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Show diagnostics under the cursor",
+      msgstr = "显示光标下的诊断",
+      references = {
+        "../../../neovim/runtime/lua/vim/_core/defaults.lua",
       },
     },
     {
@@ -916,7 +1052,7 @@ return {
     {
       context = "desc",
       msgid = "Split window",
-      msgstr = "水平拆分Window",
+      msgstr = "水平拆分 Window",
       references = {
         "lua/which-key/plugins/presets.lua",
       },
@@ -924,7 +1060,7 @@ return {
     {
       context = "desc",
       msgid = "Split window vertically",
-      msgstr = "垂直拆分Window",
+      msgstr = "垂直拆分 Window",
       references = {
         "lua/which-key/plugins/presets.lua",
       },
@@ -948,7 +1084,7 @@ return {
     {
       context = "desc",
       msgid = "Swap current with next",
-      msgstr = "与下一个Window交换",
+      msgstr = "与下一个 Window 交换",
       references = {
         "lua/which-key/plugins/presets.lua",
       },
@@ -956,7 +1092,7 @@ return {
     {
       context = "desc",
       msgid = "Switch windows",
-      msgstr = "切换Window",
+      msgstr = "切换 Window",
       references = {
         "lua/which-key/plugins/presets.lua",
       },
@@ -1007,6 +1143,22 @@ return {
       msgstr = "切换大小写",
       references = {
         "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Toggle comment",
+      msgstr = "切换注释",
+      references = {
+        "../../../neovim/runtime/lua/vim/_core/defaults.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Toggle comment line",
+      msgstr = "切换行注释",
+      references = {
+        "../../../neovim/runtime/lua/vim/_core/defaults.lua",
       },
     },
     {
@@ -1124,7 +1276,7 @@ return {
     {
       context = "desc",
       msgid = "alternate buffer",
-      msgstr = "备用Buffer",
+      msgstr = "备用 Buffer",
       references = {
         "lua/which-key/plugins/registers.lua",
       },
@@ -1412,7 +1564,7 @@ return {
     {
       context = "notification",
       msgid = "There were issues reported with your **which-key** mappings.\nUse `:checkhealth which-key` to find out more.",
-      msgstr = "你的 **which-key** 映射报告了问题。\n使用 `:checkhealth which-key` 查看详情。",
+      msgstr = "检测到你的 **which-key** 映射存在问题。\n使用 `:checkhealth which-key` 查看详情。",
       references = {
         "lua/which-key/mappings.lua",
       },
@@ -1422,7 +1574,7 @@ return {
       msgid = "Usage: WhichKey [mode] [keys]",
       msgstr = "用法：WhichKey [mode] [keys]",
       references = {
-        "lua/which-key/init.lua",
+        "lua/which-key/config.lua",
       },
     },
   },

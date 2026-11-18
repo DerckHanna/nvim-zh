@@ -117,7 +117,7 @@ return {
     {
       context = "",
       msgid = "[LSP] Rename, no matching language servers with rename capability.",
-      msgstr = "[LSP] 重命名失败，没有支持重命名能力的语言服务器。",
+      msgstr = "[LSP] 重命名：没有支持重命名能力的语言服务器。",
       references = {
         "lua/vim/lsp/buf.lua",
       },

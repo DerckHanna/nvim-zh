@@ -87,7 +87,7 @@ local messages = {
   {
     '[LSP] Rename, no matching language servers with rename capability.',
     'vim/lsp/buf.lua',
-    '[LSP] 重命名失败，没有支持重命名能力的语言服务器。',
+    '[LSP] 重命名：没有支持重命名能力的语言服务器。',
   },
   { 'No item resolved', 'vim/lsp/buf.lua', '未解析出条目' },
   {

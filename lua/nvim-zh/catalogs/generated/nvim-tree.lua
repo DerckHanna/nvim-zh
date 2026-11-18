@@ -68,7 +68,7 @@ return {
     {
       context = "mapping",
       msgid = "Copy Basename",
-      msgstr = "复制文件名",
+      msgstr = "复制主文件名",
       references = {
         "lua/nvim-tree/keymap.lua",
       },
@@ -332,7 +332,7 @@ return {
     {
       context = "mapping",
       msgid = "Rename: Basename",
-      msgstr = "重命名：文件名",
+      msgstr = "重命名：主文件名",
       references = {
         "lua/nvim-tree/keymap.lua",
       },

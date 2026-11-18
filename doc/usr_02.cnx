@@ -111,7 +111,7 @@ Normal 模式，按 <Esc> 键即可。有时需要按两次。如果 Vim 向你
 
 回到 Normal 模式后，你可以用这些键移动光标：
 
-	h   左						*hjkl*
+	h   左							*hjkl*
 	j   下
 	k   上
 	l   右

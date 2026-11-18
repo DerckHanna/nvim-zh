@@ -76,7 +76,7 @@ v:completed_item
 					*v:count* *count-variable*
 v:count
 		最近一个普通模式命令所带的计数。可用于在映射之前获取该计数。只读。
-		示例： >
+		示例： >vim
 		  :map _x :<C-U>echo "the count is " .. v:count<CR>
 <
 		注意：当你先输入计数再输入 ':' 时会得到行范围，必须用 <C-U> 将其去掉。
@@ -99,7 +99,7 @@ v:ctype
 v:dying
 		通常为零。捕获到致命信号时被设为一。捕获到多个信号时该数字会递增。
 		可在 autocommand 中用它检查 Vim 是否没有正常终止。
-		示例： >
+		示例： >vim
 		  :au VimLeave * if v:dying | echo "\nAAAAaaaarrrggghhhh!!!\n" | endif
 <
 		注意：如果 v:dying 为一的时候又捕获到另一个致命信号，VimLeave
@@ -117,7 +117,7 @@ v:echospace
 v:errmsg
 		最近发生的错误消息（不一定会显示出来）。
 		可修改（可以设置）。
-		示例： >
+		示例： >vim
 		  let v:errmsg = ""
 		  silent! next
 		  if v:errmsg != ""
@@ -129,7 +129,7 @@ v:errors
 		断言函数（如 |assert_true()|）发现的错误。这是一个字符串列表。
 		断言失败时，断言函数会追加一项。返回值也表明了这一点：如果向
 		v:errors 添加了项，则返回一，否则返回零。
-		要清除旧结果，将其置空： >
+		要清除旧结果，将其置空： >vim
 		  let v:errors = []
 <
 		如果 v:errors 被设为列表以外的任何值，断言函数会将其变为空列表。
@@ -137,7 +137,7 @@ v:errors
 					*v:event* *event-variable*
 v:event
 		当前 |autocommand| 的事件数据 Dictionary。仅在该事件的生命周期内
-		有效；保存或传递 v:event 是无效的！请改为复制它： >
+		有效；保存或传递 v:event 是无效的！请改为复制它： >vim
 		  au TextYankPost * let g:foo = deepcopy(v:event)
 <
 		键因事件而异；请查阅具体事件的文档，例如 |DirChanged| 或
@@ -150,7 +150,7 @@ v:event
 		                   该事件，则为 |v:true|。
 		  cmdlevel         命令行的层级。
 		  cmdtype          命令行的类型，|cmdline-char|。
-		  col              |CompleteChanged| 中弹出菜单的列数，相对于屏幕。
+		  col              |CompleteChanged| 中弹出菜单的列位置（相对屏幕）。
 		  complete_type    见 |complete_info_mode|
 		  complete_word    所选的单词；如果补全被放弃或丢弃则为空。
 		  completed_item   |CompleteChanged| 中当前选中的项，如果未选中
@@ -169,7 +169,7 @@ v:event
 		  regname          请求的 register（例如 "xyy" 中的 "x"），未指定
 		                   register 的操作则为空字符串。
 		  regtype          register 的类型，由 |getregtype()| 返回。
-		  row              |CompleteChanged| 中弹出菜单的行数，相对于屏幕。
+		  row              |CompleteChanged| 中弹出菜单的行位置（相对屏幕）。
 		  scope            事件特定的作用域名称。
 		  scrollbar        弹出菜单有滚动条则为 |v:true|，否则为
 		                   |v:false|。
@@ -183,7 +183,7 @@ v:event
 v:exception
 		最近捕获且尚未结束的异常的值。另见 |v:stacktrace|、|v:throwpoint|
 		和 |throw-variables|。
-		示例： >
+		示例： >vim
 		  try
 		    throw "oops"
 		  catch /.*/
@@ -196,7 +196,7 @@ v:exception
 v:exiting
 		退出码；在调用 |VimLeavePre| 和 |VimLeave| autocmd 之前为 |v:null|。
 		见 |:q|、|:x| 和 |:cquit|。
-		示例： >
+		示例： >vim
 		  :au VimLeave * echo "Exit code is " .. v:exiting
 <
 
@@ -210,7 +210,7 @@ v:exitreason
 		- "restart"   |:restart|、|ZR|。
 		- "restart!"  |:restart!|、|[count]||ZR|。
 
-		示例： >
+		示例： >vim
 		  autocmd ExitPre * if v:exitreason ==# 'restart' | echomsg 'restarting' | endif
 <
 		只读。
@@ -517,7 +517,7 @@ v:shell_error
 		最后一条 shell 命令的结果。非零表示最后一条 shell 命令出错。为零表示
 		没有问题。只有在 shell 把错误码返回给 Vim 时才有效。当命令无法执行时，
 		该值常常为 -1。只读。
-		示例： >
+		示例： >vim
 		  !mv foo bar
 		  if v:shell_error
 		    echo 'could not rename "foo" to "bar"!'
@@ -634,7 +634,7 @@ v:this_session
 v:throwpoint
 		最近捕获且尚未结束的异常的抛出位置。输入命令时不会被设置。另见
 		|v:exception|、|v:stacktrace| 和 |throw-variables|。
-		示例： >
+		示例： >vim
 		  try
 		    throw "oops"
 		  catch /.*/

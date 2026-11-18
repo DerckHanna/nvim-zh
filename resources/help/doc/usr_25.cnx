@@ -176,11 +176,11 @@ Vim 能排版的不仅仅是纯文本。改变这一点的方法见 |fo-table|�
 两端对齐文本			*justify* *:Justify* *Justify()* *package-justify*
 
 Vim 没有内建的两端对齐文本的办法。不过有一个很利落的宏包可以干这活儿。要用
-这个包，执行下面的命令： >
+这个包，执行下面的命令： >vim
 
 	:packadd justify
 
-或者把这行放进你的 |vimrc|： >
+或者把这行放进你的 |vimrc|： >vim
 
 	:packadd! justify
 
@@ -238,8 +238,8 @@ $VIMRUNTIME/pack/dist/opt/justify/plugin/justify.vim。
 制表位，并插入恰好所需的空格或制表符组合。
 
 	注意：
-	你可以把 'tabstop' 选项设为 4。然而，如果你在另一时间编辑该文件，
-	并把 'tabstop' 设为默认值 8，它看起来就会不对。在其他程序里以及打印
+	你可以把 'tabstop' 选项设为 4。然而，如果你下次编辑该文件时，
+	把 'tabstop' 设为默认值 8，它看起来就会不对。在其他程序里以及打印
 	时，缩进也会不对。因此建议始终把 'tabstop' 保持在八。这是所有类 UNIX
 	系统上的标准值。
 
@@ -303,7 +303,7 @@ Vim window 底部会出现一个水平滚动条。
 		 g0  g^    gm	   gM g$
 
 
-在单词处断行				*edit-no-break*
+在单词处断行					*edit-no-break*
 
 在为另一个程序准备文本时，你可能得做成不含换行的段落。使用 'nowrap' 的一个
 缺点是你看不到你正在处理的整句话。当 'wrap' 打开时，单词被从中间断开，这使
@@ -352,7 +352,7 @@ Vim window 底部会出现一个水平滚动条。
 	:map <Down> gj
 
 
-把段落变成一行				*edit-paragraph-join*
+把段落变成一行						*edit-paragraph-join*
 
 如果你想导入文本到像 MS-Word 这样的程序，每个段落就该是一行。如果你的段落
 目前是用空行分隔的，下面就是把每个段落变成一行的办法： >

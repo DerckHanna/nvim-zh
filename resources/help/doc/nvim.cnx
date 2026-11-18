@@ -65,7 +65,7 @@ Nvim 的 "IDE" 功能由 |LSP| 提供。
 
     :restart
 
-其他功能可能需要 |provider-python| 和 |provider-clipboard| 等软件。
+要使用某些功能，你可能需要额外安装软件，见 |provider-python| 和 |provider-clipboard|。
 
 你的 Vim 配置未必完全兼容 Nvim（见 |vim-differences|）。例如，Nvim 已移除
 'ttymouse' 选项，因为在可能的情况下始终启用鼠标支持。如果 Vim 和 Nvim

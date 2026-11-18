@@ -531,7 +531,7 @@ Vim 往回退若干行，然后从那里开始弄清情况。下面这条命令�
 
 如果你的文件工作得很好，也许想让它可供其它 Vim 用户使用。先读下一节，确保你
 的文件对他人来说也好用。然后用电子邮件发给 Vim 的维护者：
-<maintainer@vim.org>。还要说明 filetype 可以怎样被检出。运气好的话，你的文件
+<maintainer@vim.org>。还要说明 filetype 可以怎样被检测出来。运气好的话，你的文件
 会被纳入下一个 Vim 版本！
 
 
@@ -546,7 +546,7 @@ Vim 往回退若干行，然后从那里开始弄清情况。下面这条命令�
 	:syntax keyword cType off_t uint
 
 把这个文件写成与原语法文件相同的名字。这里就是 "c.vim"。把它放在
-'runtimepath' 靠后位置的一个目录里。这使它工作在原语法文件之后被加载。对 Unix
+'runtimepath' 靠后位置的一个目录里。这使它在原语法文件之后被加载。对 Unix
 来说就是：
 
 	~/.config/nvim/after/syntax/c.vim ~

@@ -13,10 +13,10 @@
 影响搜索行为的选项见此处：|search-options|
 
 |27.1|	忽略大小写
-|27.2|	绕到文件末尾继续
+|27.2|	到达文件末尾后绕回
 |27.3|	偏移量
 |27.4|	多次匹配
-|27.5|	二选一
+|27.5|	备选分支
 |27.6|	字符范围
 |27.7|	字符类
 |27.8|	匹配换行
@@ -82,7 +82,7 @@
 	MS-Windows 上可以用 CTRL-Break。
 
 ==============================================================================
-*27.2*	绕到文件末尾继续
+*27.2*	到达文件末尾后绕回
 
 默认情况下，向前搜索从当前光标位置开始查找给定的字符串。然后一直进行到文件
 末尾。如果到那时还没找到该字符串，它就从头开始，从文件开头一直搜索到光标位
@@ -290,7 +290,7 @@ Vim 会在 window 的右下角（如果有状态行，就在状态行里）显�
 它就会试着用 `.*` 尽可能多地匹配字符，于是把 "axbxb" 整个匹配掉。
 
 ==============================================================================
-*27.5*	二选一
+*27.5*	备选分支
 
 pattern 里的 "或" 运算符是 "\|"。例如： >
 
@@ -356,10 +356,10 @@ pattern 里的 "或" 运算符是 "\|"。例如： >
 
 	/"[^"]*"
 <
-	 "	  a double quote
-	  [^"]	  any character that is not a double quote
-	      *	  as many as possible
-	       "  a double quote again
+	 "	  一个双引号
+	  [^"]	  任何非双引号的字符
+	      *	  尽可能多
+	       "  再一个双引号
 
 这会匹配 "foo" 和 "3!x"，包括双引号在内。
 
@@ -372,17 +372,17 @@ pattern 里的 "或" 运算符是 "\|"。例如： >
 
 查找字母字符。这等价于用 "/[a-zA-Z]"。下面还有几个：
 
-	item	matches			equivalent ~
-	\d	digit			[0-9]
-	\D	non-digit		[^0-9]
-	\x	hex digit		[0-9a-fA-F]
-	\X	non-hex digit		[^0-9a-fA-F]
-	\s	white space		[ 	]     (<Tab> and <Space>)
-	\S	non-white characters	[^ 	]     (not <Tab> and <Space>)
-	\l	lowercase alpha		[a-z]
-	\L	non-lowercase alpha	[^a-z]
-	\u	uppercase alpha		[A-Z]
-	\U	non-uppercase alpha	[^A-Z]
+	item	匹配			等价 ~
+	\d	数字			[0-9]
+	\D	非数字			[^0-9]
+	\x	十六进制数字		[0-9a-fA-F]
+	\X	非十六进制数字		[^0-9a-fA-F]
+	\s	空白			[ 	]     (<Tab> 和 <Space>)
+	\S	非空白字符		[^ 	]     (非 <Tab> 和 <Space>)
+	\l	小写字母		[a-z]
+	\L	非小写字母		[^a-z]
+	\u	大写字母		[A-Z]
+	\U	非大写字母		[^A-Z]
 
 	注意：
 	使用这些预定义范围比使用它们所代表的字符范围要快得多。
@@ -417,15 +417,15 @@ pattern 里的 "或" 运算符是 "\|"。例如： >
 
 字符类有：
 
-	item	matches				option ~
-	\i	identifier characters		'isident'
-	\I	like \i, excluding digits
-	\k	keyword characters		'iskeyword'
-	\K	like \k, excluding digits
-	\p	printable characters		'isprint'
-	\P	like \p, excluding digits
-	\f	file name characters		'isfname'
-	\F	like \f, excluding digits
+	item	匹配				选项 ~
+	\i	标识符字符			'isident'
+	\I	同 \i，但不含数字
+	\k	keyword 字符			'iskeyword'
+	\K	同 \k，但不含数字
+	\p	可打印字符			'isprint'
+	\P	同 \p，但不含数字
+	\f	文件名字符			'isfname'
+	\F	同 \f，但不含数字
 
 ==============================================================================
 *27.8*	匹配换行

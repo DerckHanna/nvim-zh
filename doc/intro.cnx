@@ -527,7 +527,7 @@ Vim 的名称和当前文件的完整名称会显示在标题栏中。当 window
 API 客户端 ~
 所有外部 UI 和远程插件（区别于普通的 Vim 插件）通常都称为 "clients"；但只有当
 某个东西的目的是为他人方便而抽象或封装 RPC API 时，我们才称它为 "API client"
-（就像 AWS 的 boto3 之于 REST 客户端或 SDK：你可以用 curl 这样的 HTTP 客户端
+（就像 AWS 的 REST 客户端或 SDK boto3：你可以用 curl 这样的 HTTP 客户端
 直接与 AWS REST 通信，但 boto3 把它包装成一个方便的 python 接口）。例如，Nvim
 的 node-client 就是一个 API client：
     https://github.com/neovim/node-client

@@ -298,7 +298,7 @@ source 任何 Vim 脚本，所以它也可以理解成 "source"）。
 
 	vim -S ~/.config/nvim/mine.vim
 
-提示：要打开你在文件浏览器 window 里看到、并显示在空 window 中的某个文件，把
+提示：要把文件浏览器 window 里列出的某个文件打开到那个空 window 中，把
 光标移到该文件名上按 "O"。用鼠标双击也可以。
 
 

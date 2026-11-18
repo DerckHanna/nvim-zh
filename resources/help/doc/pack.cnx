@@ -267,7 +267,7 @@ pack/foo/start/lib/autoload/foolib.vim >
   （|vim.lsp.buf.document_symbol()|）。
 
 切换插件的版本和/或来源 ~
-• 更新插件的 'init.lua'，让它具有想要的 `version` 和/或 `src`。假定要切换的是
+• 在 'init.lua' 中把该插件的 `version`（和/或 `src`）改为目标值。假定要切换的是
   名为 'plugin1' 的插件。
 • |:restart|。插件在磁盘上的状态（修订版和/或跟踪的源）尚未改变。只有
   |vim.pack-lockfile| 中该插件的 `version` 被更新。
@@ -277,12 +277,12 @@ pack/foo/start/lib/autoload/foolib.vim >
   改回，否则下次运行 |vim.pack.update()| 时会再次提示你。
 
 冻结插件使其不被更新 ~
-• 更新插件的 'init.lua'，把 `version` 设为当前修订版。可从
+• 在 'init.lua' 中把该插件的 `version` 设为当前修订版。可从
   |vim.pack-lockfile| 取得它（插件字段 `rev`；形如 `abc12345`）。
 • |:restart|。
 
 解冻插件以开始接收更新 ~
-• 更新插件的 'init.lua'，把 `version` 设为你希望它更新到的版本。
+• 在 'init.lua' 中把该插件的 `version` 设为你希望它更新到的版本。
 • |:restart|。
 
 更新之后回退插件 ~
@@ -449,7 +449,7 @@ update({names}, {opts})                                    *vim.pack.update()*
     注意：
     • 每次实际更新都会记录到 "nvim-pack.log" 文件中，该文件位于 "log"
       |standard-path|。
-    • 如果源的默认分支发生了改变（比如从 `master` 变为 `main`），它不会更新该
+    • 如果源的默认分支发生了改变（比如从 `master` 变为 `main`），它不会随之更新所跟踪的
       默认分支。要让 `version = nil` 指向新的默认分支，请重新安装该插件
       （|vim.pack.del()| + |vim.pack.add()|）。
 

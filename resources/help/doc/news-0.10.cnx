@@ -212,7 +212,7 @@ Nvim 0.9 以来的重要变更                                         *news-0.1
     https://microsoft.github.io/language-server-protocol/specification/#textDocument_diagnostic
   • 实现了 LSP 类型层级：|vim.lsp.buf.typehierarchy()|
     https://microsoft.github.io/language-server-protocol/specification/#textDocument_prepareTypeHierarchy
-  • |vim.lsp.status()| 把最近的进度消息作为字符串返回。
+  • |vim.lsp.status()| 取走最近的进度消息并作为字符串返回。
   • LSP 客户端在应用文本编辑时，现在总会保存并恢复具名的 buffer marks。
   • LSP 客户端现在支持 `positionEncoding` 这项 server capability。如果 server
     在其初始化响应中返回 `positionEncoding` capability，Nvim 会自动设置客户端

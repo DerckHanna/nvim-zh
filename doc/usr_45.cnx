@@ -220,8 +220,8 @@ little-endian 的。这种文件格式在 MS-Windows 上很常见（例如注册
 
 	:edit ++enc=koi8-r russian.txt
 
-"++enc" 这部分指定了只用于这个文件的编码名称。Vim 会按指定的编码把文件转换
-成 'encoding'，本例中是俄语。'fileencoding' 也会被设成指定的编码，这样在写
+"++enc" 这部分指定了只用于这个文件的编码名称。Vim 会把文件从指定的编码（本例中
+是俄语）转换成 'encoding'。'fileencoding' 也会被设成指定的编码，这样在写
 文件时就能做反向转换。
    写文件时也可以用同样的参数。这样你其实可以用 Vim 来转换文件。示例： >
 

@@ -523,12 +523,13 @@ getline() 函数从当前 buffer 获取一行。它的参数指定行号。这�
 
 当你在 substitute() 调用前后做更多工作时，使用函数就变得有意思了。
 
-函数						*function-list*
+
+函数							*function-list*
 
 函数非常多。这里按用途分组列举。按字母顺序排列的列表见：
 |vimscript-functions|。在函数名上按 CTRL-] 可以跳到它的详细帮助。
 
-字符串操作：					*string-functions*
+字符串操作：						*string-functions*
 	nr2char()		根据字符的数值得到字符
 	list2str()		根据数字列表得到字符串
 	char2nr()		得到字符的数值
@@ -586,7 +587,7 @@ getline() 函数从当前 buffer 获取一行。它的参数指定行号。这�
 	gettext()		查找消息译文
 	items()			得到 String 索引-字符对的 List
 
-List 操作：					*list-functions*
+List 操作：						*list-functions*
 	get()			索引错误时不报错地取得一项
 	len()			List 中的项数
 	empty()			检查 List 是否为空
@@ -621,7 +622,7 @@ List 操作：					*list-functions*
 	flattennew()		展平 List 的副本
 	items()			得到 List 索引-值对的 List
 
-Dictionary 操作：				*dict-functions*
+Dictionary 操作：					*dict-functions*
 	get()			键错误时不报错地取得一项
 	len()			Dictionary 中的条目数
 	has_key()		检查某个键是否出现在 Dictionary 中
@@ -643,7 +644,7 @@ Dictionary 操作：				*dict-functions*
 	min()			Dictionary 中的最小值
 	count()			某个值出现的次数
 
-浮点运算：				*float-functions*
+浮点运算：						*float-functions*
 	float2nr()		把 Float 转换为 Number
 	abs()			绝对值（对 Number 也有效）
 	round()			四舍五入
@@ -669,7 +670,7 @@ Dictionary 操作：				*dict-functions*
 	isinf()			检查是否为无穷
 	isnan()			检查是否非数字
 
-Blob 操作：					*blob-functions*
+Blob 操作：						*blob-functions*
 	blob2list()		根据 blob 得到数字列表
 	list2blob()		根据数字列表得到 blob
 	reverse()		反转 blob 中数字的顺序
@@ -677,7 +678,7 @@ Blob 操作：					*blob-functions*
 	indexof()		Blob 中表达式为真的索引
 	items()			得到 Blob 索引-值对的 List
 
-其他运算：					*bitwise-function*
+其他运算：						*bitwise-function*
 	and()			按位与
 	invert()		按位取反
 	or()			按位或
@@ -686,7 +687,7 @@ Blob 操作：					*blob-functions*
 	rand()			获取伪随机数
 	srand()			初始化 rand() 使用的种子
 
-变量：						*var-functions*
+变量：							*var-functions*
 	type()			变量的类型
 	islocked()		检查变量是否被锁定
 	funcref()		取得函数引用的 Funcref
@@ -729,7 +730,7 @@ Blob 操作：					*blob-functions*
 	getcursorcharpos()	得到光标的字符位置
 	setcursorcharpos()	设置光标的字符位置
 
-处理当前 buffer 中的文本：		*text-functions*
+处理当前 buffer 中的文本：				*text-functions*
 	getline()		从 buffer 获取一行或一组行
 	getregion()		从 buffer 获取一块文本区域
 	getregionpos()		获取一块区域的位置列表
@@ -859,13 +860,13 @@ buffer、window 与参数列表：
 	fullcommand()		获取完整命令名
 	cmdcomplete_info()	获取命令行补全信息
 
-Quickfix 与位置列表：			*quickfix-functions*
+Quickfix 与位置列表：				*quickfix-functions*
 	getqflist()		quickfix 错误的列表
 	setqflist()		修改 quickfix 列表
 	getloclist()		位置列表项的列表
 	setloclist()		修改位置列表
 
-插入模式补全：				*completion-functions*
+插入模式补全：					*completion-functions*
 	complete()		设置找到的匹配项
 	complete_add()		向找到的匹配项中添加
 	complete_check()	检查补全是否应中止
@@ -874,7 +875,7 @@ Quickfix 与位置列表：			*quickfix-functions*
 	pumvisible()		检查弹出菜单是否显示
 	pum_getpos()		弹出菜单显示时的位置和大小
 
-折叠：					*folding-functions*
+折叠：						*folding-functions*
 	foldclosed()		检查特定行是否有闭合的折叠
 	foldclosedend()		类似 foldclosed()，但返回最后一行
 	foldlevel()		检查特定行的折叠层级
@@ -898,7 +899,7 @@ Syntax 与高亮：	  *syntax-functions* *highlighting-functions*
 	matchdelete()		删除由 |matchadd()| 或 |:match| 命令定义的匹配
 	setmatches()		恢复由 |getmatches()| 保存的匹配列表
 
-拼写：					*spell-functions*
+拼写：						*spell-functions*
 	spellbadword()		定位光标处或其后的拼写错误单词
 	spellsuggest()		返回建议的拼写更正
 	soundfold()		返回单词的近似读音形式
@@ -909,7 +910,7 @@ Syntax 与高亮：	  *syntax-functions* *highlighting-functions*
 	histget()		从某个历史记录获取一项
 	histnr()		获取某个历史记录列表的最高索引
 
-交互：					*interactive-functions*
+交互：						*interactive-functions*
 	browse()		弹出文件选择器
 	browsedir()		弹出目录选择器
 	confirm()		让用户做出选择
@@ -944,7 +945,7 @@ Vim server：					*server-functions*
 	foreground()		把 Vim window 移到前台
 	remote_foreground()	把 Vim server 的 window 移到前台
 
-window 的大小与位置：			*window-size-functions*
+window 的大小与位置：				*window-size-functions*
 	winheight()		获取特定 window 的高度
 	winwidth()		获取特定 window 的宽度
 	win_screenpos()		获取某个 window 的屏幕位置
@@ -993,7 +994,7 @@ Sign：						*sign-functions*
 	assert_fails()		断言某条命令失败
 	assert_report()		报告一次测试失败
 
-定时器：						*timer-functions*
+定时器：					*timer-functions*
 	timer_start()		创建一个定时器
 	timer_pause()		暂停或恢复一个定时器
 	timer_stop()		停止一个定时器
@@ -1028,7 +1029,7 @@ Context Stack：					*ctx-functions*
 	ctxset()		设置从栈顶算起指定索引处的上下文
 	ctxsize()		返回上下文栈的大小
 
-杂项：					*various-functions*
+杂项：						*various-functions*
 	mode()			获取当前编辑模式
 	visualmode()		上次使用的可视模式
 	exists()		检查变量、函数等是否存在
@@ -1737,7 +1738,7 @@ MS-Windows 复制到 Unix，它们仍然能正常工作。见 |:source_crnl|。�
 	let XXX_loaded = 1
 
 ==============================================================================
-*41.11*	编写 plugin				*write-plugin*
+*41.11*	编写 plugin					*write-plugin*
 
 你可以用一种让许多人使用的方式来编写 Vim script。这称为 plugin。Vim 用户可以
 把你的脚本放进他们的 plugin 目录，然后立刻使用它的功能 |add-plugin|。
@@ -1796,7 +1797,7 @@ plugin 置于公有领域，或使用 Vim |license|。在 plugin 顶部附近简
   4	" License:	This file is placed in the public domain.
 
 
-行续接，避免副作用		*use-cpo-save*
+行续接，避免副作用					*use-cpo-save*
 
 在上面的第 18 行中使用了行续接机制 |line-continuation|。设置了 'compatible'
 的用户在这里会遇到麻烦，他们会得到一条错误消息。我们不能简单地重置
@@ -1927,7 +1928,7 @@ s:Add()。
 |:map-<script>|  第 26 行对 ":noremenu" 也做了同样的处理。|:menu-<script>|
 
 
-<SID> 与 <Plug>					*using-<Plug>*
+<SID> 与 <Plug>						*using-<Plug>*
 
 <SID> 和 <Plug> 都用于避免：输入按键的映射与只供其他映射调用的映射相互干扰。
 注意使用 <SID> 和 <Plug> 的区别：
@@ -2043,7 +2044,7 @@ s:count 加一。函数是从哪里调用的并不重要，由于它是在该脚
 	:set fileformat=unix
 
 
-文档						*write-local-help*
+文档							*write-local-help*
 
 为你的 plugin 写一些文档也是个好主意，尤其是当它的行为可以被用户改变时。关于
 文档如何安装，见 |add-local-help|。
@@ -2078,7 +2079,7 @@ s:count 加一。函数是从哪里调用的并不重要，由于它是在该脚
 建议用 || 引用帮助的其他部分。这能让用户容易找到相关的帮助。
 
 
-filetype 检测					*plugin-filetype*
+filetype 检测						*plugin-filetype*
 
 如果你的 filetype 还没有被 Vim 检测到，就应该在一个单独的文件中创建一段
 filetype 检测代码。它通常是一条自动命令，在文件名匹配某个模式时设置 filetype。
@@ -2287,7 +2288,7 @@ exists("*s:Func")	检查函数是否已经定义。
 另见 |plugin-special|，那里列出了所有 plugin 都要用到的特殊事项。
 
 ==============================================================================
-*41.13*	编写 compiler plugin		*write-compiler-plugin*
+*41.13*	编写 compiler plugin			*write-compiler-plugin*
 
 compiler plugin 为特定的编译器设置选项。用户可以用 |:compiler| 命令加载它。
 主要用途是设置 'errorformat' 和 'makeprg' 选项。
@@ -2324,7 +2325,7 @@ Vim 为此定义了 ":CompilerSet" 用户命令。下面是一个例子： >
 末尾的目录中。在 Unix 上可以是 ~/.config/nvim/after/compiler。
 
 ==============================================================================
-*41.14*	编写可快速加载的 plugin	*write-plugin-quickload*
+*41.14*	编写可快速加载的 plugin			*write-plugin-quickload*
 
 plugin 可能会变大、变得相当长。启动延迟可能变得明显，而你却几乎不用这个
 plugin。这时就该用快速加载 plugin 了。
@@ -2388,7 +2389,7 @@ plugin。这时就该用快速加载 plugin 了。
 plugin 定义匹配该模式的函数。
 
 ==============================================================================
-*41.15*	编写库脚本			*write-library-script*
+*41.15*	编写库脚本				*write-library-script*
 
 有些功能会在多个地方用到。当它超过几行时，你会想把它放进一个脚本，并从许多
 脚本中使用它。我们把这一个脚本称为库脚本。
@@ -2444,7 +2445,7 @@ plugin 定义匹配该模式的函数。
 进一步阅读：|autoload|。
 
 ==============================================================================
-*41.16*	分发 Vim script			*distribute-script*
+*41.16*	分发 Vim script					*distribute-script*
 
 Vim 用户会在 Vim 网站上寻找脚本：https://www.vim.org。如果你做出了对别人有用
 的东西，就分享出来吧！

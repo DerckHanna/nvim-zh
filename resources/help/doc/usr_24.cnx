@@ -98,8 +98,8 @@
 的 ( 上，在那儿停半秒，然后移回你正在输入的位置。
    如果没有匹配的 (，Vim 会响铃。这样你就知道可能在某处漏了 (，或者多打了
 一个 )。
-   匹配对 [] 和 {} 也会显示。你不必等到再输入下一个字符才移回，Vim 一看到
-它就移回光标，插入照旧继续。
+   匹配对 [] 和 {} 也会显示。你不必停下来等，只管继续输入；Vim 一看到下一个
+字符就移回光标，插入照旧继续。
    你可以用 'matchtime' 选项改变 Vim 等待的时间。例如让 Vim 等一秒半： >
 
 	:set matchtime=15
@@ -129,8 +129,8 @@ Vim 可以在插入时自动补全单词。你打出单词的开头部分，按 
 	total = ch_array[0] + ch_array[1] +  ~
 
 现在如果你按 CTRL-P，Vim 会重新搜索能补全光标前单词的单词。由于光标前面
-什么也没有，它往前找到第一个单词，是 "ch_array"。再按一次 CTRL-P 得到
-下一个匹配的单词，这里是 "total"。第三次 CTRL-P 继续往前找。如果前面没有
+什么也没有，它向文件开头方向找到第一个单词，是 "ch_array"。再按一次 CTRL-P 得到
+下一个匹配的单词，这里是 "total"。第三次 CTRL-P 继续向文件开头方向找。如果前面没有
 别的了，编辑器就把可用的单词用完了，于是回到原来的文本，什么也没有。第四次
 CTRL-P 让编辑器从 "ch_array" 重新开始。
 
@@ -140,12 +140,12 @@ Previous-match（上一个匹配）。
 
 Vim 编辑器费了不少功夫去找可补全的单词。默认情况下它搜索下面这些地方：
 
-	1. Current file
-	2. Files in other windows
-	3. Other loaded files (hidden buffers)
-	4. Files which are not loaded (inactive buffers)
-	5. Tag files
-	6. All files #included by the current file
+	1. 当前文件
+	2. 其他 window 中的文件
+	3. 其他已载入的文件（隐藏 buffer）
+	4. 未载入的文件（非活动 buffer）
+	5. tag 文件
+	6. 当前文件 #include 的所有文件
 
 
 选项
@@ -163,18 +163,19 @@ Vim 编辑器费了不少功夫去找可补全的单词。默认情况下它搜�
 
 如果你知道自己要找什么，可以用这些命令按某类项目补全：
 
-	CTRL-X CTRL-F		file names
-	CTRL-X CTRL-L		whole lines
-	CTRL-X CTRL-D		macro definitions (also in included files)
-	CTRL-X CTRL-I		current and included files
-	CTRL-X CTRL-K		words from a dictionary
-	CTRL-X CTRL-R		contents from registers
-	CTRL-X CTRL-T		words from a thesaurus
+	CTRL-X CTRL-F		文件名
+	CTRL-X CTRL-L		整行
+	CTRL-X CTRL-D		宏定义（含 include 文件中的）
+	CTRL-X CTRL-I		当前文件与 include 文件
+	CTRL-X CTRL-K		词典中的单词
+	CTRL-X CTRL-R		register 内容
+	CTRL-X CTRL-T		同义词词典中的单词
 	CTRL-X CTRL-]		tags
-	CTRL-X CTRL-V		Vim command line
+	CTRL-X CTRL-V		Vim 命令行
 
 其中每一个之后都可以用 CTRL-N 找下一个匹配，用 CTRL-P 找上一个匹配。
    这些命令的更多信息见：|ins-completion|。
+
 
 补全文件名
 
@@ -393,8 +394,8 @@ CTRL-R {register} 命令插入 register 的内容。要避免输入很长的单�
 
 第一列的 "i" 表示插入模式。这些缩写只在插入模式下有效。其它可能的字符是：
 
-	c	Command-line mode			:cabbrev
-	!	both Insert and Command-line mode	:abbreviate
+	c	命令行模式			:cabbrev
+	!	插入模式与命令行模式皆可	:abbreviate
 
 由于缩写在命令行模式下不常用，你多半会用 ":iabbrev" 命令。例如这样可以避免
 在输入下面这样的命令时把 "ad" 展开： >

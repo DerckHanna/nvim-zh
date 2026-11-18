@@ -15,6 +15,8 @@ stats    print the manifest counts
 The supplement PO keeps upstream msgids verbatim so it can be merged into (or
 submitted to) the upstream catalog; msgids that upstream truncated are repaired
 by translations/native/runtime_repairs.po, built from the pinned C sources.
+The separate intro.po retains current welcome-screen keys alongside the
+upstream catalog's older spacing/wording, with pinned source and binary evidence.
 """
 
 from __future__ import annotations
@@ -309,6 +311,26 @@ def check(root: Path) -> dict:
     translated_repairs = {entry['msgid'] for entry in repairs}
     if translated_repairs & (supplement_ids | exemptions):
         raise NativeError('repairs: runtime msgid collides with an upstream msgid')
+    intro = []
+    if 'intro' in manifest:
+        info = manifest['intro']
+        intro = _read_catalog(root / info['po'], terms, 'intro')
+        source = info['source']
+        if source['commit'] != manifest['upstream']['commit']:
+            raise NativeError('intro: source commit must match the pinned upstream')
+        for field in ('sha256', 'binary_sha256'):
+            if not re.fullmatch(r'[0-9a-f]{64}', source.get(field, '')):
+                raise NativeError(f'intro: invalid source {field}')
+        ids = {entry['msgid'] for entry in intro}
+        expected = {item['msgid'] for item in info['messages']}
+        if (len(ids) != len(intro) or len(intro) != info['entries']
+                or len(info['messages']) != len(intro) or ids != expected):
+            raise NativeError('intro: duplicate keys or entries differ from the manifest')
+        if ids & (supplement_ids | exemptions | translated_repairs):
+            raise NativeError('intro: runtime key collides with another local catalog')
+        for item in info['messages']:
+            if not item.get('previous_msgid') or item.get('source_line', 0) <= 0:
+                raise NativeError('intro: previous msgid and pinned source line are required')
     for item in manifest['exemptions']:
         if 'do not translate' not in item.get('marker', ''):
             raise NativeError(f"exemption {item['msgid']!r}: marker does not record an upstream do-not-translate note")
@@ -327,6 +349,7 @@ def check(root: Path) -> dict:
         'repairs': len(translated_repairs),
         'prefix_repairs': len(prefix_repairs),
         'glossary_terms': len(terms),
+        'intro': len(intro),
     }
 
 
@@ -337,7 +360,8 @@ def _key(entry: dict) -> tuple[str, str]:
     return entry.get('msgctxt') or '', entry['msgid']
 
 
-def merge(manifest: dict, upstream: list[dict], supplement: list[dict], repairs: list[dict]) -> tuple[list[dict], dict]:
+def merge(manifest: dict, upstream: list[dict], supplement: list[dict], repairs: list[dict],
+          intro: list[dict] | None = None) -> tuple[list[dict], dict]:
     gaps = {item['msgid'] for item in manifest['gaps']}
     exemptions = {item['msgid'] for item in manifest['exemptions']}
     prefix_repairs = manifest.get('prefix_repairs', [])
@@ -382,6 +406,15 @@ def merge(manifest: dict, upstream: list[dict], supplement: list[dict], repairs:
         if key in merged:
             raise NativeError(f'runtime repair collides with an existing catalog key: {key!r}')
         merged[key] = dict(entry)
+    previous = {item['msgid']: item['previous_msgid'] for item in manifest.get('intro', {}).get('messages', [])}
+    for entry in intro or []:
+        key = _key(entry)
+        if key in merged:
+            raise NativeError(f'intro repair collides with an existing catalog key: {key!r}')
+        legacy_key = ('', previous.get(entry['msgid'], ''))
+        if legacy_key not in merged:
+            raise NativeError(f'intro: previous upstream key no longer exists: {legacy_key!r}')
+        merged[key] = dict(entry)
     by_msgid = {entry['msgid']: entry for entry in merged.values()}
     uncovered = sorted(g for g in gaps if g not in exemptions
                        and not by_msgid.get(g, {}).get('msgstr', '').strip())
@@ -394,6 +427,7 @@ def merge(manifest: dict, upstream: list[dict], supplement: list[dict], repairs:
         'untranslated': sum(1 for e in entries if not e.get('msgstr', '').strip() and not e.get('msgstr_plural')),
         'exemptions': len(exemptions),
         'repairs': len(repairs),
+        'intro': len(intro or []),
     }
     if stats['untranslated'] != stats['exemptions']:
         raise NativeError(f'merged catalog has {stats["untranslated"]} untranslated entries, '
@@ -551,7 +585,9 @@ def build(root: Path, manifest: dict, upstream_path: Path, out_dir: Path, expect
         raise NativeError(f'{upstream_path}: no messages')
     supplement = _read_catalog(root / manifest['supplement']['po'], terms, 'supplement')
     repairs = _read_catalog(root / manifest['repairs']['po'], terms, 'runtime repairs')
-    entries, stats = merge(manifest, upstream, supplement, repairs)
+    intro = (_read_catalog(root / manifest['intro']['po'], terms, 'intro')
+             if 'intro' in manifest else [])
+    entries, stats = merge(manifest, upstream, supplement, repairs, intro)
     merged_text = render_po(entries, headers)
     out_dir.mkdir(parents=True, exist_ok=True)
     merged_po = out_dir / 'nvim.merged.po'
@@ -628,7 +664,8 @@ def main(argv: list[str] | None = None) -> int:
             print(f"NATIVE_STATS upstream={upstream['version']}@{upstream['commit'][:12]} "
                   f"messages={upstream['messages']} translated={upstream['translated']} "
                   f"untranslated={upstream['untranslated']} supplement={manifest['supplement']['entries']} "
-                  f"exemptions={len(manifest['exemptions'])} repairs={manifest['repairs']['entries']}")
+                  f"exemptions={len(manifest['exemptions'])} repairs={manifest['repairs']['entries']} "
+                  f"intro={manifest.get('intro', {}).get('entries', 0)}")
         elif args.command == 'sync':
             manifest = load_manifest(args.root)
             result = sync(args.root, manifest, args.fetch)

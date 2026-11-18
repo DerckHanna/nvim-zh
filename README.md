@@ -260,12 +260,13 @@ make build-native    # 合并上游 + 补充 + 修复，产出 build/native/zh_C
 make audit-native    # 可选：用本机 nvim 二进制核对补充条目的运行时字面量
 ```
 
-上游目录里有两类“键对不上”的缺陷会让译文在运行时完全不生效，构建时一并修好：
+上游目录里有三类“键对不上”的缺陷会让译文在运行时完全不生效，构建时一并修好：
 
 | 缺陷 | 条数 | 处理 |
 |---|---|---|
 | 抽取 `PRIdVARNUMBER` 时未展开，msgid 被截断（如 `E5403: Chunk %i start %`） | 4 | `translations/native/runtime_repairs.po` 按固定上游 C 源码重建运行时 msgid |
 | 同一消息在运行时还有一条带 `E###: ` 前缀的调用点，po 只记录了无前缀键 | 25 | manifest 的 `prefix_repairs`，构建时补同前缀条目 |
+| 原生欢迎页提示的空格、措辞与帮助主题已更新，上游 PO 仍是旧查询键 | 6 | `translations/native/intro.po`；`manifests/native.json` 的 `intro` 固定源码行、文件 hash 与实测二进制 hash |
 
 `make audit-native` 在本机固定二进制及其 runtime 树（sha256 记入 manifest 的
 `runtime_audit`）上实测：118 条补充中 76 条直接对上二进制字面量、25 条另有带前缀
@@ -277,6 +278,31 @@ make audit-native    # 可选：用本机 nvim 二进制核对补充条目的运
 
 构建只写 `build/` 目录，**不安装、不替换**系统或 Neovim 自带的任何 MO；装卸与接线
 属于后续显式集成步骤，插件 `core` 模块当前仍只读取发行版自带目录。
+
+### 原生欢迎页显示中文
+
+无文件启动时的 Neovim 标志与 `:help` / `:q` 提示来自原生 gettext，不经过
+`vim.notify` 等 Lua UI 包装。只安装本插件会启用中文 Help，不会自动启用系统中文
+locale 或替换核心 MO。固定 0.12.6 的上游 PO 还存在六条欢迎提示的运行时键不匹配，
+已由 `intro.po` 补齐；新 MO 共 2020 条，其中 2008 条有译文、12 条为原有豁免。
+
+在 Arch Linux 上显式启用的步骤（由用户执行）：
+
+1. 在 `/etc/locale.gen` 中取消 `zh_CN.UTF-8 UTF-8` 的注释，运行 `sudo locale-gen`，
+   用 `locale -a` 确认 `zh_CN.utf8` 可用。
+2. 运行 `make build-native`。备份 Neovim 自带的中文 MO 后，将构建结果安装到
+   `:NvimZhInfo` 显示的核心 MO 路径。本机 `/usr/bin/nvim` 对应：
+
+   ```bash
+   sudo install -Dm644 build/native/zh_CN.UTF-8/LC_MESSAGES/nvim.mo \
+     /usr/share/locale/zh_CN.UTF-8/LC_MESSAGES/nvim.mo
+   ```
+
+3. 用 `LC_ALL=zh_CN.UTF-8 nvim` 启动。这个单次命令可避开现有 `LC_ALL=C.UTF-8`
+   对 `LC_MESSAGES` 的覆盖；也可按个人需要在启动脚本中配置。
+
+此安装步骤会替换包管理器提供的 MO，系统升级后应复核；Neovim 版本变化时要重新
+核对运行时键。本项目的构建和测试不会自行执行上述系统安装。
 
 ## 测试
 
@@ -299,10 +325,12 @@ make sync          # 默认离线只读（不联网）
 make sync-fetch    # 显式只读联网同步 UI 目录（--fetch 是工具参数，不是 make 参数）
 ```
 
-阶段 9 的真实运行时探针默认跳过（`skipped=2`）；设置
+阶段 9 的真实运行时探针默认跳过（原有 2 项，以及欢迎页套件中的 1 项）；设置
 `NVIM_ZH_TEST_NATIVE_RUNTIME=1` 后会在临时 prefix + 临时 locale 下用副本 nvim
 验证 `E482`、`E576`、`E136`、`E5005` 的译文与「豁免条目保持英文」，并断言随包
 `build/native/zh_CN.UTF-8/LC_MESSAGES/nvim.mo` 等于按缓存固定上游 PO 重建的结果。
+欢迎页另用真实 POSIX PTY 捕获原生启动画面，对比英文 locale 与临时中文 locale，
+断言六条提示的中文和原命令均存在；这项画面验证固定为 0.12.6，其余版本显式跳过。
 
 可用 `NVIM_BIN=/path/to/nvim` 指定 Neovim，用 `PYTHON=/path/to/python3`
 指定 Python（phase7–9 的 shell 入口会把它传给 Python 检查器）。`make test`

@@ -60,6 +60,9 @@ Buffer、Window、Register 等术语遵守 glossary。空译文、fuzzy、占位
      并在 manifest 记录上游源码行证据；
    - 运行时另有一条带 `E###: ` 前缀的调用点时，在 manifest 的 `prefix_repairs` 记录前缀与
      二进制证据，构建时自动补同前缀条目。
+   - 欢迎页提示的旧键已在上游译过、实际运行时键却更新时，编辑 `translations/native/intro.po`，
+     并在 manifest 的 `intro` 中保留旧键、固定源码行、源码 hash 与二进制 hash。
+     不改写原有上游键，构建时同时保留两代查询键。
 5. 改动后跑 `make check-native`、`make build-native`；换 Neovim 版本还要跑
    `make audit-native` 复核 `runtime_audit`（二进制相关，必须重测）。
 6. 产物只写 `build/`。不安装 MO、不改系统 locale、不动 Neovim 本体和发行版目录；

@@ -14,4 +14,5 @@ trap 'rm -rf -- "$state"' EXIT
 export XDG_STATE_HOME=$state
 python=${PYTHON:-python3}
 "$python" "$HERE/test_native_catalog.py"
+"$python" "$HERE/test_intro_catalog.py"
 printf 'PHASE9_RESULT=PASS\n'

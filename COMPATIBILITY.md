@@ -197,7 +197,8 @@ initialize 能力、包与 corpus SHA-256 保存在 `tests/phase7/`。结果分�
 | 上游 `# do not translate` 豁免 | 12 | 保持英文；逐条 marker 与理由在 `manifests/native.json` |
 | 重建运行时 msgid（截断修复） | 4 | `E5403/E5404/E5405/E5406`，按固定上游 C 源码重建 |
 | 补带 `E###: ` 前缀的运行时键 | 25 | `E574/E575/E576/E886/E136` 调用点；证据为该二进制中的字面量 |
-| 合并后 MO | 2014 条 | 2002 translated / 12 untranslated（等于豁免数），`msgfmt` 统计一致 |
+| 欢迎页运行时键修复（2026-11-17 补测） | 6 | `intro.po`，固定 `version.c:4245–4253` 与本机二进制字面量；六条提示在真实 PTY 下显示中文 |
+| 合并后 MO（2026-11-17 重建） | 2020 条 | 2008 translated / 12 untranslated（等于豁免数），`msgfmt` 统计一致 |
 
 `make build-native` 产出的 MO 在临时 prefix（复制 nvim 二进制 + 临时 `zh_CN.UTF-8`
 locale + `LOCPATH`）下实测，宿主 locale、系统目录与 Neovim 本体均未改动：
@@ -209,6 +210,7 @@ locale + `LOCPATH`）下实测，宿主 locale、系统目录与 Neovim 本体�
 | 损坏 shada 时重命名失败 | `E136: Did not rename …` | `E136: 未重命名 …，因为 … 看起来不像 ShaDa 文件` |
 | `msgpackdump` 自引用字典 | 英文 | `E5005: 无法 dump msgpackdump() 参数，索引 0：容器在 键 'self' 中引用了自己`（用到本项目的 `key %s` 片段译文） |
 | 豁免条目 `[Command Line]` | 英文 | 仍为英文（上游标注不译） |
+| 无文件启动的欢迎页（2026-11-17 补测） | 六条新手/检查/退出/帮助/新闻/Kuwasha 提示因键过期仍为英文 | 临时中文 locale 和新 MO 下六条均为中文；C.UTF-8 对照仍为英文，命令和版本号不变 |
 
 上表每一行都由 `NVIM_ZH_TEST_NATIVE_RUNTIME=1 make test-phase9` 在临时 prefix + 临时
 locale 下断言（`E136`/`E5005` 与豁免行过去只是文档声明、没有测试覆盖）；同一测试还会用

@@ -33,6 +33,8 @@ def synthetic_upstream(manifest: dict, headers: dict[str, str] | None = None) ->
     entries.append({'msgid': 'E484: Can\'t open file %s', 'msgstr': 'E484: 无法打开文件 %s'})
     entries.append({'msgid': '%d buffer unloaded', 'msgid_plural': '%d buffers unloaded',
                     'msgstr_plural': {0: '释放了 %d 个缓冲区'}})
+    for item in manifest.get('intro', {}).get('messages', []):
+        entries.append({'msgid': item['previous_msgid'], 'msgstr': '旧版提示'})
     return entries
 
 

@@ -36,6 +36,48 @@
       "E5406: Chunk %i end %<PRIdVARNUMBER> splits multibyte character"
     ]
   },
+  "intro": {
+    "po": "translations/native/intro.po",
+    "entries": 6,
+    "source": {
+      "path": "src/nvim/version.c",
+      "commit": "779c36969e31080503be2dfccbcc3f999e289606",
+      "sha256": "152f4822cfd0912f01cfb5fd6abff8879e6af74b9a777f370d5771121f96466e",
+      "binary_sha256": "d308f10e416aec90c8794a7a10174777b8262076fc9d5aa3db043fd86e260531"
+    },
+    "messages": [
+      {
+        "msgid": "type  :help nvim<Enter>     if you are new! ",
+        "previous_msgid": "type  :help nvim<Enter>       if you are new! ",
+        "source_line": 4245
+      },
+      {
+        "msgid": "type  :checkhealth<Enter>   to optimize Nvim",
+        "previous_msgid": "type  :checkhealth<Enter>     to optimize Nvim",
+        "source_line": 4246
+      },
+      {
+        "msgid": "type  :q<Enter>             to exit         ",
+        "previous_msgid": "type  :q<Enter>               to exit         ",
+        "source_line": 4247
+      },
+      {
+        "msgid": "type  :help<Enter>          for help        ",
+        "previous_msgid": "type  :help<Enter>            for help        ",
+        "source_line": 4248
+      },
+      {
+        "msgid": "type  :help news<Enter>     for v%s.%s notes ",
+        "previous_msgid": "type  :help news<Enter> to see changes in v%s.%s",
+        "source_line": 4250
+      },
+      {
+        "msgid": "type  :help Kuwasha<Enter>  for information ",
+        "previous_msgid": "type  :help iccf<Enter>       for information ",
+        "source_line": 4253
+      }
+    ]
+  },
   "exemptions": [
     {
       "msgid": "??? from here until ???END lines may be messed up",

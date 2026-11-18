@@ -80,7 +80,7 @@ jobs:
           import io, json, tarfile, urllib.request
           from pathlib import Path
           manifest = json.loads(Path('manifests/upstreams.json').read_text())
-          selected = {name: manifest['upstreams'][name] for name in ('which-key', 'telescope', 'lazy.nvim', 'nvim-tree', 'nvim-cmp')}
+          selected = {name: manifest['upstreams'][name] for name in ('which-key', 'telescope', 'lazy.nvim', 'nvim-tree', 'nvim-cmp', 'nvim-dap', 'nvim-dap-ui')}
           selected.update(manifest['test_dependencies'])
           for name, item in selected.items():
               destination = Path('/tmp/nvim-zh-smoke') / ('lazy' if name == 'lazy.nvim' else name)
@@ -103,3 +103,6 @@ jobs:
           NVIM_ZH_TEST_LAZY: /tmp/nvim-zh-smoke/lazy
           NVIM_ZH_TEST_NVIM_TREE: /tmp/nvim-zh-smoke/nvim-tree
           NVIM_ZH_TEST_NVIM_CMP: /tmp/nvim-zh-smoke/nvim-cmp
+          NVIM_ZH_TEST_NVIM_DAP: /tmp/nvim-zh-smoke/nvim-dap
+          NVIM_ZH_TEST_NVIM_DAP_UI: /tmp/nvim-zh-smoke/nvim-dap-ui
+          NVIM_ZH_TEST_NVIM_NIO: /tmp/nvim-zh-smoke/nvim-nio

@@ -11,6 +11,7 @@ local unpack = table.unpack or unpack
 local attached = false
 local ctx
 local release_notification
+local find_pre_group
 
 local slots = {
   window = {
@@ -136,6 +137,26 @@ local function sync_all()
   sync(slots.pickers)
 end
 
+-- The pinned pickers.lua fires User TelescopeFindPre immediately before
+-- create_layout(), after pickers.new already ran. It is the last public boundary
+-- where the window/previewer modules are guaranteed loaded, so the very first
+-- picker of a session gets the same display projection as later ones.
+local function ensure_find_pre()
+  if find_pre_group then return end
+  find_pre_group = vim.api.nvim_create_augroup('NvimZhTelescopeFindPre', { clear = true })
+  vim.api.nvim_create_autocmd('User', {
+    group = find_pre_group,
+    pattern = 'TelescopeFindPre',
+    desc = 'nvim-zh: project Telescope window titles before the first layout',
+    callback = function()
+      if attached and ctx and ctx.enabled() then
+        sync(slots.window)
+        sync(slots.previewer)
+      end
+    end,
+  })
+end
+
 function M.attach(next_ctx)
   if not next_ctx.enabled() then
     M.detach()
@@ -150,11 +171,16 @@ function M.attach(next_ctx)
       context = 'notification',
     })
   end
+  ensure_find_pre()
   sync_all()
 end
 
 function M.detach()
   attached = false
+  if find_pre_group then
+    pcall(vim.api.nvim_del_augroup_by_id, find_pre_group)
+    find_pre_group = nil
+  end
   if release_notification then
     local release = release_notification
     release_notification = nil

@@ -63,7 +63,7 @@ require('nvim-zh').setup({
 
 - `auto`：自动适配已经加载且公共接口兼容的受支持插件，不为了汉化强制 `require` 插件。
 - `lazy_load`：通过 `User LazyLoad` 和后续 Buffer/焦点边界处理晚加载模块。
-- `disabled`：要关闭的适配器名称数组，例如 `{ 'telescope', 'nvim-tree' }`。
+- `disabled`：要关闭的适配器名称数组，例如 `{ 'telescope', 'nvim-tree', 'nvim-dap', 'nvim-dap-ui' }`。
 
 支持的接缝、固定上游和限制见[第三方插件适配](adapters.md)。外部插件后来替换同一函数时，本插件不抢回所有权，并在状态中报告 `external_override`。
 

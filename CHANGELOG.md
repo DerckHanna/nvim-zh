@@ -13,6 +13,7 @@
 - 受支持 Linux/glibc + LuaJIT 环境自动绑定用户目录中的 MO，必要时异步准备私有 locale，不修改系统文件或子进程环境。
 - `status()`、`stats()`、`missing()`、`open()`、`check()`、`refresh()` 结构化接口，以及 `translate()`、`register_catalog()`、`teardown()`。
 - which-key 内置 preset/生成数量与通知、Telescope 初始及动态标题与通知、nvim-tree 默认映射与通知的固定上游适配。
+- nvim-dap 的通知、结构化选择器、REPL 帮助、直接输入提示、quickfix/健康报告显示适配；nvim-dap-ui 的固定渲染文本、mapping 描述、浮窗标题、元素/Window 选择器与通知适配。两者均保留动态调试数据和原始协议行为。
 - 精确通知 title 来源注册，保留插件前缀并避免公共 UI 二次翻译。
 - 按单元、公共契约、维护工具、集成、真实端到端和固定上游划分的测试入口，以及真实 PTY、vim.pack、native 和并发验证。
 

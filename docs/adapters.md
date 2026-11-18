@@ -73,6 +73,47 @@
 - 主 tree renderer、私有帮助 Buffer 和用户命令描述没有稳定逐文本公开接缝，不扫描 Buffer。
 - prompt/select 的原始 items 和回调值保持原样。没有可靠来源信息时，不把 Yes/No、文件名或路径塞进全局目录猜测翻译。
 
+## nvim-dap
+
+固定上游：`cfa2d58f4537aca6ca83e2de1a0d9f1491121264`。
+
+### 已接入
+
+- 通过精确 `DAP` 通知标题路由的固定通知，保留错误、路径、配置名、会话/线程 ID 和退出码等动态载荷。
+- `dap.ui.pick_one` / `pick_one_sync` 的固定 prompt，以及具有 `fn` / `action` / `pid` 结构证据的动作和进程 label。原始 item、选择索引、回调和 coroutine 行为不变。
+- REPL 新建 Buffer 时的固定 mapping 描述，以及真实 `.help` / `help` / `.h` 执行范围内的 `Commands:`、`Custom commands:`；栈帧列表的固定跳转提示。`dap> `、命令 token、补全项和调试器输出不翻译。
+- 设置变量、设置表达式和异常断点筛选器的直接 `vim.fn.input` 提示。投影只存在于对应公开动作/同步调用内，输入值、默认值和后续 session 请求保持原样。
+- `breakpoints.to_qf_list` 的显示副本：根据原始断点字段重建固定前缀，不解析或改写最终用户文本。原始 quickfix 列表、Buf/行列和 `DAP Breakpoints` 内部标题不变。
+- `health.check` 的固定健康报告文本，以及合成线程根节点的 `Threads` 标题；动态适配器名、路径和会话数据不变。
+
+### 边界
+
+- 已有 REPL Buffer 的 prompt callback 和历史行不会重建；适配器只接入后续自然创建/执行的接缝。
+- 无 title 通知、插件加载时立即注册的用户命令描述、launch.json 的动态输入没有同等安全的来源接缝，保持原文；不为此包装全局 `vim.fn.input` 或扫描 Buffer。
+- quickfix 同一 Buf/行存在多个断点且无法无歧义对应原始字段时回退原文，避免错配条件或日志消息。
+- 日志、协议对象、异常诊断正文、变量/帧/线程名称和外部进程输出不属于目录数据。
+
+## nvim-dap-ui
+
+固定上游：`cc9dd33aade7f20bae414d0cba163bc60d4d4b43`。
+
+### 已接入
+
+- 通过精确 `nvim-dap-ui` 通知标题路由的固定通知，动态元素名、表达式和错误载荷保留原值。
+- 固定版本 `Canvas.write` 显示投影，只处理 `DapUIBreakpointsInfo`、`DapUIWatchesEmpty`、`DapUISource` 三类高亮下的固定标签/占位文本。高亮位置按中文新字节宽度由原实现重新计算。
+- Buffer 局部 mapping 的描述、浮窗默认元素标题、元素选择器的 prompt/label、值截断后的固定行数后缀，以及无活动会话等合成状态文本。
+- 默认 `select_window` 路径的同步 `print("Select window: ")` 投影。自定义 `config.select_window` 不包装，原始 Window id 和按键选择逻辑不变。
+- 无参 setup、重复 setup、晚加载和模块表换代；首次自然 render 即使用中文，不为了汉化强制加载插件。
+
+共享 `nio.ui.select` 只有在 DAP UI 已完成 setup、候选项恰好是六个内置非 hover 元素 ID、且原 formatter 产生预期标签时才投影显示文本。原始 item、选择索引和回调结果不变；同 prompt 的其他选择器不命中。
+
+### 边界
+
+- 不扫描或重写已有 Buffer；目录更新后的文本在下一次自然 render 时生效。`DAP Scopes` 等 Buffer 名是查找身份，不作为标题翻译。
+- 变量、作用域、表达式、栈帧、线程、路径、调试器输出和 DAP 协议数据保持原样。只有经过结构条件确认的固定合成文本进入目录。
+- 依赖缺失、布局/注册错误等抛出值不属于显示投影，保持英文；图标本身和没有固定 hover 文案的 controls 不制造翻译。
+- 默认 Window 选择的 print 包装是固定版本同步接缝，异常、重入和外部替换按所有权恢复；不接管全局消息 UI。
+
 ## lazy.nvim 与 nvim-cmp
 
 - lazy.nvim 的 `User LazyLoad` 用于受支持适配器的晚加载发现，通知继续使用 Neovim 公共 UI 接缝；lazy 主面板私有 view/Buffer 不适配。

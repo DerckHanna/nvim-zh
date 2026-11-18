@@ -1,0 +1,749 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: nvim-zh\n"
+"PO-Revision-Date: 2026-11-18 23:45+0800\n"
+"Last-Translator: nvim-zh maintainers\n"
+"Language-Team: Simplified Chinese\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: zh_CN\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+# Notifications routed only by the exact public title DAP.
+#: lua/dap.lua:319
+msgctxt "notification"
+msgid "Can't get configurations from launch.json:\n%s"
+msgstr "无法从 launch.json 获取配置：\n%s"
+
+#: lua/dap.lua:475
+msgctxt "notification"
+msgid "Invalid adapter type %s, expected `executable`, `server` or `pipe`"
+msgstr "适配器类型 %s 无效，应为 `executable`、`server` 或 `pipe`"
+
+#: lua/dap.lua:540
+msgctxt "notification"
+msgid "Configuration provider %s must return a list of configurations. Got: %s"
+msgstr "配置提供器 %s 必须返回配置列表，实际为：%s"
+
+#: lua/dap.lua:546
+msgctxt "notification"
+msgid "No configuration found for `%s`. You need to add configs to `dap.configurations.%s` (See `:h dap-configuration`)"
+msgstr "未找到 `%s` 的配置。请在 `dap.configurations.%s` 中添加配置（参见 `:h dap-configuration`）"
+
+#: lua/dap.lua:561
+msgctxt "notification"
+msgid "No configuration selected"
+msgstr "未选择配置"
+
+#: lua/dap.lua:637
+msgctxt "notification"
+msgid "Run aborted"
+msgstr "运行已中止"
+
+#: lua/dap.lua:655
+msgctxt "notification"
+msgid "Config references missing adapter `%s`. Available are: %s"
+msgstr "配置引用了不存在的适配器 `%s`，可用适配器：%s"
+
+#: lua/dap.lua:661
+msgctxt "notification"
+msgid "Invalid adapter `%s` for config `%s`. Expected a table or function. Read :help dap-adapter and define a valid adapter."
+msgstr "适配器 `%s` 对配置 `%s` 无效。应为 table 或 function。请阅读 :help dap-adapter 并定义有效适配器。"
+
+#: lua/dap.lua:679
+msgctxt "notification"
+msgid "No configuration available to re-run"
+msgstr "没有可重新运行的配置"
+
+#: lua/dap.lua:703 lua/dap.lua:712 lua/dap.lua:817 lua/dap.lua:958 lua/dap/ui/widgets.lua:737
+msgctxt "notification"
+msgid "No active session"
+msgstr "没有活动会话"
+
+#: lua/dap.lua:735
+msgctxt "notification"
+msgid "Error on step_into: %s (while requesting stepInTargets)"
+msgstr "step_into 出错：%s（请求 stepInTargets 时）"
+
+#: lua/dap.lua:742
+msgctxt "notification"
+msgid "No targets found. Trying regular step_into."
+msgstr "未找到目标，正在尝试常规 step_into。"
+
+#: lua/dap.lua:753
+msgctxt "notification"
+msgid "No target selected. No stepping."
+msgstr "未选择目标，不执行单步调试。"
+
+#: lua/dap.lua:780 lua/dap.lua:789
+msgctxt "notification"
+msgid "Debug Adapter does not support stepping backwards."
+msgstr "调试适配器不支持反向单步调试。"
+
+#: lua/dap.lua:798 lua/dap/entity.lua:433
+msgctxt "notification"
+msgid "Thread paused %s"
+msgstr "线程 %s 已暂停"
+
+#: lua/dap.lua:806
+msgctxt "notification"
+msgid "dap.stop() is deprecated. Call dap.close() instead"
+msgstr "dap.stop() 已弃用，请改为调用 dap.close()"
+
+#: lua/dap.lua:842
+msgctxt "notification"
+msgid "Session terminated"
+msgstr "会话已终止"
+
+#: lua/dap.lua:967
+msgctxt "notification"
+msgid "Error restarting debug adapter: %s"
+msgstr "重启调试适配器时出错：%s"
+
+#: lua/dap.lua:969
+msgctxt "notification"
+msgid "Restarted debug adapter"
+msgstr "调试适配器已重启"
+
+#: lua/dap.lua:1001
+msgctxt "notification"
+msgid "No breakpoints set!"
+msgstr "未设置断点！"
+
+#: lua/dap.lua:1079
+msgctxt "notification"
+msgid "Cannot set exception breakpoints: No active session!"
+msgstr "无法设置异常断点：没有活动会话！"
+
+#: lua/dap.lua:1087
+msgctxt "notification"
+msgid "Cannot use run_to_cursor without active session"
+msgstr "没有活动会话，无法使用 run_to_cursor"
+
+#: lua/dap.lua:1091
+msgctxt "notification"
+msgid "run_to_cursor can only be used if stopped at a breakpoint"
+msgstr "run_to_cursor 只能在断点停止时使用"
+
+#: lua/dap.lua:1232
+msgctxt "notification"
+msgid "No active session. Doing nothing."
+msgstr "没有活动会话，不执行任何操作。"
+
+#: lua/dap.lua:1247
+msgctxt "notification"
+msgid "Config needs the `request` property which must be one of `attach` or `launch`"
+msgstr "配置必须包含 `request` 属性，其值须为 `attach` 或 `launch`"
+
+#: lua/dap.lua:1255
+msgctxt "notification"
+msgid "Couldn't connect to %s:%s: %s"
+msgstr "无法连接到 %s:%s：%s"
+
+#: lua/dap/session.lua:19
+msgctxt "notification"
+msgid "Undefined error"
+msgstr "未知错误"
+
+#: lua/dap/session.lua:156
+msgctxt "notification"
+msgid "Terminal exited %d running %s %s"
+msgstr "终端退出，退出码 %d；运行命令：%s %s"
+
+#: lua/dap/session.lua:242
+msgctxt "notification"
+msgid "Requested external terminal, but none configured. Fallback to integratedTerminal"
+msgstr "请求使用外部终端，但尚未配置。回退到 integratedTerminal"
+
+#: lua/dap/session.lua:246
+msgctxt "notification"
+msgid "Could not launch terminal %s"
+msgstr "无法启动终端 %s"
+
+#: lua/dap/session.lua:350
+msgctxt "notification"
+msgid "Error getting exception info: %s"
+msgstr "获取异常信息时出错：%s"
+
+#: lua/dap/session.lua:403
+msgctxt "notification"
+msgid "Adapter reported frame in buf %d line %d:%d, but: %s. Ensure executable is up2date and if using a source mapping ensure it is correct"
+msgstr "适配器报告的帧位于 Buffer %d 的第 %d:%d 行，但：%s。请确保可执行文件为最新；若使用源码映射，请确保映射正确"
+
+#: lua/dap/session.lua:539
+msgctxt "notification"
+msgid "Stopped at line %s but `switchbuf` setting prevented jump to location. Target buffer %s not open in any window?"
+msgstr "已停在第 %s 行，但 `switchbuf` 设置阻止跳转到目标位置。目标 Buffer %s 是否未在任何 Window 中打开？"
+
+#: lua/dap/session.lua:587 lua/dap/session.lua:596
+msgctxt "notification"
+msgid "Source missing, cannot jump to frame: %s"
+msgstr "缺少源码，无法跳转到帧：%s"
+
+#: lua/dap/session.lua:719
+msgctxt "notification"
+msgid "Error retrieving threads: %s"
+msgstr "获取线程时出错：%s"
+
+#: lua/dap/session.lua:759
+msgctxt "notification"
+msgid "Stopped event received, but no threadId or allThreadsStopped"
+msgstr "收到 stopped 事件，但未提供 threadId 或 allThreadsStopped"
+
+#: lua/dap/session.lua:787
+msgctxt "notification"
+msgid "Error retrieving stack traces: %s"
+msgstr "获取栈跟踪时出错：%s"
+
+#: lua/dap/session.lua:795
+msgctxt "notification"
+msgid "Debug adapter stopped at unavailable location"
+msgstr "调试适配器停止在不可用位置"
+
+#: lua/dap/session.lua:893
+msgctxt "notification"
+msgid "No current frame available, cannot use goto"
+msgstr "没有当前帧，无法使用 goto"
+
+#: lua/dap/session.lua:897
+msgctxt "notification"
+msgid "Debug Adapter doesn't support GotoTargetRequest"
+msgstr "调试适配器不支持 GotoTargetRequest"
+
+#: lua/dap/session.lua:903
+msgctxt "notification"
+msgid "Error getting gotoTargets: %s"
+msgstr "获取 gotoTargets 时出错：%s"
+
+#: lua/dap/session.lua:907
+msgctxt "notification"
+msgid "No goto targets available. Can't execute goto"
+msgstr "没有可用的 goto 目标，无法执行 goto"
+
+#: lua/dap/session.lua:928
+msgctxt "notification"
+msgid "Error executing goto: %s"
+msgstr "执行 goto 时出错：%s"
+
+#: lua/dap/session.lua:938
+msgctxt "notification"
+msgid "Debug adapter doesn't support breakpoints with conditions"
+msgstr "调试适配器不支持条件断点"
+
+#: lua/dap/session.lua:941
+msgctxt "notification"
+msgid "Debug adapter doesn't support breakpoints with hit conditions"
+msgstr "调试适配器不支持命中条件断点"
+
+#: lua/dap/session.lua:944
+msgctxt "notification"
+msgid "Debug adapter doesn't support log points"
+msgstr "调试适配器不支持日志点"
+
+#: lua/dap/session.lua:1003
+msgctxt "notification"
+msgid "Error setting breakpoints: %s"
+msgstr "设置断点时出错：%s"
+
+#: lua/dap/session.lua:1024
+msgctxt "notification"
+msgid "Debug adapter doesn't support exception breakpoints"
+msgstr "调试适配器不支持异常断点"
+
+#: lua/dap/session.lua:1048
+msgctxt "notification"
+msgid "Debug adapter does not support ExceptionOptions"
+msgstr "调试适配器不支持 ExceptionOptions"
+
+#: lua/dap/session.lua:1060
+msgctxt "notification"
+msgid "Error setting exception breakpoints: %s"
+msgstr "设置异常断点时出错：%s"
+
+#: lua/dap/session.lua:1167
+msgctxt "notification"
+msgid "Invalid adapter definition. Expected a table with type `executable` or `server`: %s"
+msgstr "适配器定义无效。应为 type 为 `executable` 或 `server` 的 table：%s"
+
+#: lua/dap/session.lua:1196
+msgctxt "notification"
+msgid "Could not connect startDebugging child session %s:%s: %s"
+msgstr "无法连接 startDebugging 子会话 %s:%s：%s"
+
+#: lua/dap/session.lua:1290
+msgctxt "notification"
+msgid "command `%s` of adapter `%s` exited with %d. Run :DapShowLog to open logs"
+msgstr "命令 `%s`（适配器 `%s`）以退出码 %d 退出。运行 :DapShowLog 打开日志"
+
+#: lua/dap/session.lua:1305
+msgctxt "notification"
+msgid "Executable `%s` not found, fix the adapter definition for `%s` (%s)"
+msgstr "找不到可执行文件 `%s`，请修正 `%s` 的适配器定义（%s）"
+
+#: lua/dap/session.lua:1311
+msgctxt "notification"
+msgid "`command` of adapter `%s` must not be empty"
+msgstr "适配器 `%s` 的 `command` 不能为空"
+
+#: lua/dap/session.lua:1313
+msgctxt "notification"
+msgid "Error running `%s` of `%s`: "
+msgstr "运行 `%s`（所属 `%s`）时出错： "
+
+#: lua/dap/session.lua:1431
+msgctxt "notification"
+msgid "Couldn't connect to pipe %s: %s"
+msgstr "无法连接到管道 %s：%s"
+
+#: lua/dap/session.lua:1442 lua/dap/session.lua:1521
+msgctxt "notification"
+msgid "Debug adapter disconnected"
+msgstr "调试适配器已断开连接"
+
+#: lua/dap/session.lua:1662
+msgctxt "notification"
+msgid "Error pausing: %s"
+msgstr "暂停时出错：%s"
+
+#: lua/dap/session.lua:1686
+msgctxt "notification"
+msgid "Error requesting threads: %s"
+msgstr "请求线程时出错：%s"
+
+#: lua/dap/session.lua:1699
+msgctxt "notification"
+msgid "No thread to stop. Not pausing..."
+msgstr "没有可停止的线程，不执行暂停……"
+
+#: lua/dap/session.lua:1710
+msgctxt "notification"
+msgid "Debug Adapter does not support restart frame"
+msgstr "调试适配器不支持重启帧"
+
+#: lua/dap/session.lua:1715
+msgctxt "notification"
+msgid "Current frame not set. Debug adapter needs to be stopped at breakpoint to use restart frame"
+msgstr "未设置当前帧。调试适配器必须停在断点处才能使用 restart frame"
+
+#: lua/dap/session.lua:1727
+msgctxt "notification"
+msgid "No frame available that can be restarted"
+msgstr "没有可重启的帧"
+
+#: lua/dap/session.lua:1742
+msgctxt "notification"
+msgid "Error on restart_frame: %s"
+msgstr "restart_frame 出错：%s"
+
+#: lua/dap/session.lua:1779 lua/dap/session.lua:1947
+msgctxt "notification"
+msgid "Error on %s: %s"
+msgstr "%s 出错：%s"
+
+#: lua/dap/session.lua:1793
+msgctxt "notification"
+msgid "No stopped threads. Cannot move"
+msgstr "没有已停止的线程，无法移动"
+
+#: lua/dap/session.lua:1862
+msgctxt "notification"
+msgid "Request `%s` timed out after %sms"
+msgstr "请求 `%s` 在 %s 毫秒后超时"
+
+#: lua/dap/session.lua:1939
+msgctxt "notification"
+msgid "Could not initialize debug adapter: %s"
+msgstr "无法初始化调试适配器：%s"
+
+#: lua/dap/session.lua:1976
+msgctxt "notification"
+msgid "Debug adapter didn't respond. Either the adapter is slow (then wait and ignore this) or there is a problem with your adapter or `%s` configuration. Check the logs for errors (:help dap.set_log_level)"
+msgstr "调试适配器未响应。可能是适配器较慢（可等待并忽略此消息），也可能是适配器或 `%s` 配置有问题。请检查日志中的错误（:help dap.set_log_level）"
+
+#: lua/dap/session.lua:2036
+msgctxt "notification"
+msgid "Cannot move frame if not stopped"
+msgstr "未停止时无法移动帧"
+
+#: lua/dap/session.lua:2049
+msgctxt "notification"
+msgid "Can't move past first frame"
+msgstr "不能越过第一帧"
+
+#: lua/dap/session.lua:2052
+msgctxt "notification"
+msgid "Can't move past last frame"
+msgstr "不能越过最后一帧"
+
+#: lua/dap/entity.lua:101
+msgctxt "notification"
+msgid "Error fetching variables: %s"
+msgstr "获取变量时出错：%s"
+
+#: lua/dap/entity.lua:154
+msgctxt "notification"
+msgid "Error fetching variable: %s"
+msgstr "获取变量时出错：%s"
+
+#: lua/dap/entity.lua:176
+msgctxt "notification"
+msgid "No active session, cannot set variable"
+msgstr "没有活动会话，无法设置变量"
+
+#: lua/dap/entity.lua:180
+msgctxt "notification"
+msgid "Session has no active frame, cannot set variable"
+msgstr "会话没有活动帧，无法设置变量"
+
+#: lua/dap/entity.lua:185
+msgctxt "notification"
+msgid "Cannot set variable on %s, couldn't find its parent container"
+msgstr "无法设置变量 %s，找不到其父容器"
+
+#: lua/dap/entity.lua:203
+msgctxt "notification"
+msgid "Error setting variable: %s"
+msgstr "设置变量时出错：%s"
+
+#: lua/dap/entity.lua:214
+msgctxt "notification"
+msgid "No activate session, cannot set expression"
+msgstr "没有活动会话，无法设置表达式"
+
+#: lua/dap/entity.lua:229
+msgctxt "notification"
+msgid "Error on setExpression: %s"
+msgstr "setExpression 出错：%s"
+
+#: lua/dap/entity.lua:365
+msgctxt "notification"
+msgid "Error fetching stackTrace: %s"
+msgstr "获取 stackTrace 时出错：%s"
+
+#: lua/dap/entity.lua:372 lua/dap/entity.lua:420
+msgctxt "notification"
+msgid "Error on continue: %s"
+msgstr "continue 出错：%s"
+
+#: lua/dap/repl.lua:181 lua/dap/ui/widgets.lua:288
+msgctxt "notification"
+msgid "Cannot navigate to frame without active session"
+msgstr "没有活动会话，无法跳转到帧"
+
+#: lua/dap/repl.lua:603
+msgctxt "notification"
+msgid "completions request failed: %s"
+msgstr "补全请求失败：%s"
+
+#: lua/dap/ui.lua:260
+msgctxt "notification"
+msgid "No children on line %s. Can't expand"
+msgstr "第 %s 行没有子项，无法展开"
+
+#: lua/dap/ui.lua:392
+msgctxt "notification"
+msgid "No action possible on: %s"
+msgstr "无法对以下内容执行操作：%s"
+
+#: lua/dap/ext/vscode.lua:61
+msgctxt "notification"
+msgid "Unsupported input type in vscode launch.json: %s"
+msgstr "vscode launch.json 中的输入类型不受支持：%s"
+
+#: lua/dap/ext/vscode.lua:109
+msgctxt "notification"
+msgid "No input with id `%s` found in inputs"
+msgstr "在 inputs 中找不到 id 为 `%s` 的输入"
+
+# Prompt strings are projected by dap.ui.pick_one(_sync), not global vim.ui.select.
+#: lua/dap.lua:555
+msgctxt "prompt"
+msgid "Configuration: "
+msgstr "配置： "
+
+#: lua/dap.lua:749
+msgctxt "prompt"
+msgid "Step into which function?"
+msgstr "要步入哪个函数？"
+
+#: lua/dap.lua:1158
+msgctxt "prompt"
+msgid "Session still initializing> "
+msgstr "会话仍在初始化> "
+
+#: lua/dap.lua:1160
+msgctxt "prompt"
+msgid "Not focused on any stopped Thread> "
+msgstr "未聚焦任何已停止线程> "
+
+#: lua/dap.lua:1162
+msgctxt "prompt"
+msgid "Session active, but not stopped at breakpoint> "
+msgstr "会话活动，但未停在断点处> "
+
+#: lua/dap.lua:1206
+msgctxt "prompt"
+msgid "Thread to resume> "
+msgstr "要恢复的线程> "
+
+#: lua/dap/session.lua:912
+msgctxt "prompt"
+msgid "goto target> "
+msgstr "goto 目标> "
+
+#: lua/dap/session.lua:1695
+msgctxt "prompt"
+msgid "Which thread?: "
+msgstr "选择哪个线程？ "
+
+#: lua/dap/session.lua:1732
+msgctxt "prompt"
+msgid "Can't restart current frame, pick another frame to restart: "
+msgstr "无法重启当前帧，请选择要重启的其他帧： "
+
+#: lua/dap/session.lua:1798
+msgctxt "prompt"
+msgid "Select thread to step in> "
+msgstr "选择要单步执行的线程> "
+
+#: lua/dap/ui.lua:402
+msgctxt "prompt"
+msgid "Actions> "
+msgstr "操作> "
+
+#: lua/dap/utils.lua:249
+msgctxt "prompt"
+msgid "Select process: "
+msgstr "选择进程： "
+
+#: lua/dap/utils.lua:369
+msgctxt "prompt"
+msgid "Select executable: "
+msgstr "选择可执行文件： "
+
+#: lua/dap/utils.lua:369
+msgctxt "prompt"
+msgid "Select file: "
+msgstr "选择文件： "
+
+#: lua/dap/entity.lua:195
+msgctxt "prompt"
+msgid "New `%s` value: "
+msgstr "`%s` 的新值： "
+
+#: lua/dap/entity.lua:221
+msgctxt "prompt"
+msgid "New `%s` expression: "
+msgstr "`%s` 的新表达式： "
+
+#: lua/dap/session.lua:1044
+msgctxt "prompt"
+msgid "Exception breakpoint filters: "
+msgstr "异常断点筛选器： "
+
+#: lua/dap.lua:1166
+msgctxt "action"
+msgid "Terminate session"
+msgstr "终止会话"
+
+#: lua/dap.lua:1170
+msgctxt "action"
+msgid "Pause a thread"
+msgstr "暂停线程"
+
+#: lua/dap.lua:1174
+msgctxt "action"
+msgid "Restart session"
+msgstr "重启会话"
+
+#: lua/dap.lua:1178
+msgctxt "action"
+msgid "Disconnect (terminate = true)"
+msgstr "断开连接（terminate = true）"
+
+#: lua/dap.lua:1184
+msgctxt "action"
+msgid "Disconnect (terminate = false)"
+msgstr "断开连接（terminate = false）"
+
+#: lua/dap.lua:1190
+msgctxt "action"
+msgid "Start additional session"
+msgstr "启动附加会话"
+
+#: lua/dap.lua:1196
+msgctxt "action"
+msgid "Do nothing"
+msgstr "不执行任何操作"
+
+#: lua/dap.lua:1202
+msgctxt "action"
+msgid "Resume stopped thread"
+msgstr "恢复已停止的线程"
+
+#: lua/dap/repl.lua:174 lua/dap/entity.lua:399 lua/dap/ui/widgets.lua:279
+msgctxt "action"
+msgid "Jump to frame"
+msgstr "跳转到帧"
+
+#: lua/dap/ui/widgets.lua:331
+msgctxt "action"
+msgid "Focus session"
+msgstr "聚焦会话"
+
+#: lua/dap/entity.lua:262
+msgctxt "action"
+msgid "Copy as expression"
+msgstr "复制为表达式"
+
+#: lua/dap/entity.lua:265
+msgctxt "action"
+msgid "Set expression"
+msgstr "设置表达式"
+
+#: lua/dap/entity.lua:267
+msgctxt "action"
+msgid "Set variable"
+msgstr "设置变量"
+
+#: lua/dap/ui.lua:212 lua/dap/entity.lua:408
+msgctxt "action"
+msgid "Expand"
+msgstr "展开"
+
+#: lua/dap/entity.lua:411
+msgctxt "action"
+msgid "Resume thread"
+msgstr "恢复线程"
+
+#: lua/dap/entity.lua:429
+msgctxt "action"
+msgid "Stop thread"
+msgstr "停止线程"
+
+#: lua/dap/utils.lua:243
+msgctxt "process"
+msgid "id=%d name=%s"
+msgstr "id=%d，名称=%s"
+
+# REPL labels are translated only inside a real .help execution scope.
+#: lua/dap/repl.lua:192
+msgctxt "repl_help"
+msgid "Commands:"
+msgstr "命令："
+
+#: lua/dap/repl.lua:199
+msgctxt "repl_help"
+msgid "Custom commands:"
+msgstr "自定义命令："
+
+#: lua/dap/repl.lua:169
+msgctxt "repl_hint"
+msgid "(press enter on line to jump to frame)"
+msgstr "（在行上按 Enter 跳转到帧）"
+
+#: lua/dap/repl.lua:62
+msgctxt "mapping"
+msgid "Move to next prompt"
+msgstr "移动到下一个提示符"
+
+#: lua/dap/repl.lua:74
+msgctxt "mapping"
+msgid "Move to previous prompt"
+msgstr "移动到上一个提示符"
+
+#: lua/dap/ui/widgets.lua:232 lua/dap/repl.lua:260
+msgctxt "widget"
+msgid "Threads"
+msgstr "线程"
+
+# Quickfix prefixes are rebuilt from raw breakpoint fields, never parsed from user text.
+#: lua/dap/breakpoints.lua:214
+msgctxt "quickfix"
+msgid "Rejected"
+msgstr "已拒绝"
+
+#: lua/dap/breakpoints.lua:214
+msgctxt "quickfix"
+msgid "Rejected: %s"
+msgstr "已拒绝：%s"
+
+#: lua/dap/breakpoints.lua:215
+msgctxt "quickfix"
+msgid "Log message: %s"
+msgstr "日志消息：%s"
+
+#: lua/dap/breakpoints.lua:216
+msgctxt "quickfix"
+msgid "Condition: %s"
+msgstr "条件：%s"
+
+#: lua/dap/breakpoints.lua:217
+msgctxt "quickfix"
+msgid "Hit condition: %s"
+msgstr "命中条件：%s"
+
+#: lua/dap/health.lua:7
+msgctxt "health"
+msgid "Missing required `command` property"
+msgstr "缺少必需的 `command` 属性"
+
+#: lua/dap/health.lua:10
+msgctxt "health"
+msgid "`command` is not executable. Check path and permissions. Use vim.fn.expand to handle ~ or $HOME:\n   %s"
+msgstr "`command` 不可执行。请检查路径和权限。使用 vim.fn.expand 处理 ~ 或 $HOME：\n   %s"
+
+#: lua/dap/health.lua:17
+msgctxt "health"
+msgid "is executable: %s"
+msgstr "可执行：%s"
+
+#: lua/dap/health.lua:28
+msgctxt "health"
+msgid "dap: Adapters"
+msgstr "dap：适配器"
+
+#: lua/dap/health.lua:31
+msgctxt "health"
+msgid "dap.adapter: %s"
+msgstr "dap.adapter：%s"
+
+#: lua/dap/health.lua:33
+msgctxt "health"
+msgid "Adapter is a function. Can't validate it"
+msgstr "适配器是函数，无法验证"
+
+#: lua/dap/health.lua:41
+msgctxt "health"
+msgid "Missing required `port` property"
+msgstr "缺少必需的 `port` 属性"
+
+#: lua/dap/health.lua:49
+msgctxt "health"
+msgid "Missing required `pipe` property"
+msgstr "缺少必需的 `pipe` 属性"
+
+#: lua/dap/health.lua:52
+msgctxt "health"
+msgid "%s must be one of: executable, server or pipe"
+msgstr "%s 必须是以下值之一：executable、server 或 pipe"
+
+#: lua/dap/health.lua:57
+msgctxt "health"
+msgid "dap: Sessions"
+msgstr "dap：会话"
+
+#: lua/dap/health.lua:60
+msgctxt "health"
+msgid "No active sessions"
+msgstr "没有活动会话"
+
+#: lua/dap/health.lua:64
+msgctxt "health"
+msgid "  id: %s\n  type: %s"
+msgstr "  id：%s\n  类型：%s"
+
+#: lua/dap/health.lua:66
+msgctxt "health"
+msgid "\n  id: %s\n  type: %s\n  started, but not initialized. Either the adapter definition or the used configuration is wrong, or the defined adapter doesn't speak DAP"
+msgstr "\n  id：%s\n  类型：%s\n  已启动，但尚未初始化。适配器定义或所用配置有误，或者所定义的适配器未实现 DAP 通信"

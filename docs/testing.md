@@ -11,7 +11,7 @@
 | `make test-tools` | `tests/tools` | PO/native/资源构建、原子写、安全发布、Help relay 与 inventory |
 | `make test-integration` | `tests/integration` | 配置保存/回滚、真实 Neovim Help/诊断、资源状态、并发、native 与可选 clangd |
 | `make test-e2e` | `tests/e2e` | 真实 PTY、只读 TUI、临时本地 Git 与 vim.pack、可选中文欢迎页 |
-| `make test-upstream` | `tests/upstream` | 固定 which-key、Telescope、lazy、nvim-tree、cmp 公开接缝和源码摘要 |
+| `make test-upstream` | `tests/upstream` | 固定 which-key、Telescope、lazy、nvim-tree、cmp、nvim-dap、nvim-dap-ui 的公开或固定显示接缝与源码摘要 |
 
 默认 `make test` 顺序执行前五类，不访问网络、不要求第三方源码。真实终端和本地 Git/vim.pack 都是离线测试。`tests/fixtures` 保存输入与历史服务器观察；`tests/support` 保存共享断言及进程环境，不向产品发布 fixture 目录条目。
 
@@ -38,7 +38,7 @@ make release-check
 
 ## 固定上游
 
-上游 repository、完整 commit 与实际接缝文件 SHA-256 来自 `manifests/upstreams.json`；Plenary 的固定测试依赖放在同一 manifest 的 `test_dependencies` 中。CI 按该清单获取源码，再使用相同 Make 入口。源码可放在仓库外任意目录：
+上游 repository、完整 commit 与实际接缝文件 SHA-256 来自 `manifests/upstreams.json`；Plenary 和 nvim-nio 的固定测试依赖放在同一 manifest 的 `test_dependencies` 中。CI 按该清单获取源码，再使用相同 Make 入口。源码可放在仓库外任意目录：
 
 ```bash
 up=/absolute/path/to/fixed-upstreams
@@ -48,6 +48,9 @@ NVIM_ZH_TEST_PLENARY="$up/plenary" \
 NVIM_ZH_TEST_LAZY="$up/lazy" \
 NVIM_ZH_TEST_NVIM_TREE="$up/nvim-tree" \
 NVIM_ZH_TEST_NVIM_CMP="$up/nvim-cmp" \
+NVIM_ZH_TEST_NVIM_DAP="$up/nvim-dap" \
+NVIM_ZH_TEST_NVIM_DAP_UI="$up/nvim-dap-ui" \
+NVIM_ZH_TEST_NVIM_NIO="$up/nvim-nio" \
 make test-upstream
 ```
 

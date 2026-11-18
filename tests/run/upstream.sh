@@ -2,7 +2,7 @@
 set -euo pipefail
 source "$(dirname -- "${BASH_SOURCE[0]}")/lib/env.sh"
 # Explicit upstream entry: a missing checkout is a failure, never a skip.
-for source_env in NVIM_ZH_TEST_WHICH_KEY NVIM_ZH_TEST_TELESCOPE NVIM_ZH_TEST_PLENARY NVIM_ZH_TEST_LAZY NVIM_ZH_TEST_NVIM_TREE NVIM_ZH_TEST_NVIM_CMP; do
+for source_env in NVIM_ZH_TEST_WHICH_KEY NVIM_ZH_TEST_TELESCOPE NVIM_ZH_TEST_PLENARY NVIM_ZH_TEST_LAZY NVIM_ZH_TEST_NVIM_TREE NVIM_ZH_TEST_NVIM_CMP NVIM_ZH_TEST_NVIM_DAP NVIM_ZH_TEST_NVIM_DAP_UI NVIM_ZH_TEST_NVIM_NIO; do
   if [[ -z ${!source_env:-} || ! -d ${!source_env} ]]; then
     printf 'UPSTREAM=FAIL missing fixed source: %s\n' "$source_env" >&2
     exit 1

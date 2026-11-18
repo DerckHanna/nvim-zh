@@ -2,11 +2,11 @@ local h = dofile(vim.env.NVIM_ZH_ROOT .. '/tests/support/plugin_helpers.lua')
 local check, equal = h.check, h.equal
 
 -- Absent plugins must remain absent; no adapter may force require/preload.
-for _, name in ipairs({ 'which-key.config', 'telescope.pickers', 'telescope.pickers.window', 'nvim-tree' }) do
+for _, name in ipairs({ 'which-key.config', 'telescope.pickers', 'telescope.pickers.window', 'nvim-tree', 'dap', 'dap.ui', 'dap.repl', 'dapui', 'dapui.render.canvas', 'nio.ui' }) do
   package.loaded[name] = nil
 end
 local preload_calls = 0
-for _, name in ipairs({ 'which-key.config', 'telescope.pickers', 'telescope.pickers.window', 'nvim-tree' }) do
+for _, name in ipairs({ 'which-key.config', 'telescope.pickers', 'telescope.pickers.window', 'nvim-tree', 'dap', 'dap.ui', 'dap.repl', 'dapui', 'dapui.render.canvas', 'nio.ui' }) do
   package.preload[name] = function() preload_calls = preload_calls + 1; error('forced load: ' .. name) end
 end
 h.setup()
@@ -14,7 +14,9 @@ equal(preload_calls, 0, 'adapter forced an absent plugin to load')
 local absent = require('nvim-zh').status().plugins
 check(not absent['which-key'].active and absent['which-key'].reason == 'not_loaded', 'absent which-key state')
 check(not absent.telescope.active and absent.telescope.reason == 'not_loaded', 'absent Telescope state')
-for _, name in ipairs({ 'which-key.config', 'telescope.pickers', 'telescope.pickers.window', 'nvim-tree' }) do
+check(not absent['nvim-dap'].active and absent['nvim-dap'].reason == 'not_loaded', 'absent nvim-dap state')
+check(not absent['nvim-dap-ui'].active and absent['nvim-dap-ui'].reason == 'not_loaded', 'absent nvim-dap-ui state')
+for _, name in ipairs({ 'which-key.config', 'telescope.pickers', 'telescope.pickers.window', 'nvim-tree', 'dap', 'dap.ui', 'dap.repl', 'dapui', 'dapui.render.canvas', 'nio.ui' }) do
   package.preload[name] = nil
 end
 

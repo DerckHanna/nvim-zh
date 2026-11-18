@@ -74,3 +74,19 @@
 最终清理和发布检查在获得环境权限后执行：删除的绝对路径为 `/home/hanna/desktop/nvim-zh/.agents/refactor`，随后仅在父目录为空时 rmdir `.agents`；原日志已归档后删除。沙箱外同一 `make release-check` 实际退出 0，Lua/MO/完整资源可重复性与资源校验再次通过。沙箱注入的空元数据挂载未出现在真实候选中，未更改发布排除规则。该权限条件已解除，最终无 BLOCKED 项。
 
 本地重构验收完成；当前有效用例无 FAIL。上表默认可选 SKIP 均另有显式实测，实机服务器 pull 不支持与未验证平台仍保留上述限制。仅项目自有 `doc/nvim-zh.cnx/.txt` 随接口调整，未批量改写上游 Help 译文。
+
+## nvim-dap / nvim-dap-ui 增量验证（2026-11-19）
+
+本节只记录本次新增适配的实际结果，不改写上面的历史基线。固定上游为 nvim-dap `cfa2d58f4537aca6ca83e2de1a0d9f1491121264`、nvim-dap-ui `cc9dd33aade7f20bae414d0cba163bc60d4d4b43`；真实 UI smoke 另固定 nvim-nio `edcc181a875301dd21840189aa2f2f9ad69fc172`。
+
+- 编辑源新增 188 条：nvim-dap 147 条、nvim-dap-ui 41 条。`make check-translations` 实测 `CATALOG_CHECK=PASS domains=7 entries=598`。
+- `make check-syntax` 实测 `SYNTAX=PASS py=30 sh=10 lua=109 type_analysis=false`；`git diff --check` 通过。
+- `make build-resources` 实测 7 个生成 Lua、`RESOURCE_BUNDLE=BUILT 147 files`；`make check-resources` 与 `make check-reproducible` 均通过，后者输出 `REPRODUCIBLE_BUILD=PASS generated_lua native_mo complete_resources`。
+- `make test` 实际通过 unit、contract、tools、integration、e2e 五类入口；包含两个新适配器契约、真实 PTY/vim.pack、133 篇 Help parity。默认未启用的 native runtime 三项与 clangd 可选项仍按 runner 标为 SKIP，不计入本轮新增 PASS。
+- `make test-upstream` 实际通过全部既有与新增固定上游：`UPSTREAM_SOURCE_CONTRACT=PASS files=73 plugins=7`、`DAP_PO_SOURCE_REFS=PASS nvim-dap_entries=147 nvim-dap_refs=162 nvim-dap-ui_entries=41 nvim-dap-ui_refs=63`、`UPSTREAM_RESULT=PASS`。
+- 真实 DAP 输出：`NVIM_DAP_UPSTREAM_SPEC=PASS commit=cfa2d58 no_config,first_repl,help_scope select,direct_input,quickfix,health generation,external_override,teardown`。
+- 真实 DAP UI 输出：`NVIM_DAP_UI_UPSTREAM_SPEC=PASS commit=cc9dd33 first_open real_buffer highlights mappings float select select_window notify differential generations teardown entries=41`。实际检查中文 Buffer、高亮字节宽、mapping lhs/rhs/flags、动态断点值、浮窗标题、元素与 Window 选择、通知、模块换代和 teardown。
+
+增量测试曾出现真实 `.help` FAIL。独立取证确认是 spec 同时运行 `plugins.auto=false` 管理器和手工 attach，`repl.open()` 的 BufEnter 让管理器拆掉了手工 wrapper；改用独立 engine/UI 生命周期后真实中文断言通过。后续还修正了测试自身的三处假设：`自定义命令：` 包含 `命令：` 子串，改为整行精确计数；`pick_one` 回调经 `schedule_wrap`，等待后再断言；REPL 间接加载 `dap.ui`，提前捕获真实原函数再验证换代。源码形状检查器的一处单/双引号假设也按固定源码修正。没有删除动态输出负测或弱化换代断言来转绿，产品适配器未因这些 harness 缺陷改动。
+
+固定源码和探针仅放在本次 `.dsh-scratch`，真实上游套件完成后已核对绝对路径并清理。既有 REPL/Buffer 不回溯扫描，协议、日志、调试器输出、命令 token、动态变量及内部身份字符串保持原文；详细安全边界见 `docs/adapters.md`。

@@ -26,7 +26,7 @@ function M.overrides()
 end
 function M.empty_catalogs()
   local sources = {}
-  for _, domain in ipairs({ 'nvim-zh', 'nvim-ui', 'which-key', 'telescope', 'nvim-tree', 'clangd' }) do
+  for _, domain in ipairs({ 'nvim-zh', 'nvim-ui', 'which-key', 'telescope', 'nvim-tree', 'nvim-dap', 'nvim-dap-ui', 'clangd' }) do
     sources[domain] = { schema = 1, domain = domain, locale = 'zh_CN', entries = {} }
   end
   return sources

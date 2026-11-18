@@ -163,6 +163,16 @@ nvim-tree 翻译默认 on_attach 的映射后缀，保留 ASCII `nvim-tree: ` �
 页解析。覆盖默认 setup 以及 lazy 先 setup 后 LazyLoad 的顺序。用户自定义
 on_attach 描述和已有 Buffer 的映射保持原样；不扫描私有 renderer/help Buffer。
 
+nvim-dap 翻译精确 DAP title 通知、结构化选择器、REPL 帮助和固定输入提示，
+并投影断点 quickfix 文本与健康报告。REPL prompt/命令 token、补全、协议、
+日志、调试器输出和动态变量保持原文；已有 REPL callback 不重建。无 title
+通知、加载时立即注册的用户命令描述及 launch.json 动态输入不在安全范围内。
+
+nvim-dap-ui 只投影固定显示文本：三类高亮下的 render 标签、mapping 描述、
+浮窗标题、元素选择器、默认 Window 选择提示和精确 title 通知。共享 nio.ui
+选择器要求 setup 完成以及固定元素 ID/formatter 标签；原始 item 和回调不变。
+已有 Buffer 不扫描，动态变量、表达式、栈帧、路径和调试器输出保持原文。
+
 lazy.nvim 只提供 User LazyLoad。nvim-cmp 未找到由 cmp 自己拥有且具有安全显示
 接缝的固定标签，保持 inventory_only。固定 commit、源码 hash 和限制见
 manifests/upstreams.json。

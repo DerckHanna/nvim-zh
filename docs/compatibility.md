@@ -36,6 +36,8 @@
 | which-key | `3aab2147e74890957785941f0c1ad87d0a44c15a` | preset desc、生成数量、精确 title 通知；footer 与私有 Buffer 不覆盖 |
 | Telescope | `40aedd8a68c78a656a10a8d62d80c54af59420fb` | 初始标题显示投影、静态/动态 previewer 标题、通知；内部英文行为值和最终 refine 标题不覆盖 |
 | nvim-tree | `69eb0c34ed3d836d5a0d92d913b77dd73b054f2f` | 默认 on_attach 映射后缀与通知；用户自定义描述、已有 Buffer 和私有 renderer 不覆盖 |
+| nvim-dap | `cfa2d58f4537aca6ca83e2de1a0d9f1491121264` | 精确 title 通知、结构化选择器、REPL 帮助、直接输入提示、quickfix 显示副本与健康报告；协议、日志、调试器输出和已有 REPL 不覆盖 |
+| nvim-dap-ui | `cc9dd33aade7f20bae414d0cba163bc60d4d4b43` | 高亮限定的固定 render 文本、mapping 描述、浮窗标题、选择器、默认 Window 提示与通知；动态 DAP 数据和已有 Buffer 不改写 |
 | lazy.nvim | `306a05526ada86a7b30af95c5cc81ffba93fef97` | `User LazyLoad`；主面板私有 view 不覆盖 |
 | nvim-cmp | `2ffe79f1f021def8dd1fcd81deb16f1bb0d989f3` | inventory-only，没有可证明安全的 cmp 自有固定标签 |
 

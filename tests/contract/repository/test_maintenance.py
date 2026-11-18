@@ -185,6 +185,11 @@ class MaintenanceTests(unittest.TestCase):
                 self.assertTrue(upstream.get('sources'), name)
                 for source, meta in upstream['sources'].items():
                     self.assertRegex(meta['sha256'], r'^[0-9a-f]{64}$', f'{name}:{source}')
+        for name, dependency in manifest['test_dependencies'].items():
+            self.assertRegex(dependency['commit'], r'^[0-9a-f]{40}$', name)
+            self.assertTrue(dependency.get('sources'), name)
+            for source, meta in dependency['sources'].items():
+                self.assertRegex(meta['sha256'], r'^[0-9a-f]{64}$', f'{name}:{source}')
 
 
 if __name__ == '__main__':

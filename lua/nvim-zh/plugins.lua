@@ -4,6 +4,8 @@ local adapters = {
   require('nvim-zh.adapters.which_key'),
   require('nvim-zh.adapters.telescope'),
   require('nvim-zh.adapters.nvim_tree'),
+  require('nvim-zh.adapters.nvim_dap'),
+  require('nvim-zh.adapters.nvim_dap_ui'),
   {
     name = 'lazy.nvim',
     modules = { 'lazy' },
@@ -38,6 +40,15 @@ local adapters = {
 
 local config = { auto = false, lazy_load = true, disabled = {} }
 local AUGROUP = 'NvimZhPluginLateLoad'
+-- Some supported plugins finish loading after nvim-zh setup without emitting
+-- User LazyLoad (e.g. which-key auto-setups on a 500ms timer). Their module
+-- signature only changes once loading completes, so a bounded startup sweep
+-- re-attaches adapters when that happens. It never forces a plugin to load and
+-- stops as soon as the signature is stable; FocusGained/BufEnter and LazyLoad
+-- remain the long-term boundaries.
+local startup_timers = {}
+local startup_signature
+local STARTUP_DELAYS = { 300, 800, 1600 }
 
 local function enabled(name)
   if not config.auto then return false end
@@ -83,15 +94,56 @@ local function setup_lazy_load()
   })
 end
 
+local function clear_startup_timers()
+  for _, timer in ipairs(startup_timers) do
+    timer:stop()
+    if not timer:is_closing() then timer:close() end
+  end
+  startup_timers = {}
+  startup_signature = nil
+end
+
+local function attach_all()
+  for _, adapter in ipairs(adapters) do attach_one(adapter) end
+end
+
+-- Re-attach only when the loaded-module signature actually changed, so a stable
+-- session does no repeated work and an external replacement is never reclaimed.
+local function startup_sweep()
+  if not config.auto then return end
+  local signature = M.loaded_signature()
+  if signature == startup_signature then return end
+  startup_signature = signature
+  attach_all()
+end
+
+local function schedule_startup_sweep()
+  clear_startup_timers()
+  if not config.auto then return end
+  startup_signature = M.loaded_signature()
+  for _, delay in ipairs(STARTUP_DELAYS) do
+    local timer = (vim.uv or vim.loop).new_timer()
+    startup_timers[#startup_timers + 1] = timer
+    -- One-shot timers stop themselves; handles are closed centrally on the next
+    -- setup or teardown, never from inside a running callback.
+    timer:start(delay, 0, vim.schedule_wrap(function()
+      timer:stop()
+      startup_sweep()
+    end))
+  end
+end
+
 function M.setup(next_config)
   config = vim.deepcopy(next_config or config)
   setup_lazy_load()
-  for _, adapter in ipairs(adapters) do attach_one(adapter) end
+  attach_all()
+  schedule_startup_sweep()
 end
 
 function M.teardown()
   config = { auto = false, lazy_load = false, disabled = {} }
   clear_lazy_load()
+  clear_startup_timers()
   for _, adapter in ipairs(adapters) do adapter.detach() end
 end
 

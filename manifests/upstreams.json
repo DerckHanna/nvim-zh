@@ -1175,6 +1175,101 @@
         }
       }
     },
+    "nvim-dap": {
+      "repository": "https://github.com/mfussenegger/nvim-dap",
+      "commit": "cfa2d58f4537aca6ca83e2de1a0d9f1491121264",
+      "adapter": {
+        "status": "implemented",
+        "public_path": "exact vim.notify title; structured dap.ui selectors; scoped REPL/new-buffer and vim.fn.input display hooks; breakpoint quickfix display projection; health.check",
+        "excluded": "DAP protocol data, logs, debugger output, raw variables/frames/threads, REPL command tokens/completions, existing Buffer contents, eager user-command descriptions and internal quickfix/Buffer identities",
+        "seam": "vim.notify:title=DAP; dap.ui.pick_one(_sync); scoped REPL execute/append/open/toggle; session.set_exception_breakpoints and variable.tree_spec.compute_actions vim.fn.input; breakpoints.to_qf_list; health.check; synthetic thread root",
+        "domain": "nvim-dap",
+        "writes": "fixed_display_strings_only",
+        "version_related": "REPL new_buf and help execution are pinned synchronous scopes; quickfix text is reprojected from raw breakpoint fields; direct input prompts are scoped to their owning public action",
+        "limitations": "existing REPL prompt callbacks are not reattached; untitled notifications and eager command descriptions stay unchanged; duplicate quickfix locations fall back when raw breakpoint ownership is ambiguous"
+      },
+      "sources": {
+        "lua/dap.lua": {
+          "sha256": "64b278643f19f44d474531356881ff9d2c922c57a28dd1e63ae6524ab972b285"
+        },
+        "lua/dap/breakpoints.lua": {
+          "sha256": "2ed707bfb9b87dc4107033133cbe00e1569d8c1f3bfbeba211bf131b90f6e621"
+        },
+        "lua/dap/entity.lua": {
+          "sha256": "ee56d3ed625e4949ab839f3e34d02440bee7d80d4dede2530de0356c0639a6b4"
+        },
+        "lua/dap/ext/vscode.lua": {
+          "sha256": "6bd49ffe7a055de8885fcbd44a7e94745a93739cae822db5aaa45c4614cd3bee"
+        },
+        "lua/dap/health.lua": {
+          "sha256": "5b12cab31a580577c4e19b581b252577959c0da40d74dfb5810f1aebe6393da8"
+        },
+        "lua/dap/repl.lua": {
+          "sha256": "22088588e0d55e36ffd0e94276189320bba3bf16381b7bf063bff82d540b0406"
+        },
+        "lua/dap/session.lua": {
+          "sha256": "2c0b59c6383b6899eac2d281f8ddb01ae960f8b667856a674b939fa3aa04a121"
+        },
+        "lua/dap/ui.lua": {
+          "sha256": "68fafc5e37e19ed714fdd01707bd97e7dc5bc40ca123cbf641b47d714e2aa932"
+        },
+        "lua/dap/ui/widgets.lua": {
+          "sha256": "3b7eb7d86186d618bfb73c008d72a6dccaa1aadde2858367a60e19d06f98ad7e"
+        },
+        "lua/dap/utils.lua": {
+          "sha256": "8126189ccdcceaec17616f0e50e32ff73f9fe80f7d84651872e6637fc51b898f"
+        }
+      }
+    },
+    "nvim-dap-ui": {
+      "repository": "https://github.com/rcarriga/nvim-dap-ui",
+      "commit": "cc9dd33aade7f20bae414d0cba163bc60d4d4b43",
+      "adapter": {
+        "status": "implemented",
+        "public_path": "fixed render/display projections and exact vim.notify title",
+        "excluded": "raw DAP data, user values, debugger output, internal Buffer names, dependency/layout error values and existing Buffer contents",
+        "seam": "Canvas.new/write(highlight-scoped); util.apply_mapping(desc); util.format_value/error; util.select_win(scoped exact print); windows.open_float(title); guarded nio.ui.select; setup lifecycle; exact vim.notify title",
+        "domain": "nvim-dap-ui",
+        "writes": "fixed_display_strings_only",
+        "version_related": "Canvas.write recomputes matches from projected text; select_win is synchronous and render.new_canvas snapshots Canvas.new at module load",
+        "limitations": "existing Buffers are not scanned; shared nio.ui.select requires completed dapui setup, exactly six built-in non-hover IDs and expected formatter labels"
+      },
+      "sources": {
+        "lua/dapui/client/lib.lua": {
+          "sha256": "cb365540a8b25141b3ee1a654d1c77b8f39e9b71554aedeb48247daebccd5ff6"
+        },
+        "lua/dapui/components/breakpoints.lua": {
+          "sha256": "051af06356998fb055b7453e6df18223b630fe6e84036f87460915f38f2ee194"
+        },
+        "lua/dapui/components/frames.lua": {
+          "sha256": "cce40bee0346c1f58511217f4ae2c651de06b9233d06e2d5d075c165383e7671"
+        },
+        "lua/dapui/components/watches.lua": {
+          "sha256": "4ea55296e48bb8c101a7b3cb7ed6b416334d2a5ee096b47b1afa4e9140f514ff"
+        },
+        "lua/dapui/config/init.lua": {
+          "sha256": "29004c339bf7ff4e9522325dc89f2b701207fdea3bf2fbfa03afb7d1c75f329f"
+        },
+        "lua/dapui/init.lua": {
+          "sha256": "4ef7ec849f05d6d8a1753169f54b62e2250818305de1b8c5724107f061a04c34"
+        },
+        "lua/dapui/render/canvas.lua": {
+          "sha256": "84160c2a8525992a8d8838f5f4f9310b60339df10f8c293f8cd35b0bead5a8a2"
+        },
+        "lua/dapui/render/init.lua": {
+          "sha256": "c969b3e06c7b53f5830c3453d61184c735e55c8909a19ed4ef992dfb1a852441"
+        },
+        "lua/dapui/util.lua": {
+          "sha256": "55e4cbcd55acd6706fb7b8b8abc7fba671c3d649c2fc98faa8631104012b3575"
+        },
+        "lua/dapui/windows/float.lua": {
+          "sha256": "b451e5e00d0ab7709c45a40a72b630b3b2b4e21757ddce8d1afc2626f1a3d46f"
+        },
+        "lua/dapui/windows/init.lua": {
+          "sha256": "8d196e169b5b784da4f8b0a359a98942c98d45bc1e10510194a3fe897cace364"
+        }
+      }
+    },
     "nvim-cmp": {
       "repository": "https://github.com/hrsh7th/nvim-cmp",
       "commit": "2ffe79f1f021def8dd1fcd81deb16f1bb0d989f3",
@@ -1230,6 +1325,24 @@
         },
         "lua/plenary/popup/init.lua": {
           "sha256": "1c34ac8a52c1610675753a6278045e2f11e1e63787ab1e59d4ca71d519ca4d87"
+        }
+      }
+    },
+    "nvim-nio": {
+      "repository": "https://github.com/nvim-neotest/nvim-nio",
+      "commit": "edcc181a875301dd21840189aa2f2f9ad69fc172",
+      "sources": {
+        "lua/nio/control.lua": {
+          "sha256": "3a30c4748d0466f091075c68bb61850a05ca97f5c69fb73ce822afee665d860b"
+        },
+        "lua/nio/init.lua": {
+          "sha256": "51632e7944fe5bf1ee8de350b498e3d37d15cddf372517d4c954b272245c3617"
+        },
+        "lua/nio/tasks.lua": {
+          "sha256": "189845a42697cb83809b1b0af5a22ca07d9d4971ba3bdfc89bf360550e2ca643"
+        },
+        "lua/nio/ui.lua": {
+          "sha256": "3dcf56c86ae4842138ef4393abede01c9b7ed8b9737a58564e254a313bb8d97e"
         }
       }
     }

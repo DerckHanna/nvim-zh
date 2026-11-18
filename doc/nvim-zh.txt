@@ -188,6 +188,20 @@ setup-before-LazyLoad order are covered. User custom on_attach descriptions and
 existing buffer mappings are left unchanged. Private renderer/help buffers are
 not scanned.
 
+nvim-dap translates exact DAP-title notifications, structured selectors, REPL
+help, and fixed input prompts, and projects breakpoint quickfix text and health
+reports. REPL prompts/command tokens, completions, protocol data, logs, debugger
+output, and dynamic variables stay intact; existing REPL callbacks are not
+rebuilt. Untitled notifications, eagerly registered command descriptions, and
+launch.json dynamic inputs have no covered source-safe seam.
+
+nvim-dap-ui projects fixed display text only: render labels under three
+highlight groups, mapping descriptions, float titles, the element selector,
+the default window-selection prompt, and exact-title notifications. Its shared
+nio.ui selector requires completed setup and fixed element IDs/formatter labels;
+raw items and callback results stay unchanged. Existing buffers are not scanned;
+dynamic variables, expressions, frames, paths, and debugger output stay intact.
+
 lazy.nvim supplies User LazyLoad only. nvim-cmp remains inventory_only because
 no fixed cmp-owned label with a safe display seam was found. Fixed commits,
 source hashes, and limitations are in manifests/upstreams.json.

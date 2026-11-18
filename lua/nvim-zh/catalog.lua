@@ -6,6 +6,8 @@ local BUILTIN_SOURCES = {
   ['which-key'] = 'translations/po/zh_CN/which-key.po',
   telescope = 'translations/po/zh_CN/telescope.po',
   ['nvim-tree'] = 'translations/po/zh_CN/nvim-tree.po',
+  ['nvim-dap'] = 'translations/po/zh_CN/nvim-dap.po',
+  ['nvim-dap-ui'] = 'translations/po/zh_CN/nvim-dap-ui.po',
   clangd = 'translations/po/zh_CN/clangd.po',
 }
 local registrations = {}

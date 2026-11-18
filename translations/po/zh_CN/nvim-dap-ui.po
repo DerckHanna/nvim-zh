@@ -1,0 +1,258 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: nvim-zh\n"
+"PO-Revision-Date: 2026-11-18 23:40+0800\n"
+"Last-Translator: nvim-zh maintainers\n"
+"Language-Team: Simplified Chinese\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: zh_CN\n"
+"X-Generator: nvim-zh catalog_tool\n"
+
+# Notifications routed by the exact public title "nvim-dap-ui".
+
+#: lua/dapui/init.lua:139
+#. Runtime template reconstructed from "No such element: " .. elem_name.
+msgctxt "notification"
+msgid "No such element: %s"
+msgstr "不存在元素：%s"
+
+#: lua/dapui/init.lua:143
+#: lua/dapui/init.lua:190
+msgctxt "notification"
+msgid "No active debug session"
+msgstr "没有活动的调试会话"
+
+#: lua/dapui/util.lua:27
+msgctxt "notification"
+msgid "Rendering failed: %s"
+msgstr "渲染失败：%s"
+
+#: lua/dapui/client/lib.lua:24
+#: lua/dapui/client/lib.lua:34
+msgctxt "notification"
+msgid "No source available for frame"
+msgstr "当前栈帧没有可用源码"
+
+#: lua/dapui/client/lib.lua:73
+#. Runtime template reconstructed from a fixed prefix and a variable/expression name.
+msgctxt "notification"
+msgid "Debug server doesn't support setting %s"
+msgstr "调试服务器不支持设置 %s"
+
+#: lua/dapui/render/canvas.lua:142
+#. Exact runtime string for the fixed expand action.
+msgctxt "notification"
+msgid "No expand action for current line"
+msgstr "当前行没有展开操作"
+
+#: lua/dapui/render/canvas.lua:142
+#. Exact runtime string for the fixed open action.
+msgctxt "notification"
+msgid "No open action for current line"
+msgstr "当前行没有打开操作"
+
+#: lua/dapui/render/canvas.lua:142
+#. Exact runtime string for the fixed remove action.
+msgctxt "notification"
+msgid "No remove action for current line"
+msgstr "当前行没有移除操作"
+
+#: lua/dapui/render/canvas.lua:142
+#. Exact runtime string for the fixed edit action.
+msgctxt "notification"
+msgid "No edit action for current line"
+msgstr "当前行没有编辑操作"
+
+#: lua/dapui/render/canvas.lua:142
+#. Exact runtime string for the fixed repl action.
+msgctxt "notification"
+msgid "No repl action for current line"
+msgstr "当前行没有 REPL 操作"
+
+#: lua/dapui/render/canvas.lua:142
+#. Exact runtime string for the fixed toggle action.
+msgctxt "notification"
+msgid "No toggle action for current line"
+msgstr "当前行没有切换操作"
+
+#: lua/dapui/render/canvas.lua:142
+#. Exact runtime string for the fixed watch action.
+msgctxt "notification"
+msgid "No watch action for current line"
+msgstr "当前行没有监视操作"
+
+# Fixed render/display strings. Dynamic debugger data is deliberately absent.
+
+#: lua/dapui/components/watches.lua:94
+msgctxt "runtime"
+msgid "No active session"
+msgstr "没有活动的调试会话"
+
+#: lua/dapui/components/watches.lua:79
+msgctxt "empty"
+msgid "No Expressions\n"
+msgstr "没有监视表达式\n"
+
+#: lua/dapui/components/breakpoints.lua:151
+msgctxt "breakpoint"
+msgid "Log Message:"
+msgstr "日志消息："
+
+#: lua/dapui/components/breakpoints.lua:154
+msgctxt "breakpoint"
+msgid "Condition:"
+msgstr "条件："
+
+#: lua/dapui/components/breakpoints.lua:157
+msgctxt "breakpoint"
+msgid "Hit Condition:"
+msgstr "命中条件："
+
+#: lua/dapui/util.lua:319
+msgctxt "render"
+msgid " ... [%s more lines]"
+msgstr " ……[还有 %s 行]"
+
+#: lua/dapui/components/frames.lua:61
+msgctxt "source"
+msgid "<unknown>"
+msgstr "<未知>"
+
+# Element picker prompt and labels. The original IDs are returned unchanged.
+
+#: lua/dapui/init.lua:67
+msgctxt "select"
+msgid "Select an element:"
+msgstr "选择元素："
+
+#: lua/dapui/util.lua:141
+msgctxt "select_window"
+msgid "Select window: "
+msgstr "选择 Window： "
+
+#: lua/dapui/init.lua:69
+#: lua/dapui/config/init.lua:102
+msgctxt "select_item"
+msgid "Scopes"
+msgstr "作用域"
+
+#: lua/dapui/init.lua:69
+#: lua/dapui/config/init.lua:105
+msgctxt "select_item"
+msgid "Breakpoints"
+msgstr "断点"
+
+#: lua/dapui/init.lua:69
+#: lua/dapui/config/init.lua:106
+msgctxt "select_item"
+msgid "Stacks"
+msgstr "调用栈"
+
+#: lua/dapui/init.lua:69
+#: lua/dapui/config/init.lua:107
+msgctxt "select_item"
+msgid "Watches"
+msgstr "监视"
+
+#: lua/dapui/init.lua:69
+#: lua/dapui/config/init.lua:114
+msgctxt "select_item"
+msgid "Repl"
+msgstr "REPL"
+
+#: lua/dapui/init.lua:69
+#: lua/dapui/config/init.lua:115
+msgctxt "select_item"
+msgid "Console"
+msgstr "控制台"
+
+# Default floating-window titles; the internal element IDs remain lowercase.
+
+#: lua/dapui/init.lua:157
+#: lua/dapui/config/init.lua:102
+msgctxt "element_title"
+msgid "scopes"
+msgstr "作用域"
+
+#: lua/dapui/init.lua:157
+#: lua/dapui/config/init.lua:105
+msgctxt "element_title"
+msgid "breakpoints"
+msgstr "断点"
+
+#: lua/dapui/init.lua:157
+#: lua/dapui/config/init.lua:106
+msgctxt "element_title"
+msgid "stacks"
+msgstr "调用栈"
+
+#: lua/dapui/init.lua:157
+#: lua/dapui/config/init.lua:107
+msgctxt "element_title"
+msgid "watches"
+msgstr "监视"
+
+#: lua/dapui/init.lua:157
+#: lua/dapui/config/init.lua:114
+msgctxt "element_title"
+msgid "repl"
+msgstr "REPL"
+
+#: lua/dapui/init.lua:157
+#: lua/dapui/config/init.lua:115
+msgctxt "element_title"
+msgid "console"
+msgstr "控制台"
+
+#: lua/dapui/init.lua:95
+#: lua/dapui/init.lua:157
+msgctxt "element_title"
+msgid "hover"
+msgstr "悬停"
+
+# Buffer-local mapping descriptions. These msgids are action IDs at the
+# behavior layer and are translated only at util.apply_mapping's desc sink.
+
+#: lua/dapui/render/canvas.lua:19
+#: lua/dapui/util.lua:206
+msgctxt "mapping"
+msgid "expand"
+msgstr "展开"
+
+#: lua/dapui/render/canvas.lua:19
+#: lua/dapui/util.lua:206
+msgctxt "mapping"
+msgid "open"
+msgstr "打开"
+
+#: lua/dapui/render/canvas.lua:19
+#: lua/dapui/util.lua:206
+msgctxt "mapping"
+msgid "remove"
+msgstr "移除"
+
+#: lua/dapui/render/canvas.lua:19
+#: lua/dapui/util.lua:206
+msgctxt "mapping"
+msgid "edit"
+msgstr "编辑"
+
+#: lua/dapui/render/canvas.lua:19
+#: lua/dapui/util.lua:206
+msgctxt "mapping"
+msgid "repl"
+msgstr "发送到 REPL"
+
+#: lua/dapui/render/canvas.lua:19
+#: lua/dapui/util.lua:206
+msgctxt "mapping"
+msgid "toggle"
+msgstr "切换"
+
+#: lua/dapui/render/canvas.lua:19
+#: lua/dapui/util.lua:206
+msgctxt "mapping"
+msgid "watch"
+msgstr "添加到监视"

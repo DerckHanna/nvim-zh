@@ -196,10 +196,15 @@ def check_entry(entry: dict, path: Path, terms: list[dict]) -> None:
         if term.get('domain') not in (None, path.stem) or term.get('context') not in (None, context):
             continue
         present = re.search(rf'(?<![A-Za-z0-9_]){re.escape(source)}(?![A-Za-z0-9_])', msgid)
-        if not present:
-            continue
-        if term.get('policy') == 'preserve' and source not in msgstr:
+        # Preserve the exact technical spelling for singular capitalized terms.
+        # Also reject forbidden translations for lowercase/plural source forms;
+        # otherwise "buffers" or "current buffer" silently bypass the glossary.
+        inflected = re.search(rf'(?<![A-Za-z0-9_]){re.escape(source)}s?(?![A-Za-z0-9_])',
+                              msgid, flags=re.IGNORECASE)
+        if term.get('policy') == 'preserve' and present and source not in msgstr:
             raise CatalogError(f'{location}: preserved term {source!r} was translated or removed')
+        if not present and not inflected:
+            continue
         for forbidden in term.get('forbidden', []):
             if forbidden in msgstr:
                 raise CatalogError(f'{location}: forbidden translation {forbidden!r} for {source!r}')
@@ -223,6 +228,27 @@ def load_glossary(path: Path | None) -> list[dict]:
         if not isinstance(term.get('source'), str) or term.get('policy') not in ('preserve', 'translate'):
             raise CatalogError(f'{path}: each term needs source and preserve/translate policy')
     return terms
+
+
+def builtin_sources(root: Path) -> dict[str, Path]:
+    """Read the data-only BUILTIN_SOURCES table; do not duplicate its domains."""
+    source = (root / 'lua/nvim-zh/catalog.lua').read_text(encoding='utf-8')
+    table = re.search(r'local BUILTIN_SOURCES = \{(.*?)\n\}', source, re.S)
+    if not table:
+        raise CatalogError('missing BUILTIN_SOURCES table')
+    result = {}
+    for line in table[1].strip().splitlines():
+        match = re.fullmatch(r"\s*(?:\['([^']+)'\]|(\w+)) = '([^']+)',\s*", line)
+        if not match:
+            raise CatalogError(f'invalid BUILTIN_SOURCES line: {line}')
+        domain, relative = match[1] or match[2], match[3]
+        if relative != f'translations/po/zh_CN/{domain}.po' or domain in result:
+            raise CatalogError(f'invalid builtin source: {domain}')
+        result[domain] = root / relative
+    actual = set((root / 'translations/po/zh_CN').glob('*.po'))
+    if actual != set(result.values()):
+        raise CatalogError('production PO files differ from BUILTIN_SOURCES')
+    return result
 
 
 def check(po_dir: Path, glossary: Path | None = None) -> dict[str, int]:
@@ -393,7 +419,7 @@ def compare_sync(before: dict, after: dict) -> list[dict]:
 def release_check(root: Path) -> list[str]:
     """Return release-blocking paths; never edits the candidate tree."""
     problems: list[str] = []
-    forbidden_parts = {'__pycache__', '.pytest_cache', '.cache', 'node_modules', '.git'}
+    forbidden_parts = {'__pycache__', '.pytest_cache', '.cache', 'node_modules', '.git', '.agents', '.codex', '.aws'}
     forbidden_suffixes = {'.pyc', '.pyo', '.log', '.tmp', '.bak', '.swp', '.zip', '.gz'}
     # Neovim 0.10/0.11 fall back to ./.nvimlog (and 0.12 to ./nvim.log) when the
     # state directory is read-only. Path('.nvimlog').suffix is '' for a leading
@@ -483,6 +509,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument('--package-dir', type=Path, default=root)
     args = parser.parse_args(argv)
     try:
+        if args.command in ('check', 'build') and args.po_dir.resolve() == (root / 'translations/po/zh_CN').resolve():
+            builtin_sources(root)
         if args.command == 'check':
             result = check(args.po_dir, args.glossary)
             print(f'CATALOG_CHECK=PASS domains={result["domains"]} entries={result["entries"]}')

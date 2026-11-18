@@ -1,13 +1,16 @@
 # 发布检查清单
 
-发布是人工操作；自动化不得自行打 tag、推送或发布。
+发布是人工操作；自动化不得自行提交、打 tag、推送或发布。
 
-- [ ] 确认目标版本号遵循 semver，CHANGELOG 与兼容表和实际能力一致。
-- [ ] 在本机必过版本运行 `make test` 和 `make check-translations`。
-- [ ] 运行 `make check-reproducible`，确认 PO→Lua 无时间戳且字节一致。
-- [ ] 运行 `make release-check` 检查排除工作树 `.git` 后的临时候选包，处理所有零字节、缓存、临时件、日志与研究下载。
-- [ ] 单独运行固定完整 commit 的真实上游 smoke，记录每个结果和 SKIP。
-- [ ] 运行离线 `make sync`；如需联网，只用显式入口 `make sync-fetch`（UI 目录）或 `make sync-native`（核心消息）并审查变化——`make sync --fetch` 不是合法调用，`--fetch` 属于工具参数。
-- [ ] 从实际命令输出记录静态条目、运行时观察覆盖率与性能，不沿用旧数字。
-- [ ] 检查发布包不包含 `.git`、测试临时件、缓存、研究源码、散落备份或日志。
-- [ ] 由维护者人工决定 tag/发布；本次任务未执行这些操作。
+- [ ] 确认 `VERSION`、`CHANGELOG.md` 与目标版本一致，发布版号遵循 semver。
+- [ ] 运行 `make check-syntax check-translations check-native`，处理所有语法、PO、术语和清单错误。
+- [ ] 运行 `make build-resources check-resources`，确认完整 `resources/` 与编辑源一致；安装端没有构建 hook。
+- [ ] 运行 `make test`，覆盖默认离线契约、配置自动生效、真实 PTY、vim.pack 确认/取消/更新/损坏资源/回退及并发。
+- [ ] 运行 `make check-reproducible`，确认 Lua、MO 与完整资源无时间戳且逐字节一致。
+- [ ] 准备 manifest 固定 commit 的第三方源码，运行 `make test-upstream`；缺少固定源码必须视为未完成，不接受 SKIP 冒充通过。
+- [ ] 按 `docs/testing.md` 的显式入口运行可用的真实 native/clangd 检查，逐项记录 PASS、FAIL、SKIP 和受阻原因。
+- [ ] 运行 `make release-check`，检查排除工作树 `.git` 后的临时候选包，处理所有零字节、缓存、临时件、日志与研究下载。
+- [ ] 运行离线 `make sync`。如需联网，只用显式入口 `make sync-fetch` 或 `make sync-native`，并审查全部变化；`make sync --fetch` 不是合法调用。
+- [ ] 从当次命令输出记录覆盖范围、运行时观察、可选检查和性能读数，不沿用旧数字，不把 fixture 命中率写成整体汉化率。
+- [ ] 检查发布包不包含 `.git`、测试临时件、缓存、研究源码、散落备份或日志；项目文档没有陈旧 PASS、旧入口或阶段性进度叙述。
+- [ ] 由维护者人工决定是否提交、打 tag 和发布。

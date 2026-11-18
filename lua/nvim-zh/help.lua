@@ -1,8 +1,15 @@
 local M = {}
 
 local function project_root()
-  local source = debug.getinfo(1, 'S').source:sub(2)
-  return vim.fs.dirname(vim.fs.dirname(vim.fs.dirname(source)))
+  return require('nvim-zh.paths').root
+end
+local resource_root
+
+function M.set_resource_root(root)
+  if resource_root == root then return end
+  if resource_root then vim.opt.runtimepath:remove(resource_root) end
+  resource_root = root
+  if root then vim.opt.runtimepath:prepend(root) end
 end
 
 -- Language entries absent before setup are owned by this module. On repeated
@@ -42,7 +49,7 @@ function M.setup(config)
 end
 
 function M.info(config)
-  local root = project_root()
+  local root = resource_root or project_root()
   return {
     enabled = config.enabled,
     helplang = vim.o.helplang,
@@ -58,7 +65,8 @@ local function external_chinese_help()
     local doc = vim.fs.dirname(vim.uv.fs_realpath(path) or path)
     -- Resolve aliases too: a second runtimepath entry pointing at this plugin
     -- does not prove an independent installation. Require a usable help index.
-    if doc ~= own_doc then
+    local active_doc = resource_root and (vim.uv.fs_realpath(resource_root .. '/doc') or resource_root .. '/doc')
+    if doc ~= own_doc and doc ~= active_doc then
       local ok, rows = pcall(vim.fn.readfile, doc .. '/tags-cn')
       if ok then
         for _, row in ipairs(rows) do

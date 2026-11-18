@@ -17,24 +17,12 @@ jobs:
           - version: v0.12.6
             asset: nvim-linux-x86_64
             sha256: 474430d53e6264f6d6dd18db42d6dc9df3a1b56ca9e88a325bbf860e1a811d87
-            scope: full
-            experimental: false
-          - version: v0.11.5
-            asset: nvim-linux-x86_64
-            sha256: b2f91117be5b5ea39edd7297156dc2a4a8df4add6c95a90809a8df19e7ab6f52
-            scope: full
             experimental: false
           - version: nightly
             asset: nvim-linux-x86_64
             # A moving nightly cannot have a stable pin; do not reuse a stale hash.
             sha256: ''
-            scope: full
             experimental: true
-          - version: v0.10.4
-            asset: nvim-linux-x86_64
-            sha256: 95aaa8e89473f5421114f2787c13ae0ec6e11ebbd1a13a1bd6fcf63420f8073f
-            scope: foundation
-            experimental: false
     continue-on-error: ${{ matrix.experimental }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -64,40 +52,8 @@ jobs:
             sudo apt-get update
             sudo apt-get install -y gettext
           fi
-      - name: Verify shipped native MO against the pinned cache
-        if: matrix.version == 'v0.12.6'
-        env:
-          PYTHONDONTWRITEBYTECODE: '1'
-        run: |
-          python3 - <<'PY'
-          import hashlib
-          from pathlib import Path
-          import sys
-          import tempfile
-
-          root = Path.cwd()
-          sys.path.insert(0, str(root / 'tools'))
-          import native_catalog as nc
-
-          manifest = nc.load_manifest(root)
-          cached = root / 'build/upstream/zh_CN.UTF-8.po'
-          shipped = root / 'build/native/zh_CN.UTF-8/LC_MESSAGES/nvim.mo'
-          for path in (cached, shipped):
-              if not path.is_file():
-                  raise SystemExit(f'required native input is missing: {path}')
-          with tempfile.TemporaryDirectory(prefix='nvim-zh-native-mo-ci-') as tmp:
-              stats = nc.build(root, manifest, cached, Path(tmp) / 'out',
-                               expect_sha=manifest['upstream']['sha256'])
-          actual = hashlib.sha256(shipped.read_bytes()).hexdigest()
-          if stats['mo_sha256'] != actual:
-              raise SystemExit(f'shipped native MO is stale: {actual} != {stats["mo_sha256"]}')
-          print(f'NATIVE_MO_REPRODUCIBLE=PASS sha256={actual}')
-          PY
-      - name: Foundation checks
-        run: make test-foundation
-      - name: Full offline contract and release checks
-        if: matrix.scope == 'full'
-        run: make test
+      - name: Syntax, catalogs, resources, offline suites and release gates
+        run: make check-syntax check-translations check-native check-resources check-reproducible test release-check
       - name: CI compatibility evidence
         run: nvim --version | head -n 3
 
@@ -118,18 +74,28 @@ jobs:
           printf '%s  %s\n' '474430d53e6264f6d6dd18db42d6dc9df3a1b56ca9e88a325bbf860e1a811d87' /tmp/nvim.tar.gz | sha256sum -c -
           tar -xzf /tmp/nvim.tar.gz -C /tmp
           echo /tmp/nvim-linux-x86_64/bin >> "$GITHUB_PATH"
-      - name: Fetch fixed upstream archives
+      - name: Fetch manifest-pinned upstream archives
         run: |
-          mkdir -p /tmp/nvim-zh-smoke
-          fetch() { mkdir -p "/tmp/nvim-zh-smoke/$1"; curl -fsSL "https://github.com/$2/archive/$3.tar.gz" | tar -xz --strip-components=1 -C "/tmp/nvim-zh-smoke/$1"; }
-          fetch which-key folke/which-key.nvim 3aab2147e74890957785941f0c1ad87d0a44c15a
-          fetch telescope nvim-telescope/telescope.nvim 40aedd8a68c78a656a10a8d62d80c54af59420fb
-          fetch plenary nvim-lua/plenary.nvim 74b06c6c75e4eeb3108ec01852001636d85a932b
-          fetch lazy folke/lazy.nvim 306a05526ada86a7b30af95c5cc81ffba93fef97
-          fetch nvim-tree nvim-tree/nvim-tree.lua 69eb0c34ed3d836d5a0d92d913b77dd73b054f2f
-          fetch nvim-cmp hrsh7th/nvim-cmp 2ffe79f1f021def8dd1fcd81deb16f1bb0d989f3
-      - name: Run real public-seam smoke
-        run: make test-phase4 test-phase7
+          python3 - <<'PYFETCH'
+          import io, json, tarfile, urllib.request
+          from pathlib import Path
+          manifest = json.loads(Path('manifests/upstreams.json').read_text())
+          selected = {name: manifest['upstreams'][name] for name in ('which-key', 'telescope', 'lazy.nvim', 'nvim-tree', 'nvim-cmp')}
+          selected.update(manifest['test_dependencies'])
+          for name, item in selected.items():
+              destination = Path('/tmp/nvim-zh-smoke') / ('lazy' if name == 'lazy.nvim' else name)
+              destination.mkdir(parents=True)
+              url = item['repository'] + '/archive/' + item['commit'] + '.tar.gz'
+              with urllib.request.urlopen(url, timeout=60) as response:
+                  archive = tarfile.open(fileobj=io.BytesIO(response.read()), mode='r:gz')
+              for member in archive.getmembers():
+                  parts = Path(member.name).parts[1:]
+                  if parts:
+                      member.name = str(Path(*parts))
+                      archive.extract(member, destination, filter='data')
+          PYFETCH
+      - name: Run fixed upstream contracts
+        run: make test-upstream
         env:
           NVIM_ZH_TEST_WHICH_KEY: /tmp/nvim-zh-smoke/which-key
           NVIM_ZH_TEST_TELESCOPE: /tmp/nvim-zh-smoke/telescope

@@ -1,0 +1,122 @@
+*remote_plugin.txt*    Nvim
+
+
+		 NVIM REFERENCE MANUAL	  by Thiago de Arruda
+
+
+Nvim 对远端插件的支持			  *remote-plugin*
+
+				      输入 |gO| 查看目录。
+
+==============================================================================
+1. 简介					    *remote-plugin-intro*
+
+可扩展性是 Nvim 的首要目标。任何编程语言都可以用来扩展 Nvim，而无需改动 Nvim
+本身。这是通过远端插件实现的：它们是协进程，与 Nvim 进程之间有一条直接通信
+通道（经由 |RPC|）。
+
+尽管这些插件运行在独立进程中，它们仍然可以调用、被调用和接收事件，就像插件的
+代码在主进程中执行一样。
+
+==============================================================================
+2. 插件宿主					    *remote-plugin-hosts*
+
+插件固然可以实现为任意程序，直接与高层 Nvim API 通信，并通过 |rpcrequest()| 和
+|rpcnotify()| 被调用，但这不是最佳做法。开发者应首先确认所选编程语言是否有可用的
+插件宿主。
+
+插件宿主是为插件提供高层环境的程序，负责处理通过 |RPC| 连接定义命令、自动命令和
+函数所涉及的大部分样板代码。宿主只在已注册的某个插件需要它时才被加载，从而让
+Nvim 的启动尽可能快，即使安装了许多插件/宿主。
+
+==============================================================================
+3. 示例					    *remote-plugin-example*
+
+了解远端插件的最好方式是通过示例，所以我们来看看一个 Python 插件是什么样子。
+这个插件导出一个命令、一个函数和一个自动命令。插件名为 'Limit'，它所做的只是
+限制对它发起的请求次数。以下是插件源码： >python
+
+    import pynvim
+
+    @pynvim.plugin
+    class Limit(object):
+        def __init__(self, vim):
+            self.vim = vim
+            self.calls = 0
+
+        @pynvim.command('Cmd', range='', nargs='*', sync=True)
+        def command_handler(self, args, range):
+            self._increment_calls()
+            self.vim.current.line = (
+                'Command: Called %d times, args: %s, range: %s' % (self.calls,
+                                                                   args,
+                                                                   range))
+
+        @pynvim.autocmd('BufEnter', pattern='*.py', eval='expand("<afile>")',
+                        sync=True)
+        def autocmd_handler(self, filename):
+            self._increment_calls()
+            self.vim.current.line = (
+                'Autocmd: Called %s times, file: %s' % (self.calls, filename))
+
+        @pynvim.function('Func')
+        def function_handler(self, args):
+            self._increment_calls()
+            self.vim.current.line = (
+                'Function: Called %d times, args: %s' % (self.calls, args))
+
+        def _increment_calls(self):
+            if self.calls == 5:
+                raise Exception('Too many calls!')
+            self.calls += 1
+<
+
+可以看到，这个插件是用地道的 Python 实现的（类、方法和装饰器）。这些特定语言的
+惯用法到 Vimscript 的转换发生在生成插件清单的时候（见下一节）。
+
+注意，导出的命令和自动命令都带有 "sync" 标志，它影响 Nvim 调用插件的方式：使用
+"sync" 时会调用 |rpcrequest()| 函数，它会阻塞 Nvim，直到处理函数返回一个值。
+不使用 "sync" 标志时，调用以「发出即忘记」的方式通过 |rpcnotify()| 进行，这意味着
+处理函数返回的值或抛出的异常都会被忽略。
+
+要测试上面的插件，必须把它保存到某个 'runtimepath' 目录下的 "rplugin/python"
+中（例如 ~/.config/nvim/rplugin/python/limit.py）。然后必须用
+|:UpdateRemotePlugins| 生成远端插件清单。
+
+==============================================================================
+4. 远端插件清单				    *remote-plugin-manifest*
+						      *:UpdateRemotePlugins*
+
+仅仅把远端插件安装到 "rplugin/{host}" 并不足以让它们在需要时被自动加载。每当
+安装、更新或删除一个远端插件时，你都必须执行 |:UpdateRemotePlugins|。
+
+|:UpdateRemotePlugins| 生成远端插件清单，这是一个特殊的 Vimscript 文件，其中
+包含所有远端插件定义的全部 Vimscript 实体（命令/自动命令/函数）的声明，每个
+实体都关联到对应的宿主和插件路径。
+
+清单声明只是对 `remote#host#RegisterPlugin` 函数的调用，该函数负责在声明的命令、
+自动命令或函数第一次被使用时立即引导宿主启动。
+
+生成清单这一步是必要的，目的是在用户拥有使用不同宿主的远端插件时保持 Nvim 启动
+迅速。例如，假设某用户有三个插件，分别使用 Python、Java 和 .NET 宿主。如果我们在
+启动时加载全部三个插件，那么也会启动三个语言运行时，这可能要花上好几秒！
+
+有了清单，每个宿主只会在需要时才被加载。继续上面的例子，假设那个 Java 插件是
+Java 代码的语义补全引擎。如果它定义了自动命令 `BufEnter *.java`，那么只有当
+Nvim 加载匹配 "*.java" 的 buffer 时，Java 宿主才会启动。
+
+如果显式调用 |:UpdateRemotePlugins| 显得不方便，可以这样看待它：这是一种在为
+一般用途保持轻快的同时，在 Nvim 中提供 IDE 能力的方式。它也与 |:helptags|
+命令类似。
+
+						*$NVIM_RPLUGIN_MANIFEST*
+除非设置了 $NVIM_RPLUGIN_MANIFEST，否则清单会被写入一个名为 `rplugin.vim`
+的文件，位置在：
+
+	Unix ~
+	  $XDG_DATA_HOME/nvim/ 或 ~/.local/share/nvim/
+
+	Windows ~
+	  $LOCALAPPDATA/nvim/ 或 ~/AppData/Local/nvim/
+
+ vim:tw=78:ts=8:noet:ft=help:norl:

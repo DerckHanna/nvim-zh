@@ -1,44 +1,100 @@
 *nvim-zh.txt*	nvim-zh
 
 nvim-zh                                                         *nvim-zh*
-                    *nvim-zh-phase8* *nvim-zh-phase7* *nvim-zh-phase6* *nvim-zh-phase5*
-                    *nvim-zh-phase4* *nvim-zh-phase3* *nvim-zh-phase2* *nvim-zh-phase1*
 
-nvim-zh is a Chinese localization plugin for Neovim. Phase 8 extends it with
-translations for surfaces users actually see: native core/gettext integration, a
-standalone translation engine, deterministic catalog tooling, local statistics,
-Neovim UI public seams, and pinned Neovim help translations (see |nvim-zh-help|).
-Diagnostic/LSP protocol data, third-party private buffers, and external tool byte
-streams are never taken over.
+nvim-zh is a Simplified Chinese localization plugin for Neovim. It integrates
+native gettext messages, Chinese Help, exact Lua catalogs, common UI, supported
+third-party plugins, and clangd diagnostic/LSP display text.
 
-SETUP                                                       *nvim-zh-setup*
+It does not rewrite editing buffers, raw diagnostic/LSP objects, third-party
+source files, private rendered UI, or external tool byte streams. Unknown text
+falls back to English.
 
-Call setup from your plugin manager: >lua
+REQUIREMENTS AND INSTALLATION                     *nvim-zh-setup* *nvim-zh-install*
+
+Neovim 0.12+ is required for the supported vim.pack installation and update
+workflow. Users do not need Python, msgfmt, helptags, or a build hook.
+
+The translation baseline is Neovim 0.12.6. Automatic native gettext binding
+currently requires Linux/glibc + LuaJIT; other environments report a native
+degradation while Chinese Help and Lua UI remain available.
+
+Install and enable with: >lua
+
+    vim.pack.add({ 'https://github.com/DerckHanna/nvim-zh' }, { load = true })
+    require('nvim-zh').setup()
+<
+All runtime resources ship with the package. setup validates and activates
+them without compiling MO files or generating help tags on the user's machine.
+
+COMMANDS                                                     *nvim-zh-commands*
+
+*:NvimZh*        Open or focus the read-only Chinese status panel.
+*:NvimZhCheck*   Show read-only health results. Also available through
+                  `:checkhealth nvim-zh`.
+
+There are no separate Update, Rollback, Reload, Info, or Missing commands.
+Structured data is available through |nvim-zh-api| instead of notification
+scraping.
+
+PANEL AND UPDATES                                              *nvim-zh-panel*
+
+:NvimZh opens overview, translation, missing-entry, and health pages.
+Tab/Shift-Tab switch pages, j/k scroll, / searches, ? opens this help, and
+q/Esc closes the panel. It has no update, configuration-editing, build, or
+rollback actions.
+
+Update only through vim.pack: >lua
+
+    vim.pack.update()
+<
+Use :write in the standard vim.pack confirmation buffer. Cancelling leaves the
+active resources unchanged. Confirmed changes automatically synchronize MO,
+UI/diagnostic/LSP catalogs, Chinese Help, and prebuilt indexes.
+
+Pure resource changes affect subsequent queries without a restart. An
+implementation change is reported as restart_required and completes
+automatically on the next startup. Invalid candidates preserve the previous
+verified resource set. Version rollback uses vim.pack and its lock file.
+
+CONFIGURATION                                                 *nvim-zh-config*
+
+The default configuration is: >lua
 
     require('nvim-zh').setup({
       modules = {
-        core = { enabled = true, apply_language = false },
+        core = { enabled = true, apply_language = true },
         help = { enabled = true, lang = { 'cn', 'en' }, vimcdoc = false },
         ui = { notify = true, prompts = true, select_items = false, echo = false },
         plugins = { auto = true, lazy_load = true, disabled = {} },
+        diagnostics = {
+          enabled = true,
+          virtual_text = true,
+          virtual_lines = true,
+          float = true,
+        },
+        lsp = { messages = true, progress = true },
       },
       terminology = 'preserve',
+      overrides = {},
       missing = { enabled = true, max_entries = 2000 },
     })
 <
-The plugin never applies the OS locale automatically. Use |:NvimZhCheck| to
-inspect the existing Neovim gettext catalog and zh_CN.UTF-8 locale. Vimcdoc is
-an optional, separately installed dependency; it is not vendored.
+modules.core controls only native gettext integration. enabled=false disables
+it; apply_language=false opts out of automatic MO binding and message-language
+selection. Chinese Help and Lua UI are independent.
 
-ENGINE                                                     *nvim-zh-engine*
+modules.help selects 'helplang'. Vimcdoc is an optional external resource, not
+a bundled dependency. modules.ui controls notify, input/select, optional select
+item formatting, and opt-in echo. modules.plugins.auto adapts loaded supported
+plugins without forcing the plugins themselves to load; disabled is an array of
+adapter names.
 
-`require('nvim-zh').translate(spec)` accepts domain, optional context, msgid,
-optional args, and formatted. It returns text, status, and entry_id. Exact
-entries take priority over anchored templates. Named arguments are preferred;
-non-positional printf arguments are never reordered. Missing or invalid data
-always falls back to the original msgid.
+Diagnostic formatters call a user formatter first and preserve nil suppression,
+errors, raw diagnostics, ranges, codes, and user_data.lsp. LSP wrappers copy only
+display fields and preserve actions, tokens, progress values, and cancellation.
 
-User overrides are data tables indexed by explicit domain and context: >lua
+Overrides are data indexed by domain, explicit context, and source msgid: >lua
 
     overrides = {
       ['my-plugin'] = {
@@ -47,85 +103,133 @@ User overrides are data tables indexed by explicit domain and context: >lua
       },
     }
 <
-Functions and executable user rules are not catalog data. Catalogs load lazily
-and merge built-in entries before overrides. No fuzzy runtime matching or
-global terminology substitution is performed.
+Functions and executable rules are not catalog data. Buffer, Window, and
+Register use the preserve terminology policy; no global runtime terminology
+replacement is performed.
 
-COMMANDS                                                 *nvim-zh-commands*
+Optional hot configuration is `stdpath('config') .. '/nvim-zh.json'`: >
 
-*:NvimZhInfo*    Show Neovim version, setup state, locale, MO and helplang.
-*:NvimZhCheck*   Read-only core/help checks. Also available through
-                 `:checkhealth nvim-zh`.
-*:NvimZhMissing* Show bounded, local missing statistics. Dynamic values,
-                 paths, and long source strings are redacted by default.
-*:NvimZhReload*  Reload catalogs/overrides, then safely rebuild UI adapters.
+    {"schema":1,"modules":{"ui":{"notify":false}}}
+<
+Precedence is defaults < setup(opts) < local JSON. Lists replace lists. Saving
+validates and applies the file; invalid input or a failed application preserves
+the last valid configuration. Deleting it restores the base setup options.
+External edits are checked on focus/buffer events. Arbitrary Lua files are never
+executed as hot configuration, and package updates never overwrite this file.
 
-Static catalog coverage and runtime observed coverage are separate. Neither is
-a claim of complete Neovim coverage. Statistics are memory-only by default.
+LUA API                                                           *nvim-zh-api*
 
-*nvim-zh-ui*
-UI ADAPTERS~
+The public module exposes only the following functions. Internal nvim-zh.*
+modules are not stable plugin APIs.
 
-notify/notify_once translate messages while retaining source-message deduplication.
-input/select translate prompt/title only and preserve opts, callbacks, async order,
-raw input, and original item/index. select_items is off by default; when enabled it
-wraps format_item without replacing items.
+status()        Return a deep-copied snapshot of effective configuration,
+                running/installed versions, resources, native/Help/UI/plugin/
+                diagnostic/LSP state, and runtime task state. Queries do not
+                implicitly setup, install, update, generate locales, or write.
 
-echo is opt-in. It preserves chunk highlights/metadata, history, opts and message id.
-Fast events bypass translation. Output streams, terminal bytes, private buffers,
-diagnostics, LSP and third-party private UI are not adapted.
+translate(spec) Return text, status, entry_id. spec accepts domain, optional
+                context, msgid, optional args/formatted/translated/observe.
+                Exact entries precede anchored templates. status is translated
+                or fallback; unknown/ambiguous/error cases return the source.
 
-Adapted real text also covers what Neovim itself shows through vim.notify while a
-user drives LSP features (e.g. "No information available", "No locations found",
-"No code actions available") and the vim.ui.input/select prompts for rename, code
-actions and code lenses. Only literals that exist in the pinned 0.12.6 sources are
-covered; other text, dynamic payloads and protocol fields stay in English.
+register_catalog(domain, loader, metadata?)
+                Register a lazy catalog. loader returns schema=1, domain,
+                locale, and entries. User overrides merge after built-ins.
 
-Setup is idempotent. Later external replacements are never overwritten on teardown or
-reclaimed on reload; Info and checkhealth report external_override. Translation errors
-fall back to the source text, while original implementation errors propagate.
+stats()         Return loaded catalog entry counts and this process's actual
+                observed/fallback/missing statistics. These are not global
+                localization coverage or fixture hit rates.
 
-*nvim-zh-plugins*
-THIRD-PARTY PLUGINS~
+missing()       Return bounded, sorted, redacted missing entries. Dynamic text,
+                paths, and long messages use SHA-256 labels. Memory only.
 
-plugins.auto adapts loaded, API-compatible which-key/Telescope modules without forcing
-require. If a plugin loads later, run nvim-zh setup after its setup or :NvimZhReload.
+open()          Open/focus the panel and return its window. Return nil, error
+                when no UI is attached.
 
-which-key uses public replace.desc and preserves key/rhs/mapping. Telescope wraps
-pickers.new and translates prompt/results/preview titles only, preserving finder,
-entry_maker, attach_mappings and entries. Use disabled = { "which-key", "telescope" }
-to disable either adapter. Pinned commits and source hashes are in upstreams.json.
-lazy.nvim reuses the public vim.notify seam and the User LazyLoad event. nvim-tree
-chains public setup/on_attach and translates mapping desc only. nvim-cmp and external
-tools remain inventory_only; private buffers are excluded.
+check(callback?) Start a read-only check and return a task id. The callback
+                receives ok/status/error_code/error/task_id/results. status is
+                ok, degraded, error, or cancelled. A superseded pending check
+                receives cancelled/superseded; teardown uses cancelled/stopped.
 
-HELP DOCUMENTS                                            *nvim-zh-help*
-Translations ship as `.cnx` files and are reachable through doc/tags-cn.
-'helplang' becomes `cn,en`, so any tag without a translation falls back to the
-English runtime document. Documents translated completely (status=complete):
+refresh(callback?) Reconcile local configuration, registered catalogs, and the
+                current installed resources. Return a task id. The callback
+                additionally receives restart_required. This never downloads,
+                changes vim.pack locks, or selects another revision. Manual
+                refresh is not required for ordinary vim.pack updates.
 
-- |help.txt|       the default `:help` landing page and topic index.
-- |nvim.txt|       getting started with Nvim and migrating from Vim.
-- |lua-guide|      the complete guide to configuring Nvim with Lua.
-- |diagnostic-api| the diagnostic framework and vim.diagnostic Lua API.
-- |terminal|      the embedded terminal emulator and the :Termdebug plugin.
+teardown()      Cancel pending work, close the panel, and restore only state
+                still owned by nvim-zh. Later external replacements are not
+                reclaimed.
 
-For every document manifests/upstreams.json records the upstream repository, full
-commit, source path, SHA-256, local translation path and complete/partial status.
-Translations keep every English help tag, `|link|`, example block and default-value
-note; example code is preserved byte-for-byte so it stays copy-pasteable. The
-English text remains reachable through `:help <tag>@en`.
+UI AND THIRD-PARTY PLUGINS                                      *nvim-zh-plugins*
 
-MAINTENANCE                                           *nvim-zh-maintenance*
+notify_once deduplicates the English source before notification. input/select
+preserve opts, callbacks, asynchronous order, raw input, and item/index.
+select_items wraps only format_item. echo preserves chunk highlights/metadata,
+history, opts, and message ids; fast events bypass translation.
 
-Run `make check-translations` to validate PO syntax, UTF-8, duplicate keys,
-placeholder parity, protected code spans, and glossary rules. Run `make build`
-to generate stable, domain-split pure Lua catalogs. The runtime does not need
-msgfmt. Buffer, Window, and Register are preserved English terms by default.
+Notification sources are registered by exact public opts.title. Fixed plugin
+prefixes and their whitespace are preserved. Unknown titles use nvim-ui;
+unknown messages fall back without a second translation/observation.
 
-Run `make test-phase8` to verify every help document: bidirectional tag parity,
-tags-cn matching Neovim's own `:helptags` output, unchanged example blocks and
-links, pinned-baseline hash equality, and that `:help` opens Chinese while
-untranslated documents still fall back to English.
+which-key uses replace.desc for real built-in preset descriptions and generated
+counts. This public seam has no provenance, so an identical user description
+can display the same exact translation; the original mapping is never mutated.
+Private footer rendering is not adapted.
+
+Telescope translates the initial title display projection and Previewer:title.
+It does not change picker.prompt_title or other internal English behavior
+values, so to_fuzzy_refine keeps working. The final refine change_title seam is
+not covered. Entries, finders, callbacks, and dynamic paths are preserved.
+
+nvim-tree translates default on_attach mapping suffixes while preserving the
+ASCII `nvim-tree: ` prefix and help parser. Default setup and lazy's
+setup-before-LazyLoad order are covered. User custom on_attach descriptions and
+existing buffer mappings are left unchanged. Private renderer/help buffers are
+not scanned.
+
+lazy.nvim supplies User LazyLoad only. nvim-cmp remains inventory_only because
+no fixed cmp-owned label with a safe display seam was found. Fixed commits,
+source hashes, and limitations are in manifests/upstreams.json.
+
+DIAGNOSTICS AND LSP                                         *nvim-zh-diagnostics*
+
+Only recognized clang/clangd display text is translated. virtual_text,
+virtual_lines, and open_float use public formatter seams. Raw vim.diagnostic
+objects, quickfix, push/pull payloads, locations, and user_data.lsp stay in the
+source language.
+
+showMessage/showMessageRequest translate display copies and return original
+actions. $/progress changes only title/message display copies, never token,
+percentage, or cancellation. window/logMessage and external tool output remain
+unchanged.
+
+HELP DOCUMENTS                                                  *nvim-zh-help*
+
+Chinese translations ship as .cnx files with prebuilt tags-cn. The default
+'helplang' is cn,en, so missing tags fall back to English. Use `:help <tag>@en`
+to select the English runtime document explicitly.
+
+Per-document upstream commit, source path, SHA-256, and complete/partial status
+are machine-recorded in manifests/upstreams.json and help_inventory.json.
+Structural tag/example/link checks and manifest status do not claim semantic
+review or complete Neovim localization.
+
+doc/nvim-zh.txt and doc/nvim-zh.cnx are project-owned help, not upstream Neovim
+translations and not included in the upstream document count.
+
+MAINTENANCE                              *nvim-zh-maintenance* *nvim-zh-resources*
+
+See CONTRIBUTING.md and docs/testing.md for editing sources, test categories,
+and optional real upstream checks. Common maintainer commands: >
+
+    make check-syntax check-translations check-native
+    make build-resources check-resources
+    make test
+    make test-upstream
+    make check-reproducible release-check
+<
+Generated Lua catalogs, MO files, help indexes, inventory, and resources are
+never hand-edited. Package users need none of these commands.
 
  vim:tw=78:ts=8:et:ft=help:norl:

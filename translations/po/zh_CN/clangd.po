@@ -9,22 +9,22 @@ msgstr ""
 "Language: zh_CN\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: tests/phase5/fixtures/clangd-corpus.json
+#: tests/fixtures/clangd/messages.json
 msgctxt "redefinition"
 msgid "Redefinition of '{name}'"
 msgstr "'{name}' 重复定义"
 
-#: tests/phase5/fixtures/clangd-corpus.json
+#: tests/fixtures/clangd/messages.json
 msgctxt "previous_definition"
 msgid "Previous definition is here"
 msgstr "此前的定义在这里"
 
-#: tests/phase7/fixtures/clangd-real-observed.json tests/phase7/corpus/undeclared.cpp
+#: tests/fixtures/clangd/observed.json tests/fixtures/clangd/corpus/undeclared.cpp
 msgctxt "undeclared_identifier"
 msgid "Use of undeclared identifier '{name}'"
 msgstr "使用了未声明的标识符 '{name}'"
 
-#: tests/phase7/fixtures/clangd-real-observed.json tests/phase7/corpus/unknown_type.cpp
+#: tests/fixtures/clangd/observed.json tests/fixtures/clangd/corpus/unknown_type.cpp
 msgctxt "unknown_type_name"
 msgid "Unknown type name '{name}'"
 msgstr "未知类型名 '{name}'"

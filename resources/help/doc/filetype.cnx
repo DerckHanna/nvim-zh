@@ -1,0 +1,1091 @@
+*filetype.txt*  Nvim
+
+
+		  VIM REFERENCE MANUAL	  by Bram Moolenaar
+
+
+文件类型						*filetype* *file-type*
+
+另见 |autocmd.txt|。
+
+                                      输入 |gO| 查看目录。
+
+==============================================================================
+1. 文件类型					*filetypes* *file-types*
+
+Vim 能够检测所编辑文件的类型。这是通过检查文件名，有时也通过检查文件内容中的特定
+文本来完成的。
+
+							*:filetype* *:filet*
+要启用文件类型检测，请在 vimrc 中使用此命令： >
+	:filetype on
+每次编辑新文件或已有文件时，Vim 都会尝试识别文件的类型并设置 'filetype' 选项。
+这会触发 FileType 事件，你可以用它来设置语法高亮、设置选项等。
+
+详情：":filetype on" 命令会加载以下文件：
+		$VIMRUNTIME/filetype.lua
+		$VIMRUNTIME/filetype.vim
+	filetype.lua 会创建一个 autocommand，对所有的 BufNewFile 和
+	BufRead 事件触发。它尝试根据文件的扩展名或名称来检测文件类型。
+
+	filetype.vim 是一个 Vim 脚本，它为 BufNewFile 和 BufRead 事件定义
+	autocommand。与 filetype.lua 不同，该文件为每个文件类型模式创建独立的
+	BufNewFile 和 BufRead 事件。
+
+	如果无法通过名称找到文件类型，则使用文件 $VIMRUNTIME/scripts.vim
+	根据文件内容来检测它。
+	当 GUI 正在运行或即将启动时，也会加载 |menu.vim| 脚本。
+
+要添加自己的文件类型，请参阅下面的 |new-filetype|。要搜索某个文件类型的帮助，
+请在前面加上 "ft-"，并可选地在后面加上 "-syntax"、"-indent" 或
+-plugin"。例如： >
+	:help ft-vim-indent
+	:help ft-vim-syntax
+	:help ft-man-plugin
+
+如果文件类型没有被自动检测出来，或者检测出的类型不对，你可以手动设置
+'filetype' 选项，也可以向文件中添加 modeline。例如，对于 IDL 文件使用命令： >
+	:set filetype=idl
+
+或者向文件中添加此 |modeline|： >
+	/* vim: set filetype=idl : */
+<
+						*:filetype-plugin-on*
+你可以用以下命令为特定文件类型启用插件文件的加载： >
+	:filetype plugin on
+如果尚未打开文件类型检测，也会一并打开。
+这实际上会加载 'runtimepath' 中的文件 "ftplugin.vim"。
+结果是，编辑文件时会加载其插件文件（如果检测到的文件类型有插件文件）。
+|filetype-plugin|
+
+						*:filetype-plugin-off*
+你可以再次用以下命令禁用它： >
+	:filetype plugin off
+此时不会关闭文件类型检测。但如果你确实关闭了文件类型检测，插件也不会被加载。
+这实际上会加载 'runtimepath' 中的文件 "ftplugof.vim"。
+
+						*:filetype-indent-on*
+你可以用以下命令为特定文件类型启用 indent 文件的加载： >
+	:filetype indent on
+如果尚未打开文件类型检测，也会一并打开。这实际上会加载 'runtimepath' 中的
+文件 "indent.vim"。
+结果是，编辑文件时会加载其 indent 文件（如果检测到的文件类型有 indent
+文件）。|indent-expression|
+
+						*:filetype-indent-off*
+你可以再次用以下命令禁用它： >
+	:filetype indent off
+此时不会关闭文件类型检测。但如果你确实关闭了文件类型检测，indent 文件也不会
+被加载。这实际上会加载 'runtimepath' 中的文件 "indoff.vim"。
+这会禁用你将要打开的文件的自动缩进，但已经打开的文件仍保持原样。
+要禁用已打开文件的缩进，请重置 'autoindent'、'cindent'、'smartindent'
+和/或 'indentexpr'。
+
+						*:filetype-off*
+要禁用文件类型检测，请使用此命令： >
+	:filetype off
+这会保留 "plugin" 和 "indent" 的标志，但由于不再检测任何文件类型，它们要到
+下次 ":filetype on" 时才会生效。
+
+
+概览：						*:filetype-overview*
+
+命令				检测	插件		缩进 ~
+:filetype on			开启		不变	不变
+:filetype off			关闭		不变	不变
+:filetype plugin on		开启		开启		不变
+:filetype plugin off		不变	关闭		不变
+:filetype indent on		开启		不变	开启
+:filetype indent off		不变	不变	关闭
+:filetype plugin indent on	开启		开启		开启
+:filetype plugin indent off	不变	关闭		关闭
+
+要查看当前状态，输入： >
+	:filetype
+输出看起来类似这样： >
+	filetype detection:ON  plugin:ON  indent:OFF
+
+文件类型也用于语法高亮。如果使用了 ":syntax on" 命令，也会安装文件类型检测。
+无需在执行 ":syntax on" 之后再执行 ":filetype on"。
+
+要禁用其中某个文件类型，请在你的 filetype 文件中添加一行，参见
+|remove-filetype|。
+
+							*filetype-detect*
+要再次检测文件类型： >
+	:filetype detect
+如果你从空文件开始，然后输入了使得文件类型可以被检测出来的文本，请使用此命令。
+例如，当你在 shell 脚本中输入了："#!/bin/csh"。
+   当文件类型检测被关闭时，会先启用它，就像使用了 "on" 参数一样。
+
+							*filetype-overrule*
+奏效。可以使用若干全局变量来覆盖某些扩展名所使用的文件类型：
+
+	文件名	变量 ~
+	`*.app`		g:filetype_app
+	`*.asa`		g:filetype_asa		|ft-aspperl-syntax|
+						|ft-aspvbs-syntax|
+	`*.asm`		g:asmsyntax		|ft-asm-syntax|
+	`*.asp`		g:filetype_asp		|ft-aspperl-syntax|
+						|ft-aspvbs-syntax|
+	`*.bas`		g:filetype_bas		|ft-basic-syntax|
+	`*.cfg`		g:filetype_cfg
+	`*.cls`		g:filetype_cls
+	`*.csh`		g:filetype_csh		|ft-csh-syntax|
+	`*.dat`		g:filetype_dat
+	`*.def`		g:filetype_def
+	`*.dsp`		g:filetype_dsp
+	`*.f`		g:filetype_f		|ft-forth-syntax|
+	`*.frm`		g:filetype_frm		|ft-form-syntax|
+	`*.fs`		g:filetype_fs		|ft-forth-syntax|
+	`*.h`		g:c_syntax_for_h	|ft-c-syntax|
+	`*.i`		g:filetype_i		|ft-progress-syntax|
+	`*.inc`		g:filetype_inc
+	`*.int`		g:filetype_int
+	`*.lsl`		g:filetype_lsl
+	`*.m`		g:filetype_m		|ft-mathematica-syntax|
+	`*.mac`		g:filetype_mac
+	`*[mM]makefile,*.mk,*.mak,[mM]akefile*`
+			g:make_flavor		|ft-make-syntax|
+	`*.markdown,*.mdown,*.mkd,*.mkdn,*.mdwn,*.md`
+			g:filetype_md		|ft-pandoc-syntax|
+	`*.mod`		g:filetype_mod
+	`*.p`		g:filetype_p		|ft-pascal-syntax|
+	`*.pl`		g:filetype_pl
+	`*.pp`		g:filetype_pp		|ft-pascal-syntax|
+	`*.prg`		g:filetype_prg
+	`*.r`		g:filetype_r
+	`*.sig`		g:filetype_sig
+	`*.sql`		g:filetype_sql		|ft-sql-syntax|
+	`*.src`		g:filetype_src
+	`*.sys`		g:filetype_sys
+	`*.sh`		g:bash_is_sh		|ft-sh-syntax|
+	`*.tex`		g:tex_flavor		|ft-tex-plugin|
+	`*.typ`		g:filetype_typ
+	`*.v`		g:filetype_v
+	`*.w`		g:filetype_w		|ft-cweb-syntax|
+
+对于少数文件类型，只有在无法检测到该文件类型时才会使用该全局变量：
+	`*.r`		g:filetype_r	|ft-rexx-syntax|
+
+							*filetype-ignore*
+为了避免某些文件被检查，会使用 g:ft_ignore_pat 变量。默认值是这样设置的： >
+	:let g:ft_ignore_pat = '\.\(Z\|gz\|bz2\|zip\|tgz\)$'
+这意味着不会检查压缩文件的内容。
+
+							*new-filetype*
+如果你想要使用的文件类型还没有被检测出来，有几种添加它的方法。推荐的做法是
+用 |vim.filetype.add()| 把它添加到 Nvim 内置的文件类型检测机制中。如果你想
+手动处理检测，请按以下步骤操作：
+
+A. 如果你想覆盖所有默认的文件类型检查。
+   这样做需要为每个文件类型写一个文件。缺点是文件可能很多。优点是只要把这个
+   文件放到正确的目录中就能生效。
+							*ftdetect*
+   1. 创建你的用户 runtime 目录。通常使用 'runtimepath' 选项的第一项。
+      然后在其中创建目录 "ftdetect"。Unix 下的示例： >
+	:!mkdir -p ~/.config/nvim/ftdetect
+<
+   2. 创建一个包含用于检测文件类型的 autocommand 的文件。示例： >
+	au BufRead,BufNewFile *.mine		set filetype=mine
+<      注意没有 "augroup" 命令，在加载你的文件时这一步已经完成了。
+      你也可以使用模式 "*"，然后检查文件内容来识别它。
+      把这个文件写成 "mine.vim"，放在你的用户 runtime 目录的 "ftdetect"
+      目录中。例如，在 Unix 下： >
+	:w ~/.config/nvim/ftdetect/mine.vim
+
+3. 要使用新的文件类型检测，必须重启 Vim。
+
+   "ftdetect" 目录中的文件在所有默认检查之后使用，因此它们可以覆盖先前检测到的
+   文件类型。但你也可以使用 |:setfiletype| 来保留先前检测到的文件类型。
+
+B. 如果你想在默认文件类型检查之后检测你的文件。
+
+   做法与上面的 A 类似，但不用无条件设置 'filetype'，而是使用 ":setfiletype"。
+   它只在尚未检测到文件类型时设置 'filetype'。示例： >
+	au BufRead,BufNewFile *.txt		setfiletype text
+<
+   你也可以在命令中使用已经检测到的文件类型。例如，当检测到 "pascal" 时
+   改用文件类型 "mypascal"： >
+	au BufRead,BufNewFile *		if &ft == 'pascal' | set ft=mypascal
+								       | endif
+
+C. 如果你的文件类型可以通过文件名或扩展名检测出来。
+   1. 创建你的用户 runtime 目录。通常使用 'runtimepath' 选项的第一项。
+      Unix 下的示例： >
+	:!mkdir -p ~/.config/nvim
+<
+   2. 创建一个包含用于检测文件类型的 autocommands 的文件。示例： >
+	" my filetype file
+	if exists("did_load_filetypes")
+	  finish
+	endif
+	augroup filetypedetect
+	  au! BufRead,BufNewFile *.mine		setfiletype mine
+	  au! BufRead,BufNewFile *.xyz		setfiletype drawing
+	augroup END
+<
+      把这个文件写成 "filetype.vim"，放在你的用户 runtime 目录中。例如，在 Unix
+      下： >
+	:w ~/.config/nvim/filetype.vim
+
+3. 要使用新的文件类型检测，必须重启 Vim。
+
+   你的 filetype.vim 会在默认的 FileType autocommands 安装之前被加载。你的
+   autocommands 会先匹配，而 ":setfiletype" 命令会确保之后没有其他
+   autocommands 再设置 'filetype'。
+							*new-filetype-scripts*
+D. 如果你的文件类型只能通过检查文件内容来检测。
+
+   1. 创建你的用户 runtime 目录。通常使用 'runtimepath' 选项的第一项。
+      Unix 下的示例： >
+	:!mkdir -p ~/.config/nvim
+<
+   2. 为此创建一个 Vim 脚本文件。示例： >
+	if did_filetype()	" filetype already set..
+	  finish		" ..don't do these checks
+	endif
+	if getline(1) =~ '^#!.*\<mine\>'
+	  setfiletype mine
+	elseif getline(1) =~? '\<drawing\>'
+	  setfiletype drawing
+	endif
+<     更多示例请参见 $VIMRUNTIME/scripts.vim。
+      把这个文件写成 "scripts.vim"，放在你的用户 runtime 目录中。例如，在 Unix
+      下： >
+	:w ~/.config/nvim/scripts.vim
+<
+   3. 检测会立即生效，无需重启 Vim。
+
+   你的 scripts.vim 会在默认的文件类型检查之前加载，这意味着你的规则会覆盖
+   $VIMRUNTIME/scripts.vim 中的默认规则。
+
+							*remove-filetype*
+如果检测到的文件类型对你不合适，可以把 'filetype' 设为一个不存在的名字，
+例如 `ignored`，以避免稍后又被设置成其他值。
+
+						     *g:did_load_filetypes*
+通过设置 `did_load_filetypes` 全局变量，可以禁用 Nvim 提供的内置文件类型检测。
+如果该变量存在，默认的 `$VIMRUNTIME/filetype.lua` 就不会运行。
+
+							*plugin-details*
+"plugin" 目录可以位于 'runtimepath' 选项中的任意一个目录下。所有这些目录
+都会被搜索插件，并且它们都会被加载。例如，如果这条命令： >
+
+	set runtimepath
+
+会产生类似这样的输出： >
+
+	runtimepath=/etc/vim,~/.config/nvim,/usr/local/share/vim/vim82
+
+那么 Vim 会加载这些目录及其子目录中的所有插件： >
+
+	/etc/vim/plugin/
+	~/.config/nvim/plugin/
+	/usr/local/share/vim/vim82/plugin/
+
+注意最后一个是展开后的 $VIMRUNTIME 的值。
+
+注意，使用插件管理器或 |packages| 时，会有很多目录被添加到 'runtimepath'。
+这些插件各自需要一个独立的目录，不要把它们直接放在 ~/.config/nvim/plugin 中。
+
+如果你的插件似乎没有被加载，怎么办？你可以使用 |-V| 参数来查看 Vim 启动时
+发生了什么： >
+
+	vim -V2
+
+你会看到大量消息，其中有一条关于加载插件的提示。它以如下内容开头： >
+
+	Searching for "plugin/**/*.vim" in
+
+在那里你可以看到 Vim 在哪里寻找你的插件脚本。
+
+==============================================================================
+2. 文件类型插件						*filetype-plugins*
+
+当启用了文件类型插件的加载（|:filetype-plugin-on|）时，会设置选项并定义映射。
+这些都是 buffer 局部的，不会用于其他文件。
+
+为某个文件类型定义映射可能会妨碍你自己定义的映射。有几种方法可以避免这一点：
+1. 把 "maplocalleader" 变量设置为你希望映射以之开头的按键序列。示例： >
+	:let maplocalleader = ","
+<   这样所有映射都会以逗号开头，而不是默认的反斜杠。另见 |<LocalLeader>|。
+
+2. 定义你自己的映射。示例： >
+	:map ,p <Plug>MailQuote
+<   你需要查看下面插件文件的说明，了解它提供的功能以及要映射的字符串。
+   你需要在插件加载之前定义自己的映射（在编辑该类型的文件之前）。这样插件就会
+   跳过安装默认映射。
+					*no_mail_maps* *g:no_mail_maps*
+3. 通过设置一个变量来禁用为特定文件类型定义映射，变量名中包含文件类型的名字。
+   对于 "mail" 文件类型，可以这样设置： >
+	:let no_mail_maps = 1
+<					*no_plugin_maps* *g:no_plugin_maps*
+4. 通过设置一个变量来禁用为所有文件类型定义映射： >
+	:let no_plugin_maps = 1
+<
+
+							*ftplugin-overrule*
+如果某个全局文件类型插件没有完全满足你的需求，有三种修改方式：
+
+1. 添加一些设置。
+   你必须在 'runtimepath' 靠前的目录中创建一个新的文件类型插件。
+   例如在 Unix 下，可以使用这个文件： >
+	vim ~/.config/nvim/ftplugin/fortran.vim
+<    你可以设置想要添加的那些设置和映射。注意全局插件会在这之后加载，它可能会覆盖
+   你在这里做的设置。如果是这样，你需要使用下面两种方法之一。
+
+2. 复制该插件并修改副本。
+   你必须把副本放在 'runtimepath' 靠前的目录中。例如在 Unix 下，可以这样做： >
+	cp $VIMRUNTIME/ftplugin/fortran.vim ~/.config/nvim/ftplugin/fortran.vim
+<    然后你可以按自己的喜好编辑复制后的文件。由于 b:did_ftplugin 变量会被设置，
+   全局插件将不会被加载。这种方法的缺点是，当随附的插件得到改进时，你必须再次
+   复制并修改它。
+
+3. 在加载全局插件之后覆盖这些设置。
+   你必须在 'runtimepath' 靠后的目录中创建一个新的文件类型插件。例如在 Unix 下，
+   可以使用这个文件： >
+	vim ~/.config/nvim/after/ftplugin/fortran.vim
+在这个文件中，你只需要修改想要更改的那些设置。
+
+==============================================================================
+3.  默认文件类型插件的文档。				*ftplugin-docs*
+
+
+					*plugin_exec* *g:plugin_exec*
+启用外部命令的执行。历史上这样做是为了给例如 perl 文件类型插件（以及另外几个）
+设置搜索路径。
+出于安全原因默认禁用： >
+	:let g:plugin_exec = 1
+也可以只为某些文件类型启用它： >
+	:let g:<filetype>_exec = 1
+因此，要只为 ruby 启用它，请设置以下变量： >
+	:let g:ruby_exec = 1
+
+如果同时设置了全局的 `plugin_exec` 和特定于文件类型的 `<filetype>_exec` 变量，
+则特定于文件类型的变量应当优先。
+
+
+ADA
+
+该插件的文档在这里：|ft_ada.txt|。
+
+
+ASCIIDOC						*ft-asciidoc-plugin*
+
+要启用 |folding|，使用： >
+	let g:asciidoc_folding = 1
+
+要禁用折叠标题的嵌套，使用： >
+	let g:asciidoc_foldnested = 0
+
+要禁用折叠标题下的所有内容，使用： >
+	let asciidoc_fold_under_title = 0
+
+
+ARDUINO							*ft-arduino-plugin*
+
+默认会设置以下选项，与 Arduino IDE 的默认设置一致： >
+
+	setlocal expandtab tabstop=2 softtabstop=2 shiftwidth=2
+
+要禁用此行为，请在 vimrc 中设置以下变量： >
+
+	let g:arduino_recommended_style = 0
+
+
+AWK							*ft-awk-plugin*
+
+可以通过如下设置来启用 GNU Awk 特有的功能（例如 @include）： >
+	:let g:awk_is_gawk = 1
+
+
+CHANGELOG						*ft-changelog-plugin*
+
+便于在 Changelog 文件中轻松录入 Changelog 条目。有一些命令、映射和变量值得
+了解一下：
+
+选项：
+'comments'		被置空，以免打乱格式。
+'textwidth'		被设为 78，这是标准值。
+'formatoptions'		添加 't' 标志，以便在插入文本时换行。
+
+命令：
+NewChangelogEntry	以智能方式添加一条新的 Changelog 条目
+			（见下文）。
+
+局部映射：
+<Leader>o		以同样智能的方式开始一条新的 Changelog 条目
+			（见下文）。
+
+全局映射：
+注意：要访问全局映射，需要先加载 ftplugin/changelog.vim 文件，例如使用 >
+				runtime ftplugin/changelog.vim
+<			在你的 |init.vim| 中。
+<Leader>o		切换到为当前目录打开的 ChangeLog buffer，
+			或者如果当前目录中存在该文件，则在新 buffer 中打开它。然后它的行为与上面
+			描述的局部 <Leader>o 相同。
+
+变量：
+g:changelog_timeformat  已废弃；请改用 g:changelog_dateformat。
+g:changelog_dateformat	ChangeLog 条目中使用的日期（和时间）格式。
+			接受的格式与 |strftime()| 函数相同。
+			默认值是 "%Y-%m-%d"，这是许多 ChangeLog 布局的标准格式。
+g:changelog_username	用户的名字和电子邮件地址。
+			默认值由环境变量和系统文件推导得出。它会搜索 /etc/passwd 中当前用户的
+			注释部分，该部分通常包含用户的真实姓名，直到第一个分隔逗号为止。然后
+			检查 $NAME 环境变量，最后运行 `whoami` 和 `hostname` 来构建电子邮件地址。
+			最终形式为 >
+				Full Name  <user@host>
+<
+g:changelog_new_date_format
+			创建新的日期条目时使用的格式。
+			下表描述了字符串中的特殊记号：
+				%%	插入一个 '%' 字符
+				%d	插入上面的日期
+				%u	插入上面的用户
+				%p	插入以下内容的结果
+					b:changelog_entry_prefix
+				%c	完成后光标所在的位置
+			默认值是 "%d  %u\n\n\t* %p%c\n\n"，它会产生类似下面这样的内容（| 表示
+			光标将出现的位置，除非位于行首，此时它表示行的开头）： >
+				|2003-01-14  Full Name  <user@host>
+				|
+				|        * prefix|
+<
+g:changelog_new_entry_format
+			创建新条目时使用的格式。
+			下表描述了字符串中的特殊记号：
+				%p	插入以下内容的结果
+					b:changelog_entry_prefix
+				%c	完成后光标所在的位置
+			默认值是 "\t*%c"，它会产生类似下面这样的内容 >
+				|        * prefix|
+<
+g:changelog_date_entry_search
+			搜索日期条目时使用的搜索模式。
+			可用于 g:changelog_new_date_format 的那些记号在这里也可以使用。
+			默认值是 '^\s*%d\_s*%u'，它会找到匹配以下形式的行 >
+				|2003-01-14  Full Name  <user@host>
+<			以及一些类似的格式。
+
+g:changelog_date_end_entry_search
+			搜索日期条目结尾时使用的搜索模式。
+			可用于 g:changelog_new_date_format 的那些记号在这里也可以使用。
+			默认值是 '^\s*$'，它会找到只包含空白字符或完全为空的行。
+
+b:changelog_name					*b:changelog_name*
+			要查找的 ChangeLog 文件的名字。
+			默认值是 'ChangeLog'。
+
+b:changelog_path
+			当前 buffer 要使用的 ChangeLog 的路径。
+			默认值为空，因此会在与当前 buffer 相同的目录中查找名为
+			|b:changelog_name| 的文件。如果没有找到，则搜索当前 buffer 的父目录。
+			如此递归进行，直到找到文件或没有更多父目录可搜索为止。
+
+b:changelog_entry_prefix
+			要调用的函数名，用于生成新条目的前缀。该函数不接受参数，并且
+			应返回包含该前缀的字符串。返回空前缀也是可以的。
+			默认值会生成 ChangeLog 的路径名与当前 buffer 的路径名之间的最短路径。
+			将来，这个变量也可以使用其他变量上下文，例如 g:。
+
+Changelog 条目会被插入到增加文本最少的位置。在确定当前日期和用户之后，会在文件
+中搜索以当前日期和用户开头的条目，如果找到，就在它下面添加另一个条目。
+如果没有找到，则把新的条目项添加到 Changelog 的开头。
+
+
+FORTRAN							*ft-fortran-plugin*
+
+选项：
+'expandtab'	被打开，以避免使用 Fortran 标准所要求的制表符，
+		除非用户在 vimrc 中设置了 fortran_have_tabs。
+'textwidth'	对于固定源码格式设为 80，而对于自由源码格式设为 132。设置
+		fortran_extended_line_length 变量会把固定源码格式的宽度增加到 132。
+'formatoptions' 被设为断开代码行和注释行并保留长行。你可以用 |gq| 格式化注释。
+关于 fortran_have_tabs 的进一步讨论以及源码格式检测所使用的方法，请参见
+|ft-fortran-syntax|。
+
+
+FREEBASIC						*ft-freebasic-plugin*
+
+该插件旨在把四种 FreeBASIC 方言——"fb"、"qb"、"fblite" 和 "deprecated"——
+当作不同的语言来对待。
+
+方言会被设置为以下位置中第一个找到的名字：g:freebasic_forcelang、正在编辑的
+文件中的任何 #lang 指令或 $lang 元命令，或者最后的 g:freebasic_lang。这些全局
+变量在概念上对应 fbc 的 -forcelang 和 -lang 选项。如果没有显式指定方言，
+则使用 "fb"。
+
+例如，要把方言默认设为 "fblite"，但仍允许任何 #lang 指令覆盖，请使用以下命令： >
+
+	let g:freebasic_lang = "fblite"
+
+
+GDSCRIPT						*ft-gdscript-plugin*
+
+默认会设置以下选项，依据 Godot 官方文档： >
+
+	setlocal noexpandtab softtabstop=0 shiftwidth=0
+
+要禁用此行为，请在 vimrc 中设置以下变量： >
+
+	let g:gdscript_recommended_style = 0
+
+
+GIT COMMIT						*ft-gitcommit-plugin*
+
+提供了一个命令 :DiffGitCached，用于在 preview window 中显示当前提交的 diff。
+它等价于调用 "git diff --cached"，再加上传给该命令的任何参数。
+
+GIT REBASE						*ft-gitrebase-plugin*
+
+gitrebase 文件类型定义了以下 buffer 局部命令，以辅助交互式 `git rebase`： >
+
+	:Drop   " to discard this commit
+	:Edit   " to stop for editing this commit
+	:Fixup  " to squash (but discard the message) into the previous one
+	:Pick   " to pick this commit (the cursor is on)
+	:Reword " to pick this commit, but change the commit message
+	:Squash " to squash this commit into the previous one
+
+此外，可以使用以下命令在不同的可能性之间循环切换： >
+
+	:Cycle  " to cycle between the previous commands
+<
+`:Cycle` 命令也映射到 CTRL-A 和 CTRL-X 键。
+详情请参见 `git-rebase --help`。
+
+GLEAM						*ft-gleam-plugin*
+
+默认会按照推荐的 gleam 风格设置以下选项： >
+
+	setlocal expandtab shiftwidth=2 softtabstop=2
+
+要禁用此行为，请在 vimrc 中设置以下变量： >
+
+	let g:gleam_recommended_style = 0
+
+GO							*ft-go-plugin*
+
+默认会设置以下选项，依据 Golang 官方文档： >
+
+	setlocal noexpandtab softtabstop=0 shiftwidth=0
+
+要禁用此行为，请在 vimrc 中设置以下变量： >
+
+	let g:go_recommended_style = 0
+
+
+GPROF							*ft-gprof-plugin*
+
+gprof 文件类型插件定义了映射 <C-]>，用于从 gprof 平坦剖析中的函数条目或调用图中的
+函数条目跳转到调用图中该函数的详细信息。
+
+可以用以下方式禁用该映射： >
+	let g:no_gprof_maps = 1
+
+
+HARE							*ft-hare*
+
+由于该插件的文本相当长，已放入单独的文件：|ft_hare.txt|。
+
+HTML							*ft-html-plugin*
+
+标签折叠会带来一些困难。许多元素（例如 `blockquote`）总是由起始标签和结束标签
+界定；某些元素的结束标签（例如 `p`）在特定上下文中可以省略；空元素（例如 `hr`）
+没有结束标签。虽然支持可省略结束标签的规则是临时的而且很复杂 [0]，但它们适用于
+作用域内的元素。假设语法上是良构的，一个结束标签可以关联到作用域内 [1] 且靠近
+文件开头的、最近的可匹配起始标签，而所有不配对的标签和内联标签都可以忽略。
+在语法高亮生效的情况下，使用 |fold-expr| 方法可以启用标签折叠： >
+	let g:html_expr_folding = 1
+<
+默认情况下，每次发生 |TextChanged| 或 |InsertLeave| 事件后都会从头重新进行标签
+折叠。这样的频率可能不是你想要的，尤其是对大文件而言，可以用以下方式禁用这种
+重新计算： >
+	let g:html_expr_folding_without_recomputation = 1
+        doautocmd FileType
+<
+要强制重新计算，请执行： >
+	unlet! b:foldsmap
+	normal zx
+<
+[0] https://html.spec.whatwg.org/multipage/syntax.html#optional-tags
+[1] https://en.wikipedia.org/wiki/Dangling_else
+
+IDRIS2							*ft-idris2-plugin*
+
+默认会设置以下选项： >
+
+	setlocal shiftwidth=2 tabstop=2 expandtab
+	setlocal comments=s1:{-,mb:-,ex:-},:\|\|\|,:--
+	setlocal commentstring=--\ %s
+	setlocal wildignore+=*.ibc
+
+要使用制表符而不是空格进行缩进，请在 vimrc 中设置以下变量： >
+
+	let g:idris2#allow_tabchar = 1
+
+JAVA							*ft-java-plugin*
+
+当变量 "g:ftplugin_java_source_path" 已定义，且其值是一个扩展名为 ".jar" 或
+".zip" 的文件名时，例如： >
+	let g:ftplugin_java_source_path = '/path/to/src.jar'
+	let g:ftplugin_java_source_path = '/path/to/src.zip'
+<
+并且 |zip| 插件已经被加载，那么可以用 |gf| 命令打开该归档文件，用 |n| 命令查找
+选定的类型，并可以用 <Return> 键加载列出的文件。
+
+注意，在使用 Zip 插件加载的 buffer 内部使用 "gf" 命令的效果取决于 Zip 插件的
+版本。对于不支持 Jar 类型归档的 Zip 插件版本，可以考虑为每个感兴趣的 Jar 归档
+创建扩展名为 ".zip" 的符号链接，并从现在起把这样的文件赋给该变量。
+
+否则，对于已定义的变量 "g:ftplugin_java_source_path"，会把该变量的值作为前缀
+来进一步修改 'path' 选项的局部值，例如： >
+	let g:ftplugin_java_source_path = $JDK_SRC_PATH
+	let &l:path = g:ftplugin_java_source_path .. ',' .. &l:path
+<
+并且可以对完全限定的类型使用 "gf" 命令，在 "path" 中查找文件并尝试加载它。
+
+请记住，每次给该变量赋新值后，都要在加载了 Java 文件的 buffer 中手动触发
+|FileType| 事件： >
+	doautocmd FileType
+<
+Markdown 文档注释可能出于美观原因，在注释标记（`///`）之后包含通常的连续纵向
+前导空白；然而，在 Markdown 中某些横向的前导空白是有意义的，因为它们表示
+代码块等。为方便起见，为 |gq| 操作符提供了一个 'formatexpr' 函数。只要
+没有定义 "g:java_ignore_javadoc" 或 "g:java_ignore_markdown"，就可以按需
+启用 Markdown 注释的重新格式化： >
+	setlocal formatexpr=g:javaformat#RemoveCommonMarkdownWhitespace()
+<
+对于低于 `7.4.265` 的 Vim 版本，则使用： >
+	setlocal formatexpr=javaformat#RemoveCommonMarkdownWhitespace()
+<
+该函数接受一个行范围，移除公共的连续纵向前导空白，并重写该范围内的行。取决于
+作者的排版风格和注释内容，选择哪些行进行重新格式化，可能从整个注释到只选取其中
+一部分不等。
+在移除 "g:java_ignore_markdown" 或 "g:java_ignore_javadoc" 之后，如果要每次都
+启用 Markdown 注释的识别，请记住对高于 `8.2.1397` 的 Vim 版本手动重新加载
+"javaformat.vim"： >
+	runtime autoload/javaformat.vim
+<
+LUA							*ft-lua-plugin*
+
+					*g:lua_version* *g:lua_subversion*
+Lua 文件类型的 'includeexpr' 和 |ft-lua-syntax| 高亮使用全局变量
+"g:lua_version" 和 "g:lua_subversion" 来确定要使用的 Lua 版本（默认为 5.3）
+
+例如，要使用 Lua 5.1，可以这样设置变量： >
+
+	let g:lua_version = 5
+	let g:lua_subversion = 1
+<
+MAIL							*ft-mail-plugin*
+
+选项：
+'modeline'	被关闭，以避免特洛伊木马的危险，并避免包含 "Vim:" 的
+		Subject 行导致错误消息。
+'textwidth'	被设为 72。这通常是电子邮件推荐的宽度。
+'formatoptions'	被设为断开文本行并在新行中重复注释引导符，
+		这样引用行开头的 ">" 就会被重复。你也可以用 |gq| 格式化引用的文本。
+
+局部映射：
+<LocalLeader>q   or   \MailQuote
+	引用可视模式下选中的文本，或普通模式下从光标位置到文件末尾的文本。
+	这意味着每一行都会插入 "> "。
+
+MAN					*ft-man-plugin* *:Man* *man.lua*
+
+在 Nvim 中查看手册页。支持高亮、补全、区域设置和导航。另见 |find-manpage|。
+
+man.lua 总是会尝试复用最近的 man window（上方/左侧），否则会创建一个分屏。
+
+补全的区分大小写行为由 'fileignorecase' 控制。
+
+命令：
+Man {name}                显示 {name} 的手册页。
+Man {sect} {name}         显示 {name} 和 {sect} 章节的手册页。
+Man {name}({sect})        同上。
+Man {sect} {name}({sect}) 用于在补全时显示真实章节，
+                          当给出的章节是前缀时，例如 1m 与 1。
+Man {path}                打开 {path} 处的手册页。如果 {path} 相对于当前目录，
+                          请在前面加上 "./"。
+Man                       打开光标下 <cWORD>（man buffer）或 <cword>（非 man buffer）的手册页。
+Man!                      把当前 buffer 的内容作为手册页显示。
+
+|:Man| 接受命令修饰符。例如，要使用垂直分屏： >vim
+    :vertical Man printf
+要复用当前的 window： >vim
+    :hide Man printf
+
+局部映射：
+K or CTRL-]               跳转到光标下 <cWORD> 的手册页。
+                          可以接受一个计数作为章节号。
+CTRL-T                    跳回到该手册页被打开时的位置。
+gO                        显示手册页的大纲。|gO|
+q                         :quit（如果作为 $MANPAGER 调用），否则为 :close。
+
+变量：
+*g:no_man_maps*             不在 manpage buffer 中创建映射。
+*g:ft_man_folding_enable*   用 foldmethod=indent foldnestmax=1 折叠手册页。
+*b:man_default_sects*       逗号分隔的、按顺序排列的首选章节列表。
+                          例如在 C 中，通常需要第 3 或第 2 节： >
+                               :let b:man_default_sections = '3,2'
+*g:man_hardwrap*            硬换行到 $MANWIDTH 或 window 宽度；如果 $MANWIDTH
+                          为空或大于 window 宽度。默认启用。设为 |FALSE| 可启用软换行。
+
+要把 Nvim 用作 manpager： >bash
+    export MANPAGER='nvim +Man!'
+
+注意：在 shell 中把 Nvim 作为 `$MANPAGER` 运行 `man` 时，`man` 会使用 `groff`
+预先格式化手册页，而 Nvim 会按从 stdin 接收到的样子显示手册页（它无法“撤销”
+man/groff 造成的硬换行）。要阻止 man/groff 对手册页进行硬换行，可以在环境中
+设置 `$MANWIDTH=999`。
+
+要禁用粗体高亮： >vim
+    :highlight link manBold Normal
+
+疑难解答：
+
+如果你看到类似这样的错误： >
+    fuse: mount failed: Permission denied
+这可能是由 AppArmor 沙箱引起的。要修复此问题，请在例如
+`/etc/apparmor.d/local/usr.bin.man` 中添加一个局部覆盖： >bash
+    mount fstype=fuse.nvim options=(ro, nosuid, nodev) -> /tmp/**,
+    /usr/bin/fusermount Ux,
+另见 https://github.com/neovim/neovim/issues/30268 。
+
+MARKDOWN						*ft-markdown-plugin*
+
+要启用折叠，使用： >
+	let g:markdown_folding = 1
+
+'expandtab' 默认会被设置。如果你不想要，使用： >
+	let g:markdown_recommended_style = 0
+
+
+ORG							*ft-org-plugin*
+
+要启用折叠，使用： >
+	let g:org_folding = 1
+<
+
+PDF							*ft-pdf-plugin*
+
+提供了两个映射 <C-]> 和 <C-T>，用于模拟标签栈来浏览 PDF。以下内容被视为标签：
+
+- xref 表中 "startxref" 之后的字节偏移量
+- trailer 中 /Prev 键之后指向更早的 xref 表的字节偏移量
+- xref 表中形如 "0123456789 00000 n" 的行
+- PDF 中任何位置形如 "1 0 R" 的对象引用
+
+可以用以下方式禁用这些映射 >
+	:let g:no_pdf_maps = 1
+
+PLSQL							*ft-plsql-plugin*
+
+要在 PL/SQL 文件类型中启用语法折叠，请设置以下变量： >
+
+	:let g:plsql_fold = 1
+<
+
+PYTHON						*ft-python-plugin* *PEP8*
+
+默认会按照 PEP8 设置以下选项： >
+
+	setlocal expandtab shiftwidth=4 softtabstop=4 tabstop=8
+
+要禁用此行为，请在 vimrc 中设置以下变量： >
+
+	let g:python_recommended_style = 0
+
+POWERSHELL
+
+该插件的文档在这里：|ft_ps1.txt|。
+
+
+QUERY					                *ft-query-plugin*
+
+
+对已安装解析器的 treesitter 查询进行 lint（使用
+|vim.treesitter.query.lint()|）默认是禁用的。要启用 lint，请在打开和写入
+buffer 时添加 >lua
+
+	vim.g.query_lint_on = { 'BufEnter', 'BufWrite' }
+<
+到你的配置中。要在编辑时更新 diagnostics，使用 >lua
+
+	vim.g.query_lint_on = { 'InsertLeave', 'TextChanged' }
+<
+如需专用的 language server，请参见 https://github.com/ribru17/ts_query_ls。
+
+QF QUICKFIX					    *qf.vim* *ft-qf-plugin*
+
+"qf" 文件类型用于 quickfix window，参见 |quickfix-window|。
+
+quickfix 文件类型插件包含在 |status-line| 中显示产生 quickfix 列表的命令的配置。
+要禁用此设置，请按如下方式配置： >
+	:let g:qf_disable_statusline = 1
+
+
+R MARKDOWN						*ft-rmd-plugin*
+
+默认不会加载 ftplugin/html.vim。如果你希望加载它，请在你的 |vimrc| 中添加： >
+	let rmd_include_html = 1
+
+'formatexpr' 选项会根据 R 代码和 Markdown 代码动态设置为不同的值。如果你不希望
+设置 'formatexpr'，请在你的 |vimrc| 中添加： >
+	let rmd_dynamic_comments = 0
+
+
+R RESTRUCTURED TEXT					*ft-rrst-plugin*
+
+'formatexpr' 选项会根据 R 代码和 ReStructured text 动态设置为不同的值。如果你
+不希望设置 'formatexpr'，请在你的 |vimrc| 中添加： >
+	let rrst_dynamic_comments = 0
+
+
+RESTRUCTUREDTEXT					*ft-rst-plugin*
+
+以下格式化设置是可选的： >
+	setlocal expandtab shiftwidth=3 softtabstop=3 tabstop=8
+
+要启用此行为，请在 vimrc 中设置以下变量： >
+	let g:rst_style = 1
+
+
+RNOWEB							*ft-rnoweb-plugin*
+
+'formatexpr' 选项会根据 R 代码和 LaTeX 代码动态设置为不同的值。如果你不希望
+设置 'formatexpr'，请在你的 |vimrc| 中添加： >
+	let rnw_dynamic_comments = 0
+
+
+RAKU
+
+该插件的文档在这里：|ft_raku.txt|。
+
+
+RPM SPEC						*ft-spec-plugin*
+
+由于该插件的文本相当长，已放入单独的文件：|pi_spec.txt|。
+
+
+SHADA							*ft-shada*
+
+可以方便地编辑二进制 |shada-file|。打开的二进制文件按以下格式显示： >
+
+    Type with timestamp YYYY-mm-ddTHH:MM:SS:
+      % Key__  Description___  Value
+      + fooba  foo bar baz fo  {msgpack-value}
+      + abcde  abc def ghi jk  {msgpack-value}
+    Other type with timestamp YYYY-mm-ddTHH:MM:SS:
+      @ Description__  Value
+      - foo bar baz t  {msgpack-value}
+      # Expected more elements in list
+    Some other type with timestamp YYYY-mm-ddTHH:MM:SS:
+      # Unexpected type: type instead of map
+      = {msgpack-value}
+
+文件类型插件定义了所有的 |Cmd-event|。定义 |SourceCmd| 事件后，"source file.shada"
+等价于 "|:rshada| file.shada"。|BufWriteCmd|、|FileWriteCmd| 和
+|FileAppendCmd| 事件会受以下设置影响：
+
+*g:shada#keep_old_header*	布尔值，如果设为 false，写入时所有 header 条目都
+				会被忽略。默认为 1。
+*g:shada#add_own_header*	布尔值，如果设为 true，第一个写入的条目将始终
+				是带有两个值的 header 条目，位于一个带有附加数据的 map 中：|v:version|
+				附加到 "version" 键，"shada.vim" 附加到 "generator" 键。默认为 1。
+
+格式说明：
+
+1. `#` 开始一段注释。以空格字符开头、然后是 `#` 的行会被忽略。插件只可以添加
+注释行来指出 ShaDa 格式中的某些错误。不包含任何非空白字符的行也会被忽略。
+2. 每个条目以一行开头，格式为 "{type} with timestamp {timestamp}:"。{timestamp}
+是表示实际 Unix 时间戳值的 |strftime()| 格式化字符串。strftime() 的第一个参数
+等于 `%Y-%m-%dT%H:%M:%S`。写入时，这个时间戳会使用 |msgpack#strptime()| 解析，
+并带有缓存（它会记住哪个时间戳产生了特定的 strftime() 输出，如果你没有修改
+时间戳就使用该值）。{type} 是以下之一
+    1 - Header
+    2 - 搜索模式
+    3 - 替换字符串
+    4 - 历史记录条目
+    5 - register
+    6 - 变量
+    7 - 全局标记
+    8 - 跳转
+    9 - buffer 列表
+   10 - 局部标记
+   11 - 变更
+    * - Unknown (0x{type-hex})
+
+   每种类型都可以用 Unknown 条目来表示："Jump with timestamp ..." 与
+   "Unknown (0x8) with timestamp ...." 相同。
+3. header 之后是以下行之一：
+   1. "  % Key__  Description__  Value"：map header。在 map header 之后
+      是一个表，其中可以包含注释以及由 "  +"、key、description 和 |{msgpack-value}|
+      组成的行。key 与 description 之间至少用两个空格分隔，description 与 value 之间
+      也至少用两个空格分隔。map 中每个 key 的宽度至多与 "Key__" header 一样宽：
+      "Key" 允许最多 3 字节的 key，"Key__" 允许最多 5 字节的 key。如果 key 实际
+      占用的字节更少，其余部分用空格填充。key 不能为空、不能以空格结尾、内部不能
+      包含两个连续的空格，也不能包含多字节字符（如果需要，请使用 "=" 格式）。
+      description 在宽度和内容上有相同的限制，只是允许空的 description。
+      description 列可以省略。
+
+      写入时 description 会被忽略。值 |msgpack#equal| 等于默认值的 key 会被忽略。
+      key 的顺序会保留。所有 key 都被当作字符串（而不是二进制字符串）。
+
+      注意：专门针对 buffer 列表条目，允许有多个 map header。每个 map header 都会
+      在 buffer 列表中开始一个新的 map 条目，因为 ShaDa 的 buffer 列表条目是一个 map
+      数组。也就是说 >
+
+        Buffer list with timestamp 1970-01-01T00:00:00:
+          % Key  Description  Value
+          + f    file name    "/foo"
+          + l    line number  1
+          + c    column       10
+<
+      等价于 >
+
+        Buffer list with timestamp 1970-01-01T00:00:00:
+          = [{="f": "/foo", ="c": 10}]
+<
+      而 >
+
+        Buffer list with timestamp 1970-01-01T00:00:00:
+          % Key  Description  Value
+          + f    file name    "/foo"
+
+          % Key  Description  Value
+          + f    file name    "/bar"
+<
+      等价于 >
+
+        Buffer list with timestamp 1970-01-01T00:00:00:
+          = [{="f": "/foo"}, {="f": "/bar"}]
+<
+      注意 2：专门针对 register 条目设计了特殊的数组语法： >
+
+        Register with timestamp 1970-01-01T00:00:00:
+          % Key  Description  Value
+          + rc   contents     @
+          | - "line1"
+          | - "line2"
+<
+      这等价于 >
+
+        Register with timestamp 1970-01-01T00:00:00:
+          % Key  Description  Value
+          + rc   contents     ["line1", "line2"]
+<
+      如果数组表示显得过于冗长，就会自动使用这种语法。
+   2. "  @  Description__  Value"：array header。与 map 相同，但省略了 key，
+      并且 description 不能省略。array 条目以 "  -" 开头。示例： >
+
+        History entry with timestamp 1970-01-01T00:00:00:
+          @ Description_  Value
+          - history type  SEARCH
+          - contents      "foo"
+          - separator     '/'
+<
+      等价于 >
+
+        History entry with timestamp 1970-01-01T00:00:00:
+          = [SEARCH, "foo", '/']
+<
+      注意：这里不识别 register 条目的特殊数组语法。
+   3. "  = {msgpack-value}"：原始值。这里的 |{msgpack-value}| 可以是
+      绝对任意类型。这里同样不识别 register 条目的特殊数组语法。
+
+
+RUST							*ft-rust*
+
+由于该插件的文本相当长，已放入单独的文件：|ft_rust.txt|。
+
+
+SQL							*ft-sql*
+
+由于该插件的文本相当长，已放入单独的文件：|ft_sql.txt|。
+
+
+TEX						*ft-tex-plugin* *g:tex_flavor*
+
+如果 `*.tex` 文件的第一行形式为 >
+	%&<format>
+那么这决定了文件类型：plaintex（用于 plain TeX）、context（用于 ConTeXt）或
+tex（用于 LaTeX）。否则会在文件中搜索关键字来选择 context 或 tex。如果没有找到
+关键字，则默认为 plaintex。你可以把变量 g:tex_flavor 定义为你最常用的格式
+（而不是文件类型）来改变默认值。使用以下之一： >
+	let g:tex_flavor = "plain"
+	let g:tex_flavor = "context"
+	let g:tex_flavor = "latex"
+目前不识别其他格式。
+
+TYPST							*ft-typst-plugin*
+
+							*g:typst_conceal*
+当 |TRUE| 时，Typst 文件类型插件会把 'conceallevel' 选项设为 2。
+
+							*g:typst_folding*
+当 |TRUE| 时，Typst 文件类型插件会折叠标题。（默认：|FALSE|）
+
+要启用： >
+	let g:typst_folding = 1
+<
+							*g:typst_foldnested*
+当 |TRUE| 时，Typst 文件类型插件会把嵌套标题折叠到它们的父标题下。（默认：
+|TRUE|）
+
+要禁用： >
+	let g:typst_foldnested = 0
+<
+VIM							*ft-vim-plugin*
+
+Vim 文件类型插件定义了用 [[ 和 ]] 移动到函数开头和结尾的映射。用 ]" 和 [" 在
+注释之间移动。
+
+可以用以下方式禁用这些映射： >
+	let g:no_vim_maps = 1
+
+YAML							*ft-yaml-plugin*
+默认情况下，YAML 文件类型插件会启用以下选项： >
+	setlocal shiftwidth=2 softtabstop=2
+
+要禁用此行为，请设置以下变量： >
+	let g:yaml_recommended_style = 0
+
+
+ZIG							*ft-zig-plugin*
+
+						*g:zig_recommended_style*
+默认会按照 Zig 推荐的风格（https://ziglang.org/documentation/master/）设置以下
+缩进选项： >
+
+	setlocal expandtab shiftwidth=4 softtabstop=4 tabstop=8
+<
+要禁用此行为，请把 |g:zig_recommended_style| 设为 0： >
+
+	let g:zig_recommended_style = 0
+<
+							*g:zig_std_dir*
+Zig 标准库的路径。Zig 的 |ftplugin| 会读取 |g:zig_std_dir| 并把它们追加到
+Zig 文件的 'path' 中。Zig 标准库的位置取决于系统和安装方式。
+
+可以使用 `zig env` 自动设置 |g:zig_std_dir|： >
+
+	let g:zig_std_dir = json_decode(system('zig env'))['std_dir']
+<
+例如，可以把这放进 FileType |:autocmd| 或用户 |ftplugin| 中，使其只在打开
+Zig 文件时加载。
+
+
+ZIMBU							*ft-zimbu-plugin*
+
+Zimbo 文件类型插件定义了用 [[ 和 ]] 移动到函数开头和结尾的映射。
+
+可以用以下方式禁用这些映射： >
+	let g:no_zimbu_maps = 1
+<
+
+
+ vim:tw=78:ts=8:noet:ft=help:norl:

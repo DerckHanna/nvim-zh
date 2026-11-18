@@ -1,0 +1,505 @@
+{
+  "domain": "nvim-tree",
+  "entries": [
+    {
+      "context": "mapping",
+      "msgid": "CD",
+      "msgstr": "切换目录"
+    },
+    {
+      "context": "mapping",
+      "msgid": "Close",
+      "msgstr": "关闭"
+    },
+    {
+      "context": "mapping",
+      "msgid": "Close Directory",
+      "msgstr": "关闭目录"
+    },
+    {
+      "context": "mapping",
+      "msgid": "Collapse All",
+      "msgstr": "折叠全部"
+    },
+    {
+      "context": "mapping",
+      "msgid": "Copy",
+      "msgstr": "复制"
+    },
+    {
+      "context": "mapping",
+      "msgid": "Copy Absolute Path",
+      "msgstr": "复制绝对路径"
+    },
+    {
+      "context": "mapping",
+      "msgid": "Copy Basename",
+      "msgstr": "复制文件名"
+    },
+    {
+      "context": "mapping",
+      "msgid": "Copy Name",
+      "msgstr": "复制名称"
+    },
+    {
+      "context": "mapping",
+      "msgid": "Copy Relative Path",
+      "msgstr": "复制相对路径"
+    },
+    {
+      "context": "mapping",
+      "msgid": "Create File Or Directory",
+      "msgstr": "创建文件或目录"
+    },
+    {
+      "context": "mapping",
+      "msgid": "Cut",
+      "msgstr": "剪切"
+    },
+    {
+      "context": "mapping",
+      "msgid": "Delete",
+      "msgstr": "删除"
+    },
+    {
+      "context": "mapping",
+      "msgid": "Delete Bookmarked",
+      "msgstr": "删除书签节点"
+    },
+    {
+      "context": "mapping",
+      "msgid": "Expand All",
+      "msgstr": "展开全部"
+    },
+    {
+      "context": "mapping",
+      "msgid": "First Sibling",
+      "msgstr": "第一个同级节点"
+    },
+    {
+      "context": "mapping",
+      "msgid": "Help",
+      "msgstr": "帮助"
+    },
+    {
+      "context": "mapping",
+      "msgid": "Info",
+      "msgstr": "信息"
+    },
+    {
+      "context": "mapping",
+      "msgid": "Last Sibling",
+      "msgstr": "最后一个同级节点"
+    },
+    {
+      "context": "mapping",
+      "msgid": "Live Filter: Clear",
+      "msgstr": "实时过滤：清除"
+    },
+    {
+      "context": "mapping",
+      "msgid": "Live Filter: Start",
+      "msgstr": "实时过滤：开始"
+    },
+    {
+      "context": "mapping",
+      "msgid": "Move",
+      "msgstr": "移动"
+    },
+    {
+      "context": "mapping",
+      "msgid": "Move Bookmarked",
+      "msgstr": "移动书签节点"
+    },
+    {
+      "context": "mapping",
+      "msgid": "Next Diagnostic",
+      "msgstr": "下一个诊断"
+    },
+    {
+      "context": "mapping",
+      "msgid": "Next Git",
+      "msgstr": "下一个 Git 变更"
+    },
+    {
+      "context": "mapping",
+      "msgid": "Next Sibling",
+      "msgstr": "下一个同级节点"
+    },
+    {
+      "context": "mapping",
+      "msgid": "Open",
+      "msgstr": "打开"
+    },
+    {
+      "context": "mapping",
+      "msgid": "Open Preview",
+      "msgstr": "打开预览"
+    },
+    {
+      "context": "mapping",
+      "msgid": "Open: Horizontal Split",
+      "msgstr": "打开：水平分屏"
+    },
+    {
+      "context": "mapping",
+      "msgid": "Open: In Place",
+      "msgstr": "原地打开"
+    },
+    {
+      "context": "mapping",
+      "msgid": "Open: New Tab",
+      "msgstr": "打开：新标签页"
+    },
+    {
+      "context": "mapping",
+      "msgid": "Open: No Window Picker",
+      "msgstr": "打开：不使用 Window 选择器"
+    },
+    {
+      "context": "mapping",
+      "msgid": "Open: Vertical Split",
+      "msgstr": "打开：垂直分屏"
+    },
+    {
+      "context": "mapping",
+      "msgid": "Parent Directory",
+      "msgstr": "父目录"
+    },
+    {
+      "context": "mapping",
+      "msgid": "Paste",
+      "msgstr": "粘贴"
+    },
+    {
+      "context": "mapping",
+      "msgid": "Prev Diagnostic",
+      "msgstr": "上一个诊断"
+    },
+    {
+      "context": "mapping",
+      "msgid": "Prev Git",
+      "msgstr": "上一个 Git 变更"
+    },
+    {
+      "context": "mapping",
+      "msgid": "Previous Sibling",
+      "msgstr": "上一个同级节点"
+    },
+    {
+      "context": "mapping",
+      "msgid": "Refresh",
+      "msgstr": "刷新"
+    },
+    {
+      "context": "mapping",
+      "msgid": "Rename",
+      "msgstr": "重命名"
+    },
+    {
+      "context": "mapping",
+      "msgid": "Rename: Basename",
+      "msgstr": "重命名：文件名"
+    },
+    {
+      "context": "mapping",
+      "msgid": "Rename: Full Path",
+      "msgstr": "重命名：完整路径"
+    },
+    {
+      "context": "mapping",
+      "msgid": "Rename: Omit Filename",
+      "msgstr": "重命名：省略文件名"
+    },
+    {
+      "context": "mapping",
+      "msgid": "Run Command",
+      "msgstr": "运行命令"
+    },
+    {
+      "context": "mapping",
+      "msgid": "Run System",
+      "msgstr": "使用系统打开"
+    },
+    {
+      "context": "mapping",
+      "msgid": "Search",
+      "msgstr": "搜索"
+    },
+    {
+      "context": "mapping",
+      "msgid": "Toggle Bookmark",
+      "msgstr": "切换书签"
+    },
+    {
+      "context": "mapping",
+      "msgid": "Toggle Filter: Custom",
+      "msgstr": "切换过滤器：自定义"
+    },
+    {
+      "context": "mapping",
+      "msgid": "Toggle Filter: Dotfiles",
+      "msgstr": "切换过滤器：点文件"
+    },
+    {
+      "context": "mapping",
+      "msgid": "Toggle Filter: Git Clean",
+      "msgstr": "切换过滤器：Git 无改动"
+    },
+    {
+      "context": "mapping",
+      "msgid": "Toggle Filter: Git Ignored",
+      "msgstr": "切换过滤器：Git 忽略"
+    },
+    {
+      "context": "mapping",
+      "msgid": "Toggle Filter: No Bookmark",
+      "msgstr": "切换过滤器：无书签"
+    },
+    {
+      "context": "mapping",
+      "msgid": "Toggle Filter: No Buffer",
+      "msgstr": "切换过滤器：无 Buffer"
+    },
+    {
+      "context": "mapping",
+      "msgid": "Toggle Group Empty",
+      "msgstr": "切换空目录组"
+    },
+    {
+      "context": "mapping",
+      "msgid": "Trash",
+      "msgstr": "移到回收站"
+    },
+    {
+      "context": "mapping",
+      "msgid": "Trash Bookmarked",
+      "msgstr": "将书签节点移到回收站"
+    },
+    {
+      "context": "mapping",
+      "msgid": "Up",
+      "msgstr": "上级目录"
+    },
+    {
+      "context": "notification",
+      "msgid": "%d git jobs have timed out after git.timeout %dms, disabling git integration.",
+      "msgstr": "%d 个 Git 任务在 git.timeout %dms 后超时，正在禁用 Git 集成。"
+    },
+    {
+      "context": "notification",
+      "msgid": "%d nodes properly removed.",
+      "msgstr": "已删除 %d 个节点。"
+    },
+    {
+      "context": "notification",
+      "msgid": "%d nodes removed from clipboard.",
+      "msgstr": "已从剪贴板移除 %d 个节点。"
+    },
+    {
+      "context": "notification",
+      "msgid": "%s -> %s",
+      "msgstr": "%s -> %s"
+    },
+    {
+      "context": "notification",
+      "msgid": "%s is not writable, cannot move.",
+      "msgstr": "%s 不可写，无法移动。"
+    },
+    {
+      "context": "notification",
+      "msgid": "%s removed from clipboard.",
+      "msgstr": "已从剪贴板移除 %s。"
+    },
+    {
+      "context": "notification",
+      "msgid": "%s was properly created",
+      "msgstr": "已创建 %s"
+    },
+    {
+      "context": "notification",
+      "msgid": "%s was properly removed.",
+      "msgstr": "已删除 %s。"
+    },
+    {
+      "context": "notification",
+      "msgid": "Buffer for file %s is modified",
+      "msgstr": "文件 %s 的 Buffer 已修改"
+    },
+    {
+      "context": "notification",
+      "msgid": "Cannot create: path already exists: %s",
+      "msgstr": "无法创建：路径已存在：%s"
+    },
+    {
+      "context": "notification",
+      "msgid": "Clipboard has been emptied.",
+      "msgstr": "剪贴板已清空。"
+    },
+    {
+      "context": "notification",
+      "msgid": "Could not create file %s",
+      "msgstr": "无法创建文件 %s"
+    },
+    {
+      "context": "notification",
+      "msgid": "Could not create folder %s",
+      "msgstr": "无法创建目录 %s"
+    },
+    {
+      "context": "notification",
+      "msgid": "Could not initialize an fs_event watcher for path %s : %s",
+      "msgstr": "无法为路径 %s 初始化 fs_event 监视器：%s"
+    },
+    {
+      "context": "notification",
+      "msgid": "Could not remove %s",
+      "msgstr": "无法删除 %s"
+    },
+    {
+      "context": "notification",
+      "msgid": "Could not start the fs_event watcher for path %s : %s",
+      "msgstr": "无法启动路径 %s 的 fs_event 监视器：%s"
+    },
+    {
+      "context": "notification",
+      "msgid": "Could not stop the fs_event watcher for path %s : %s",
+      "msgstr": "无法停止路径 %s 的 fs_event 监视器：%s"
+    },
+    {
+      "context": "notification",
+      "msgid": "Disabling watchers: %s",
+      "msgstr": "正在禁用监视器：%s"
+    },
+    {
+      "context": "notification",
+      "msgid": "Failed to decode session file (%s): %s",
+      "msgstr": "无法解码会话文件（%s）：%s"
+    },
+    {
+      "context": "notification",
+      "msgid": "Failed to load bookmarks: %s",
+      "msgstr": "书签加载失败：%s"
+    },
+    {
+      "context": "notification",
+      "msgid": "Failed to save bookmarks: %s",
+      "msgstr": "书签保存失败：%s"
+    },
+    {
+      "context": "notification",
+      "msgid": "Failed to write session file (%s): %s",
+      "msgstr": "无法写入会话文件（%s）：%s"
+    },
+    {
+      "context": "notification",
+      "msgid": "File system watcher failed (%s) for path %s, halting watcher.",
+      "msgstr": "文件系统监视器失败（%s），路径 %s，正在停止监视器。"
+    },
+    {
+      "context": "notification",
+      "msgid": "Invalid bookmarks.persist, disabling persistence: %s",
+      "msgstr": "bookmarks.persist 无效，禁用持久化：%s"
+    },
+    {
+      "context": "notification",
+      "msgid": "Invalid return type for field renderer.group_empty. Expected string, got %s",
+      "msgstr": "字段 renderer.group_empty 的返回类型无效：应为 string，实际为 %s"
+    },
+    {
+      "context": "notification",
+      "msgid": "Invalid session file (%s): %s",
+      "msgstr": "会话文件无效（%s）：%s"
+    },
+    {
+      "context": "notification",
+      "msgid": "Modifier %s is not in allowed list : %s",
+      "msgstr": "修饰符 %s 不在允许列表中：%s"
+    },
+    {
+      "context": "notification",
+      "msgid": "More windows (%d) than actions.open_file.window_picker.chars (%d).",
+      "msgstr": "Window 数量（%d）超过 actions.open_file.window_picker.chars（%d）。"
+    },
+    {
+      "context": "notification",
+      "msgid": "No bookmarks to delete.",
+      "msgstr": "没有可删除的书签。"
+    },
+    {
+      "context": "notification",
+      "msgid": "No bookmarks to move.",
+      "msgstr": "没有可移动的书签。"
+    },
+    {
+      "context": "notification",
+      "msgid": "No bookmarks to trash.",
+      "msgstr": "没有可移到回收站的书签。"
+    },
+    {
+      "context": "notification",
+      "msgid": "No loaded buffer coincides with %s",
+      "msgstr": "没有与 %s 对应的已加载 Buffer"
+    },
+    {
+      "context": "notification",
+      "msgid": "Observed %d consecutive file system events with interval < %dms, exceeding filesystem_watchers.max_events=%s. Disabling watcher for directory '%s'. Consider adding this directory to filesystem_watchers.ignore_dirs",
+      "msgstr": "连续观察到 %d 个文件系统事件，间隔小于 %dms，超过 filesystem_watchers.max_events=%s。正在禁用目录 '%s' 的监视器。请考虑将此目录加入 filesystem_watchers.ignore_dirs"
+    },
+    {
+      "context": "notification",
+      "msgid": "Problem occurred in the function ``opts.renderer.hidden_display`` see nvim-tree.renderer.hidden_display on :h nvim-tree",
+      "msgstr": "函数 ``opts.renderer.hidden_display`` 出错，请参阅 :h nvim-tree 中的 nvim-tree.renderer.hidden_display"
+    },
+    {
+      "context": "notification",
+      "msgid": "Unrecognized git state '%s'",
+      "msgstr": "无法识别的 Git 状态 '%s'"
+    },
+    {
+      "context": "notification",
+      "msgid": "current working directory unavailable: %s",
+      "msgstr": "当前工作目录不可用：%s"
+    },
+    {
+      "context": "notification",
+      "msgid": "expansion iteration was halted after %d discovered folders",
+      "msgstr": "展开迭代在发现 %d 个目录后中止"
+    },
+    {
+      "context": "notification",
+      "msgid": "invalid config type \"%s\" passed to setup, using defaults",
+      "msgstr": "setup 收到的配置类型 \"%s\" 无效，使用默认配置"
+    },
+    {
+      "context": "notification",
+      "msgid": "nvim-tree.lua requires Nvim >= 0.10. You may use a compat-nvim-0.X tag for earlier Nvim versions, however they will receive no updates or support.",
+      "msgstr": "nvim-tree.lua 需要 Nvim >= 0.10。较早的 Nvim 版本可使用 compat-nvim-0.X 标签，但这些版本不会获得更新或支持。"
+    },
+    {
+      "context": "notification",
+      "msgid": "trash failed: %s; please see :help nvim-tree.trash",
+      "msgstr": "回收站操作失败：%s；请参阅 :help nvim-tree.trash"
+    },
+    {
+      "context": "notification",
+      "msgid": "trash.cmd '%s' is not an executable.",
+      "msgstr": "trash.cmd '%s' 不是可执行程序。"
+    }
+  ],
+  "locale": "zh_CN",
+  "metadata": {
+    "headers": {
+      "Content-Transfer-Encoding": "8bit",
+      "Content-Type": "text/plain; charset=UTF-8",
+      "Language": "zh_CN",
+      "Language-Team": "Simplified Chinese",
+      "Last-Translator": "nvim-zh maintainers",
+      "MIME-Version": "1.0",
+      "PO-Revision-Date": "2026-11-18 13:34+0800",
+      "Project-Id-Version": "nvim-zh"
+    },
+    "source": "nvim-tree.po"
+  },
+  "schema": 1
+}

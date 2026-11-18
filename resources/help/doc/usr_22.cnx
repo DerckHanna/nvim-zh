@@ -1,0 +1,376 @@
+*usr_22.txt*	Nvim
+
+
+		     VIM USER MANUAL	by Bram Moolenaar
+
+
+			     查找要编辑的文件
+
+
+文件到处都能找到。那么你怎么找到它们呢？Vim 提供了多种浏览目录树的方式。
+还有一些命令可以跳转到在另一个文件里提到的文件。而且 Vim 会记住之前编辑过
+哪些文件。
+
+|22.1|	文件浏览器
+|22.2|	当前目录
+|22.3|	查找文件
+|22.4|	buffer 列表
+
+     下一章：|usr_23.txt|  编辑其他文件
+ 上一章：|usr_21.txt|  离开再回来
+目录：|usr_toc.txt|
+
+==============================================================================
+*22.1*	文件浏览器
+
+Vim 有一个 plugin，使你可以编辑一个目录。试试这个： >
+
+	:edit .
+
+借助 autocommands 和 Vim 脚本的魔力，window 中会填满该目录的内容。它看起来
+像这样（为了不超过 78 列，稍作整理）： >
+
+  " ==========================================================================
+  " Netrw Directory Listing                                       (netrw v184)
+  "   /path/to/vim/runtime/doc
+  "   Sorted by      name
+  "   Sort sequence: [\/]$,*,\(\.bak\|\~\|\.o\|\.h\|\.info\|\.swp\)[*@]\=$
+  "   Quick Help: <F1>:help -:go up dir D:delete R:rename s:sort-by x:special
+  " ==========================================================================
+  ../
+  ./
+  check/
+  Makefile
+  autocmd.txt
+  change.txt
+  eval.txt
+  filetype.txt
+  help.txt.info
+<
+
+你可以看到这些条目：
+
+1. 浏览工具的名称及其版本号
+2. 正在浏览的目录的名称
+3. 排序方式（可按名称、时间或大小）
+4. 名称如何排序（目录在前，然后按扩展名，等等）
+5. 如何获取帮助（<F1> 键），以及可用命令的简表
+6. 文件列表，其中包括 "../"（它会把父目录也列出来）
+
+如果你启用了语法高亮，不同的部分会以不同颜色显示，以便更容易辨认。
+
+你可以用 Normal 模式的 Vim 命令在文本中移动。例如，把光标移到某个文件名上
+并按 <Enter>，你就会开始编辑那个文件。要回到浏览器，再次使用 ":edit ."，
+或者使用 ":Explore"。CTRL-O 也可以。
+
+试着在光标位于某个目录名上时按 <Enter>。结果是文件浏览器进入该目录，并显示
+在其中找到的条目。在第一个目录 "../" 上按 <Enter> 会让你上移一层。按 "-"
+也能做到同样的事，而不必先把光标移到 "../" 条目上。
+
+你可以按 <F1> 获取关于在 netrw 文件浏览器里能做些什么的帮助。你会看到这样
+的内容：
+>
+ QUICK HELP						netrw-quickhelp
+                       (Use ctrl-] to select a topic)
+	Intro to Browsing...............................netrw-intro-browse
+	  Quick Reference: Maps.........................netrw-quickmap
+	  Quick Reference: Commands.....................netrw-browse-cmds
+<
+<F1> 键因此会把你带到一个 netrw 目录浏览的内容页帮助页面。它是一个普通的
+帮助页；使用通常的 |CTRL-]| 可以跳转到带 tag 的帮助条目，使用 |CTRL-O| 可以
+跳回来。所以，如果你在 |netrw-quickmap| 上按 CTRL-]，就会跳到下面这里：
+>
+				netrw-quickmap  netrw-quickmaps
+ QUICK REFERENCE: MAPS				netrw-browse-maps
+
+	  ---			-----------------			----
+	  Map			Quick Explanation			Link
+	  ---			-----------------			----
+	 <F1>	Causes Netrw to issue help
+	 <cr>	Netrw will enter the directory or read the file      netrw-cr
+	 <del>	Netrw will attempt to remove the file/directory      netrw-del
+<	（等等）
+
+要选择要显示和编辑的文件（光标位于某个文件名上时）：
+>
+	   o	Enter the file/directory under the cursor in a new   netrw-o
+		browser window.  A horizontal split is used.
+	   O	Obtain a file specified by cursor                    netrw-O
+	   p	Preview the file                                     netrw-p
+	   P	Browse in the previously used window                 netrw-P
+	   v	Enter the file/directory under the cursor in a new   netrw-v
+		browser window.  A vertical split is used.
+<
+以下 normal 模式命令可用于控制浏览器的显示：
+>
+	   i	Cycle between thin, long, wide, and tree listings    netrw-i
+	   r	Reverse sorting order                                netrw-r
+	   s	Select sorting style: by name, time, or file size    netrw-s
+<
+再举几个额外的 normal 模式命令作为示例：
+>
+	   cd	Make browsing directory the current directory        netrw-cd
+	   D	Attempt to remove the file(s)/directory(ies)         netrw-D
+	   gb	Go to previous bookmarked directory                  netrw-gb
+	   mb	Bookmark current directory                           netrw-mb
+	   R	Rename the designated file(s)/directory(ies)         netrw-R
+<
+你也可以使用命令行模式；同样只是举例：
+>
+     :Explore[!]  [dir] Explore directory of current file......netrw-explore
+     :Hexplore[!] [dir] Horizontal Split & Explore.............netrw-explore
+<
+netrw 浏览器并不局限于你本地的机器；你还可以使用这样的 URL： >
+
+	:Explore ftp://somehost/path/to/dir/
+	:e scp://somehost/path/to/dir/
+<
+	注意：结尾的 "/" 很重要。
+
+更多内容见 |netrw-browse|。
+
+==============================================================================
+*22.2*	当前目录
+
+和 shell 一样，Vim 也有当前目录的概念。假设你在自己的主目录中，想编辑某个
+名为 "VeryLongFileName" 的目录里的好几个文件。你可以这样做： >
+
+	:edit VeryLongFileName/file1.txt
+	:edit VeryLongFileName/file2.txt
+	:edit VeryLongFileName/file3.txt
+
+为了省去大量输入，这样做： >
+
+	:cd VeryLongFileName
+	:edit file1.txt
+	:edit file2.txt
+	:edit file3.txt
+
+":cd" 命令会改变当前目录。你可以用 ":pwd" 命令查看当前目录是哪一个： >
+
+	:pwd
+	/home/Bram/VeryLongFileName
+
+Vim 会记住你上次使用过的目录。用 "cd -" 可以回到它。例如： >
+
+	:pwd
+	/home/Bram/VeryLongFileName
+	:cd /etc
+	:pwd
+	/etc
+	:cd -
+	:pwd
+	/home/Bram/VeryLongFileName
+	:cd -
+	:pwd
+	/etc
+
+
+window 局部目录
+
+当你拆分一个 window 时，两个 window 使用同一个当前目录。如果你在新的 window
+中想编辑别处的一批文件，可以让它使用不同的目录，而不改变另一个 window 的
+当前目录。这称为局部目录。 >
+
+	:pwd
+	/home/Bram/VeryLongFileName
+	:split
+	:lcd /etc
+	:pwd
+	/etc
+	CTRL-W w
+	:pwd
+	/home/Bram/VeryLongFileName
+
+只要没有用过 `:lcd` 命令，所有 window 就共享同一个当前目录。在其中一个
+window 里执行 `:cd` 命令也会改变另一个 window 的当前目录。
+   对于使用过 `:lcd` 的 window，会记住一个不同的当前目录。在其他 window 中
+使用 `:cd` 或 `:lcd` 不会改变它。
+   在使用不同当前目录的 window 中执行 `:cd` 命令时，它会恢复使用共享目录。
+
+
+标签页局部目录
+
+当你打开一个新的标签页时，它使用打开该标签页时所在的上一个标签页中那个
+window 的目录。你可以用 `:tcd` 命令改变当前标签页的目录。一个标签页中的
+所有 window 都共享这个目录，但具有 window 局部目录的 window 除外。在这个
+标签页中新打开的任何 window 都会把这个目录用作当前工作目录。在标签页中
+使用 `:cd` 命令不会改变那些具有标签页局部目录的标签页的工作目录。当在某个
+标签页中用 `:cd` 命令改变全局工作目录时，它也会改变当前标签页的工作目录。
+
+
+==============================================================================
+*22.3*	查找文件
+
+你正在编辑一个 C 程序，其中包含这一行：
+
+	#include "inits.h" ~
+
+你想看看那个 "inits.h" 文件里有什么。把光标移到那个文件名上并输入： >
+
+	gf
+
+Vim 会找到这个文件并编辑它。
+   如果文件不在当前目录中呢？Vim 会使用 'path' 选项来查找该文件。这个选项
+是一个目录名列表，指明到哪里查找你的文件。
+   假设你的 include 文件位于 "c:/prog/include"。下面这条命令会把它加到
+'path' 选项中： >
+
+	:set path+=c:/prog/include
+
+这个目录是一个绝对路径。无论你身在何处，它都指向同一个位置。如果你的文件
+位于某个子目录中，也就是在当前文件所在目录的下层呢？那么你可以指定一个
+相对路径名。它以点开头：
+>
+	:set path+=./proto
+
+这告诉 Vim 到 "proto" 目录中查找，该目录位于你使用 "gf" 的那个文件所在
+目录的下层。因此对 "inits.h" 使用 "gf" 时，Vim 会从该文件所在目录开始查找
+"proto/inits.h"。
+   如果没有 "./"，也就是只写 "proto"，Vim 会到当前目录下层的 "proto" 目录
+中查找。而当前目录未必就是你正在编辑的那个文件所在的位置。
+
+'path' 选项还允许用更多方式来指定到哪些目录中搜索文件。参见 'path' 选项的
+帮助。
+   'isfname' 选项用于决定哪些字符算作文件名的一部分，哪些不算（例如上面
+例子中的 " 字符）。
+
+当你知道文件名，但它在文件里找不到时，你可以直接输入它： >
+
+	:find inits.h
+
+然后 Vim 会使用 'path' 选项来尝试定位该文件。这与 ":edit" 命令相同，区别
+只在于它使用了 'path'。
+
+要在新的 window 中打开找到的文件，请用 CTRL-W f 代替 "gf"，或者用 ":sfind"
+代替 ":find"。
+
+
+还有一个好办法，可以直接启动 Vim 去编辑 'path' 中某处的文件： >
+
+	vim "+find stdio.h"
+
+这会在你的 'path' 值中查找文件 "stdio.h"。这里的引号是必需的，以便把它
+作为单个参数 |-+c|。
+
+==============================================================================
+*22.4*	buffer 列表
+
+Vim 编辑器用 buffer 这个词来描述正在编辑的文件。实际上，一个 buffer 就是你
+所编辑的那个文件的副本。当你改完这个 buffer 后，就把 buffer 的内容写回文件。
+buffer 不仅包含文件内容，还包含所有标记、设置以及与之相关的其他东西。
+
+
+隐藏的 buffer
+
+假设你正在编辑文件 one.txt，又需要编辑文件 two.txt。你大可以直接使用
+":edit two.txt"，但由于你对 one.txt 做了改动，那样行不通。你也不想现在就
+把 one.txt 写盘。Vim 为你提供了一个解决办法： >
+
+	:hide edit two.txt
+
+buffer "one.txt" 从屏幕上消失了，但 Vim 仍然知道你正在编辑这个 buffer，
+因此它保留了改动过的文本。这称为隐藏的 buffer：该 buffer 含有文本，但你看
+不到它。
+   ":hide" 的参数是另一条命令。":hide" 让那条命令表现得就好像设置了
+'hidden' 选项一样。你也可以自己设置这个选项。其效果是：任何 buffer 被放弃
+时都会变成隐藏的。
+   小心！当你有带改动的隐藏 buffer 时，在没有确认已保存所有 buffer 之前，
+不要退出 Vim。
+
+
+非活动的 buffer
+
+一个 buffer 被使用过一次之后，Vim 会记住关于它的一些信息。当它没有显示在
+某个 window 中，也没有被隐藏时，它仍然在 buffer 列表中。这称为非活动的
+buffer。概览：
+
+	Active		出现在某个 window 中，文本已载入。
+	Hidden		不在 window 中，文本已载入。
+	Inactive	不在 window 中，文本未载入。
+
+非活动的 buffer 会被记住，因为 Vim 保留了关于它们的信息，比如标记。记住
+文件名也很有用，这样你可以看到自己编辑过哪些文件。并且可以再次编辑它们。
+
+
+列出 buffer
+
+用这条命令查看 buffer 列表： >
+
+	:buffers
+
+还有一条命令做同样的事，它不那么明显地是用来列出 buffer 的，但输入起来短
+得多： >
+
+	:ls
+
+输出可能像这样：
+
+  1 #h   "help.txt"			line 62 ~
+  2 %a + "usr_21.txt"			line 1 ~
+  3      "usr_toc.txt"			line 1 ~
+
+第一列是 buffer 编号。你可以用它来编辑 buffer，而不必输入名字，见下文。
+   在 buffer 编号之后是标志位。然后是文件名，以及上次光标所在的行号。
+   可能出现的标志位如下（从左到右）：
+
+	u	buffer 未被列出 |unlisted-buffer|。
+	 %	当前 buffer。
+	 #	备用 buffer。
+	  a	buffer 已载入并显示。
+	  h	buffer 已载入但被隐藏。
+	   =	buffer 是只读的。
+	   -	buffer 不可修改，即 'modifiable' 选项已关闭。
+	    +	buffer 已被修改。
+
+
+编辑 buffer
+
+你可以按编号编辑 buffer。这样可以避免输入文件名： >
+
+	:buffer 2
+
+但要知道编号，唯一的办法是查看 buffer 列表。你可以改用名字，或者名字的一
+部分： >
+
+	:buffer help
+
+Vim 会为你输入的名字找出最匹配的 buffer。如果只有一个 buffer 与该名字匹配，
+就会使用它。在这个例子里是 "help.txt"。
+   要在新的 window 中打开一个 buffer： >
+
+	:sbuffer 3
+
+用名字也同样可行。
+
+
+使用 buffer 列表
+
+你可以用这些命令在 buffer 列表中移动：
+
+	:bnext		转到下一个 buffer
+	:bprevious	转到上一个 buffer
+	:bfirst		转到第一个 buffer
+	:blast		转到最后一个 buffer
+
+要把一个 buffer 从列表中移除，使用这条命令： >
+
+	:bdelete 3
+
+同样，用名字也可以。
+   如果你删除一个原本是活动的 buffer（在某个 window 中可见），那个 window
+会被关闭。如果你删除当前的 buffer，当前的 window 会被关闭。如果它是最后一个
+window，Vim 会找另一个 buffer 来编辑。你不可能什么也不编辑！
+
+	注意：即使用 ":bdelete" 移除了 buffer，Vim 仍然记得它。它实际上被设为
+	"unlisted"，不再出现在 ":buffers" 的列表中。":buffers!" 命令会列出
+	未列出的 buffer（是的，Vim 能做到看似不可能的事）。要真正让 Vim 忘记
+	一个 buffer，请用 ":bwipe"。另见 'buflisted' 选项。
+
+==============================================================================
+
+下一章：|usr_23.txt|  编辑其他文件
+
+版权：见 |manual-copyright|
+
+vim:tw=78:ts=8:noet:ft=help:norl:

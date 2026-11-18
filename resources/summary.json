@@ -1,0 +1,33 @@
+{
+  "baseline": "0.12.6",
+  "domains": {
+    "clangd": 4,
+    "nvim-tree": 97,
+    "nvim-ui": 18,
+    "telescope": 96,
+    "which-key": 176
+  },
+  "help": {
+    "complete": 133,
+    "complete_lines": 130515,
+    "documents": 135,
+    "example_blocks": 5019,
+    "excluded": 2,
+    "excluded_lines": 1002,
+    "help_links": 14302,
+    "lines": 131517,
+    "not_started": 0,
+    "not_started_lines": 0,
+    "partial": 0,
+    "partial_lines": 0,
+    "tags": 10801
+  },
+  "native": {
+    "probe": {
+      "msgid": "type  :help nvim<Enter>     if you are new! ",
+      "msgstr": "输入  :help nvim<Enter>     查看入门指南"
+    },
+    "supplement": 118
+  },
+  "schema": 1
+}

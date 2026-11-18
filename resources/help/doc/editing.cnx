@@ -1,0 +1,1465 @@
+*editing.txt*   Nvim
+
+
+		  VIM REFERENCE MANUAL	  by Bram Moolenaar
+
+
+编辑文件						*edit-files*
+
+                                    输入 |gO| 查看目录。
+
+==============================================================================
+1. 简介						*edit-intro*
+
+用 Vim 编辑一个文件意味着：
+
+1. 把文件读入 buffer
+2. 用编辑器命令修改 buffer
+3. 把 buffer 写入文件
+
+							*current-file*
+只要你不写出 buffer，原始文件就保持不变。
+如果你开始编辑一个文件（把文件读入 buffer），该文件名会被记住为"当前文件名"。这也
+称为当前 buffer 的名称。它可以在命令行上用 "%" 使用 |:_%|。
+
+							*alternate-file*
+如果之前已经有一个当前文件名，那么它就成为替换文件名（alternate file name）。它可以
+在命令行上用 "#" 使用 |:_#|，你也可以用 |CTRL-^| 命令在当前文件与替换文件之间切换。
+不过，使用 |:keepalt| 时替换文件名不会被改变。
+每个 window 都会记住一个替换文件名。
+
+							*:keepa* *:keepalt*
+:keepa[lt] {cmd}	在保持当前替换文件名的同时执行 {cmd}。注意被间接调用的命令
+			（例如通过函数调用）仍可能设置替换文件名。
+
+所有文件名都会被记录在 buffer 列表中。当你输入一个用于编辑（例如 ":e filename"）或
+写出（例如 ":w filename"）的文件名时，该文件名会被加入该列表。你可以用 buffer 列表
+记住你编辑过哪些文件，并用 |CTRL-^| 命令快速从一个文件切换到另一个（例如为了复制
+文本）。先输入文件编号，然后按 CTRL-^。
+
+
+CTRL-G		或				*CTRL-G* *:f* *:fi* *:file*
+:f[ile]			打印当前文件名（按输入时的原样，除非用过 ":cd"）、
+			光标位置（除非设置了 'ruler' 选项）以及文件状态
+			（只读、已改动、读取错误、新文件）。关于如何让该
+			消息更短，见 'shortmess' 选项。
+
+:f[ile]!		类似 |:file|，但即使 'shortmess' 表明应当截断，也不
+			截断名称。
+
+{count}CTRL-G		类似 CTRL-G，但以完整路径打印当前文件名。如果计数
+			大于 1，还会给出当前 buffer 编号。
+
+					*g_CTRL-G* *word-count* *byte-count*
+g CTRL-G		以五种方式打印光标的当前位置：列（Column）、行
+			（Line）、单词（Word）、字符（Character）和字节
+			（Byte）。如果字符数与字节数相同，则省略字符位置。
+
+			如果该行中有在屏幕上占据多个位置的字符（<Tab> 或
+			特殊字符），或有每列使用多个字节的字符（'encoding'
+			为 utf-8 时 0x7F 以上的字符），则字节列与屏幕列都会
+			显示，以短横线分隔。
+
+			另见 'ruler' 选项和 |wordcount()| 函数。
+
+							*v_g_CTRL-G*
+{Visual}g CTRL-G	类似 "g CTRL-G"，但显示可视选中区域的单词、
+			字符、行和字节计数。
+			在块模式中还会显示列计数。（{Visual} 见
+			|Visual-mode|。）
+
+							*:file_f*
+:f[ile][!] {name}	把当前文件名设为 {name}。可选的 ! 可避免截断消息，
+			如同 |:file|。
+			如果该 buffer 原本有名称，那个名称会成为
+			|alternate-file| 名称。会创建一个未列出的 buffer
+			来保存旧名称。
+
+			关于避免文件名转义，见 |nvim_buf_set_name()|。
+
+							*:0file*
+:0f[ile][!]		移除当前 buffer 的名称。可选的 ! 可避免截断消息，
+			如同 |:file|。
+
+:buffers
+:files
+:ls			列出当前所有已知的文件名。见 |windows.txt|
+			|:files| |:buffers| |:ls|。
+
+Vim 会记住你输入的文件名的完整路径名。大多数情况下显示文件名时只显示你输入的名称，
+但如果你用过 ":cd" 命令，使用的则是完整路径名 |:cd|。
+
+							*home-replace*
+如果环境变量 $HOME 已设置，且文件名以该字符串开头，它常常会被显示为把 HOME 替换为
+"~" 的形式。这样做是为了让文件名更短。读写文件时仍然使用完整名称，"~" 只在显示
+文件名时使用。当替换文件名会导致只剩下 "~" 时，改用 "~/ "（以避免把设为 $HOME 的
+选项与设为 "~" 的 'backupext' 混淆）。
+
+写出 buffer 时，默认使用当前文件名。因此当你给出 "ZZ" 或 ":wq" 命令时，原始文件
+会被覆盖。如果你不希望这样，可以通过给 ":write" 命令一个文件名参数，把 buffer 写入
+另一个文件。例如： >
+
+	vim testfile
+	[change the buffer with editor commands]
+	:w newfile
+	:q
+
+这会创建一个文件 "newfile"，它是 "testfile" 的改动副本。
+文件 "testfile" 会保持不变。无论如何，如果设置了 'backup' 选项，Vim 会在原始文件被
+覆盖之前重命名或复制它。如果你发现需要原始文件，可以使用这个备份。另见 'patchmode'
+选项。备份文件的名称通常是原始文件加上 'backupext'。默认的 "~" 有点奇怪，是为了
+避免意外覆盖已存在的文件。如果你更喜欢 ".bak"，请更改 'backupext' 选项。可以通过
+设置 'backupdir' 把备份文件放到另一个目录。
+
+当你没有给出文件名就开始编辑时，消息中会显示 "No File"。如果 ":write" 命令带有文件
+名参数，当前文件的文件名会被设为该文件名。这只在 'cpoptions' 含有 'F' 标志时发生
+（默认含有）|cpo-F|。当你先在一个空 buffer 中输入文本、然后把它写入文件时，这很有
+用。如果 'cpoptions' 含有 'f' 标志（默认_不_含有）|cpo-f|，则文件名会为
+":read file" 命令设置。这在启动 Vim 时不给参数、然后用 ":read file" 开始编辑文件时
+很有用。
+当文件名已被设置且 'filetype' 为空时，会触发文件类型探测自动命令。
+							*not-edited*
+因为文件名是在并没有真正开始编辑该文件的情况下设置的，所以你会受到保护，不会被覆盖
+该文件。这是通过设置 "notedited" 标志来实现的。你可以用 CTRL-G 或 ":file" 命令查看
+该标志是否已设置。当 "notedited" 标志已设置时，输出中会含有 "[Not edited]"。
+在把 buffer 写入当前文件名（用 ":w!"）时，"notedited" 标志会被重置。
+
+							*abandon*
+Vim 会记住你是否改动过 buffer。你会受到保护，不会丢失所做的改动。如果你试图不写出就
+退出，或想开始编辑另一个文件，Vim 会拒绝。为了覆盖该保护，请在命令中加一个 '!'。
+此时改动会丢失。例如：如果 buffer 已被改动，":q" 不会工作，但 ":q!" 会。要查看
+buffer 是否被改动，请使用 "CTRL-G" 命令。如果 buffer 已被改动，消息中会含有
+"[Modified]"；如果 'shortmess' 中含有 'm' 标志，则含有 "+"。
+
+如果你想不询问就自动保存改动，请打开 'autowriteall' 选项。'autowrite' 是与之关联的
+Vi 兼容选项，它对所有命令并不都有效。
+
+如果你想保留已改动的 buffer 而不保存它，请打开 'hidden' 选项。见 |hidden-buffer|。
+有些命令在未设置 'hidden' 时也会这样工作，请查阅该命令的帮助。
+
+==============================================================================
+2. 编辑文件					*edit-a-file*
+
+							*:e* *:edit* *reload*
+:e[dit][!] [++opt] [+cmd]
+			编辑当前文件。当该文件在 Vim 之外被改动时，用它可以
+			重新编辑当前文件。
+							*:edit!* *discard*
+			如果给出 [!]，当前 buffer 中未保存的改动会被丢弃。
+			没有 [!] 时，如果存在未保存的改动，该命令会失败，
+			除非设置了 'autowriteall' 且该文件可以被写出。
+			另见 |++opt| 和 |+cmd|。
+
+							*:edit_f*
+:e[dit][!] [++opt] [+cmd] {file}
+			编辑 {file}。
+							*:edit!_f*
+			如果给出 [!]，当前 buffer 中未保存的改动会被丢弃。
+			没有 [!] 时，如果存在未保存的改动，该命令会失败，
+			除非设置了 'hidden'，或设置了 'autowriteall' 且该
+			文件可以被写出。
+			另见 |++opt| 和 |+cmd|。
+
+							*:edit_#* *:e#*
+:e[dit] [++opt] [+cmd] #[count]
+			编辑第 [count] 个 buffer（如 |:files| 所示）。
+			该命令与 [count] CTRL-^ 相同。但如果替换 buffer 没有
+			文件名，":e #" 不会工作，而 CTRL-^ 此时仍能工作。
+			另见 |++opt| 和 |+cmd|。
+
+							*:ene* *:enew*
+:ene[w]			编辑一个新的、无名称的 buffer。如果当前 buffer 已被
+			改动，这会失败，除非设置了 'hidden'，或设置了
+			'autowriteall' 且该文件可以被写出。
+			如果 'fileformats' 不为空，则新 buffer 使用其中给出的
+			第一种格式。如果 'fileformats' 为空，则使用当前 buffer
+			的 'fileformat'。
+
+							*:ene!* *:enew!*
+:ene[w]!		编辑一个新的、无名称的 buffer。丢弃对当前 buffer 的任何
+			改动。
+			像 |:enew| 那样设置 'fileformat'。
+
+							*:fin* *:find*
+:fin[d][!] [++opt] [+cmd] {file}
+			在 'path' 中查找 {file}，然后 |:edit| 它。
+			另见：'findfunc'。
+
+:{count}fin[d][!] [++opt] [+cmd] {file}
+			与 ":find" 类似，但使用 'path' 中的第 {count} 个匹配。
+			因此 ":2find file" 会找到 'path' 中出现的第二个 "file"。
+			当 'path' 中该文件的匹配数少于所要求的数量时，你会得到
+			一条错误消息。
+
+							*:ex*
+:ex [++opt] [+cmd] [file]
+			与 |:edit| 相同。
+
+							*:vi* *:visual*
+:vi[sual][!] [++opt] [+cmd] [file]
+			在 Ex 模式中使用时：离开 |Ex-mode|，回到普通模式。
+			其他情况下与 |:edit| 相同。
+
+							*:vie* *:view*
+:vie[w][!] [++opt] [+cmd] file
+			在 Ex 模式中使用时：离开 |Ex-mode|，回到普通模式。
+			其他情况下与 |:edit| 相同，但为该 buffer 设置
+			'readonly' 选项。
+
+							*CTRL-^* *CTRL-6*
+CTRL-^			编辑替换文件。替换文件多半是先前编辑的文件。这是在两个
+			文件之间切换的快捷方式。它等同于 ":e #"，区别在于没有
+			文件名时它也能工作。
+
+			如果打开了 'autowrite' 或 'autowriteall' 选项且 buffer
+			已被改动，则写出它。
+			^ 字符大多位于 6 键上，同时按 CTRL 和 6 就得到我们
+			所说的 CTRL-^。但在某些非美式键盘上，CTRL-^ 是以其他
+			方式产生的。
+
+{count}CTRL-^		编辑 buffer 列表中的第 [count] 个文件（等同于
+			":e #[count]"）。这是在文件之间切换的快捷方式。
+			更多细节见上面的 |CTRL-^|。
+
+							*gf* *E446* *E447*
+[count]gf		编辑名称位于光标下或其后的文件。
+			助记："goto file"（转到文件）。
+			用 'isfname' 选项判断哪些字符应当属于文件名。尾随的
+			标点字符 ".,:;!" 会被忽略。被转义的空格 "\ " 会被缩减
+			为单个空格。
+			把 'path' 选项用作查找该文件时要搜索的目录名列表。
+			关于相对目录和通配符的细节，见 'path' 选项。
+			用 'suffixesadd' 选项检查添加后缀后的文件名。
+			如果找不到该文件，则用 'includeexpr' 修改名称并再次
+			尝试。
+			如果给出 [count]，则编辑 'path' 中找到的第 count 个
+			文件。
+			如果 Vim 拒绝 |abandon| 当前文件，该命令失败。
+			如果你想在新的 window 中编辑该文件，请使用 |CTRL-W_CTRL-F|。
+			如果你确实想编辑一个新文件，请使用： >
+				:e <cfile>
+<			要让 gf 总是这样工作： >
+				:map gf :e <cfile><CR>
+<			如果该名称是形如 "type://machine/path" 的超文本链接，
+			你需要 |netrw| 插件。
+			在 Unix 上 '~' 字符会被展开，如同 "~user/file"。
+			环境变量也会被展开 |expand-env|。
+
+							*v_gf*
+{Visual}[count]gf	与 "gf" 相同，但使用高亮的文本作为要编辑的文件名。
+			'isfname' 被忽略。跳过前导空白，除此之外所有空白和
+			特殊字符都会被包含进文件名。
+			（{Visual} 见 |Visual-mode|。）
+
+							*gF*
+[count]gF		与 "gf" 相同，区别在于如果文件名后面跟有数字，则光标
+			会被放到该文件中的那一行。
+			文件名与该数字之间必须用一个既非文件名组成
+			（见 'isfname'）也非数字的字符分隔。" line " 也能被
+			识别，如同它在 `:verbose command UserCmd` 的输出中所
+			使用的那样
+			文件名、分隔符与数字之间的空白会被忽略。
+			示例：
+				eval.c:10 ~
+				eval.c @ 20 ~
+				eval.c (30) ~
+				eval.c 40 ~
+
+							*v_gF*
+{Visual}[count]gF	与 "v_gf" 相同。
+
+这些命令用于开始编辑单个文件。这意味着该文件被读入 buffer，并设置当前文件名。所打开
+的文件取决于当前目录，见 |:cd|。
+
+关于文件被读入之后所给消息的说明，见 |read-messages|。
+
+如果你把 buffer 弄乱了想重新开始，可以使用 ":e!" 命令。":e" 命令只在你改变了当前
+文件名时才有用。
+
+							*:filename* *{file}*
+除这里提到的内容之外，关于在期望文件名之处可用的更多特殊项，见 |cmdline-special|。
+
+关于非 Unix 系统的说明：使用接受单个文件名的命令（例如 ":edit file"）时，文件名中
+允许出现空格，但尾随空格会被忽略。这在经常把空格嵌入文件名的系统（例如 MS-Windows）
+上很有用。示例：命令 ":e   Long File Name " 会编辑文件 "Long File Name"。使用接受
+多个文件名的命令（例如 ":next file1 file2"）时，内嵌的空格必须用反斜杠转义。
+
+						*wildcard* *wildcards*
+{file} 中的通配符会被展开，但与文件补全一样，'wildignore' 和 'suffixes' 会生效。
+支持哪些通配符取决于系统。下面是常见的几种：
+	`?`	匹配一个字符
+	`*`	匹配任意内容，包括空
+	`**`	匹配任意内容，包括空，并递归进入目录
+	[abc]	匹配 'a'、'b' 或 'c'
+
+要避免通配符的特殊含义，请在其前面加反斜杠。不过在 MS-Windows 上反斜杠是路径分隔符，
+且当 'isfname' 选项中含有 "[" 时，"path\[abc]" 仍会被视为通配符。避免这种情况的
+一个简单办法是使用 "path\[[]abc]"，它会匹配文件 "path\[abc]"。
+
+					*starstar-wildcard*
+展开 "**" 在 Unix、Win32、macOS 以及其他少数系统上是可行的（但在 Unix 和 macOS 上
+可能取决于你的 'shell' 设置。已知它在 zsh 下能正确工作；对 bash 而言这要求至少
+bash 版本 >= 4.X）。
+这允许搜索一棵目录树。最多深入 100 层目录。
+注意有些命令中它的行为略有不同，见 |file-searching|。
+示例： >
+	:n **/*.txt
+找到文件：
+	aaa.txt ~
+	subdir/bbb.txt ~
+	a/b/c/d/ccc.txt ~
+当 "**" 前后紧邻非通配符字符时，这些字符只在顶层目录中匹配。它们不会用于树中更深的
+目录。例如： >
+	:n /usr/inc**/types.h
+找到文件：
+	/usr/include/types.h ~
+	/usr/include/sys/types.h ~
+	/usr/inc/old/types.h ~
+注意带 "/sys" 的路径被包含进来，因为它不需要匹配 "/inc"。因此这相当于匹配
+"/usr/inc*/*/*..."，而不是 "/usr/inc*/inc*/inc*"。
+
+					*backtick-expansion* *`-expansion*
+在 Unix 以及少数其他系统上，文件名参数也可以使用反引号，例如： >
+	:next `find . -name ver\\*.c -print`
+	:view `ls -t *.patch  \| head -n1`
+Vim 会用 'shell' 运行反引号中的命令，并把标准输出作为给定 Vim 命令的参数（来自该
+shell 命令的错误消息会被丢弃）。
+要查看 Vim 正在运行什么 shell 命令，请把 'verbose' 选项设为 4。当该 shell 命令返回
+非零退出码时，会显示一条错误消息，并且该 Vim 命令会被中止。要避免这一点，请让 shell
+总是返回零，像这样： >
+       :next `find . -name ver\\*.c -print \|\| true`
+
+星号前的反斜杠是必需的，以防止 shell 在 find 程序执行之前展开 "ver*.c"。shell 管道
+符号 "|" 前的反斜杠可防止 Vim 把它解析为命令结束符。
+这在大多数其他系统上也可行，限制是反引号必须包住整个项。不可能在第一个反引号之前或
+最后一个反引号之后紧接文本。
+
+							*`=*
+可以改为把反引号按 Vim 表达式来展开，而不是按外部命令，方法是在第一个反引号之后立即
+放一个等号，例如： >
+	:e `=tempname()`
+该表达式几乎可以包含任何内容，因此它也可用于避免 '"'、"|"、'%' 和 '#' 的特殊含义。
+不过 'wildignore' 会像对其他通配符那样生效。
+
+表达式中的环境变量会在求值该表达式时展开，因此这样可行： >
+	:e `=$HOME .. '/.vimrc'`
+这在字符串内部使用 $HOME，它会按字面使用，多半不是你想要的效果： >
+	:e `='$HOME' .. '/.vimrc'`
+
+如果该表达式返回字符串，则各名称之间要用换行分隔。当结果是 |List| 时，每一项被用作
+一个名称。换行也会分隔名称。
+
+							*++opt* *[++opt]*
+[++opt] 参数可用于为单条命令设置某些选项，以及指定处理坏字符的行为。其形式是： >
+	++{optname}
+或者： >
+	++{optname}={value}
+
+其中 {optname} 是下列之一：	    *++ff* *++enc* *++bin* *++nobin* *++edit*
+    ff     或  fileformat   覆盖 'fileformat'
+    enc    或  encoding	    覆盖 'fileencoding'
+    bin    或  binary	    设置 'binary'
+    nobin  或  nobinary	    重置 'binary'
+    bad			    指定处理坏字符的行为
+    edit		    对于 |:read|：像编辑文件那样保留选项
+    p			    对于 |:write|：创建该文件的父目录
+
+{value} 不能含有空白。它可以是这些选项的任何合法值。
+示例： >
+	:e ++ff=unix
+这会把同一个文件再次编辑，并把 'fileformat' 设为 "unix"。 >
+
+	:w ++enc=latin1 newfile
+这会把当前 buffer 以 latin1 格式写入 "newfile"。
+
+写出文件时所给的消息中，如果 'fileencoding' 或 ++enc 所指定的值与 'encoding' 不同，
+会显示 "[converted]"。
+
+可以有多个 ++opt 参数，彼此用空白分隔。它们必须都出现在任何 |+cmd| 参数之前。
+
+								*++p*
+"++p" 标志会在文件不存在时创建其父目录。例如如果你编辑 "foo/bar/file.txt"，则
+":write ++p" 命令会在写出文件之前按需创建 "foo/bar/"。 >
+
+	:edit foo/bar/file.txt
+	:write ++p
+
+如果你想让 :write（不带 "++p"）总是创建缺失的父目录，请把这条自动命令加入你的配置： >
+
+	" Auto-create parent directories (except for URIs "://").
+	au BufWritePre,FileWritePre * if @% !~# '\(://\)' | call mkdir(expand('<afile>:p:h'), 'p') | endif
+<
+
+								*++bad*
+"++bad=" 的参数指定对无法转换的字符和非法字节如何处理。它可以是下面三种之一：
+    ++bad=X      用一个单字节字符替换每个坏字符。
+    ++bad=keep   不做转换，保留坏字符。注意这可能导致你的文本中出现非法字节！
+    ++bad=drop   移除坏字符。
+
+默认行为类似 "++bad=?"：把每个坏字符替换为问号。在某些地方会使用倒问号（0xBF）。
+
+注意并非所有命令都会使用 ++bad 参数，尽管你加上它时它们并不会报错。例如 |:write|。
+
+注意读取时 'fileformat' 和 'fileencoding' 选项会被设为所使用的格式。写出时不会这样，
+因此下一次写出会使用该选项的旧值。'binary' 选项同理。
+
+
+							*+cmd* *[+cmd]*
+[+cmd] 参数可用于把光标定位到新打开的文件中，或执行任何其他命令：
+	+		从最后一行开始。
+	+{num}		从第 {num} 行开始。
+	+/{pat}		从含有 {pat} 的第一行开始。
+	+{command}	打开新文件后执行 {command}。
+			{command} 是任何 Ex 命令。
+要在 {pat} 或 {command} 中包含空白，请在其前面加一个反斜杠。反斜杠数量要加倍。 >
+	:edit  +/The\ book	     file
+	:edit  +/dir\ dirname\\      file
+	:edit  +set\ dir=c:\\\\temp  file
+注意在最后一个示例中反斜杠数量减半了两次：一次用于 "+cmd" 参数，一次用于 ":set"
+命令。
+
+							*file-formats*
+'fileformat' 选项设置文件的 <EOL> 风格：
+'fileformat'    字符		   名称				~
+  "dos"		<CR><NL> 或 <NL>   DOS 格式		*DOS-format*
+  "unix"	<NL>		   Unix 格式		*Unix-format*
+  "mac"		<CR>		    Mac 格式		*Mac-format*
+
+读入文件时，上述字符会被解释为 <EOL>。在 DOS 格式（Windows 上的默认值）中，
+<CR><NL> 和 <NL> 都会被解释为 <EOL>。注意以 DOS 格式写出文件时，每个单独的 <NL>
+都会被加上 <CR> 字符。另见 |file-read|。
+
+写出文件时，使用上述字符作为 <EOL>。对于 DOS 格式使用 <CR><NL>。另见
+|DOS-format-write|。
+
+你可以按 DOS 格式读入文件、按 Unix 格式写出。这会把所有 <CR><NL> 对替换为 <NL>
+（假定 'fileformats' 含有 "dos"）： >
+	:e file
+	:set fileformat=unix
+	:w
+如果你按 Unix 格式读入文件、按 DOS 格式写出，则所有 <NL> 字符都会被替换为 <CR><NL>
+（假定 'fileformats' 含有 "unix"）： >
+	:e file
+	:set fileformat=dos
+	:w
+
+如果你开始编辑一个新文件，且 'fileformats' 选项不为空（这是默认情况），Vim 会尝试
+探测该文件中的行是用哪些指定格式分隔的。设为 "unix,dos" 时，Vim 会检查各行是以单个
+<NL>（Unix 上所用）还是以 <CR><NL> 对（MS-Windows）结尾。只有_所有_行都以 <CR><NL>
+结尾时，'fileformat' 才会被设为 "dos"，否则设为 "unix"。当 'fileformats' 含有
+"mac" 且文件中找不到 <NL> 字符时，'fileformat' 会被设为 "mac"。
+
+如果在非 MS-Windows 系统上把 'fileformat' 选项设为 "dos"，会显示消息 "[dos]" 以提醒
+你发生了不寻常的情况。在 MS-Windows 系统上，如果 'fileformat' 被设为 "unix"，你会
+得到消息 "[unix]"。在所有系统上，如果 'fileformat' 被设为 "mac"，你会得到消息
+"[mac]"。
+
+如果 'fileformats' 选项为空且使用 DOS 格式，但读入文件时某些行并不以 <CR><NL> 结尾，
+文件消息中会含有 "[CR missing]"。
+如果 'fileformats' 选项为空且使用 Mac 格式，但读入文件时发现了 <NL>，文件消息中会
+含有 "[NL missing]"。
+
+如果新文件不存在，当 'fileformats' 为空时使用当前 buffer 的 'fileformat'。否则新文件
+使用 'fileformats' 中的第一种格式。
+
+在编辑二进制、可执行文件或 Vim 脚本文件之前，应当设置 'binary' 选项。一个简单的办法
+是用 "-b" 选项启动 Vim。这会避免使用 'fileformat'。否则你就要冒单个 <NL> 字符被意外
+替换为 <CR><NL> 的风险。
+
+行尾与文件尾				*eol-and-eof*
+
+Vim 有几个选项用于控制文件格式：
+	'fileformat'	<EOL> 风格：Unix、DOS、Mac
+	'endofline'	最后一行是否以 <EOL> 结尾
+	'endoffile'	文件是否以 CTRL-Z 结尾
+	'fixendofline'	是否修正 eol 和 eof
+
+前三个值通常在读入文件时被自动探测，并在把文本写入文件时使用。编辑 buffer 时，看起来
+每一行都有行尾，而且 CTRL-Z 并不存在（例外是设置了 'binary' 时，那时行为不同）。
+
+'fixendofline' 选项可用于选择写出什么。你也可以更改选项值，以便按与读入时不同的方式
+写出文件。
+
+下面是一些使用它们的示例。
+
+如果你想要 Unix 格式的文件（每行以 NL 结尾）： >
+	setl ff=unix fixeol
+你大概应当在任何类 Unix 系统上这样做。现代 MS-Windows 系统也倾向于能与它良好配合。
+建议始终为 Vim 脚本使用这种格式。
+
+如果你想在现代环境中使用旧的 MS-DOS 文件，修正行尾并去掉 CTRL-Z，但保留 <CR><NL>
+风格的 <EOL>： >
+	setl ff=dos fixeol
+这对许多 MS-Windows 程序很有用，它们常常期望 <CR><NL> 行尾。
+
+如果你想去掉最后的 <EOL> 并加上最后的 CTRL-Z（例如用于 CP/M 之类的旧系统）： >
+	setl ff=dos nofixeol noeol eof
+
+如果你想要完全按原样保留文件格式，包括任何最后的 <EOL> 和最后的 CTRL-Z： >
+	setl nofixeol
+
+==============================================================================
+3. 参数列表				*argument-list* *arglist*
+
+如果你在启动 Vim 时给出多个文件名，这个列表会被记住为参数列表。你可以跳到该列表中的
+每个文件。
+
+不要把它与 buffer 列表混淆，后者可以用 |:buffers| 命令查看。参数列表在 Vi 中就已经
+存在，而 buffer 列表是 Vim 新增的。参数列表中的每个文件名也都会出现在 buffer 列表中
+（除非它已被 |:bdel| 或 |:bwipe| 删除）。但很常见的情况是 buffer 列表中的名称不在
+参数列表中。
+
+本主题在用户手册的 |07.2| 节中介绍。
+
+有一个全局参数列表，默认供所有 window 使用。也可以创建局部于 window 的参数列表，见 |:arglocal|。
+
+可以把参数列表与下列命令以及表达式函数 |argc()| 和 |argv()| 一起使用。它们都作用于
+当前 window 的参数列表。
+
+							*:ar* *:arg* *:args*
+:ar[gs]			打印参数列表，当前文件用方括号标出。
+
+:ar[gs] [++opt] [+cmd] {arglist}			*:args_f*
+			把 {arglist} 定义为新的参数列表并编辑第一个。如果
+			已有改动且 Vim 不想 |abandon| 当前 buffer，这会
+			失败。
+			另见 |++opt| 和 |+cmd|。
+
+:ar[gs]! [++opt] [+cmd] {arglist}			*:args_f!*
+			把 {arglist} 定义为新的参数列表并编辑第一个。丢弃
+			对当前 buffer 的任何改动。
+			另见 |++opt| 和 |+cmd|。
+
+:[count]arge[dit][!] [++opt] [+cmd] {name} ...		*:arge* *:argedit*
+			把 {name} 加入参数列表并编辑它。
+			不检查重复，可以把同一个文件加入参数列表两次
+			|:argded|。
+			这类似于先使用 |:argadd| 再 |:edit|（一个小差别是
+			|:edit| 不改变参数列表，因此参数列表指针不会改变）。
+			文件名中的空格必须用 "\" 转义。
+			[count] 的用法与 |:argadd| 相同。
+			如果当前文件无法被 |abandon|，{name} 仍会被加入参数
+			列表，但不会被编辑。不检查重复。
+			另见 |++opt| 和 |+cmd|。
+
+:[count]arga[dd] {name} ...			*:arga* *:argadd* *E479*
+:[count]arga[dd]						*E1156*
+			把 {name} 加入参数列表。省略 {name} 时，把当前 buffer
+			名称加入参数列表。
+			如果省略 [count]，{name} 会被加在参数列表中当前条目
+			之后。否则它们被加在第 [count] 个文件之后。
+			如果参数列表是 "a b c"，而 "b" 是当前参数，则这些
+			命令的结果是：
+				command		new argument list ~
+				:argadd x	a  [b]  x  c
+				:0argadd x	x   a  [b] c
+				:1argadd x	a   x  [b] c
+				:$argadd x	a  [b]  c  x
+			而在最后一条之后：
+				:+2argadd y	a  [b]  c  x  y
+			不检查重复，可以把同一个文件加入参数列表两次。你可以
+			用 |:argdedupe| 事后修正： >
+				:argadd *.txt | argdedupe
+<			当前正在编辑的文件不会被改变。
+			注意：你也可以使用这种方法： >
+				:args ## x
+<			这会加入 "x" 项并排序新的列表。
+
+:argded[upe]					*:argded* *:argdedupe*
+			从参数列表中移除重复的文件名。
+			如果你的当前文件是重复项，你的当前文件会改为原始
+			文件的索引。
+
+:argd[elete] {pattern} ...		*:argd* *:argdelete* *E480* *E610*
+			从参数列表中删除与 {pattern} 匹配的文件。
+			{pattern} 的用法类似文件模式，见 |file-pattern|。
+			可以用 "%" 来删除当前条目。
+			该命令会保留当前正在编辑的文件，即使它已从参数列表中
+			被删除。
+			示例： >
+				:argdel *.obj
+
+:[range]argd[elete]	从参数列表中删除 [range] 范围内的文件。
+			示例： >
+				:10,$argdel
+<			删除第 10 个及之后的参数，保留 1-9。 >
+				:$argd
+<			只删除最后一个。 >
+				:argd
+				:.argd
+<			删除当前参数。 >
+				:%argd
+<			从参数列表中移除所有文件。
+			当范围中的最后一个数字太大时，会删到最后一个参数为止。
+
+							*:argu* *:argument*
+:[count]argu[ment] [count] [++opt] [+cmd]
+			编辑参数列表中的第 [count] 个文件。省略 [count] 时
+			使用当前条目。如果已有改动且 Vim 不想 |abandon| 当前
+			buffer，这会失败。
+			另见 |++opt| 和 |+cmd|。
+
+:[count]argu[ment]! [count] [++opt] [+cmd]
+			编辑参数列表中的第 [count] 个文件，丢弃对当前 buffer
+			的任何改动。省略 [count] 时使用当前条目。
+			另见 |++opt| 和 |+cmd|。
+
+:[count]n[ext] [++opt] [+cmd]			*:n* *:ne* *:next* *E165* *E163*
+			编辑后面第 [count] 个文件。如果已有改动且 Vim 不想
+			|abandon| 当前 buffer，这会失败。另见 |++opt| 和
+			|+cmd|。
+
+								*]a*
+]a			映射到 |:next|。|default-mappings|
+
+:[count]n[ext]! [++opt] [+cmd]
+			编辑后面第 [count] 个文件，丢弃对 buffer 的任何改动。
+			另见 |++opt| 和 |+cmd|。
+
+:n[ext] [++opt] [+cmd] {arglist}			*:next_f*
+			与 |:args_f| 相同。
+
+:n[ext]! [++opt] [+cmd] {arglist}
+			与 |:args_f!| 相同。
+
+:[count]N[ext] [count] [++opt] [+cmd]			*:Next* *:N* *E164*
+			编辑参数列表中前面第 [count] 个文件。如果已有改动且
+			Vim 不想 |abandon| 当前 buffer，这会失败。
+			另见 |++opt| 和 |+cmd|。
+
+:[count]N[ext]! [count] [++opt] [+cmd]
+			编辑参数列表中前面第 [count] 个文件。丢弃对 buffer 的
+			任何改动。另见 |++opt| 和 |+cmd|。
+
+:[count]prev[ious] [count] [++opt] [+cmd]		*:prev* *:previous*
+			与 :Next 相同。另见 |++opt| 和 |+cmd|。
+
+							*[a*
+[a			映射到 |:previous|。|default-mappings|
+
+							*:rew* *:rewind*
+:rew[ind] [++opt] [+cmd]
+			开始编辑参数列表中的第一个文件。如果已有改动且 Vim
+			不想 |abandon| 当前 buffer，这会失败。
+			另见 |++opt| 和 |+cmd|。
+
+								*[A*
+[A			映射到 |:rewind|。|default-mappings|
+
+:rew[ind]! [++opt] [+cmd]
+			开始编辑参数列表中的第一个文件。丢弃对 buffer 的任何
+			改动。另见 |++opt| 和 |+cmd|。
+
+							*:fir* *:first*
+:fir[st][!] [++opt] [+cmd]
+			":rewind" 的另一个名称。
+
+							*:la* *:last*
+:la[st] [++opt] [+cmd]
+			开始编辑参数列表中的最后一个文件。如果已有改动且 Vim
+			不想 |abandon| 当前 buffer，这会失败。
+			另见 |++opt| 和 |+cmd|。
+
+								*]A*
+]A			映射到 |:last|。|default-mappings|
+
+:la[st]! [++opt] [+cmd]
+			开始编辑参数列表中的最后一个文件。丢弃对 buffer 的任何
+			改动。另见 |++opt| 和 |+cmd|。
+
+							*:wn* *:wnext*
+:[count]wn[ext] [++opt]
+			写出当前文件并开始编辑后面第 [count] 个文件。另见
+			|++opt| 和 |+cmd|。
+
+:[count]wn[ext] [++opt] {file}
+			把当前文件写入 {file}，并开始编辑后面第 [count] 个
+			文件，除非 {file} 已存在且 'writeany' 选项关闭。另见
+			|++opt| 和 |+cmd|。
+
+:[count]wn[ext]! [++opt] {file}
+			把当前文件写入 {file}，并开始编辑后面第 [count] 个
+			文件。另见 |++opt| 和 |+cmd|。
+
+:[count]wN[ext][!] [++opt] [file]		*:wN* *:wNext*
+:[count]wp[revious][!] [++opt] [file]		*:wp* *:wprevious*
+			与 :wnext 相同，但转到前一个文件而不是下一个。
+
+上面各命令中的 [count] 默认为一。对某些命令可以使用两个计数。使用最后一个（最右边的
+那个）。
+
+如果没有给出 [+cmd] 参数，光标会被放到该文件最后已知的光标位置。如果设置了
+'startofline'，光标会被放到该行的第一个非空白字符处，否则使用最后已知的列。如果没有
+最后已知的光标位置，光标会位于第一行（Ex 模式下为最后一行）。
+
+							*{arglist}*
+参数列表中的通配符会被展开，文件名会被排序。因此你可以用命令 `vim *.c` 编辑所有 C
+文件。在 Vim 内部，命令 `:n *.c` 做同样的事。
+
+空白用于分隔文件名。要在文件名中包含空格或制表符，请在其前面加一个反斜杠。例如，要
+编辑单个文件 "foo bar"： >
+	:next foo\ bar
+
+在 Unix 以及少数其他系统上，你也可以使用反引号，例如： >
+	:next `find . -name \\*.c -print`
+星号前的反斜杠是必需的，以防 "*.c" 在执行 find 程序之前就被 shell 展开。
+
+							*arglist-position*
+当存在参数列表时，你可以从 window 标题（如果有标题且 'title' 打开）以及用 "CTRL-G" 命令
+得到的文件消息中看出你正在编辑哪个文件。你会看到类似
+	(4 of 11)
+的内容。
+如果你实际上并没有编辑参数列表当前位置上的文件，它会变成
+	((4) of 11)
+这意味着你位于参数列表中的第 4 个位置，但编辑的并不是参数列表中的第四个文件。当你
+执行 ":e file" 时就会这样。
+
+
+局部参数列表
+
+							*:arglocal*
+:argl[ocal]		为全局参数列表创建一个局部副本。
+			不会开始编辑另一个文件。
+
+:argl[ocal][!] [++opt] [+cmd] {arglist}
+			定义一个局部于当前 window 的新参数列表。除此之外行为类似
+			|:args_f|。
+
+							*:argglobal*
+:argg[lobal]		让当前 window 使用全局参数列表。
+			不会开始编辑另一个文件。
+
+:argg[lobal][!] [++opt] [+cmd] {arglist}
+			让当前 window 使用全局参数列表。像 |:args_f| 那样定义
+			一个新的全局参数列表。所有使用全局参数列表的 window 都会
+			看到这个新列表。
+
+可以有多个参数列表。它们可以在 window 之间共享。共享时，在一个 window 中改变参数列表也会改变
+另一个 window 中的参数列表。
+
+分割 window 时，新 window 会从当前 window 继承参数列表。此后两个 window 共享该列表，直到其中一个用
+|:arglocal| 或 |:argglobal| 改用另一个参数列表。
+
+
+使用参数列表
+
+						*:argdo*
+:[range]argdo[!] {cmd}	对参数列表中的每个文件执行 {cmd}；如果指定了 [range]，
+			则只对该范围内的参数执行。它的效果相当于依次执行： >
+				:rewind
+				:{cmd}
+				:next
+				:{cmd}
+				etc.
+<			当当前文件无法被 |abandon| 且没有给出 [!] 时，该命令
+			失败。
+			在某个文件上检测到错误后，参数列表中后续文件不会再被
+			访问。
+			参数列表中的最后一个文件（或发生错误的位置）成为当前
+			文件。
+			{cmd} 可以包含 '|' 以连接多条命令。
+			{cmd} 不得改变参数列表。
+			注意：此命令执行期间，Syntax 自动命令事件会被禁用（通过
+			把它加入 'eventignore'）。这会显著加快编辑各个文件的
+			速度。
+			另见 |:windo|、|:tabdo|、|:bufdo|、|:cdo|、|:ldo|、
+			|:cfdo| 和 |:lfdo|。
+
+示例： >
+	:args *.c
+	:argdo set ff=unix | update
+这会把 'fileformat' 选项设为 "unix"，并在文件现在已被改动时写出它。这对所有 `*.c`
+文件都会执行。
+
+示例： >
+	:args *.[ch]
+	:argdo %s/\<my_foo\>/My_Foo/ge | update
+这会把所有 "*.c" 和 "*.h" 文件中的单词 "my_foo" 改为 "My_Foo"。"e" 标志用于
+":substitute" 命令，以避免在未使用 "my_foo" 的文件上报错。":update" 只在有改动时
+写出文件。
+
+==============================================================================
+4. 写出					*writing* *save-file*
+
+注意：当 'write' 选项关闭时，你无法写出任何文件。
+
+							*:w* *:write*
+					*E502* *E503* *E504* *E505*
+					*E512* *E514* *E667* *E949*
+:w[rite] [++opt]	把整个 buffer 写入当前文件。这是保存对文件所做改动的常规
+			方式。当设置了 'readonly'，或存在其他无法写出的原因（例如
+			父目录不存在，可用 |++p| 避免）时，会失败。
+			关于 ++opt 见 |++opt|，但只有 ++p、++bin、++nobin、++ff
+			和 ++enc 有效。
+
+
+:w[rite]! [++opt]	类似 ":write"，但当设置了 'readonly' 或存在其他导致
+			写出被拒的原因时强制写出。
+			注意：这可能改变该文件的权限与属主，并破坏（符号）链接。
+			在 'cpoptions' 中加入 'W' 标志可避免这一点。
+
+:[range]w[rite][!] [++opt]
+			把指定的行写入当前文件。这不常见，因为该文件将不会含有
+			buffer 中的所有行。
+
+							*:w_f* *:write_f*
+:[range]w[rite] [++opt]	{file}
+			把指定的行写入 {file}，除非它已存在且 'writeany' 选项
+			关闭。
+
+							*:w!*
+:[range]w[rite]! [++opt] {file}
+			把指定的行写入 {file}。覆盖已存在的文件。
+
+						*:w_a* *:write_a* *E494*
+:[range]w[rite][!] [++opt] >>
+			把指定的行追加到当前文件。
+
+:[range]w[rite][!] [++opt] >> {file}
+			把指定的行追加到 {file}。即使文件不存在，'!' 也会强制
+			写出。
+
+							*:w_c* *:write_c*
+:[range]w[rite] [++opt] !{cmd}
+			以 [range] 范围内的行作为标准输入执行 {cmd}（注意 '!'
+			前面的空格）。{cmd} 像 ":!{cmd}" 那样执行，任何 '!' 都会
+			被替换为先前那条命令 |:!|。
+
+":w" 命令的默认 [range] 是整个 buffer（1,$）。|'[| 和 |']| 标记会被设为写出命令所用
+的 [range]。如果你写出整个 buffer，它就不再被视为已改动。当你用 ":w somefile" 把它
+写到另一个文件时，这取决于 'cpoptions' 中的 "+" 标志。含有该标志时，写出命令会重置
+'modified' 标志，即使 buffer 本身可能仍与其文件不同。
+
+如果给 ":w" 一个文件名，该文件会成为替换文件。例如，当写出失败、你想稍后用 ":w #"
+重试时就可以用到它。可以从 'cpoptions' 选项中移除 'A' 标志来关闭这一行为。
+
+注意 'fsync' 选项在这里有影响。如果它被设置，可能会使写出
+变慢（但更安全）。
+
+							*:sav* *:saveas*
+:sav[eas][!] [++opt] {file}
+			把当前 buffer 以 {file} 为名保存，并把当前 buffer 的
+			文件名设为 {file}。先前的名称被用作替换文件名。
+			要覆盖已存在的文件，需要 [!]。
+			当 'filetype' 为空时，会在写出文件之前用新名称做文件
+			类型探测。
+			写出成功后会重置 'readonly'。
+
+							*:up* *:update*
+:[range]up[date][!] [++opt] [>>] [file]
+			类似 ":write"，但只在 buffer 已被改动时写出，或当该
+			buffer 代表一个磁盘上尚不存在的新文件时写出。
+
+
+写出多个 buffer				*buffer-write*
+
+							*:wa* *:wall*
+:wa[ll]	[++opt]		写出所有已改动的 buffer。没有文件名的 buffer 会导致
+			错误消息。只读的 buffer 不会被写出。
+			关于 ++opt 见 |++opt|，但只有 ++p 有效，且作用于每个
+			被写出的文件。
+
+:wa[ll]! [++opt]	写出所有已改动的 buffer，即使是只读的那些。没有文件名
+			的 buffer 不会被写出，并会导致错误消息。
+
+
+如果你试图覆盖一个已在别处被改动的文件（除非使用了 "!"），Vim 会警告你。见
+|timestamp|。
+
+			    *backup* *E207* *E506* *E507* *E508* *E509* *E510*
+如果你在 'backup'、'writebackup' 或 'patchmode' 选项打开时写入一个已存在的文件
+（但不追加），原始文件的备份会被创建。该文件要么被复制，要么被重命名（见
+'backupcopy'）。在文件被成功写出之后，且 'writebackup' 选项打开而 'backup' 选项
+关闭时，备份文件会被删除。当 'patchmode' 选项打开时，备份文件可能被重命名。
+
+							*backup-table*
+'backup' 'writebackup'	动作	~
+   off	     off	不创建备份
+   off	     on		备份当前文件，之后删除（默认）
+   on	     off	删除旧备份，备份当前文件
+   on	     on		删除旧备份，备份当前文件
+
+当 'backupskip' 模式与所写出文件的名称匹配时，不会创建备份文件。此时会忽略 'backup'
+和 'writebackup' 的值。
+
+当 'backup' 选项打开时，旧的备份文件（与新备份文件同名）会被删除。如果未设置
+'backup' 但设置了 'writebackup'，已存在的备份文件不会被删除。在写出文件期间所创建的
+备份文件会有不同的名称。
+
+在某些文件系统上，崩溃时你有可能同时丢失备份和新写出的文件（它可能存在，但含有伪造
+数据）。此时请尝试恢复，因为交换文件已同步到磁盘，可能仍然存在。|:recover|
+
+'backupdir' 选项给出的目录用于存放备份文件。（默认：与被写出文件相同的目录。）
+
+备份是一个新文件（即原始文件的副本），还是被重命名的原始文件，取决于 'backupcopy'
+选项。何时复制、何时重命名的说明见该选项。
+
+如果备份文件的创建失败，则不会执行写出。如果你无论如何都想写出，请在命令中加 '!'。
+
+							*file-watcher*
+当你发现某些程序有问题——它们会在 buffer 被写出时采取动作（例如 inotify、entr 或
+fswatch），或当外部应用执行 Vim 来编辑文件（例如 git），而这些程序似乎没有察觉到原始
+文件已被改动时，你可以考虑把 'backupcopy' 选项的值改为 "yes"。这会确保 Vim 写入那些
+监视程序所期望的同一个文件，而不会创建一个新文件（创建新文件会使它们无法检测到该文件
+已被改动）。另见 |crontab|
+
+							*write-permissions*
+写出新文件时权限是读写。在 unix 上掩码为 0o666 并额外应用 umask。写出一个此前被读入
+的文件时，Vim 会保留其权限，但会清除 s 位。
+
+							*write-readonly*
+当 'cpoptions' 选项含有 'W' 时，Vim 会拒绝覆盖只读文件。不含 'W' 时，":w!" 会在系统
+允许的情况下覆盖只读文件（该目录必须可写）。
+
+							*write-fail*
+如果新文件的写出失败，你必须小心不要同时丢失你的改动_和_原始文件。如果没有备份文件而
+新文件又写出失败，你就已经丢失了原始文件！在写出文件之前不要退出 Vim！如果做了备份，
+它会被放回原始文件的位置（如果可能）。如果你退出 Vim 并丢失了所做的改动，原始文件多半
+仍然在那里。如果放回原始文件失败，会有错误消息告诉你已丢失原始文件。
+
+						*DOS-format-write*
+如果 'fileformat' 为 "dos"，则 <EOL> 使用 <CR><NL>。这是 Windows 上的默认值。在其他
+系统上会显示消息 "[dos]"，以提醒你使用了不寻常的 <EOL>。
+						*Unix-format-write*
+如果 'fileformat' 为 "unix"，则 <EOL> 使用 <NL>。在 Windows 上会显示消息 "[unix]"。
+						*Mac-format-write*
+如果 'fileformat' 为 "mac"，则 <EOL> 使用 <CR>。会显示消息 "[mac]"。
+
+另见 |file-formats| 以及 'fileformat' 和 'fileformats' 选项。
+
+						*ACL*
+ACL 代表访问控制列表（Access Control List）。它是控制文件访问权限的一种高级方式。
+它用于新的 MS-Windows 和 Unix 系统，但仅当文件系统支持它时。
+   Vim 会在写出文件时尝试保留 ACL 信息。备份文件会获得原始文件的 ACL 信息。
+   ACL 信息也用于检查文件是否只读（在打开文件时）。
+
+					*xattr* *E1506* *E1508* *E1509*
+xattr 代表扩展属性（Extended Attributes）。它是在文件系统的文件中随文件一起保存元数据
+的一种高级方式。它取决于实际使用的文件系统，Vim 只在 Linux 系统上支持它。
+   Vim 会在写出文件时尝试保留扩展属性信息。备份文件会获得原始文件的扩展属性。
+
+						*read-only-share*
+当 MS-Windows 在网络上共享一个驱动器时，它可以被标记为只读。这意味着即使文件的只读
+属性不存在，且 NT 网络共享驱动器上的 ACL 设置允许写入该文件，你仍然无法写入它。Win32
+平台上的 Vim 会检测只读网络驱动器，并把该文件标记为只读。你无法用 |:write| 覆盖它。
+
+						*write-device*
+当文件名实际上是设备名时，Vim 不会创建备份（那是不可能的）。由于该设备已存在，你需要
+使用 "!"。
+Unix 示例： >
+	:w! /dev/lpt0
+以及 MS-Windows： >
+	:w! lpt0
+在 Unix 上，当名称并未指向普通文件或目录时即被检测为设备。fifo 或命名管道在 Vim 看来
+也像设备。
+在 MS-Windows 上，设备按其名称检测：
+	CON
+	CLOCK$
+	NUL
+	PRN
+	COMn	n=1,2,3... 等等
+	LPTn	n=1,2,3... 等等
+这些名称可以是大写或小写。
+
+==============================================================================
+5. 写出与退出					*write-quit*
+
+							*:q* *:quit*
+:q[uit]			退出当前 window。如果这是最后一个 |edit-window|，则退出
+			Vim。如果已有改动且 Vim 拒绝 |abandon| 当前 buffer，
+			或参数列表中最后一个文件尚未被编辑，这会失败。
+			如果还有其他标签页，而退出的是当前 |tabpage| 中的最后
+			一个 window，则关闭当前标签页。
+			会触发 |QuitPre| 自动命令事件。
+			关于退出另一个 window 见 |CTRL-W_q|。
+
+:conf[irm] q[uit]	退出，但当已有改动，或参数列表中最后一个文件尚未被
+			编辑时会给出提示。见 |:confirm| 和 'confirm'。
+
+:q[uit]!		不写出而退出，即使当前 buffer 有改动。该 buffer 会被
+			卸载，即使它设置了 'hidden'。
+			如果这是最后一个 window，且存在已改动的隐藏 buffer，则
+			当前 buffer 被放弃，第一个已改动的隐藏 buffer 成为当前
+			buffer。
+			要总是退出，请使用 ":qall!"。
+
+:cq[uit]		总是不写出而退出，并返回错误码。见 |:cq|。
+
+							*:wq*
+:wq [++opt]		写出当前文件并关闭 window。如果这是最后一个
+			|edit-window|，Vim 退出。
+			当文件只读或 buffer 没有名称时写出失败。当参数列表中
+			最后一个文件尚未被编辑时退出失败。
+
+:wq! [++opt]		写出当前文件并关闭 window。如果这是最后一个
+			|edit-window|，Vim 退出。当当前 buffer 没有名称时写出
+			失败。
+
+:wq [++opt] {file}	写入 {file} 并关闭 window。如果这是最后一个
+			|edit-window|，Vim 退出。当参数列表中最后一个文件尚未
+			被编辑时退出失败。
+
+:wq! [++opt] {file}	写入 {file} 并关闭当前 window。如果这是最后一个
+			|edit-window|，退出 Vim。
+
+:[range]wq[!] [++opt] [file]
+			与上面相同，但只写出 [range] 范围内的行。
+
+							*:x* *:xit*
+:[range]x[it][!] [++opt] [file]
+			类似 ":wq"，但只在有改动时才写出。
+			当设置了 'hidden' 且有多个 window 时，当前 buffer 会在写出
+			文件之后变为隐藏。
+
+							*:exi* *:exit*
+:[range]exi[t][!] [++opt] [file]
+			与 :xit 相同。
+
+							*ZZ*
+ZZ			如果已改动，则写出当前文件，并关闭当前 window（与 ":x"
+			相同）。
+			如果当前文件有多个 window，只关闭当前 window。
+
+							*ZQ*
+ZQ			不检查改动而退出（与 ":q!" 相同）。
+
+							*ZR*
+[count]ZR		执行 |:restart|。如果给出的 [count] 为 [1-8]，则不恢复
+			会话（":restart! +qall"）。如果给出的 [count] 为 9，则
+			在不恢复会话、也不检查改动的情况下重启
+			（":restart! +qall!"）。
+
+多个 WINDOW 与 BUFFER				*window-exit*
+
+							*:qa* *:qall*
+:qa[ll]		退出 Vim，除非有些 buffer 已被改动。（用 ":bmod" 转到下一个
+		已改动的 buffer）。
+		当设置了 'autowriteall' 时，所有已改动的 buffer 都会被写出，
+		如同 |:wqall|。
+
+:conf[irm] qa[ll]
+		退出 Vim。当某些 buffer 已被改动时给出提示。见 |:confirm|。
+
+:qa[ll]!	退出 Vim。对 buffer 的任何改动都会丢失。
+		另见 |:cquit|，它做同样的事但以非零值退出。
+
+							*:quita* *:quitall*
+:quita[ll][!]	与 ":qall" 相同。
+
+:wqa[ll] [++opt]				*:wqa* *:wqall* *:xa* *:xall*
+:xa[ll]		写出所有已改动的 buffer 并退出 Vim。如果存在没有文件名、
+		只读或因其他原因无法写出的 buffer，Vim 不会退出。
+
+:conf[irm] wqa[ll] [++opt]
+:conf[irm] xa[ll]
+		写出所有已改动的 buffer 并退出 Vim。当某些 buffer 只读或因
+		其他原因无法写出时给出提示。见 |:confirm|。
+
+:wqa[ll]! [++opt]
+:xa[ll]!	写出所有已改动的 buffer，即使是只读的那些，并退出 Vim。
+		如果存在没有文件名或因其他原因无法写出的 buffer，Vim 不会
+		退出。
+
+==============================================================================
+6. 对话框					*edit-dialogs*
+
+							*:confirm* *:conf*
+:conf[irm] {command}	执行 {command}，并在某个操作需要确认时使用对话框。可用于
+			|:edit|、|:restart|、|:q|、|:qa| 和 |:w| 命令
+			（后者用于覆盖只读设置），以及任何可能因未保存改动而失败
+			的命令，例如 |:only|、|:buffer|、|:bdelete| 等。
+
+示例： >
+  :confirm w foo
+<	当 "foo" 已存在时会请求确认。 >
+  :confirm q
+<	当存在改动时会请求确认。 >
+  :confirm qa
+<	如果存在任何已改动、未保存的 buffer，会逐一提示你保存或放弃。
+	也有"全部保存"和"全部放弃"的选项。
+
+如果你想总是使用 ":confirm"，请设置 'confirm' 选项。
+
+					*:browse* *:bro* *E338* *E614* *E615* *E616*
+:bro[wse] {command}	为 {command} 的一个参数打开文件选择对话框。目前这对
+			|:e|、|:w|、|:wall|、|:wq|、|:wqall|、|:x|、
+			|:xall|、|:exit|、|:view|、|:sview|、|:r|、
+			|:saveas|、|:sp|、|:mkexrc|、|:mkvimrc|、
+			|:mksession|、|:mkview|、|:split|、|:vsplit|、
+			|:tabe|、|:tabnew|、|:cfile|、|:cgetfile|、
+			|:caddfile|、|:lfile|、|:lgetfile|、|:laddfile|、
+			|:diffsplit|、|:diffpatch|、|:pedit|、|:redir|、
+			|:source|、|:update|、|:visual|、|:vsplit|，以及
+			在设置了 'confirm' 时的 |:qall| 有效。
+			注意：仅在 Win32 GUI 中；在控制台中，如果存在
+			FileExplorer 自动命令组，`:browse edit` 可以工作。
+			无法使用 ":browse" 时你会得到一条错误消息。如果
+			{command} 不支持浏览，则该 {command} 会在没有对话框的
+			情况下执行。
+			":browse set" 的行为类似 |:options|。
+			关于 ":browse oldfiles" 另见 |:oldfiles|。
+
+语法最好通过几个示例来展示： >
+	:browse e $vim/foo
+<		在 $vim/foo 目录中打开浏览器，并编辑所选的文件。 >
+	:browse e
+<		在用 'browsedir' 指定的目录中打开浏览器，并编辑所选
+		的文件。 >
+	:browse w
+<		在当前 buffer 所在目录中打开浏览器，默认使用当前 buffer
+		的文件名，并把 buffer 以所选的文件名保存。 >
+	:browse w C:/bar
+<		在 C:/bar 目录中打开浏览器，默认使用当前 buffer 的文件
+		名，并把 buffer 以所选的文件名保存。
+另见 'browsedir' 选项。
+对于不支持浏览的 Vim 版本，该命令会被原样执行。
+
+							*browsefilter*
+对于 MS-Windows，你可以修改浏览对话框中所用的过滤器。通过设置 g:browsefilter 或
+b:browsefilter 变量，你可以全局地或按 buffer 局部地更改这些过滤器。该变量被设为一个
+格式为 "{filter label}\t{pattern};{pattern}\n" 的字符串，其中 "{filter label}" 是
+出现在 "Files of Type" 组合框中的文本，{pattern} 是用于过滤文件名的模式。可以给出多个
+模式，
+用 ';' 分隔。
+
+例如，要让对话框中只出现 Vim 文件，你可以使用下面这条命令： >
+
+     let g:browsefilter = "Vim scripts\t*.vim\nVim Startup Files\t*vimrc\n"
+
+你也可以通过设置 b:browsefilter 变量按 buffer 覆盖过滤器设置。你多半会在文件类型插件中
+设置 b:browsefilter，以便浏览对话框中含有与你当前正在编辑的文件类型相关的条目。
+缺点：这会使开始编辑另一类型的文件变得困难。要克服这一点，你可以在 Windows 上把下面
+内容作为最后一个过滤器加入： >
+
+	All Files\t(*.*)\t*\n
+<或者在其他平台上加入下面内容，以便用户仍能访问任何想要的文件： >
+
+	All Files\t(*)\t*\n
+<
+
+要避免在 Vim 实际并不支持 browsefilter 时设置它，你可以使用 has("browsefilter")： >
+
+	if has("browsefilter")
+	   let g:browsefilter = "whatever"
+	endif
+
+==============================================================================
+7. 当前目录				*current-directory*
+
+你可以用 |:cd|、|:tcd| 和 |:lcd| 切换到另一个目录，这样你就不必在文件名前面输入该
+目录名。这对执行外部命令也有影响，例如 ":!ls" 或 ":te ls"。
+
+当前目录有三种"作用域"：全局、标签页和 window。window 局部的当前工作目录优先于标签页局部的
+当前工作目录，而后者又优先于全局当前工作目录。如果某个局部工作目录（标签页或 window）不
+存在，则适用层级中下一较高的作用域。
+
+							*:cd* *E747* *E472*
+:cd[!]			在非 Unix 系统上、'cdhome' 关闭时：打印当前目录名。
+			其他情况：把当前目录切换到主目录。清除任何 window 局部
+			目录。
+			在所有这些系统上，都可以用 |:pwd| 打印当前目录。
+
+:cd[!] {path}		把当前目录切换到 {path}。
+			如果 {path} 是相对路径，则会在 'cdpath' 所列的目录中
+			搜索它。
+			清除任何 window 局部目录。
+			不改变已打开文件的含义，因为它的完整路径名已被记住。
+			不过来自 |arglist| 的文件可能改变！
+			在 MS-Windows 上这也会切换活动驱动器。
+			要切换到当前文件所在目录： >
+				:cd %:h
+<
+							*:cd-* *E186*
+:cd[!] -		切换到上一个当前目录（在上一条 ":cd {path}" 命令
+			之前）。
+
+							*:chd* *:chdir*
+:chd[ir][!] [path]	与 |:cd| 相同。
+
+							*:tc* *:tcd*
+:tc[d][!] {path}	类似 |:cd|，但只为当前标签页设置目录。当前 window 也会
+			使用该目录。其他标签页中的 window，以及当前标签页中拥有
+			自己 window 局部目录的 window，其当前目录不变。
+
+							*:tcd-*
+:tc[d][!] -		切换到上一个当前目录（在上一条 ":tcd {path}" 命令
+			之前）。
+
+							*:tch* *:tchdir*
+:tch[dir][!]		与 |:tcd| 相同。
+
+							*:lc* *:lcd*
+:lc[d][!] {path}	类似 |:cd|，但只为当前 window 设置当前目录。其他 window 或
+			标签页的当前目录不变。
+
+							*:lch* *:lchdir*
+:lch[dir][!]		与 |:lcd| 相同。
+
+							*:lcd-*
+:lc[d][!] -		切换到上一个当前目录（在上一条 ":lcd {path}" 命令
+			之前）。
+
+							*:pw* *:pwd* *E187*
+:pw[d]			打印当前目录名。
+			另见 |getcwd()|。
+							*:pwd-verbose*
+			当 'verbose' 非零时，|:pwd| 还会显示当前目录是在哪个
+			作用域中设置的。示例： >
+
+				" Set by :cd
+				:verbose pwd
+				[global] /path/to/current
+
+				" Set by :lcd
+				:verbose pwd
+				[window] /path/to/current
+
+				" Set by :tcd
+				:verbose pwd
+				[tabpage] /path/to/current
+
+只要没有用过 |:lcd| 或 |:tcd| 命令，所有 window 就共享同一个当前目录。用命令跳到另一个
+window 不会改变当前目录的任何情况。
+
+当某个 window 用过 |:lcd| 时，所指定的目录成为该 window 的当前目录。未用过 |:lcd| 命令的 window
+沿用全局或标签页局部的目录。跳到另一个 window 时，当前目录会改为最后指定的局部当前目录。
+如果从未指定过，则使用全局或标签页局部的目录。创建新 window 时，它继承当前 window 的局部目录。
+
+切换标签页时行为相同。如果当前标签页没有局部工作目录，则使用全局工作目录。
+
+使用 |:cd| 命令时，当前 window 和标签页会失去它们的局部当前目录，此后使用全局当前目录。
+使用 |:tcd| 命令时，只有当前 window 会失去其局部工作目录。
+
+使用 |:cd| 之后，读写文件将使用完整路径名。在某些网络文件系统上这可能导致问题。使用
+完整路径名的结果是，当前正在使用的文件名仍会指向同一个文件。示例：如果你有文件 a:test
+和目录 a:vim，命令 ":e test"、":cd vim"、":w" 会覆盖文件 a:test，而不会写入
+a:vim/test。但如果你执行 ":w test"，则会写入文件 a:vim/test，因为你给了一个新文件名，
+并没有引用 ":cd" 之前的文件名。
+
+==============================================================================
+8. 编辑二进制文件				*edit-binary*
+
+尽管 Vim 是为编辑文本文件而做的，但也可以编辑二进制文件。|-b| 这个 Vim 参数（b 代表
+binary）让 Vim 以二进制模式做文件 I/O，并为编辑二进制文件设置一些选项（'binary' 打开、
+'textwidth' 设为 0、'modeline' 关闭、'expandtab' 关闭）。设置 'binary' 选项有同样的
+效果。别忘了在读入文件_之前_就这样做。
+
+编辑二进制文件时有几件事要记住：
+- 编辑可执行文件时字节数不能改变。只用 "R" 或 "r" 命令修改文本。不要用 "x" 或退格
+  删除字符。
+- 把 'textwidth' 选项设为 0。否则行会被意外地一分为二。
+- 当 <EOL> 不多时，行会变得很长。如果你想编辑一行放不进屏幕的内容，请重置 'wrap'
+  选项。此时会使用水平滚动。如果某行变得太长（见 |limits|），你就无法编辑该行。读入
+  文件时该行会被分割。读入文件时也可能出现"内存不足"错误。
+- 确保在加载文件_之前_已设置 'binary' 选项。否则 <CR><NL> 和 <NL> 都会被视为行尾，
+  并且在写出文件时 <NL> 会被替换为 <CR><NL>。
+- <Nul> 字符在屏幕上显示为 ^@。你可以用 "CTRL-V CTRL-@" 或 "CTRL-V 000" 输入它们。
+- 要在文件中插入一个 <NL> 字符，请分割一行。把 buffer 写入文件时，会为 <EOL> 写出
+  一个 <NL>。
+- Vim 通常会在文件末尾没有 <EOL> 时追加一个。设置 'binary' 选项可阻止这一点。如果你
+  想加上最后的 <EOL>，请设置 'endofline' 选项。你也可以读取该选项的值来判断最后一行
+  是否原本有 <EOL>（你无法在文本中看到这一点）。
+
+==============================================================================
+9. 加密						*encryption*
+
+					                *:X* *E817* *E818* *E819* *E820*
+对编辑加密文件的支持已被移除。
+	https://github.com/neovim/neovim/issues/694
+	https://github.com/neovim/neovim/issues/701
+
+==============================================================================
+10. 时间戳					*timestamp* *timestamps*
+
+当你开始编辑一个文件时，Vim 会记住该文件的修改时间戳、模式和大小。这用于避免你同时拥有
+同一个文件的两个不同版本（而你并不知情）。
+
+运行 shell 命令之后（|:!cmd| |suspend| |:read!| |K|），会比较某个 window 中所有 buffer 的
+时间戳、文件模式和文件大小。Vim 会对任何已改变的文件运行相关的 |FileChangedShell|
+自动命令，或显示警告。在 GUI 中，这会在 Vim 重新获得输入焦点时发生。
+
+							*E321* *E462*
+如果你想在文件于 Vim 之外被改动时自动重新加载它，请设置 'autoread' 选项。不过在你写出
+文件的那一刻它不起作用，只在文件并未在 Vim 内部被改动时才起作用。
+							*ignore-timestamp*
+如果你不想被询问，也不想自动重新加载文件，可以使用： >
+	set buftype=nofile
+
+或者，从 shell 启动 gvim 时： >
+	gvim file.log -c "set buftype=nofile"
+
+注意，如果定义了 FileChangedShell 自动命令，你就不会得到警告消息或提示。该自动命令
+应当自行处理。
+
+对目录不会有警告。但如果你是开始编辑一个新文件、而它后来被创建为目录，你会收到警告。
+
+当 Vim 注意到某个文件的时间戳已改变，而该文件正在某个 buffer 中被编辑但并未改变时，
+Vim 会检查该文件的内容是否相同。做法是重新读入该文件（读入一个隐藏 buffer，随后立即
+再次删除）并比较文本。如果文本相同，你不会收到警告。
+
+如果你被警告得不够频繁，可以使用下面这条命令。
+
+							*:checkt* *:checktime*
+:checkt[ime]		检查是否有 buffer 在 Vim 之外被改动。如果最终会出现同一个
+			文件的两个版本，这会检查并警告你。
+			如果这是从自动命令中调用、从 ":global" 命令中调用，或
+			不是手工输入的，则实际检查会推迟到副作用（重新加载
+			文件）无害的时刻。
+			会检查每个已加载 buffer 所关联的文件是否被改动。如果
+			文件已被改动，Vim 会采取行动。如果 buffer 中没有改动且
+			设置了 'autoread'，则该 buffer 会被重新加载。否则会
+			让你选择是否重新加载该文件。如果该文件已被删除，你会
+			得到错误消息。
+			如果该文件之前不存在而现在存在了，你会收到警告。
+			一旦某个文件被检查过，时间戳就会被重置，你不会再被警告。
+			语法高亮、标记、差异状态、'fileencoding'、'fileformat'
+			和 'binary' 选项不会被改变。关于也重新加载这些内容
+			（例如代码格式化工具改动了文件时），见 |v:fcs_choice|。
+
+:[N]checkt[ime] {filename}
+:[N]checkt[ime] [N]
+			检查特定 buffer 的时间戳。该 buffer 可以用名称、编号或
+			模式指定。
+
+
+							*E813* *E814*
+如果你选择重新加载，Vim 会重新加载该 buffer。如果存在含有该 buffer 的可见 window，重新
+加载会在该 window 的上下文中进行。否则会使用一个特殊 window，以便大多数自动命令能正常工作。
+你无法关闭这个 window。另外还有几项限制。最好是确保当前 buffer 之外不发生任何事情。例如，
+设置 window 局部选项可能落到错误的 window 中。把 window 分割开、在那里做点什么再关闭它应当没问题
+（前提是其他自动命令没有副作用）。关闭无关的 window 和 buffer 会让你陷入麻烦。
+
+在写出文件之前会检查时间戳（除非使用了 "!"）。如果它已改变，Vim 会询问你是否真的想
+覆盖该文件：
+
+	WARNING: The file has been changed since reading it!!!
+	Do you really want to write to it (y/n)?
+
+如果你按 'y'，Vim 会继续写出该文件。如果你按 'n'，写出会被中止。如果你用的是 ":wq"
+或 "ZZ"，Vim 不会退出，你会再得到一次写出该文件的机会。
+
+该消息通常意味着在编辑会话开始之后有人写入了该文件。这可能是另一个人，此时你多半想检查
+你对文件的改动与对方的改动是否应当合并。请把文件写到另一个名称下并检查差异（可以用
+"diff" 程序来做这件事）。
+
+也可能是你自己从另一个编辑会话或用另一条命令（例如过滤器命令）修改了该文件。此时你就
+知道自己想保留哪个版本。
+
+时间检查的精度取决于文件系统。在 Unix 上它通常精确到亚秒。在旧文件系统和 MS-Windows
+上通常是一秒。用 `has('nanotime')` 检查是否可用亚秒级时间戳检查。
+
+有一种情况你会收到消息但其实什么都没错：在 Win32 系统上夏令时开始的那一天。Win32 库中
+有些东西会让 Vim 对小时差产生混淆。这个问题第二天就消失。
+
+==============================================================================
+11. 文件搜索					*file-searching*
+
+文件搜索目前用于 'path'、'cdpath' 和 'tags' 选项，以及 |finddir()| 和 |findfile()|。
+其他命令使用 |wildcards|，略有不同。
+
+有三种不同的搜索类型：
+
+1) 向下搜索：					*starstar*
+   向下搜索使用通配符 "*"、"**"，以及你的操作系统可能支持的其他通配符。"*" 和 "**"
+   由 Vim 内部处理，因此它们在所有操作系统上都能工作。注意 "**" 只有在名称开头时才
+   作为特殊通配符起作用。
+
+   "*" 的用法很简单：它匹配 0 个或多个字符。在搜索模式中这相当于 `.*`。注意文件名
+   搜索中不使用 "."。
+
+   "**" 更为精细：
+      - 它_只_匹配目录。
+      - 默认最多向下匹配 30 层目录，因此你可以用它搜索整棵目录树
+      - 最大匹配层数可以通过在 "**" 后追加数字给出。
+	因此 '/usr/**2' 可以匹配： >
+		/usr
+		/usr/include
+		/usr/include/sys
+		/usr/include/g++
+		/usr/lib
+		/usr/lib/X11
+		....
+<	它_不_匹配 '/usr/include/g++/std'，因为那将是三层。
+	允许的数字范围是 0（"**0" 会被移除）到 100
+	如果给定的数字小于 0，则默认为 30；如果大于 100，则使用 100。系统
+	对路径长度也有限制，通常是 256 或 1024 字节。
+      - "**" 只能位于路径末尾，或后面跟路径分隔符，或跟一个数字加路径分隔符。
+
+   你可以按任意顺序组合 "*" 和 "**"： >
+	/usr/**/sys/*
+	/usr/*tory/sys/**
+	/usr/**2/sys/*
+
+2) 向上搜索：
+   这里你可以给出一个目录，然后在该目录树上向上搜索一个文件。你可以给出停止目录来限制
+   向上搜索。停止目录以 ';' 追加到路径（对 'path' 选项）或文件名（对 'tags' 选项）
+   之后。如果你想给出多个停止目录，请用 ';' 分隔。如果你不想有停止目录（"一直向上
+   搜索到根目录"），只需用 ';'。 >
+	/usr/include/sys;/usr
+<   会在下列位置搜索： >
+	   /usr/include/sys
+	   /usr/include
+	   /usr
+<
+   如果你使用相对路径，向上搜索会从 Vim 的当前目录开始，或从当前文件所在目录开始
+   （如果该相对路径以 './' 开头，且 'cpoptions' 中不含 'd'）。
+
+   如果 Vim 的当前路径是 /u/user_x/work/release，而你执行 >
+	:set path=include;/u/user_x
+<   然后用 |gf| 搜索一个文件，则会在下列位置搜索该文件： >
+	/u/user_x/work/release/include
+	/u/user_x/work/include
+	/u/user_x/include
+
+<   注意：如果你的 'path' 设置包含一个不存在的目录，Vim 会跳过该不存在的目录；如果
+   使用向上搜索，它也不会在该不存在目录的父目录中搜索。
+
+3) 组合的向上/向下搜索：
+   如果 Vim 的当前路径是 /u/user_x/work/release，而你执行 >
+	set path=**;/u/user_x
+<   然后用 |gf| 搜索一个文件，则会在下列位置搜索该文件： >
+	/u/user_x/work/release/**
+	/u/user_x/work/**
+	/u/user_x/**
+<
+   小心！这可能消耗大量时间，因为对 '/u/user_x/**' 的搜索包含
+   '/u/user_x/work/**' 和 '/u/user_x/work/release/**'。因此
+   '/u/user_x/work/release/**' 会被搜索三次，'/u/user_x/work/**' 会被搜索两次。
+
+   在上面的示例中，你可能想把 path 设为： >
+	:set path=**,/u/user_x/**
+<   这会搜索： >
+	/u/user_x/work/release/**
+	/u/user_x/**
+<   这会搜索同样的目录，但顺序不同。
+
+   注意 ":find"、":sfind" 和 ":tabfind" 命令的补全目前对含有 URL、或使用带深度限制的
+   双星（/usr/**2）、或使用向上搜索（;）记法的 'path' 项不起作用。
+
+==============================================================================
+12. 受信任文件						*trust*
+
+如果启用了 'exrc'，Nvim 会执行文件系统上发现的任意代码。为防止执行恶意代码，只有
+"受信任文件"会被执行。你可以用 |:trust| 命令或 |vim.secure.read()| 函数把文件标记为
+受信任或不受信任。
+
+							*:trust* *E5570*
+:trust [++deny] [++remove] [file]
+
+			管理受信任文件。不带 ++ 选项时，:trust 会把当前 buffer
+			（或 [file]，但请见下面的警告）标记为受信任，以
+			其内容的哈希为键。该受信任列表存储在磁盘上，Nvim
+			重启后会复用它。
+
+			警告：`:trust [file]` 存在 TOCTOU 风险，因此出于安全
+			考虑，你应当先查看该文件、检查其内容，然后运行
+			`:trust`（不带 [file] 参数）。
+
+			[++deny] 会把当前 buffer 或 [file] 标记为不受信任：
+			它将永远不会被执行，'exrc' 会忽略它。
+
+			[++remove] 会把当前 buffer 或 [file] 从受信任列表中
+			移除。当 'exrc' 或 |vim.secure.read()| 发现该文件时，
+			会提示用户信任或拒绝它。
+
+ vim:tw=78:ts=8:noet:ft=help:norl:

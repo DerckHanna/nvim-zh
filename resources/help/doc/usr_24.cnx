@@ -1,0 +1,543 @@
+*usr_24.txt*	Nvim
+
+
+		     VIM USER MANUAL	by Bram Moolenaar
+
+
+			     快速插入
+
+
+输入文本时，Vim 提供各种方法来减少击键次数、避免输入错误。用插入模式补全
+重复之前输入过的单词。把长单词缩写成短的。输入键盘上没有的字符。
+
+|24.1|	修正错误
+|24.2|	显示匹配
+|24.3|	补全
+|24.4|	重复插入
+|24.5|	从另一行复制
+|24.6|	插入 register
+|24.7|	缩写
+|24.8|	输入特殊字符
+|24.9|	二合字母
+|24.10|	普通模式命令
+
+     下一章：|usr_25.txt|  编辑排版的文本
+ 上一章：|usr_23.txt|  编辑其他文件
+目录：|usr_toc.txt|
+
+==============================================================================
+*24.1*	修正错误
+
+前面已经提到过 <BS> 键。它删除光标前一个字符。<Del> 键对光标下（之后）的
+字符做同样的事。
+   当你把整个单词打错时，用 CTRL-W：
+
+	The horse had fallen to the sky ~
+				       CTRL-W
+	The horse had fallen to the ~
+
+如果你把一行彻底弄乱了想重新开始，用 CTRL-U 删除它。它会保留光标之后的文本
+和缩进。只删除从第一个非空白字符到光标之间的文本。光标在下一行 "fallen"
+的 "f" 上时按 CTRL-U 会这样：
+
+	The horse had fallen to the ~
+		      CTRL-U
+	fallen to the ~
+
+当你在前面几个单词处发现错误时，需要把光标移到那里去改正。例如你输入了：
+
+	The horse had follen to the ground ~
+
+你需要把 "follen" 改成 "fallen"。光标在行尾时，你会输入下面这些来改正： >
+
+					<Esc>4blraA
+
+<	退出插入模式			<Esc>
+	往回四个单词			     4b
+	移到 "o" 上方			       l
+	替换成 "a"			ra
+	重新开始插入模式			  A
+
+另一种做法： >
+
+		<C-Left><C-Left><C-Left><C-Left><Right><Del>a<End>
+
+<	往回四个单词		     <C-Left><C-Left><C-Left><C-Left>
+	移到 "o" 上方			<Right>
+	删除 "o"				       <Del>
+	插入一个 "a"					    a
+	移到行尾				     <End>
+
+这些用特殊键来移动，同时保持在插入模式中。这有点像你在无模式编辑器里的做法。
+它更容易记住，但更费时间（你得把手从字母键移开去按光标键，而且 <End> 键不看
+键盘很难按准）。
+   编写不离开插入模式的映射时，这些特殊键最有用。那时多打几下无所谓。
+   插入模式下可以使用的按键一览：
+
+	<C-Home>	跳到文件开头
+	<PageUp>	向上整屏
+	<Home>		跳到行首
+	<S-Left>	左移一个单词
+	<C-Left>	左移一个单词
+	<S-Right>	右移一个单词
+	<C-Right>	右移一个单词
+	<End>		跳到行尾
+	<PageDown>	向下整屏
+	<C-End>		跳到文件末尾
+
+还有几个，见 |ins-special-special|。
+
+==============================================================================
+*24.2*	显示匹配
+
+你输入 ) 时，若能看出它与哪个 ( 匹配就好了。要让 Vim 这样做，用这条命令： >
+
+	:set showmatch
+
+现在你输入 "(example)" 这样的文本，一打出 )，Vim 就会短暂地把光标移到匹配
+的 ( 上，在那儿停半秒，然后移回你正在输入的位置。
+   如果没有匹配的 (，Vim 会响铃。这样你就知道可能在某处漏了 (，或者多打了
+一个 )。
+   匹配对 [] 和 {} 也会显示。你不必等到再输入下一个字符才移回，Vim 一看到
+它就移回光标，插入照旧继续。
+   你可以用 'matchtime' 选项改变 Vim 等待的时间。例如让 Vim 等一秒半： >
+
+	:set matchtime=15
+
+时间以十分之一秒为单位。
+
+==============================================================================
+*24.3*	补全
+
+Vim 可以在插入时自动补全单词。你打出单词的开头部分，按 CTRL-P，Vim 就猜出
+其余部分。
+   例如假设你在写一个 C 程序，想要输入下面这行：
+
+	total = ch_array[0] + ch_array[1] + ch_array[2]; ~
+
+你先输入下面这些：
+
+	total = ch_array[0] + ch_ ~
+
+这时你用 CTRL-P 命令让 Vim 补全这个单词。Vim 搜索以光标前面内容开头的单词。
+这里是 "ch_"，与单词 ch_array 匹配。于是按 CTRL-P 会得到：
+
+	total = ch_array[0] + ch_array ~
+
+再多输入一点，你会得到这个（以空格结尾）：
+
+	total = ch_array[0] + ch_array[1] +  ~
+
+现在如果你按 CTRL-P，Vim 会重新搜索能补全光标前单词的单词。由于光标前面
+什么也没有，它往前找到第一个单词，是 "ch_array"。再按一次 CTRL-P 得到
+下一个匹配的单词，这里是 "total"。第三次 CTRL-P 继续往前找。如果前面没有
+别的了，编辑器就把可用的单词用完了，于是回到原来的文本，什么也没有。第四次
+CTRL-P 让编辑器从 "ch_array" 重新开始。
+
+要向前搜索，用 CTRL-N。因为搜索会在文件末尾回绕，CTRL-N 和 CTRL-P 找到的
+匹配相同，但顺序不同。提示：CTRL-N 是 Next-match（下一个匹配），CTRL-P 是
+Previous-match（上一个匹配）。
+
+Vim 编辑器费了不少功夫去找可补全的单词。默认情况下它搜索下面这些地方：
+
+	1. Current file
+	2. Files in other windows
+	3. Other loaded files (hidden buffers)
+	4. Files which are not loaded (inactive buffers)
+	5. Tag files
+	6. All files #included by the current file
+
+
+选项
+
+你可以用 'complete' 选项定制搜索顺序。
+
+会用到 'ignorecase' 选项。设置后，搜索匹配时忽略大小写差异。
+
+补全专用的一个选项是 'infercase'。在忽略大小写的情况下找匹配时很有用
+（必须设置 'ignorecase'），但它仍沿用已输入单词的大小写。因此如果你输入
+"For"，而 Vim 找到匹配 "fortunately"，结果会是 "Fortunately"。
+
+
+补全特定项目
+
+如果你知道自己要找什么，可以用这些命令按某类项目补全：
+
+	CTRL-X CTRL-F		file names
+	CTRL-X CTRL-L		whole lines
+	CTRL-X CTRL-D		macro definitions (also in included files)
+	CTRL-X CTRL-I		current and included files
+	CTRL-X CTRL-K		words from a dictionary
+	CTRL-X CTRL-R		contents from registers
+	CTRL-X CTRL-T		words from a thesaurus
+	CTRL-X CTRL-]		tags
+	CTRL-X CTRL-V		Vim command line
+
+其中每一个之后都可以用 CTRL-N 找下一个匹配，用 CTRL-P 找上一个匹配。
+   这些命令的更多信息见：|ins-completion|。
+
+补全文件名
+
+以 CTRL-X CTRL-F 为例。它会查找文件名。它扫描当前目录中的文件，并显示每一个
+与光标前单词匹配的文件。
+   例如假设当前目录里有下面这些文件：
+
+	main.c  sub_count.c  sub_done.c  sub_exit.c
+
+现在进入插入模式并开始输入：
+
+	The exit code is in the file sub ~
+
+这时你输入命令 CTRL-X CTRL-F。Vim 现在通过查看当前目录中的文件来补全当前
+单词 "sub"。第一个匹配是 sub_count.c。这不是你要的那个，所以你按 CTRL-N
+匹配下一个文件。这个匹配是 sub_done.c。再按一次 CTRL-N 就轮到 sub_exit.c。
+结果：
+
+	The exit code is in the file sub_exit.c ~
+
+如果文件名以 /（Unix）或 C:\（MS-Windows）开头，你就能在文件系统里找所有
+文件。例如输入 "/u" 再按 CTRL-X CTRL-F。这会匹配 "/usr"（这是在 Unix 上）：
+
+	the file is found in /usr/ ~
+
+如果你现在按 CTRL-N 就回到 "/u"。反之，若要接受 "/usr/" 并再往下进入一层
+目录，再按一次 CTRL-X CTRL-F：
+
+	the file is found in /usr/X11R6/ ~
+
+结果当然取决于你的文件系统里有什么。匹配按字母顺序排序。
+
+
+在源代码中补全
+
+源代码文件结构良好，这使得可以用聪明的方式补全。在 Vim 里这叫 Omni 补全。
+在另一些编辑器里它叫 intellisense，不过那是商标。
+
+Omni 补全的关键是 CTRL-X CTRL-O。显然这里的 O 代表 Omni，这样你好记一些。
+我们用编辑 C 源代码的例子： >
+
+	{
+	    struct foo *p;
+	    p->
+
+光标在 "p->" 之后。现在按 CTRL-X CTRL-O。Vim 会给你一个备选列表，就是
+"struct foo" 包含的各个成员。这与用 CTRL-P 相当不同，CTRL-P 会补全任何单词，
+而这里只有 "struct foo" 的成员是有效的。
+
+要让 Omni 补全工作，你可能需要做些设置。至少要确保启用了 filetype 插件。
+你的 vimrc 文件里应当有这么一行： >
+	filetype plugin on
+或者： >
+	filetype plugin indent on
+
+对于 C 代码，你需要创建 tags 文件并设置 'tags' 选项。这在 |ft-c-omni| 里有
+说明。对于其它文件类型你可能需要做类似的事，见下面 |compl-omni-filetypes|。
+它只对特定的文件类型有效。查看 'omnifunc' 选项的值就能知道它是否可用。
+
+==============================================================================
+*24.4*	重复插入
+
+如果你按 CTRL-A，编辑器会插入你上次处于插入模式时输入的文本。
+   例如假设你有一个文件，开头是这样： >
+
+	"file.h" ~
+	/* Main program begins */ ~
+
+你编辑这个文件，在第一行开头插入 "#include "： >
+
+	#include "file.h" ~
+	/* Main program begins */ ~
+
+你用命令 "j^" 下到下一行开头。现在你开始插入新的一行 "#include"。于是你
+输入： >
+
+	i CTRL-A
+
+结果如下： >
+
+	#include "file.h" ~
+	#include /* Main program begins */ ~
+
+插入的 "#include " 是因为 CTRL-A 插入了上一次插入的文本。现在你输入
+"main.h"<Enter> 来结束这一行： >
+
+
+	#include "file.h" ~
+	#include "main.h" ~
+	/* Main program begins */ ~
+
+CTRL-@ 命令先做一次 CTRL-A，然后退出插入模式。这是再次做完全同样插入的
+快捷方式。
+
+==============================================================================
+*24.5*	从另一行复制
+
+CTRL-Y 命令插入光标上方的那个字符。复制上一行时这很有用。例如你有这行 C
+代码：
+
+	b_array[i]->s_next = a_array[i]->s_next; ~
+
+现在你需要输入同样的一行，但用 "s_prev" 而不是 "s_next"。开始新的一行，按
+14 次 CTRL-Y，直到到达 "next" 的 "n"：
+
+	b_array[i]->s_next = a_array[i]->s_next; ~
+	b_array[i]->s_ ~
+
+现在你输入 "prev"：
+
+	b_array[i]->s_next = a_array[i]->s_next; ~
+	b_array[i]->s_prev ~
+
+继续按 CTRL-Y，直到后面那个 "next"：
+
+	b_array[i]->s_next = a_array[i]->s_next; ~
+	b_array[i]->s_prev = a_array[i]->s_ ~
+
+现在输入 "prev;" 收尾。
+
+CTRL-E 命令的作用和 CTRL-Y 一样，只是它插入光标下方的字符。
+
+==============================================================================
+*24.6*	插入 register
+
+CTRL-R {register} 命令插入 register 的内容。要避免输入很长的单词时这很有
+用。例如你需要输入这个：
+
+	r = VeryLongFunction(a) + VeryLongFunction(b) + VeryLongFunction(c) ~
+
+这个函数名定义在另一个文件里。编辑那个文件，把光标移到那里的函数名上，然后
+把它复制到 register v 里： >
+
+	"vyiw
+
+"v 是 register 名，"yiw" 是复制内部单词（yank-inner-word）。现在编辑要插入
+新行的文件，输入开头的几个字母：
+
+	r = ~
+
+现在用 CTRL-R v 插入函数名：
+
+	r = VeryLongFunction ~
+
+你继续输入函数名之间的字符，并再用两次 CTRL-R v。
+   你本来也可以用补全做同样的事。当有很多单词以相同字符开头时，用 register
+更有用。
+
+如果 register 里含有 <BS> 这类特殊字符，它们会被当作从键盘输入的那样解释。
+如果你不想这样（你确实想把 <BS> 插入到文本里），用 CTRL-R CTRL-R {register}
+命令。
+
+==============================================================================
+*24.7*	缩写
+
+缩写是一个短词，用来代替一个长词。例如 "ad" 代表 "advertisement"。Vim 让你
+输入一个缩写，然后自动为你展开它。
+   要让 Vim 每次插入 "ad" 时都把它展开成 "advertisement"，用下面这条命令： >
+
+	:iabbrev ad advertisement
+
+现在你输入 "ad" 时，整个单词 "advertisement" 会被插入到文本里。触发它的是
+输入一个不能作为单词一部分的字符，例如空格：
+
+	What Is Entered		What You See
+	I saw the a		I saw the a ~
+	I saw the ad		I saw the ad ~
+	I saw the ad<Space>	I saw the advertisement<Space> ~
+
+只输入 "ad" 时不会展开。这样你就可以输入 "add" 这样的单词，它不会被展开。
+只有完整的单词才会检查缩写。
+
+
+缩写多个单词
+
+可以定义一个展开为多个单词的缩写。例如把 "JB" 定义为 "Jack Benny"，用下面
+这条命令： >
+
+	:iabbrev JB Jack Benny
+
+作为程序员，我用两个相当不寻常的缩写： >
+
+	:iabbrev #b /****************************************
+	:iabbrev #e <Space>****************************************/
+
+它们用来创建框式注释。注释以 #b 开头，画出顶行。然后我输入注释文本，再用 #e
+画出底行。
+   注意 #e 缩写以一个空格开头。也就是说前两个字符是空格加星号。通常 Vim 会
+忽略缩写与展开内容之间的空格。为了避免这个问题，我把空格拼成七个字符：
+<, S, p, a, c, e, >。
+
+	Note:
+	":iabbrev" 打起来是个长单词。":iab" 一样好用。
+	这就是把 abbreviate 命令本身也缩写了！
+
+
+修正输入错误
+
+每次都犯同样的输入错误很常见。例如把 "the" 打成 "teh"。你可以用缩写来修正： >
+
+	:abbreviate teh the
+
+你可以加一整串这样的条目。每次发现一个常见错误就加一个。
+
+
+列出缩写
+
+":abbreviate" 命令列出缩写： >
+
+	:abbreviate
+	i  #e		  ****************************************/
+	i  #b		 /****************************************
+	i  JB		 Jack Benny
+	i  ad		 advertisement
+	!  teh		 the
+
+第一列的 "i" 表示插入模式。这些缩写只在插入模式下有效。其它可能的字符是：
+
+	c	Command-line mode			:cabbrev
+	!	both Insert and Command-line mode	:abbreviate
+
+由于缩写在命令行模式下不常用，你多半会用 ":iabbrev" 命令。例如这样可以避免
+在输入下面这样的命令时把 "ad" 展开： >
+
+	:edit ad
+
+
+删除缩写
+
+要删掉一个缩写，用 ":unabbreviate" 命令。假设你有下面这个缩写： >
+
+	:abbreviate @f fresh
+
+你可以用这条命令删除它： >
+
+	:unabbreviate @f
+
+你输入这条命令时会注意到 @f 被展开成了 "fresh"。别担心，Vim 照样能理解
+（除非你给 "fresh" 也定义了缩写，不过那不太可能）。
+   要删除所有缩写： >
+
+	:abclear
+
+":unabbreviate" 和 ":abclear" 也有插入模式的变体（":iunabbreviate" 和
+":iabclear"）以及命令行模式的变体（":cunabbreviate" 和 ":cabclear"）。
+
+
+重映射缩写
+
+定义缩写时有一件事要留神：展开后的字符串不应被映射。例如： >
+
+	:abbreviate @a adder
+	:imap dd disk-door
+
+现在你输入 @a，会得到 "adisk-doorer"。这不是你想要的。要避免这种情况，用
+":noreabbrev" 命令。它的作用和 ":abbreviate" 一样，但避免展开后的字符串被
+用于映射： >
+
+	:noreabbrev @a adder
+
+幸好，缩写的展开结果被映射的情况不太可能发生。
+
+==============================================================================
+*24.8*	输入特殊字符
+
+CTRL-V 命令用来原样插入下一个字符。也就是说，该字符有任何特殊含义都会被忽略。
+例如： >
+
+	CTRL-V <Esc>
+
+插入一个 escape 字符。这样你就不会离开插入模式。（别真的在 CTRL-V 后面打那个
+空格，它只是让这行好读一些）。
+
+	Note:
+	在 MS-Windows 上 CTRL-V 用来粘贴文本。请用 CTRL-Q 代替
+	CTRL-V。另一方面在 Unix 上，CTRL-Q 在某些终端上不起作用，
+	因为它有特殊含义。
+
+你也可以用 CTRL-V {digits} 命令插入一个十进制数为 {digits} 的字符。例如字符
+编号 127 是 <Del> 字符（但不一定是 <Del> 键！）。要插入 <Del> 请输入： >
+
+	CTRL-V 127
+
+这样最多可以输入 255 号字符。输入不足两位数字时，一个非数字字符会终止该命令。
+要避免输入非数字字符，就在前面补一个或两个零凑成三位。
+   下面这些命令都插入一个 <Tab> 再加一个点：
+
+	CTRL-V 9.
+	CTRL-V 09.
+	CTRL-V 009.
+
+要按十六进制输入字符，在 CTRL-V 后面加一个 "x"： >
+
+	CTRL-V x7f
+
+这样也最多到 255 号字符（CTRL-V xff）。你可以用 "o" 按八进制输入字符，还有
+另外两种方法可以输入 16 位和 32 位的数字（例如表示 Unicode 字符）： >
+
+	CTRL-V o123
+	CTRL-V u1234
+	CTRL-V U12345678
+
+==============================================================================
+*24.9*	二合字母
+
+有些字符不在键盘上。例如版权符号（©）。要在 Vim 里输入这些字符，你用二合
+字母（digraph），即两个字符代表一个。例如要输入一个 ©，你按三个键： >
+
+	CTRL-K Co
+
+要知道有哪些二合字母可用，用下面这条命令： >
+
+	:digraphs
+
+Vim 会显示二合字母表。下面是其中三行：
+
+  AC ~_ 159  NS |  160  !I ¡  161  Ct ¢  162  Pd £  163  Cu ¤  164  Ye ¥  165 ~
+  BB ¦  166  SE §  167  ': ¨  168  Co ©  169  -a ª  170  << «  171  NO ¬  172 ~
+  -- ­  173  Rg ®  174  'm ¯  175  DG °  176  +- ±  177  2S ²  178  3S ³  179 ~
+
+这显示出，例如按 CTRL-K Pd 得到的二合字母是字符（£）。这是 163 号字符
+（十进制）。
+   Pd 是 Pound 的缩写。大多数二合字母的选取都为了给你关于它将产生的字符的
+提示。浏览一遍这张表你就会明白其中的逻辑。
+   如果某个组合没有对应的二合字母，你可以把第一个和第二个字符对调。因此
+CTRL-K dP 也可行。因为 "dP" 没有二合字母，Vim 会再去搜索 "Pd" 二合字母。
+
+	Note:
+	二合字母取决于 Vim 认为你正在使用的字符集。始终用 ":digraphs"
+	来查明当前可用的二合字母。
+
+你可以用十进制数字指定目标字符来定义自己的二合字母。例如： >
+
+	:digraph a\" 228
+
+这定义了 CTRL-K a" 插入一个 ä 字符。注意：我们不得不转义 " 字符，否则它会
+被当作注释字符。
+
+二合字母的更多信息见：|digraphs|
+   另一种输入特殊字符的方法是用 keymap。更多相关内容见：|45.5|
+
+==============================================================================
+*24.10*	普通模式命令
+
+插入模式提供的命令数量有限。在普通模式下你有更多命令。当你想用其中某个时，
+通常先用 <Esc> 离开插入模式，执行那个普通模式命令，再用 "i" 或 "a" 重新
+进入插入模式。
+   还有一种更快的办法。用 CTRL-O {command} 你可以在插入模式下执行任何普通
+模式命令。例如要删除从光标到行尾的内容： >
+
+	CTRL-O D
+
+这样你只能执行一个普通模式命令。但你可以指定 register 或计数。一个更复杂的
+例子： >
+
+	CTRL-O "g3dw
+
+这会删除到第三个单词处，放进 register g。
+
+==============================================================================
+
+下一章：|usr_25.txt|  编辑排版的文本
+
+版权：见 |manual-copyright|
+
+vim:tw=78:ts=8:noet:ft=help:norl:

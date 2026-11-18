@@ -22,7 +22,7 @@ return {
       msgid = "Previous definition is here",
       msgstr = "此前的定义在这里",
       references = {
-        "tests/phase5/fixtures/clangd-corpus.json",
+        "tests/fixtures/clangd/messages.json",
       },
     },
     {
@@ -30,7 +30,7 @@ return {
       msgid = "Redefinition of '{name}'",
       msgstr = "'{name}' 重复定义",
       references = {
-        "tests/phase5/fixtures/clangd-corpus.json",
+        "tests/fixtures/clangd/messages.json",
       },
     },
     {
@@ -38,8 +38,8 @@ return {
       msgid = "Use of undeclared identifier '{name}'",
       msgstr = "使用了未声明的标识符 '{name}'",
       references = {
-        "tests/phase7/corpus/undeclared.cpp",
-        "tests/phase7/fixtures/clangd-real-observed.json",
+        "tests/fixtures/clangd/corpus/undeclared.cpp",
+        "tests/fixtures/clangd/observed.json",
       },
     },
     {
@@ -47,8 +47,8 @@ return {
       msgid = "Unknown type name '{name}'",
       msgstr = "未知类型名 '{name}'",
       references = {
-        "tests/phase7/corpus/unknown_type.cpp",
-        "tests/phase7/fixtures/clangd-real-observed.json",
+        "tests/fixtures/clangd/corpus/unknown_type.cpp",
+        "tests/fixtures/clangd/observed.json",
       },
     },
   },

@@ -164,8 +164,6 @@ function M.setup(next_config)
   setup_float()
 end
 
-function M.reload(next_config) M.setup(next_config) end
-
 function M.teardown()
   config = { enabled = false, virtual_text = false, virtual_lines = false, float = false }
   restore_display('virtual_text', states.virtual_text)
@@ -188,7 +186,7 @@ function M.info()
       enabled = config.enabled and config.float == true,
       active = float_state.active == true, reason = float_state.reason or 'not_initialized',
     },
-    domain = 'clangd', corpus_entries = 7, corpus_translated = 5, static_entries = 4,
+    domain = 'clangd',
     runtime_observed = runtime.observed, runtime_translated = runtime.translated,
   }
 end

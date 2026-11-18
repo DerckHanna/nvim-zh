@@ -243,12 +243,8 @@ end
 
 function M.stats()
   local stats = missing.stats()
-  stats.static = { domains = catalog.coverage() }
+  stats.static = { domains = catalog.inventory() }
   return stats
-end
-
-function M.reload()
-  return catalog.reload()
 end
 
 return M

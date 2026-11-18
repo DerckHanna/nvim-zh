@@ -1,0 +1,6666 @@
+*options.txt*	Nvim
+
+
+		  VIM REFERENCE MANUAL	  by Bram Moolenaar
+
+
+选项							*options*
+
+选项总览请见 quickref.txt |option-list|。
+
+Vim 有一系列内部变量与开关，可以设置它们来获得特殊效果。这些选项有三种形式：
+	boolean		只能是开或关			*boolean* *toggle*
+	number		具有数值
+	string		具有字符串值
+
+				      按 |gO| 查看目录。
+
+==============================================================================
+1. 设置选项					*set-option* *E764*
+
+							*:se* *:set*
+:se[t][!]		显示所有与默认值不同的选项。
+			存在 [!] 时每个选项各占一行。
+
+:se[t][!] all		显示所有选项。
+			存在 [!] 时每个选项各占一行。
+
+								*E518* *E519*
+:se[t] {option}?	显示 {option} 的值。
+			注意：部分遗留选项已被移除。|nvim-removed|
+
+:se[t] {option}		切换选项：设置，将其打开。
+			number 选项：显示数值。
+			string 选项：显示值。
+
+:se[t] no{option}	切换选项：重置，将其关闭。
+
+							   *:set-!* *:set-inv*
+:se[t] {option}!   或
+:se[t] inv{option}	切换选项：反转取值。
+
+				*:set-default* *:set-&* *:set-&vi* *:set-&vim*
+:se[t] {option}&	将选项重置为其默认值。
+:se[t] {option}&vi	将选项重置为其 Vi 默认值。
+:se[t] {option}&vim	将选项重置为其 Vim 默认值。
+
+:se[t] all&		将所有选项设为其默认值。以下选项的值不变：
+			  'columns'
+			  'lines'
+			警告：这可能带来许多副作用。
+
+					    *:set-args* *:set=* *E487* *E521*
+:se[t] {option}={value}		或
+:se[t] {option}:{value}
+			将 string 或 number 选项设为 {value}。
+			对 number 选项，取值可用十进制、十六进制（以 0x 开头）
+			或八进制（以 '0' 或 '0o' 开头）。
+			输入 'wildchar'（默认是 <Tab>）即可插入旧值。许多
+			语法固定的 string 选项还支持补全已知取值。
+			参见 |cmdline-completion| 与 |complete-set-option|。
+			{option} 与 '=' 之间的空白允许存在并会被忽略。
+			'=' 与 {value} 之间的空白不允许。
+			在 {value} 中使用空白与反斜杠请见 |option-backslash|。
+
+:se[t] {option}+={value}				*:set+=*
+			将 {value} 加到 number 选项上，或将其追加到
+			string 选项后。若选项是逗号分隔列表，会加一个逗号，
+			{value} 为空时除外。
+			若选项是 flag 列表，多余的 flag 会被移除。添加一个
+			已存在的 flag 时选项值不变。
+			若选项支持 "key:value" 项且 {value} 含一个
+			"key:value" 项或含多个逗号分隔的项，则每一项各自
+			单独处理：
+			- 某项 "key:value" 的 key 已存在但值不同：删除旧项，
+			  并把新项追加到末尾。
+			- 某项 "key:value" 是精确重复：保持不动。
+			- 其它已存在的项保持不动。
+			- 新项追加到末尾。
+			另见上面的 |:set-args|。
+
+:se[t] {option}^={value}				*:set^=*
+			将 {value} 乘到 number 选项上，或将其前置到
+			string 选项。若选项是逗号分隔列表，会加一个逗号，
+			{value} 为空时除外。
+			若选项支持 "key:value" 项且 {value} 含一个
+			"key:value" 项或含多个逗号分隔的项，则每一项各自
+			单独处理。作用与 |:set+=| 相同，但新项前置到开头
+			而不是追加到末尾。
+			另见上面的 |:set-args|。
+
+:se[t] {option}-={value}				*:set-=*
+			从 number 选项减去 {value}，或从 string 选项中移除
+			{value}（若其中存在）。
+			若 string 选项中不含该 {value}，不报错也不警告。若选项
+			是逗号分隔列表，会删除一个逗号，除非选项变为空。
+			若选项是 flag 列表，{value} 必须与选项中的写法完全一致。
+			请逐个移除 flag 以避免出问题。
+			若选项支持 "key:value" 项且 {value} 含一个
+			"key:value" 项或含多个逗号分隔的项，则每一项各自
+			单独处理。某项 "key:value" 会按 key 移除已有项，与
+			其值无关。某项 "key:" 也按 key 匹配移除。
+			逗号分隔列表或 flag 列表中的单个取值可通过输入
+			'wildchar' 插入。参见 |complete-set-option|。
+			另见上面的 |:set-args|。
+
+":set" 的 {option} 参数可以重复给出。例如： >
+	:set ai nosi sw=3 ts=3
+若你在某个参数中出了错，会给出错误信息，其后的参数将被忽略。
+
+							*:set-verbose*
+当 'verbose' 非零时，显示选项值还会说明它最后是在何处被设置的。例如： >
+	:verbose set shiftwidth cindent?
+<  shiftwidth=4 ~
+	  Last set from modeline line 1 ~
+  cindent ~
+	  Last set from /usr/local/share/vim/vim60/ftplugin/c.vim line 30 ~
+只有在请求具体某选项的值时才如此，":verbose set all" 或不带参数的
+":verbose set" 不做此显示。
+当选项是手工设置时，没有 "Last set" 消息。
+当选项是在执行函数、用户命令或 autocommand 期间被设置时，会报告定义它的
+那个脚本。
+几种特殊文本：
+	Last set from modeline line 1 ~
+		该选项在 |modeline| 中被设置。
+	Last set from --cmd argument ~
+		该选项通过命令行参数 |--cmd| 或 + 被设置。
+	Last set from -c argument ~
+		该选项通过命令行参数 |-c|、+、|-S| 或 |-q| 被设置。
+	Last set from environment variable ~
+		该选项来自 $VIMINIT。
+	Last set from error handler ~
+		该选项在求值导致错误时被清除。
+
+							*option-backslash*
+要在 string 选项值中含空白，必须在其前加一个反斜杠。要含一个反斜杠，须用两个。
+实际上这意味着选项值中的反斜杠数量会减半（向下取整）。
+在选项 'path'、'cdpath' 和 'tags' 中，空格前须用三个反斜杠，因为它们可以用
+逗号或空格分隔。
+像 'backupdir' 和 'tags' 这类逗号分隔的选项还要求用两个反斜杠转义逗号，而
+'makeprg' 这类非逗号分隔的选项则不需要。
+在 |:let| 与 |literal-string| 中设置选项时，反斜杠的层数要少一层。
+几个例子： >
+   :set makeprg=make\ file	    results in "make file"
+   :let &makeprg='make file'	    (same as above)
+   :set makeprg=make\\\ file	    results in "make\ file"
+   :set tags=tags\ /usr/tags	    results in "tags" and "/usr/tags"
+   :set tags=tags\\\ file	    results in "tags file"
+   :let &tags='tags\ file'	    (same as above)
+
+   :set makeprg=make,file	    results in "make,file"
+   :set makeprg=make\\,file	    results in "make\,file"
+   :set tags=tags,file		    results in "tags" and "file"
+   :set tags=tags\\,file	    results in "tags\,file"
+   :let &tags='tags\,file'	    (same as above)
+
+"|" 字符把 ":set" 命令与其后的命令分开。要在选项值中含 "|"，请改用 "\|"。
+此例将 'titlestring' 选项设为 "hi|there"： >
+   :set titlestring=hi\|there
+这会设置 'titlestring' 选项为 "hi"，'iconstring' 为 "there"： >
+   :set titlestring=hi|set iconstring=there
+
+同理，双引号字符开始一段注释。要在选项值中含 '"'，请改用 '\"'。此例将
+'titlestring' 选项设为 "hi "there""： >
+   :set titlestring=hi\ \"there\"
+
+在 Win32 上，文件名中的反斜杠大多不会被移除。更准确地说：对于期望文件名的
+选项（即会展开环境变量的那些），普通文件名字符前的反斜杠不会被移除。但特殊
+字符（空格、反斜杠、逗号等）前的反斜杠则按上面解释的方式使用。
+有一种特殊情况：值以 "\\" 开头时 >
+   :set dir=\\machine\path	    results in "\\machine\path"
+   :set dir=\\\\machine\\path	    results in "\\machine\path"
+   :set dir=\\path\\file	    results in "\\path\file" (wrong!)
+第一个的起始反斜杠会保留，而第二个中的反斜杠会减半。这样无论你期望反斜杠
+减半还是期望保留，都能正确工作。第三个的结果大概不是你要的，请避免。
+
+				*add-option-flags* *remove-option-flags*
+				*E539*
+有些选项是 flag 列表。要在不改变已有 flag 的前提下给这类选项添加一个 flag，
+可以这样做： >
+   :set guioptions+=a
+从选项中移除一个 flag 则这样做： >
+   :set guioptions-=a
+这会从 'guioptions' 中移除 'a' flag。
+注意每次应只添加或移除一个 flag。若 'guioptions' 的值为 "ab"，用
+"set guioptions-=ba" 不会生效，因为字符串 "ba" 并不出现。
+
+			   *:set_env* *expand-env* *expand-environment-var*
+特定 string 选项中的环境变量会被展开。若环境变量存在，'$' 及其后的环境变量
+名会被替换为其值。若不存在，'$' 与该名字保持原样。环境变量名之后可以跟任意
+非 id 字符（非字母、数字或 '_'）。该字符及其后的内容会追加到环境变量的值
+之后。示例： >
+   :set term=$TERM.new
+   :set path=/usr/$INCLUDE,$HOME/include,.
+用 ":set opt-=val" 或 ":set opt+=val" 添加或移除字符串时，展开在添加或移除
+之前完成。
+
+
+本地选项的处理				*local-options*
+
+注：以下内容同样适用于 |global-local| 选项。
+
+有些选项仅适用于某个 window 或 buffer。每个 window 或 buffer 都保存该选项
+自己的一份拷贝，因此各自可有自己的取值。这让你可以在一个 window 里设置
+'list' 而在另一个里不设。也可以在同一个 buffer 里把 'shiftwidth' 设为 3，
+另一个里设为 4。
+
+下文说明这些本地选项在特定情形下的行为。你其实不必全知道，因为 Vim 大体上
+用的就是你会预期的那些取值。可惜「做到用户所期望的」是件挺复杂的事……
+
+拆分一个 window 时，本地选项会被拷贝到新 window。因此在拆分之后，两个
+window 的内容看起来相同。
+
+编辑一个新 buffer 时，其本地选项值必须被初始化。由于当前 buffer 的本地选项
+可能是专为该 buffer 设的，因此不使用它们。作为替代，每个 buffer-local 选项
+还另有一个全局值，新 buffer 使用该全局值。用 ":set" 会同时改变本地值与全局
+值。用 "setlocal" 只改变本地值，因此编辑新 buffer 时不会用到该值。
+
+编辑一个此前编辑过的 buffer 时，会再次使用最后关闭的那个 window 的选项。
+若该 buffer 在这个 window 中编辑过，则用当时的取值。否则使用该 buffer 最后
+一次被编辑的那个最后关闭的 window 中的取值。
+
+用 ":setlocal" 可为某类 buffer 专门设置一个本地 window 选项。当你在同一个
+window 中编辑另一个 buffer 时，你不想继续沿用这些本地 window 选项。而
+":set" 同时还会设置本地 window 选项的全局值，该值在编辑另一个 buffer 时
+被使用。每个 window 都有这些全局值自己的拷贝，使其对 window 本地、但对
+该 window 中的所有 buffer 全局。借此可以这样做： >
+	:e one
+	:set list
+	:e two
+此时 'list' 选项在 "two" 中也会被设置，因为用 ":set list" 同时设了全局值。 >
+	:set nolist
+	:e one
+	:setlocal list
+	:e two
+此时 'list' 选项未被设置，因为 ":set nolist" 重置了全局值，":setlocal list"
+只改了本地值，而 ":e two" 取的是全局值。注意若接下来这样做： >
+	:e one
+你会拿回上次编辑 "one" 时的 'list' 值。对 window 本地的选项，会按每个
+buffer 记忆。buffer 未加载时也是如此，但当 buffer 被清除时 |:bwipe| 就会
+丢失。
+
+特殊本地 window 选项			*local-noglobal*
+
+以下本地 window 选项在创建新 window 时不会被拷贝过去，因此其行为略有不同：
+
+	Option		Reason	~
+	'previewwindow'	只可能有一个
+	'scroll'	特定于已存在的 window
+	'winfixbuf'	特定于已存在的 window
+	'winfixheight'	特定于已存在的 window
+	'winfixwidth'	特定于已存在的 window
+
+特殊本地 buffer 选项
+
+以下本地 buffer 选项在创建新 buffer 时不会被拷贝过去，因此其行为略有不同：
+
+	Option		Reason	~
+	'filetype'	由 autocommands 显式设置
+	'syntax'	由 autocommands 显式设置
+	'bufhidden'	标示 |special-buffers|
+	'buftype'	标示 |special-buffers|
+	'readonly'	会被自动检测
+	'modified'	会被自动检测
+
+							*:setl* *:setlocal*
+:setl[ocal][!] ...	与 ":set" 类似，但只设置当前 buffer 或 window
+			本地的值。并非所有选项都有本地值。若该选项没有
+			本地值，则设置全局值。
+			带 "all" 参数时：显示所有本地选项的本地值。
+			不带参数时：显示所有与默认值不同的本地选项的
+			本地值。
+			显示某个具体本地选项时，显示其本地值。对于
+			global/local 布尔选项，当正在使用全局值时，会在
+			选项名之前显示 "--"。
+			对于全局选项，显示全局值（但这可能在将来改变）。
+
+:se[t] {option}<	将 {option} 的有效值设为其全局值。
+			对 |global-local| 选项，本地值被移除，这样将使用
+			全局值。
+			对其余所有选项，全局值被拷贝到本地值。
+
+:setl[ocal] {option}<	通过把全局值拷贝到本地值，将 {option} 的有效值设为
+			其全局值。
+
+注意 |global-local| 选项的行为在 string 与 number 两类选项之间略有不同。
+
+							*:setg* *:setglobal*
+:setg[lobal][!] ...	与 ":set" 类似，但只设置某个本地选项的全局值，
+			不改变本地值。
+			显示选项时，显示全局值。
+			带 "all" 参数时：显示所有本地选项的全局值。
+			不带参数时：显示所有与默认值不同的本地选项的
+			全局值。
+
+对于 buffer 本地和 window 本地选项：
+	命令		 全局值		 本地值		 条件 ~
+      :set option=value	     设置	      设置
+ :setlocal option=value	      -		      设置
+:setglobal option=value	     设置	       -
+      :set option?	      -		     显示	 已设置本地值
+      :set option?	    显示	       -	 未设置本地值
+ :setlocal option?	      -		     显示
+:setglobal option?	    显示	       -
+
+
+带本地值的全局选项				*global-local*
+
+当你在所有 buffer 与 window 中大多使用同一个值时，选项就是全局的。对某些全局
+选项，有时拥有一个不同的本地值是有用的。你可以用 ":setlocal" 设置本地值。那个
+buffer 或 window 随后会使用本地值，而其它 buffer 与 window 继续使用全局值。
+
+例如，你有两个 window，都在编辑 C 源码。它们使用全局 'makeprg' 选项。如果你在
+其中一个 window 中这样做： >
+	:set makeprg=gmake
+那么另一个 window 会切换到同一个值。不必在另一个 C 源码 window 中再设置
+'makeprg' 选项。可是，如果你在一个新 window 中开始编辑 Perl 文件，你会希望为它
+使用另一个 'makeprg'，而不改变用于 C 源码文件的值。你使用这条命令： >
+	:setlocal makeprg=perlmake
+你可以通过把本地值设为空，切换回使用全局值： >
+	:setlocal makeprg=
+这只对 string 选项有效。对于 number 或 boolean 选项，你需要使用 "<" 标志，
+像这样： >
+	:setlocal autoread<
+注意对既不是 boolean 也不是 number 的选项，使用 "<" 是把全局值拷贝到本地值，
+它不会切换回使用全局值（当全局值稍后改变时，这一点就有影响）。你也可以用： >
+	:set path<
+这会使 'path' 的本地值变空，于是全局值被使用。因此它等价于： >
+	:setlocal path=
+注意：将来会有更多全局选项可以被设为 |global-local|。届时对一个全局选项使用
+":setlocal" 的行为可能不同。
+
+						*option-value-function*
+有些选项（'completefunc'、'findfunc'、'omnifunc'、'operatorfunc'、
+'quickfixtextfunc'、'tagfunc' 与 'thesaurusfunc'）被设为函数名、函数引用或
+lambda 函数。使用 lambda 时它会被转换成名字，例如 "<lambda>123"。
+示例：
+>
+	set opfunc=MyOpFunc
+	set opfunc=function('MyOpFunc')
+	set opfunc=funcref('MyOpFunc')
+	set opfunc={a\ ->\ MyOpFunc(a)}
+
+设为 script 本地函数： >
+	set opfunc=s:MyLocalFunc
+	set opfunc=<SID>MyLocalFunc
+
+用 funcref 变量设置： >
+	let Fn = function('MyTagFunc')
+	let &tagfunc = Fn
+
+用 lambda 表达式设置： >
+	let &tagfunc = {t -> MyTagFunc(t)}
+
+用含 lambda 表达式的变量设置： >
+	let L = {a, b, c -> MyTagFunc(a, b , c)}
+	let &tagfunc = L
+
+在 expr 选项里调用函数				*expr-option-function*
+
+少数选项的值，例如 'foldexpr'，是一个会被求值以得到值的表达式。求值可能有
+相当多的开销。使开销最小、同时也让选项值保持非常简单的一种方法是：定义一个
+函数，并把该选项设为不带参数地调用它。也可以使用 |v:lua-call|。示例： >vim
+	lua << EOF
+	  function _G.MyFoldFunc()
+	    -- ... compute fold level for line v:lnum
+	    return level
+	  end
+	EOF
+	set foldexpr=v:lua.MyFoldFunc()
+
+
+设置 filetype
+
+:setf[iletype] [FALLBACK] {filetype}			*:setf* *:setfiletype*
+			把 'filetype' 选项设为 {filetype}，除非它在一系列
+			（嵌套的）autocommands 中已被设为非空。
+			这是以下写法的简写： >
+				:if !did_filetype()
+				:  setlocal filetype={filetype}
+				:endif
+<			用于 filetype.vim 文件，以避免把 'filetype'
+			选项设置两次，从而导致不同的设置与 syntax
+			文件被加载。
+
+			存在可选的 FALLBACK 参数时，后出现的
+			:setfiletype 命令会覆盖 'filetype'。这用于那些
+			只是猜测的 filetype 检测。执行此命令后
+			|did_filetype()| 会返回 false。
+
+				*option-window* *optwin*
+:bro[wse] se[t]			*:set-browse* *:browse-set* *:opt* *:options*
+:opt[ions]		打开一个 window，用于查看与设置所有选项。
+			选项按功能分组。
+			为每个选项提供简短帮助。在简短帮助上按
+			<CR> 会打开一个 help window，其中给出该
+			选项的更多帮助。
+			修改选项的值，然后在 "set" 行上按 <CR> 以
+			设置新值。对于 window 与 buffer 专属选项，
+			选项值会设在最近访问的 window 中，除非那是
+			help window，此时会使用 help window 下方的
+			window（跳过 option-window）。
+
+							*$HOME*
+使用 "~" 就像使用 "$HOME"，但它只在选项开头以及空格或逗号之后被识别。
+
+在 Unix 系统上也可以使用 "~user"。它会被替换为用户 "user" 的 home 目录。
+示例： >
+    :set path=~mool/include,/usr/include,.
+
+在 Unix 系统上也可以使用 "${HOME}" 形式。此时 {} 之间的名字可以包含非 id
+字符。注意若你想在 "gf" 命令中使用它，需要把 '{' 与 '}' 字符加入 'isfname'。
+
+注意：环境变量与 "~/" 的展开只在 ":set" 命令中执行，用 ":let" 给选项赋值时
+不会执行。
+
+							*$HOME-windows*
+在 MS-Windows 上，如果 $HOME 没有被定义为环境变量，那么 Vim 在运行时会把它
+设为 $HOMEDRIVE$HOMEPATH 的展开结果。若 $HOMEDRIVE 未设置，则使用
+$USERPROFILE。
+
+这个展开值不会被导出到环境中，这在运行外部命令时有影响： >
+	:echo system('set | findstr ^HOME=')
+以及 >
+	:echo luaeval('os.getenv("HOME")')
+应当什么也不回显（空字符串），尽管 exists('$HOME') 为 true。当把 $HOME 设为
+非空字符串时，它会被导出给子进程。
+
+
+注意被展开选项的最大长度是有限的。具体多少取决于系统，多数情况下大约是
+256 或 1024 个字符。
+==============================================================================
+2. 自动设置选项					*auto-setting*
+
+除了用 ":set" 命令改动选项，你还可以用多种方式自动设置选项：
+
+1. 用 |config| 文件或 |startup| 参数。你可以用 |:mkvimrc|、|:mkview| 与
+   |:mksession| 创建初始化文件。
+2. 编辑文件时执行的 |autocommand|。
+3. 若启用了 'exrc'，当前目录中的 ".nvim.lua" 文件。
+4. 当前 buffer 所在目录或其祖先目录中的 |editorconfig|。
+5. 文件开头或结尾处的 'modeline' 设置。见下文。
+
+					*modeline* *vim:* *vi:* *ex:* *E520*
+modeline 有两种形式。第一种形式：
+	[text{white}]{vi:|vim:|ex:}[white]{options}
+
+[text{white}]		空，或任意文本后跟至少一个空白字符
+			（<Space> 或 <Tab>）；"ex:" 总是要求至少
+			一个空白字符
+{vi:|vim:|ex:}		字符串 "vi:"、"vim:" 或 "ex:"
+[white]			可选的空白
+{options}		一组选项设置，用空白或 ':' 分隔，其中 ':' 之间
+			的每一部分都是 ":set" 命令的参数（可以为空）
+
+示例：
+   vi:noai:sw=3 ts=6 ~
+   vim: tw=77 ~
+
+第二种形式（这与某些版本的 Vi 兼容）：
+
+	[text{white}]{vi:|vim:|Vim:|ex:}[white]se[t] {options}:[text]
+
+[text{white}]		空，或任意文本后跟至少一个空白字符
+			（<Space> 或 <Tab>）；"ex:" 总是要求至少
+			一个空白字符
+{vi:|vim:|Vim:|ex:}	字符串 "vi:"、"vim:"、"Vim:" 或 "ex:"
+[white]			可选的空白
+se[t]			字符串 "set " 或 "se "（注意其中的空格）；
+			使用 "Vim" 时必须是 "set"。
+{options}		一组选项，用空白分隔，它是 ":set" 命令的参数
+:			一个冒号
+[text]			任意文本，或为空
+
+示例： >
+   /* vim: set ai tw=75: */
+   /* Vim: set ai tw=75: */
+
+{vi:|vim:|Vim:|ex:} 之前的空白是必需的。这能把像 "lex:" 这样的普通词被误认
+的可能性降到最低。有一个例外："vi:" 与 "vim:" 也可以位于行首（为了兼容 3.0
+版）。在行首使用 "ex:" 会被忽略（它可能是 "example:" 的简写）。
+
+如果某个 modeline 里禁用了 modeline（即带上 nomodeline），后续的 modeline
+都会被忽略。这是为了支持按文件关闭 modeline。当某一行看起来像 modeline
+但并不是时，这很有用。例如，最好这样开始一个含 "vim:" 这类字符串的 YAML
+文件
+    # vim: nomodeline ~
+以避免 modeline 被误检测。在 modeline 被禁用之后同一行上后续的选项（若有）
+仍会被求值（但一般你不会有的）。
+
+							*modeline-local*
+这些选项的设置方式与 ":setlocal" 类似：新值只作用于包含该文件的 buffer 与
+window。虽然也可以从 modeline 设置全局选项，但这不常见。如果你打开了两个
+window，而其中的文件把同一个全局选项设成了不同的值，结果取决于哪个最后被打开。
+
+编辑一个已经加载的文件时，只使用 modeline 中的 window 本地选项。因此，如果你
+在打开文件后手动改动了某个 buffer 本地选项，之后在另一个 window 中编辑同一个
+buffer 时它不会被改动。但 window 本地选项会被设置。
+
+							*modeline-version*
+如果 modeline 只想用于某些版本的 Vim，可以在 "vim:" 或 "Vim:" 处指定版本号：
+	vim{vers}:	版本 {vers} 或更晚
+	vim<{vers}:	早于版本 {vers}
+	vim={vers}:	版本 {vers}
+	vim>{vers}:	晚于版本 {vers}
+{vers} 对于 Vim 7.0 是 700（主版本号乘以一百再加上次版本号）。
+例如，只对 Vim 7.0 使用 modeline： >
+	/* vim700: set foldmethod=marker */
+对 7.2 之后的 Vim 使用 modeline： >
+	/* vim>702: set cole=2: */
+"vim" 与 ":" 之间不能有空白。
+如果 {vers} 不适合作为整数，则忽略该 modeline。
+
+
+检查的行数可以用 'modelines' 选项设置。如果 'modeline' 关闭或 'modelines'
+为 0，则不检查任何行。
+
+注意对于第一种形式，行中其余的全部内容都会被使用，因此像这样的一行： >
+   /* vi:ts=4: */
+会因末尾的 "*/" 给出错误消息。这一行则是可以的： >
+   /* vi:set ts=4: */
+
+如果检测到错误，该行其余部分会被跳过。
+
+如果你想在 set 命令中包含 ':'，请在它之前加一个 '\'。':' 前面的反斜杠会被
+移除。示例： >
+   /* vi:set fillchars=stl\:^,vert\:\|: */
+这会把 'fillchars' 选项设为 "stl:^,vert:\|"。只有 ':' 前面的单个反斜杠会被
+移除。因此要包含 "\:" 你必须写成 "\\:"。
+							*E992* *no-modeline-option*
+出于安全原因，除 "set" 之外的其它命令都不被支持（有人可能会创建带 modeline
+的 Trojan horse 文本文件）。而且并非所有选项都能被设置。对某些选项会设置一个
+标志，这样在取值被使用时 |sandbox| 会生效。某些选项只有在 'modelineexpr' 被
+设置时才能从 modeline 设置（默认是关闭）。
+
+不过，modeline 总还是有一点点惹麻烦的风险。例如，某个捣蛋鬼把 'textwidth'
+设为 5，你所有的行就会意外地被折行。所以在编辑不受信任的文本之前要禁用
+modeline。例如 mail ftplugin 就是这么做的。
+
+提示：如果你想做设置选项以外的事，可以定义一个 autocommand，检查文件里是否
+有某个特定字符串。例如： >
+	au BufReadPost * if getline(1) =~ "VAR" | call SetVar() | endif
+并定义一个函数 SetVar()，对含有 "VAR" 的那一行做点什么。
+
+==============================================================================
+3. 选项概要						*option-summary*
+
+在下面的列表里，所有选项都会给出全名，若有缩写也一并给出。两种形式都可以用。
+
+在本文档中，说某个 boolean 选项被"设置"（set）表示输入了 ":set option"。说某个
+选项被"重置"（reset）表示使用了 ":set nooption"。
+
+多数选项在所有 window 与 buffer 中都一样。有少数选项与文本在 window 中如何呈现
+有关。这些选项可以在每个 window 中被设为不同的值。例如 'list' 选项可以在一个
+window 中设置、在另一个 window 中对同一文本重置，从而同时提供两种显示方式。
+有少数选项与某个特定文件有关。这些选项可以每文件或每 buffer 有不同的值。例如
+'textwidth' 选项对普通文本文件可以是 78，对 C 程序可以是 0。
+
+	global				所有 buffer 与 window 共用一个选项
+	local to window		每个 window 各有此选项的一份副本
+	local to buffer		每个 buffer 各有此选项的一份副本
+
+创建新 window 时，当前活动 window 的选项值会被用作 window 专属选项的默认值。
+对于 buffer 专属选项，这取决于 'cpoptions' 选项中的 's' 与 'S' 标志。如果包含
+了 's'（这也是默认情况），那么首次进入某个 buffer 时会从当前活动 buffer 拷贝
+buffer 选项的值。如果存在 'S'，则每次进入 buffer 时都会拷贝这些选项，这几乎就
+像拥有全局选项一样。如果 's' 与 'S' 都不存在，则会在创建 buffer 时从当前活动
+buffer 拷贝这些选项。
+
+隐藏选项						*hidden-options*
+
+并非所有选项在所有版本中都被支持。这取决于所支持的特性，有时也取决于系统。
+关于这一点，下面的花括号里有说明。当某个选项不被支持时，它被称为隐藏选项。
+试图获取隐藏选项的值不会报错，而是会返回该选项的默认值。你无法改变隐藏选项
+的值。
+
+要测试 "foo" 是否是有效的选项名，可以这样写： >
+	if exists('&foo')
+这对隐藏选项也会返回 true。要测试选项 "foo" 是否真的被支持，可以这样写： >
+	if exists('+foo')
+<
+							*E355*
+带简短描述的选项跳转表见 |Q_op|。
+
+			*'allowrevins'* *'ari'* *'noallowrevins'* *'noari'*
+'allowrevins' 'ari'	boolean	（默认关闭）
+			global
+	允许在 Insert 模式中使用 CTRL-_。这默认是关闭的，以免那些误把
+	CTRL-_ 敲成 SHIFT-_ 的用户进入反向 Insert 模式后又不知道怎么
+	退出。见 'revins'。
+
+			*'ambiwidth'* *'ambw'*
+'ambiwidth' 'ambw'	string	（默认 "single"）
+			global
+	告诉 Vim 如何处理东亚宽度类别为 Ambiguous 的字符（例如 Euro、
+	Registered Sign、Copyright Sign、希腊字母、西里尔字母）。
+
+	目前有两种可能的值：
+	"single":	使用与 US-ASCII 字符相同的宽度。这是多数用户
+			所期望的。
+	"double":	使用 ASCII 字符宽度的两倍。
+						*E834* *E835*
+	如果 'listchars' 或 'fillchars' 中含有会成为双倍宽度的
+	字符，则不能使用 "double" 值。在调用 setcellwidths() 时
+	也可能给出这些错误。
+
+	对于以 |setcellwidths()| 指定的字符，这些值会被覆盖。
+
+	有若干 CJK 字体，其字符字形宽度完全取决于它们在传统 CJK 编码中占
+	几个八位组。在那些编码中，Euro、Registered sign、希腊字母/西里尔字母
+	都由两个八位组表示，因此这些字体给它们的是"宽"字形。某些用于在文本
+	文件中绘制表格的线条绘制字符也是如此。因此，当 GUI Vim 使用 CJK 字体
+	（或 Vim 运行在使用 CJK 字体的终端/终端模拟器中，或 Vim 在带 "-cjkwidth"
+	选项启动的 xterm 中运行时），应当把该选项设为 "double"，以让 Vim 的
+	宽度判断与字体中字形的宽度一致。在 CJK 版的 MS-Windows 中，若系统
+	locale 设为某个 CJK locale，可能也必须设为 "double"。见 Unicode
+	Standard Annex #11 (https://www.unicode.org/reports/tr11)。
+
+			*'arabic'* *'arab'* *'noarabic'* *'noarab'*
+'arabic' 'arab'		boolean	（默认关闭）
+			local to window
+	设置该选项即可开始编辑阿拉伯语文本。
+	设置该选项将会：
+	- 设置 'rightleft' 选项，除非已设置 'termbidi'。
+	- 设置 'arabicshape' 选项，除非已设置 'termbidi'。
+	- 把 'keymap' 选项设为 "arabic"；在 Insert 模式下用 CTRL-^ 可以在
+	  输入英文与阿拉伯语键位映射之间切换。
+	- 设置 'delcombine' 选项
+
+	重置该选项将会：
+	- 重置 'rightleft' 选项。
+	- 禁用 'keymap' 的使用（但不改变它的值）。
+	注意 'arabicshape' 与 'delcombine' 不会被重置（它是全局选项）。
+	另见 |l10n-arabic.txt|。
+
+		*'arabicshape'* *'arshape'* *'noarabicshape'* *'noarshape'*
+'arabicshape' 'arshape'	boolean	（默认开启）
+			global
+	当该选项开启且 'termbidi' 关闭时，显示阿拉伯语所需的视觉字符修正
+	就会生效。本质上就是启用了 shaping；该术语含义很广，涵盖：
+	  a) 根据字符在词中的位置（词首、词中、词尾与独立形）改变/变换
+	     字符；
+	  b) 启用组合字符的能力；
+	  c) 启用某些字符所需的连写。
+	禁用时，显示为每个字符真实的独立形。
+	阿拉伯语是一种复杂语言，还需要其它设置，详见 |l10n-arabic.txt|。
+
+			*'autochdir'* *'acd'* *'noautochdir'* *'noacd'*
+'autochdir' 'acd'	boolean	（默认关闭）
+			global
+	当它开启时，每当你打开文件、切换 buffer、删除 buffer 或开/关 window，
+	Vim 都会改变当前工作目录。它会切换到包含所打开或所选文件的那个目录。
+	当 buffer 没有名字时它也没有目录，因此导航到它时当前目录不会改变。
+	注意：当该选项开启时，某些插件可能无法工作。
+
+			*'autocomplete'* *'ac'* *'noautocomplete'* *'noac'*
+'autocomplete' 'ac'	boolean	（默认关闭）
+			global 或 local to buffer |global-local|
+	当它开启时，Vim 会在你输入时显示补全菜单，类似使用 |i_CTRL-N| 但
+	是自动触发的。见 |ins-autocompletion|。
+
+					*'autocompletedelay'* *'acl'*
+'autocompletedelay' 'acl'	number	（默认 0）
+			global
+	输入之后自动补全菜单出现前的延迟，单位为毫秒。如果你不想让它打开得
+	太快，可以把该值设得比你的输入速度稍高一点。见 |ins-autocompletion|。
+
+					*'autocompletetimeout'* *'act'*
+'autocompletetimeout' 'act'	number	（默认 80）
+			global
+	递减式时间分片补全算法的初始超时（单位毫秒）。从该值开始，对每个更慢
+	的来源减半，直到达到最小值。所有来源都会运行，但较慢的来源会被迅速
+	降低优先级。默认值经过调校，使得即使在慢速系统上有多个慢来源，弹出
+	菜单也能在约 200ms 内打开。很少需要改变该值。只有 80 或更大的值有效。
+	特殊情况：当 'complete' 中含有 "F" 或 "o"（函数来源）时，会使用更长
+	的超时，让类似 LSP 服务器这类有时会更久的来源最多用约 1 秒（例如在
+	加载模块时）。见 |ins-autocompletion|。
+
+			*'autoindent'* *'ai'* *'noautoindent'* *'noai'*
+'autoindent' 'ai'	boolean	（默认开启）
+			local to buffer
+	开始新行时（在 Insert 模式下输入 <CR>，或使用 "o" 或 "O" 命令时）
+	从当前行拷贝缩进。如果你在新行上除了 <BS> 或 CTRL-D 之外没有输入
+	任何东西，然后又输入 <Esc>、CTRL-O 或 <CR>，缩进会再次被删掉。把
+	光标移到另一行也有同样的效果，除非 'cpoptions' 中包含 'I' 标志。
+	当 autoindent 开启时，格式化（用 "gq" 命令，或在 Insert 模式下到达
+	'textwidth' 时）使用第一行的缩进。
+	当 'smartindent' 或 'cindent' 开启时，缩进会以另一种方式改变。
+
+				*'autoread'* *'ar'* *'noautoread'* *'noar'*
+'autoread' 'ar'		boolean	（默认开启）
+			global 或 local to buffer |global-local|
+	当检测到文件在 Vim 之外被改变，且在 Vim 之内没有被改变时，自动重新
+	读取它。当文件已被删除时不会这样做，因此你保留的是它被删除之前的
+	文本。当它再次出现时就会被读取。|timestamp|
+	如果该选项有本地值，用以下命令可切换回使用全局值： >vim
+		set autoread<
+<
+
+				*'autowrite'* *'aw'* *'noautowrite'* *'noaw'*
+'autowrite' 'aw'	boolean	（默认关闭）
+			global
+	若文件已被修改，则在每个 `:next`、`:rewind`、`:last`、`:first`、
+	`:previous`、`:stop`、`:suspend`、`:tag`、`:!`、`:make`、CTRL-] 与
+	CTRL-^ 命令时写入文件的内容；当 `:buffer`、CTRL-O、CTRL-I、'{A-Z0-9}
+	或 `{A-Z0-9} 命令把你带到另一个文件时也是如此。
+	如果 buffer 变成隐藏的，则不写入它，例如当 'bufhidden' 被设为 "hide"
+	且使用了 `:next` 时。
+	注意对某些命令不会使用 'autowrite' 选项，参见 'autowriteall'。
+	有些 buffer 不会被写入，特别是当 'buftype' 为 "nowrite"、"nofile"、
+	"terminal" 或 "prompt" 时。
+	慎用：如果你对 buffer 做了不想被保存的临时改动，该选项可能导致它还是
+	被存下来。用 ":file {name}" 重命名该 buffer 可能有助于避免这一点。
+
+			*'autowriteall'* *'awa'* *'noautowriteall'* *'noawa'*
+'autowriteall' 'awa'	boolean	（默认关闭）
+			global
+	类似 'autowrite'，但也用于 ":edit"、":enew"、":quit"、":qall"、
+	":exit"、":xit"、":recover" 命令以及关闭 Vim window 时。
+	设置该选项还意味着 Vim 表现得就像已经设置了 'autowrite'。
+
+						*'background'* *'bg'*
+'background' 'bg'	string	（默认 "dark"）
+			global
+	当设为 "dark" 或 "light" 时，调整该类背景的默认颜色组。如果能够检测
+	背景色，|TUI| 或其它 UI 会在启动时设置它。
+
+	该选项不会改变背景色，它只是告诉 Nvim "继承来的"（终端/GUI）背景
+	看起来是什么样。
+	如果你想显式设置背景色，见 |:hi-normal|。
+						*g:colors_name*
+	当载入配色方案时（即设置了 "g:colors_name" 变量），改变 'background'
+	会导致配色方案被重新载入。如果配色方案会随 'background' 的值调整，
+	这样就能生效。不过，如果配色方案自己设置 'background'，效果可能被
+	抵消。需要时请先删除 "g:colors_name" 变量。
+
+	通常该选项会在 vimrc 文件中设置。也可能取决于终端名。示例： >vim
+		if $TERM ==# "xterm"
+		  set background=dark
+		endif
+<	当该选项被改变时，各高亮组的默认设置会发生变化。要使用其它设置，
+	请把 ":highlight" 命令放在 'background' 选项的设置之后。
+
+						*'backspace'* *'bs'*
+'backspace' 'bs'	string	（默认 "indent,eol,start"）
+			global
+	影响 Insert 模式下 <BS>、<Del>、CTRL-W 与 CTRL-U 的行为。这是一组
+	以逗号分隔的项。每一项允许一种退格越过某物的方式：
+	值	作用	~
+	indent	允许退格越过自动缩进
+	eol	允许退格越过换行（合并行）
+	start	允许退格越过插入的起始位置；CTRL-W 与 CTRL-U 在插入起始
+		处就停止。
+	nostop	类似 start，但 CTRL-W 与 CTRL-U 不会在插入起始处停止。
+
+	当该值为空时，使用与 Vi 兼容的退格方式，上面各项提到的方式都无法使用。
+
+				*'backup'* *'bk'* *'nobackup'* *'nobk'*
+'backup' 'bk'		boolean	（默认关闭）
+			global
+	在覆盖文件之前先做备份。在文件成功写入之后保留该备份。如果你不想保留
+	备份文件，但确实希望在写入文件期间有一份备份，请重置该选项并设置
+	'writebackup' 选项（这就是默认情况）。如果你完全不想要备份文件，请
+	把两个选项都重置（当你的文件系统几乎满了时用这个办法）。更多解释见
+	|backup-table|。
+	当 'backupskip' 模式匹配时，无论如何都不会做备份。
+	当设置了 'patchmode' 时，备份可能被重命名，从而成为文件最旧的版本。
+
+						*'backupcopy'* *'bkc'*
+'backupcopy' 'bkc'	string	（默认 "auto"）
+			global 或 local to buffer |global-local|
+	当写入文件且做了备份时，该选项告诉 Vim 备份是怎么做的。这是一个以
+	逗号分隔的单词列表。
+
+	主要的值有：
+	"yes"	为文件做一份拷贝并覆盖原来的那个
+	"no"	重命名该文件并写入一个新文件
+	"auto"	前者之一，哪个效果最好就用哪个
+
+	可以与前几个值组合使用的额外值有：
+	"breaksymlink"	写入时总是断开符号链接
+	"breakhardlink"	写入时总是断开硬链接
+
+	做一份拷贝并覆盖原文件：
+	- 拷贝文件需要额外的时间。
+	+ 当文件有特殊属性、是（硬/符号）链接或带有资源分支时，这些都会被保留。
+	- 当文件是链接时，备份的名字将是该链接的名字，而不是真实文件的名字。
+
+	重命名该文件并写入一个新文件：
+	+ 快。
+	- 有时文件的所有属性并不能都拷贝到新文件。
+	- 当文件是链接时，新文件将不是链接。
+
+	"auto" 值是折中方案：当 Vim 发现重命名该文件可以在没有副作用的情况下
+	完成（属性可以传递过去，且文件不是链接）时，就用它。当预计会有问题
+	时，就做一份拷贝。
+
+	"breaksymlink" 与 "breakhardlink" 值可以与 "yes"、"no"、"auto" 中的
+	任何一个组合使用。包含它们时，它们会强制 Vim 总是断开符号链接或硬链接，
+	做法正是"no"选项所做的：把原文件重命名为备份，并在原位置写入一个新文件。
+	例如在所有文件都是符号链接或硬链接、且任何改动都应留在本地源代码树而
+	不传播回原始来源的源代码树中，这可能有用。
+								*crontab*
+	"no" 与 "auto" 会导致问题的一种情形：某个程序打开文件、调用 Vim 编辑
+	该文件，然后检查（通过文件描述符）该打开的文件是否被改变，而它会检查
+	备份文件而不是新创建的文件。"crontab -e" 就是这样一个例子，还有若干
+	|file-watcher| 守护进程（如 inotify）也是如此。在这种情况下你大概想
+	切换该选项。
+
+	当做拷贝时，原文件会被截断，然后填入新文本。这意味着原文件的保护位、
+	属主与符号链接都不会被改动。然而备份文件是一个新文件，属主是编辑该
+	文件的用户。备份文件所属的组被设为原文件的组。如果这一步失败，则该
+	组的保护位被设为与 others 相同。
+
+	当文件被重命名时，情况正好相反：备份具有原文件的相同属性，而新写入的
+	文件属于当前用户。当原文件曾是（硬/符号）链接时，新文件将不是链接！
+	这就是 "auto" 值在文件是链接时不重命名的原因。新写入文件的属主与组
+	会被设为与原来相同，但系统可能拒绝这样做。在这种情况下 "auto" 值同样
+	不会重命名该文件。
+
+						*'backupdir'* *'bdir'*
+'backupdir' 'bdir'	string	（默认 ".,$XDG_STATE_HOME/nvim/backup//"）
+			global
+			在 |modeline| 中不允许使用。|no-modeline-option|
+	备份文件目录的列表，用逗号分隔。
+	- 备份文件会被创建在列表中第一个可以创建的目录里。如果这些目录都不
+	  存在，Nvim 会尝试创建列表中的最后一个目录。
+	- 为空表示不会创建备份文件（'patchmode' 也就无法使用！）。写入可能
+	  因此失败。
+	- 目录 "." 表示把备份文件放在与被编辑文件相同的目录中。
+	- 以 "./" 开头的目录（对 MS-Windows 是 ".\"）表示把备份文件放在
+	  相对于被编辑文件所在位置的地方。开头的 "." 会被替换为被编辑文件的
+	  路径名。（目录名中的 "." 没有特殊含义）。
+	- 逗号之后的空格会被忽略，其它空格被视为目录名的一部分。要让目录名
+	  以空格开头，请在其前面加一个反斜杠。
+	- 要让目录名中包含逗号，请在其前面加一个反斜杠。
+	- 目录名可以以 '/' 结尾。
+	- 对 Unix 与 Win32，如果目录名以两个路径分隔符 "//" 结尾，交换文件名
+	  将依据文件的完整路径来构建，其中所有路径分隔符都改为百分号 '%'。
+	  这能确保备份目录中文件名的唯一性。
+	  在 Win32 上也可以以 "\\" 结尾。不过，当后面跟有分隔用的逗号时，必须
+	  用 "//"，因为 "\\" 会把逗号包含进文件名中。因此建议用 '//' 而不是
+	  '\\'。
+	- 环境变量会被展开 |:set_env|。
+	- 注意 '\' 字符，在空格前输入一个，要得到选项中的一个则输入两个
+	  （见 |option-backslash|），例如： >vim
+	    set bdir=c:\\tmp,\ dir\\,with\\,commas,\\\ dir\ with\ spaces
+<
+	另见 'backup' 与 'writebackup' 选项。
+	如果你想在 Unix 上隐藏备份文件，可以考虑这个值： >vim
+		set backupdir=./.backup,~/.backup,.,/tmp
+<	你必须为它能正常工作在每个目录以及你的 home 目录中创建一个
+	".backup" 目录。
+	在列表中添加或移除目录时，优先使用 |:set+=| 与 |:set-=|。这样可以
+	避免将来某个版本使用别的默认值时出现问题。
+
+					*'backupext'* *'bex'* *E589*
+'backupext' 'bex'	string	（默认 "~"）
+			global
+	追加到文件名之后以形成备份文件名的字符串。默认值相当不寻常，因为这样
+	可以避免用备份文件意外覆盖已存在的文件。你可能更愿意用 ".bak"，但请
+	确保你没有想保留的以 ".bak" 结尾的文件。
+	只能使用普通文件名字符；`/\*?[|<>` 是非法的。
+
+	如果你喜欢保留很多备份，可以用一个 BufWritePre autocommand 在写入
+	文件之前改变 'backupext'，以便加入时间戳。 >vim
+		au BufWritePre * let &bex = '-' .. strftime("%Y%b%d%X") .. '~'
+<	用 'backupdir' 把备份放到另一个目录。
+
+						*'backupskip'* *'bsk'*
+'backupskip' 'bsk'	string	（默认 "$TMPDIR/*,$TMP/*,$TEMP/*"
+                                  Unix: "/tmp/*,$TMPDIR/*,$TMP/*,$TEMP/*"
+                                  Mac: "/private/tmp/*,$TMPDIR/*,$TMP/*,$TEMP/*"）
+			global
+	一组文件名模式。当其中某个模式与所写入文件的文件名匹配时，不创建备份
+	文件。指定的文件名与该文件的完整路径名都会被用到。
+	该模式的使用方式与 |:autocmd| 中的一样，见 |autocmd-pattern|。
+	小心特殊字符，见 |option-backslash|。
+	当 $TMPDIR、$TMP 或 $TEMP 未定义时，它不会被用于默认值。"/tmp/*" 只在
+	Unix 上使用。
+
+	警告：没有备份文件意味着，当 Vim 没能正确写入你的 buffer，然后由于
+	某种原因退出时，你既会失去原文件，也会失去你正在写的内容。只有在你
+	不在乎丢失该文件时才禁用备份。
+
+	注意环境变量不会被展开。如果你想用 $HOME，必须显式展开它，例如： >vim
+		let &backupskip = escape(expand('$HOME'), '\') .. '/tmp/*'
+
+<	注意默认值也确保 "crontab -e" 能正常工作（当原本要通过重命名原文件来
+	做备份时，crontab 就看不到新创建的文件了）。另见 'backupcopy' 与
+	|crontab|。
+
+						*'belloff'* *'bo'*
+'belloff' 'bo'		string	（默认 "all"）
+			global
+	指定哪些事件不会响铃。这是一个以逗号分隔的条目列表。对其中出现的每个
+	条目，响铃都会被静音。它最常用于指定要在 Insert 模式下静音的特定
+	事件。
+	你也可以用 'visualbell' 让它闪烁。
+
+	条目	    出现时的含义	~
+	all	    所有事件。
+	backspace   当敲击 <BS> 或 <Del> 且删除导致错误时。
+	cursor	    在 |Insert-mode| 中无法用光标键或 <PageUp>/<PageDown>
+		    移动时。
+	complete    使用 |i_CTRL-X_CTRL-K| 或 |i_CTRL-X_CTRL-T| 时发生错误。
+	copy	    无法在 Insert 模式下用 |i_CTRL-Y| 或 |i_CTRL-E| 拷贝字符。
+	ctrlg	    Insert 模式下 <C-G> 之后出现未知字符。
+	error	    发生了其它错误（例如试图连接最后一行）
+		    （多用于 |Normal-mode| 或 |Cmdline-mode|）。
+	esc	    在 |Normal-mode| 中敲击 <Esc>。
+	hangul	    被忽略。
+	lang	    为 Lua/Mzscheme/TCL 调用 beep 模块。
+	mess	    没有可供 |g<| 输出的内容。
+	showmatch   'showmatch' 功能发生错误。
+	operator    空区域错误 |cpo-E|。
+	register    |Insert-mode| 中 <C-R> 之后出现未知的 register。
+	shell	    来自 shell 输出的响铃 |:!|。
+	spell	    拼写建议时发生错误。
+	term	    来自 |:terminal| 输出的响铃。
+	wildmode    还有更多匹配可供 |cmdline-completion| 使用
+		    （取决于 'wildmode' 的设置）。
+
+	它最常用于微调 Insert 模式下何时应当响铃。对于 Normal 模式与 Ex 命令，
+	响铃常常用来表示发生了错误。它可以通过加入 "error" 关键字来静音。
+
+				*'binary'* *'bin'* *'nobinary'* *'nobin'*
+'binary' 'bin'		boolean	（默认关闭）
+			local to buffer
+	该选项应当在编辑二进制文件之前设置。你也可以使用 |-b| Vim 参数。当
+	该选项被打开时，若干选项会被改动（即使它原本就已打开）：
+		'textwidth'  会被设为 0
+		'wrapmargin' 会被设为 0
+		'modeline'   会被关闭
+		'expandtab'  会被关闭
+	另外，'fileformat' 与 'fileformats' 选项不会被使用，文件读取与写入
+	时就像 'fileformat' 是 "unix" 一样（用单个 <NL> 分隔行）。
+	'fileencoding' 与 'fileencodings' 选项不会被使用，文件读取时不做
+	任何转换。
+	注意：当 'bin' 选项开启时，你开始编辑（另一个）文件，自动命令中的设置
+	可能会再次改变这些设置（例如 'textwidth'），从而在编辑时造成麻烦。
+	你可能想在该文件载入后再次设置 'bin'。
+	这些选项以前的值会被记住，并在 'bin' 从开启切换为关闭时恢复。每个
+	buffer 都有自己保存的一份选项值。
+	要带着 'binary' 设置编辑文件，你可以使用 |++bin| 参数。这样你就不必
+	执行 ":set bin"，而后者会对你编辑的所有文件都生效。
+	写文件时，只有原文件中最后一行带有 <EOL> 时才会写出该行的 <EOL>
+	（通常若最后一行没有 <EOL>，Vim 会追加一个；这会让文件变长）。见
+	'endofline' 选项。
+
+						*'bomb'* *'nobomb'*
+'bomb'			boolean	（默认关闭）
+			local to buffer
+	写入文件且满足下列条件时，会在文件开头加上 BOM（Byte Order Mark，
+	字节序标记）：
+	- 该选项开启
+	- 'binary' 选项关闭
+	- 'fileencoding' 为 "utf-8"、"ucs-2"、"ucs-4" 或其中之一的小端/
+	  大端变体。
+	有些应用程序用 BOM 来识别文件的编码。它常被用于 MS-Windows 上的
+	UCS-2 文件。对其它应用程序它则会造成麻烦，例如："cat file1 file2"
+	会让 file2 的 BOM 出现在结果文件的中间。Gcc 不接受 BOM。
+	当 Vim 读取文件且 'fileencodings' 以 "ucs-bom" 开头时，会检查 BOM
+	是否存在，并相应地设置 'bomb'。除非设置了 'binary'，否则它会从第一行
+	被移除，使你在编辑时看不到它。当你没有改动这些选项时，写文件时 BOM
+	会被恢复。
+
+						*'breakat'* *'brk'*
+'breakat' 'brk'		string	（默认 " ^I!@*-+;:,./?"）
+			global
+	该选项让你选择当 'linebreak' 开启时，哪些字符可能引起折行。它只对
+	ASCII 字符有效。
+
+			*'breakindent'* *'bri'* *'nobreakindent'* *'nobri'*
+'breakindent' 'bri'	boolean	（默认关闭）
+			local to window
+	每个折行的行都会在视觉上继续缩进（与该行开头相同的空白量），从而
+	保持水平的文本块。
+
+					*'breakindentopt'* *'briopt'*
+'breakindentopt' 'briopt'	string	（默认 ""）
+			local to window
+	'breakindent' 的设置。它可以由下列可选条目组成，且必须用逗号分隔：
+		min:{n}	    应用 'breakindent' 之后保留的最小文本宽度，即使结果
+			    文本通常会窄于此值。这样可以防止几乎缩进到 window
+			    右边界附近的文本在折行时占用大量垂直空间。
+			    （默认：20）
+		shift:{n}   应用 'breakindent' 之后，折行部分的开头会被移动给定
+			    数量的字符。它允许动态的（负值）法语式段落缩进，或强调
+			    （正值）行的续行。
+			    （默认：0）
+		sbr	    在应用额外的缩进之前显示 'showbreak' 的值。
+			    （默认关闭）
+		list:{n}    为匹配编号或项目符号列表的行增加额外的缩进
+			    （使用 'formatlistpat' 设置）。
+			    （默认：0）
+		list:-1	    使用 'formatlistpat' 匹配结果的宽度作为缩进。
+		column:{n}  在列 {n} 处缩进。它会覆盖其它子选项。
+			    注意：为 'showbreak' 设置可能会额外增加一份缩进。
+			    （默认关闭）
+
+						*'bufhidden'* *'bh'*
+'bufhidden' 'bh'	string	（默认 ""）
+			local to buffer  |local-noglobal|
+	该选项指定当 buffer 不再显示于某个 window 中时会发生什么：
+	  <empty>	沿用全局的 'hidden' 选项
+	  hide		隐藏该 buffer（不卸载它），即使没有设置 'hidden'
+	  unload	卸载该 buffer，即使设置了 'hidden'；|:hide| 命令也会
+			卸载该 buffer
+	  delete	从 buffer 列表中删除该 buffer，即使设置了 'hidden'；
+			|:hide| 命令也会删除该 buffer，使其行为类似 |:bdelete|
+	  wipe		把该 buffer 从 buffer 列表中彻底清除，即使设置了
+			'hidden'；|:hide| 命令也会清除该 buffer，使其行为类似
+			|:bwipeout|
+
+	小心：使用 "unload"、"delete" 或 "wipe" 时，buffer 中的改动会丢失且
+	没有警告。此外，这些值可能破坏那些临时在 buffer 之间切换的自动命令。
+	该选项与 'buftype'、'swapfile' 一起用于指定特殊种类的 buffer。见
+	|special-buffers|。
+
+			*'buflisted'* *'bl'* *'nobuflisted'* *'nobl'* *E85*
+'buflisted' 'bl'	boolean	（默认开启）
+			local to buffer
+	当该选项被设置时，该 buffer 会出现在 buffer 列表中。若它被重置，则
+	它不会被用于 ":bnext"、"ls"、Buffers 菜单等。
+	对于仅用于记住文件名或标记的 buffer，Vim 会重置该选项。Vim 在开始
+	编辑某个 buffer 时会设置它。但用 ":buffer" 移动到某个 buffer 时
+	不会设置。
+
+						*'buftype'* *'bt'* *E382*
+'buftype' 'bt'		string	（默认 ""）
+			local to buffer  |local-noglobal|
+	该选项的值指定 buffer 的类型：
+	  <empty>	普通 buffer
+	  acwrite	该 buffer 总是通过 |BufWriteCmd| 写入
+	  help		help buffer（不要手动设置）
+	  nofile	该 buffer 与文件无关，不会被写入
+	  nowrite	该 buffer 不会被写入
+
+	  prompt	只能编辑最后一节、供插件使用的 buffer。|prompt-buffer|
+	  quickfix	错误列表 |:cwindow| 或位置列表 |:lwindow|
+	  terminal	|terminal-emulator| buffer
+
+	该选项与 'bufhidden'、'swapfile' 一起用于指定特殊种类的 buffer。见
+	|special-buffers|。
+	另见 |win_gettype()|，它返回该 window 的类型。
+
+	改动该选项要小心，它可能有很多副作用！其中一个副作用是 Vim 不会检查
+	文件的时间戳，如果文件被其它程序改动，这不会被察觉。
+
+	"quickfix" buffer 只用于错误列表与位置列表。该值由 |:cwindow| 与
+	|:lwindow| 命令设置，你不应当改动它。
+
+	"nofile" 与 "nowrite" 类型的 buffer 类似：
+	两者：		该 buffer 不会被写入磁盘，":w" 不工作（但
+			":w filename" 确实可用）。
+	两者：		该 buffer 永远不会被视为 'modified'。改动将要丢失
+			时（例如你退出 Vim 时）不会有警告。
+	两者：		只有在使用过多内存时才会创建交换文件（当 'swapfile'
+			被重置时则永远不会有交换文件）。
+	仅 nofile：	该 buffer 的名字是固定的，它不会被当作文件名处理。
+			它不会因 |:cd| 命令而被改动。
+	两者：		当使用 ":e bufname" 且已在编辑 "bufname" 时，该
+			buffer 会被清空，并像 |:edit| 那样照常触发自动命令。
+							*E676*
+	"acwrite" 意味着该 buffer 的名字与文件无关，如同 "nofile"，但它会被
+	写入。因此与 "nofile" 和 "nowrite" 不同，":w" 确实可用，改动过的
+	buffer 不能不保存就被放弃。写入时需要匹配的 |BufWriteCmd|、
+	|FileWriteCmd| 或 |FileAppendCmd| 自动命令。
+
+							*'busy'*
+'busy'			number	（默认 0）
+			local to buffer
+	设置 buffer 的 "busy" 状态。它会在默认 statusline 中显示。当 busy
+	状态大于 0 时，busy 标志会显示在 statusline 中。
+	"busy" 的语义是任意的，通常由拥有该 buffer 的插件决定。
+
+						*'casemap'* *'cmp'*
+'casemap' 'cmp'		string	（默认 "internal,keepascii"）
+			global
+	指定改变字母大小写的细节。它可以包含下列单词，用逗号分隔：
+	internal	使用内部的大小写映射函数，当前 locale 不会改变大小写
+			映射。当省略 "internal" 时，只要可用，就会使用系统库
+			的 towupper() 与 towlower() 函数。
+	keepascii	对 ASCII 字符（0x00 到 0x7f）使用美国的大小写映射，
+			当前 locale 不生效。这大概只对土耳其语有意义。
+
+				*'cdhome'* *'cdh'* *'nocdhome'* *'nocdh'*
+'cdhome' 'cdh'		boolean	（Unix 上默认开启，Windows 上默认关闭）
+			global
+			在 |modeline| 中被禁止。|no-modeline-option|
+	开启时，不带参数的 |:cd|、|:tcd| 与 |:lcd| 会像 Unix 那样把当前
+	工作目录改为 |$HOME| 目录。
+	关闭时，这些命令只打印当前目录名。
+
+					*'cdpath'* *'cd'* *E344* *E346*
+'cdpath' 'cd'		string	（默认等价于 $CDPATH 或 ",,"）
+			global
+			在 |modeline| 中被禁止。|no-modeline-option|
+	这是一个目录列表，使用 |:cd|、|:tcd| 与 |:lcd| 命令时会搜索它，
+	前提是所搜索的目录使用相对路径；若它含有以 "/"、"./" 或 "../" 开头
+	的绝对部分，那时不会使用 'cdpath' 选项。
+	'cdpath' 选项的值的形式与语义与 'path' 相同。另见 |file-searching|。
+	默认值取自 $CDPATH，并在前面加上一个 ","，以便先搜索当前目录。
+	如果取自 $CDPATH 的默认值不是你想要的，可以在你的 vimrc 文件中加入
+	下列命令的修改版本来覆盖它： >vim
+	  let &cdpath = ',' .. substitute(substitute($CDPATH, '[, ]', '\\\0', 'g'), ':', ',', 'g')
+<	环境变量会被展开 |:set_env|。
+	（'cdpath' 的某些部分可以传给 shell 以展开文件名）。
+
+							*'cedit'*
+'cedit'			string	（默认 CTRL-F）
+			global
+	在命令行模式下用来打开命令行 window 的那个键。只允许不可打印的键。
+	该键可以指定为单个字符，但很难输入。更可取的办法是使用
+	|key-notation|（例如 <Up>、<C-F>），或前面加上脱字符的字母
+	（例如 `^F` 就是 CTRL-F）。示例： >vim
+		set cedit=^Y
+		set cedit=<Esc>
+<	|Nvi| 也有该选项，但它只使用第一个字符。
+	见 |cmdwin|。
+
+							*'channel'*
+'channel'		number	（默认 0）
+			local to buffer
+	与该 buffer 相连的 |channel|，若没有连接任何 channel 则为 0。
+	在 |:terminal| buffer 中这是终端 channel。
+	只读。
+
+				*'charconvert'* *'ccv'* *E202* *E214* *E513*
+'charconvert' 'ccv'	string	（默认 ""）
+			global
+			在 |modeline| 中被禁止。|no-modeline-option|
+	用于字符编码转换的表达式。当要读取或已写入的文件其编码与期望的不同
+	时，它会被求值。
+	当支持内部的 iconv() 函数并且它能够完成转换时，不使用 'charconvert'。
+	更推荐使用 iconv()，因为它快得多。
+	当读取 stdin |--| 时不使用 'charconvert'，因为没有文件可供转换。你
+	必须先把文本保存到文件中。
+	成功时该表达式必须返回零、false 或空字符串，失败时返回非零或 true。
+	可能的编码名见 |encoding-names|。此外，'fileencodings' 与
+	'fileencoding' 中给出的名字也会被使用。
+	"latin1"、"unicode"、"ucs-2"、"ucs-4" 与 "utf-8" 之间的转换由 Vim
+	内部完成，不会使用 'charconvert'。
+	它也用于 Unicode 转换。
+	示例： >vim
+		set charconvert=CharConvert()
+		fun CharConvert()
+		  system("recode "
+			\ .. v:charconvert_from .. ".." .. v:charconvert_to
+			\ .. " <" .. v:fname_in .. " >" .. v:fname_out)
+		  return v:shell_error
+		endfun
+<	相关的 Vim 变量有：
+		v:charconvert_from	当前编码的名字
+		v:charconvert_to	期望编码的名字
+		v:fname_in		输入文件的名字
+		v:fname_out		输出文件的名字
+	注意 v:fname_in 与 v:fname_out 永远不会相同。
+
+	使用不带参数的函数调用的优点是它更快，见 |expr-option-function|。
+
+	如果 'charconvert' 表达式以 s: 或 |<SID>| 开头，那么它会被替换为
+	脚本 ID（|local-function|）。示例： >vim
+		set charconvert=s:MyConvert()
+		set charconvert=<SID>SomeConvert()
+<	否则该表达式会在设置该选项的脚本的上下文中求值，因此脚本本地项是
+	可用的。
+
+					*'chistory'* *'chi'* *E1542* *E1543*
+'chistory' 'chi'	number	（默认 10）
+			global
+	quickfix 栈中应当记住的 quickfix 列表数量。必须介于 1 与 100 之间。
+	如果该选项被设为小于 quickfix 列表栈中条目数的值，条目会从最旧的那个
+	开始被移除。如果当前 quickfix 列表被移除，那么会用栈顶（最近创建的）
+	quickfix 列表取而代之。更多信息见 |quickfix-stack|。
+
+				*'cindent'* *'cin'* *'nocindent'* *'nocin'*
+'cindent' 'cin'		boolean	（默认关闭）
+			local to buffer
+	启用 C 程序的自动缩进。用 'cinkeys' 设置触发 Insert 模式下重新缩进
+	的键，用 'cinoptions' 设置你偏好的缩进风格。
+	如果 'indentexpr' 非空，它会覆盖 'cindent'。
+	如果 'lisp' 未开启，且 'indentexpr' 与 'equalprg' 都为空，则 "="
+	操作符会使用该算法缩进，而不是调用外部程序。
+	见 |C-indenting|。
+	如果你不喜欢 'cindent' 的工作方式，可以试试 'smartindent' 选项或
+	'indentexpr'。
+
+						*'cinkeys'* *'cink'*
+'cinkeys' 'cink'	string	（默认 "0{,0},0),0],:,0#,!^F,o,O,e"）
+			local to buffer
+	一个按键列表：在 Insert 模式下敲击这些键会使当前行重新缩进。
+	仅当 'cindent' 开启且 'indentexpr' 为空时才会使用。
+	该选项的格式见 |cinkeys-format|。
+	见 |C-indenting|。
+
+						*'cinoptions'* *'cino'*
+'cinoptions' 'cino'	string	（默认 ""）
+			local to buffer
+	'cinoptions' 影响 'cindent' 重新缩进 C 程序中各行的方式。该选项
+	的取值见 |cinoptions-values|，C 缩进的一般信息见 |C-indenting|。
+
+					*'cinscopedecls'* *'cinsd'*
+'cinscopedecls' 'cinsd'	string	（默认 "public,protected,private"）
+			local to buffer
+	会被 |cino-g| 解释为 C++ scope 声明的关键字。例如，对于定义了
+	额外 scope 声明 "signals"、"public slots" 与 "private slots" 的
+	Qt 框架，这很有用： >vim
+		set cinscopedecls+=signals,public\ slots,private\ slots
+<
+
+						*'cinwords'* *'cinw'*
+'cinwords' 'cinw'	string	（默认 "if,else,while,do,for,switch"）
+			local to buffer
+	当设置了 'smartindent' 或 'cindent' 时，这些关键字会让下一行额外
+	缩进一层。对于 'cindent'，这只会在合适的位置（{} 内部）进行。
+	注意 'cinwords' 不使用 'ignorecase'。如果大小写无关紧要，请把该
+	关键字的大写与小写形式都包含进来："if,If,IF"。
+
+						*'clipboard'* *'cb'*
+'clipboard' 'cb'	string	（默认 ""）
+			global
+	该选项是一个以逗号分隔的名字列表。
+	可识别以下名字：
+
+						*clipboard-unnamed*
+	unnamed		当包含此项时，Vim 会把所有原本写入 unnamed register
+			的 yank、delete、change 与 put 操作改用 clipboard
+			register "*"。当显式指定了某个 register 时，总会使用
+			该 register，无论 'clipboard' 中是否有 "unnamed"。可以
+			始终用 "* 记法显式访问 clipboard register。另见
+			|clipboard|。
+
+						*clipboard-unnamedplus*
+	unnamedplus	"unnamed" 标志的一个变体：对所有原本写入 unnamed
+			register 的 yank、delete、change 与 put 操作，改用
+			clipboard register "+"（|quoteplus|）而不是 register
+			"*"。当该选项中同时包含 "unnamed" 时，yank 与 delete
+			操作（put 除外）还会把文本拷贝进 register "*"。
+			见 |clipboard|。
+
+						*'cmdheight'* *'ch'*
+'cmdheight' 'ch'	number	（默认 1）
+			global or local to tabpage
+	命令行使用的屏幕行数。有助于避免 |hit-enter| 提示。
+	该选项的值随 tabpage 一起保存，因此每个 tabpage 可以有不同
+	的值。
+
+	当 'cmdheight' 为零时，除非正在使用，否则没有命令行。显示命令行
+	时，它会覆盖屏幕的最后一行。
+
+	警告：`cmdheight=0` 是实验性的。启用 |ui2| 时效果更好。
+
+						*'cmdwinheight'* *'cwh'*
+'cmdwinheight' 'cwh'	number	（默认 7）
+			global
+	命令行 window 使用的屏幕行数。|cmdwin|
+
+						*'colorcolumn'* *'cc'*
+'colorcolumn' 'cc'	string	（默认 ""）
+			local to window
+	'colorcolumn' 是一个以逗号分隔的屏幕列列表，这些列会用 ColorColumn
+	|hl-ColorColumn| 高亮。可用于对齐文本。会让屏幕重绘变慢。
+	屏幕列可以是绝对数字，也可以是前面带 '+' 或 '-' 的数字，它会加到
+	'textwidth' 上或从中减去。 >vim
+
+		set cc=+1	  " highlight column after 'textwidth'
+		set cc=+1,+2,+3  " highlight three columns after 'textwidth'
+		hi ColorColumn ctermbg=lightgrey guibg=lightgrey
+<
+	当 'textwidth' 为零时，带 '-' 与 '+' 的条目不会被使用。
+	最多高亮 256 列。
+
+						*'columns'* *'co'* *E594*
+'columns' 'co'		number	（默认 80 或终端宽度）
+			global
+	屏幕的列数。通常由终端初始化设置，不必手工设置。
+	当 Vim 运行在 GUI 中或可调整大小的 window 中时，设置该选项会导致
+	window 尺寸被改变。如果你只想让 GUI 使用该尺寸，请把命令放进
+	|ginit.vim| 文件。
+	当你设置该选项而 Vim 无法改变显示器的物理列数时，显示可能变乱。
+	对于 GUI 这总是可行的，Vim 会把列数限制为屏幕上能容纳的数量。你
+	可以用下面这条命令得到尽可能宽的 window： >vim
+		set columns=9999
+<	最小值为 12，最大值为 10000。
+
+					*'comments'* *'com'* *E524* *E525*
+'comments' 'com'	string	（默认 "s1:/*,mb:*,ex:*/,://,b:#,:%,:XCOMM,n:>,fb:-,fb:•"）
+			local to buffer
+	一个以逗号分隔的字符串列表，其中每个字符串都可以开始一个注释行。
+	见 |format-comments|。关于用反斜杠插入空格，见 |option-backslash|。
+
+					*'commentstring'* *'cms'* *E537*
+'commentstring' 'cms'	string	（默认 ""）
+			local to buffer
+	注释的模板。值中的 "%s" 会被替换为注释文本，在可能时应在其两侧
+	补上空格。
+	用于 |commenting| 以及为折叠添加标记，见 |fold-marker|。
+
+						*'complete'* *'cpt'* *E535*
+'complete' 'cpt'	string	（默认 ".,w,b,u,t"）
+			local to buffer
+	该选项控制使用 CTRL-P、CTRL-N 或 |ins-autocompletion| 时补全
+	|ins-completion| 的行为。它也用于整行补全 |i_CTRL-X_CTRL-L|。
+	它指明补全的类型以及要扫描的位置。它是一个以逗号分隔的标志
+	列表：
+	.	扫描当前 buffer（'wrapscan' 被忽略）
+	w	扫描其它 window 中的 buffer
+	b	扫描 buffer 列表中已加载的其它 buffer
+	u	扫描 buffer 列表中未加载的 buffer
+	U	扫描不在 buffer 列表中的 buffer
+	k	扫描 'dictionary' 选项给出的文件
+	kspell  使用当前启用的拼写检查 |spell|
+	k{dict}	扫描文件 {dict}。可以给出多个 "k" 标志，模式也是合法的。
+		例如： >vim
+			set cpt=k/usr/dict/*,k~/spanish
+<	s	扫描 'thesaurus' 选项给出的文件
+	s{tsr}	扫描文件 {tsr}。可以给出多个 "s" 标志，模式也是合法的。
+	i	扫描当前文件与包含的文件
+	d	在当前文件与包含的文件中扫描已定义的名称或宏
+		|i_CTRL-X_CTRL-D|
+	]	tag 补全
+	t	与 "]" 相同
+	f	扫描 buffer 名（而不是 buffer 内容）
+	F{func}	调用函数 {func}。可以指定多个 "F" 标志。关于该函数如何被
+		调用以及它应返回什么，见 |complete-functions|。值可以是
+		函数名或 |Funcref|。对于 |Funcref| 值，空格必须用反斜杠
+		('\') 转义，逗号必须用双反斜杠（'\\'）转义（见
+		|option-backslash|）。
+		与其它来源不同，函数可以提供从光标前的非关键字字符开始
+		的补全，而且它们替换文本的起始位置可能与其他来源不同。
+		如果 {func} 返回的 Dict 包含 `{"refresh": "always"}`，
+		那么每当其前面的文本发生变化时，该函数都会被再次调用。
+		如果生成匹配项可能很慢，请定期调用 |complete_check()| 以
+		保持 Vim 响应。这对 |ins-autocompletion| 尤为重要。
+	F	等价于使用 "F{func}"，其中函数取自 'completefunc' 选项。
+	o	等价于使用 "F{func}"，其中函数取自 'omnifunc' 选项。
+
+	未加载的 buffer 不会被加载，因此它们的自动命令 |:autocmd| 不会
+	被执行，这可能导致来自某些文件（例如 gzip 压缩文件）的意外补全。
+	未加载的 buffer 不会被扫描用于整行补全。
+
+	CTRL-N、CTRL-P 与 |ins-autocompletion| 可用于任何基于 'iskeyword'
+	的补全（dictionary |i_CTRL-X_CTRL-K|、包含的模式 |i_CTRL-X_CTRL-I|、
+	tags |i_CTRL-X_CTRL-]| 以及普通展开）。对于 'complete' 中的 "F" 与
+	"o" 标志，非关键字也可以被补全。
+
+	可以为某个补全来源指定可选的匹配上限：在来源标志后追加一个脱字符
+	("^") 再跟 {count}。例如：".^9,w,u,t^5" 把来自当前 buffer 的匹配
+	限制为 9 个，把来自 tags 的限制为 5 个。其它来源仍然不限。
+	注意：匹配上限只在前向补全（CTRL-N）时生效，在后向补全（CTRL-P）
+	时被忽略。
+
+	当 'modelineexpr' 关闭时，该选项不能在 modeline 中设置。
+
+						*'completefunc'* *'cfu'*
+'completefunc' 'cfu'	string	（默认 ""）
+			local to buffer
+			在 |modeline| 中不允许。|no-modeline-option|
+	该选项指定一个用于 CTRL-X CTRL-U 插入模式补全的函数。
+	|i_CTRL-X_CTRL-U|
+	关于该函数如何被调用以及它应返回什么，见 |complete-functions|。
+	值可以是函数名、|lambda| 或 |Funcref|。更多信息见
+	|option-value-function|。
+
+					*'completeitemalign'* *'cia'*
+'completeitemalign' 'cia'	string	（默认 "abbr,kind,menu"）
+			global
+	一个以逗号分隔的字符串列表，用于控制 Insert 模式补全时弹出菜单中
+	条目的对齐方式与显示顺序。支持的值是 "abbr"、"kind" 与 "menu"。
+	这些值可用于定制 |complete-items| 在弹出菜单中的显示方式。注意：
+	必须始终包含这三个值，顺序任意。
+
+						*'completeopt'* *'cot'*
+'completeopt' 'cot'	string	（默认 "menu,popup"）
+			global or local to buffer |global-local|
+	一个以逗号分隔的选项列表，用于 Insert 模式补全 |ins-completion|。
+	支持的值是：
+
+	   fuzzy    为补全候选启用 |fuzzy-matching|。这样可以进行更灵活、
+		    更直观的匹配：字符可以被跳过，即使没有输入精确的序列也
+		    能找到匹配（对 thesaurus 补全 |compl-thesaurus| 禁用）。
+
+	   longest
+		    当 'autocomplete' 未启用时，只插入各匹配项的最长公共
+		    前缀（对 thesaurus 补全 |compl-thesaurus| 禁用）。如果
+		    显示了弹出菜单，你可以用 CTRL-L 补上更多字符。是否忽略
+		    大小写取决于补全的类型。对于 buffer 文本，适用
+		    'ignorecase' 选项。
+
+		    当 'autocomplete' 已启用且没有选中任何补全条目时，各
+		    匹配项的最长公共前缀会被插入到光标之后。该前缀既可以
+		    取自所有显示的条目，也可以只取自当前 buffer 中的条目。
+		    插入的文本用 |hl-PreInsert| 高亮，并且光标位置不发生
+		    改变（类似 `"preinsert"`）。按 CTRL-Y 接受。
+		    另见 |preinserted()|。
+
+	   menu	    用弹出菜单显示可能的补全项。只有当匹配项多于一个且
+		    有足够颜色可用时才会显示菜单。|ins-completion-menu|
+
+	   menuone  即使只有一个匹配项也使用弹出菜单。当存在关于该匹配
+		    项的额外信息（例如它来自哪个文件）时很有用。
+
+	   nearest  各匹配项按其与光标位置的接近程度排列，而默认行为
+		    只对出现在光标下方的匹配项考虑接近程度。这只适用于
+		    来自当前 buffer 的匹配项。若存在 "fuzzy" 则无效果。
+
+	   noinsert 在用户从菜单中选择某个匹配项之前，不插入任何文本。
+		    只能与 "menu" 或 "menuone" 组合使用。若存在 "longest"
+		    则无效果。
+
+	   noselect 与 "noinsert" 相同，只是没有菜单项会被预先选中。
+		    若 "noinsert" 与 "noselect" 同时存在，"noselect" 优先。
+		    当 'autocomplete' 开启时会自动启用此项，除非同时启用了
+		    "preinsert"。
+
+	   nosort   当启用 "fuzzy" 时，禁用按模糊评分对补全候选排序。
+		    候选将按它们的原始顺序出现。
+
+	   popup    在弹出的 window 中显示当前选中补全项的额外信息。
+		    只能与 "menu" 或 "menuone" 组合使用。会覆盖
+		    "preview"。
+
+	   preinsert
+		    在当前已输入部分之后插入第一个补全候选的文本，并用
+		    |hl-PreInsert| 高亮。光标不移动。
+		    要求未设置 "fuzzy"，且 'completeopt' 中包含 "menuone"
+		    或启用了 'autocomplete'。当 'autocomplete' 已启用时，
+		    如果设置了 'ignorecase' 而未设置 'infercase'，则此项
+		    不起作用。
+		    另见 |preinserted()|。
+
+	   preview  在 preview window 中显示当前选中补全项的额外信息。
+		    只能与 "menu" 或 "menuone" 组合使用。
+
+	当 'autocomplete' 已启用时，只有 "fuzzy"、"longest"、"popup"、
+	"preinsert" 与 "preview" 有效果。
+
+	该选项不适用于 |cmdline-completion|。那种情况请见 'wildoptions'。
+
+						*'completeslash'* *'csl'*
+'completeslash' 'csl'	string	（默认 ""）
+			local to buffer
+			只能在 MS-Windows 中修改
+	当设置了该选项时，它会覆盖补全所用的 'shellslash'：
+	- 当该选项被设为 "slash" 时，Insert 模式下的路径补全使用正斜杠。
+	  在 MS-Windows 上 'noshellslash' 开启时编辑 HTML tag 或 Makefile，
+	  这很有用。
+	- 当该选项被设为 "backslash" 时，使用反斜杠。在 MS-Windows 上
+	  'shellslash' 开启时编辑批处理文件，这很有用。
+	- 当该选项为空时，使用与 'shellslash' 相同的字符。
+	对于 Insert 模式补全使用 buffer 本地值。对于命令行补全使用全局值。
+
+					*'completetimeout'* *'cto'*
+'completetimeout' 'cto'	number	（默认 0）
+			global
+	类似 'autocompletetimeout'，但作用于 |i_CTRL-N| 与 |i_CTRL-P|
+	补全。值为 0 会禁用超时；允许使用正值。
+
+					*'concealcursor'* *'cocu'*
+'concealcursor' 'cocu'	string	（默认 ""）
+			local to window
+	设置光标所在行中的文本也可以被隐藏的模式。当当前模式被列出时，
+	隐藏就会像在其它行中一样发生。
+	  n		Normal 模式
+	  v		Visual 模式
+	  i		Insert 模式
+	  c		命令行编辑，用于 'incsearch'
+
+	'v' 适用于 Visual 区域中的所有行，而不仅是光标所在行。
+	一个有用的值是 "nc"。help 文件就使用它。只要你在移动，文本就被
+	隐藏，但开始插入文本或选择 Visual 区域时，被隐藏的文本会显示出来，
+	这样你就能看到自己在做什么。
+	请记住光标位置并不总是它所显示的位置。例如在垂直移动时，它可能
+	会改变列。
+
+						*'conceallevel'* *'cole'*
+'conceallevel' 'cole'	number	（默认 0）
+			local to window
+	决定带有 "conceal" 语法属性的文本 |:syn-conceal| 如何显示：
+
+	值		效果 ~
+	0		文本正常显示
+	1		每一段被隐藏的文本都被替换为一个字符。如果该语法项没有
+			定义自定义替换字符（见 |:syn-cchar|），则使用
+			'listchars' 中定义的字符。它用 "Conceal" 高亮组
+			高亮。
+	2		被隐藏的文本完全隐藏，除非它定义了自定义替换字符
+			（见 |:syn-cchar|）。
+	3		被隐藏的文本完全隐藏。
+
+	注意：在光标所在行上被隐藏的文本不会被隐藏，这样你就能编辑和拷贝
+	该文本。这一点可以用 'concealcursor' 选项来改变。
+
+				*'confirm'* *'cf'* *'noconfirm'* *'nocf'*
+'confirm' 'cf'		boolean	（默认关闭）
+			global
+	当 'confirm' 开启时，某些通常因为 buffer 中有未保存的改动而会失败的
+	操作，例如 ":q" 与 ":e"，会改为弹出一个对话框，询问你是否希望保存
+	当前文件。你仍然可以用 ! 来无条件地 |abandon| 一个 buffer。
+	如果 'confirm' 关闭，你也可以用 |:confirm| 命令仅为一条命令启用确认
+	（这在映射中最有用）。
+	另见 |confirm()| 函数以及 'guioptions' 中的 'v' 标志。
+
+			*'copyindent'* *'ci'* *'nocopyindent'* *'noci'*
+'copyindent' 'ci'	boolean	（默认关闭）
+			local to buffer
+	在为新行自动缩进时拷贝已有各行缩进的结构。通常新的缩进是由一系列
+	Tab 后跟所需数量的空格重建而成的（除非 'expandtab' 被启用，此时只
+	使用空格）。启用此选项后，新行会拷贝已有行在缩进时所用的那些字符。
+	'expandtab' 对这些字符没有影响，Tab 仍然是 Tab。如果新的缩进比已有
+	行更大，剩余部分按通常的方式填充。
+	见 'preserveindent'。
+
+						*'cpoptions'* *'cpo'* *cpo*
+'cpoptions' 'cpo'	string	（默认 "aABceFs_"）
+			global
+	一串单字符标志。某字符出现即表示该行为与 Vi 兼容。这用于那些「不
+	与 Vi 兼容」大多时候或有时更受青睐的场合。'cpoptions' 代表
+	"compatible-options"。
+	可以加入逗号以提高可读性。
+	为避免将来新增标志带来的问题，请使用 ":set" 的 "+=" 与 "-=" 特性
+	|add-option-flags|。
+
+	    包含	行为	~
+							*cpo-a*
+		a	包含时，带文件名参数的 ":read" 命令会为当前
+			window 设置替代文件名。
+							*cpo-A*
+		A	包含时，带文件名参数的 ":write" 命令会为当前
+			window 设置替代文件名。
+							*cpo-b*
+		b	":map" 命令中的 "\|" 被识别为 map 命令的
+			结尾。'\' 会被包含在映射中，'|' 之后的文本
+			被解释为下一条命令。要在映射中包含 '|'，请
+			用 CTRL-V 代替反斜杠。适用于所有映射、缩写、
+			菜单与 autocmd 命令。
+			另见 |map_bar|。
+							*cpo-B*
+		B	反斜杠在映射、缩写、用户命令以及菜单命令
+			的 "to" 部分中没有特殊含义。移除该标志才能
+			像 CTRL-V 一样使用反斜杠。例如，命令
+			":map X \<Esc>" 会让 X 被映射为：
+				'B' included:	"\^["	 (^[ is a real <Esc>)
+				'B' excluded:	"<Esc>"  (5 characters)
+							*cpo-c*
+		c	搜索会在光标位置处任何匹配的末尾继续，但不会
+			超出下一行的开头。不包含该标志时，搜索从光标
+			位置后一个字符继续。带 'c' 时，重复 "/abab"
+			在 "abababababab" 中只得到三处匹配，不带 'c'
+			则有五处匹配。
+							*cpo-C*
+		C	不要拼接以反斜杠开头的被读取的行。
+			见 |line-continuation|。
+							*cpo-d*
+		d	在 'tags' 选项中使用 "./" 不表示使用相对于
+			当前文件的 tags 文件，而是当前目录中的
+			tags 文件。
+							*cpo-D*
+		D	在带字符参数的 Normal 模式命令之后，无法用
+			CTRL-K 输入二合字母，这些命令如 |r|、|f| 与
+			|t|。
+							*cpo-e*
+		e	用 ":@r" 执行 register 时，总是给最后一行加上
+			<CR>，即使该 register 不是行式的。如果不存在
+			该标志，而 register 不是行式的且最后一行不以
+			<CR> 结尾，那么最后一行会被放到命令行上，
+			可以在按 <CR> 之前编辑它。
+							*cpo-E*
+		E	对 Empty 区域使用 "y"、"d"、"c"、"g~"、"gu" 或
+			"gU" 会报错。只有当至少有一个字符可操作时，
+			这些操作符才工作。例如：这会使 "y0" 在第一列
+			失败。
+							*cpo-f*
+		f	包含时，带文件名参数的 ":read" 命令会在当前
+			buffer 还没有文件名时，为当前 buffer 设置
+			文件名。
+							*cpo-F*
+		F	包含时，带文件名参数的 ":write" 命令会在当前
+			buffer 还没有文件名时，为当前 buffer 设置
+			文件名。另见 |cpo-P|。
+							*cpo-i*
+		i	包含时，中断读取文件会让该文件保持为已修改
+			状态。
+							*cpo-I*
+		I	在刚为 'autoindent' 插入缩进之后上下移动光标
+			时，不要删除该缩进。
+							*cpo-J*
+		J	|sentence| 在 '.'、'!' 或 '?' 之后必须跟两个
+			空格。<Tab> 不被识别为空白。
+							*cpo-K*
+		K	当键码在映射中途只读入一半时，不要等它补全。
+			这会破坏映射 <F1><F1>——当第二个 <F1> 只被
+			读入一部分时。它使得可以通过输入 <F1><Esc>
+			来取消该映射。
+							*cpo-l*
+		l	搜索模式中 [] 范围内的反斜杠按字面处理，只有
+			"\]"、"\^"、"\-" 与 "\\" 是特殊的。
+			见 |/[]|
+			   'l' included: "/[ \t]"  finds <Space>, '\' and 't'
+			   'l' excluded: "/[ \t]"  finds <Space> and <Tab>
+							*cpo-L*
+		L	当 'list' 选项被设置时，'wrapmargin'、
+			'textwidth'、'softtabstop' 以及 Virtual Replace
+			模式（见 |gR|）会把一个 <Tab> 计为两个字符，
+			而不是 <Tab> 的通常行为。
+							*cpo-m*
+		m	包含时，showmatch 总是等待半秒钟。不包含时，
+			showmatch 会等待半秒或直到输入了某个字符。
+			'showmatch'
+							*cpo-M*
+		M	被排除时，"%" 匹配会把反斜杠考虑在内。因此在
+			"( \( )" 与 "\( ( \)" 中，外层括号会匹配。
+			包含时 "%" 忽略反斜杠，这是 Vi 兼容的行为。
+							*cpo-n*
+		n	包含时，'number' 与 'relativenumber' 所用的列
+			也会用于被折行的文本。
+							*cpo-o*
+		o	用于搜索命令的行偏移不会被记住供下次搜索
+			使用。
+							*cpo-O*
+		O	即使文件在编辑时并不存在，也不要抱怨它正在被
+			覆盖。这是一种防止他人意外创建文件的保护。
+			Vi 对此并不抱怨。
+							*cpo-P*
+		P	包含时，向文件追加的 ":write" 命令会在当前
+			buffer 还没有文件名、且同时包含 'F' 标志
+			|cpo-F| 时，为当前 buffer 设置文件名。
+							*cpo-q*
+		q	合并多行时，把光标留在合并两行时它应在的
+			位置。
+							*cpo-r*
+		r	重做（"." 命令）用 "/" 来重复搜索命令，而不是
+			实际使用过的搜索串。
+							*cpo-R*
+		R	移除被过滤的行上的 mark。没有该标志时，mark
+			会像使用了 |:keepmarks| 那样被保留。
+							*cpo-s*
+		s	首次进入 buffer 时设置 buffer 选项。这与
+			Vim 3.0 版的做法相同。而且这也是默认。如果
+			不存在该标志，则在创建 buffer 时设置选项。
+							*cpo-S*
+		S	每次进入 buffer 时都设置 buffer 选项
+			（'readonly'、'fileformat'、'filetype' 与
+			'syntax'）。这是（最）与 Vi 兼容的设置。选项会被设为
+			当前 buffer 中的值。当你改变某个选项并转到另一个
+			buffer 时，该值会被拷贝。这实际上让 buffer 选项对
+			所有 buffer 都是全局的。
+
+			's'    'S'     copy buffer options
+			no     no      when buffer created
+			yes    no      when buffer first entered (default)
+			 X     yes     each time when buffer entered (vi comp.)
+							*cpo-t*
+		t	用于 tag 命令的搜索模式会被记住供 "n" 命令
+			使用。否则 Vim 只把该模式放进搜索模式的历史，
+			但不改变上次使用的搜索模式。
+							*cpo-u*
+		u	撤销与 Vi 兼容。见 |undo-two-ways|。
+							*cpo-v*
+		v	在 Insert 模式中，被退格删除的字符仍留在屏幕上
+			可见。没有该标志时，这些字符会立即从屏幕上
+			擦除。带该标志时，新输入的文本会覆盖被退格
+			删除的字符。
+							*cpo-W*
+		W	不要覆盖只读文件。省略时，":w!" 会在可能的情况
+			下覆盖只读文件。
+							*cpo-x*
+		x	命令行上的 <Esc> 会执行该命令行。Vim 中的默认
+			是放弃该命令行，因为 <Esc> 通常会中止一条
+			命令。|c_<Esc>|
+							*cpo-X*
+		X	对 "R" 使用计数时，被替换的文本只删除一次。
+			在用 "." 和计数重复 "R" 时也是如此。
+							*cpo-y*
+		y	一条 yank 命令可以用 "." 重做。如果真想用这个，
+			请三思，它可能破坏某些插件，因为大多数人期望
+			"." 只重复一次改动。
+							*cpo-Z*
+		Z	在设置了 'readonly' 选项时使用 "w!"，不要重置
+			'readonly'。
+							*cpo-!*
+		!	重做一条过滤命令时，使用上次用过的外部命令，
+			不管它是什么。否则就使用上次用过的 -filter-
+			命令。
+							*cpo-$*
+		$	对一行做改动时，不要重画该行，而是在被改动的
+			文本末尾放一个 '$'。当你输入新文本时，被改动的
+			文本会被覆盖。如果你输入任何会把光标移开插入
+			点的命令，该行会被重画。
+							*cpo-%*
+		%	对 "%" 命令采用与 Vi 兼容的匹配方式。
+			不识别 "#if"、"#endif" 等。
+			不识别 "/*" 与 "*/"。
+			单引号与双引号内的括号也会被计入，导致含有
+			括号的字符串扰乱匹配。例如在 "if (strcmp("foo(",
+			s))" 这样一行中，第一个括号不会匹配最后一个。
+			不包含该标志时，单引号与双引号内的括号会被
+			特别处理。匹配引号外的括号时，引号内的一切都
+			被忽略。匹配引号内的括号时，它会找到与之匹配的
+			那个括号（如果存在的话）。这对 C 程序非常适用。
+			该标志也用于其它特性，例如 C 缩进。
+							*cpo-+*
+		+	包含时，":write file" 命令会重置 buffer 的
+			'modified' 标志，尽管该 buffer 本身可能仍与其
+			文件不同。
+							*cpo->*
+		>	向 register 追加时，在被追加的文本之前放入一个
+			换行。
+							*cpo-;*
+		;	用 |,| 或 |;| 重复上次的 |t| 搜索，而光标恰好
+			位于被搜索字符的正前方时，光标不会移动。不包含
+			时，光标会跳过它并跳到下一处出现的字符。
+							*cpo-~*
+		~	包含时，用 |:cd|、|:lcd| 或 |:tcd| 改变目录时
+			不要解析符号链接。这样能保留 buffer 名以及显示
+			当前目录时的符号链接路径。被排除时（默认），
+			符号链接会被解析为其目标路径。
+							*cpo-_*
+		_	对某个词使用 |cw| 时，不要把该词后面的空白包含
+			在动作中。
+
+			*'cursorbind'* *'crb'* *'nocursorbind'* *'nocrb'*
+'cursorbind' 'crb'	boolean	（默认关闭）
+			local to window
+	当该选项被设置时，随着当前 window 中的光标移动，其它
+	cursorbound 的 window（即同样设置了该选项的 window）会把各自的
+	光标移到对应的行与列。该选项对于查看文件两个版本之间的差异很有用
+	（见 'diff'）；在 diff 模式中，被插入与被删除的行（但不含行内的
+	字符）都会被纳入考虑。
+
+			*'cursorcolumn'* *'cuc'* *'nocursorcolumn'* *'nocuc'*
+'cursorcolumn' 'cuc'	boolean	（默认关闭）
+			local to window
+	用 CursorColumn |hl-CursorColumn| 高亮光标所在的屏幕列。对于对齐
+	文本很有用。会让屏幕重画变慢。
+	如果你只希望在当前 window 中高亮，可以使用这些 autocmd： >vim
+		au WinLeave * set nocursorline nocursorcolumn
+		au WinEnter * set cursorline cursorcolumn
+<
+
+			*'cursorline'* *'cul'* *'nocursorline'* *'nocul'*
+'cursorline' 'cul'	boolean	（默认关闭）
+			local to window
+	用 CursorLine |hl-CursorLine| 高亮光标所在的文本行。便于轻松找到
+	光标。会让屏幕重画变慢。当 Visual 模式激活时不使用该高亮，以便
+	更容易看清被选中的文本。
+
+					*'cursorlineopt'* *'culopt'*
+'cursorlineopt' 'culopt'	string	（默认 "both"）
+			local to window
+	用逗号分隔的设置列表，控制 'cursorline' 如何显示。
+	有效值：
+	"line"		用 CursorLine |hl-CursorLine| 高亮光标所在的
+			文本行。
+	"screenline"	只用 CursorLine |hl-CursorLine| 高亮光标所在
+			的屏幕行。
+	"number"	用 CursorLineNr |hl-CursorLineNr| 高亮光标所在
+			的行号。
+
+	特殊值：
+	"both"		"line,number" 这两个值的别名。
+
+	"line" 与 "screenline" 不能同时使用。
+
+							*'debug'*
+'debug'			string	（默认 ""）
+			global
+	可以使用这些值：
+	msg	原本会被忽略的错误消息仍会被给出。
+	throw	原本会被忽略的错误消息仍会被给出，同时还抛出异常
+		并设置 |v:errmsg|。
+	beep	原本只会响一声提示音时，改为给出一条消息。
+	这些值可以组合，用逗号分隔。
+	"msg" 与 "throw" 对于调试 'foldexpr'、'formatexpr' 或
+	'indentexpr' 很有用。
+
+						*'define'* *'def'*
+'define' 'def'		string	（默认 ""）
+			global or local to buffer |global-local|
+	用于查找宏定义的模式。它是一个搜索模式，就像 "/" 命令所用的那样。
+	该选项用于 "[i" 与 "[d" 这类命令 |include-search|。匹配之后会用
+	'isident' 选项来识别被定义的名字： >
+		{match with 'define'}{non-ID chars}{defined name}{non-ID char}
+<	关于如何插入反斜杠以包含空格或反斜杠，见 |option-backslash|。
+	对 C++ 来说，这个值会很有用，以便包含 const 类型声明： >
+		^\(#\s*define\|[a-z]*\s*const\s*[a-z]*\)
+<	你也可以在名字之前使用 "\ze"，并继续该模式以检查后面跟着什么。
+	例如对 Javascript，如果函数是这样定义的
+	`func_name = function(args)`: >
+		^\s*\ze\i\+\s*=\s*function(
+<	如果函数是这样定义的 `func_name : function() {...`: >
+	        ^\s*\ze\i\+\s*[:]\s*(*function\s*(
+<	使用 ":set" 命令时，反斜杠必须写两遍！
+	为避免这一点，可以用 `:let` 配单引号字符串： >vim
+		let &l:define = '^\s*\ze\k\+\s*=\s*function('
+<
+
+			*'delcombine'* *'deco'* *'nodelcombine'* *'nodeco'*
+'delcombine' 'deco'	boolean	（默认关闭）
+			global
+	编辑 Unicode 时，若设置该选项，退格键与 Normal 模式的 "x" 会逐个
+	删除各组合字符。关闭时（默认），字符会连同其组合字符一起被删除。
+	注意：设置 'delcombine' 后，"xx" 的工作方式可能与 "2x" 不同！
+
+	这对阿拉伯语、希伯来语以及许多其它语言很有用，这类语言中组合字符
+	可能叠在基础字符之上，而你只想删除组合字符。
+
+						*'dictionary'* *'dict'*
+'dictionary' 'dict'	string	（默认 ""）
+			global or local to buffer |global-local|
+	以逗号分隔的文件名列表，用于为关键字补全命令 |i_CTRL-X_CTRL-K|
+	查找单词。每个文件应包含一个单词列表。可以每行一个单词，也可以
+	每行多个单词，用非关键字字符分隔（推荐使用空白）。最大行长度为
+	510 字节。
+
+	当该选项为空，或其中存在 "spell" 条目，且启用了拼写检查时，就会
+	使用当前活动的 'spelllang' 的词表。见 |spell|。
+
+	要在文件名中包含逗号，请在其前面加一个反斜杠。逗号之后的空格会被
+	忽略，其它地方的空格会算进文件名。关于反斜杠的用法见
+	|option-backslash|。
+	环境变量会被展开 |:set_env|。
+	这与 |Dictionary| 变量类型毫无关系。
+	到哪里去找单词列表？
+	- BSD/macOS 包含 "/usr/share/dict/words" 文件。
+	- 在 apt 管理的系统（Debian/Ubuntu）上，试试 "apt install spell"
+	  以取得 "/usr/share/dict/words" 文件。
+	从该列表中添加或移除目录时，推荐使用 |:set+=| 与 |:set-=|。这样
+	可以避免未来版本改用另一个默认值时出现问题。
+	出于安全原因，该选项不能使用反引号。
+
+						*'diff'* *'nodiff'*
+'diff'			boolean	（默认关闭）
+			local to window
+	把当前 window 加入展示文件间差异的那组 window 中。见 |diff-mode|。
+
+						*'diffanchors'* *'dia'*
+'diffanchors' 'dia'	string	（默认 ""）
+			global or local to buffer |global-local|
+	每个 buffer 中 {address} 的列表，以逗号分隔，在做 diff 时被视为
+	锚点。可以指定 "$+1" 表示最后一行之后的那一行。"%" 不能用于该
+	选项。每个 buffer 最多可设置 20 个锚点。
+
+	每个锚点行会把 buffer 分割开来（分割发生在锚点之上），每一部分
+	各自进行 diff，最后再把结果合并。当提供多个 {address} 时，锚点会
+	在内部按行号排序。如果使用 buffer 局部选项，每个 buffer 应具有
+	相同数量的锚点（多余的锚点会被忽略）。只有当 'diffopt' 设置了
+	"anchor" 时才会使用该选项。更多细节与示例见 |diff-anchors|。
+								*E1550*
+	如果某些 {address} 在每个 buffer 中都无法解析到某一行（例如某个
+	模式搜索没有匹配到任何东西），那么所有锚点都不会被使用。
+								*E1562*
+	只有当没有隐藏的 diff buffer 时才能使用 diff 锚点。
+
+						*'diffexpr'* *'dex'*
+'diffexpr' 'dex'	string	（默认 ""）
+			global
+			在 |modeline| 中不允许。|no-modeline-option|
+	用于从文件的两个版本取得一个 diff 文件（ed 风格或 unified 风格）
+	的表达式。见 |diff-diffexpr|。
+
+						*'diffopt'* *'dip'*
+'diffopt' 'dip'		string	（默认 "internal,filler,closeoff,indent-heuristic,inline:char,linematch:40"）
+			global
+	diff 模式的选项设置。它可以由下列条目组成。全部条目都是可选的。
+	条目之间必须用逗号分隔。
+
+		algorithm:{text} 使用指定的 diff 算法配合内部 diff 引擎。
+				目前支持的算法有：
+				myers      默认算法
+				minimal    花费额外时间来生成尽可能小的
+					   diff
+				patience   patience diff 算法
+				histogram  histogram diff 算法
+
+		anchor		当设置了 'diffanchors' 时，在每个 buffer 中
+				把特定的行锚定，使其彼此对齐。见
+				|diff-anchors|。
+
+		closeoff	当关闭一个设置了 'diff' 的 window，而同一个
+				tabpage 中只剩下一个设置了 'diff' 的 window
+				时，在该 window 中执行 `:diffoff`。这会撤销
+				`:diffsplit` 命令。
+
+		context:{n}	在改动与一个包含未改动行的折叠之间使用 {n}
+				行的上下文。省略时使用六行的上下文。使用零时
+				上下文实际上是一，因为折叠之间需要一行，对
+				于被删除的行也是如此。把它设成很大的值
+				（999999）可以完全禁用折叠。见 |fold-diff|。
+
+		filler		显示填充行，使文本与在相同位置插入了行的
+				window 保持同步。当 window 并排且设置了
+				'scrollbind' 时最有用。
+
+		foldcolumn:{n}	启动 diff 模式时把 'foldcolumn' 选项设为
+				{n}。没有此项时使用 2。
+
+		followwrap	跟随 'wrap' 选项，保持原样。
+
+		horizontal	以水平分割启动 diff 模式（除非另有明确
+				指定）。
+
+		hiddenoff	当 buffer 变为隐藏时，不要对它使用 diff
+				模式。
+
+		iblank		忽略整行都是空白的改动。如果 'diffexpr' 为
+				空，会给 "diff" 命令加上 "-B" 标志。关于它
+				的确切效果，请查阅 "diff" 命令的文档。
+				注意：diff 的 window 会失去同步，因为空白行
+				之间的差异不会被考虑。
+
+		icase		忽略文本大小写的改动。"a" 与 "A" 被视作
+				相同。如果 'diffexpr' 为空，会给 "diff" 命令
+				加上 "-i" 标志。
+
+		indent-heuristic
+				对内部 diff 库使用缩进启发式。
+
+		inline:{text}	高亮一处改动之内的行内差异。见 |view-diffs|。
+				支持的取值有：
+
+				none    不做行内高亮。
+				simple  在每一行中，从第一个不同字符高亮
+					到最后一个。这是没有设置任何
+					`inline:` 值时的默认行为。
+				char    用内部 diff 做逐字符的 diff，并高亮
+					差异。
+				word    用内部 diff 做按 |word| 的 diff，并
+					高亮差异。像 emoji 与 CJK 字符这类
+					非字母数字的多字节字符被视为独立的
+					词。改动之间的小段非单词字符间隙
+					（5 字节或更少）会合并为一个高亮块。
+
+		internal	使用内部 diff 库。设置了 'diffexpr' 时此项
+				被忽略。
+				*E960* 当写 buffer 时内存耗尽，或 diff
+				大于 1 GB 时，涉及该 buffer 的 diff 会
+				忽略此项。把 'verbose' 选项设开可以看到
+				这种情况何时发生。
+
+		iwhite		忽略空白数量上的改动。如果 'diffexpr' 为
+				空，会给 "diff" 命令加上 "-b" 标志。关于它
+				的确切效果，请查阅 "diff" 命令的文档。它应当
+				忽略在末尾添加空白，但不忽略开头的空白。
+
+		iwhiteall	忽略所有空白的改动。如果 'diffexpr' 为空，
+				会给 "diff" 命令加上 "-w" 标志。关于它
+				的确切效果，请查阅 "diff" 命令的文档。
+
+		iwhiteeol	忽略行尾的空白改动。如果 'diffexpr' 为空，
+				会给 "diff" 命令加上 "-Z" 标志。关于它
+				的确切效果，请查阅 "diff" 命令的文档。
+
+		linematch:{n}   对齐并标记各 buffer 之间最相似的那些行上
+				的改动。当 diff 大块中的总行数超过 {n}
+				时，这些行就不会被对齐，因为对非常大的
+				diff 大块而言会有明显的滞后。合理的设置是
+				"linematch:60"，这样可为每边各 30 行的
+				2 buffer diff 大块，或每边各 20 行的
+				3 buffer diff 大块启用对齐。设置此项时会
+				隐式地设置 "filler"。
+
+		vertical	以垂直分割启动 diff 模式（除非另有明确
+				指定）。
+
+	示例： >vim
+		set diffopt=internal,filler,context:4
+		set diffopt=
+		set diffopt=internal,filler,foldcolumn:3
+		set diffopt-=internal  " do NOT use the internal diff parser
+<
+
+				*'digraph'* *'dg'* *'nodigraph'* *'nodg'*
+'digraph' 'dg'		boolean	（默认关闭）
+			global
+	允许在 Insert 模式下用 {char1} <BS> {char2} 输入二合字母。
+	见 |digraphs|。
+
+						*'directory'* *'dir'*
+'directory' 'dir'	string	（默认 "$XDG_STATE_HOME/nvim/swap//"）
+			global
+			在 |modeline| 中不允许。|no-modeline-option|
+	swap 文件的目录名列表，用逗号分隔。
+
+	可能的条目：
+	- 会在第一个可用的目录中创建该 swap 文件。如果在任何目录中都不可
+	  用，但选项中列出的最后一个目录不存在，就会创建它。
+	- 为空表示不使用 swap 文件（恢复将不可能！），并且不会给出
+	  |E303| 错误。
+	- 目录 "." 表示把 swap 文件放在被编辑文件所在的同一目录中。在
+	  Unix 上会在文件名前加一个点，这样它就不会出现在目录列表中。在
+	  MS-Windows 上会设置 "hidden" 属性，并在可能时在前面加一个点。
+	- 以 "./"（MS-Windows 上为 ".\"）开头的目录表示把 swap 文件放在
+	  相对于被编辑文件所在位置的地方。开头的 "." 会被替换为被编辑
+	  文件的路径名。
+	- 对于 Unix 与 Win32，如果目录以两个路径分隔符 "//" 结尾，swap
+	  文件名就会用该文件的完整路径构造出来，其中所有路径分隔符都被
+	  替换为百分号 '%'（包括 Win32 上驱动器号后面的冒号）。这样能
+	  保证该文件名在保留目录中的唯一性。
+	  在 Win32 上也可以以 "\\" 结尾。不过，当后面跟着分隔用的逗号时，
+	  必须使用 "//"，因为 "\\" 会把逗号包含进文件名。因此建议使用
+	  '//'，而不用 '\\'。
+	- 逗号之后的空格被忽略，其它空格被视为目录名的一部分。要让目录名
+	  以空格开头，请在其前面加一个反斜杠。
+	- 要在目录名中包含逗号，请在其前面加一个反斜杠。
+	- 目录名可以以 ':' 或 '/' 结尾。
+	- 环境变量会被展开 |:set_env|。
+	- 小心 '\' 字符，在空格前要输入一个，要得到选项中的一个则要输入
+	  两个（见 |option-backslash|），例如： >vim
+	    set dir=c:\\tmp,\ dir\\,with\\,commas,\\\ dir\ with\ spaces
+<
+	两次编辑同一个文件会给出警告。不建议使用 "/tmp" 及其它类似位置：
+	如果系统崩溃你会丢失 swap 文件。而且计算机上的其他人可能可以看到
+	这些文件。
+	从该列表中添加或移除目录时使用 |:set+=| 与 |:set-=|，这样如果
+	Nvim 的默认值被改动就不会出问题。
+
+						*'display'* *'dy'*
+'display' 'dy'		string	（默认 "lastline"）
+			global
+	改变文本的显示方式。这是一个由逗号分隔的标志列表：
+	lastline	包含时，window 中最后一行的内容会尽可能多地显示出来。
+			在最后一屏幕行的最后几列放置 "@@@"，以表示该行的
+			其余部分没有被显示。
+	truncate	类似 "lastline"，但 "@@@" 会显示在最后一屏幕行的第一
+			列。优先于 "lastline"。
+	uhex		以十六进制 <xx> 显示不可打印字符，而不是使用 ^C 与
+			~C。
+	msgsep		过时的标志。允许但不起作用。|msgsep|
+
+	当 "lastline" 与 "truncate" 都未包含时，放不下的最后一行会被
+	替换为 "@" 各行。
+
+	"@" 字符可以通过在 'fillchars' 中设置 "lastline" 条目来改变。
+	该字符用 |hl-NonText| 高亮。
+
+						*'eadirection'* *'ead'*
+'eadirection' 'ead'	string	（默认 "both"）
+			global
+	说明 'equalalways' 选项何时生效：
+		ver	垂直方向，window 的宽度不受影响
+		hor	水平方向，window 的高度不受影响
+		both	window 的宽度与高度都受影响
+
+				*'emoji'* *'emo'* *'noemoji'* *'noemo'*
+'emoji' 'emo'		boolean	（默认开启）
+			global
+	开启时，所有 Unicode emoji 字符都被视为全角。这排除了 "text
+	emoji" 字符，它们通常以单角显示。不过，如果这类 "text emoji"
+	后面跟着 U+FE0F 变体选择符，就会被当作全角 emoji 处理。
+
+	遗憾的是并没有关于这件事的良好规范，它是靠反复试验确定的。可以
+	用 |setcellwidths()| 函数来改变这一行为。
+
+						*'encoding'* *'enc'*
+'encoding' 'enc'	string	（默认 "utf-8"）
+			global
+	内部使用以及用于 |RPC| 通信的字符串编码。始终为 UTF-8。
+
+	关于控制文件内容编码，见 'fileencoding'。
+
+			*'endoffile'* *'eof'* *'noendoffile'* *'noeof'*
+'endoffile' 'eof'	boolean	（默认关闭）
+			local to buffer
+	表示读取文件时在文件末尾发现了一个 CTRL-Z 字符。通常只在
+	'fileformat' 为 "dos" 时才会发生。写文件时，若该选项关闭且
+	'binary' 选项开启，或 'fixeol' 选项关闭，则不会在文件末尾写入
+	CTRL-Z。
+	关于示例设置见 |eol-and-eof|。
+
+			*'endofline'* *'eol'* *'noendofline'* *'noeol'*
+'endofline' 'eol'	boolean	（默认开启）
+			local to buffer
+	写文件时，若该选项关闭且 'binary' 选项开启，或 'fixeol' 选项
+	关闭，则不会为文件中的最后一行写入 <EOL>。开始编辑新文件时，
+	该选项会根据文件最后一行是否带有 <EOL> 被自动设置或重置。通常
+	你不需要设置或重置该选项。
+	当 'binary' 关闭且 'fixeol' 开启时，写文件时不会用到该值。当
+	'binary' 开启或 'fixeol' 关闭时，它被用来记住文件中最后一行是否
+	存在 <EOL>，这样在写文件时就能保持原文件的情形。但如果愿意，
+	你也能改变它。
+	关于示例设置见 |eol-and-eof|。
+
+			*'equalalways'* *'ea'* *'noequalalways'* *'noea'*
+'equalalways' 'ea'	boolean	（默认开启）
+			global
+	开启时，在分割或关闭 window 之后，所有 window 都会被自动设置为
+	同样大小。该选项被打开的瞬间也会如此。关闭时，分割一个 window
+	会缩小当前 window 的尺寸，而让其它 window 保持原样。关闭一个
+	window 时，多出来的行会分给它旁边的 window（取决于 'splitbelow'
+	与 'splitright'）。
+	在垂直分割与水平分割的 window 混在一起时，会计算一个最小尺寸，
+	如果还有空间，某些 window 可能会更大。'eadirection' 选项说明了
+	尺寸会受哪个方向影响。
+	可以通过分别设置 'winfixheight' 与 'winfixwidth' 来避免改变
+	window 的高度与宽度。
+	如果在创建新 window 时指定了 window 尺寸，那么目前不会把这些
+	尺寸均等化（这有点复杂，但未来可能会实现）。
+
+						*'equalprg'* *'ep'*
+'equalprg' 'ep'		string	（默认 ""）
+			global 或 local to buffer |global-local|
+			在 |modeline| 中不允许使用。|no-modeline-option|
+	用于 "=" 命令的外部程序。当该选项为空时，使用内部的格式化函数：
+	'lisp'、'cindent' 或 'indentexpr'。
+	环境变量会被展开 |:set_env|。关于如何包含空格与反斜杠，见
+	|option-backslash|。
+
+			*'errorbells'* *'eb'* *'noerrorbells'* *'noeb'*
+'errorbells' 'eb'	boolean	（默认关闭）
+			global
+	为错误消息响铃（beep 或屏幕闪烁）。这只对错误消息有影响，许多没有
+	消息的错误总会响铃（例如在 Normal 模式下按 <Esc>）。见 'visualbell'
+	让铃声表现得像屏幕闪烁或什么都不做。见 'belloff' 以微调何时响铃。
+
+						*'errorfile'* *'ef'*
+'errorfile' 'ef'	string	（默认 "errors.err"）
+			global
+			在 |modeline| 中不允许使用。|no-modeline-option|
+	QuickFix 模式（见 |:cf|）所用错误文件的名称。当使用了 "-q" 命令行
+	参数时，'errorfile' 会被设为随后的那个参数。见 |-q|。
+	":make" 命令不会用它，那种情况见 'makeef'。
+	环境变量会被展开 |:set_env|。
+	关于如何包含空格与反斜杠，见 |option-backslash|。
+
+						*'errorformat'* *'efm'*
+'errorformat' 'efm'	string	（默认值非常长）
+			global 或 local to buffer |global-local|
+	对错误文件中各行的格式的类 Scanf 描述（见 |errorformat|）。
+
+						*'eventignore'* *'ei'*
+'eventignore' 'ei'	string	（默认 ""）
+			global
+	一个 autocommand 事件名的列表，其中的事件将被忽略。
+	当它被设为 "all"，或 "all" 是其中一项时，所有 autocommand 事件都
+	被忽略，autocommand 不会被执行。
+	否则它就是一个以逗号分隔的事件名列表。示例： >vim
+	    set ei=WinEnter,WinLeave
+<
+	要忽略除某些事件之外的所有事件，可以使用 "-" 前缀： >vim
+	    :set ei=all,-WinLeave
+<
+
+					*'eventignorewin'* *'eiw'*
+'eventignorewin' 'eiw'	string	（默认 ""）
+			local to window
+	与 'eventignore' 类似，但它作用于某个特定的 window 及其 buffer：
+	对于这些 window 与 buffer 相关的 autocommand，可以被无限期地忽略，
+	而不影响全局的 'eventignore'。
+
+	注：下列事件被视为发生在 window 上下文之外，因此无法被
+	'eventignorewin' 忽略：
+
+		|ChanInfo|,
+		|ChanOpen|,
+		|CmdUndefined|,
+		|CmdlineChanged|,
+		|CmdlineEnter|,
+		|CmdlineLeave|,
+		|CmdlineLeavePre|,
+		|CmdwinEnter|,
+		|CmdwinLeave|,
+		|ColorScheme|,
+		|ColorSchemePre|,
+		|CompleteChanged|,
+		|CompleteDone|,
+		|CompleteDonePre|,
+		|DiagnosticChanged|,
+		|DiffUpdated|,
+		|DirChanged|,
+		|DirChangedPre|,
+		|ExitPre|,
+		|FocusGained|,
+		|FocusLost|,
+		|FuncUndefined|,
+		|LspAttach|,
+		|LspDetach|,
+		|LspNotify|,
+		|LspProgress|,
+		|LspRequest|,
+		|LspTokenUpdate|,
+		|MarkSet|,
+		|MenuPopup|,
+		|ModeChanged|,
+		|OptionSet|,
+		|PackChanged|,
+		|PackChangedPre|,
+		|Progress|,
+		|QuickFixCmdPost|,
+		|QuickFixCmdPre|,
+		|QuitPre|,
+		|RemoteReply|,
+		|SafeState|,
+		|SessionLoadPost|,
+		|SessionLoadPre|,
+		|SessionWritePost|,
+		|ShellCmdPost|,
+		|Signal|,
+		|SourceCmd|,
+		|SourcePost|,
+		|SourcePre|,
+		|SpellFileMissing|,
+		|StdinReadPost|,
+		|StdinReadPre|,
+		|SwapExists|,
+		|Syntax|,
+		|TabClosed|,
+		|TabClosedPre|,
+		|TabEnter|,
+		|TabLeave|,
+		|TabNew|,
+		|TabNewEntered|,
+		|TermClose|,
+		|TermEnter|,
+		|TermLeave|,
+		|TermOpen|,
+		|TermRequest|,
+		|TermResponse|,
+		|UIEnter|,
+		|UILeave|,
+		|User|,
+		|VimEnter|,
+		|VimLeave|,
+		|VimLeavePre|,
+		|VimResized|,
+		|VimResume|,
+		|VimSuspend|,
+		|WinNew|,
+		|WinNewPre|
+
+				*'expandtab'* *'et'* *'noexpandtab'* *'noet'*
+'expandtab' 'et'	boolean	（默认关闭）
+			local to buffer
+	在 Insert 模式下：在插入 <Tab> 时使用适当数量的空格。在使用 '>' 与
+	'<' 命令以及在 'autoindent' 开启时，缩进使用空格。当 'expandtab'
+	开启时，要插入真正的 tab，请用 CTRL-V<Tab>。另见 |:retab| 与
+	|ins-expandtab|。
+
+	*'exrc'* *'ex'* *'noexrc'* *'noex'* *project-config* *workspace-config*
+'exrc' 'ex'		boolean	（默认关闭）
+			global
+			在 |modeline| 中不允许使用。|no-modeline-option|
+	启用项目本地配置。如果文件在 |trust| 列表中，Nvim 会执行在
+	|current-directory| 及其所有父目录（向上排序）中找到的任何
+	.nvim.lua、.nvimrc 或 .exrc 文件。用 |:trust| 管理受信任的文件。
+	另见 |vim.secure.read()|。
+
+	重置 'exrc' 会停止进一步在父目录中搜索 'exrc' 文件，类似
+	|editorconfig.root|。
+
+	为了取得自身所在位置，Lua exrc 文件可以使用 |debug.getinfo()|。
+	见 |lua-script-location|。
+
+	把 'exrc' 与 |editorconfig| 作比较：
+	- 'exrc' 可以执行任意代码；editorconfig 只是指定设置。
+	- 'exrc' 专属于 Nvim；editorconfig 在其它编辑器中也能用。
+
+	要实现项目本地的 LSP 配置：
+	1. 启用 'exrc'。
+	2. 把 LSP 配置放在项目根目录的 ".nvim/lsp/*.lua"。
+	3. 在项目根目录创建 ".nvim.lua"，并写入这一行： >lua
+	    vim.cmd[[set runtimepath+=.nvim]]
+<
+
+					*'fileencoding'* *'fenc'* *E213*
+'fileencoding' 'fenc'	string	（默认 ""）
+			local to buffer
+	当前 buffer 的文件内容编码。转换使用 iconv() 完成，或按
+	'charconvert' 的指定完成。
+
+	当 'fileencoding' 不是 UTF-8 时，写文件时会进行转换。关于读取见
+	下文。
+	当 'fileencoding' 为空时，文件将以 UTF-8 保存
+	编码（读写文件时都不做转换）。
+
+	警告：转换成非 Unicode 编码可能导致信息丢失！
+
+	关于可能的取值，见 |encoding-names|。此外，还可以指定转换器能够处理
+	的取值，见 |mbyte-conversion|。
+
+	读取文件时，'fileencoding' 会依据 'fileencodings' 被设置。要想以某种
+	特定编码读取文件，设置 'fileencoding' 是没用的，请使用 |++enc| 参数。
+	有一个例外：当 'fileencodings' 为空时，会使用 'fileencoding' 的值。
+	对于新文件，使用 'fileencoding' 的全局值。
+
+	在前面加 "8bit-" 与 "2byte-" 在此没有意义，它们会被忽略。设置该选项
+	时，取值会被转换为小写。因此你也可以用大写形式来设置它。'_' 字符会
+	被替换为 '-'。如果某个名字能从 |encoding-names| 处的列表中被识别出
+	来，它会被替换为标准名字。例如 "ISO8859-2" 会变成 "iso-8859-2"。
+
+	设置该选项后，在开始编辑文件之后，'modified' 选项会被设置，因为写出
+	的文件会有所不同。
+
+	请记住，从 modeline 改变 'fenc' 发生在文本已被读取之后，因此它作用
+	于文件被写出之时。如果你确实在 modeline 中设置了 'fenc'，可能还想
+	设置 'nomodified'，以避免无法 ":q"。
+
+	当 'modifiable' 关闭时，该选项不能被改变。
+
+					*'fileencodings'* *'fencs'*
+'fileencodings' 'fencs'	string	（默认 "ucs-bom,utf-8,default,latin1"）
+			global
+	这是在开始编辑一个已存在的文件时被考虑的一系列字符编码。读取文件
+	时，Vim 会尝试使用其中提到的第一个字符编码。如果检测到错误，就会
+	尝试列表中的下一个。当找到一个可用的编码时，'fileencoding' 会被设
+	为它。如果全都失败，'fileencoding' 会被设为空字符串，这意味着使用
+	UTF-8。
+		警告：转换可能导致信息丢失！你可以用 |++bad| 参数来指定对
+		无法转换的字符该怎么办。
+
+	对于空文件或只含 ASCII 字符的文件，大多数编码都能用，于是会使用
+	'fileencodings' 的第一项（"ucs-bom" 除外，它要求 BOM 存在）。如果你
+	更希望用另一种编码，可以用 BufReadPost autocommand 事件来测试是否要
+	使用你偏好的编码。示例： >vim
+		au BufReadPost * if search('\S', 'w') == 0 |
+			\ set fenc=iso-2022-jp | endif
+<	如果文件中不含非空白字符，这会把 'fileencoding' 设为 "iso-2022-jp"。
+	当使用了 |++enc| 参数时，'fileencodings' 的取值不会被用到。
+	注意 'fileencodings' 不用于新文件，而是改用 'fileencoding' 的全局值。
+	你可以这样设置它： >vim
+		setglobal fenc=iso-8859-2
+<	这意味着一个并不存在的文件可能得到与空文件不同的编码。
+	特殊值 "ucs-bom" 可用于检查文件开头是否有 Unicode BOM（Byte Order
+	Mark，字节序标记）。为使其正常工作，它前面不能有 "utf-8" 或其它
+	Unicode 编码。
+	一个 8 位编码（例如 "latin1"）的条目应当放在最后，因为 Vim 无法检测
+	出错误，于是该编码总会被接受。
+	特殊值 "default" 可用于采用来自环境的编码。当你的环境使用非 latin1
+	的编码（例如俄语）时，它很有用。
+	当文件中含有非法的 UTF-8 字节序列时，它不会被识别为 "utf-8"。你可以
+	用 |8g8| 命令来找出那个非法字节序列。
+	错误的值：			错在哪里：
+		latin1,utf-8		总是会使用 "latin1"
+		utf-8,ucs-bom,latin1	在 utf-8 文件中无法识别
+					BOM
+		cp1250,latin1		总是会使用 "cp1250"
+	如果 'fileencodings' 为空，'fileencoding' 不会被修改。
+	关于可能的取值见 'fileencoding'。
+	设置该选项直到下一次读取文件时才会生效。
+
+						*'fileformat'* *'ff'*
+'fileformat' 'ff'	string	（默认 Windows："dos"，Unix："unix"）
+			local to buffer
+	这给出当前 buffer 的 <EOL>，用于从文件读取该 buffer 或把该 buffer
+	写入文件：
+	    dos	    <CR><NL>
+	    unix    <NL>
+	    mac	    <CR>
+	当使用 "dos" 时，文件末尾的 CTRL-Z 会被忽略。
+	见 |file-formats| 与 |file-read|。
+	关于文件的字符编码见 'fileencoding'。
+	当 'binary' 被设置时，'fileformat' 的取值会被忽略，文件 I/O 表现得
+	就像它被设为 "unix" 一样。
+	当开始编辑一个文件，且 'fileformats' 不为空、'binary' 关闭时，该选项
+	会被自动设置。
+	设置该选项后，在开始编辑文件之后，'modified' 选项会被设置，因为写出
+	的文件会有所不同。
+	当 'modifiable' 关闭时，该选项不能被改变。
+
+						*'fileformats'* *'ffs'*
+'fileformats' 'ffs'	string	（默认 Windows："dos,unix"，Unix："unix,dos"）
+			global
+	这给出在开始编辑一个新 buffer 以及把文件读入一个已存在的 buffer 时
+	将要尝试的行尾（<EOL>）格式：
+	- 当为空时，将始终使用由 'fileformat' 定义的格式。它不会被自动设置。
+	- 当被设为一个名字时，每当打开一个新 buffer 就使用该格式。'fileformat'
+	  会为该 buffer 相应地设置。把文件读入一个已存在的 buffer 时，将使用
+	  'fileformats' 的名字，无论该 buffer 的 'fileformat' 被设为什么。
+	- 当存在多个用逗号分隔的名字时，读取文件时会进行自动 <EOL> 检测。
+	  开始编辑一个文件时，会对 <EOL> 做检查：
+	  1. 如果所有行都以 <CR><NL> 结尾，且 'fileformats' 包含 "dos"，
+	     则 'fileformat' 被设为 "dos"。
+	  2. 如果找到一个 <NL> 且 'fileformats' 包含 "unix"，则 'fileformat'
+	     被设为 "unix"。注意当找到的 <NL> 前面没有 <CR> 时，"unix" 优先
+	     于 "dos"。
+	  3. 如果 'fileformat' 尚未被设置，且找到一个 <CR>，且 'fileformats'
+	     包含 "mac"，则 'fileformat' 被设为 "mac"。
+	     这意味着 "mac" 只在下列情况下才被选中：
+	      "unix" 不存在，或文件里找不到 <NL>，并且
+	      "dos" 不存在，或文件里找不到 <CR><NL>。
+	     例外：如果已选中 "unix"，但在第一个 <NL> 之前有一个 <CR>，并且
+	     在开头几行里 <CR> 看起来比 <NL> 更多，则使用 "mac"。
+	  4. 如果 'fileformat' 仍未被设置，就使用 'fileformats' 中的第一个名字。
+	  把文件读入一个已存在的 buffer 时也做同样的事，但这就像只针对该文件
+	  把 'fileformat' 适当地设好了一样，该选项本身不会被改变。
+	当 'binary' 被设置时，'fileformats' 的取值不会被用到。
+
+	当 Vim 以空 buffer 启动时使用第一项。你可以在 .vimrc 中设置
+	'fileformat' 来推翻这一点。
+
+	对于使用类 Dos <EOL>（<CR><NL>）的系统，在读取被 ":source" 的文件
+	以及 vimrc 文件时，可能会进行自动 <EOL> 检测：
+	- 当 'fileformats' 为空时，没有自动检测。将使用 Dos 格式。
+	- 当 'fileformats' 被设为一个或多个名字时，会进行自动检测。这依据
+	  文件中的第一个 <NL>：如果它前面有一个 <CR>，则使用 Dos 格式，否则
+	  使用 Unix 格式。
+	另见 |file-formats|。
+
+		*'fileignorecase'* *'fic'* *'nofileignorecase'* *'nofic'*
+'fileignorecase' 'fic'	boolean	（在文件名大小写通常被忽略的系统上默认开启）
+			global
+	当设置时，使用文件名与目录名时会忽略大小写。
+
+	在文件系统传统上不区分大小写的系统上（例如 MS-Windows 与 macOS），
+	该选项默认开启。不过，Vim 无法在运行时判定某个特定的文件系统是区分
+	大小写还是不区分大小写。
+
+	关于只在做补全时忽略大小写，见 'wildignorecase'。
+
+						*'filetype'* *'ft'*
+'filetype' 'ft'		string	（默认 ""）
+			local to buffer  |local-noglobal|
+	设置此选项时，FileType autocommand 事件会被触发。所有与该选项的值
+	匹配的 autocommands 都会被执行。因此 'filetype' 的值被用来代替文件
+	名。
+	否则该选项并不总能反映当前的文件类型。
+	该选项通常在检测到文件类型时被设置。要启用这一点，请使用
+	":filetype on" 命令。|:filetype|
+	把该选项设成不同的值，在 modeline 中最有用，适用于那些文件类型不会
+	被自动识别的文件。
+	例如，对于 IDL 文件： >c
+		/* vim: set filetype=idl : */
+<	|FileType| |filetypes|
+	当值中出现一个点时，它会把两个 filetype 名字分隔开，因此不应在某个
+	filetype 中使用点。例如： >c
+		/* vim: set filetype=c.doxygen : */
+<	这会先使用 "c" filetype，然后使用 "doxygen" filetype。
+	这对 filetype 插件与 syntax 文件都有效。点可以出现不止一个。
+	无论 'cpoptions' 中是 's' 还是 'S' 标志，该选项都不会被拷贝到另一个
+	buffer。
+	只能使用字母数字字符、'-' 与 '_'（在组合不同 filetypes 时允许把 '.'
+	作为分隔符）。
+
+						*'fillchars'* *'fcs'*
+'fillchars' 'fcs'	string	（默认 ""）
+			global 或 local to window |global-local|
+	用于填充 statuslines、垂直分隔符、window 中的特殊行，以及
+	|ins-completion-menu| 中被截断的文本的字符。它是一个以逗号分隔的
+	条目列表。每个条目有一个名字、一个冒号以及该项的值：|E1511|
+
+	条目		默认值		用于 ~
+	stl		' '		当前 window 的 statusline
+	stlnc		' '		非当前 windows 的 statusline
+	wbr		' '		window 栏
+	horiz		'─' 或 '-'	水平分隔符 |:split|
+	horizup		'┴' 或 '-'	朝上的水平分隔符
+	horizdown	'┬' 或 '-'	朝下的水平分隔符
+	vert		'│' 或 '|'	垂直分隔符 |:vsplit|
+	vertleft	'┤' 或 '|'	朝左的垂直分隔符
+	vertright	'├' 或 '|'	朝右的垂直分隔符
+	verthoriz	'┼' 或 '+'	重叠的垂直与水平分隔符
+	fold		'·' 或 '-'	填充 'foldtext'
+	foldopen	'-'		标记一个折叠的开始
+	foldclose	'+'		显示一个已关闭的折叠
+	foldsep		'│' 或 '|'	打开的折叠的中间标记
+	foldinner	none		当数字 foldlevel 在狭窄的 'foldcolumn' 中
+					会被重复时，改用此字符显示
+	diff		'-'		'diff' 选项中被删除的行
+	msgsep		' '		消息分隔符 'display'
+	eob		'~'		buffer 末尾的空行
+	lastline	'@'		'display' 包含 lastline/truncate
+	trunc		'>'		|ins-completion-menu| 中被截断的文本
+	truncrl		'<'		在 'rightleft' 模式下与 "trunc" 相同
+
+	任何被省略的条目都会回退到默认值。
+
+	注意 "horiz"、"horizup"、"horizdown"、"vertleft"、"vertright" 与
+	"verthoriz" 只有在 'laststatus' 为 3 时才被用到，因为其它情况下只会
+	用到垂直的 window 分隔符。
+
+	若 'ambiwidth' 为 "double"，则 "horiz"、"horizup"、"horizdown"、
+	"vert"、"vertleft"、"vertright"、"verthoriz"、"foldsep" 与 "fold"
+	会默认为单字节的替代字符。
+
+	例如： >vim
+	    set fillchars=stl:\ ,stlnc:\ ,vert:│,fold:·,diff:-
+<
+	所有条目都支持单字节与多字节字符。但不支持双宽字符。|E1512|
+
+	这些条目所用的高亮：
+	条目		高亮组 ~
+	stl		StatusLine		|hl-StatusLine|
+	stlnc		StatusLineNC		|hl-StatusLineNC|
+	wbr		WinBar			|hl-WinBar| 或 |hl-WinBarNC|
+	horiz		WinSeparator		|hl-WinSeparator|
+	horizup		WinSeparator		|hl-WinSeparator|
+	horizdown	WinSeparator		|hl-WinSeparator|
+	vert		WinSeparator		|hl-WinSeparator|
+	vertleft	WinSeparator		|hl-WinSeparator|
+	vertright	WinSeparator		|hl-WinSeparator|
+	verthoriz	WinSeparator		|hl-WinSeparator|
+	fold		Folded			|hl-Folded|
+	foldopen	FoldColumn		|hl-FoldColumn|
+	foldclose	FoldColumn		|hl-FoldColumn|
+	foldsep		FoldColumn		|hl-FoldColumn|
+	diff		DiffDelete		|hl-DiffDelete|
+	msgsep		MsgSeparator		|hl-MsgSeparator|
+	eob		EndOfBuffer		|hl-EndOfBuffer|
+	lastline	NonText			|hl-NonText|
+	trunc		众多 Popup 菜单高亮组之一，例如
+			|hl-PmenuSel|
+	truncrl	与 "trunc" 相同
+
+					*'findfunc'* *'ffu'* *E1514*
+'findfunc' 'ffu'	string	（默认 ""）
+			global 或 local to buffer |global-local|
+			|modeline| 中不允许。|no-modeline-option|
+	被调用以获得 |:find| 命令的文件名（可以多个）的函数。当该选项为空时，
+	会使用内部的 |file-searching| 机制。
+
+	值可以是一个函数名、一个 |lambda| 或一个 |Funcref|。
+	更多信息见 |option-value-function|。
+
+	该函数被调用时会传入两个参数。第一个参数是一个 |String|，即 |:find|
+	命令的参数。第二个参数是一个 |Boolean|，当函数被调用是为了获得 |:find|
+	命令的命令行补全匹配列表时，它被设为 |v:true|。
+	该函数应返回一个字符串的 List。
+
+	每次调用 |:find| 命令时，该函数只会被调用一次。
+	该函数可以处理 'path' 中指定的所有目录。
+
+	若找到匹配，该函数应返回一个 |List|，其中包含一个或多个文件名。若未找到
+	匹配，该函数应返回一个空的 List。
+
+	若在函数调用期间遇到任何错误，则使用空的 List 作为返回值。
+
+	执行 'findfunc' 期间不允许修改文本或跳转到另一个 window |textlock|。
+
+
+	示例：
+	>vim
+	    " Use glob()
+	    func FindFuncGlob(cmdarg, cmdcomplete)
+		let pat = a:cmdcomplete ? $'{a:cmdarg}*' : a:cmdarg
+		return glob(pat, v:false, v:true)
+	    endfunc
+	    set findfunc=FindFuncGlob
+
+	    " Use the 'git ls-files' output
+	    func FindGitFiles(cmdarg, cmdcomplete)
+		let fnames = systemlist('git ls-files')
+		return fnames->filter('v:val =~? a:cmdarg')
+	    endfunc
+	    set findfunc=FindGitFiles
+<
+
+		*'fixendofline'* *'fixeol'* *'nofixendofline'* *'nofixeol'*
+'fixendofline' 'fixeol'	boolean	（默认开启）
+			local to buffer
+	写文件时若该选项开启，则文件末尾的 <EOL> 在缺失时会被恢复。如果你希望
+	保留原文件的情形，请关闭该选项。
+	当 'binary' 选项被设置时，该选项的值无关紧要。
+	见 'endofline' 选项。
+	示例设置见 |eol-and-eof|。
+
+						*'foldclose'* *'fcl'*
+'foldclose' 'fcl'	string	（默认 ""）
+			global
+	当被设为 "all" 时，当光标不在某个折叠中且其层级高于 'foldlevel' 时，
+	该折叠会被关闭。如果你希望折叠在移出时自动关闭，这会很有用。
+
+						*'foldcolumn'* *'fdc'*
+'foldcolumn' 'fdc'	string	（默认 "0"）
+			local to window
+	何时以及如何绘制 foldcolumn。有效值有：
+	    "auto":       调整为显示折叠所需的最小宽度。
+	    "auto:[1-9]": 调整为容纳多个折叠所需的宽度，上限为所选
+			  的层级
+	    "0":          禁用 foldcolumn
+	    "[1-9]":      显示固定数量的列
+	见 |folding|。
+
+			*'foldenable'* *'fen'* *'nofoldenable'* *'nofen'*
+'foldenable' 'fen'	boolean	（默认开启）
+			local to window
+	关闭时所有折叠都是打开的。该选项可用于在「显示全部未折叠文本」与
+	「以折叠方式查看文本」（包括手工打开或关闭的折叠）之间快速切换。可用
+	|zi| 命令切换它。当 'foldenable' 关闭时，'foldcolumn' 会保持空白。
+	该选项会由那些新建折叠或关闭折叠的命令设置。
+	见 |folding|。
+
+						*'foldexpr'* *'fde'*
+'foldexpr' 'fde'	string	（默认 "0"）
+			local to window
+	当 'foldmethod' 为 "expr" 时使用的表达式。它对每一行求值以获得其折叠
+	层级。上下文被设为设置 'foldexpr' 的那个脚本，可以访问脚本本地项。
+	用法见 |fold-expr|。
+
+	如果是在 modeline 中被设置，该表达式会在 |sandbox| 中求值，见
+	|sandbox-option|。
+	当 'diff' 选项开启或 'modelineexpr' 选项关闭时，该选项不能从
+	|modeline| 中被设置。
+
+	求值 'foldexpr' 期间不允许修改文本或跳转到另一个 window |textlock|。
+
+						*'foldignore'* *'fdi'*
+'foldignore' 'fdi'	string	（默认 "#"）
+			local to window
+	只在 'foldmethod' 为 "indent" 时使用。以 'foldignore' 中的字符开头的
+	行，其折叠层级取自周围的行。在检查该字符之前会跳过空白。
+	默认的 "#" 对 C 程序很合适。见 |fold-indent|。
+
+						*'foldlevel'* *'fdl'*
+'foldlevel' 'fdl'	number	（默认 0）
+			local to window
+	设置折叠层级：层级更高的折叠会被关闭。
+	把该选项设为零会关闭所有折叠。数值越大，被关闭的折叠越少。
+	该选项会由 |zm|、|zM| 与 |zR| 之类的命令设置。
+	见 |fold-foldlevel|。
+
+					*'foldlevelstart'* *'fdls'*
+'foldlevelstart' 'fdls'	number	（默认 -1）
+			global
+	在某个 window 中开始编辑另一个 buffer 时设置 'foldlevel'。
+	适合用来总是以所有折叠都关闭的状态开始编辑（值 0）、以部分折叠关闭
+	的状态开始（值 1），或以没有折叠关闭的状态开始（值 99）。
+	这一步在读入任何 modeline 之前完成，因此 modeline 中的设置会推翻该
+	选项。以 |diff-mode| 开始编辑一个文件时也会忽略该选项并关闭所有折叠。
+	它也在 BufReadPre autocommands 之前完成，以便让 autocmd 能针对特定
+	文件推翻 'foldlevel' 的值。
+	当值为负数时，它不会被用到。
+
+					*'foldmarker'* *'fmr'* *E536*
+'foldmarker' 'fmr'	string	（默认 "{{{,}}}"）
+			local to window
+	当 'foldmethod' 为 "marker" 时使用的开始与结束标记。其中必须有一个
+	逗号，用于分隔开始标记与结束标记。标记是字面字符串（用正则表达式会
+	太慢）。
+	见 |fold-marker|。
+
+						*'foldmethod'* *'fdm'*
+'foldmethod' 'fdm'	string	（默认 "manual"）
+			local to window
+	当前 window 所用的折叠种类。可能的取值：
+	|fold-manual|	manual	    折叠由手工创建。
+	|fold-indent|	indent	    缩进相同的行构成一个折叠。
+	|fold-expr|	expr	    'foldexpr' 给出某行的折叠层级。
+	|fold-marker|	marker	    用标记来指定折叠。
+	|fold-syntax|	syntax	    syntax 高亮项指定折叠。
+	|fold-diff|	diff	    折叠未发生改动的文本。
+
+						*'foldminlines'* *'fml'*
+'foldminlines' 'fml'	number	（默认 1）
+			local to window
+	设置一个折叠可被显示为关闭时所需超过的屏幕行数。对手工关闭的折叠也是
+	如此。用默认值 1 时，一个折叠只有在占用两行或更多屏幕行时才能被关闭。
+	设为零即可关闭只占一屏幕行的折叠。
+	注意这只影响显示出来的样子。用 "zc" 关闭一个因小于 'foldminlines' 而
+	显示为打开的折叠之后，随后再按 "zc" 可能会关闭包含它的折叠。
+
+						*'foldnestmax'* *'fdn'*
+'foldnestmax' 'fdn'	number	（默认 20）
+			local to window
+	为 "indent" 与 "syntax" 方法设置折叠的最大嵌套层数。这样可避免创建
+	过多的折叠。使用超过 20 的值不起作用，因为内部限制是 20。
+
+						*'foldopen'* *'fdo'*
+'foldopen' 'fdo'	string	（默认 "block,hor,mark,percent,quickfix,search,tag,undo"）
+			global
+	指定当命令把光标移入一个已关闭的折叠时，哪些类型的命令会打开折叠。它
+	是一个以逗号分隔的条目列表。
+	注意：当命令是某个映射的一部分时，该选项不会被用到。请把 |zv| 命令
+	加到映射中以获得同样的效果。
+	（理由：映射本身可能想自己控制折叠的打开）
+
+		条目		命令 ~
+		all		任何
+		block		(, {, [[, [{ 等
+		hor		水平移动："l"、"w"、"fx" 等
+		insert		Insert 模式下的任何命令
+		jump		远距离跳转："G"、"gg" 等
+		mark		跳转到标记："'m"、CTRL-O 等
+		percent		"%"
+		quickfix	":cn"、":crew"、":make" 等
+		search		搜索某个模式："/"、"n"、"*"、"gd" 等
+				（不适用于 ":" 命令中的搜索模式）
+				也适用于 |[s| 与 |]s|。
+		tag		跳转到 tag：":ta"、CTRL-T 等
+		undo		撤销或重做："u" 与 CTRL-R
+	当某条移动命令被用于一个操作符时（例如 "dl" 或 "y%"），该选项不会被
+	用到。这意味着该操作符会把整个已关闭的折叠包含进来。
+	注意垂直移动不在此列，因为那会让移动到已关闭的折叠上变得非常困难。
+	在 Insert 模式下插入文本时，包含光标的那些折叠总会是打开的。
+	要关闭折叠，你可以用 |zx| 命令重新应用 'foldlevel'，或把 'foldclose'
+	选项设为 "all"。
+
+						*'foldtext'* *'fdt'*
+'foldtext' 'fdt'	string	（默认 "foldtext()"）
+			local to window
+	用于指定已关闭的折叠所显示文本的表达式。上下文被设为设置 'foldexpr'
+	的那个脚本，可以访问脚本本地项。用法见 |fold-foldtext|。
+
+	如果是在 modeline 中被设置，该表达式会在 |sandbox| 中求值，见
+	|sandbox-option|。
+	当 'modelineexpr' 关闭时，该选项不能在 modeline 中被设置。
+
+	求值 'foldtext' 期间不允许修改文本或跳转到另一个 window |textlock|。
+
+	当被设为空字符串时，foldtext 被禁用，该行会按通常方式显示，带有高亮
+	且不做行回绕。
+
+						*'formatexpr'* *'fex'*
+'formatexpr' 'fex'	string	（默认 ""）
+			local to buffer
+	用于为 |gq| 操作符或自动格式化（见 'formatoptions'）格式化一段行的
+	表达式。当该选项为空时，使用 'formatprg'。
+
+	|v:lnum|  变量保存要格式化的第一行。
+	|v:count| 变量保存要格式化的行数。
+	|v:char|  变量保存如果该表达式是因为自动格式化而被求值，即将被插入
+		      的那个字符。它可以是空的。此时还不要插入它！
+
+	例如： >vim
+		set formatexpr=mylang#Format()
+<	这会调用 'runtimepath' 中 autoload/mylang.vim 文件里的
+	mylang#Format() 函数。|autoload|
+
+	使用不带参数的函数调用有一个好处是更快，见 |expr-option-function|。
+
+	当 'textwidth' 被设置并且要加入超出该限制的文本时，该表达式也会被求值。
+	这发生在与使用内部格式化时相同的条件下。此时要确保光标保持相对于文本
+	的同一位置！在这种情形下 |mode()| 函数会返回 "i" 或 "R"。
+
+	当表达式求值为非零时，Vim 会回退为使用内部的格式化机制。
+
+	如果表达式以 s: 或 |<SID>| 开头，它会被替换成
+	脚本 ID（|local-function|）。示例： >vim
+		set formatexpr=s:MyFormatExpr()
+		set formatexpr=<SID>SomeFormatExpr()
+<	否则，该表达式会在设置此选项的那个脚本的上下文中求值，
+	因此脚本局部项也可用。
+
+	从 modeline 设置时，该表达式会在 |sandbox| 中求值，见
+	|sandbox-option|。这样会使该选项失效，因为不允许改动 buffer 文本。
+	当 'modelineexpr' 关闭时，不能在 modeline 中设置该选项。
+
+						*'formatlistpat'* *'flp'*
+'formatlistpat' 'flp'	string	(default "^\s*\d\+[\]:.)}\t ]\s*")
+			local to buffer
+	用于识别列表头的模式。'formatoptions' 中的 "n" 标志会用到它。
+	该模式必须精确匹配将成为其下一行缩进的那段文本。可以用 |/\ze|
+	标记匹配的结束位置，同时继续检查更多字符。模式之后必须还有一个
+	字符；当它匹配整行时，会按「没有匹配」处理。
+	默认值识别一个数字，其后跟一个可选标点字符和空白。
+
+						*'formatoptions'* *'fo'*
+'formatoptions' 'fo'	string	(default "tcqj")
+			local to buffer
+	这是一个字母序列，描述如何做自动格式化。
+	可能取值见 |fo-table|，格式化文本的方法见 |gq|。
+	为便于阅读可以插入逗号。
+	为避免与将来新增的标志冲突，请使用 ":set" 的 "+=" 和 "-=" 功能
+	|add-option-flags|。
+
+						*'formatprg'* *'fp'*
+'formatprg' 'fp'	string	(default "")
+			global or local to buffer |global-local|
+			Disallowed in |modeline|. |no-modeline-option|
+	用于配合 |gq| 格式化行的外部程序。若已设置 'formatexpr' 则忽略。
+
+	若为空，将使用内部的 |C-indenting| 函数。
+
+	该程序必须从 stdin 读取输入并向 stdout 产生输出。Unix 程序 "fmt"
+	就是这样的程序。环境变量会被展开 |:set_env|。关于包含空格和反斜杠
+	的写法见 |option-backslash|。
+
+					*'fsync'* *'fs'* *'nofsync'* *'nofs'*
+'fsync' 'fs'		boolean	(default on)
+			global or local to buffer |global-local|
+			Disallowed in |modeline|. |no-modeline-option|
+	当打开时，保存文件后（|:write|、|writefile()|、……）、|swap-file|、
+	|undo-persistence| 和 |shada-file| 之后都会调用 OS 函数 fsync()。
+	这会把文件刷写到磁盘，确保它被安全写入。
+	在某些系统上较慢：写入 buffer、退出 Nvim 以及其它操作有时可能
+	需要几秒。
+
+	在下列情形下文件总会被刷写（忽略 'fsync'）：
+	- |CursorHold| 事件被触发
+	- 调用了 |:preserve|
+	- 系统信号指示电量不足
+	- Nvim 异常退出
+
+	这是一个 |global-local| 选项，因此可以按 buffer 设置，例如在写入
+	较慢的文件系统时。
+
+						*'grepformat'* *'gfm'*
+'grepformat' 'gfm'	string	(default "%f:%l:%m,%f:%l%m,%f  %l%m")
+			global or local to buffer |global-local|
+	用于识别 ":grep" 命令输出的格式。
+	这是一个类似 scanf 的字符串，使用的格式与 'errorformat' 选项相同：
+	见 |errorformat|。
+
+	若 ripgrep（'grepprg'）可用，默认为 "%f:%l:%c:%m"。
+
+						*'grepprg'* *'gp'*
+'grepprg' 'gp'		string	(default see below)
+			global or local to buffer |global-local|
+			Disallowed in |modeline|. |no-modeline-option|
+	用于 |:grep| 命令的程序。
+	注意：若改动此项，也必须同时更新 'grepformat'。
+
+	可以包含 "%" 和 "#" 字符，会按 |cmdline-special| 展开。
+	占位符 "$*" 指定参数插入的位置。
+
+	环境变量会被展开 |:set_env|。关于包含空格和反斜杠的写法见
+	|option-backslash|。
+
+	特殊取值：当 'grepprg' 被设为 "internal" 时，|:grep| 命令的行为
+	如同 |:vimgrep|，|:lgrep| 如同 |:lvimgrep|，|:grepadd| 如同
+	|:vimgrepadd|，|:lgrepadd| 如同 |:lvimgrepadd|。
+
+	另见 |:make_makeprg|，那里的多数说明同样适用于 'grepprg'。
+
+	默认为：
+	- 若 ripgrep 可用则为 "rg --vimgrep -uu "（|:checkhealth|），
+	- 在 Unix 上为 "grep -HIn $* /dev/null"，
+	- 在 Windows 上为 "findstr /n $* nul"。
+
+	Ripgrep 可能会做额外过滤，例如使用 .gitignore 规则以及跳过隐藏文件。
+	默认情况下（通过 "-u"）这是被禁用的，以便更接近标准 grep 的行为。
+	你可以用 -i/--ignore-case 和 -S/--smart-case 选项让 ripgrep 与 Vim 的
+	大小写处理保持一致。可以监听 |OptionSet| 以便在例如 'ignorecase' 改变时
+	动态更新 'grepprg'。
+
+				*'guicursor'* *'gcr'* *E545* *E546* *E548* *E549*
+'guicursor' 'gcr'	string	(default "n-v-c-sm:block,i-ci-ve:ver25,r-cr-o:hor20,t:block-blinkon500-blinkoff500-TermCursor")
+			global
+	为每个模式配置光标样式。在 GUI 和许多终端中有效。见 |tui-cursor-shape|。
+
+	要禁用光标样式，重置该选项： >vim
+		set guicursor=
+
+<	要启用各模式形状、"Cursor" 高亮和闪烁： >vim
+		set guicursor=n-v-c:block,i-ci-ve:ver25,r-cr:hor20,o:hor50
+		  \,a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor
+		  \,sm:block-blinkwait175-blinkoff150-blinkon175
+
+<	该选项是以逗号分隔的部件列表。每个部件由一个模式列表和一个
+	参数列表组成：
+		mode-list:argument-list,mode-list:argument-list,..
+	模式列表是以连字符分隔的下列模式列表：
+		n	Normal 模式
+		v	Visual 模式
+		ve	'selection' 为 "exclusive" 的 Visual 模式（若未指定则
+			与 'v' 相同）
+		o	Operator-pending 模式
+		i	Insert 模式
+		r	Replace 模式
+		c	命令行 Normal（追加）模式
+		ci	命令行 Insert 模式
+		cr	命令行 Replace 模式
+		sm	Insert 模式中的 showmatch
+		t	Terminal 模式
+		a	所有模式
+	参数列表是以连字符分隔的下列参数列表：
+		hor{N}	水平条，{N} 为字符高度的百分比
+		ver{N}	竖直条，{N} 为字符宽度的百分比
+		block	块状光标，填满整个字符
+			- 上述三项中只应出现一项。
+			- 每个模式默认为 "block"。
+		blinkwait{N}				*cursor-blinking*
+		blinkon{N}
+		blinkoff{N}
+			光标闪烁时间：blinkwait 是光标开始闪烁前的延迟，
+			blinkon 是光标显示的时间，blinkoff 是光标不显示的
+			时间。时间单位是毫秒。当其中一个数值为零时不闪烁。
+			例如： >vim
+				set guicursor=n:blinkon0
+<
+			每个模式默认为 "blinkon0"。
+		{group-name}
+			决定光标颜色和字体的高亮组。
+			在 |TUI| 中：
+			- |inverse|/reverse 且未给出 group-name 时会被解释为
+			  "宿主终端默认的光标颜色"，通常意味着「反色的
+			  bg 与 fg 颜色」。
+			- |ctermfg| 和 |guifg| 被忽略。
+		{group-name}/{group-name}
+			两个高亮组名称，第一个在未使用语言映射时使用，
+			另一个在使用时使用。|language-mapping|
+
+	部件示例：
+	   n-c-v:block-nCursor	在 Normal、命令行和 Visual 模式中，使用
+				颜色取自 "nCursor" 高亮组的块状光标
+	   n-v-c-sm:block,i-ci-ve:ver25-Cursor,r-cr-o:hor20
+				在 Normal 等模式中使用块状光标，颜色为宿主
+				终端定义的默认颜色。在 Insert 类模式中，使用
+				颜色取自 "Cursor" 高亮组的竖直条光标。在
+				Replace 类模式中，使用默认颜色的下划线光标。
+	   i-ci:ver30-iCursor-blinkwait300-blinkon200-blinkoff150
+				在 Insert 和命令行 Insert 模式中，使用宽度 30%
+				的竖直条光标，颜色取自 "iCursor" 高亮组。
+				闪烁稍快一些。
+
+	'a' 模式不同。它会为所有模式设置给定的参数列表。它不会把任何
+	东西重置为默认值。这可用于对所有模式做统一设置。例如，关闭
+	闪烁："a:blinkon0"
+
+	光标高亮示例： >vim
+	    highlight Cursor gui=reverse guifg=NONE guibg=NONE
+	    " Note: gui=reverse overrides colors.
+	    highlight Cursor gui=NONE guifg=bg guibg=fg
+<
+
+					*'guifont'* *'gfn'* *E235* *E596*
+'guifont' 'gfn'		string	(default "DejaVu Sans Mono,Courier New,monospace"
+                                 Mac: "SF Mono,Menlo,Monaco,Courier New,monospace"
+                                 Linux: "Source Code Pro,DejaVu Sans Mono,Courier New,monospace"
+                                 MS-Windows: "Cascadia Code,Cascadia Mono,Consolas,Courier New,monospace")
+			global
+	这是用于 Vim 的 GUI 版本的字体列表。
+	最简单的形式下该值只有一个字体名。找不到该字体时会得到错误消息。
+	要尝试其它字体名可以给出一个列表，字体名之间用逗号分隔。
+	使用第一个有效的字体。
+
+	逗号之后的空格被忽略。要在字体名中包含逗号，需在其前面加一个
+	反斜杠。设置选项时，空格和反斜杠前都需额外加一个反斜杠。另见
+	|option-backslash|。例如： >vim
+	    set guifont=Screen15,\ 7x13,font\\,with\\,commas
+<	这会让 Vim 首先尝试使用字体 "Screen15"，如果失败则尝试使用 "7x13"，
+	然后改用 "font,with,commas"。
+
+	若所有字体都无法加载，Vim 会保留当前设置。
+	若给出的字体列表为空，Vim 会尝试使用其它资源设置（对 X 而言会用
+	Vim.font 资源），最后会尝试某个应当总是存在的内建默认值（在 X 的
+	情形下是 "7x13"）。给出的字体名应为 "normal" 字体。Vim 会尝试查找
+	相应的粗体与斜体字体。
+
+	对 Win32 和 Mac OS： >vim
+	    set guifont=*
+<	会弹出字体选择器，你可以在其中挑选想要的字体。
+
+	字体名取决于所用的 GUI。
+
+	对 Mac OSX 可以使用类似这样的写法： >vim
+	    set guifont=Monaco:h10
+<								*E236*
+	注意字体必须是等宽的（所有字符宽度相同）。
+
+	要在 X11 上预览字体，或许可以使用 "xfontsel" 程序。"xlsfonts" 程序
+	会给出所有可用字体的列表。
+
+	对 Win32 GUI					*E244* *E245*
+	- 在字体名中接受这些选项：
+		hXX - 高度为 XX（点，可以是浮点数）
+		wXX - 宽度为 XX（点，可以是浮点数）
+		b   - 粗体
+		i   - 斜体
+		u   - 下划线
+		s   - 删除线
+		cXX - 字符集 XX。有效的字符集有：ANSI, ARABIC,
+		      BALTIC, CHINESEBIG5, DEFAULT, EASTEUROPE, GB2312, GREEK,
+		      HANGEUL, HEBREW, JOHAB, MAC, OEM, RUSSIAN, SHIFTJIS,
+		      SYMBOL, THAI, TURKISH, VIETNAMESE ANSI 和 BALTIC。
+		      通常你会用 "cDEFAULT"。
+
+	  用 ':' 分隔各个选项。
+	- 可以用 '_' 代替空格，这样就不必用反斜杠来转义空格。
+	- 示例： >vim
+	    set guifont=courier_new:h12:w5:b:cRUSSIAN
+	    set guifont=Andale_Mono:h7.5:w4.5
+<
+
+				*'guifontwide'* *'gfw'* *E231* *E533* *E534*
+'guifontwide' 'gfw'	string	(default "")
+			global
+	用于双宽字符的字体，以逗号分隔的列表。
+	会使用第一个能加载的字体。
+
+	注意：这些字体的宽度必须正好是 'guifont' 所指定字体的两倍，
+	并且高度相同。
+
+	当 'guifont' 有有效字体而 'guifontwide' 为空时，Vim 会尝试把
+	'guifontwide' 设为匹配的双宽字体。
+
+						*'helpfile'* *'hf'*
+'helpfile' 'hf'		string	(default (MS-Windows) "$VIMRUNTIME\doc\help.txt"
+                                         (others) "$VIMRUNTIME/doc/help.txt")
+			global
+			Disallowed in |modeline|. |no-modeline-option|
+	主 help 文件的名称。随附的所有 help 文件应放在同一个目录中。
+	此外，'runtimepath' 中的所有 "doc" 目录也会被使用。
+	环境变量会被展开 |:set_env|。例如："$VIMRUNTIME/doc/help.txt"。
+	若 $VIMRUNTIME 未设置，也会尝试 $VIM。关于包含空格和反斜杠的写法，
+	另见 |$VIMRUNTIME| 与 |option-backslash|。
+
+						*'helpheight'* *'hh'*
+'helpheight' 'hh'	number	(default 20)
+			global
+	用 ":help" 命令打开 help window 时的最小初始高度。help window
+	的初始高度是当前 window 高度的一半；当 'ea' 选项打开时，则与其它
+	window 相同。当高度小于 'helpheight' 时，高度会被设为 'helpheight'。
+	设为 0 可禁用它。
+
+						*'helplang'* *'hlg'*
+'helplang' 'hlg'	string	(default messages language or empty)
+			global
+	以逗号分隔的语言列表。Vim 会使用能找到所需 help 的第一种语言。
+	英文 help 总会作为最后的备选。你可以加上 "en" 以便优先使用英文而非
+	其它语言，但那样只会找到存在于该语言中、而不存在于英文 help 中的 tag。
+	示例： >vim
+		set helplang=de,it
+<	这会先搜索德文 help 文件，然后意大利文，最后英文。
+	在非英文 help 文件中使用 |CTRL-]| 和 ":help!" 时，Vim 会在该选项
+	生效前先尝试在当前语言中查找 tag。见 |help-translated|。
+
+				*'hidden'* *'hid'* *'nohidden'* *'nohid'*
+'hidden' 'hid'		boolean	(default on)
+			global
+	关闭时，buffer 在被 |abandon| 时会被卸载（包括丢失撤销信息）。
+	打开时，buffer 在被 |abandon| 时会变为隐藏。显示在另一个 window 中
+	的 buffer 当然不会变为隐藏。
+
+	在下列三项都成立时，在 buffer 列表中移动的命令有时会隐藏一个 buffer，
+	即使 'hidden' 选项已关闭：
+	- 该 buffer 已被修改
+	- 'autowrite' 关闭或无法写入
+	- 使用了 '!' 标志
+	另见 |windows|。
+
+	要隐藏特定的 buffer 请使用 'bufhidden' 选项。
+	用 ":hide {command}" 可以为一条命令设置 'hidden' |:hide|。
+
+						*'history'* *'hi'*
+'history' 'hi'		number	(default 10000)
+			global
+	会记住 ":" 命令的历史以及先前搜索模式的历史。该选项决定每个历史
+	中可以保存多少条记录（消息保留的条数见 |cmdline-editing| 与
+	'messagesopt'）。
+	最大值为 10000。
+
+				*'hlsearch'* *'hls'* *'nohlsearch'* *'nohls'*
+'hlsearch' 'hls'	boolean	(default on)
+			global
+	当存在上一次的搜索模式时，高亮其所有匹配。|hl-Search| 高亮组决定不在
+	光标之下的匹配的高亮方式，而 |hl-CurSearch| 高亮组（若已定义）决定
+	光标之下那个匹配的高亮方式。若 |hl-CurSearch| 未定义，则两者都使用
+	|hl-Search|。注意只高亮匹配的文本，不应用任何偏移。
+	另见：'incsearch' 和 |:match|。
+	当你对高亮的匹配感到厌烦时，可以用 |:nohlsearch| 关掉它。这不会改变
+	选项的值，只要你一使用搜索命令，高亮就会回来。
+	'redrawtime' 指定查找匹配所花费的最长时间。
+	当搜索模式能匹配行尾时，Vim 会尝试高亮所有匹配的文本。然而这取决于
+	搜索从哪里开始。这将是 window 中的第一行，或闭合折叠之下的第一行。
+	之前某行中未被绘制的匹配可能不会在新绘制的行中延续。
+	你可以用 'shada' 的 'h' 标志 |shada-h| 指定启动时是否恢复高亮状态。
+
+						*'icon'* *'noicon'*
+'icon'			boolean	(default off, on when title can be restored)
+			global
+	打开时，window 的图标文本会被设为 'iconstring' 的值（若它非空），或
+	设为当前正在编辑的文件名。只使用文件名的最后一部分。
+	会被 'iconstring' 选项覆盖。
+	只有在终端支持设置 window 图标时才有效。
+
+							*'iconstring'*
+'iconstring'		string	(default "")
+			global
+	当该选项非空时，它会被用作 window 的图标文本。这仅在 'icon' 选项打开
+	时发生。
+	只有在终端支持设置 window 图标文本时才有效
+	当该选项含有 printf 风格的 '%' 项时，它们会按照 'statusline' 所用的
+	规则展开。示例设置见 'titlestring'。
+	当 'modelineexpr' 关闭时，该选项不能在 modeline 中设置。
+
+			*'ignorecase'* *'ic'* *'noignorecase'* *'noic'*
+'ignorecase' 'ic'	boolean	(default off)
+			global
+	在搜索模式、|cmdline-completion|、在 tags 文件中搜索、|expr-==| 以及
+	插入模式补全 |ins-completion| 中忽略大小写。
+	另见 'smartcase' 和 'tagcase'。
+	可以用模式中的 "\c" 或 "\C" 推翻它，见 |/ignorecase|。
+
+						*'iminsert'* *'imi'*
+'iminsert' 'imi'	number	(default 0)
+			local to buffer
+	指定在插入模式中是否使用 :lmap 或输入法 (IM)。有效值：
+		0	:lmap 关闭且 IM 关闭
+		1	:lmap 打开且 IM 关闭
+		2	:lmap 关闭且 IM 打开
+	要在用 <Esc> 离开插入模式时总是把该选项重置为零，
+	可以这样： >vim
+		inoremap <ESC> <ESC>:set iminsert=0<CR>
+<	这样，在离开插入模式时 :lmap 和 IM 会自动关闭。
+	注意在插入模式中使用 CTRL-^ 时该选项会改变 |i_CTRL-^|。
+	把 'keymap' 设为有效的 keymap 名称时，该值会被设为 1。
+	它也被用作 "r" 和 "f" 这类命令的参数。
+
+						*'imsearch'* *'ims'*
+'imsearch' 'ims'	number	(default -1)
+			local to buffer
+	指定在输入搜索模式时是否使用 :lmap 或输入法 (IM)。有效值：
+		-1	使用 'iminsert' 的值，看起来就像在输入搜索模式时
+			也使用了 'iminsert'
+		0	:lmap 关闭且 IM 关闭
+		1	:lmap 打开且 IM 关闭
+		2	:lmap 关闭且 IM 打开
+	注意在命令行模式中使用 CTRL-^ 时该选项会改变 |c_CTRL-^|。
+	当该值不是 -1 且把 'keymap' 选项设为有效的 keymap 名称时，该值会
+	被设为 1。
+
+						*'inccommand'* *'icm'*
+'inccommand' 'icm'	string	(default "nosplit")
+			global
+	非空时，在你输入的同时显示 |:substitute|、|:smagic|、|:snomagic| 以及
+	带 |:command-preview| 标志的用户命令的效果。
+
+	可能的值：
+		nosplit	在 buffer 中增量显示命令的效果。
+		split	同 "nosplit"，但还会在预览 window 中显示屏幕外的
+			部分结果。
+
+	如果内建命令的预览太慢（超过 'redrawtime'），'inccommand' 会被自动
+	禁用，直到 |Command-line-mode| 结束。
+
+						*'include'* *'inc'*
+'include' 'inc'		string	(default "")
+			global or local to buffer |global-local|
+	用于查找 include 命令的模式。它和 "/" 命令一样是一个搜索模式
+	（见 |pattern|）。该选项用于 "[i"、"]I"、"[d" 等命令。
+	通常用 'isfname' 选项识别匹配模式之后的文件名。但如果模式中出现
+	"\zs"，则从 "\zs" 到末尾（若出现 "\ze" 则到 "\ze"）匹配的文本会被
+	用作文件名。用它包含不在 'isfname' 中的字符，比如空格。然后你可以用
+	'includeexpr' 处理匹配到的文本。
+	关于包含空格和反斜杠，见 |option-backslash|。
+
+						*'includeexpr'* *'inex'*
+'includeexpr' 'inex'	string	(default "")
+			local to buffer
+	用于把 'include' 选项找到的字符串转换为文件名的表达式。主要用于把
+	"." 改成 "/" 以适用于 Java： >vim
+		setlocal includeexpr=substitute(v:fname,'\\.','/','g')
+<	"v:fname" 变量会被设为检测到的文件名。
+	注意是双反斜杠：`:set` 命令先把它减半，于是值中剩一个，其中 "\."
+	按字面匹配一个点。对于简单的字符替换，`tr()` 可以避免转义： >vim
+		setlocal includeexpr=tr(v:fname,'.','/')
+<
+	当找不到未修改的文件名时，|gf| 命令也会用到它。这样就能在 'include'
+	语句之后的名称上执行 "gf"。
+	注意：不用于 |<cfile>|。
+
+	如果表达式以 s: 或 |<SID>| 开头，它会被替换为脚本 ID
+	(|local-function|)。示例： >vim
+		setlocal includeexpr=s:MyIncludeExpr()
+		setlocal includeexpr=<SID>SomeIncludeExpr()
+<	否则，表达式会在设置该选项的脚本的上下文中求值，因此脚本局部项目
+	是可用的。
+
+	如果值只是一个不带参数的函数调用，效率会更高，
+	见 |expr-option-function|。
+
+	当在 modeline 中设置时，表达式会在 |sandbox| 中求值，
+	见 |sandbox-option|。
+	当 'modelineexpr' 关闭时，该选项不能在 modeline 中设置。
+
+	在求值 'includeexpr' 期间不允许修改文本或跳到另一个 window |textlock|。
+
+				*'incsearch'* *'is'* *'noincsearch'* *'nois'*
+'incsearch' 'is'	boolean	(default on)
+			global
+	在输入搜索命令时，显示到目前为止输入的模式匹配的位置。匹配到的字符串
+	会被高亮。如果模式无效或未找到，则不显示任何内容。屏幕会频繁更新，
+	因此只在快速的终端上才有用。
+	注意匹配会被显示，但当未找到匹配以及按下 <Esc> 时，光标会回到原来的
+	位置。你仍然需要用 <Enter> 结束搜索命令才能把光标移到匹配处。
+	用 CTRL-G 和 CTRL-T 键移动到下一个和上一个匹配。|c_CTRL-G| |c_CTRL-T|
+	Vim 只搜索大约半秒钟。对于复杂的模式和/或大量文本，可能找不到匹配。
+	这是为了避免在你输入模式时 Vim 卡住。
+	|hl-IncSearch| 高亮组决定高亮方式。
+	当 'hlsearch' 打开时，在输入搜索命令期间所有匹配的字符串也会被高亮。
+	另见：'hlsearch'。
+	如果你不想打开 'hlsearch'，但又想在搜索时高亮所有匹配，可以用 autocmd
+	打开和关闭 'hlsearch'。示例： >vim
+		augroup vimrc-incsearch-highlight
+		  autocmd!
+		  autocmd CmdlineEnter [\/\?] :set hlsearch
+		  autocmd CmdlineLeave [\/\?] :set nohlsearch
+		augroup END
+<
+	CTRL-L 可以把当前匹配之后的一个字符添加到命令行。如果 'ignorecase'
+	和 'smartcase' 都已设置且命令行中没有大写字符，添加的字符会被转换为
+	小写。
+	CTRL-R CTRL-W 可以把当前匹配末尾的 word 添加到命令行，不包括已经输入
+	的那些字符。
+
+						*'indentexpr'* *'inde'*
+'indentexpr' 'inde'	string	(default "")
+			local to buffer
+	求值以获得某行正确缩进的表达式。在创建新行时、对 |=| 运算符以及
+	在插入模式中按 'indentkeys' 选项的规定使用。
+	当该选项非空时，它会覆盖 'cindent' 和 'smartindent' 的缩进。当 'lisp'
+	已设置时，该选项只在 'lispoptions' 含有 "expr:1" 时使用。
+	求值该表达式时 |v:lnum| 被设为要计算缩进的行号。求值该表达式时光标
+	也位于该行（但它可能被移动）。
+
+	如果表达式以 s: 或 |<SID>| 开头，它会被替换为脚本 ID
+	(|local-function|)。示例： >vim
+		set indentexpr=s:MyIndentExpr()
+		set indentexpr=<SID>SomeIndentExpr()
+<	否则，表达式会在设置该选项的脚本的上下文中求值，因此脚本局部项目
+	是可用的。
+
+	使用不带参数的函数调用的好处是更快，
+	见 |expr-option-function|。
+
+	该表达式必须返回相当于缩进的空格数。它可以返回 "-1" 以保持当前缩进
+	（这意味着缩进使用 'autoindent'）。
+	用于计算缩进的有用函数有 |indent()|、|cindent()| 和 |lispindent()|。
+	该表达式的求值不得有副作用！它不得修改文本、跳到另一个 window 等。
+	之后光标位置总会被恢复，因此光标可能被移动。
+	通常该选项会被设置为调用一个函数： >vim
+		set indentexpr=GetMyIndent()
+<	除非 'debug' 选项含有 "msg"，否则错误消息会被抑制。
+	见 |indent-expression|。
+
+	当在 modeline 中设置时，表达式会在 |sandbox| 中求值，
+	见 |sandbox-option|。
+	当 'modelineexpr' 关闭时，该选项不能在 modeline 中设置。
+
+	在求值 'indentexpr' 期间不允许修改文本或跳到另一个 window |textlock|。
+
+						*'indentkeys'* *'indk'*
+'indentkeys' 'indk'	string	(default "0{,0},0),0],:,0#,!^F,o,O,e")
+			local to buffer
+	在插入模式中输入时会导致当前行重新缩进的键的列表。仅在 'indentexpr'
+	非空时发生。
+	格式与 'cinkeys' 相同，见 |indentkeys-format|。
+	见 |C-indenting| 和 |indent-expression|。
+
+			*'infercase'* *'inf'* *'noinfercase'* *'noinf'*
+'infercase' 'inf'	boolean	(default off)
+			local to buffer
+	在插入模式中进行关键字补全 |ins-completion| 且 'ignorecase' 也打开时，
+	匹配的大小写会根据已输入的文本调整。如果已输入的文本在某个位置是小写
+	字母而匹配在该位置是大写字母，则补全的部分会变为小写。如果已输入的
+	文本没有小写字母，而匹配在已输入文本为大写字母的位置是小写字母，且它
+	前面有一个字母，则补全的部分会变为大写。
+	使用 'noinfercase' 时匹配按原样使用。
+
+						*'isfname'* *'isf'*
+'isfname' 'isf'		string	(default for Windows:
+                             "@,48-57,/,\,.,-,_,+,,,#,$,%,{,},[,],@-@,!,~,="
+                            otherwise: "@,48-57,/,.,-,_,+,,,#,$,%,~,=")
+			global
+	该选项指定的字符会被包含在文件名和路径名中。文件名用于 "gf"、"[i"
+	这类命令以及 tags 文件中。它也用于 |pattern| 中的 "\f"。
+	256 及以上的多字节字符总是被包含，用该选项只能指定 255 及以下的字符。
+	对于 UTF-8，0xa0 到 0xff 的字符也会被包含。
+	在往该选项添加空白字符之前要三思。虽然文件名中可能出现空格，但后果是
+	Vim 在补全时不知道文件名从哪里开始、到哪里结束。
+	'isfname' 中不含空格时多半效果更好。
+
+	注意在使用反斜杠作为路径分隔符的系统上，Vim 会尽力让它按你期望的方式
+	工作。这有点棘手，因为 Vi 最初用反斜杠来转义特殊字符。在这些系统上，
+	Vim 不会删除普通文件名字符前面的反斜杠，但在 Unix 及其同类系统上会
+	删除。默认不包含 '&' 和 '^'，因为它们对 cmd.exe 来说是特殊的。
+
+	该选项的格式是用逗号分隔的部分列表。每个部分可以是一个字符编号或一个
+	范围。范围是两个字符编号中间加 '-'。字符编号可以是 0 到 255 之间的
+	十进制数，也可以是 ASCII 字符本身（对数字不适用）。示例：
+		"_,-,128-140,#-43"	（包含 '_' 和 '-'，以及 128 到 140
+					的范围和 '#' 到 43）
+	如果某个部分以 '^' 开头，则它后面的字符编号或范围会从该选项中排除。该
+	选项从左到右解释。把要排除的字符放在包含它的范围之后。要包含 '^' 本身，
+	请把它用作该选项的最后一个字符或某个范围的末尾。示例：
+		"^a-z,#,^"	（排除 'a' 到 'z'，包含 '#' 和 '^'）
+	如果字符是 '@'，则所有 isalpha() 返回 TRUE 的字符都会被包含。通常这些
+	是 a 到 z 和 A 到 Z 的字符，再加上带重音的字符。要包含 '@' 本身请使用
+	"@-@". 示例：
+		"@,^a-z"	所有字母字符，但不包括小写 ASCII 字母。
+		"a-z,A-Z,@-@"	所有字母加上 '@' 字符。
+	可以在期望字符编号的位置写一个逗号来包含逗号。示例：
+		"48-57,,,_"	数字、逗号和下划线。
+	可以在逗号前面加 '^' 来排除逗号。示例：
+		" -~,^,,9"	从空格到 '~' 的所有字符，排除逗号，再加上
+				<Tab>。
+	关于包含空格和反斜杠，见 |option-backslash|。
+
+						*'isident'* *'isi'*
+'isident' 'isi'		string	(default for Windows:
+                                           "@,48-57,_,128-167,224-235"
+                                otherwise: "@,48-57,_,192-255")
+			global
+	该选项给出的字符会被包含在标识符中。标识符用于识别环境变量以及
+	'define' 选项匹配之后的位置。它也用于 |pattern| 中的 "\i"。关于该
+	选项格式的说明见 'isfname'。对 '@' 只使用 255 及以下的字符。
+	注意：如果你修改该选项，可能会破坏环境变量的展开。例如，当包含 '/'
+	而 Vim 试图展开 "$HOME/.local/state/nvim/shada/main.shada" 时。也许你
+	应该改 'iskeyword' 而不是它。
+
+						*'iskeyword'* *'isk'*
+'iskeyword' 'isk'	string	(default "@,48-57,_,192-255")
+			local to buffer
+	关键字用于许多命令的搜索和识别："w"、"*"、"[i" 等。它也用于 |pattern|
+	中的 "\k"。关于该选项格式的说明见 'isfname'。对于 '@'，255 以上的
+	字符请查看 "word" 字符类（根据 Unicode 通用类别被归类为字母、数字或
+	emoji 的任何字符）。
+
+	注意 "\k" 字符类和 |word| 动作之间有区别。前者匹配任何 word 字符，而
+	后者在字符类发生变化时停止。
+
+	对于 C 程序，你可以使用 "a-z,A-Z,48-57,_,.,-,>"。
+	对于 help 文件，它被设为所有非空白的可打印字符，但 "*"、'"' 和 '|'
+	除外（这样在命令上按 CTRL-] 就能找到该命令的 help）。
+	当 'lisp' 选项打开时，'-' 字符总是被包含。
+	该选项也会影响语法高亮，除非语法使用了 |:syn-iskeyword|。
+
+						*'isprint'* *'isp'*
+'isprint' 'isp'		string	(default "@,161-255")
+			global
+	该选项给出的字符会直接显示在屏幕上。它也用于 |pattern| 中的 "\p"。从
+	空格（ASCII 32）到 '~'（ASCII 126）的字符总是直接显示，即使它们未
+	包含在 'isprint' 中或被排除。关于该选项格式的说明见 'isfname'。
+
+	不可打印字符用两个字符显示：
+		  0 -  31	"^@" - "^_"
+		 32 - 126	总是单个字符
+		   127		"^?"
+		128 - 159	"~@" - "~_"
+		160 - 254	"| " - "|~"
+		   255		"~?"
+	128 到 255 的非法字节（无效 UTF-8）会显示为 <xx>，其中 xx 是该字节的
+	十六进制值。
+	当 'display' 含有 "uhex" 时，所有不可打印字符都显示为 <xx>。
+	不可打印字符会使用 SpecialKey 高亮。|hl-SpecialKey|
+
+	256 及以上的多字节字符总是被包含，用该选项只能指定 255 及以下的字符。
+	当一个字符可打印但当前字体中没有时，会显示一个替换字符。
+	不可打印和零宽的 Unicode 字符会显示为 <xxxx>。没有选项可以指定这些
+	字符。
+
+			*'joinspaces'* *'js'* *'nojoinspaces'* *'nojs'*
+'joinspaces' 'js'	boolean	(default off)
+			global
+	使用连接命令时，在 '.'、'?' 和 '!' 之后插入两个空格。否则只插入一个
+	空格。
+
+						*'jumpoptions'* *'jop'*
+'jumpoptions' 'jop'	string	(default "clean")
+			global
+	改变 |jumplist| 行为的单词列表。
+	  stack         让 jumplist 的行为像 tagstack 一样。jumplist 中条目的
+			相对位置会被保留，代价是在 jumplist 中向后导航然后跳转
+			到某个位置时会丢弃后续条目。|jumplist-stack|
+
+	  view          在 jumplist、|changelist|、|alternate-file| 中移动，使用
+			|mark-motions| 或弹出 |tagstack| 时，尝试恢复该动作发生
+			时所在的 |mark-view|。
+
+	  clean         从 jumplist 中移除未加载的 buffer。
+
+						*'keymap'* *'kmp'* *E544*
+'keymap' 'kmp'		string	(default "")
+			local to buffer
+	键盘映射的名称。见 |mbyte-keymap|。
+	把该选项设为有效的 keymap 名称会有把 'iminsert' 设为一的副作用，这样
+	keymap 才会生效。'imsearch' 也会被设为一，除非它本来是 -1。
+	只能使用字母数字字符、'.'、'-' 和 '_'。
+
+						*'keymodel'* *'km'*
+'keymodel' 'km'		string	(default "")
+			global
+	逗号分隔的单词列表，这些单词启用按键可以做的特殊事情。可以使用这些值：
+	   startsel	使用带 Shift 的特殊键开始选择（是 Select 模式还是 Visual
+			模式，取决于 'selectmode' 中是否有 "key"）。
+	   stopsel	使用不带 Shift 的特殊键停止选择。
+	此上下文中的特殊键是光标键、<End>、<Home>、<PageUp> 和 <PageDown>。
+
+						*'keywordprg'* *'kp'*
+'keywordprg' 'kp'	string	(default ":Man", Windows: ":help")
+			global or local to buffer |global-local|
+			Disallowed in |modeline|. |no-modeline-option|
+	用于 |K| 命令的程序。环境变量会被展开 |:set_env|。
+
+	特殊情况：
+	- ":help" 使用 |:help| 打开光标处的 |word|。（注意以前把全局选项设为
+	  空值就能做到这一点，现在这种做法已废弃。）
+	- ":help!" 对光标处的 |WORD| 执行 |:help!|（DWIM）。
+	- 如果值以 ":" 开头，则它被当作 Ex 命令调用，若存在 [count] 则作为第一
+	  个参数传入。
+	- 如果值是 "man" 或 "man -s"，[count] 是 man 手册的章节号。
+
+	关于包含空格和反斜杠，见 |option-backslash|。
+
+	示例： >vim
+		set keywordprg=:help!
+		set keywordprg=man\ -s
+		set keywordprg=:Man
+<
+
+					*'langmap'* *'lmap'* *E357* *E358*
+'langmap' 'lmap'	string	(default "")
+			global
+			Disallowed in |modeline|. |no-modeline-option|
+	该选项允许把你的键盘切换到特殊的语言模式。当你在插入模式中输入文本时，
+	字符被直接插入。在普通模式中，'langmap' 选项负责把这些特殊字符翻译成
+	按键原来的含义。这意味着你不必为了执行普通模式命令而改变键盘模式。
+	这与 'keymap' 选项相反，在后者中字符是在插入模式中被映射的。
+	还要考虑把 'langremap' 设为 off，以防止 'langmap' 作用于映射产生的
+	字符。
+
+	示例（希腊语，UTF-8）：				*greek*  >vim
+	    set langmap=ΑA,ΒB,ΨC,ΔD,ΕE,ΦF,ΓG,ΗH,ΙI,ΞJ,ΚK,ΛL,ΜM,ΝN,ΟO,ΠP,QQ,ΡR,ΣS,ΤT,ΘU,ΩV,WW,ΧX,ΥY,ΖZ,αa,βb,ψc,δd,εe,φf,γg,ηh,ιi,ξj,κk,λl,μm,νn,οo,πp,qq,ρr,σs,τt,θu,ωv,ςw,χx,υy,ζz
+<	示例（交换 z 和 y 对命令的含义）： >vim
+	    set langmap=zy,yz,ZY,YZ
+<
+	'langmap' 选项是用逗号分隔的部分列表。每个部分可以是两种形式之一：
+	1.  一组对。每对是一个 "from" 字符紧接着一个 "to" 字符。示例："aA"、
+	    "aAbBcC"。
+	2.  一组 "from" 字符、一个分号，然后是一组 "to" 字符。示例："abc;ABC"
+	示例："aA,fgh;FGH,cCdDeE"
+	特殊字符前面需要加反斜杠。这些字符是 ";"、','、'"'、'|' 和反斜杠本身。
+
+	这会让你无需在两种语言之间来回切换就能激活 vim 动作。在下列情况中，你的
+	语言字符会被理解为普通的 vim 英文字符（根据 langmap 映射）：
+	 o 普通/可视模式（命令、buffer/register 名、用户映射）
+	 o 插入/替换模式：CTRL-R 之后的 Register 名
+	 o 插入/替换模式：映射
+	在命令行模式中输入的字符不会受该选项影响。注意该选项可以随时修改，从而
+	在不同的语言/编码的映射之间切换。使用映射来省去每次都要输入的麻烦！
+
+						*'langmenu'* *'lm'*
+'langmenu' 'lm'		string	(default "")
+			global
+	菜单翻译使用的语言。告诉 Vim 从 'runtimepath' 中的 "lang" 目录加载哪个
+	文件： >vim
+		"lang/menu_" .. &langmenu .. ".vim"
+<	（不含空格）。
+	例如，要总是使用荷兰语菜单，无论 $LANG 被设为什么： >vim
+		set langmenu=nl_NL.ISO_8859-1
+<	当 'langmenu' 为空时，使用 |v:lang|。
+	只能使用普通的文件名字符，`/\*?[|<>` 是非法的。
+	如果你的 $LANG 被设为非英语语言，但你确实想使用英语菜单： >vim
+		set langmenu=none
+<	该选项必须在加载菜单、打开文件类型检测或语法高亮之前设置。一旦菜单已
+	定义，设置该选项就没有效果了。但你可以这样做： >vim
+		source $VIMRUNTIME/delmenu.vim
+		set langmenu=de_DE.ISO_8859-1
+		source $VIMRUNTIME/menu.vim
+<	警告：这会删除你自己定义的所有菜单！
+
+			*'langremap'* *'lrm'* *'nolangremap'* *'nolrm'*
+'langremap' 'lrm'	boolean	(default off)
+			global
+	关闭时，设置 'langmap' 不会作用于映射产生的字符。如果设置 'langmap' 会
+	禁用你的一些映射，请确保该选项为 off。
+
+						*'laststatus'* *'ls'*
+'laststatus' 'ls'	number	(default 2)
+			global
+	该选项的值影响最后一个 window 何时拥有状态行：
+		0: 从不
+		1: 仅当至少有两个 window 时
+		2: 总是
+		3: 总是，且仅最后一个 window
+	如果你有多个 window，带状态行时屏幕看起来更漂亮，但它会多占一个
+	屏幕行。|status-line|
+
+			*'lazyredraw'* *'lz'* *'nolazyredraw'* *'nolz'*
+'lazyredraw' 'lz'	boolean	(default off)
+			global
+	设置该选项后，在执行宏、register 和其它不是手动输入的命令期间，屏幕不会
+	被重绘。此外，window 标题的更新也会被推迟。要强制更新，
+	请使用 |:redraw|。
+	这偶尔会导致显示错误。它只适合在重绘可能引起闪烁或导致变慢的操作中临时
+	设置。
+
+						*'lhistory'* *'lhi'*
+'lhistory' 'lhi'	number	(default 10)
+			local to window
+	类似 'chistory'，但用于与某个 window 关联的 location list 栈。如果在
+	location list window 本身或与该 location list 栈关联的 window 中修改该
+	选项，新值也会应用到另一个上。这意味着对于给定的 location list window
+	及其对应的 window，该值总是相同的。更多信息见 |quickfix-stack|。
+
+			*'linebreak'* *'lbr'* *'nolinebreak'* *'nolbr'*
+'linebreak' 'lbr'	boolean	(default off)
+			local to window
+	如果打开，Vim 会在 'breakat' 中的某个字符处而不是在屏幕上能容纳的最后
+	一个字符处折行。与 'wrapmargin' 和 'textwidth' 不同，这不会在文件中插入
+	<EOL>，它只影响文件的显示方式，不影响其内容。如果设置了 'breakindent'，
+	行会在视觉上缩进。然后 'showbreak' 的值会被用于放在折行之前。当 'wrap'
+	选项关闭时不使用该选项。
+	注意 <EOL> 之后的 <Tab> 字符大多不会以正确的空白量显示。
+
+							*'lines'* *E593*
+'lines'			number	(default 24 or terminal height)
+			global
+	Vim window 的行数。
+	通常你不需要设置它。它由终端初始化代码自动完成。
+	当 Vim 在 GUI 或可调整大小的 window 中运行时，设置该选项会导致 window
+	大小被改变。当你只想为 GUI 使用该大小时，把命令放到你的 |gvimrc| 文件
+	中。
+	Vim 会把行数限制在屏幕能容纳的范围内。你可以用这条命令获得尽可能高的
+	window： >vim
+		set lines=999
+<	最小值为 2，最大值为 1000。
+
+						*'linespace'* *'lsp'*
+'linespace' 'lsp'	number	(default 0)
+			global
+			only in the GUI
+	在字符之间插入的像素行数。如果字体使用整个字符单元高度，使各行互相接触，
+	这个选项就很有用。非零时就有空间放下划线。
+	有些字体在行间可能有太多空间（为了容纳上伸部和下伸部）。这时把
+	'linespace' 设为负值就有意义了。不过这可能导致显示问题！
+
+						*'lisp'* *'nolisp'*
+'lisp'			boolean	(default off)
+			local to buffer
+	Lisp 模式：在插入模式中输入 <Enter> 时，把下一行的缩进设为 Lisp 标准
+	（嗯，算是吧）。用 "cc" 或 "S" 时也会这样。要使其生效，'autoindent' 也
+	必须打开。另见 'lispwords'。
+	'-' 字符被包含在关键字字符中。如果 'equalprg' 为空，则重新定义 "="
+	运算符，使用这同一套缩进算法而不是调用外部程序。
+
+						*'lispoptions'* *'lop'*
+'lispoptions' 'lop'	string	(default "")
+			local to buffer
+	当用 'lisp' 选项启用 Lisp 缩进时，影响它的项的逗号分隔列表。目前只支持
+	一项：
+		expr:1	在设置了 'indentexpr' 时，将它用于 Lisp 缩进
+		expr:0	不把 'indentexpr' 用于 Lisp 缩进（默认）
+	注意使用 'indentexpr' 时，`=` 运算符会缩进所有行，否则第一行不会被缩进
+	（Vi 兼容）。
+
+						*'lispwords'* *'lw'*
+'lispwords' 'lw'	string	（默认非常长）
+			global 或 local to buffer |global-local|
+	逗号分隔的单词列表；当用 'lisp' 选项启用时，它们会影响 Lisp 的
+	缩进行为。
+
+						*'list'* *'nolist'*
+'list'			boolean	（默认关闭）
+			local to window
+	List 模式：默认情况下，把 tab 显示为 ">"，把行尾空格显示为 "-"，
+	把不间断空格字符显示为 "+"。用来分辨 tab 与空格的区别、以及查看
+	行尾空白很有用。可通过 'listchars' 选项进一步定制。
+
+	当 'listchars' 不含 "tab" 字段时，tab 显示为 "^I" 或 "<09>"，
+	就像显示不可打印字符那样。
+
+	在 Normal 模式下，光标显示在 Tab 字符所占空间的起始处，而不是像
+	通常那样显示在末尾。若要在用空格显示 Tab 的同时获得这种光标位置，
+	可以使用： >vim
+		let &list = v:true | let &lcs = 'tab:  '
+<
+	注意：当 'cpoptions' 包含 'L' 时，list 模式也会影响格式化（由
+	'textwidth' 或 'wrapmargin' 设置）。改变 tab 的显示方式参见
+	'listchars'。
+
+						*'listchars'* *'lcs'*
+'listchars' 'lcs'	string	（默认 "tab:> ,trail:-,nbsp:+"）
+			global 或 local to window |global-local|
+	用于 'list' 模式和 |:list| 命令的字符串。它是一个逗号分隔的
+	字符串设置列表。 *E1511*
+
+							*lcs-eol*
+	  eol:c		在每行行尾显示的字符。省略时，行尾不显示
+			额外字符。
+							*lcs-tab*
+	  tab:xy[z]	用来显示一个 tab 的两个或三个字符。
+			第三个字符是可选的。
+
+	  tab:xy	总是使用 'x'，然后尽可能多地使用 'y'。因此
+			"tab:>-" 会显示为： >
+				>
+				>-
+				>--
+				etc.
+<
+	  tab:xyz	总是使用 'z'，然后在前面加上 'x'，再尽可能多地
+			使用 'y'。因此 "tab:<->" 会显示为： >
+				>
+				<>
+				<->
+				<-->
+				etc.
+<
+			省略 "tab:" 时，tab 显示为 ^I。
+							*lcs-space*
+	  space:c	用于显示空格的字符。省略时，空格留空。
+							*lcs-multispace*
+	  multispace:c...
+			用于循环显示多个连续空格的一个或多个字符。
+			会覆盖 "space" 设置，但单个空格除外。省略时
+			使用 "space" 设置。例如，
+			`:set listchars=multispace:---+` 会把十个连续
+			空格显示为： >
+				---+---+--
+<
+							*lcs-lead*
+	  lead:c	用于显示行首空格的字符。省略时，行首空格留空。
+			对行首空格会覆盖 "space" 和 "multispace" 设置。
+			可以把它与 "tab:" 结合使用，例如： >vim
+				set listchars+=tab:>-,lead:.
+<
+							*lcs-leadmultispace*
+	  leadmultispace:c...
+			类似 |lcs-multispace| 的值，但只用于行首空格。
+			对行首的多个空格也会覆盖 |lcs-lead|。
+			`:set listchars=leadmultispace:---+` 会把十个
+			连续的行首空格显示为： >
+				---+---+--XXX
+<
+			"XXX" 表示行中第一个非空白字符。
+							*lcs-leadtab*
+	  leadtab:xy[z]
+			类似 |lcs-tab|，但只用于行首的 tab。省略时，
+			行首 tab 使用 "tab" 设置。要让其生效，还必须
+			设置 |lcs-tab|。 *E1572*
+			可以把它与 "tab:" 结合使用，例如： >vim
+				let &listchars = 'tab:>-,leadtab:. '
+<	这会把行首 tab 显示为句点(.)，把其它 tab 显示为
+			">--"。
+							*lcs-trail*
+	  trail:c	用于显示行尾空格的字符。省略时，行尾空格留空。
+			对行尾空格会覆盖 "space" 和 "multispace" 设置。
+							*lcs-extends*
+	  extends:c	当 'wrap' 关闭且该行延伸到屏幕右侧之外时，
+			在最后一列显示的字符。
+							*lcs-precedes*
+	  precedes:c	当第一列可见字符之前还有文本时，在物理行第一个
+			可见列显示的字符。
+							*lcs-conceal*
+	  conceal:c	当 'conceallevel' 设为 1 时，用来代替被隐藏
+			文本而显示的字符。省略时为空格。
+							*lcs-nbsp*
+	  nbsp:c	用于显示不间断空格字符（0xA0（十进制 160）和
+			U+202F）的字符。省略时留空。
+
+	字符 ':' 和 ',' 不应使用。可以使用 UTF-8 字符。所有字符
+	都必须是单宽的。 *E1512*
+
+	每个字符都可以用十六进制指定： >vim
+		set listchars=eol:\\x24
+		set listchars=eol:\\u21b5
+		set listchars=eol:\\U000021b5
+<	注意使用的是双反斜杠。十六进制字符的个数对于 \\x 必须是
+	2 个，对于 \\u 必须是 4 个，对于 \\U 必须是 8 个。
+
+	示例： >vim
+	    set lcs=tab:>-,trail:-
+	    set lcs=tab:>-,eol:<,nbsp:%
+	    set lcs=extends:>,precedes:<
+<	"eol"、"extends" 和 "precedes" 会使用 |hl-NonText| 高亮。
+	"nbsp"、"space"、"tab"、"multispace"、"lead" 和 "trail" 使用
+	|hl-Whitespace|。
+
+			*'loadplugins'* *'lpl'* *'noloadplugins'* *'nolpl'*
+'loadplugins' 'lpl'	boolean	（默认开启）
+			global
+	开启时，插件脚本会在启动时加载 |load-plugins|。可以在 |vimrc|
+	文件中重置此选项，以禁止加载插件。
+	注意：使用 "-u NONE" 和 "--noplugin" 命令行参数会重置此选项。
+	|-u| |--noplugin|
+
+						*'makeef'* *'mef'*
+'makeef' 'mef'		string	（默认 ""）
+			global
+			不允许在 |modeline| 中使用。 |no-modeline-option|
+	|:make| 命令（见 |:make_makeprg|）和 |:grep| 命令所用
+	错误文件的名称。
+	为空时，会使用内部生成的临时文件。
+	当包含 "##" 时，它会被替换成一个数字，使名称唯一。这可以确保
+	":make" 命令不会覆盖已有文件。
+	不会用于 ":cf" 命令。那请参见 'errorfile'。
+	环境变量会被展开 |:set_env|。
+	关于如何包含空格和反斜杠，参见 |option-backslash|。
+
+						*'makeencoding'* *'menc'*
+'makeencoding' 'menc'	string	（默认 ""）
+			global 或 local to buffer |global-local|
+	读取外部命令输出时使用的编码。为空时，不转换编码。
+	用于 `:make`、`:lmake`、`:grep`、`:lgrep`、`:grepadd`、
+	`:lgrepadd`、`:cfile`、`:cgetfile`、`:caddfile`、`:lfile`、`:lgetfile`
+	和 `:laddfile`。
+
+	这主要在使用 MS-Windows 时有用。如果启用了 iconv，把
+	'makeencoding' 设为 "char" 与设为系统 locale 编码效果相同。
+	示例： >vim
+		set makeencoding=char	" system locale is used
+<
+
+						*'makeprg'* *'mp'*
+'makeprg' 'mp'		string	（默认 "make"）
+			global 或 local to buffer |global-local|
+			不允许在 |modeline| 中使用。 |no-modeline-option|
+	用于 ":make" 命令的程序。参见 |:make_makeprg|。
+	此选项可以包含 '%' 和 '#' 字符（见 |:_%| 和 |:_#|），它们会被
+	展开为当前文件名和轮换文件名。使用 |::S| 来转义文件名，以防
+	其中包含特殊字符。
+	环境变量会被展开 |:set_env|。关于如何包含空格和反斜杠，参见
+	|option-backslash|。
+	注意 '|' 必须转义两次：一次为 ":set"，一次为命令的解释。当你
+	使用名为 "myfilter" 的过滤器时，像这样写： >vim
+	    set makeprg=gmake\ \\\|\ myfilter
+<	占位符 "$*" 可以给出（甚至可以多次给出）以指定参数插入的位置，
+	例如： >vim
+	    set makeprg=latex\ \\\\nonstopmode\ \\\\input\\{$*}
+<
+
+						*'matchpairs'* *'mps'*
+'matchpairs' 'mps'	string	（默认 "(:),{:},[:]"）
+			local to buffer
+	成对出现的字符。|%| 命令会从一个跳到另一个。
+	只允许不同字符组成的字符对，因此无法在两个双引号之间跳转。
+	字符之间必须用冒号分隔。
+	各字符对之间必须用逗号分隔。包含 '<' 和 '>'（用于 HTML）的
+	示例： >vim
+		set mps+=<:>
+
+<	一个更奇特的示例：在赋值语句中的 '=' 和 ';' 之间跳转，
+	这对 C 和 Java 之类的语言很有用： >vim
+		au FileType c,cpp,java set mps+==:;
+
+<	关于使用 "%" 的更高级方式，参见 $VIMRUNTIME/plugin 目录中的
+	matchit.vim 插件。 |add-local-help|
+
+						*'matchtime'* *'mat'*
+'matchtime' 'mat'	number	（默认 5）
+			global
+	当设置了 'showmatch' 时，显示匹配括号的时长的十分之一秒数。
+	注意这不像其它设置时间的选项那样以毫秒为单位。这是为了与 Nvi
+	兼容。
+
+						*'maxfuncdepth'* *'mfd'*
+'maxfuncdepth' 'mfd'	number	（默认 100）
+			global
+	用户函数调用的最大深度。这通常用来捕获无限递归。当使用的递归
+	函数深度更大时，把 'maxfuncdepth' 设为更大的数。但这会消耗更多
+	内存，有在内存耗尽时失败的危险。若把此限制增大到 200 以上，
+	还会改变 Ex 命令递归的最大值，参见 |E169|。
+	另见 |:function|。
+	也用于回调函数的最大深度。
+
+					*'maxmapdepth'* *'mmd'* *E223*
+'maxmapdepth' 'mmd'	number	（默认 1000）
+			global
+	映射在不产生可使用字符的情况下执行的最大次数。这通常用来
+	捕获无限映射，例如 ":map x y" 与 ":map y x"。它仍然无法捕获
+	":map g wg"，因为在执行下一个映射之前 'w' 已经被使用了。
+	另见 |key-mapping|。
+
+						*'maxmempattern'* *'mmp'*
+'maxmempattern' 'mmp'	number	（默认 1000）
+			global
+	用于模式匹配的最大内存量（以 Kbyte 为单位）。最大值约为
+	2000000。用它来不受限制地工作。
+							*E363*
+	当 Vim 触及此限制时会给出错误消息，并且多半表现得像输入了
+	CTRL-C 一样。
+	触及此限制通常意味着模式非常低效或过于复杂。在非常长的行上
+	使用模式 `\(.\)*` 时可能就会发生。`.*` 的效果要好得多。
+	在重绘时，当语法规则试图匹配复杂的文本结构时也可能发生。
+	Vim 可能在触及 'maxmempattern' 限制之前就耗尽内存，这种情况下
+	你会得到 "Out of memory" 而不是别的错误。
+
+					*'maxsearchcount'* *'msc'*
+'maxsearchcount' 'msc'	number	（默认 999）
+			global
+	搜索计数状态 |shm-S| 中显示的最大匹配数。当匹配数超过此值时，
+	Vim 会显示 ">" 而不是精确计数，以保持搜索快速。
+	注意：更大的值可能影响性能。
+	该值必须介于 1 与 9999 之间。另见 |searchcount()| 函数。
+
+						*'menuitems'* *'mis'*
+'menuitems' 'mis'	number	（默认 25）
+			global
+	菜单中使用的最大项目数。用于从项目列表生成的菜单，例如
+	Buffers 菜单。改变此选项没有直接效果，必须先刷新菜单。
+
+						*'messagesopt'* *'mopt'*
+'messagesopt' 'mopt'	string	（默认 "hit-enter,history:500,progress:c"）
+			global
+	输出消息的选项设置。它可以由以下项目组成。各项目之间必须用
+	逗号分隔。
+
+	history:{n}	决定在 |:messages| 历史中记住多少条记录。
+			最大值为 10000。把它设为零会清空消息历史。
+			此项必须始终存在。
+
+	hit-enter	当消息长度超过 'cmdheight' 大小时使用 |hit-enter|
+			提示。
+
+	progress:{s}	决定在哪里显示进度消息。有效值为：
+			  - empty：进度消息不显示在 cmdline 中。
+			  - "c"：进度消息显示在 cmdline 中。
+
+	wait:{n}	已由 |ui2| 废弃。
+			不使用 |hit-enter| 提示，而是简单地等待 {n}
+			毫秒，让用户有机会阅读消息。{n} 最大为
+			10000。使用 0 禁用等待（用户将看不到任何
+			"hit-enter" 消息）。存在 "hit-enter" 时忽略
+			此项，但不存在 "hit-enter" 时此项为必需。
+
+						*'mkspellmem'* *'msm'*
+'mkspellmem' 'msm'	string	（默认 "460000,2000,500"）
+			global
+			不允许在 |modeline| 中使用。 |no-modeline-option|
+	|:mkspell| 的参数。它调整何时开始压缩单词树。单词很多时压缩
+	可能很慢，但为避免内存耗尽又需要压缩。每个单词所用的内存量
+	很大程度上取决于单词之间的相似程度，这就是这项调整很复杂的
+	原因。
+
+	共有三个数字，用逗号分隔： >
+		{start},{inc},{added}
+<
+	对大多数语言来说，未压缩的单词树能放进内存。{start} 给出在
+	进行任何压缩之前可以使用的内存量（以 Kbyte 为单位）。它应当
+	比 Vim 可用的内存量略小一些。
+
+	当超过 {start} 限制时，{inc} 数字指定在进行下一次压缩之前
+	可以分配的内存量（以 Kbyte 为单位）。数值低意味着添加较少的
+	单词后就进行压缩，这很慢。数值高意味着会分配更多内存。
+
+	进行压缩之后，在忽略 {inc} 限制、并在需要任何额外内存时就
+	进行压缩之前，还可以添加 {added} 乘以 1024 个单词。数值低
+	意味着触及 {inc} 限制的可能性更小，使用的内存更少，但速度
+	更慢。
+
+	这些数字对其很重要的语言是意大利语和匈牙利语。默认值适用于
+	你有大约 512 Mbyte 的情况。如果你有 1 Gbyte，可以使用： >vim
+		set mkspellmem=900000,3000,800
+<	如果你的内存少于 512 Mbyte，那么无论把 'mkspellmem' 设为
+	什么，|:mkspell| 对某些语言都可能失败。环境变量会被展开
+	|:set_env|。
+
+				*'modeline'* *'ml'* *'nomodeline'* *'noml'*
+'modeline' 'ml'		boolean	（默认开启（root 为关闭））
+			local to buffer
+	如果 'modeline' 开启，'modelines' 给出为 set 命令检查的行数。
+	如果 'modeline' 关闭或 'modelines' 为零，则不检查任何行。
+	参见 |modeline|。
+
+			*'modelineexpr'* *'mle'* *'nomodelineexpr'* *'nomle'*
+'modelineexpr' 'mle'	boolean	（默认关闭）
+			global
+			不允许在 |modeline| 中使用。 |no-modeline-option|
+	开启时，允许某些属于表达式的选项在 modeline 中被设置。请查看
+	各选项以确认它是否受 'modelineexpr' 影响。另见 |modeline|。
+
+						*'modelines'* *'mls'*
+'modelines' 'mls'	number	（默认 5）
+			global
+	如果 'modeline' 开启，'modelines' 给出为 set 命令检查的行数。
+	如果 'modeline' 关闭或 'modelines' 为零，则不检查任何行。
+	参见 |modeline|。
+
+			*'modifiable'* *'ma'* *'nomodifiable'* *'noma'* *E21*
+'modifiable' 'ma'	boolean	（默认开启）
+			local to buffer
+	关闭时，buffer 内容不能被更改。'fileformat' 和 'fileencoding'
+	选项也不能被更改。
+	可以在启动时用 |-M| 命令行参数重置。
+
+				*'modified'* *'mod'* *'nomodified'* *'nomod'*
+'modified' 'mod'	boolean	（默认关闭）
+			local to buffer  |local-noglobal|
+	开启时，buffer 被视为已修改。此选项在以下情况下被设置：
+	1. 自上次写入以来文本发生了更改。使用 |undo| 命令回到原始文本
+	   会重置此选项。但撤销写入之前所做的更改会再次设置此选项，
+	   因为文本与写入时不同。
+	2. 'fileformat' 或 'fileencoding' 与其原始值不同。原始值在读取
+	   或写入 buffer 时设置。":set nomodified" 命令也会把原始值
+	   重置为当前值，并且 'modified' 选项会被重置。
+	   对 'eol' 和 'bomb' 同理。
+	当更改是 BufNewFile、BufRead/BufReadPost、BufWritePost、
+	FileAppendPost 或 VimLeave autocommand 事件导致的 buffer
+	更改时，不会设置此选项。解释参见 |gzip-example|。
+
+	当 'buftype' 为 "prompt" 时，更改 buffer 不会隐式设置
+	'modified'，但用户或插件可以显式设置它。
+
+	当 'buftype' 为 "nowrite" 或 "nofile" 时，可以设置此选项，
+	但它会被忽略。
+
+	注意文本实际上可能相同，例如对 "A" 使用 "rA" 时会设置
+	'modified'。
+
+						*'more'* *'nomore'*
+'more'			boolean	（默认开启）
+			global
+	开启时，列表在填满整个屏幕时会暂停。你会看到 |more-prompt|。
+	此选项关闭时没有暂停，列表会一直继续到结束。
+
+							*'mouse'*
+'mouse'			string	（默认 "nvi"）
+			global
+	启用鼠标支持。例如，在 Normal 模式和 Visual 模式下启用鼠标： >vim
+		set mouse=nv
+<
+	要临时禁用鼠标支持，在使用鼠标的同时按住 shift 键。
+
+	可以为不同模式启用鼠标支持：
+		n	Normal 模式
+		v	Visual 模式
+		i	Insert 模式
+		c	命令行模式
+		h	编辑 help 文件时的所有前述模式
+		a	所有前述模式
+		r	用于 |hit-enter| 和 |more-prompt| 提示
+
+	在文本 buffer 中的任意位置左键单击即可把光标放到那里。这对
+	操作符也有效，例如输入 |d| 然后左键单击，删除从当前光标位置
+	到你所点击位置之间的文本。
+
+	拖动 |status-line| 或 window 的垂直分隔条可以调整其大小。
+
+	如果为 "v"（Visual 模式）启用，则双击按词选择，三击按行选择，
+	四击按矩形块选择。
+
+	关于用鼠标滚轮滚动，参见 |scroll-mouse-wheel|。
+
+	注意：在终端中启用鼠标时，如果可能，复制/粘贴会使用
+	"* register。另见 'clipboard'。
+
+	相关选项：
+	'mousefocus'	window 焦点跟随鼠标指针
+	'mousemodel'	哪个鼠标按键执行哪个操作
+	'mousehide'	输入文本时隐藏鼠标指针
+	'selectmode'	是启动 Select 模式还是 Visual 模式
+
+		*'mousefocus'* *'mousef'* *'nomousefocus'* *'nomousef'*
+'mousefocus' 'mousef'	boolean	（默认关闭）
+			global
+	鼠标指针所在的 window 会被自动激活。当以其它方式改变 window
+	布局或 window 焦点时，鼠标指针会被移到拥有键盘焦点的 window。
+	默认为关闭，因为这会使下拉菜单用起来有点古怪，指针经过就可能
+	意外激活一个 window。
+
+				*'mousehide'* *'mh'* *'nomousehide'* *'nomh'*
+'mousehide' 'mh'	boolean	（默认开启）
+			global
+			仅在 GUI 中
+	开启时，输入字符时鼠标指针会被隐藏。移动鼠标时鼠标指针会恢复。
+
+						*'mousemodel'* *'mousem'*
+'mousemodel' 'mousem'	string	（默认 "popup_setpos"）
+			global
+	设置鼠标使用的模式。名称主要指明右键的用途：
+	   extend	右键扩展选区。行为类似 xterm。
+	   popup	右键弹出菜单。shift 加左键扩展选区。
+			行为类似 Microsoft Windows。
+	   popup_setpos	类似 "popup"，但光标会被移到鼠标单击的位置，
+			因此所选操作会作用于被单击的对象。如果单击
+			在选区内部，则作用于该选区，即光标不移动。
+			这当然意味着在选区之外单击右键会结束
+			Visual 模式。
+	各模式下每个按键的作用概览：
+	鼠标		    extend		popup(_setpos) ~
+	左键单击	    放置光标		放置光标
+	左键拖动	    开始选择		开始选择
+	shift-左键	    搜索单词		扩展选择
+	右键单击	    扩展选择		弹出菜单（放置光标）
+	右键拖动	    扩展选择		-
+	中键单击	    粘贴		粘贴
+
+	在 "popup" 模式下，右键会产生一个弹出菜单。Nvim 会创建默认的
+	|popup-menu|，但你可以重新定义它。
+
+	注意，你还可以用映射进一步细化按键的含义。参见
+	|mouse-overview|。但映射不会用于无模式选择。
+
+	示例： >vim
+	    map <S-LeftMouse>     <RightMouse>
+	    map <S-LeftDrag>      <RightDrag>
+	    map <S-LeftRelease>   <RightRelease>
+	    map <2-S-LeftMouse>   <2-RightMouse>
+	    map <2-S-LeftDrag>    <2-RightDrag>
+	    map <2-S-LeftRelease> <2-RightRelease>
+	    map <3-S-LeftMouse>   <3-RightMouse>
+	    map <3-S-LeftDrag>    <3-RightDrag>
+	    map <3-S-LeftRelease> <3-RightRelease>
+	    map <4-S-LeftMouse>   <4-RightMouse>
+	    map <4-S-LeftDrag>    <4-RightDrag>
+	    map <4-S-LeftRelease> <4-RightRelease>
+<
+	需要 CTRL 修饰键的鼠标命令可以通过在使用鼠标之前输入 "g" 键
+	来模拟：
+	    "g<LeftMouse>"  是 "<C-LeftMouse>	（跳转到鼠标单击处的 tag）
+	    "g<RightMouse>" 是 "<C-RightMouse>	（"CTRL-T"）
+
+*'mousemoveevent'* *'mousemev'* *'nomousemoveevent'* *'nomousemev'* *mouse-hover*
+'mousemoveevent' 'mousemev'	boolean	（默认关闭）
+			global
+	开启时，鼠标移动事件会被送入输入队列，并可用于映射
+	|<MouseMove>|。默认为关闭，可避免不必要的鼠标移动开销。
+	警告：设置此选项可能导致鼠标移动时挂起的映射被中止。
+
+						*'mousescroll'* *E5080*
+'mousescroll'		string	（默认 "ver:3,hor:6"）
+			global
+	此选项控制用鼠标滚轮滚动时滚动的行数/列数
+	（|scroll-mouse-wheel|）。该选项是一个逗号分隔的列表。每个
+	部分由方向和计数组成，如下：
+		direction:count,direction:count
+	方向是 "hor" 或 "ver" 之一。"hor" 控制水平滚动，"ver" 控制
+	垂直滚动。计数设置给定方向上的滚动量，它应当是一个非负整数。
+	每个方向最多设置一次。如果省略某个方向，则使用默认值（水平
+	滚动为 6，垂直滚动为 3）。你可以通过把计数设为 0 来禁用鼠标
+	滚动。
+
+	示例： >vim
+		set mousescroll=ver:5,hor:2
+<	这会让 Nvim 在垂直滚动时每次滚动 5 行，在水平滚动时每次
+	滚动 2 列。
+
+						*'mousetime'* *'mouset'*
+'mousetime' 'mouset'	number	（默认 500）
+			global
+	定义两次鼠标单击之间使第二次单击被识别为多击的最大时间（以
+	msec 为单位）。
+
+						*'nrformats'* *'nf'*
+'nrformats' 'nf'	string	（默认 "bin,hex"）
+			local to buffer
+	这定义了在使用 CTRL-A 和 CTRL-X 命令分别对数字做加法与减法时，
+	Vim 会考虑哪些进制；关于这些命令的更多信息参见 |CTRL-A|。
+	alpha	如果包含，单个字母字符会被递增或递减。这对带有字母
+		索引 a)、b) 等的列表很有用。		*octal-nrformats*
+	octal	如果包含，以零开头的数字会被视为八进制。示例：对 "007"
+		使用 CTRL-A 会得到 "010"。
+	hex	如果包含，以 "0x" 或 "0X" 开头的数字会被视为十六进制。
+		示例：对 "0x100" 使用 CTRL-X 会得到 "0x0ff"。
+	bin	如果包含，以 "0b" 或 "0B" 开头的数字会被视为二进制。
+		示例：对 "0b1000" 使用 CTRL-X 会减一，得到 "0b0111"。
+	unsigned    如果包含，数字会被识别为无符号。因此开头的短横线或
+		负号不会被视为数字的一部分。示例：
+		    对 "9-2020" 中的 "2020" 使用 CTRL-X 会得到 "9-2019"
+		    （不含 "unsigned" 时则会变成 "9-2021"）。
+		    对 "9-2020" 中的 "2020" 使用 CTRL-A 会得到 "9-2021"
+		    （不含 "unsigned" 时则会变成 "9-2019"）。
+		    对 "0" 使用 CTRL-X 或对 "18446744073709551615"
+		    （2^64 - 1）使用 CTRL-A 没有效果，溢出会被防止。
+	blank	如果包含，会根据前面的空白把数字视为有符号或无符号。
+		如果带前导短横线的数字的短横线紧跟在一个非空白字符
+		（即不是 tab 也不是 " "）之后，负号不会被视为数字的
+		一部分。例如：
+		    对 "Carbon-14" 中的 "14" 使用 CTRL-A 会得到
+		    "Carbon-15"（不含 "blank" 时则会变成 "Carbon-13"）。
+		    对 "Carbon -8" 中的 "8" 使用 CTRL-X 会得到
+		    "Carbon -9"（因为 -8 前面是空白。如果设置了
+		    "unsigned"，则会得到 "Carbon -7"）。
+		如果包含此格式，溢出会像设置了 "unsigned" 那样被防止。
+		如果同时包含此格式和 "unsigned"，"unsigned" 优先。
+
+	仅仅以 1-9 范围内的数字开头的数字总是被视为十进制。对于未被
+	识别为八进制或十六进制的数字也是如此。
+
+				*'number'* *'nu'* *'nonumber'* *'nonu'*
+'number' 'nu'		boolean	（默认关闭）
+			local to window
+	在每行前面打印行号。当 'n' 选项从 'cpoptions' 中排除时，
+	折行的行不会使用行号所在的列。
+	使用 'numberwidth' 选项来调整行号所占的空间。
+	当折行的长行不是以第一个字符开头时，会在行号前面加上 '-' 字符。
+	关于高亮，参见 |hl-LineNr|、|hl-CursorLineNr| 以及
+	|:sign-define| 的 "numhl" 参数。
+						*number_relativenumber*
+	'relativenumber' 选项会把显示的数字改为相对于光标。
+	与 'number' 一起共有以下四种组合（光标在第 3 行）：
+
+		'nonu'          'nu'            'nonu'          'nu'
+		'nornu'         'nornu'         'rnu'           'rnu'
+	>
+	    |apple          |  1 apple      |  2 apple      |  2 apple
+	    |pear           |  2 pear       |  1 pear       |  1 pear
+	    |nobody         |  3 nobody     |  0 nobody     |3   nobody
+	    |there          |  4 there      |  1 there      |  1 there
+<
+
+						*'numberwidth'* *'nuw'*
+'numberwidth' 'nuw'	number	(default 4)
+			local to window
+	行号至少要占用的列数。仅当设置了 'number' 或 'relativenumber' 选项，
+	或者打印带行号的行时才有意义。由于行号与文本之间总有一个空格，
+	行号本身可用的字符数要少一个。
+	该值是最小宽度。需要时会使用更大的宽度，以容纳 buffer 中最高的
+	行号，或者 window 的行数，具体取决于设置的是 'number' 还是
+	'relativenumber'。因此在 Vim 默认值 4 下，行号最多可到 999。
+	当 buffer 有 1000 行时会使用五列。最小值为 1，最大值为 20。
+
+						*'omnifunc'* *'ofu'*
+'omnifunc' 'ofu'	string	(default "")
+			local to buffer
+			Disallowed in |modeline|. |no-modeline-option|
+	该选项指定一个函数，用于 CTRL-X CTRL-O 的插入模式全能补全。
+	|i_CTRL-X_CTRL-O|
+	关于该函数如何被调用以及应返回什么，见 |complete-functions|。
+	该值可以是函数名、|lambda| 或 |Funcref|。
+	更多信息见 |option-value-function|。
+	该选项通常由 filetype 插件设置：|:filetype-plugin-on|
+
+					*'operatorfunc'* *'opfunc'*
+'operatorfunc' 'opfunc'	string	(default "")
+			global
+			Disallowed in |modeline|. |no-modeline-option|
+	该选项指定一个由 |g@| 操作符调用的函数。
+	更多信息与示例见 |:map-operator|。该值可以是函数名、|lambda| 或
+	|Funcref|。更多信息见 |option-value-function|。
+
+						*'packpath'* *'pp'*
+'packpath' 'pp'		string	(default see 'runtimepath')
+			global
+			Disallowed in |modeline|. |no-modeline-option|
+	用于查找 package 的目录。
+	见 |packages| 与 |packages-runtimepath|。
+	环境变量会被展开 |:set_env|。
+
+						*'paragraphs'* *'para'*
+'paragraphs' 'para'	string	(default "IPLPPPQPP TPHPLIPpLpItpplpipbp")
+			global
+	指定分隔段落的 nroff 宏。它们由两个字母成对组成
+	（见 |object-motions|）。
+
+						*'patchexpr'* *'pex'*
+'patchexpr' 'pex'	string	(default "")
+			global
+			Disallowed in |modeline|. |no-modeline-option|
+	用于对文件应用补丁并生成结果新版本文件的表达式。
+	见 |diff-patchexpr|。
+
+					*'patchmode'* *'pm'* *E205* *E206*
+'patchmode' 'pm'	string	(default "")
+			global
+	当非空时保留文件最旧的版本。如果你正在修改源码发行版中的文件，
+	可以用它保留文件的原始版本。只有在文件第一次被写入时，才会保留
+	原始文件的副本。副本的名字是原始文件名加上 'patchmode' 选项中的
+	字符串。该选项应以点开头。可以使用像 ".orig" 或 ".org" 这样的
+	字符串。要使其生效，'backupdir' 不能为空
+	（细节：新文件成功写入后，备份文件会被重命名为 patchmode 文件，
+	所以才必须能够写入备份文件）。若没有需要备份的文件，
+	则会创建一个空文件。
+	当 'backupskip' 模式匹配时，不会生成 patchmode 文件。
+	对压缩文件使用 'patchmode' 时，扩展名会追加到末尾
+	（例如 "file.gz.orig"），因此得到的名字并不总能被识别为压缩文件。
+	只能使用普通文件名字符，`/\*?[|<>` 是非法的。
+
+				*'path'* *'pa'* *E343* *E345* *E347* *E854*
+'path' 'pa'		string	(default ".,,")
+			global or local to buffer |global-local|
+	这是一个目录列表，在使用 |gf|, [f, ]f, ^Wf, |:find|, |:sfind|,
+	|:tabfind| 以及其它命令时会搜索这些目录，前提是被搜索的文件具有
+	相对路径（不以 "/"、"./" 或 "../" 开头）。'path' 选项中的目录
+	可以是相对路径，也可以是绝对路径。
+	- 用逗号分隔目录名： >vim
+		set path=.,/usr/local/include,/usr/include
+<	- 也可以用空格分隔目录名。若目录名中含有空格，需要在前面加一个
+	  额外的反斜杠，并对空格转义： >vim
+		set path=.,/dir/with\\\ space
+<	- 若目录名中含有逗号，需要在前面加一个额外的反斜杠： >vim
+		set path=.,/dir/with\\,comma
+<	- 要相对于当前文件所在目录进行搜索，请使用： >vim
+		set path=.
+<	- 要在当前目录中搜索，请在两个逗号之间使用空字符串： >vim
+		set path=,,
+<	- 目录名可以以 ':' 或 '/' 结尾。
+	- 环境变量会被展开 |:set_env|。
+	- 使用 |netrw| 时可以使用 URL。例如加上 "https://www.vim.org"
+	  就能让 ":find index.html" 生效。
+	- 用 "*"、"**" 和 ";" 在目录树中向上或向下搜索。
+	  信息与语法见 |file-searching|。
+	- 小心 '\' 字符，在选项中要得到一个反斜杠需要输入两个： >vim
+		set path=.,c:\\include
+<	  或者干脆改用 '/'： >vim
+		set path=.,c:/include
+<	别忘了 "."，否则连与文件同目录的文件都找不到！
+	最大长度是有限制的。具体取决于系统，多数情况下大约是 256 或
+	1024 个字符。
+	你可以借助 'path' 的值检查是否所有 include 文件都能找到，
+	见 |:checkpath|。
+	在列表中增删目录时，推荐使用 |:set+=| 与 |:set-=|。
+	这样可以避免将来版本改用其它默认值时出现问题。
+	要移除当前目录请使用： >vim
+		set path-=
+<	要添加当前目录请使用： >vim
+		set path+=
+<	要使用环境变量，你大概需要替换分隔符。下面是一个追加 $INCL 的
+	例子，其中目录名用分号分隔： >vim
+		let &path = &path .. "," .. substitute($INCL, ';', ',', 'g')
+<	把 ';' 替换成 ':' 或实际使用的其它分隔符。注意当 $INCL 含有
+	逗号或空白时这样不行。
+
+		*'preserveindent'* *'pi'* *'nopreserveindent'* *'nopi'*
+'preserveindent' 'pi'	boolean	(default off)
+			local to buffer
+	改变当前行的缩进时，尽可能保留缩进结构。通常缩进会被替换为所需
+	数量的 Tab 后跟空格（除非启用了 'expandtab'，那样就只用空格）。
+	启用该选项意味着缩进时会尽可能多地保留已有的字符，
+	只在需要时补充额外的 Tab 或空格。
+	'expandtab' 不适用于被保留的空白，Tab 仍然是 Tab。
+	注意：多次使用 ">>" 后，得到的缩进是 Tab 与空格的混合。
+	你可能不喜欢这样。
+	另见 'copyindent'。
+	使用 |:retab| 清理空白。
+
+						*'previewheight'* *'pvh'*
+'previewheight' 'pvh'	number	(default 12)
+			global
+	预览 window 的默认高度。用于 |:ptag| 及相关命令。
+	用于未给出计数时的 |CTRL-W_}|。
+
+		*'previewwindow'* *'pvw'* *'nopreviewwindow'* *'nopvw'* *E590*
+'previewwindow' 'pvw'	boolean	(default off)
+			local to window  |local-noglobal|
+	标识预览 window。只能有一个 window 设置该选项。
+	它通常不直接设置，而是通过 |:ptag|、|:pedit| 等命令之一来设置。
+
+						*'pumblend'* *'pb'*
+'pumblend' 'pb'		number	(default 0)
+			global
+	为 |popup-menu| 启用伪透明。有效值范围从 0（弹出菜单完全不透明，
+	即禁用）到 100（背景完全透明）。0-30 之间的值通常最有用。
+
+	可以用 |highlight-blend| 覆盖弹出菜单内部单个高亮的级别。
+	例如，要启用透明但强制当前选中项完全不透明： >vim
+
+		set pumblend=15
+		hi PmenuSel blend=0
+<
+	依赖 UI。在 RGB 颜色下效果最好。'termguicolors'
+
+							*'pumborder'*
+'pumborder'		string	(default "")
+			global
+	定义 popupmenu window 的默认边框样式。有效值见 'winborder'。
+	|hl-PmenuBorder| 用于边框高亮，当样式为 "shadow" 时会使用
+	|hl-PmenuShadow| 与 |hl-PmenuShadowThrough| 组。
+
+	当 'mousemodel' 设为 "popup" 或 "popup_setpos" 时，该选项也适用于
+	鼠标弹出菜单，它们会用同样的样式显示边框。
+
+						*'pumheight'* *'ph'*
+'pumheight' 'ph'	number	(default 0)
+			global
+	弹出菜单中显示的最大项目数（|ins-completion-menu|）。
+	零表示 "使用可用的屏幕空间"。
+
+						*'pummaxwidth'* *'pmw'*
+'pummaxwidth' 'pmw'	number	(default 0)
+			global
+	弹出菜单的最大宽度（|ins-completion-menu|）。为零时没有最大宽度
+	限制，否则弹出菜单永远不会比该值更宽。被截断的文本会由
+	'fillchars' 选项的 "trunc" 值来指示。
+
+	该选项优先于 'pumwidth'。
+
+						*'pumwidth'* *'pw'*
+'pumwidth' 'pw'		number	(default 15)
+			global
+	弹出菜单的最小宽度（|ins-completion-menu|）。若光标列 + 'pumwidth'
+	超过屏幕宽度，弹出菜单会被挪动以适配屏幕。
+
+						*'pyxversion'* *'pyx'*
+'pyxversion' 'pyx'	number	(default 3)
+			global
+			Disallowed in |modeline|. |no-modeline-option|
+	指定 pyx* 函数与命令 |python_x| 所使用的 python 版本。
+	由于只支持 Python 3，该值始终为 `3`。设置任何其它值都是错误的。
+
+					*'quickfixtextfunc'* *'qftf'*
+'quickfixtextfunc' 'qftf'	string	(default "")
+			global
+			Disallowed in |modeline|. |no-modeline-option|
+	该选项指定一个函数，用于获取在 quickfix 与 location list window
+	中显示的文本。可以用它自定义 quickfix 或 location window 中为
+	对应 quickfix 或 location list 的每个条目显示的信息。
+	关于如何编写该函数以及示例，见 |quickfix-window-function|。
+	该值可以是函数名、|lambda| 或 |Funcref|。
+	更多信息见 |option-value-function|。
+
+	求值 'qftf' 时不允许修改文本或跳到另一个 window |textlock|。
+
+						*'quoteescape'* *'qe'*
+'quoteescape' 'qe'	string	(default "\")
+			local to buffer
+	字符串中用于转义引号的字符。用于 a', a" 和 a` 这类对象 |a'|。
+	当字符串中出现该选项中的某个字符时，其后一个字符会被跳过。
+	默认值会使得文本 "foo\"bar\\" 被视为一个字符串。
+
+				*'readonly'* *'ro'* *'noreadonly'* *'noro'*
+'readonly' 'ro'		boolean	(default off)
+			local to buffer  |local-noglobal|
+	若打开，除非使用 '!'，否则写入会失败。这可以保护你避免意外
+	覆盖文件。当 Vim 以只读模式启动（"vim -R"）或可执行文件名为
+	"view" 时，默认为打开。
+	使用 ":w!" 时，当前 buffer 的 'readonly' 选项会被重置，
+	除非 'cpoptions' 中含有 'Z' 标志。
+	使用 ":view" 命令时，新编辑的 buffer 会被设置 'readonly' 选项。
+	关于禁止修改 buffer，见 'modifiable'。
+
+						*'redrawdebug'* *'rdb'*
+'redrawdebug' 'rdb'	string	(default "")
+			global
+	用于改变重绘工作方式的标志，供调试之用。
+	在 'writedelay' 设为某个合理值时最有用。
+	支持以下标志：
+	    compositor	对由 compositor 处理的每个重绘事件，用短暂闪烁
+			重绘区域的方式指示，颜色表示重绘类型。
+			用到的 highlight 组（及其默认颜色）如下：
+		RedrawDebugNormal   gui=reverse   正常重绘被透传
+		RedrawDebugClear    guibg=Yellow  清除事件被透传
+		RedrawDebugComposed guibg=Green   重绘事件被 compositor 修改
+						  （由于 grid 重叠等）
+		RedrawDebugRecompose guibg=Red    重绘由 compositor 自身生成，
+						  原因是某个 grid 被移动或删除。
+	    line	在屏幕上绘制的每一行之后引入延迟。
+			使用 TUI 或其它单 grid UI 时，用 "compositor"
+			能得到更多信息，应优先使用（每一行都由
+			compositor 作为单独的事件处理）
+	    flush	在每个 "flush" 事件之后引入延迟。
+	    nothrottle	关闭消息 grid 的节流。这是一项优化，在绘制
+			消息区域时（'display' 的 msgsep 标志生效时）
+			把许多小的滚动合并成一次较大的滚动。
+	    invalid	对内部屏幕状态的不一致启用更严格的检查（中止）。
+			在调试器中运行 nvim（以及测试套件）时最有用。
+	    nodelta	把所有内部重绘的单元格都发送给 UI，
+			即使它们与已经显示的状态相比没有变化。
+
+						*'redrawtime'* *'rdt'*
+'redrawtime' 'rdt'	number	(default 2000)
+			global
+	重绘显示的毫秒数上限。适用于 'hlsearch'、'inccommand'、
+	|:match| 高亮、语法高亮，以及异步的 |LanguageTree:parse()|。
+	当重绘耗时超过这个毫秒数时，不会再高亮更多匹配。
+	对于语法高亮，该时间按 window 计算。超过限制后语法高亮会被禁用，
+	直到使用 |CTRL-L|。
+	这用于避免 Vim 在使用非常复杂的模式时挂起。
+
+						*'regexpengine'* *'re'*
+'regexpengine' 're'	number	(default 0)
+			global
+	选择默认的 regexp 引擎。|two-engines|
+	可能的取值有：
+		0	自动选择
+		1	旧引擎
+		2	NFA 引擎
+	注意使用 NFA 引擎时，若模式中含有不支持的东西，该模式将不会
+	匹配。这仅对调试 regexp 引擎有用。
+	使用自动选择可以让 Vim 在默认引擎代价过高时切换引擎。
+	例如当 NFA 引擎使用太多状态时。这应该能防止 Vim 在复杂模式
+	配合长文本时挂起。
+
+		*'relativenumber'* *'rnu'* *'norelativenumber'* *'nornu'*
+'relativenumber' 'rnu'	boolean	(default off)
+			local to window
+	在每一行前面显示相对于光标所在行的行号。
+	相对行号有助于使用 |count|——你可以把它加在某些纵向移动命令
+	（例如 j k + -）前面，而无需自己计算。与其它命令
+	（例如 y d c < > gq gw =）组合使用时尤其有用。
+	当 'cpoptions' 中排除了 'n' 选项时，折行的行不会占用行号所在列。
+	可以用 'numberwidth' 选项设置行号占用的空间。
+	当一条很长的折行不是从第一个字符开始时，行号前面会加上 '-' 字符。
+	行号使用的高亮见 |hl-LineNr| 与 |hl-CursorLineNr|。
+
+	光标行前面的数字还取决于 'number' 的值，
+	两个选项的所有组合见 |number_relativenumber|。
+
+							*'report'*
+'report'		number	(default 2)
+			global
+	报告改动行数的阈值。当改动的行数超过 'report' 时，多数 ":"
+	命令都会给出消息。若希望总是报告，把 'report' 设为 0。
+	对于 ":substitute" 命令，使用的是替换次数而不是行数。
+
+				*'revins'* *'ri'* *'norevins'* *'nori'*
+'revins' 'ri'		boolean	(default off)
+			global
+	在插入模式下插入字符会反向进行。见 "反向输入" |ins-reverse|。
+	当设置了 'allowrevins' 时，可以在插入模式下用 CTRL-_ 命令
+	切换该选项。
+
+				*'rightleft'* *'rl'* *'norightleft'* *'norl'*
+'rightleft' 'rl'	boolean	(default off)
+			local to window
+	打开时，显示方向变为从右到左，即文件中存储的字符从右向左出现。
+	使用该选项可以编辑希伯来语、阿拉伯语等从右向左书写的语言
+	的文件。该选项是每个 window 独立的，因此可以同时编辑混合文件，
+	或者以两种方式查看同一个文件（当你有混合了从右到左和从左到右
+	字符串的文本文件，想让两组内容在不同 window 中都正确显示时，
+	这很有用）。另见 |rileft.txt|。
+
+						*'rightleftcmd'* *'rlc'*
+'rightleftcmd' 'rlc'	string	(default "search")
+			local to window
+	该选项中的每个词都会让一组命令的命令行编辑以从右到左模式工作：
+
+		search		"/" 和 "?" 命令
+
+	这对希伯来语、阿拉伯语和波斯语等语言很有用。
+	必须设置 'rightleft' 选项，'rightleftcmd' 才会生效。
+
+					*'ruler'* *'ru'* *'noruler'* *'noru'*
+'ruler' 'ru'		boolean	(default on)
+			global
+	显示光标所在的行号与列号，用逗号分隔。有空间时，
+	会在最右侧显示文本在文件中的相对位置：
+		Top	可见第一行
+		Bot	可见最后一行
+		All	第一行和最后一行都可见
+		45%	文件中的相对位置
+	若设置了 'rulerformat'，它将决定 ruler 的内容。
+	每个 window 都有自己的 ruler。若 window 有状态行，ruler 就显示在
+	那里。若 window 没有状态行且 'cmdheight' 为零，则不显示 ruler。
+	否则它显示在屏幕最后一行。若状态行由 'statusline' 给出
+	（即非空），该选项优先于 'ruler' 与 'rulerformat'。
+	若显示的字符数与文本中的字节数不同（例如 TAB 或多字节字符），
+	则同时显示文本列（字节编号）与屏幕列，用短横线分隔。
+	空行显示为 "0-1"。
+	空 buffer 的行号也会是零："0,0-1"。
+	若你不想一直看到 ruler，又想知道自己在哪里，请使用
+	"g CTRL-G" |g_CTRL-G|。
+
+						*'rulerformat'* *'ruf'*
+'rulerformat' 'ruf'	string	(default "")
+			global
+	当该选项非空时，它决定为 'ruler' 选项显示的 ruler 字符串的内容。
+	该选项的格式与 'statusline' 相同。
+	当 'modelineexpr' 关闭时，不能在 modeline 中设置该选项。
+
+	默认 ruler 宽度是 17 个字符。要让 ruler 宽 15 个字符，
+	在开头放 "%15("，在末尾放 "%)"。
+	示例： >vim
+		set rulerformat=%15(%c%V\ %p%%%)
+<
+
+					*'runtimepath'* *'rtp'* *vimfiles*
+'runtimepath' 'rtp'	string	(default "$XDG_CONFIG_HOME/nvim,
+                                               $XDG_CONFIG_DIRS[1]/nvim,
+                                               $XDG_CONFIG_DIRS[2]/nvim,
+                                               …
+                                               $XDG_DATA_HOME/nvim[-data]/site,
+                                               $XDG_DATA_DIRS[1]/nvim/site,
+                                               $XDG_DATA_DIRS[2]/nvim/site,
+                                               …
+                                               $VIMRUNTIME,
+                                               …
+                                               $XDG_DATA_DIRS[2]/nvim/site/after,
+                                               $XDG_DATA_DIRS[1]/nvim/site/after,
+                                               $XDG_DATA_HOME/nvim[-data]/site/after,
+                                               …
+                                               $XDG_CONFIG_DIRS[2]/nvim/after,
+                                               $XDG_CONFIG_DIRS[1]/nvim/after,
+                                               $XDG_CONFIG_HOME/nvim/after")
+			global
+			Disallowed in |modeline|. |no-modeline-option|
+	在这些目录中搜索以下 runtime 文件：
+	  filetype.lua	filetype 定义 |new-filetype|
+	  autoload/	自动加载的脚本 |autoload-functions|
+	  colors/	颜色方案文件 |:colorscheme|
+	  compiler/	编译器文件 |:compiler|
+	  doc/		文档 |write-local-help|
+	  ftplugin/	filetype 插件 |write-filetype-plugin|
+	  indent/	缩进脚本 |indent-expression|
+	  keymap/	键盘映射文件 |mbyte-keymap|
+	  lang/		菜单翻译 |:menutrans|
+	  lsp/		LSP 客户端配置 |lsp-config|
+	  lua/		|Lua| 插件
+	  menu.vim	GUI 菜单 |menu.vim|
+	  pack/		package |:packadd|
+	  parser/	|treesitter| 语法解析器
+	  plugin/	插件脚本 |write-plugin|
+	  queries/	|treesitter| 查询
+	  rplugin/	|remote-plugin| 脚本
+	  spell/	拼写检查文件 |spell|
+	  syntax/	语法文件 |mysyntaxfile|
+	  tutor/	教程文件 |:Tutor|
+
+	以及用 |:runtime| 命令搜索的任何其它文件。
+
+	默认设置会搜索这些位置：
+	1. 你的主目录，用于个人偏好。
+	   由 `stdpath("config")` 给出。|$XDG_CONFIG_HOME|
+	2. 按 |xdg| 规定必须包含配置文件的目录
+	   （$XDG_CONFIG_DIRS，默认为 /etc/xdg）。其中也包含系统管理员
+	   的偏好。
+	3. Data 主目录，用于用户安装的插件。
+	   由 `stdpath("data")/site` 给出。|$XDG_DATA_HOME|
+	4. $XDG_DATA_DIRS 中每个目录下的 nvim/site 子目录。
+	   用于系统管理员安装、但不属于 Nvim 发行版的插件。
+	   XDG_DATA_DIRS 默认为 /usr/local/share/:/usr/share/，
+	   所以系统管理员应把 site 插件安装到 /usr/share/nvim/site。
+	5. $VIMRUNTIME，用于 Nvim 随附的文件。
+							*after-directory*
+	6, 7, 8, 9. 第 1、2、3、4 项的 after/ 子目录中，顺序相反。
+	   用于让偏好覆盖或补充发行版默认值或系统级设置（很少需要）。
+
+							*packages-runtimepath*
+	"start" package 也会在这些目录之后被搜索（|runtime-search-path|）
+	以查找 runtime 文件，不过这类 package 不会显式出现在 &runtimepath
+	中。而 "opt" package 会由 |:packadd| 显式加入 &runtimepath。
+
+	注意，与 'path' 不同，这里不允许 "**" 这种通配符。
+	普通通配符是允许的，但会显著拖慢 runtime 文件的搜索。
+	为了速度，请尽量少用条目并避免通配符。
+	见 |:runtime|。
+	示例： >vim
+		set runtimepath=~/vimruntime,/mygroup/vim,$VIMRUNTIME
+<	这会先使用目录 "~/vimruntime"（其中包含你的个人 Nvim runtime
+	文件），然后使用 "/mygroup/vim"，最后使用 "$VIMRUNTIME"
+	（默认的 runtime 文件）。
+	你可以把某个目录放在 $VIMRUNTIME 之前，以找到替换发行版 runtime
+	文件的文件。也可以把某个目录放在 $VIMRUNTIME 之后，以找到为
+	发行版 runtime 文件补充内容的文件。
+
+	使用 |--clean| 时，主目录条目不会被包含。
+	环境变量会被展开 |:set_env|。
+
+						*'scroll'* *'scr'*
+'scroll' 'scr'		number	(default half the window height)
+			local to window  |local-noglobal|
+	用 CTRL-U 和 CTRL-D 命令滚动的行数。当 window 大小改变时会被
+	设为 window 行数的一半。在设置 'scroll' 选项之后启用
+	|status-line| 或 'tabline' 选项时可能会发生这种情况。
+	若给 CTRL-U 或 CTRL-D 命令一个计数，它会被用作 'scroll' 的新值。
+	用 ":set scroll=0" 重置为 window 高度的一半。
+
+						*'scrollback'* *'scbk'*
+'scrollback' 'scbk'	number	(default 10000)
+			local to buffer
+	在可见屏幕之外保留的最大行数。若新行超过该限制，顶部的行会被
+	删除。
+	最小值为 1，最大值为 1000000。
+	仅用于 |terminal| buffer。
+
+	注意：不可见且保留在 scrollback 中的行，在终端 buffer 被水平
+	调整大小时不会重新折行。
+
+			*'scrollbind'* *'scb'* *'noscrollbind'* *'noscb'*
+'scrollbind' 'scb'	boolean	(default off)
+			local to window
+	另见 |scroll-binding|。设置该选项后，滚动当前 window 也会滚动
+	其它 scrollbind window（也设置了该选项的 window）。
+	该选项对查看文件两个版本之间的差异很有用，见 'diff'。
+	关于决定该选项应如何解释的选项，见 'scrollopt'。
+	拆分 window 以编辑另一个文件时，该选项多半会被重置。这意味着
+	":split | edit file" 会得到两个具有 scroll-binding 的 window，
+	而 ":split file" 不会。
+
+						*'scrolljump'* *'sj'*
+'scrolljump' 'sj'	number	(default 1)
+			global
+	光标移出屏幕时（例如用 "j"）最少滚动的行数。
+	不用于滚动命令（例如 CTRL-E、CTRL-D）。
+	若你的终端滚动很慢会很有用。
+	设为 -1 到 -100 的负数时，会被用作 window 高度的百分比。
+	因此 -50 会滚动 window 高度的一半。
+
+						*'scrolloff'* *'so'*
+'scrolloff' 'so'	number	(default 0)
+			global or local to window |global-local|
+	光标上下方保留的最小屏幕行数。这会让工作位置周围可见一些上下文。
+	若把它设得很大（999），光标行会始终位于 window 中间（文件开头
+	或结尾、以及长行折行时除外）。
+	使用过局部值之后，用下面两者之一恢复全局值： >vim
+		setlocal scrolloff<
+		setlocal scrolloff=-1
+<	水平滚动请见 'sidescrolloff'。
+
+						*'scrollopt'* *'sbo'*
+'scrollopt' 'sbo'	string	(default "ver,jump")
+			global
+	这是一个以逗号分隔的词列表，指定 'scrollbind' window 应如何动作。
+	'sbo' 代表 ScrollBind Options。
+	可用以下词：
+	    ver		为 'scrollbind' window 绑定纵向滚动
+	    hor		为 'scrollbind' window 绑定横向滚动
+	    jump	适用于两个 window 之间纵向滚动的偏移量。
+			该偏移量是绑定的 window 中首个显示行的差值。
+			在一个 window 中移动时，另一个 'scrollbind' window
+			可能到达 buffer 开头之前或结尾之后的位置。
+			不过偏移量不会改变，移回来时 'scrollbind' window
+			会尽可能滚动到期望的位置。
+			现在把那个 window 变为当前 window 时，
+			可以用相对偏移量做两件事：
+			1. 未包含 "jump" 时，相对偏移量会按新的当前
+			   window 中的滚动位置调整。回到另一个 window 时，
+			   会使用新的相对偏移量。
+			2. 包含 "jump" 时，其它 window 会被滚动以保持
+			   相同的相对偏移量。回到另一个 window 时，
+			   它仍使用相同的相对偏移量。
+	另见 |scroll-binding|。
+	当 'diff' 模式生效时，纵向滚动绑定总是存在，即使没有 "ver"。
+
+						*'sections'* *'sect'*
+'sections' 'sect'	string	(default "SHNHH HUnhsh")
+			global
+	指定分隔章节的 nroff 宏。它们是两字母的组合对（见 |object-motions|）。
+	默认值让章节从 nroff 宏 ".SH"、".NH"、".H"、".HU"、".nh" 和 ".sh" 开始。
+
+						*'selection'* *'sel'*
+'selection' 'sel'	string	(default "inclusive")
+			global
+	该选项定义选区的行为。它只在 Visual 和 Select 模式中使用。
+	可能的值：
+	   value	past line     inclusive ~
+	   old		   no		yes
+	   inclusive	   yes		yes
+	   exclusive	   yes		no
+	"past line" 意味着光标允许被定位到行末后一个字符处。
+	"inclusive" 意味着选区的最后一个字符会被包含在一次操作中。例如，
+	当用 "x" 删除选区时。
+	当使用 "old" 且 'virtualedit' 允许光标移过行尾时，换行符仍不会被包含。
+	当使用 "exclusive" 时，visual 模式中的光标位置会针对包含式动作进行调整
+	|inclusive-motion-selection-exclusive|。
+
+	注意：
+	- 当使用 "exclusive" 且从行尾向后选择时，若从 Normal 模式开始且
+	  'virtualedit' 为空，你无法包含一行的最后一个字符。
+	- 当 "exclusive" 用于单字符 visual 选区时，Vim 的行为就像 'selection'
+	  是 inclusive 一样（换句话说，你无法以可视方式选择一个空区域）。
+
+						*'selectmode'* *'slm'*
+'selectmode' 'slm'	string	(default "")
+			global
+	这是一个以逗号分隔的单词列表，指定当开始一次选择时，何时启动
+	Select 模式而不是 Visual 模式。
+	可能的值：
+	   mouse	使用鼠标时
+	   key		使用带 Shift 的特殊键时
+	   cmd		使用 "v"、"V" 或 CTRL-V 时
+	见 |Select-mode|。
+
+					*'sessionoptions'* *'ssop'*
+'sessionoptions' 'ssop'	string	(default "blank,buffers,curdir,folds,help,tabpages,winsize,terminal")
+			global
+	改变 |:mksession| 命令的效果。它是一个以逗号分隔的单词列表。
+	每个单词启用对某项内容的保存与恢复：
+	   word		save and restore ~
+	   blank	空 window
+	   buffers	隐藏和未加载的 buffer，不只是 window 中的那些
+	   curdir	当前目录
+	   folds	手动创建的折叠、打开/关闭的折叠以及局部折叠选项
+	   globals	以大写字母开头且至少包含一个小写字母的全局变量。
+			只存储 String 和 Number 类型。
+	   help		help window
+	   localoptions	局部于某个 window 或 buffer 的选项和映射（不是局部选项的
+			全局值）
+	   options	所有选项和映射（也包括局部选项的全局值）
+	   skiprtp	从选项中排除 'runtimepath' 和 'packpath'
+	   resize	Vim window 的大小：'lines' 和 'columns'
+	   sesdir	会话文件所在的目录将成为当前目录（当从不同系统通过网络
+			访问项目时很有用）
+	   tabpages	所有 tabpage；没有它则只恢复当前 tabpage，这样你可以为
+			每个 tabpage 分别创建一个会话
+	   terminal	包含终端 window，其中的命令可以被恢复
+	   winpos	整个 Vim window 的位置
+	   winsize	window 大小
+	   slash	|deprecated| 始终启用。在文件名中使用 "/"。
+	   unix		|deprecated| 始终启用。使用 "\n" 行尾。
+
+	不要同时包含 "curdir" 和 "sesdir"。两者都不包含时，文件名会以
+	绝对路径存储。
+	如果省略 "options"，恢复会话后许多事情将无法正常工作。
+
+					*'shada'* *'sd'* *E526* *E527* *E528*
+'shada' 'sd'		string	(default "!,'100,<50,s10,h,r/tmp/,r/private/")
+			global
+			Disallowed in |modeline|. |no-modeline-option|
+	非空时，shada 文件会在启动时读取，并在退出 Vim 时写入
+	（见 |shada-file|）。该字符串应是一个以逗号分隔的参数列表，每个参数
+	由单个字符（标识该参数）以及指定其值的数字或字符串组成。若省略某个
+	字符，则该参数使用默认值。下面是标识字符及其值的效果列表。
+	CHAR	VALUE	~
+							*shada-!*
+	!	包含时，保存并恢复以大写字母开头且不含小写字母的全局变量。
+		因此 "KEEPTHIS 和 "K_L_M" 会被存储，而 "KeepThis" 和
+		"_K_L_M" 不会。嵌套的 List 和 Dict 项可能无法被正确读回，
+		最终得到一个空项。
+							*shada-quote*
+	"	每个 register 保存的最大行数。它是 '<' 项的旧名称，缺点是
+		你需要在 " 前加一个反斜杠，否则它会被识别为注释的开始！
+							*shada-%*
+	%	包含时，保存并恢复 buffer 列表。如果 Vim 是以文件名参数启动
+		的，则不会恢复 buffer 列表。如果 Vim 启动时没有文件名参数，
+		则 buffer 列表会从 shada 文件恢复。Quickfix（'buftype'）、
+		未列出（'buflisted'）、未命名以及位于可移动介质上的 buffer
+		（|shada-r|）不会被保存。
+		后面跟数字时，该数字指定最多存储多少个 buffer。不带数字时
+		所有 buffer 都会被存储。
+							*shada-'*
+	'	记住其标记的先前编辑文件的最大数量。当 'shada' 非空时该参数
+		必须始终包含。
+		若非零，则 |jumplist| 和 |changelist| 也会存储在 shada 文件中。
+							*shada-/*
+	/	要保存的搜索模式历史中的最大项数。若非零，则先前的搜索和替换
+		模式也会被保存。未包含时，使用 'history' 的值。
+							*shada-:*
+	:	要保存的命令行历史中的最大项数。未包含时，使用 'history' 的值。
+							*shada-<*
+	<	每个 register 保存的最大行数。若为零则不保存 register。
+		未包含时保存所有行。" 是该项的旧名称。
+		另见下面的 's' 项：以 KiB 指定的限制。
+							*shada-@*
+	@	要保存的输入行历史中的最大项数。未包含时，使用 'history' 的值。
+							*shada-c*
+	c	为兼容性保留的哑选项。没有实际效果：ShaDa 始终使用 UTF-8，
+		且 'encoding' 的值也被固定为 UTF-8。
+							*shada-f*
+	f	是否需要存储文件标记。若为零，则不存储文件标记（'0 到 '9、
+		'A 到 'Z）。不存在或非零时，它们都会被存储。'0 用于当前光标
+		位置（退出时或执行 |:wshada| 时）。
+							*shada-h*
+	h	加载 shada 文件时禁用 'hlsearch' 的效果。未包含时，取决于
+		自上次搜索命令以来是否使用过 ":nohlsearch"。
+							*shada-n*
+	n	shada 文件的名称。名称必须紧跟在 'n' 之后。必须位于该选项的
+		末尾！如果设置了 'shadafile' 选项，该文件名会覆盖此处用
+		'shada' 给出的名称。环境变量在打开文件时展开，而不是在设置
+		该选项时展开。
+							*shada-r*
+	r	可移动介质。参数是一个字符串（直到下一个 ','）。该参数可以
+		给出多次。每次指定一个路径的开头，不会为它存储标记。这是为了
+		避开可移动介质。在 Windows 上你可以使用 "ra:,rb:"。你也可以
+		把它用于临时文件，例如在 Unix 上："r/tmp"。大小写被忽略。
+							*shada-s*
+	s	一项内容的最大大小，以 KiB 计。若为零则不保存任何内容。与 Vim
+		不同，这适用于所有项，buffer 列表和头部除外。完整项的大小会
+		偏差三个无符号整数：使用 `s10` 时最大项大小可能是 1 字节
+		（类型：7 位整数）+ 9 字节（时间戳：最多 64 位整数）+ 3 字节
+		（项大小：最多 16 位整数，因为 2^8 < 10240 < 2^16）+ 10240 字节
+		（请求的最大项内容大小）= 10253 字节。
+
+	示例： >vim
+	    set shada='50,<1000,s100,:0,n~/nvim/shada
+<
+	'50		你编辑的最后 50 个文件的标记会被记住。
+	<1000		register 的内容（每个最多 1000 行）会被记住。
+	s100		内容占用超过 100 KiB 的项会被跳过。
+	:0		命令行历史不会被保存。
+	n~/nvim/shada	要使用的文件名是 "~/nvim/shada"。
+	no /		由于未指定 '/'，将使用默认值，即保存所有搜索历史，
+			以及先前的搜索和替换模式。
+	no %		buffer 列表不会被保存也不会被读回。
+	no h		'hlsearch' 高亮会被恢复。
+
+	从空值设置 'shada' 时，你可以用 |:rshada| 加载文件的内容，这不会
+	自动完成。
+
+						*'shadafile'* *'sdf'*
+'shadafile' 'sdf'	string	(default "")
+			global
+			Disallowed in |modeline|. |no-modeline-option|
+	非空时，覆盖用于 |shada|（viminfo）的文件名。
+	等于 "NONE" 时，不会读取或写入任何 shada 文件。
+	该选项可以用 |-i| 命令行标志设置。|--clean| 命令行标志会把它设为
+	"NONE"。
+	环境变量会被展开 |:set_env|。
+
+						*'shell'* *'sh'* *E91*
+'shell' 'sh'		string	(default $SHELL or "sh", Win32: "cmd.exe")
+			global
+			Disallowed in |modeline|. |no-modeline-option|
+	用于 ! 和 :! 命令的 shell 名称。改变该值时也应检查这些选项：
+	'shellpipe'、'shellslash'、'shellredir'、'shellquote'、'shellxquote'
+	和 'shellcmdflag'。
+	允许给命令提供一个参数，例如 "csh -f"。
+	关于包含空格和反斜杠的写法，见 |option-backslash|。
+	环境变量会被展开 |:set_env|。
+
+	如果 shell 的名称包含空格，你需要把它括在引号中。带引号的示例： >vim
+		set shell=\"c:\program\ files\unix\sh.exe\"\ -f
+<	注意每个引号前的反斜杠（以避免开启注释）以及每个空格前的反斜杠
+	（以避免结束选项值），所以最好像这样使用 |:let-&|： >vim
+		let &shell='"C:\Program Files\unix\sh.exe" -f'
+<	另请注意 "-f" 不在引号内，因为它不是命令名的一部分。
+							*shell-unquoting*
+	关于引号的规则：
+	1. 选项会在不在引号内的空格和 Tab 字符处分割："abc def" 会运行名为
+	   "abc" 的 shell 并附加参数 "def"，'"abc def"' 会运行名为 "abc def"
+	   的 shell 且不带附加参数（此处及下文：附加指“附加到
+	   'shellcmdflag'”）。
+	2. 选项中的引号可以出现在任何位置、任何数量：
+	   '"abc"'、'"a"bc'、'a"b"c'、'ab"c"' 和 '"a"b"c"' 都等价于
+	   单纯的 "abc"。
+	3. 引号内，反斜杠后跟反斜杠表示一个反斜杠。反斜杠后跟引号表示一个
+	   引号。反斜杠后跟任何其它内容表示反斜杠和下一个字符本身：
+	   '"a\\b"' 与 "a\b" 相同，'"a\\"b"' 会运行名称字面为 'a"b' 的
+	   shell，'"a\b"' 又和 "a\b" 相同。
+	4. 引号外，反斜杠始终表示它自身，不能用来转义引号：'a\"b"' 与 "a\b"
+	   相同。
+	注意这种处理是在 |:set| 完成它自己的反转义之后进行的，所以为了
+	保持头脑清醒，请像上面所示那样使用 |:let-&|。
+							*shell-powershell*
+	要使用 PowerShell： >vim
+	   set noshelltemp
+	   let &shell = 'powershell'
+	   let &shellcmdflag = '-NoLogo -NoProfile -ExecutionPolicy RemoteSigned -Command '
+	   let &shellcmdflag .= '[Console]::InputEncoding=[Console]::OutputEncoding=[System.Text.UTF8Encoding]::new();'
+	   let &shellcmdflag .= '$PSDefaultParameterValues[''Out-File:Encoding'']=''utf8'';'
+	   let &shellpipe  = '> %s 2>&1'
+	   set shellquote= shellxquote=
+<
+							*shell-pwsh*
+	要使用 pwsh，请用 `let &shell = 'pwsh'` 采用上面的设置，并添加： >vim
+	   let &shellcmdflag .= '$PSStyle.OutputRendering = ''PlainText'';'
+	   " Workaround (may not be needed in future version of pwsh):
+	   let $__SuppressAnsiEscapeSequences = 1
+<
+
+						*'shellcmdflag'* *'shcf'*
+'shellcmdflag' 'shcf'	string	(default "-c"; Windows: "/s /c")
+			global
+			Disallowed in |modeline|. |no-modeline-option|
+	传给 shell 用于执行 "!" 和 ":!" 命令的标志；例如
+	`bash.exe -c ls` 或 `cmd.exe /s /c "dir"`。对于 MS-Windows，默认值
+	会根据 'shell' 的值设置，以减少用户设置该选项的需要。
+	在 Unix 上它可以有多个标志。每个以空白分隔的部分都作为参数传给
+	shell 命令。
+	关于包含空格和反斜杠的写法，见 |option-backslash|。
+	见 |shell-unquoting|，其中讨论了如何把该选项分成多个参数。
+
+						*'shellpipe'* *'sp'*
+'shellpipe' 'sp'	string	(default ">", "| tee", "|& tee" or "2>&1| tee")
+			global
+			Disallowed in |modeline|. |no-modeline-option|
+	用于把 ":make" 命令的输出放入错误文件的字符串。另见
+	|:make_makeprg|。关于包含空格和反斜杠的写法，见 |option-backslash|。
+	必要时可以用 "%s" 表示临时文件的名称（如果该选项的值中未出现 %s，
+	文件名会被自动追加）。
+	对于 MS-Windows，默认值是 "2>&1| tee"。stdout 和 stderr 会被保存
+	到文件中并回显到屏幕上。
+	对于 Unix，默认值是 "| tee"。编译器的 stdout 会被保存到文件中并
+	回显到屏幕上。如果在初始化后 'shell' 选项是 "csh" 或 "tcsh"，
+	默认值变为 "|& tee"。如果 'shell' 选项是 "sh"、"ksh"、"mksh"、
+	"pdksh"、"zsh"、"zsh-beta"、"bash"、"fish"、"ash" 或 "dash"，
+	默认值变为 "2>&1| tee"。这意味着 stderr 也被包含在内。使用
+	'shell' 选项前会去掉路径，因此 "/bin/sh" 会使用 "sh"。
+	该选项的初始化在读取 vimrc 和其它初始化之后完成，因此当在那里设置
+	'shell' 选项时，'shellpipe' 选项会自动改变，除非它之前已被显式设置。
+	当 'shellpipe' 被设为空字符串时，不会对 ":make" 的输出做任何重定向。
+	如果你使用自己写入 'makeef' 的 'makeprg'，这很有用。如果你不想要
+	管道，但想包含 'makeef'，请把 'shellpipe' 设为单个空格。
+	别忘了在空格前加一个反斜杠：":set sp=\ "。
+	将来管道可能会用于过滤，届时该选项将变得过时（至少在 Unix 上）。
+	注意：使用像 "| tee" 这样的管道时，你会丢失 shell 命令的退出码。
+	你的 shell 或许能配置这一点，请查找 pipefail 选项（对 bash 和 zsh，
+	使用 ":set -o pipefail"）。
+	只允许一个 "%s" 值。
+
+						*'shellquote'* *'shq'*
+'shellquote' 'shq'	string	(default ""; Windows, when 'shell'
+                                        contains "sh" somewhere: "\"")
+			global
+			Disallowed in |modeline|. |no-modeline-option|
+	引号字符，放在传给 shell 的命令两侧，用于 "!" 和 ":!" 命令。
+	重定向保留在引号之外。见 'shellxquote' 可把重定向包含在内。
+	同时设置两个选项可能没有用。
+	它默认是空字符串。已知只对 Windows 系统上的第三方 shell（例如
+	MKS Korn Shell 或 bash）有用，此时它应为 "\""。默认值会根据
+	'shell' 的值调整，以减少用户设置该选项的需要。
+
+						*'shellredir'* *'srr'*
+'shellredir' 'srr'	string	(default ">", ">&" or ">%s 2>&1")
+			global
+			Disallowed in |modeline|. |no-modeline-option|
+	用于把过滤命令的输出放入临时文件的字符串。另见 |:!|。
+	关于包含空格和反斜杠的写法，见 |option-backslash|。
+	必要时可以用 "%s" 表示临时文件的名称（如果该选项的值中未出现 %s，
+	文件名会被自动追加）。
+	默认值是 ">"。对于 Unix，如果在初始化期间 'shell' 选项是 "csh" 或
+	"tcsh"，默认值变为 ">&"。如果 'shell' 选项是 "sh"、"ksh"、"mksh"、
+	"pdksh"、"zsh"、"zsh-beta"、"bash" 或 "fish"，默认值变为
+	">%s 2>&1"。这意味着 stderr 也被包含在内。对于 Win32，会执行 Unix
+	的那些检查，并额外检查 "cmd"，这使默认值变为 ">%s 2>&1"。
+	此外还会检查追加了 ".exe" 的同名名称。
+	该选项的初始化在读取 vimrc 和其它初始化之后完成，因此当在那里设置
+	'shell' 选项时，'shellredir' 选项会自动改变，除非它之前已被显式设置。
+	将来管道可能会用于过滤，届时该选项将变得过时（至少在 Unix 上）。
+								*E1577*
+	选项值中只允许一个 "%s" 项。
+
+			*'shellslash'* *'ssl'* *'noshellslash'* *'nossl'*
+'shellslash' 'ssl'	boolean	(default on, Windows: off)
+			global
+			only modifiable in MS-Windows
+	打开时，展开文件名时使用正斜杠。当使用类 Unix shell 而不是 cmd.exe
+	时这很有用。反斜杠仍然可以输入，但 Vim 会把它们改为正斜杠。
+	注意设置或重置该选项对某些已存在的文件名没有效果，因此为了获得最佳
+	效果，该选项需要在打开任何文件之前设置。将来这可能会改变。
+	'shellslash' 只在反斜杠可用作路径分隔符时生效。要测试是否如此，使用： >vim
+		if exists('+shellslash')
+<	另见 'completeslash'。
+
+			*'shelltemp'* *'stmp'* *'noshelltemp'* *'nostmp'*
+'shelltemp' 'stmp'	boolean	(default off)
+			global
+	打开时，shell 命令使用临时文件。关闭时使用管道。
+	当无法使用管道时，仍然会使用临时文件。
+	使用管道的优点是没有别人能读取该临时文件，而且 'shell' 命令不需要
+	支持重定向。
+	使用临时文件的优点是可以检测文件类型和编码。
+	当 'shelltemp' 关闭时，不会触发 |FilterReadPre|、|FilterReadPost|
+	和 |FilterWritePre|、|FilterWritePost| autocommands 事件。
+	|system()| 不遵循该选项，它始终使用管道。
+
+						*'shellxescape'* *'sxe'*
+'shellxescape' 'sxe'	string	(default "")
+			global
+			Disallowed in |modeline|. |no-modeline-option|
+	当 'shellxquote' 被设为 "(" 时，该选项中列出的字符会被 '^' 字符转义。
+	这使得可以用 cmd.exe 执行大多数外部命令。
+
+						*'shellxquote'* *'sxq'*
+'shellxquote' 'sxq'	string	(default "", Windows: "\"")
+			global
+			Disallowed in |modeline|. |no-modeline-option|
+	引号字符，放在传给 shell 的命令两侧，用于 "!" 和 ":!" 命令。
+	包含重定向。见 'shellquote' 可排除重定向。同时设置两个选项可能
+	没有用。
+	当值是 '(' 时，会追加 ')'。当值是 '"(' 时，会追加 ')"'。
+	当值是 '(' 时，另见 'shellxescape'。
+
+			*'shiftround'* *'sr'* *'noshiftround'* *'nosr'*
+'shiftround' 'sr'	boolean	(default off)
+			global
+	把缩进四舍五入到 'shiftwidth' 的倍数。适用于 > 和 < 命令。
+	Insert 模式中的 CTRL-T 和 CTRL-D 总是把缩进四舍五入到 'shiftwidth'
+	的倍数（这与 Vi 兼容）。
+
+						*'shiftwidth'* *'sw'*
+'shiftwidth' 'sw'	number	(default 8)
+			local to buffer
+	构成一级（自动）缩进的列数。被 'cindent'、|<<|、|>>| 等使用。
+	如果设为 0，Vim 使用当前的 'tabstop' 值。使用 |shiftwidth()|
+	可在脚本中获得有效值。
+
+					*'shortmess'* *'shm'* *E1336*
+'shortmess' 'shm'	string	(default "ltToOCF")
+			global
+	控制文件消息（例如 CTRL-G）以及各种其它消息的显示。
+
+	它是一个标志列表：
+	 flag	meaning when present	~
+	  l	使用 "999L, 888B" 而不是 "999 lines, 888 bytes"	*shm-l*
+	  m	使用 "[+]" 而不是 "[Modified]"			*shm-m*
+	  r	使用 "[RO]" 而不是 "[readonly]"			*shm-r*
+	  w	文件写入消息使用 "[w]" 而不是 "written"		*shm-w*
+		对 ':w >> file' 命令使用 "[a]" 而不是 "appended"
+	  a	以上所有缩写				*shm-a*
+
+	  o	写文件的消息覆盖随后的读文件消息	*shm-o*
+		（对 ":wn" 或 'autowrite' 打开时有用）
+	  O	读文件的消息覆盖任何先前的消息；也用于 quickfix 消息	*shm-O*
+		（例如 ":cn"）
+	  s	不给出 "search hit BOTTOM, continuing at TOP" 或	*shm-s*
+		"search hit TOP, continuing at BOTTOM" 消息；使用搜索计数
+		时不显示计数消息前的 "W"（见下面的 |shm-S|）
+	  t	文件消息太长而无法放入命令行时在开头截断，最左侧列会出现	*shm-t*
+		"<"；在 Ex 模式中被忽略
+	  T	其它消息太长而无法放入命令行时在中间截断，中间会出现	*shm-T*
+		"..."；在 Ex 模式中被忽略
+	  W	写文件时不给出 "written" 或 "[w]"	*shm-W*
+	  A	发现已存在的 swap 文件时不给出 "ATTENTION" 消息	*shm-A*
+	  I	启动 Vim 时不给出 intro 消息，见 |:intro|		*shm-I*
+	  c	不给出 |ins-completion-menu| 消息；例如		*shm-c*
+		"-- XXX completion (YYY)"、"match 1 of 2"、"The only
+		match"、"Pattern not found"、"Back at original" 等。
+	  C	扫描 ins-completion 项时不给出消息，例如 "scanning tags"	*shm-C*
+	  q	录制宏时不显示 "recording @a"	*shm-q*
+	  F	编辑文件时不给出文件信息，就像对该命令使用了	*shm-F*
+		`:silent`；注意这也会影响来自 'autoread' 重新加载的消息
+	  S	搜索时不显示搜索计数消息，例如	*shm-S*
+		"[1/5]"。当 "S" 标志不存在时（例如显示了搜索计数），
+		"search hit BOTTOM, continuing at TOP" 和
+		"search hit TOP, continuing at BOTTOM" 消息只在搜索计数
+		统计前用一个 "W"（助记：Wrapped）字母表示。最大限制可以用
+		'maxsearchcount' 选项设置，另见 |searchcount()| 函数。
+
+	这让你有机会避免因 buffer 之间的切换而需要按 <Enter>，同时仍然
+	在可用空间内给出尽可能有用的消息。要获得 'shm' 为空时会得到的
+	完整消息，使用 ":file!"
+	有用的值：
+	    shm=	不缩写消息。
+	    shm=a	缩写，但不丢失信息。
+	    shm=at	缩写，并在必要时截断消息。
+
+					*'showbreak'* *'sbr'* *E595*
+'showbreak' 'sbr'	string	(default "")
+			global or local to window |global-local|
+	放在被折行的行首的字符串。有用的值是 "> " 或 "+++ "： >vim
+		let &showbreak = "> "
+		let &showbreak = '+++ '
+<	只允许可打印的单格字符，<Tab> 和
+	逗号除外（在将来的版本中，逗号可能被用来分隔
+	在行尾和行首显示的部分）。
+	|hl-NonText| 高亮组决定高亮。
+	注意 showbreak 之后的 Tab 会以不同方式显示。
+	如果你希望 'showbreak' 出现在行号之间，请给 'cpoptions' 添加 "n" 标志。
+	window 局部值会覆盖全局值。如果设置了全局值而你希望当前 window 中
+	没有值，使用 NONE： >vim
+		setlocal showbreak=NONE
+<
+
+				*'showcmd'* *'sc'* *'noshowcmd'* *'nosc'*
+'showcmd' 'sc'		boolean	(default on)
+			global
+	在屏幕最后一行显示（部分）命令。如果你的终端很慢，请关闭该选项。
+	在 Visual 模式中会显示选区的大小：
+	- 在一行内选择字符时，显示字符数。如果字节数不同也会显示："2-6"
+	  表示两个字符和六个字节。
+	- 选择多于一行时，显示行数。
+	- 选择块时，显示屏幕字符数：{lines}x{columns}。
+	该信息可以用 'showcmdloc' 选项显示在其它位置，当 'cmdheight' 为 0
+	时很有用。
+
+						*'showcmdloc'* *'sloc'*
+'showcmdloc' 'sloc'	string	(default "last")
+			global
+	该选项可用于把（部分）输入的命令显示在另一个位置。可能的值为：
+	  last		屏幕最后一行（默认）。
+	  statusline	当前 window 的状态行。
+	  tabline	屏幕第一行，若 'showtabline' 已启用。
+	把该选项设为 "statusline" 或 "tabline" 意味着每当命令改变时这些
+	位置都会被重绘，这可能发生在每次按键时。
+	%S 'statusline' 项可用于在 'statusline' 或 'tabline' 中放置文本。
+	没有自定义的 'statusline' 或 'tabline' 时，它会被显示在一个方便的
+	位置。
+
+			*'showfulltag'* *'sft'* *'noshowfulltag'* *'nosft'*
+'showfulltag' 'sft'	boolean	(default off)
+			global
+	在 Insert 模式中从 tags 文件补全单词时（见 |ins-completion|），
+	把 tag 名称和整理过的搜索模式形式（如果有）一起显示为可能的匹配。
+	这样，如果你匹配了一个 C 函数，就能看到需要哪些参数的模板
+	（在编码风格允许的情况下）。
+	注意这与在 'completeopt' 中设置 "longest" 不能很好地配合，因为
+	来自搜索模式的补全可能不与输入的文本匹配。
+
+				*'showmatch'* *'sm'* *'noshowmatch'* *'nosm'*
+'showmatch' 'sm'	boolean	(default off)
+			global
+	插入括号时，短暂地跳到匹配的括号。只有当匹配项能在屏幕上看到时
+	才会跳转。显示匹配的时间可以用 'matchtime' 设置。
+	如果没有匹配项则会发出 Beep（无论匹配项是否能被看到）。
+	当 'cpoptions' 中不包含 'm' 标志时，输入一个字符会立即把光标移回
+	它应在的位置。
+	关于显示匹配时设置光标形状和闪烁，见 'guicursor' 的 "sm" 字段。
+	'matchpairs' 选项可用于指定要为哪些字符显示匹配。'rightleft' 和
+	'revins' 被用于查找相反的匹配。
+	另见 matchparen 插件，它用于在移动时高亮匹配 |pi_paren.txt|。
+	注意：使用短形式被评为 PG 级。
+
+				*'showmode'* *'smd'* *'noshowmode'* *'nosmd'*
+'showmode' 'smd'	boolean	(default on)
+			global
+	如果处于 Insert、Replace 或 Visual 模式，在最后一行放置一条消息。
+	|hl-ModeMsg| 高亮组决定高亮。
+	当 'cmdheight' 为零时该选项没有效果。
+
+						*'showtabline'* *'stal'*
+'showtabline' 'stal'	number	(default 1)
+			global
+	指定何时显示 |tabpage| 标签：
+		0: 从不
+		1: 只在至少有两个 tabpage 时
+		2: 总是
+
+						*'sidescroll'* *'ss'*
+'sidescroll' 'ss'	number	(default 1)
+			global
+	水平滚动的最小列数。只在 'wrap' 选项关闭且光标移出屏幕时使用。
+	当它为零时，光标会被放在屏幕中间。
+	使用慢速终端时把它设为一个很大的数或 0。不用于 "zh" 和 "zl" 命令。
+
+					*'sidescrolloff'* *'siso'*
+'sidescrolloff' 'siso'	number	(default 0)
+			global or local to window |global-local|
+	如果设置了 'nowrap'，保持在光标左侧和右侧的最小屏幕列数。在
+	'sidescroll' 也非零的情况下把该选项设为大于 0 的值，会让你水平
+	滚动所在的行中看到一些上下文（行首除外）。把该选项设为一个很大
+	的值（如 999）会起到让光标在 window 中水平居中的效果，只要没有
+	太靠近行首。
+	使用局部值之后，用下面两者之一恢复全局值： >vim
+		setlocal sidescrolloff<
+		setlocal sidescrolloff=-1
+<
+	示例：像下面的例子那样把它与 'sidescroll' 和 'listchars' 一起
+		 试试，以永远不允许光标移动到 "extends" 字符上： >vim
+
+		 set nowrap sidescroll=1 listchars=extends:>,precedes:<
+		 set sidescrolloff=1
+<
+
+						*'signcolumn'* *'scl'*
+'signcolumn' 'scl'	string	（默认 "auto"）
+			local to window
+	何时以及如何绘制 signcolumn。有效值有：
+	   "auto"	仅当有 sign 需要显示时
+	   "auto:[1-9]" 调整大小以容纳多个 sign，上限为给定的
+			数目（最大 9），例如 "auto:4"
+	   "auto:[1-8]-[2-9]"
+			调整大小以容纳多个 sign，直到给定的
+			最大值（最大 9），同时为至少给定的
+			最小值（最大 8）保留固定空间。
+			最小值应始终小于最大值，
+			例如 "auto:2-5"
+	   "no"		从不
+	   "yes"	始终
+	   "yes:[1-9]"  始终显示，并为上限为给定数目的
+			sign 保留固定空间（最大 9），例如 "yes:3"
+	   "number"	在 'number' 列中显示 sign。如果 number
+			列不存在，则行为与 "auto" 相同。
+
+			*'smartcase'* *'scs'* *'nosmartcase'* *'noscs'*
+'smartcase' 'scs'	boolean	（默认关闭）
+			global
+	如果搜索模式包含大写字符，则覆盖 'ignorecase' 选项。仅在搜索模式
+	由用户键入且 'ignorecase' 选项开启时使用。用于 "/"、"?"、"n"、"N"、
+	":g" 和 ":s" 命令，以及为补全菜单过滤匹配项时 |compl-states|。
+	不用于 "*"、"#"、"gd"、tag 搜索等。在 "*" 和 "#" 之后，你可以执行
+	一次 "/" 命令、从历史中召回搜索模式再按 <Enter>，来让 'smartcase'
+	生效。
+
+			*'smartindent'* *'si'* *'nosmartindent'* *'nosi'*
+'smartindent' 'si'	boolean	（默认关闭）
+			local to buffer
+	开始新行时进行智能自动缩进。适用于类 C 程序，但也可用于其它语言。
+	'cindent' 做的与此类似，在多数情况下效果更好，但更严格，见
+	|C-indenting|。当 'cindent' 开启或设置了 'indentexpr' 时，设置 'si'
+	没有任何效果。'indentexpr' 是更高级的替代方案。
+	使用 'smartindent' 时通常也应同时开启 'autoindent'。
+	以下情况会自动插入缩进：
+	- 在以 "{" 结尾的行之后。
+	- 在以 'cinwords' 中的关键字开头的行之后。
+	- 在以 "}" 开头的行之前（仅在使用 "O" 命令时）。
+	在新行的第一个字符处输入 '}' 时，该行会获得与匹配的 "{" 相同的缩进。
+	在新行的第一个字符处输入 '#' 时，会移除该行的缩进，把 '#' 放到第一列。
+	下一行的缩进会被恢复。如果你不想要这种行为，请使用这个映射：
+	":inoremap # X^H#"，其中 ^H 用 CTRL-V CTRL-H 输入。
+	使用 ">>" 命令时，以 '#' 开头的行不会右移。
+
+				*'smarttab'* *'sta'* *'nosmarttab'* *'nosta'*
+'smarttab' 'sta'	boolean	（默认开启）
+			global
+	启用后，如果光标位于行首空白中，<Tab> 键会按 'shiftwidth' 进行缩进。
+	<BS> 键的作用相反。
+	在行首空白中，这等同于把 'softtabstop' 设为 'shiftwidth' 的值。
+	注意：多数情况下，使用 'softtabstop' 是更好的选择。关于 Vim 如何处理
+	Tab 与空格，详见用户手册的 |30.5| 一节。
+
+			*'smoothscroll'* *'sms'* *'nosmoothscroll'* *'nosms'*
+'smoothscroll' 'sms'	boolean	（默认关闭）
+			local to window
+	滚动以屏幕行为单位。当设置了 'wrap' 且 window 中的第一行发生折行时，
+	其一部分可能不可见，就像它位于 window 上方一样。第一行的开头会显示
+	"<<<"，以 |hl-NonText| 高亮。
+	你也许还想把 "lastline" 加入 'display' 选项，以尽可能多地显示最后
+	一行。
+	注意：仅部分实现，对 |gj| 和 |gk| 尚不生效。
+
+						*'softtabstop'* *'sts'*
+'softtabstop' 'sts'	number	（默认 0）
+			local to buffer
+	创建软制表位，各制表位之间相隔 'softtabstop' 个列。
+	在 Insert 模式下，按 <Tab> 键会把光标移动到下一个软制表位，而不是
+	插入一个字面 Tab。<BS> 的作用与之相反但类似。Vim 会插入最少的 Tab
+	与空格的组合来产生这种视觉效果。
+
+	此设置不影响已有 tab 字符的显示。
+
+	值为 0 会禁用此行为。负值会让 Vim 使用 'shiftwidth'。如果你打算让
+	'sts' 与 'shiftwidth' 使用不同的值，可以考虑设置 'smarttab'。
+
+	当 'list' 启用时，'cpoptions' 中的 'L' 标志会改变 tab 行为。另见
+	|ins-expandtab| 和用户手册 |30.5| 一节的深入说明。
+
+	如果 'varsofttabstop' 被设为非空字符串，'softtabstop' 的值将被忽略。
+
+						*'spell'* *'nospell'*
+'spell'			boolean	（默认关闭）
+			local to window
+	开启时会进行拼写检查。见 |spell|。
+	使用的语言由 'spelllang' 指定。
+
+						*'spellcapcheck'* *'spc'*
+'spellcapcheck' 'spc'	string	（默认 "[.?!]\_[\])'"\t ]\+"）
+			local to buffer
+	用于定位句子末尾的模式。后面的单词会被检查是否以大写字母开头。如果
+	不是，它会以 SpellCap |hl-SpellCap| 高亮（除非该单词的拼写也有误）。
+	如果不想要这项检查，请把该选项设为空。
+	仅在设置了 'spell' 时使用。
+	要小心特殊字符，关于包含空格和反斜杠，见 |option-backslash|。
+	要根据语言自动设置该选项，见 |set-spc-auto|。
+
+						*'spellfile'* *'spf'*
+'spellfile' 'spf'	string	（默认 ""）
+			local to buffer
+			Disallowed in |modeline|. |no-modeline-option|
+	供 |zg| 和 |zw| 命令添加单词的单词表文件名。它必须以
+	".{encoding}.add" 结尾。你需要包含路径，否则该文件会被放在当前目录。
+	路径中可以包含 'isfname'、' '、','、'@' 和 ':' 中的字符。
+								*E765*
+	它也可以是一个以逗号分隔的名字列表。|zg| 和 |zw| 命令前的计数可用于
+	访问其中每一个。这样就能同时使用个人单词表文件和项目单词表文件。
+	当该选项为空时添加单词，Nvim 会使用（并自动创建）
+	`stdpath('data')/site/spell/`。文件名使用 'spelllang' 中出现的第一个
+	语言名，忽略地区。
+	生成的 ".spl" 文件将用于拼写检查，它不必出现在 'spelllang' 中。
+	通常所有地区共用一个文件，但如果你愿意，也可以加上地区名。不过那样
+	它只有在 'spellfile' 被设成它时才会被使用；对于 'spelllang' 中的
+	条目，只会找到不带地区名的文件。
+	环境变量会被展开 |:set_env|。
+
+						*'spelllang'* *'spl'*
+'spelllang' 'spl'	string	（默认 "en"）
+			local to buffer
+	一个以逗号分隔的单词表名字列表。当 'spell' 选项开启时，会对这些语言
+	进行拼写检查。示例： >vim
+		set spelllang=en_us,nl,medical
+<	这表示美式英语、荷兰语和医学词汇会被识别。未被识别的单词
+	会被高亮。
+	词汇表名必须由字母数字字符、短横线或下划线组成。它不应包含逗号或
+	点号。建议用短横线把两字母的语言名与具体规格分开。因此 "en-rare"
+	用于罕见的英语单词。
+	地区名必须放在最后，形式为 "_xx"，其中 "xx" 是两字母的小写地区名。
+	你可以列出多个地区来使用它们："en_us,en_ca" 同时支持美式与加式
+	英语，但不支持澳大利亚、新西兰或英国特有的单词。（注意：目前 en_au
+	和 en_nz 词典比 en_ca、en_gb 和 en_us 更旧）。
+	如果包含名字 "cjk"，东亚字符会被排除在拼写检查之外。这在编辑同时
+	含有亚洲文字的文本时很有用。
+	注意 "medical" 词典并不存在，它只是一个较长名字的示例。
+							*E757*
+	作为特例，可以直接给出 .spl 文件的名字。名字中第一个 "_xx" 会被移除
+	并用作地区名（_xx 是一个下划线、两个字母，且后面跟一个非字母）。
+	这主要用于测试目的。你必须确保使用了正确的编码，Vim 不会检查它。
+	相关拼写文件的查找方式在这里说明：|spell-load|。
+
+	如果 |package-spellfile| 插件处于活动状态，而你使用的语言名让 Vim
+	在 'runtimepath' 中找不到 .spl 文件，该插件会询问你是否要下载该文件。
+
+	该选项成功设置后，Vim 会 source 'runtimepath' 中的
+	"spell/LANG.vim" 文件。"LANG" 是 'spelllang' 的值，截取到第一个
+	既不是 ASCII 字母或数字、也不是短横线的字符为止。另见 |set-spc-auto|。
+
+						*'spelloptions'* *'spo'*
+'spelloptions' 'spo'	string	（默认 ""）
+			local to buffer
+			Disallowed in |modeline|. |no-modeline-option|
+	一个以逗号分隔的拼写检查选项列表：
+	camel		当一个词是 CamelCase 形式时，认为 "Cased" 是
+			一个独立的词：词中每个位于小写字符之后的大写
+			字符都表示一个新词的开始。
+	noplainbuffer	仅当 'syntax' 启用时，或 buffer 内设置了
+			extmark 时，才对 buffer 进行拼写检查。在这种
+			情况下只对 buffer 指定的区域做拼写检查。
+
+					*'spellsuggest'* *'sps'* *E5700*
+'spellsuggest' 'sps'	string	（默认 "best"）
+			global
+			Disallowed in |modeline|. |no-modeline-option|
+	用于拼写建议的方法。|z=| 命令和 |spellsuggest()| 函数都用它。这是
+	一个以逗号分隔的条目列表：
+
+	best		对英语效果最好的内部方法。查找类似 "fast" 的
+			改动，并使用一点谐音评分来改进排序。
+
+	double		使用两种方法并混合结果的内部方法。第一种
+			方法是 "fast"，另一种方法计算建议词与错误
+			单词在读音上的相似程度。这只在语言指定了
+			读音折叠时才有效。可能较慢，且并不总能给出
+			更好的结果。
+
+	fast		只检查简单改动的内部方法：字符的插入/删除/
+			交换。对简单的输入错误效果良好。
+
+	{number}	为 |z=| 列出的最大建议数。对 |spellsuggest()|
+			不使用。建议数永远不会超过 'lines' 的值减二。
+
+	timeout:{millisec}   把搜索建议的时间限制为 {millisec}
+			毫秒。作用于后面的方法。省略时限制为
+			5000。为负值时不限制时间。
+
+	file:{filename} 读取文件 {filename}，它必须有两列，用斜杠
+			分隔。第一列包含错误单词，第二列是建议的正确
+			单词。示例：
+				theribal/terrible ~
+			对于用内部方法不会出现在建议列表顶部的常见
+			错误，可以使用它。不含斜杠的行会被忽略，
+			可用它们来写注释。
+			第二列中的单词必须正确，否则不会被使用。
+			如果该单词目前被标记为拼写错误，请把它加入
+			一个 ".add" 文件。
+			该文件对所有语言都生效。
+
+	expr:{expr}	求值表达式 {expr}。请使用函数以避免空格带来的
+			麻烦。最好调用不带参数的函数，见
+			|expr-option-function|。|v:val| 保存拼错的
+			单词。该表达式必须求值为一个 List 的 List，
+			每一项包含一个建议和一个分数。
+			示例：
+				[['the', 33], ['that', 44]] ~
+			设置 'verbose' 并用 |z=| 查看内部方法使用的
+			分数。分数越低越好。
+			如果你临时把 'spellsuggest' 设为排除 "expr:"
+			部分，这可能会调用 |spellsuggest()|。
+			错误会被静默忽略，除非你把 'verbose' 选项设为
+			非零值。
+
+	"best"、"double" 或 "fast" 只能使用其中一个。其它的可以以任意顺序
+	出现多次。示例： >vim
+		set sps=file:~/.config/nvim/sugg,best,expr:MySuggest()
+<	环境变量会被展开 |:set_env|。
+
+			*'splitbelow'* *'sb'* *'nosplitbelow'* *'nosb'*
+'splitbelow' 'sb'	boolean	（默认关闭）
+			global
+	开启时，分割 window 会把新 window 放在当前 window 的下方。
+	|:split|
+
+						*'splitkeep'* *'spk'*
+'splitkeep' 'spk'	string	（默认 "cursor"）
+			global
+	该选项的值决定打开、关闭或调整水平分割大小时的滚动行为。
+
+	可能的取值有：
+	  cursor	保持相同的相对光标位置。
+	  screen	保持文本位于同一屏幕行。
+	  topline	保持 topline 不变。
+
+	对于 "screen" 和 "topline" 取值，光标位置会在必要时改变。此时，
+	jumplist 会被填入之前的光标位置。对于 "screen"，当 'wrap' 启用时
+	文本并不总能保持在同一个屏幕行上。
+
+			*'splitright'* *'spr'* *'nosplitright'* *'nospr'*
+'splitright' 'spr'	boolean	（默认关闭）
+			global
+	开启时，分割 window 会把新 window 放在当前 window 的右侧。
+	|:vsplit|
+
+			*'startofline'* *'sol'* *'nostartofline'* *'nosol'*
+'startofline' 'sol'	boolean	（默认关闭）
+			global
+	为 "on" 时，下面列出的命令会把光标移动到行的第一个非空白字符。
+	为 off 时，光标保持在原来的列（如果可能）。这适用于以下命令：
+	- CTRL-D、CTRL-U、CTRL-B、CTRL-F、"G"、"H"、"M"、"L"、"gg"
+	- 带按行操作符的 "d"、"<<"、"==" 和 ">>"
+	  （|operator-resulting-pos|）
+	- 带计数的 "%"
+	- 切换 buffer 的命令（CTRL-^、:bnext、:bNext 等）
+	- 只有行号的 Ex 命令，例如 ":25" 或 ":+"。
+	对于切换 buffer 的命令，光标会被放到上次编辑该 buffer 时所处的列。
+
+						*'statuscolumn'* *'stc'*
+'statuscolumn' 'stc'	string	（默认 ""）
+			local to window
+			Disallowed in |modeline|. |no-modeline-option|
+	当非空时，该选项决定 window 侧边区域的内容，该区域通常包含折叠、
+	sign 和 number 列。该选项的格式与 'statusline' 相同。
+
+	'statusline' 格式中的某些条目对 'statuscolumn' 有所不同：
+
+	%l	当前绘制行的行号列
+	%s	当前绘制行的 sign 列
+	%C	当前绘制行的折叠列
+
+	'statuscolumn' 的宽度跟随默认列的宽度，并会适应 'numberwidth'、
+	'signcolumn' 和 'foldcolumn' 选项的值（无论 sign 和折叠条目是否
+	存在）。此外，'statuscolumn' 会随求值后格式字符串的大小而增长，但有
+	上限（遵循默认折叠、sign 和 number 列的最大大小）。只有在 buffer 的
+	行数改变，或设置了 'statuscolumn' 选项时，它才会收缩。
+
+	|v:lnum|    变量保存要绘制的行号。
+	|v:relnum|  变量保存要绘制的相对行号。
+	|v:virtnum| 变量在绘制虚拟行时为负，在绘制实际的 buffer 行时为
+		      零，在绘制 buffer 行的折行部分时为正。
+
+	使用 |v:relnum| 时请记住，除非设置了 'relativenumber'，光标移动本身
+	不会导致 'statuscolumn' 更新。
+
+	注意：也支持 %@ 点击执行函数条目，但在同一列的每一行中，指定的函数
+	都会是同一个。它无法通过动态的 'statuscolumn' 格式切换，编写处理函数
+	时应记住这一点。
+
+	示例： >vim
+		" Line number with bar separator and click handlers:
+		set statuscolumn=%@SignCb@%s%=%T%@NumCb@%l│%T
+
+		" Line numbers in hexadecimal for non wrapped part of lines:
+		let &stc='%=%{v:virtnum>0?"":printf("%x",v:lnum)} '
+
+		" Human readable line numbers with thousands separator:
+		let &stc='%{substitute(v:lnum,"\\d\\zs\\ze\\'
+			   . '%(\\d\\d\\d\\)\\+$",",","g")}'
+
+		" Both relative and absolute line numbers with different
+		" highlighting for odd and even relative numbers:
+		let &stc='%#NonText#%{&nu?v:lnum:""}' .
+		 '%=%{&rnu&&(v:lnum%2)?"\ ".v:relnum:""}' .
+		 '%#LineNr#%{&rnu&&!(v:lnum%2)?"\ ".v:relnum:""}'
+
+<	警告：该表达式会对每个屏幕行求值，所以定义开销大的表达式
+	会负面影响渲染性能。
+
+					*'statusline'* *'stl'* *E540* *E542*
+'statusline' 'stl'	string	（默认非常长）
+			global or local to window |global-local|
+	设置 |status-line|。
+
+	包含 printf 风格的 "%" 条目，与普通文本交织，其中每个条目的形式为： >
+	  %-0{minwid}.{maxwid}{item}
+<
+	除 {item} 外所有字段都是可选的。使用 "%%" 显示字面字符 "%"。设为
+	空（`:set statusline=`）会把全局值设为默认值。
+
+							*stl-%!*
+	当选项以 "%!" 开头时，它会被当作表达式使用，求值后结果被用作选项值。
+	示例： >vim
+		set statusline=%!MyStatusLine()
+<	变量 *g:statusline_winid* 会被设为该状态行所属 window 的 |window-ID|。
+	结果中可以包含 %{} 条目，它们也会被求值。
+	注意 "%!" 表达式是在当前 window 和 buffer 的上下文中求值的，而 %{}
+	条目是在该状态行所属 window 的上下文中求值的。
+
+	求值该选项时若出错，它会被重置为默认值以避免更多错误。否则屏幕更新
+	会陷入循环。当结果包含不可打印字符时，结果是不可预测的。
+
+	注意，当该选项被设置时（且 'laststatus' 为 2 或 3），'ruler' 的唯一
+	作用就是控制 |CTRL-G| 的输出。
+
+	field	    含义 ~
+	-	    条目左对齐。当 minwid 大于条目长度时，默认为
+		    右对齐。
+	0	    数值条目中的前导零。会被 "-" 覆盖。
+	minwid	    条目的最小宽度，按 "-" 和 "0" 的设置填充。
+		    值必须不超过 50。
+	maxwid	    条目的最大宽度。文本条目会在左侧用 "<" 截断。
+		    数值条目会被下移到 maxwid-2 位数字，后跟 ">"number，
+		    其中 number 是缺失的位数，很像指数记法。
+	item	    如下所述的单字母代码。
+
+	下面介绍可能的 statusline 条目。"item" 中的第二个字符是类型：
+		N 表示数字
+		S 表示字符串
+		F 表示如下所述的标志
+		- 不适用
+
+	item  含义 ~
+	f S   buffer 中文件的路径，按输入时的形式或相对于当前目录。
+	F S   buffer 中文件的完整路径。
+	t S   buffer 中文件的文件名（尾部）。
+	m F   修改标志，文本为 "[+]"；若 'modifiable' 关闭则为 "[-]"。
+	M F   修改标志，文本为 ",+" 或 ",-"。
+	r F   只读标志，文本为 "[RO]"。
+	R F   只读标志，文本为 ",RO"。
+	h F   Help buffer 标志，文本为 "[help]"。
+	H F   Help buffer 标志，文本为 ",HLP"。
+	w F   预览 window 标志，文本为 "[Preview]"。
+	W F   预览 window 标志，文本为 ",PRV"。
+	y F   buffer 中文件的类型，例如 "[vim]"。见 'filetype'。
+	Y F   buffer 中文件的类型，例如 ",VIM"。见 'filetype'。
+	q S   "[Quickfix List]"、"[Location List]" 或空。
+	k S   使用 |:lmap| 映射时 "b:keymap_name" 或 'keymap' 的值：
+	      "<keymap>"
+	n N   Buffer 编号。
+	b N   光标下字符的值。
+	B N   同上，以十六进制表示。
+	o N   光标下字节在文件中的字节编号，第一个字节是 1。
+	      助记：从文件开头的偏移量（加一）
+	O N   同上，以十六进制表示。
+	l N   行号。
+	L N   buffer 中的行数。
+	c N   列号（字节索引）。
+	v N   虚拟列号（屏幕列）。
+	V N   虚拟列号，形式为 -{num}。等于 'c' 时不显示。
+	p N   文件中的行百分比，同 |CTRL-G|。
+	P S   已显示 window 中文件位置的百分比。这类似于 'ruler' 所述
+	      的百分比。长度总是 3，除非被翻译过。
+	S S   'showcmd' 的内容，见 'showcmdloc'。
+	a S   参数列表状态，同默认标题。（{max} 中的 {current}）
+	      若参数文件数为零或一则为空。
+	{ NF  求值 "%{" 与 "}" 之间的表达式，并替换为结果。
+	      注意结束的 "}" 前没有 "%"。该表达式不能包含 "}" 字符，
+	      可调用函数来绕过这一点。见下面的 |stl-%{|。
+	`{%` -  这几乎与 "{" 相同，只是表达式的结果会被重新求值为一个
+	      statusline 格式字符串。因此如果 expr 的返回值包含 "%"
+	      条目，它们会被展开。该表达式可以包含 "}" 字符，表达式的
+	      结束由 "%}" 表示。
+	      例如： >vim
+		func! Stl_filename() abort
+		    return "%t"
+		endfunc
+<	        `stl=%{Stl_filename()}`   结果为 `"%t"`
+	        `stl=%{%Stl_filename()%}` 结果为 `"Name of current file"`
+	%} -  "{%" 表达式的结束
+	( -   条目组的开始。可用于设置某个分区的宽度和对齐。
+	      后面某处必须有 %) 与之配对。
+	) -   条目组的结束。不允许宽度字段。
+	T N   对 'tabline'：tabpage N 标签的开始。用 %T 或 %X 结束该
+	      标签。用鼠标左键点击此标签会切换到指定的 tabpage，而用
+	      中键点击会关闭指定的 tabpage。
+	X N   对 'tabline'：关闭 tab N 标签的开始。用 %X 或 %T 结束该
+	      标签，例如：%3Xclose%X。用 %999X 表示 "关闭当前 tab" 的
+	      标签。用鼠标左键点击此标签会关闭指定的 tabpage。
+	@ N   执行函数标签的开始。用 %X 或 %T 结束该标签，例如：
+	      %10@SwitchBuffer@foo.c%X。点击此标签会运行指定的函数：
+	      在上例中，用鼠标左键点击一次 "foo.c" 时会运行
+	      `SwitchBuffer(10, 1, 'l', '    ')` 表达式。指定的函数按
+	      顺序接收以下参数：
+	      1. minwid 字段值；若未指定 N 则为零
+	      2. 鼠标点击次数，用于检测多次点击
+	      3. 使用的鼠标按键："l"、"r" 或 "m" 分别表示左键、右键或
+	         中键；不应假定第三个参数只会是 "l"、"r" 或 "m"：
+	         对于其它鼠标按键，可能会得到其它只含 ASCII 小写字母的
+	         非空字符串
+	      4. 按下的修饰键：若按下 shift 修饰键则字符串包含 "s"，
+	         control 为 "c"，alt 为 "a"，meta 为 "m"；目前若未按下
+	         修饰键，字符串会包含空格，但不应依赖空格的存在或修饰键
+	         的特定顺序：用 |stridx()| 检测是否存在某个修饰键；该
+	         字符串保证只包含 ASCII 字母和空格，每个修饰键一个字母；
+	         "?" 修饰键也可能出现，但它的出现是个 bug，表示新增了
+	         鼠标按键识别，却没有修改响应该标签上鼠标点击的代码。
+	      在指定的函数中使用 |getmousepos()|.winid 来获取被点击
+	      条目对应的 |window-ID|。
+	< -   行太长时在哪里截断。默认在开头。不允许宽度字段。
+	= -   对齐分区之间的分隔点。每个分区之间会用相等数量的空格
+	      分隔。只有一个 %= 时，它之后的内容会右对齐。有两个 %=
+	      时会有中间部分，其左右两侧都是空白。不允许宽度字段。
+	# -   设置高亮组。后面必须跟组名，然后再跟一个 #。因此对高亮组
+	      HLname 要使用 %#HLname#。会使用相同的高亮，非当前 window
+	      的 statusline 也是如此。
+	$ -   与 `#` 相同，只是 `%$HLname$` 组会继承前面的高亮属性。
+	* -   把高亮组设为 User{N}，其中 {N} 取自 minwid 字段，例如
+	      %1*。用 %* 或 %0* 恢复正常高亮。User{N} 与 StatusLine
+	      之间的差异会被应用到非当前 window 的 statusline 所用的
+	      StatusLineNC 上。
+	      数字 N 必须介于 1 和 9 之间。见 |hl-User1..9|
+
+	显示标志时，如果该标志紧跟在纯文本之后，Vim 会去掉前导逗号（如果有
+	的话）。当下面的示例那样使用标志时，这会带来美观的显示效果。
+
+	当一个组中的所有条目都变成空字符串（即未设置的标志），且该组未设置
+	minwid 时，整个组会变为空。这样，当没有任何标志被设置时，下面这样的
+	组会从 statusline 中完全消失。 >vim
+		set statusline=...%(\ [%M%R%H]%)...
+<	小心：每次显示状态行时都会对表达式求值。
+				*stl-%{* *g:actual_curbuf* *g:actual_curwin*
+	求值 %{} 时，当前 buffer 和当前 window 会被临时设为正在绘制其
+	statusline 的那个 window（及其 buffer）。表达式会在这一上下文中求值。
+	变量 "g:actual_curbuf" 会被设为真正当前 buffer 的 `bufnr()` 编号，
+	"g:actual_curwin" 则会被设为真正当前 window 的 |window-ID|。这两个
+	值都是字符串。
+
+	如果 'statusline' 选项是在 modeline 中设置的，它会在 |sandbox| 中
+	求值，见 |sandbox-option|。
+	当 'modelineexpr' 关闭时，该选项不能在 modeline 中设置。
+
+	求值 'statusline' 时不允许改变文本或跳转到另一个 window
+	|textlock|。
+
+	如果状态行没有在你希望的时候更新（例如在设置了表达式中使用的变量
+	之后），你可以用 `:redrawstatus` 强制更新。
+
+	全为数字的结果在显示时会被视为数字。否则结果会被当作标志文本，并
+	适用上面描述的规则。
+
+	当心表达式中的错误。它们可能让 Vim 无法使用！如果你卡住了，按住
+	':' 或 'Q' 取得提示符，然后退出并用 "vim --clean" 编辑你的 vimrc
+	或其它文件来修正它。
+
+	示例：
+	模拟设置了 'ruler' 的标准状态行 >vim
+	  set statusline=%<%f\ %h%w%m%r%=%-14.(%l,%c%V%)\ %P
+<	类似，但加入光标下字符的 ASCII 值（类似 "ga"） >vim
+	  set statusline=%<%f%h%m%r%=%b\ 0x%B\ \ %l,%c%V\ %P
+<	显示字节数和字节值，修改标志用红色。 >vim
+	  set statusline=%<%f%=\ [%1*%M%*%n%R%H]\ %-19(%3l,%02c%03V%)%O'%02b'
+	  hi User1 term=inverse,bold cterm=inverse,bold ctermfg=red
+<	加载了压缩文件时显示 ,GZ 标志 >vim
+	  set statusline=...%r%{VarExists('b:gzflag','\ [GZ]')}%h...
+<	在 |:autocmd| 中： >vim
+	  let b:gzflag = 1
+<	以及： >vim
+	  unlet b:gzflag
+<	并定义这个函数： >vim
+	  function VarExists(var, val)
+	      if exists(a:var) | return a:val | else | return '' | endif
+	  endfunction
+<
+
+						*'suffixes'* *'su'*
+'suffixes' 'su'		string	（默认 ".bak,~,.o,.h,.info,.swp,.obj"）
+			global
+	当多个文件匹配一个通配符时，具有这些后缀的文件优先级较低。见
+	|suffixes|。可以用逗号分隔后缀。逗号后的空格会被忽略。点号也被视为
+	后缀的开始。要避免点号或逗号被识别为分隔符，请在其前面加一个反斜杠
+	（关于包含空格和反斜杠，见 |option-backslash|）。
+	要完全忽略文件，见 'wildignore'。
+	在列表中添加或移除后缀时，推荐使用 |:set+=| 和 |:set-=|。这样可以
+	避免将来某个版本使用其它默认值所带来的问题。
+
+						*'suffixesadd'* *'sua'*
+'suffixesadd' 'sua'	string	(default "")
+			local to buffer
+	以逗号分隔的后缀列表，用于为 "gf"、"[I" 等命令查找文件。示例： >vim
+		set suffixesadd=.java
+<
+
+				*'swapfile'* *'swf'* *'noswapfile'* *'noswf'*
+'swapfile' 'swf'	boolean	(default on)
+			local to buffer
+	为 buffer 使用 swapfile。当某个特定 buffer 不需要 swapfile 时可以重置
+	此选项。例如，涉及连 root 都不应能访问的机密信息时。
+	注意：所有文本都会保存在内存中：
+		- 不要对大文件使用此选项。
+		- 恢复将不可能！
+	仅当 'updatecount' 非零且设置了 'swapfile' 时才会存在 swapfile。
+	重置 'swapfile' 时，当前 buffer 的 swap 文件会被立即删除。设置
+	'swapfile' 且 'updatecount' 非零时，会立即创建 swap 文件。
+	另见 |swap-file|。
+	如果你想打开一个新 buffer 而不为它创建 swap 文件，请使用
+	|:noswapfile| 修饰符。
+	关于 swap 文件的创建位置，见 'directory'。
+
+	此选项与 'bufhidden' 和 'buftype' 一起用于指定特殊种类的 buffer。
+	见 |special-buffers|。
+
+						*'switchbuf'* *'swb'*
+'switchbuf' 'swb'	string	(default "uselast")
+			global
+	此选项控制在 buffer 之间切换时的行为。
+	在以下情况下会检查此选项：
+	- 使用 |quickfix| 命令跳转到错误时（|:cc|、|:cn|、|:cp| 等）。
+	- 使用 |:stag| 命令跳转到 tag 时。
+	- 使用 |CTRL-W_f| 或 |CTRL-W_F| 命令打开文件时。
+	- 使用 buffer 分割命令跳转到 buffer 时（例如 |:sbuffer|、
+	  |:sbnext| 或 |:sbrewind|）。
+	可能的值（逗号分隔列表）：
+	   useopen	若包含，跳转到当前 tabpage 中包含指定 buffer 的第一个
+			打开的 window（如果存在）。否则：不检查其它
+			window。
+	   usetab	类似 "useopen"，但也考虑其它 tabpage 中的
+			window。
+	   split	若包含，在为显示错误的 |quickfix| 命令加载
+			buffer 之前分割当前 window。否则：不分割，
+			使用当前 window（在 quickfix window 中使用时：
+			使用先前用过的 window；若没有其它 window 则
+			分割）。
+	   vsplit	与 "split" 相同，但垂直分割。
+	   newtab	类似 "split"，但打开新 tabpage。当两者同时存在
+			时会覆盖 "split"。
+	   uselast	若包含，在使用 |quickfix| 命令跳转到错误时，
+			跳转到先前用过的 window。
+	如果某个 window 启用了 'winfixbuf'，则目前不会对分割出的
+	window 应用 'switchbuf'。
+
+						*'synmaxcol'* *'smc'*
+'synmaxcol' 'smc'	number	(default 3000)
+			local to buffer
+	搜索语法项的最大列。在长行中，超过此列的文本不会被高亮，后续
+	行也可能无法被正确高亮，因为语法状态已被清除。
+	这有助于避免对单行很长的 XML 文件进行非常缓慢的重绘。
+	设为 0 可移除此限制。
+
+						*'syntax'* *'syn'*
+'syntax' 'syn'		string	(default "")
+			local to buffer  |local-noglobal|
+	设置此选项时，会加载具有该名称的 syntax，除非已用 ":syntax off"
+	关闭 syntax highlighting。
+	否则此选项并不总能反映当前的 syntax（b:current_syntax 变量才是）。
+	此选项在 modeline 中最有用，适用于语法无法被自动识别的文件。
+	例如，在 IDL 文件中： >c
+		/* vim: set syntax=idl : */
+<	当值中出现点时，它分隔两个 filetype 名称。例如： >c
+		/* vim: set syntax=c.doxygen : */
+<	这会先使用 "c" syntax，然后使用 "doxygen" syntax。
+	注意第二个必须准备好作为附加项被加载，否则它会被跳过。可以出现
+	多个点。
+	要关闭当前文件的 syntax highlighting，请使用： >vim
+		set syntax=OFF
+<	要根据 'filetype' 选项的当前值打开 syntax highlighting： >vim
+		set syntax=ON
+<	设置 'syntax' 选项时实际发生的是：以该值为参数触发 Syntax
+	autocommand 事件。
+	此选项不会被复制到另一个 buffer，与 'cpoptions' 中的 's' 或
+	'S' 标志无关。
+	只能使用字母数字字符、'.'、'-' 和 '_'。
+
+						*'tabclose'* *'tcl'*
+'tabclose' 'tcl'	string	(default "")
+			global
+	此选项控制关闭 tabpage 时的行为（例如使用 |:tabclose|）。当为空时，
+	Vim 转到下一个（右侧）tabpage。
+
+	可能的值（逗号分隔列表）：
+	   left		若包含，转到上一个 tabpage 而不是下一个。
+	   uselast	若包含，尽可能转到先前用过的 tabpage。此选项
+			优先于其它选项。
+
+						*'tabline'* *'tal'*
+'tabline' 'tal'		string	(default "")
+			global
+	非空时，此选项决定 Vim window 顶部 tabpage 行的内容。为空时 Vim
+	会使用默认的 tabpage 行。更多信息见 |setting-tabline|。
+
+	tabpage 行只在 'showtabline' 选项指定时出现，且只在没有 GUI 标签行
+	时出现。当 'guioptions' 中包含 'e' 且 GUI 支持标签行时，会改用
+	'guitablabel'。注意这两种 tabpage 行差别很大。
+
+	值的求值方式与 'statusline' 相同。你可以使用 |tabpagenr()|、
+	|tabpagewinnr()| 和 |tabpagebuflist()| 来确定要显示的文本。第一个
+	标签用 "%1T"，第二个用 "%2T"，依此类推。用 "%X" 项表示关闭标签。
+
+	当修改了 'tabline' 中用到但不会触发其更新的内容时，请使用
+	|:redrawtabline|。
+	当 'modelineexpr' 关闭时，此选项不能在 modeline 中设置。
+
+	请记住只有一个 tabpage 是当前 tabpage，其它都不可见，你无法跳转到
+	它们的 window。
+
+						*'tabpagemax'* *'tpm'*
+'tabpagemax' 'tpm'	number	(default 50)
+			global
+	|-p| 命令行参数或 ":tab all" 命令可打开的 tabpage 最大数量。|tabpage|
+
+						*'tabstop'* *'ts'*
+'tabstop' 'ts'		number	(default 8)
+			local to buffer
+	定义用于显示 Horizontal Tab 字符（ASCII 9）的列倍数；一个
+	Horizontal Tab 总是前进到下一个 tab stop。
+	该值必须至少为 1，至多为 9999。
+	如果设置了 'vartabstop'，则忽略此选项。
+	除非你有充分理由，否则保持为 8（见用户手册 |30.5|）。
+
+			*'tagbsearch'* *'tbs'* *'notagbsearch'* *'notbs'*
+'tagbsearch' 'tbs'	boolean	(default on)
+			global
+	搜索 tag 时（例如对 |:ta| 命令），Vim 可以在 tags 文件中使用二分
+	查找或线性查找。二分查找让搜索 tag 快很多，但如果 tags 文件没有
+	正确排序，线性查找会找到更多 tag。
+	Vim 通常假定你的 tags 文件已排序，或指明它们未排序。只有在这种
+	假定不成立时才需要关闭 'tagbsearch' 选项。
+
+	当 'tagbsearch' 打开时，会先在 tags 文件中使用二分查找。在某些
+	情况下，Vim 会对某些文件改用线性查找，或用线性查找重试所有文件。
+	当 'tagbsearch' 关闭时，只进行线性查找。
+
+	当 Vim 在文件开头发现一行表明该文件未排序时，无论如何都会对该文件
+	进行线性查找： >
+	   !_TAG_FILE_SORTED	0	/some comment/
+<	['0' 前后的空白必须是单个 <Tab>]
+
+	当进行了二分查找，且在 'tags' 中列出的任何文件中都未找到匹配，
+	并且忽略大小写或使用模式而非普通 tag 名时，会用线性查找重试一次。
+	未排序 tags 文件中的 tag，以及大小写不同的匹配，只会在该重试中
+	被找到。
+
+	如果某个 tag 文件表明它按大小写折叠排序，则在忽略大小写时可以避免
+	第二次线性查找。为此在 "!_TAG_FILE_SORTED" 行中使用值 '2'。在多数
+	unix 系统中，可以用 "sort" 的 -f 开关对 tag 文件进行大小写折叠
+	排序，如下命令所示："sort -f -o tags tags"。对于 Universal ctags 和
+	Exuberant ctags 5.x 或更高版本（至少 5.5），也可以使用
+	--sort=foldcase 开关。注意大小写必须折叠为大写才能生效。
+
+	默认情况下，tag 搜索区分大小写。当设置了 'ignorecase' 且 'tagcase'
+	为 "followic" 时，或当 'tagcase' 为 "ignore" 时，忽略大小写。
+	当 'tagcase' 为 "followscs" 且设置了 'smartcase' 时，或 'tagcase'
+	为 "smart" 且模式只包含小写字符时，也忽略大小写。
+
+	当 'tagbsearch' 关闭时，存在完全匹配时 tags 搜索更慢，但没有完全
+	匹配时更快。未排序 tags 文件中的 tag 可能只有在 'tagbsearch' 关闭
+	时才能被找到。
+	当 tags 文件未排序，或以错误方式排序（不是按 ASCII 字节值）时，
+	应关闭 'tagbsearch'，或者必须在 tags 文件中包含上面给出的那一行。
+	此选项不影响查找所有匹配 tag 的命令（例如命令行补全和 ":help"）。
+
+						*'tagcase'* *'tc'*
+'tagcase' 'tc'		string	(default "followic")
+			global or local to buffer |global-local|
+	此选项指定搜索 tags 文件时如何处理大小写：
+	   followic	遵循 'ignorecase' 选项
+	   followscs    遵循 'smartcase' 和 'ignorecase' 选项
+	   ignore	忽略大小写
+	   match	匹配大小写
+	   smart	忽略大小写，除非使用了大写字母
+
+						*'tagfunc'* *'tfu'*
+'tagfunc' 'tfu'		string	(default "")
+			local to buffer
+			Disallowed in |modeline|. |no-modeline-option|
+	此选项指定用于执行 tag 搜索（包括 |taglist()|）的函数。
+	该函数接收 tag 模式，并应返回匹配 tag 的 List。关于如何编写该
+	函数及示例，见 |tag-function|。值可以是函数名、|lambda| 或
+	|Funcref|。更多信息见 |option-value-function|。
+
+						*'taglength'* *'tl'*
+'taglength' 'tl'	number	(default 0)
+			global
+	若非零，tag 的有效长度最多为这么多字符。
+
+			*'tagrelative'* *'tr'* *'notagrelative'* *'notr'*
+'tagrelative' 'tr'	boolean	(default on)
+			global
+	若打开，且使用的 tags 文件位于另一个目录，该 tags 文件中的文件名
+	相对于 tags 文件所在的目录。
+
+						*'tags'* *'tag'* *E433*
+'tags' 'tag'		string	(default "./tags;,tags")
+			global or local to buffer |global-local|
+	tag 命令使用的文件名，以空格或逗号分隔。要在文件名中包含空格或
+	逗号，请在其前面加上反斜杠（关于如何包含空格/逗号及反斜杠，见
+	|option-backslash|）。
+	当文件名以 "./" 开头时，'.' 会被替换为当前文件的路径。但仅在
+	'cpoptions' 中不包含 'd' 标志时如此。环境变量会被展开 |:set_env|。
+	另见 |tags-option|。
+	"*"、"**" 及其它通配符可用于在目录树中搜索 tags 文件。见
+	|file-searching|。例如 "/lib/**/tags" 会找到 "/lib" 下所有名为
+	"tags" 的文件。文件名本身不能包含通配符，它会按原样使用。例如
+	"/lib/**/tags?" 会找到名为 "tags?" 的文件。
+	|tagfiles()| 函数可用于获取实际使用的文件名列表。
+	在列表中添加或删除文件名时，最好使用 |:set+=| 和 |:set-=|。这可
+	避免将来某个版本使用另一个默认值所带来的问题。
+
+			*'tagstack'* *'tgst'* *'notagstack'* *'notgst'*
+'tagstack' 'tgst'	boolean	(default on)
+			global
+	打开时，|tagstack| 正常使用。关闭时，带参数的 ":tag" 或 ":tselect"
+	命令不会把 tag 压入 tagstack。随后不带参数的 ":tag"、":pop" 命令
+	或任何其它使用 tagstack 的命令会使用未修改的 tagstack，但确实会
+	改变指向活动项的指针。
+	当在不应改变 tagstack 的映射中使用 ":tag" 命令时，重置此选项很
+	有用。
+
+			*'termbidi'* *'tbidi'* *'notermbidi'* *'notbidi'*
+'termbidi' 'tbidi'	boolean	(default off)
+			global
+	由终端负责文本的双向性（按 Unicode 规定）。终端还应执行某些语言
+	（如 Arabic）所需的字形整形。
+	设置此选项意味着当设置 'arabic' 时不会设置 'rightleft'，并且
+	'arabicshape' 的值会被忽略。
+	注意设置 'termbidi' 会立即产生 'arabicshape' 被忽略的效果，但
+	'rightleft' 不会自动改变。
+	更多细节见 |l10n-arabic.txt|。
+
+		*'termguicolors'* *'tgc'* *'notermguicolors'* *'notgc'*
+'termguicolors' 'tgc'	boolean	(default off)
+			global
+	在 |TUI| 中启用 24 位 RGB 颜色。使用 "gui" |:highlight| 属性而
+	不是 "cterm" 属性。|guifg|
+	需要兼容 ISO-8613-3 的终端。
+
+	Nvim 会自动尝试判断宿主终端是否支持 24 位颜色，若支持则启用此
+	选项（除非用户显式禁用）。
+
+					*'termpastefilter'* *'tpf'*
+'termpastefilter' 'tpf'	string	(default "BS,HT,ESC,DEL")
+			global
+	一个逗号分隔的选项列表，用于指定要从粘贴到终端 window 的文本中
+	移除的控制字符。支持的值有：
+
+	   BS	    退格
+
+	   HT	    TAB
+
+	   FF	    换页
+
+	   ESC	    Escape
+
+	   DEL	    DEL
+
+	   C0	    其它控制字符，不包括 Line feed 和
+		    Carriage return < ' '
+
+	   C1	    控制字符 0x80...0x9F
+
+					*'termsync'* *'notermsync'*
+'termsync'		boolean	(default on)
+			global
+	如果宿主终端支持，则缓冲一次重绘周期中产生的所有屏幕更新，使
+	每一屏在终端中一次性显示。当终端更新比 Nvim 重绘更快时，这可以
+	防止撕裂或闪烁。
+
+						*'textwidth'* *'tw'*
+'textwidth' 'tw'	number	(default 0)
+			local to buffer
+	正在插入的文本的最大宽度。较长的行会在空白之后断开以达到此宽度。
+	值为零时禁用此功能。
+	当 'textwidth' 为零时，可以使用 'wrapmargin'。另见
+	'formatoptions' 和 |ins-textwidth|。
+	当设置了 'formatexpr' 时，会用它来断行。
+
+						*'thesaurus'* *'tsr'*
+'thesaurus' 'tsr'	string	(default "")
+			global or local to buffer |global-local|
+	用于 thesaurus 补全命令 |i_CTRL-X_CTRL-T| 查找单词的文件名列表，
+	以逗号分隔。见 |compl-thesaurus|。
+
+	如果设置了 'thesaurusfunc'（无论对 buffer 还是全局），则不使用
+	此选项。
+
+	要在文件名中包含逗号，请在其前面加上反斜杠。逗号后的空格会被
+	忽略，否则空格会被包含在文件名中。关于使用反斜杠，见
+	|option-backslash|。在列表中添加或删除目录时，最好使用 |:set+=|
+	和 |:set-=|。这可避免将来某个版本使用另一个默认值所带来的问题。
+	环境变量会被展开 |:set_env|。
+	出于安全原因，此选项中不能使用反引号。
+
+					*'thesaurusfunc'* *'tsrfu'*
+'thesaurusfunc' 'tsrfu'	string	(default "")
+			global or local to buffer |global-local|
+			Disallowed in |modeline|. |no-modeline-option|
+	此选项指定用于 CTRL-X CTRL-T thesaurus 补全的函数。
+	|i_CTRL-X_CTRL-T| 见 |compl-thesaurusfunc|。
+	值可以是函数名、|lambda| 或 |Funcref|。
+	更多信息见 |option-value-function|。
+
+				*'tildeop'* *'top'* *'notildeop'* *'notop'*
+'tildeop' 'top'		boolean	(default off)
+			global
+	打开时：波浪号命令 "~" 的行为像操作符。
+
+				*'timeout'* *'to'* *'notimeout'* *'noto'*
+'timeout' 'to'		boolean	(default on)
+			global
+	此选项和 'timeoutlen' 决定当已接收到某个映射键序列的一部分时的
+	行为。例如，如果按下了 <c-f> 且设置了 'timeout'，Nvim 会等待
+	'timeoutlen' 毫秒，以等待映射中可跟在 <c-f> 之后的任何键。
+
+						*'timeoutlen'* *'tm'*
+'timeoutlen' 'tm'	number	(default 1000)
+			global
+	等待映射序列完成的时间，以毫秒计。
+
+						*'title'* *'notitle'*
+'title'			boolean	(default off)
+			global
+	如果启用，Nvim 会更新（GUI 或终端）window 标题。格式由
+	'titlestring' 配置。默认看起来像： >
+		filename [+=-] (path) - Nvim
+<
+	其中： >
+		filename	the name of the file being edited
+		-		indicates the file cannot be modified, 'ma' off
+		+		indicates the file was modified
+		=		indicates the file is read-only
+		=+		indicates the file is read-only and modified
+		(path)		is the path of the file being edited
+		- Nvim		the server name |v:servername| or "Nvim"
+<
+
+							*'titlelen'*
+'titlelen'		number	(default 85)
+			global
+	给出用于 window 标题长度的 'columns' 百分比。当标题更长时，只
+	显示路径名的末尾。在路径名之前使用 '<' 字符来表示这一点。
+	使用百分比可以使其适应 window 的宽度。但它不会完美工作，因为
+	实际可用的字符数还取决于所用字体以及标题栏中的其它内容。当
+	'titlelen' 为零时使用完整路径。否则可以使用 1 到 30000 之间的
+	百分数值。
+	'titlelen' 也用于 'titlestring' 选项。
+
+							*'titleold'*
+'titleold'		string	(default "")
+			global
+			Disallowed in |modeline|. |no-modeline-option|
+	若非空，此选项将用于在退出时设置 window 标题。仅在 'title' 启用
+	时使用。
+
+							*'titlestring'*
+'titlestring'		string	(default "")
+			global
+	格式化 window 标题，由 'title' 选项启用。
+
+	包含 printf 风格的 "%" 项，按 'statusline' 的规则展开。如果某个
+	"%" 格式无效，它会按原样使用，且不会给出错误。
+
+	默认（空）行为等价于： >vim
+	    set titlestring=%t%(\ %M%)%(\ \(%{expand('%:p:~:h')}\)%)%a\ -\ Nvim
+<
+	示例： >vim
+	    auto BufEnter * let &titlestring = hostname() .. "/" .. expand("%:p")
+	    set title titlestring=%<%F%=%l/%L-%P titlelen=70
+<	'titlelen' 的值用于在可用空间的中间
+	或右侧对齐各项。
+
+	示例：让文件名排在最前： >vim
+	    set titlestring=%t%(\ %M%)%(\ (%{expand(\"%:~:.:h\")})%)%(\ %a%)
+<	注意使用了 "%{ }" 和表达式来获取
+	文件的路径（不含文件名）。"%( %)" 构造仅在需要时
+	添加一个分隔空格。
+
+	注意：在 'titlestring' 中使用特殊字符可能导致显示
+	乱码（例如其中包含 CR 或 NL 字符时）。
+
+	当 'modelineexpr' 关闭时，此选项不能在 modeline 中设置。
+
+					*'ttimeout'* *'nottimeout'*
+'ttimeout'		boolean	(default on)
+			global
+	此选项和 'ttimeoutlen' 决定 |TUI| 已接收到某个键码序列的一部分时
+	的行为。
+
+	例如，如果接收到 <Esc>（\x1b 字节）且设置了 'ttimeout'，Nvim 会
+	等待 'ttimeoutlen' 毫秒，以等待终端补全一个键码序列。如果在超时
+	之前没有输入到达，则假定为单个 <Esc>。许多 TUI 光标键码以 <Esc>
+	开头。
+
+	在非常慢的系统上这可能失败，导致光标键有时不工作。如果你发现
+	此问题，可以 ":set ttimeoutlen=9999"。
+	Nvim 会等待 <Esc> 之后的下一个字符到达。
+
+						*'ttimeoutlen'* *'ttm'*
+'ttimeoutlen' 'ttm'	number	(default 50)
+			global
+	等待键码序列完成的时间，以毫秒计。当已输入命令的一部分时，也
+	用于 CTRL-\ CTRL-N 和 CTRL-\ CTRL-G。
+
+	*'ttyfast'* *'tf'* *'nottyfast'* *'notf'* *E1568* *$NVIM_NOTTYFAST*
+'ttyfast' 'tf'		boolean	(default on)
+			global
+	启用假定宿主终端很快（通常是本地）的 Nvim |TUI| 特性。在启动
+	期间，Nvim 会查询终端（用于 'background' 检测等），并且必须等待
+	响应（或超时）。
+
+	如果你的终端环境很慢（例如远程 SSH），或已损坏（不响应查询），
+	Nvim 启动可能会更慢。因此你可以在启动 Nvim 之前设置
+	`$NVIM_NOTTYFAST` 环境变量来禁用此选项： >
+		NVIM_NOTTYFAST=1 nvim
+<
+
+	这些查询很早就执行，在 |--cmd| 和用户 |config| 之前，所以在你的
+	配置中 `:set nottyfast` 为时已晚。
+
+					*'undodir'* *'udir'* *E5003*
+'undodir' 'udir'	string	(default "$XDG_STATE_HOME/nvim/undo//")
+			global
+			Disallowed in |modeline|. |no-modeline-option|
+	undo 文件的目录名列表，以逗号分隔。
+	关于格式的细节见 'backupdir'。
+	"." 表示使用文件所在的目录。"file.txt" 的 undo 文件名为
+	".file.txt.un~"。
+	对于其它目录，文件名是所编辑文件的完整路径，路径分隔符被替换为
+	"%"。
+	写入时：使用第一个存在的目录。"." 总是有效，"." 之后的目录不会
+	用于写入。如果这些目录都不存在，Nvim 会尝试创建列表中的最后一个
+	目录。
+	读取时会尝试所有项来查找 undo 文件。使用第一个存在的 undo 文件。
+	当它无法被读取时会给出错误，不再使用后续项。
+	见 |undo-persistence|。
+	环境变量会被展开 |:set_env|。
+
+	注意，与 'directory' 和 'backupdir' 不同，'undodir' 总是如同存在
+	末尾斜杠一样运作（其含义见 'backupdir'）。
+
+				*'undofile'* *'udf'* *'noundofile'* *'noudf'*
+'undofile' 'udf'	boolean	(default off)
+			local to buffer
+	打开时，Vim 在把 buffer 写入文件时会自动把 undo 历史保存到 undo
+	文件，并在读取 buffer 时从同一文件恢复 undo 历史。
+	undo 文件的存储目录由 'undodir' 指定。
+	关于此特性的更多信息见 |undo-persistence|。
+	当 'undoreload' 导致重新加载之前的 buffer 被保存以供撤销时，
+	不会读取 undo 文件。
+	关闭 'undofile' 时不会删除 undo 文件。
+
+						*'undolevels'* *'ul'*
+'undolevels' 'ul'	number	(default 1000)
+			global or local to buffer |global-local|
+	可以撤销的最大更改次数。由于 undo 信息保存在内存中，数字越大
+	使用的内存越多。尽管如此，单次更改就可能已经使用大量内存。
+	设为 0 以获得 Vi 兼容性：一级撤销，且 "u" 会撤销自身： >vim
+		set ul=0
+<	但你也可以通过把 'u' 标志包含在 'cpoptions' 中获得 Vi 兼容性，
+	并且仍能用 CTRL-R 重复撤销。
+	另见 |undo-two-ways|。
+	设为 -1 表示完全不撤销。你可能只想对当前 buffer 这样做： >vim
+		setlocal ul=-1
+<	当单次更改耗尽内存时这会有帮助。
+
+	当要使用全局值时，局部值会被设为 -123456。
+
+	另见 |clear-undo|。
+
+						*'undoreload'* *'ur'*
+'undoreload' 'ur'	number	(default 10000)
+			global
+	重新加载时保存整个 buffer 以供撤销。这适用于 ":e!" 命令以及
+	buffer 在 Vim 之外被改变时的重新加载。|FileChangedShell|
+	仅当此选项为负数，或行数小于此选项的值时才会保存。
+	把此选项设为零可禁用重新加载时的撤销。
+
+	为重新加载保存撤销时，不会读取任何 undo 文件。
+
+	注意这会导致整个 buffer 被存储在内存中。如果内存耗尽，请把
+	此选项设得更小。
+
+						*'updatecount'* *'uc'*
+'updatecount' 'uc'	number	(default 200)
+			global
+	输入这么多字符后，swap 文件会被写入磁盘。为零时完全不创建
+	swap 文件（见关于恢复的章节 |crash-recovery|）。用 "-n" 选项
+	启动 Vim 时 'updatecount' 被设为零，见 |startup|。在只读模式
+	下编辑时，此选项会被初始化为 10000。
+	可以用 'swapfile' 按 buffer 禁用 swap 文件。
+	当 'updatecount' 从零设为非零时，会为所有设置了 'swapfile' 的
+	buffer 创建 swap 文件。当 'updatecount' 设为零时，不会删除
+	已存在的 swap 文件。
+	在 'buftype' 为 "nofile" 或 "nowrite" 的 buffer 中此选项
+	没有意义。
+
+						*'updatetime'* *'ut'*
+'updatetime' 'ut'	number	(default 4000)
+			global
+	如果这么多毫秒内没有输入任何内容，swap 文件会被写入磁盘
+	（见 |crash-recovery|）。也用于 |CursorHold| autocommand 事件。
+
+					*'varsofttabstop'* *'vsts'*
+'varsofttabstop' 'vsts'	string	(default "")
+			local to buffer
+	定义可变宽度的软 tab stop。值是以逗号分隔的列宽列表。每个宽度
+	定义到下一个软 tab stop 之前的列数。最后一个值会无限重复。
+
+	例如，在编辑汇编语言文件时，语句从第 9 列开始、注释从第 41 列
+	开始，使用以下内容可能会有用： >vim
+		set varsofttabstop=8,32,8
+<	这会在第 8 列设置软 tab stop，然后在第 40 列（8 + 32），此后
+	每隔 8 列一次。
+
+	注意：此设置会覆盖 'softtabstop'。
+	关于 Vim 如何处理 tab 和空格的详细说明，见用户手册的 |30.5| 节。
+
+						*'vartabstop'* *'vts'*
+'vartabstop' 'vts'	string	(default "")
+			local to buffer
+	定义可变宽度的 tab stop。该值是一个以逗号分隔的列宽列表。
+	每个宽度定义到下一个 tab stop 之前的列数；最后一个值会无限重复。
+
+	例如： >
+		:set vartabstop=4,8
+<	这会把第一个 tab stop 放在距行首 4 列处，
+	之后的每个 tab stop 间隔 8 列。
+
+	注意：该设置会覆盖 'tabstop'。
+	在 UNIX 上，建议保持 tabstop 的默认值 8。
+	可以考虑改为设置 'varsofttabstop'。
+	关于 Vim 如何处理 tab 和空格，用户手册的 |30.5| 一节有详细说明。
+
+						*'verbose'* *'vbs'*
+'verbose' 'vbs'		number	(default 0)
+			global
+	设置详细程度（verbosity）等级。也可由 |-V| 和 |:verbose| 设置。
+
+	在 Lua 脚本中对选项、映射等的赋值进行追踪的功能在等级 1 启用；
+	出于性能考虑，当 'verbose' 为 0 时不会追踪 Lua 脚本。
+
+	若大于或等于给定等级，Nvim 会产生以下消息：
+
+	Level   Messages ~
+	----------------------------------------------------------------------
+	1	启用 Lua 追踪（见上）。不产生消息。
+	2	当文件被 ":source"，或读写 |shada| 文件时。
+	3	UI 信息、终端能力。
+	4	Shell 命令。
+	5	每个被搜索的 tags 文件和 include 文件。
+	8	执行了一组 autocommand 的文件。
+	9	已执行的 autocommand。
+	11	在 path 中查找条目。
+	12	Vimscript 函数调用。
+	13	当异常被抛出、捕获、结束或丢弃时。
+	14	":finally" 子句中待处理的内容。
+	15	来自脚本的 Ex 命令（截断到 200 个字符）。
+	16	Ex 命令。
+
+	若设置了 'verbosefile'，则不会显示 verbose 消息。
+
+						*'verbosefile'* *'vfile'*
+'verbosefile' 'vfile'	string	(default "")
+			global
+			Disallowed in |modeline|. |no-modeline-option|
+	当该值非空时，所有消息都会写入以此命名的文件。
+	若该文件已存在，消息会追加写入。
+	写入文件的过程在 Vim 退出或 'verbosefile' 被设为空时结束。写入
+	是带缓冲的，因此可能过一段时间才会出现。
+	将 'verbosefile' 设为新值相当于先把它设为空。
+	与 |:redir| 的区别在于：设置了 'verbosefile' 时不会显示 verbose
+	消息。
+	环境变量会被展开 |:set_env|。
+
+						*'viewdir'* *'vdir'*
+'viewdir' 'vdir'	string	(default "$XDG_STATE_HOME/nvim/view//")
+			global
+			Disallowed in |modeline|. |no-modeline-option|
+	存放 |:mkview| 文件的目录名。
+	环境变量会被展开 |:set_env|。
+
+						*'viewoptions'* *'vop'*
+'viewoptions' 'vop'	string	(default "folds,cursor,curdir")
+			global
+	改变 |:mkview| 命令的效果。它是一个以逗号分隔的单词列表。
+	每个单词启用对某项内容的保存与恢复：
+	   word		save and restore ~
+	   cursor	文件内与 window 中的光标位置
+	   curdir	用 |:lcd| 设置的局部当前目录
+	   folds	手动创建的折叠、打开/关闭的折叠以及局部
+			fold 选项
+	   options	局部于某个 window 或 buffer 的选项和映射（不是
+			局部选项的全局值）
+	   localoptions 与 "options" 相同
+	   slash	|deprecated| 始终启用。在文件名中使用 "/"。
+	   unix		|deprecated| 始终启用。使用 "\n" 换行。
+
+						*'virtualedit'* *'ve'*
+'virtualedit' 've'	string	(default "")
+			global or local to window |global-local|
+	以逗号分隔的单词列表，取值如下：
+	    block	允许在 Visual block 模式中进行虚拟编辑。
+	    insert	允许在 Insert 模式中进行虚拟编辑。
+	    all		允许在所有模式中进行虚拟编辑。
+	    onemore	允许光标移动到行末之后一个字符处
+	    none	用作局部值时，即使设置了全局值也不允许虚拟
+			编辑。用作全局值时，"none" 与 "" 相同。
+	    NONE	"none" 的另一种拼写。
+
+	虚拟编辑意味着光标可以被定位到没有实际字符的位置。这可以是
+	tab 的中间，或行末之后。它用于在 Visual 模式中选择矩形区域
+	以及编辑表格时很有用。
+	"onemore" 则不同，它只允许光标移动到行最后一个字符的后面。
+	这会让某些命令更一致。以前，如果行是空的，光标总是位于行末
+	之后。但这与 Vi 相差很远。它还可能破坏某些插件或 Vim 脚本。
+	例如因为 |l| 可以把光标移到最后一个字符之后。使用时请小心！
+	使用 `$` 命令会移动到行内最后一个字符，而不是其后。
+	这实际上可能把光标向左移动！
+	`g$` 命令会移动到屏幕行的末尾。
+	把 "all" 与 "onemore" 组合起来没有意义，但你不会因此收到警告。
+	与其它单词组合时，"none" 会被忽略。
+
+			*'visualbell'* *'vb'* *'novisualbell'* *'novb'*
+'visualbell' 'vb'	boolean	(default off)
+			global
+	用视觉响铃代替蜂鸣。另见 'errorbells'。
+
+						*'warn'* *'nowarn'*
+'warn'			boolean	(default on)
+			global
+	当 buffer 已被修改时，若使用了 shell 命令则给出警告消息。
+
+						*'whichwrap'* *'ww'*
+'whichwrap' 'ww'	string	(default "b,s")
+			global
+	允许指定的左右移动光标的按键在光标位于行内第一个/最后一个
+	字符时移动到上一行/下一行。把字符连接起来即可为这些按键启用
+	该行为：
+		char   key	  mode	~
+		 b    <BS>	 Normal 和 Visual
+		 s    <Space>	 Normal 和 Visual
+		 h    "h"	 Normal 和 Visual（不推荐）
+		 l    "l"	 Normal 和 Visual（不推荐）
+		 <    <Left>	 Normal 和 Visual
+		 >    <Right>	 Normal 和 Visual
+		 ~    "~"	 Normal
+		 [    <Left>	 Insert 和 Replace
+		 ]    <Right>	 Insert 和 Replace
+	例如： >vim
+		set ww=<,>,[,]
+<	只在使用了光标键时才允许环绕。
+	当移动键与删除或修改操作符组合使用时，<EOL> 也算作一个字符。
+	这让光标跨过行尾时 "3h" 与 "3dh" 不同。对 "x" 和 "X" 也是
+	如此，因为它们与 "dl" 和 "dh" 相同。如果你使用这个选项，可能
+	还想使用映射 ":map <BS> X" 来让退格键删除光标前的字符。
+	当包含 'l' 且在行尾（非空行）的操作符之后使用时，它不会
+	移动到下一行。这让 "dl"、"cl"、"yl" 等正常工作。
+
+						*'wildchar'* *'wc'*
+'wildchar' 'wc'		number	(default <Tab>)
+			global
+	在命令行中开始通配符展开所需键入的字符，由 'wildmode' 指定。
+	更多信息见：|cmdline-completion|。
+	在宏内部使用时该字符不会被识别。相关内容见 'wildcharm'。
+	有些按键不会起作用，例如 CTRL-C、<CR> 和 Enter。
+	<Esc> 可以使用，但连续按两次仍会退出命令行，作为一项失效保护
+	措施。
+	尽管 'wc' 是一个 number 选项，但它可以指定为数字、单个字符、
+	|key-notation|（例如 <Up>、<C-F>），或以脱字符开头的字母
+	（例如 `^F` 即 CTRL-F）： >vim
+		:set wc=27
+		:set wc=X
+		:set wc=^I
+		set wc=<Tab>
+<	'wildchar' 也会在诸如以下搜索模式场景中启用补全：
+	|/|、|?|、|:s|、|:g|、|:v| 和 |:vim|。若要插入字面量 <Tab>
+	而不触发补全，请键入 <C-V><Tab> 或 "\t"。
+	另见 'wildoptions' 和 |wildtrigger()|。
+
+						*'wildcharm'* *'wcm'*
+'wildcharm' 'wcm'	number	(default 0)
+			global
+	'wildcharm' 的作用与 'wildchar' 完全相同，区别在于它在宏内部
+	使用时也能被识别。可以通过查看 |ex-edit-index| 找到适合该选项的
+	"空闲"命令行按键。通常你永远不会真正键入 'wildcharm'，只需在
+	会自动调用补全模式的映射中使用它，例如： >vim
+		set wcm=<C-Z>
+		cnoremap ss so $vim/sessions/*.vim<C-Z>
+<	这样，键入 :ss 之后你就可以使用 CTRL-P 和 CTRL-N。
+
+						*'wildignore'* *'wig'*
+'wildignore' 'wig'	string	(default "")
+			global
+	一个文件模式列表。当展开 |wildcards|、补全文件或目录名时，
+	匹配其中任一模式的文件会被忽略，并且它还会影响 |expand()|、
+	|glob()| 和 |globpath()| 的结果，除非传入了禁用该行为的标志。
+	该模式的使用方式与 |:autocmd| 相同，见 |autocmd-pattern|。
+	另见 'suffixes'。
+	示例： >vim
+		set wildignore=*.o,*.obj
+<	在向列表中添加或移除模式时，推荐使用 |:set+=| 和 |:set-=|。
+	这样可以避免将来某个版本使用不同默认值时出现问题。
+
+		*'wildignorecase'* *'wic'* *'nowildignorecase'* *'nowic'*
+'wildignorecase' 'wic'	boolean	(default off)
+			global
+	设置后，补全文件名和目录名时会忽略大小写。
+	当设置了 'fileignorecase' 时该选项无效。
+	当使用 shell 展开通配符时不适用，这种情况会在存在特殊字符时
+	发生。
+
+			*'wildmenu'* *'wmnu'* *'nowildmenu'* *'nowmnu'*
+'wildmenu' 'wmnu'	boolean	(default on)
+			global
+	当 'wildmenu' 打开时，命令行补全会以增强模式运行。按下
+	'wildchar'（通常是 <Tab>）调用补全时，会显示可能的匹配项。
+	当 'wildoptions' 含有 "pum" 时，补全匹配项会显示在弹出菜单中。
+	否则它们会显示在命令行正上方，并高亮第一个匹配项（如果有
+	状态行，则覆盖状态行）。
+	显示上一个/下一个匹配项的按键（如 <Tab> 或 CTRL-P/CTRL-N）
+	会使高亮移动到相应的匹配项。
+	'wildmode' 必须指定 "full"："longest" 和 "list" 不会启动
+	'wildmenu' 模式。你可以用 |wildmenumode()| 检查当前模式。
+	当按下的键不用于选择补全项时，菜单会被取消。
+
+	菜单激活时，这些按键有特殊含义：
+	CTRL-P		- 转到上一个条目
+	CTRL-N		- 转到下一个条目
+	<Left> <Right>	- 选择上一个/下一个匹配项（类似 CTRL-P/CTRL-N）
+	<PageUp>	- 向后选择若干个条目之前的匹配项
+	<PageDown>	- 向前选择若干个条目之后的匹配项
+	<Up>		- 在文件名/菜单名补全中：向上进入父目录或父菜单。
+	<Down>		- 在文件名/菜单名补全中：进入子目录或子菜单。
+	<CR>		- 在菜单补全中，当光标紧跟在点号之后时：进入子菜单。
+	CTRL-E		- 结束补全，回到选择匹配项之前的内容。
+	CTRL-Y		- 接受当前选中的匹配项并停止补全。
+
+	如果你想让 <Left> 和 <Right> 移动光标而不是选择不同的匹配项，
+	请使用： >vim
+		cnoremap <Left> <Space><BS><Left>
+		cnoremap <Right> <Space><BS><Right>
+<
+	|hl-WildMenu| 会高亮当前匹配项。
+
+						*'wildmode'* *'wim'*
+'wildmode' 'wim'	string	(default "full")
+			global
+	用于 'wildchar' 所指定字符的补全模式。
+	该选项是一个最多包含四部分的逗号分隔列表，分别对应 'wildchar'
+	的第一次、第二次、第三次和第四次按下。每一部分是一个以冒号
+	分隔的补全行为列表，这些行为在该阶段同时生效。
+
+	可能的行为值有：
+	""		只补全（插入）第一个匹配项。不再循环或列出其它匹配项。
+	"full"		补全下一个完整匹配项。循环遍历所有匹配项，在最后
+			一个匹配项之后回到原始输入。若启用了 'wildmenu'，则
+			会显示它。
+	"longest"	补全到最长的公共子串。如果这没有扩展输入，则使用
+			'wildmode' 的下一部分。
+	"list"		如果找到多个匹配项，则全部列出。
+	"lastused"	补全 buffer 名时，按最近使用排序（不包括当前
+			buffer）。仅适用于 buffer 名补全。
+	"noselect"	若启用了 'wildmenu'，显示菜单但不预选第一个条目。
+	如果只存在一个匹配项，则会完整补全它，除非指定了 "noselect"。
+
+	一些有用的冒号分隔值组合：
+	"longest:full"			以最长公共字符串开始，并显示 'wildmenu'
+					（如果已启用）。不循环遍历完整匹配项。
+	"list:full"			列出所有匹配项并补全第一个匹配项。
+	"list:longest"			列出所有匹配项并补全到最长公共前缀。
+	"list:lastused"			列出所有匹配项。补全 buffer 时，按最近
+					使用排序（不包括当前 buffer）。
+	"noselect:lastused"	不预选 'wildmenu' 中的第一个条目（若它处于
+					激活状态）。补全 buffer 时，按最近使用排序
+					（不包括当前 buffer）。
+
+	示例： >vim
+		set wildmode=full
+<	每次按键都补全完整匹配（默认行为） >vim
+		set wildmode=longest,full
+<	第一次按键：最长公共子串
+	第二次按键：循环遍历完整匹配 >vim
+		set wildmode=list:full
+<	第一次按键：列出所有匹配项并补全第一个 >vim
+		set wildmode=list,full
+<	第一次按键：只列出匹配项
+	第二次按键：补全完整匹配 >vim
+		set wildmode=longest,list
+<	第一次按键：最长公共子串
+	第二次按键：列出所有匹配项 >vim
+		set wildmode=noselect:full
+<	第一次按键：显示 'wildmenu' 但不补全也不选择
+	第二次按键：循环完整匹配 >vim
+		set wildmode=noselect:lastused,full
+<	与上面相同，但 buffer 匹配项按最后使用时间排序
+	更多信息见：|cmdline-completion|。
+
+						*'wildoptions'* *'wop'*
+'wildoptions' 'wop'	string	(default "pum,tagfile")
+			global
+	一个单词列表，用于改变 |cmdline-completion| 的完成方式。
+	支持以下取值：
+	  exacttext	存在该标志时，搜索模式补全（例如 |/|、|?|、|:s|、
+			|:g|、|:v| 和 |:vim| 中）会把 buffer 中的确切文本显示为
+			菜单项，而不保留位置锚点（例如 |/\<|）之类的正则痕迹。
+			这会提供更直观、与实际 buffer 文本相符的菜单项。但搜索
+			可能不够精确，因为模式没有被完全保留。默认情况下，
+			Vim 会保留键入的模式（带锚点）并追加匹配到的单词。这
+			保留了搜索的正确性，尤其是在使用正则表达式或启用
+			'smartcase' 时。但追加的匹配单词的大小写可能与 buffer
+			中该单词的大小写不完全一致。
+	  fuzzy			使用 |fuzzy-matching| 查找补全匹配项。指定该值
+			时，补全不会使用通配符展开。匹配项会按「最佳匹配」而
+			不是按字母顺序排序。这会找到比通配符展开更多的匹配项。
+			目前基于模糊匹配的补全不支持文件名和目录名，而是改用
+			通配符展开。
+	  pum			以与 |ins-completion-menu| 相同的风格，使用弹出菜单
+			显示补全匹配项。
+	  tagfile	使用 CTRL-D 列出匹配的 tag 时，会列出 tag 的种类
+			和 tag 所在文件。每行只显示一个匹配项。常用的 tag 种类
+			有：
+					d	#define
+					f	function
+
+	该选项不适用于 |ins-completion|。相关内容见 'completeopt'。
+
+						*'winaltkeys'* *'wak'*
+'winaltkeys' 'wak'	string	(default "menu")
+			global
+			only used in Win32
+	有些 GUI 版本允许通过把 ALT 键与菜单中带下划线的字符组合使用
+	来访问菜单项。这与把 ALT 键用于映射和输入特殊字符相冲突。
+	该选项说明该如何处理：
+	  no	不把 ALT 键用于菜单。ALT 键组合可以被映射，
+			但没有自动处理。
+	  yes	ALT 键的处理由 windowing 系统完成。ALT 键组合
+			无法被映射。
+	  menu	把 ALT 与作为菜单快捷键的字符组合使用时，会由
+			windowing 系统处理。其它按键可以被映射。
+	若通过从 'guioptions' 中排除 'm' 来禁用菜单，则 ALT 键永远
+	不会用于菜单。
+	该选项不用于 <F10>；在 Win32 上。
+
+						*'winbar'* *'wbr'*
+'winbar' 'wbr'		string	(default "")
+			global or local to window |global-local|
+	当该值非空时，此选项会启用 window 栏并决定其内容。window 栏
+	是显示在每个启用了它的 window 顶部的一条栏。'winbar' 的值
+	会像 'statusline' 那样被求值。
+
+	当修改了 'winbar' 中使用到的某个内容却未触发它更新时，请使用
+	|:redrawstatus|。
+
+	浮动 window 不使用 'winbar' 的全局值。要让浮动 window 拥有
+	window 栏，必须设置 'winbar' 的 window 局部值。
+
+	当 'modelineexpr' 关闭时，该选项不能在 modeline 中设置。
+
+						*'winblend'* *'winbl'*
+'winblend' 'winbl'	number	(default 0)
+			local to window
+	为浮动 window 启用伪透明。有效值范围从 0（完全不透明的
+	window，即禁用）到 100（完全透明的背景）。0-30 之间的值通常
+	最有用。
+
+	依赖 UI。在 RGB 颜色下效果最佳。'termguicolors'
+
+							*'winborder'*
+'winborder'		string	(default "")
+			global
+	定义浮动 window 的默认边框样式。默认值为空，等同于 "none"。
+	有效值包括：
+	- "bold"：粗线框。
+	- "double"：双线框。
+	- "none"：无边框。
+	- "rounded"：类似 "single"，但带圆角（"╭" 等）。
+	- "shadow"：通过与背景混合产生投影效果。
+	- "single"：单线框。
+	- "solid"：用单个空白单元格添加内边距。
+	- custom：以逗号分隔、恰好 8 个字符的列表，从左上角开始按
+	  顺时针排列。例如： >lua
+	     vim.o.winborder='+,-,+,|,+,-,+,|'
+<
+
+							*'window'* *'wi'*
+'window' 'wi'		number	(default screen height - 1)
+			global
+	当只有一个 window 且该值小于 'lines' 减一时，用于 |CTRL-F| 和
+	|CTRL-B| 的 window 高度。屏幕会滚动 'window' 减两行，最少
+	一行。
+	当 'window' 等于 'lines' 减一时，CTRL-F 和 CTRL-B 会以更智能
+	的方式滚动，并顾及折行。
+	调整 Vim window 大小时，若该值小于 1 或大于等于 'lines'，它会被
+	设为 'lines' 减 1。
+	注意：不要把它与 Vim window 的高度混淆，高度请用 'lines'。
+
+			*'winfixbuf'* *'wfb'* *'nowinfixbuf'* *'nowfb'*
+'winfixbuf' 'wfb'	boolean	(default off)
+			local to window
+	如果启用，window 与它正在显示的 buffer 会被配对。
+	例如，尝试用 |:edit| 更换 buffer 会失败。
+	其它会更换 window 的 buffer 的命令（如 |:cnext|）也会跳过任何
+	启用了 'winfixbuf' 的 window。不过，若 Ex 命令带有 "!" 修饰符，
+	它可以强制切换 buffer。
+
+			*'winfixheight'* *'wfh'* *'nowinfixheight'* *'nowfh'*
+'winfixheight' 'wfh'	boolean	(default off)
+			local to window  |local-noglobal|
+	在打开或关闭 window 且设置了 'equalalways' 时保持 window 高度。
+	对 |CTRL-W_=| 也是如此。|preview-window| 和 |quickfix-window|
+	默认设置该选项。
+	空间不足时高度仍可能被改变。
+
+			*'winfixwidth'* *'wfw'* *'nowinfixwidth'* *'nowfw'*
+'winfixwidth' 'wfw'	boolean	(default off)
+			local to window  |local-noglobal|
+	在打开或关闭 window 且设置了 'equalalways' 时保持 window 宽度。
+	对 |CTRL-W_=| 也是如此。
+	空间不足时宽度仍可能被改变。
+
+						*'winheight'* *'wh'* *E591*
+'winheight' 'wh'	number	(default 1)
+			global
+	当前 window 的最小行数。这不是硬性下限，空间不足时 Vim 会使
+	用更少的行。若焦点移到某个更小的 window，它的尺寸会被增大，
+	代价是其它 window 的高度。
+	正常编辑时把 'winheight' 设为较小的数。
+	把它设为 999 可让当前 window 占据屏幕的大部分。
+	其它 window 将只有 'winminheight' 那么高。这样做的缺点是
+	":all" 只会创建两个 window。要避免 "vim -o 1 2 3 4" 只创建
+	两个 window，请在启动完成后使用 |VimEnter| 事件来设置该
+	选项： >vim
+		au VimEnter * set winheight=999
+<	最小值为 1。
+	在某条改变当前 window 高度的命令之后，高度不会被调整。
+	'winheight' 作用于当前 window。请用 'winminheight' 设置其它
+	window 的最小高度。
+
+					*'winhighlight'* *'winhl'*
+'winhighlight' 'winhl'	string	(default "")
+			local to window
+	window 局部高亮。以逗号分隔的高亮 |group-name| 对
+	"{hl-from}:{hl-to},..." 列表，其中每个 {hl-from} 都是要被该
+	window 中的 {hl-to} 组覆盖的 |highlight-groups| 项。
+
+	注意：高亮命名空间优先于 'winhighlight'。
+	见 |nvim_win_set_hl_ns()| 和 |nvim_set_hl()|。
+
+	竖直分隔线的高亮由分隔线左侧的 window 决定。tabpage 的
+	'tabline' 高亮由该 tabpage 中最后获得焦点的 window 决定。
+	弹出菜单的高亮由当前 window 决定。消息区域中的高亮无法被
+	覆盖。
+
+	示例：为非当前 window 显示不同的颜色： >vim
+		set winhighlight=Normal:MyNormal,NormalNC:MyNormalNC
+<
+
+						*'winminheight'* *'wmh'*
+'winminheight' 'wmh'	number	(default 1)
+			global
+	某个 window 不是当前 window 时的最小高度。
+	这是硬性下限，window 永远不会变得更小。
+	设为 0 时，必要时 window 可以被「压扁」到零行（即只剩一条
+	状态栏）。当它们变为活动状态时会恢复为至少一行（因为光标
+	总得有个去处）。
+	请用 'winheight' 设置当前 window 的最小高度。
+	该选项只在把 window 变小时检查。不要用很大的数值，否则在打开
+	超过几个 window 时会导致错误。0 到 3 的值比较合理。
+
+						*'winminwidth'* *'wmw'*
+'winminwidth' 'wmw'	number	(default 1)
+			global
+	某个 window 不是当前 window 时的最小宽度。
+	这是硬性下限，window 永远不会变得更小。
+	设为 0 时，必要时 window 可以被「压扁」到零列（即只剩一条
+	竖直分隔线）。当它们变为活动状态时会恢复为至少一行（因为
+	光标总得有个去处）。
+	请用 'winwidth' 设置当前 window 的最小宽度。
+	该选项只在把 window 变小时检查。不要用很大的数值，否则在打开
+	超过几个 window 时会导致错误。0 到 12 的值比较合理。
+
+						*'winwidth'* *'wiw'* *E592*
+'winwidth' 'wiw'	number	(default 20)
+			global
+	当前 window 的最小列数。这不是硬性下限，空间不足时 Vim 会使
+	用更少的列。若当前 window 更小，它的尺寸会被增大，代价是其它
+	window 的宽度。把它设为 999 可让当前 window 始终占满屏幕。
+	正常编辑时把它设为较小的数。
+	在某条改变当前 window 宽度的命令之后，宽度不会被调整。
+	'winwidth' 作用于当前 window。请用 'winminwidth' 设置其它
+	window 的最小宽度。
+
+						*'wrap'* *'nowrap'*
+'wrap'			boolean	(default on)
+			local to window
+	该选项改变文本的显示方式。它不会改变 buffer 中的文本，要改变
+	文本请见 'textwidth'。
+	打开时，长于 window 宽度的行会折行，并在下一行继续显示。
+	关闭时行不会折行，长行只会显示一部分。当光标移到未显示的
+	部分时，屏幕会水平滚动。
+	必要时行会在单词中间断开。要按单词边界断行，见 'linebreak'。
+	为了让水平滚动更有用一些，可以试试： >vim
+		set sidescroll=5
+		set listchars+=precedes:<,extends:>
+<	见 'sidescroll'、'listchars' 和 |wrap-off|。
+	当 'diff' 选项打开时，该选项不能从 |modeline| 设置。
+	如果 'nowrap' 是从 |modeline| 或 |sandbox| 中设置的，那么无论
+	'list' 和 'listchars' 选项的值如何，都会使用 '>' 作为
+	|lcs-extends| 字符。这是为了防止视口之外的恶意代码不被察觉。
+	之后可手动执行 `:setlocal nowrap` 来禁用该行为。
+
+						*'wrapmargin'* *'wm'*
+'wrapmargin' 'wm'	number	(default 0)
+			local to buffer
+	从 window 右边框起算，开始折行的字符数。当键入的文本超过该
+	限制时，会插入一个 <EOL>，并在下一行继续插入。
+	添加边距的选项（如 'number' 和 'foldcolumn'）会使文本宽度
+	进一步减小。
+	当 'textwidth' 非零时，不使用该选项。
+	另见 'formatoptions' 和 |ins-textwidth|。
+
+			*'wrapscan'* *'ws'* *'nowrapscan'* *'nows'* *E384* *E385*
+'wrapscan' 'ws'		boolean	(default on)
+			global
+	搜索会绕到文件末尾继续。对 |]s| 和 |[s| 也适用，它们用于查找
+	拼写错误。
+
+						*'write'* *'nowrite'*
+'write'			boolean	(default on)
+			global
+	允许写入文件。未设置时不允许写文件。
+	可用于只读模式，此时仍然允许修改文本。可以用 |-m| 或 |-M|
+	命令行参数重置。过滤文本仍然可行，尽管这需要写入一个临时
+	文件。
+
+				*'writeany'* *'wa'* *'nowriteany'* *'nowa'*
+'writeany' 'wa'		boolean	(default off)
+			global
+	允许写入任何文件，无需用 "!" 覆盖。
+
+			*'writebackup'* *'wb'* *'nowritebackup'* *'nowb'*
+'writebackup' 'wb'	boolean	(default on)
+			global
+	在覆盖文件之前先做一个备份。除非 'backup' 选项也打开，否则文件成功写出
+	之后会删除该备份。
+	WARNING: 关闭该选项意味着当 Vim 未能正确写出你的 buffer，而后又因某种
+	原因退出时，你会同时丢失原文件和你正在写的内容。只有在文件系统几乎已
+	满、并因此导致写出失败时才应重置该选项（而且要确保在写出成功之前不要
+	退出 Vim）。另一种解释见 |backup-table|。
+	当 'backupskip' 模式匹配时，无论怎样都不会做备份。
+	取决于 'backupcopy'，备份可能是一个新文件，也可能是原文件被改名
+	（并写出一个新文件）。
+
+						*'writedelay'* *'wd'*
+'writedelay' 'wd'	number	(default 0)
+			global
+	只有与 'redrawdebug' 一起使用时才生效。
+	每写出一行或每次 flush 之后等待的毫秒数
+
+ vim:tw=78:ts=8:noet:ft=help:norl:

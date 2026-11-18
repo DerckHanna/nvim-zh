@@ -1,0 +1,454 @@
+*dev_arch.txt*          Nvim
+
+
+                            NVIM REFERENCE MANUAL
+
+
+如何开发 Nvim，模块与子系统的说明                        *dev-arch*
+
+各模块的专属细节记录在该模块文件顶部（`terminal.c`、`undo.c`、……）。每个
+主要模块的文件顶部注释里都有（也应该有）一份概述。
+
+本文档的目的是给出：
+
+1. 各部分如何拼装在一起的概览
+2. 常见任务的 how-to 指南，例如：
+    - （TODO）弃用公开函数
+    - （TODO）新增公开（API）函数或（UI）事件
+
+                                  输入 |gO| 查看目录。
+
+==============================================================================
+项目布局：东西该放在哪
+
+C 代码
+
+- Nvim 的 C 代码位于 `src/nvim/`。
+    - 其中包含我们 fork 并完全「自有」的第三方组件，即不再跟踪上游的
+      组件。尤其是：`vterm/` 和 `tui/termkey/`。
+- 随源引入（vendored）的第三方组件位于 `src/*`。
+    - `src/tee/` 与 `src/xxd/` 有自己的构建文件。它们随 Windows 产物一起
+      分发，以保证那些工具在那里存在。
+    - 其它组件如 `src/cjson/`、`src/mpack/` 被包含在 Nvim 本体中。这些
+      vendored 源码同步自上游，我们并不「自有」它们。
+
+另见 "MAINTAIN.md"。
+
+生成的 C 文件用这些文件名约定提示其用途：
+- `*.c`、`*.generated.c` - 完整 C 文件，带全部 include 等。
+- `*.c.h` - 参数化的 C 文件，包含所有必要的 include，但使用前要先定义
+  宏。例如：`typval_encode.c.h`
+- `*.h` - 完整头文件，带全部 include。不适用于 `*.generated.h`。
+- `*.h.generated.h` - 导出函数的声明。
+- `*.c.generated.h` - 静态函数的声明。
+
+
+LUA 代码
+
+Lua 代码位于四个位置之一：
+
+1. 插件！并非所有东西都要挂在 `vim.*` 上。对于非必需的功能，插件才是正确
+   的模型：这些功能（1）具有「autoload」行为，（2）用户可能禁用或替换为
+   第三方插件，（3）主要面向用户，而不是 API。
+    - 「Opt-out」插件（启动时激活）：`runtime/plugin/`
+    - 「Opt-in」插件（通过 `:packadd` 激活）：`runtime/pack/dist/opt/`
+    - 注意：更新 |standard-plugin-list|。
+    - 注意：新插件应把 Lua 模块放在共享的「nvim」命名空间：
+      `require('nvim.foo')`，而不是 `require('foo')`。
+    - 示例：
+      - ✅ spellfile `runtime/lua/nvim/spellfile.lua`
+      - ✅ tutor
+    - 不要把下面这些遗留插件当作示例（它们的模块应放在
+      `lua/nvim/x.lua`，而不是 `lua/x.lua`）：
+      - ❌ editorconfig.lua
+      - ❌ man.lua
+      - ❌ nvim.difftool
+      - ❌ nvim.tohtml
+      - ❌ nvim.undotree
+2. Stdlib：`runtime/lua/vim/`。挂在 `vim.*` 上的模块，惰性加载（与下面的
+   「Core」模块相对）。
+    - 示例：`vim.treesitter`、`vim.lpeg`。
+3. Core：`runtime/lua/vim/_core/`。仅内部使用、编译进本体的模块。可直接与
+   Nvim 内部交互。只在主线程可用。见下文 |dev-lua-builtin|。
+4. 「Shared」core：`runtime/lua/vim/_core/shared.lua`。始终可用的纯 Lua
+   函数。用于测试运行器，以及从 Nvim 启动的 worker 线程/进程。
+
+顶层 `vim.` 命名空间用于基础的 Lua 与编辑器特性。其它一切请用子模块
+（`vim.foo`）（但要避免过度「嵌套」），或用插件（见上文）。
+
+与 Vim 的 `if_lua` 兼容性明确不是目标。
+
+                                                             *dev-lua-builtin*
+即使 VIMRUNTIME 无效也仍有必要的 Lua 模块（一般是数据结构与基础工具），必须
+编译进 `nvim` 二进制。有两种做法：
+- 如果它们是私有的，把代码文件放在 `runtime/lua/vim/_core/`
+- 如果它们是公开的，在 `runtime/lua/vim/` 下挑一个新路径，
+  并把它加到 src/nvim/CMakeLists.txt 里的 VIM_MODULE_FILE。
+
+
+==============================================================================
+数据结构
+
+- StringBuilder
+- 动态列表/向量用 kvec 或 garray.c（字符串请用 StringBuilder）
+
+大多数列表请用 `kvec.h`。当确实需要链表时，用 `src/nvim/lib/queue_defs.h`，
+它定义了一种「侵入式」（intrusive）链表。
+
+Buffer 文本存为线段树（tree of line segments），定义在 `src/nvim/memline.c`。
+核心思路见 `ml_find_line`。
+
+许多编辑器概念被定义为 Lua 数据文件：
+
+- 事件（autocmd）：src/nvim/auevents.lua
+- Ex（cmdline）命令：src/nvim/ex_cmds.lua
+- 选项：src/nvim/options.lua
+- Vimscript 函数：src/nvim/eval.lua
+- v: 变量：src/nvim/vvars.lua
+
+==============================================================================
+事件                                                             *dev-events*
+
+历史上被称为「autocmd」的事件，本文中称作「编辑器事件」或简称「事件」，是供
+插件、用户配置与 Nvim 编辑器使用的高层事件。（另有一个无关的低层概念，由
+`event/defs.h#Event` 结构定义，那只是一包沿内部 |event-loop| 传递的数据。）
+
+在可行时，新的编辑器事件应使用 `aucmd_defer()` 实现（并尽可能把旧事件迁移
+过来），这样它们的处理方式可预测，从而避免崩溃。见 |dev-new-event|。
+
+==============================================================================
+UI 事件                                                      *dev-ui-events*
+
+长期愿景是：UI 事件只是另一类「编辑器事件」（旧称「autocmd」）。我们没有理由
+把面向用户或面向插件的事件分成不同类型。事件就是事件。它们的「传输方式」无关
+紧要，任何事件都应能通过任意传输方式（编辑器或 RPC）发出。
+
+与此同时，现状是 UI 事件属于特定的 RPC 事件，被打包在通用的 `redraw`
+通知里。它们也可以在进程内通过 |vim.ui_attach()| 监听。
+
+UI 事件被延后投递给各 UI，这意味着要对 UI 事件数据做深拷贝（deepcopy）。
+
+与 UI 事件关系最直接的源文件是：
+1. `src/nvim/ui.*`：调用已注册 UI 结构体的处理函数（与 msgpack-rpc 无关）
+2. `src/nvim/api/ui.*`：通过 msgpack-rpc 把消息转发给远程 UI。
+
+UI 事件定义在 `src/nvim/api/ui_events.in.h`，该文件不直接编译，而是由
+`src/gen/gen_api_ui_events.lua` 解析，后者自动生成上面那些源文件所用的包装
+函数。它还生成可通过 `api_info().ui_events` 访问的元数据。
+
+新增 UI 事件的示例见提交 d3a8e9217f39c59dd7762bd22a76b8bd03ca85ff。记得在
+本开发周期内（若尚未）提升 NVIM_API_LEVEL。
+
+其它参考：
+- |msgpack-rpc|
+- |ui|
+- https://github.com/neovim/neovim/pull/3246
+- https://github.com/neovim/neovim/pull/18375
+- https://github.com/neovim/neovim/pull/21605
+
+==============================================================================
+文件系统                                                     *dev-filesystem*
+
+https://github.com/neovim/neovim/issues/36112 路径处理（尤其是分隔符
+（「/」与「\」））按如下方式设计：除「边缘」处之外一律使用「/」分隔符，也就是
+说分隔符只在绝对必要时才即时转换。这与内部所有文本都按 UTF-8 编码、而
+Buffer 可读写各种编码的做法类似。
+
+附言：Windows 处理「/」分隔符毫无问题，只有极少数例外。会没事的，别担心。
+看在老天份上，直接用「/」就行！
+
+==============================================================================
+API
+
+                                                        *dev-api-fast*
+API 函数与 Vimscript 的「eval」函数可被标记为 |api-fast|，意味着在 Lua 回调
+等场景中调用它们是安全的。如果一个函数可能触发 `os_breakcheck()`，它就不能
+被标记为「fast」，因为该调用可能「让出」当前执行，并启动一段不期待这种情形
+的新代码执行：
+- 意外递归进入某个不期待此事的函数。
+- 改变（全局）状态，却没有在返回「被让出的」调用点之前恢复它。
+
+在实践中，这意味着任何可能触发 `os_breakcheck()` 的代码都不能是「fast」。
+例如，提交 3940c435e405 用 `EW_NOBREAK` 标志显式禁止 `os_breakcheck()`，修掉
+了 `nvim__get_runtime` 里这样一个 bug。
+
+非 fast 代码的常见例子：正则匹配、通配符展开、表达式求值。
+
+==============================================================================
+内部实践与模式                                         *dev-internals-howto*
+
+------------------------------------------------------------------------------
+新增 excmd 或 vimfn（“f_xx”）函数    *dev-new-excmd* *dev-new-vimfn*
+
+要实现一个 Ex 命令或 f_xx 函数，可从三种方式中选一种（按偏好顺序）：
+
+1. 全 Lua：实现完全位于 Lua 中。这有性能好处：从 Lua 调用 `vim.fn.xx()`
+   时会跳过 Vimscript <=> Lua 桥接。示例：
+    - `f_hostname`
+2. 部分 Lua：C 实现调用 `nlua_call_vimfn` 或 `nlua_call_excmd`。（极少数情况
+   下用：`nlua_exec` / `NLUA_EXEC_STATIC`）。示例：
+    - `ex_log`
+    - `ex_lsp`
+    - `f_serverlist`
+3. 遗留方式：完全用 C 实现该函数。
+   示例：
+    - `f_chansend`
+    - `f_flatten`
+    - `f_searchpos`
+
+------------------------------------------------------------------------------
+新增事件（autocmd）                                       *dev-new-event*
+
+新增编辑器事件（autocmd）：
+
+1. 在 `src/nvim/auevents.lua` 中注册事件名。如果该事件是 Nvim 独有的
+   （Vim 没有），还要更新 `nvim_specific` 表。
+2. 触发事件，用以下方式之一：
+   - 从 C 中，用 `aucmd_defer()` 以延后方式触发（安全、可预测）。示例见
+     `do_markset_autocmd`。
+   - 从 Lua 中，用 `vim.api.nvim_exec_autocmds()`。
+3. 在 `runtime/lua/vim/_meta/events.lua` 中定义 |event-data| 类型（若有）。
+4. 在 `runtime/doc/autocmd.txt` 中为事件写文档。
+
+==============================================================================
+事件循环                                                  *event-loop*
+
+内部的低层 libuv 事件循环（|luv-event-loop|）用于以可预测的方式调度任意的
+工作。一个明显的调度用例是延后的编辑器事件（autocmd）。另一个例子是
+|job-control|。
+
+异步事件支持
+
+Nvim 新增的特性之一是支持处理任意异步事件，可包括：
+
+- RPC 请求
+- job 控制回调
+- 定时器
+
+Nvim 通过在等待字符时进入另一个事件循环来实现该功能，所以不再是： >py
+
+  def state_enter(on_state, data):
+    do
+      key = readkey()           # Read a key from the user
+    while on_state(data, key)   # Invoke callback for the current state
+
+Nvim 的程序主循环更像是： >py
+
+  def state_enter(on_state, data):
+    do
+      event = read_next_event() # Read an event from the OS
+    while on_state(data, event) # Invoke callback for current state
+
+其中 `event` 是操作系统投递给我们的东西，包括（但不限于）用户输入。
+`read_next_event()` 这部分由 libuv 内部实现，libuv 是 Nvim 使用的平台层。
+
+由于 Nvim 的代码继承自 Vim，各状态并未准备好接收「任意事件」，所以我们用
+一个特殊的 key 来表示这类事件（当某个状态收到「任意事件」时，它通常除更新
+屏幕外不做任何事）。
+
+主循环
+
+`Loop` 结构（描述 `main_loop`）把多个队列抽象成一个循环： >
+
+    uv_loop_t uv;
+    MultiQueue *events;
+    MultiQueue *thread_events;
+    MultiQueue *fast_events;
+
+`loop_poll_events` 在 Nvim 空闲时检查 `Loop.uv` 与 `Loop.fast_events`，并且
+也按 `os_breakcheck` 的间隔检查。
+
+MultiQueue 之所以好，是因为你可以轻易挂上一次性「子队列」。例如
+`do_os_system()` 就这么做（对每个启动的进程！）以自动把事件路由到
+`main_loop`： >
+
+    Process *proc = &uvproc.process;
+    MultiQueue *events = multiqueue_new_child(main_loop.events);
+    proc->events = events;
+
+
+NVIM 生命周期
+
+Nvim 如何处理输入。
+
+考虑一个典型的类 Vim 编辑会话：
+
+01. Vim 显示欢迎屏幕
+02. 用户输入：`:`
+03. Vim 进入命令行模式
+04. 用户输入：`edit README.txt<CR>`
+05. Vim 打开文件并回到普通模式
+06. 用户输入：`G`
+07. Vim 导航到文件末尾
+09. 用户输入：`5`
+10. Vim 进入 count-pending 模式
+11. 用户输入：`d`
+12. Vim 进入 operator-pending 模式
+13. 用户输入：`w`
+14. Vim 删除 5 个单词
+15. 用户输入：`g`
+16. Vim 进入「g 命令模式」
+17. 用户输入：`g`
+18. Vim 跳到文件开头
+19. 用户输入：`i`
+20. Vim 进入插入模式
+21. 用户输入：`word<ESC>`
+22. Vim 在开头插入「word」并回到普通模式
+
+注意我们把用户操作拆成改变编辑器状态的输入序列。虽然没有关于「g 命令模式」
+（第 16 步）的文档，但它在内部的实现方式与「operator-pending 模式」类似。
+
+由此可以看出，Vim 具有输入驱动状态机的行为（更确切地说，是下推自动机，
+因为从状态迁回时需要栈）。假设每个状态都有一个负责处理按键的回调，这段
+伪代码表示主程序循环： >py
+
+  def state_enter(state_callback, data):
+    do
+      key = readkey()                 # read a key from the user
+    while state_callback(data, key)   # invoke the callback for the current state
+<
+
+也就是说，进入每个状态的方式是调用 `state_enter` 并传入该状态专属的回调与
+数据。下面是实现上述工作流之类程序的高层伪代码： >py
+
+  def main()
+    state_enter(normal_state, {}):
+
+  def normal_state(data, key):
+    if key == ':':
+      state_enter(command_line_state, {})
+    elif key == 'i':
+      state_enter(insert_state, {})
+    elif key == 'd':
+      state_enter(delete_operator_state, {})
+    elif key == 'g':
+      state_enter(g_command_state, {})
+    elif is_number(key):
+      state_enter(get_operator_count_state, {'count': key})
+    elif key == 'G'
+      jump_to_eof()
+    return true
+
+  def command_line_state(data, key):
+    if key == '<cr>':
+      if data['input']:
+        execute_ex_command(data['input'])
+      return false
+    elif key == '<esc>'
+      return false
+
+    if not data['input']:
+      data['input'] = ''
+
+    data['input'] += key
+    return true
+
+  def delete_operator_state(data, key):
+    count = data['count'] or 1
+    if key == 'w':
+      delete_word(count)
+    elif key == '$':
+      delete_to_eol(count)
+    return false  # return to normal mode
+
+  def g_command_state(data, key):
+    if key == 'g':
+      go_top()
+    elif key == 'v':
+      reselect()
+    return false  # return to normal mode
+
+  def get_operator_count_state(data, key):
+    if is_number(key):
+      data['count'] += key
+      return true
+    unshift_key(key)  # return key to the input buffer
+    state_enter(delete_operator_state, data)
+    return false
+
+  def insert_state(data, key):
+    if key == '<esc>':
+      return false  # exit insert mode
+    self_insert(key)
+    return true
+<
+
+上述内容给出了 Nvim 内部如何组织的概念。有些状态如 `g_command_state` 或
+`get_operator_count_state` 没有专用的 `state_enter` 回调，而是隐式嵌入其它
+状态（随着我们继续重构，这一点以后会改变）。要开始读真正的代码，推荐的
+顺序是：
+
+1. `state_enter()` 函数（state.c）。这是真正的程序循环，注意其中用到
+   `VimState` 结构，它包含回调与状态数据的函数指针。
+2. `main()` 函数（main.c）。所有启动完成之后，函数末尾会调用
+   `normal_enter` 进入普通模式。
+3. `normal_enter()` 函数（normal.c）是一个小包装，用于建立 NormalState
+   结构并调用 `state_enter`。
+4. `normal_check()` 函数（normal.c）在普通模式的每次迭代之前调用。
+5. `normal_execute()` 函数（normal.c）在普通模式中读到按键时调用。
+
+第 3、4、5 点里为普通模式描述的基本结构，也用于由 `state_enter` 循环管理
+的其它模式：
+
+- 命令行模式：`command_line_{enter,check,execute}()`（`ex_getln.c`）
+- 插入模式：`insert_{enter,check,execute}()`（`edit.c`）
+- 终端模式：`terminal_{enter,execute}()`（`terminal.c`）
+
+重要变量
+
+当前模式存储在 `State` 中。它可能的取值有 `MODE_NORMAL`、`MODE_INSERT`、
+`MODE_CMDLINE` 以及其它几个。
+
+当前 window 是 `curwin`。当前 buffer 是 `curbuf`。它们指向的结构里存着
+window 中的光标位置、选项值、文件名等。
+
+所有全局变量都声明在 `globals.h`。
+
+主事件循环
+
+主循环实现在 state_enter 中。基本思路是 Vim 等待用户输入一个字符，并处理
+它，直到需要下一个字符。因此 Vim 有多处等待字符输入的地方。`vgetc()` 函数
+用于此目的。它也处理映射。
+
+我们所谓的「Nvim 事件循环」实际上是围绕 `uv_run` 的包装，用来同时处理
+`fast_events` 队列以及可能的（合适的子集）延后事件。因此「裸」的
+`vim.uv.run()` 往往不足以从 Lua 插件「让出」；反之它们可以调用
+`vim.wait(0)`。
+
+屏幕更新大多推迟到某条命令或一组命令完成之后。这项工作由
+`update_screen()` 完成，它对每个 window 调用 `win_update()`，后者对每一行
+调用 `win_line()`。更多解释见 [drawscreen.c](drawscreen.c) 的开头。
+
+命令行模式
+
+输入 `:` 时，`normal_cmd()` 会调用 `getcmdline()` 取得一行 Ex 命令。
+`getcmdline()` 调用一个循环来处理每个输入的字符。它在遇到 `<CR>` 或
+`<Esc>` 或其它结束命令行模式的字符时返回。
+
+EX 命令
+
+Ex 命令由函数 `do_cmdline()` 处理。它做 `:` 命令行的通用解析，并对每条
+独立的命令调用 `do_one_cmd()`。它还负责 while 循环。
+
+`do_one_cmd()` 解析 range 与通用参数，放进 exarg_t，再传给处理该命令的
+函数。
+
+`:` 命令列在 [ex_cmds.lua](ex_cmds.lua) 中。
+
+普通模式命令
+
+普通模式命令由 `normal_cmd()` 函数处理。它也处理可选的 count 以及某些命令
+的额外字符。这些通过 `cmdarg_T` 传给处理该命令的函数。
+
+[normal.c](normal.c) 中有一个表 `nv_cmds`，它列出每条命令的首字符。每个
+条目的第二项是处理该命令的函数名。
+
+插入模式命令
+
+执行 `i` 或 `a` 命令时，`normal_cmd()` 会调用 `edit()` 函数。它包含一个
+等待下一个字符并处理它的循环。它在离开插入模式时返回。
+
+
+==============================================================================
+
+vim:tw=78:ts=8:sw=4:et:ft=help:norl:

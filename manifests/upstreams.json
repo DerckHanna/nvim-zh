@@ -606,7 +606,7 @@
           "translation": "doc/if_perl.cnx",
           "status": "complete",
           "sha256": "c4c96c20cf85b843a5cc6319893bf51a91195235ba772aa70a8bdc7e93f8e66d",
-          "notes": "Perl interface reference translated whole: the :perl/:perldo/:perlfile commands, the VIM::Buffer/VIM::Window Perl API tables and the eval examples; all 8 example blocks (embedding scripts and Perl API samples) are byte-identical to upstream, and the 29 tags keep their *perl-\u2026* names unchanged."
+          "notes": "Perl interface reference translated whole: the :perl/:perldo/:perlfile commands, the VIM::Buffer/VIM::Window Perl API tables and the eval examples; all 8 example blocks (embedding scripts and Perl API samples) are byte-identical to upstream, and the 29 tags keep their *perl-…* names unchanged."
         },
         "usr_23.txt": {
           "source": "runtime/doc/usr_23.txt",
@@ -975,13 +975,39 @@
       "commit": "3aab2147e74890957785941f0c1ad87d0a44c15a",
       "adapter": {
         "status": "implemented",
-        "seam": "replace.desc",
+        "seam": "replace.desc; setup; exact vim.notify title",
         "domain": "which-key",
-        "writes": "desc_display_only"
+        "writes": "preset_desc_and_notification_display_only",
+        "excluded": "footer/private buffers and raw user mapping data",
+        "limitations": "replace.desc has no provenance; identical user descriptions may display the same exact translation"
       },
       "sources": {
         "lua/which-key/config.lua": {
           "sha256": "babf424328f261c7334868a55af8573bb70d8cba7e4928700cedecce39c5db69"
+        },
+        "lua/which-key/init.lua": {
+          "sha256": "c7385b09dd512dcb5a617b564614e5303fb1e9080fab9ca6ffbd9f3c67702a45"
+        },
+        "lua/which-key/mappings.lua": {
+          "sha256": "f9eb63cfb17a81696b63aeb3a60193360e5b4e941d03bf84f45159ec27be1780"
+        },
+        "lua/which-key/plugins/marks.lua": {
+          "sha256": "fa9f5b1fe4798499423e019bc038a197438a1cd1570bacd71630db1f44db6811"
+        },
+        "lua/which-key/plugins/presets.lua": {
+          "sha256": "5e5ebb3011642422228c6ee6afb611da23fe023d337b61a80edbd32356eb2e6e"
+        },
+        "lua/which-key/plugins/registers.lua": {
+          "sha256": "895f300b9cc2e92d811e5845ad7b61644634bb9db3ccee96d408bf0c52f3df88"
+        },
+        "lua/which-key/plugins/spelling.lua": {
+          "sha256": "e7e04ab60da04a828c44efc6453809863e0ae85c1cc89a80ee8394d3ee92a6e6"
+        },
+        "lua/which-key/state.lua": {
+          "sha256": "8794572bb50580828396b5e8e6ca4608ca1aa5009a5f2f0849c959135fd5b919"
+        },
+        "lua/which-key/util.lua": {
+          "sha256": "ff51a10b4c338d37463891b8756b68e57763a651799df9d4f18685e28b03a02d"
         },
         "lua/which-key/view.lua": {
           "sha256": "4c7b445633ce97f36a6422b31aea981d56babc245e4d32d74d65571e7f430b45"
@@ -993,16 +1019,57 @@
       "commit": "40aedd8a68c78a656a10a8d62d80c54af59420fb",
       "adapter": {
         "status": "implemented",
-        "seam": "pickers.new",
+        "seam": "pickers.window title projection; Previewer:title; exact vim.notify title",
         "domain": "telescope",
-        "writes": "picker_titles_only"
+        "writes": "window_title_and_notification_display_only",
+        "version_related": "get_initial_window_options is pinned as a display-only projection; pickers.new is only a lifecycle hook",
+        "excluded": "picker internal titles, refine change_title, entry data and private buffers"
       },
       "sources": {
+        "lua/telescope/actions/init.lua": {
+          "sha256": "d7c9347c119b453832e2b27fb9a7bd6ef46ea79dc8a820a0160fa052f2e323b4"
+        },
+        "lua/telescope/actions/set.lua": {
+          "sha256": "320e2d3480e16693d3d5083ff93c974fe4d89992657aab12a6806fc37ec566e7"
+        },
+        "lua/telescope/builtin/__diagnostics.lua": {
+          "sha256": "80b0b742ec91bcbe1a98b9e16a5098fb787e8cc4aaded23bb1d88c5c0ec22a11"
+        },
+        "lua/telescope/builtin/__files.lua": {
+          "sha256": "c854bd86c8d67a675a499150de1380eb25fe8d7c1c512ad27297c4feebb88696"
+        },
+        "lua/telescope/builtin/__git.lua": {
+          "sha256": "814873ef08b58acd1f8f9bced88c782c6958c8a26876e321d2aa5635409d230a"
+        },
+        "lua/telescope/builtin/__internal.lua": {
+          "sha256": "95c5a947e120f8345494f6d5b4d6d161ef6db8aa7ad537d988194aca9b9196aa"
+        },
+        "lua/telescope/builtin/__lsp.lua": {
+          "sha256": "164fbb107783b3b6f02131682b8849fbaf5c87ce786b0ed5b3ebca5946c6f7ea"
+        },
+        "lua/telescope/command.lua": {
+          "sha256": "7a6db7ab0ff68bf327e96f215a2c47e8afcd31a76b24f9b99d63b6c42823d758"
+        },
+        "lua/telescope/config.lua": {
+          "sha256": "5b6612a7694176d9d686316a25945f895d701c749730058a26c2b3fb5c50e87e"
+        },
         "lua/telescope/pickers.lua": {
           "sha256": "a9d66b553c399c175a5c2190c6f6aa035ebb80d048978bb5e9df02172198a6f6"
         },
         "lua/telescope/pickers/window.lua": {
           "sha256": "61d0c06419de8ebee6755164a5d53ec01cefe0dc9ec65158e72a8b30b674f90b"
+        },
+        "lua/telescope/previewers/buffer_previewer.lua": {
+          "sha256": "e672a0cb75d3cf4f38a38801130373874426988afe5218ca1bb02ccd0217c707"
+        },
+        "lua/telescope/previewers/previewer.lua": {
+          "sha256": "d9ac15de490082a0e1e23ccb8a26693f7bc37a4f78b4c6cf55ea7ad2644dffb1"
+        },
+        "lua/telescope/previewers/term_previewer.lua": {
+          "sha256": "3e0a718da5edc2abbfaca5ae69985650518f7ab515a871312e2296a7f239f97f"
+        },
+        "lua/telescope/utils.lua": {
+          "sha256": "4b8587ff0a604bd3426d709197ef7cff92f26870d3c60769fd8722abe182534b"
         }
       }
     },
@@ -1031,18 +1098,80 @@
       "commit": "69eb0c34ed3d836d5a0d92d913b77dd73b054f2f",
       "adapter": {
         "status": "implemented",
-        "public_path": "notifications via vim.notify; on_attach mapping desc",
-        "excluded": "private renderer Buffer",
-        "seam": "setup.on_attach",
+        "public_path": "default on_attach mapping descriptions and exact vim.notify title",
+        "excluded": "private renderer/help buffers, commands and user custom on_attach descriptions",
+        "seam": "keymap.on_attach_default; setup lifecycle; exact vim.notify title",
         "domain": "nvim-tree",
-        "writes": "mapping_desc_display_only"
+        "writes": "default_mapping_suffix_and_notification_display_only",
+        "version_related": "the default attach function is pinned so the first default mapping and lazy setup order are covered",
+        "limitations": "existing buffer mappings are not rebuilt on translation refresh"
       },
       "sources": {
         "lua/nvim-tree.lua": {
           "sha256": "e4b7c864eb1dfb645b8dfd6cc5025825d503ec8f352f11300d0ec36321d4fafd"
         },
+        "lua/nvim-tree/actions/fs/clipboard.lua": {
+          "sha256": "26175fd06ff8fff8c02a8144a50626ae46542fa531c212cf92b9769243166d2a"
+        },
+        "lua/nvim-tree/actions/fs/create-file.lua": {
+          "sha256": "df39d4ca4015e2d32381f72e8c4af052c63b9e943bc7fb58ebb4f752c5ff5899"
+        },
+        "lua/nvim-tree/actions/fs/remove-file.lua": {
+          "sha256": "cd15c3ae94b349eb941a3c7e0c57e4e61b3420f647588756099eb222d10342c9"
+        },
+        "lua/nvim-tree/actions/fs/rename-file.lua": {
+          "sha256": "6cc623702068336e70b75f07e8c89f4a1d58d37ab4d53aca1427dbfc0ec85852"
+        },
+        "lua/nvim-tree/actions/fs/trash.lua": {
+          "sha256": "78dcc06523ce505f2e189564cc90a76f794e77b20be8df2eb138cf7d62e45e6d"
+        },
+        "lua/nvim-tree/actions/node/buffer.lua": {
+          "sha256": "658eb70d9b3788ae41b2db75d2a7c07ea02253b2c6a71328d175d6cccbabaf64"
+        },
+        "lua/nvim-tree/actions/node/open-file.lua": {
+          "sha256": "69b768a078697a31cb215e2da7fb5bf2c218e4359997c84db1a8e6bedb4931ad"
+        },
+        "lua/nvim-tree/config.lua": {
+          "sha256": "63fe5fcb0d9909cf162babe2e0491db99e71ae15e5ab27d1ebe742ab54ef31e2"
+        },
+        "lua/nvim-tree/explorer/watch.lua": {
+          "sha256": "e2dda364a36a1c5e18f7bf632ab5e1d5ee1d1720b2a40cfc855c9a016f116c83"
+        },
+        "lua/nvim-tree/git/runner.lua": {
+          "sha256": "19e8e0ea5bb46ae3d2de0f41c29722263cae16981e37ce9694baa535f88d4573"
+        },
+        "lua/nvim-tree/help.lua": {
+          "sha256": "92892f8d160c8cfe1d1cbbb1aeb40f86482d440427e5a697888b6c7cbac02b68"
+        },
         "lua/nvim-tree/keymap.lua": {
           "sha256": "af946146d813d266a75c4e714b7f17f509c907f0af11c15d0b17903f18a6a918"
+        },
+        "lua/nvim-tree/lib.lua": {
+          "sha256": "a3a7d5cbafa6723760f62e983caddae222327a6ea848ab2dc6b1ca8c62f56994"
+        },
+        "lua/nvim-tree/marks/init.lua": {
+          "sha256": "414c5cebc9c637b43d4a28e6b343e1749b35cab1ed9ed51b11949946174febbf"
+        },
+        "lua/nvim-tree/node/directory.lua": {
+          "sha256": "338e95863c3b47f9746d276c12044264abb83aa16870fa35136067b7a67d2aa1"
+        },
+        "lua/nvim-tree/notify.lua": {
+          "sha256": "7bee7c5dba37aa49ad271ac77a6c218b561e63e055447bb856f9d06ff97f3755"
+        },
+        "lua/nvim-tree/renderer/builder.lua": {
+          "sha256": "7fbf11fc2055848bf7226946135259733ec204a89d65d7d1ff7e0ef7fa54a697"
+        },
+        "lua/nvim-tree/renderer/decorator/git.lua": {
+          "sha256": "850c1d4617bc3a02d52a5112bde270388fa7db5ea7569fcbf22a65a8b95e3cc6"
+        },
+        "lua/nvim-tree/session.lua": {
+          "sha256": "c41642200862df95d3b0ff0ffbba146b9a1eaecbb5d6e701475a3fd6468dc770"
+        },
+        "lua/nvim-tree/view.lua": {
+          "sha256": "020ab59a7669290af6a90c2d5ac50ffdb9df726037162f487915f86712d48301"
+        },
+        "lua/nvim-tree/watcher.lua": {
+          "sha256": "911ca909bab766bc81d59cc2d6d81d5da92a7d8b91ef6d09e774b647e8689281"
         }
       }
     },
@@ -1053,7 +1182,7 @@
         "status": "inventory_only",
         "public_path": "formatting.format for cmp-owned labels only",
         "excluded": "completion abbr, kind/menu labels, source data and documentation: no fixed cmp-owned label safe to translate",
-        "reviewed_in_phase": "7C"
+        "reviewed_contract": "fixed public formatter and entry source fields"
       },
       "sources": {
         "lua/cmp/init.lua": {
@@ -1084,6 +1213,23 @@
       "sources": {
         "clang-tools-extra/clangd/ClangdLSPServer.cpp": {
           "sha256": "166463c6638e6c9002784f9cd6aff3d6c7782a610f7b890f99917818ded1f0c0"
+        }
+      }
+    }
+  },
+  "test_dependencies": {
+    "plenary": {
+      "repository": "https://github.com/nvim-lua/plenary.nvim",
+      "commit": "74b06c6c75e4eeb3108ec01852001636d85a932b",
+      "sources": {
+        "lua/plenary/log.lua": {
+          "sha256": "4410937088ad5acabea87585607b4f990e84dd48e756148794c27a8e756aad53"
+        },
+        "lua/plenary/path.lua": {
+          "sha256": "47b9716ff84dc8e64906139bcb9158152b08061bed62d6c9aa362eec6487b50d"
+        },
+        "lua/plenary/popup/init.lua": {
+          "sha256": "1c34ac8a52c1610675753a6278045e2f11e1e63787ab1e59d4ca71d519ca4d87"
         }
       }
     }

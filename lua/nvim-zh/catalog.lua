@@ -1,9 +1,17 @@
 local M = {}
 
 local SEP = '\031'
+local BUILTIN_SOURCES = {
+  ['nvim-ui'] = 'translations/po/zh_CN/nvim-ui.po',
+  ['which-key'] = 'translations/po/zh_CN/which-key.po',
+  telescope = 'translations/po/zh_CN/telescope.po',
+  ['nvim-tree'] = 'translations/po/zh_CN/nvim-tree.po',
+  clangd = 'translations/po/zh_CN/clangd.po',
+}
 local registrations = {}
 local loaded = {}
 local overrides = {}
+local bundled_sources
 
 local function valid_domain(domain)
   return type(domain) == 'string' and domain:match('^[%w][%w_.%-]*$') ~= nil
@@ -74,8 +82,26 @@ end
 -- of their own dependencies and are never subject to broad cache invalidation.
 function M._register_builtin(domain, metadata)
   local module = 'nvim-zh.catalogs.generated.' .. domain
-  M.register(domain, function() return require(module) end, metadata)
+  M.register(domain, function()
+    assert(bundled_sources ~= false, '内置资源尚未通过校验')
+    if bundled_sources and bundled_sources[domain] then return bundled_sources[domain] end
+    return require(module)
+  end, metadata)
   registrations[domain].module = module
+end
+
+function M.register_builtins()
+  for domain, source in pairs(BUILTIN_SOURCES) do
+    if not M.is_registered(domain) then
+      M._register_builtin(domain, { locale = 'zh_CN', source = source })
+    end
+  end
+end
+
+function M.builtin_domains()
+  local domains = vim.tbl_keys(BUILTIN_SOURCES)
+  table.sort(domains)
+  return domains
 end
 
 local function validate_entry(entry, domain)
@@ -198,16 +224,11 @@ function M.reload()
   return count
 end
 
-function M.coverage()
+function M.inventory()
   local domains = {}
   for domain, state in pairs(loaded) do
     if state.catalog then
-      table.insert(domains, {
-        domain = domain,
-        translated = state.catalog.total,
-        total = state.catalog.total,
-        coverage = 1,
-      })
+      table.insert(domains, { domain = domain, entries = state.catalog.total })
     end
   end
   table.sort(domains, function(a, b) return a.domain < b.domain end)
@@ -215,5 +236,26 @@ function M.coverage()
 end
 
 function M._key_separator() return SEP end
+
+-- Validate every candidate before replacing any live builtin catalog.
+function M.prepare_sources(sources)
+  assert(type(sources) == 'table', 'invalid bundled catalogs')
+  for domain, source in pairs(sources) do
+    assert(valid_domain(domain), 'invalid bundled domain')
+    build(source, domain)
+  end
+  return vim.deepcopy(sources)
+end
+
+function M.use_sources(sources)
+  local old = bundled_sources
+  bundled_sources = sources
+  for domain, registration in pairs(registrations) do
+    if registration.module then loaded[domain] = nil end
+  end
+  return old
+end
+
+function M.validate_overrides(value) return validate_overrides(value) end
 
 return M

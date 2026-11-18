@@ -1,0 +1,431 @@
+*userfunc.txt*	Nvim
+
+
+		  VIM REFERENCE MANUAL	  by Bram Moolenaar
+
+
+定义和使用函数。
+
+这在用户手册的 |41.7| 一节中介绍。
+
+				      输入 |gO| 查看目录。
+
+==============================================================================
+
+1. 定义函数 ~
+						*define-function*
+可以定义新的函数。这些函数可以像内置函数一样被调用。函数执行一串 Ex 命令。普通
+模式命令可以用 |:normal| 命令来执行。
+
+函数名必须以大写字母开头，以免与内置函数混淆。为避免在不同脚本中使用同名函数，
+请把它们设为脚本局部的。如果你确实要用全局函数，那就避免使用显而易见的短名字。
+一个好习惯是让函数名以脚本名开头，例如 "HTMLcolor()"。
+
+也可以使用花括号，见 |curly-braces-names|。
+
+|autoload| 机制很适合让函数只在被调用时才定义。
+
+							*local-function*
+脚本局部的函数必须以 "s:" 开头。局部脚本函数只能从该脚本内部，以及该脚本中定义的
+函数、用户命令和 autocommand 中调用。也可以从该脚本中定义的映射调用该函数，但当
+映射在脚本之外被展开时，必须用 |<SID>| 代替 "s:"。只存在脚本局部的函数，没有
+buffer 局部或 window 局部的函数。
+
+			*:fu* *:function* *E128* *E129* *E123* *E454* *E1058* *E1068*
+:fu[nction]		列出所有函数及其参数。
+
+:fu[nction][!] {name}	列出函数 {name}，除非给出 "!"，否则会附带行号。
+			{name} 可以是 |Dictionary| 的 |Funcref| 条目： >
+				:function dict.init
+<			注意 {name} 不是表达式，你不能使用一个函数引用类型的
+			变量。你可以用下面这个小把戏来列出变量 "Funcref" 所
+			引用的函数： >
+				let g:MyFuncref = Funcref
+				func g:MyFuncref
+				unlet g:MyFuncref
+
+:fu[nction] /{pattern}	列出名字匹配 {pattern} 的函数。
+			下面这个例子会列出所有以 "File" 结尾的函数： >
+				:function /File$
+<
+							*:function-verbose*
+当 'verbose' 非零时，列出一个函数还会显示它最后被定义的位置。示例： >
+
+    :verbose function SetFileTypeSH
+	function SetFileTypeSH(name)
+	    Last set from /usr/share/vim/vim-7.0/filetype.vim
+<
+更多信息见 |:verbose-cmd|。
+
+						*E124* *E125* *E853* *E884*
+:fu[nction][!] {name}([arguments]) [range] [abort] [dict] [closure]
+			以名字 {name} 定义一个新函数。函数体紧随其后的若干行，
+			直到匹配的 |:endfunction|。
+
+			名字必须由字母、数字和 '_' 组成，且必须以大写字母或
+			"s:" 开头（见上）。注意不允许使用 "b:"、"l:" 等
+			（自补丁 7.4.260 起，如果函数名中含有冒号，例如
+			"foo:bar()"，会给出 E884），而开头的 "g:" 会被跳过，
+			并且仍然要求后面跟一个大写字母。
+
+			{name} 可以是 |Dictionary| 的 |Funcref| 条目： >
+				:function dict.init(arg)
+<			"dict" 必须是一个已存在的字典。如果条目 "init" 尚不
+			存在，它会被添加。否则需要 [!] 来覆盖已有的函数。
+			结果是指向编号函数的 |Funcref|。该函数只能通过
+			|Funcref| 使用，并且在不再有引用指向它时会被删除。
+								*E127* *E122*
+			当同名函数已存在且未使用 [!] 时会给出错误信息。有一个
+			例外：在再次 source 一个脚本时，先前在该脚本中定义的
+			函数会被静默替换。
+			使用 [!] 时，已存在的函数会被静默替换。除非它当前
+			正在被执行，否则这是一个错误。
+			注意：请明智地使用 !。如果不加小心，它可能导致一个
+			已有函数被意外替换，而这很难调试。
+
+			关于 {arguments} 见 |function-argument|。
+
+					*:func-range* *a:firstline* *a:lastline*
+			当加上 [range] 参数时，函数应自行处理范围。范围会以
+			"a:firstline" 和 "a:lastline" 传入。如果排除了
+			[range]，":{range}call" 会对范围内的每一行调用该
+			函数，光标位于每行的开头。见 |function-range-example|。
+			光标仍会移动到范围的第一行，这与所有 Ex 命令一样。
+								*:func-abort*
+			当加上 [abort] 参数时，函数一旦检测到错误就会中止。
+								*:func-dict*
+			当加上 [dict] 参数时，函数必须通过 |Dictionary| 中的
+			一个条目来调用。此时局部变量 "self" 会被设为该字典。
+			见 |Dictionary-function|。
+						*:func-closure* *E932*
+			当加上 [closure] 参数时，函数可以访问外层作用域的变量
+			和参数。这通常称为闭包。在下面这个例子中，Bar() 使用
+			了 Foo() 作用域中的 "x"。即使 Foo() 返回之后，它仍然
+			保持被引用： >
+				:function! Foo()
+				:  let x = 0
+				:  function! Bar() closure
+				:    let x += 1
+				:    return x
+				:  endfunction
+				:  return funcref('Bar')
+				:endfunction
+
+				:let F = Foo()
+				:echo F()
+<				1 >
+				:echo F()
+<				2 >
+				:echo F()
+<				3
+
+						*function-search-undo*
+			最后使用的搜索模式和重做命令 "." 不会被该函数改变。
+			这也意味着当函数返回时，|:nohlsearch| 的效果会被撤销。
+
+				*:endf* *:endfunction* *E126* *E193* *W22*
+:endf[unction] [argument]
+			函数定义的结束。最好把它单独放在一行，不带
+			[argument]。
+
+			[argument] 可以是：
+				| command	接着要执行的命令
+				\n command	接着要执行的命令
+				" comment	总是被忽略
+				anything else	被忽略，当 'verbose' 非零时
+						给出警告
+			支持后面跟命令是在 Vim 8.0.0654 中加入的，在那之前
+			任何参数都会被静默忽略。
+
+			为了能在 `:execute` 命令中定义函数，请使用换行而不是
+			|:bar|： >
+				:exe "func Foo()\necho 'foo'\nendfunc"
+<
+				*:delf* *:delfunction* *E130* *E131* *E933*
+:delf[unction][!] {name}
+			删除函数 {name}。
+			{name} 也可以是 |Dictionary| 中一个为 |Funcref| 的
+			条目： >
+				:delfunc dict.init
+<			这会从 "dict" 中移除 "init" 条目。如果不再有引用
+			指向该函数，它会被删除。
+			加上 ! 时，如果函数不存在也不会报错。
+							*:retu* *:return* *E133*
+:retu[rn] [expr]	从函数返回。当给出 [expr] 时，它会被求值并作为函数
+			的结果返回。如果没有给出 [expr]，则返回数字 0。
+			当函数结束时没有显式的 ":return"，返回数字 0。
+			注意不会检查不可达的行，因此 ":return" 之后跟着命令
+			不会有警告。同样，也不会检查下一行是否包含有效的
+			命令。忘记行连续反斜杠可能不会被察觉： >
+				return 'some text'
+				       .. ' some more text'
+<			这会毫无怨言地返回 "some text"，而不报错。它本该
+			写成： >
+				return 'some text'
+				       \ .. ' some more text'
+<
+			如果 ":return" 用在 |:try| 之后、匹配的 |:finally|
+			之前（如果存在），那么 ":finally" 之后直到匹配的
+			|:endtry| 的命令会先被执行。这个过程适用于函数内所有
+			嵌套的 ":try"。函数在最外层的 ":endtry" 处返回。
+
+						*function-argument* *a:var*
+参数可以通过给出它的名字来定义。在函数中它就可以用作 "a:name"（"a:" 表示
+argument）。
+					*a:0* *a:1* *a:000* *E740* *...*
+最多可以给出 20 个参数，用逗号分隔。在具名参数之后可以指定一个 "..." 参数，
+表示后面可以选择性地跟更多参数。在函数中，多出的参数可以用 "a:1"、"a:2" 等
+访问。"a:0" 被设为多出参数的个数（可以为 0）。"a:000" 被设为一个包含这些参数
+的 |List|。注意 "a:1" 与 "a:000[0]" 相同。
+								*E742*
+a: 作用域及其中的变量不能被修改，它们是固定的。不过，如果使用的是复合类型，
+比如 |List| 或 |Dictionary|，你可以修改它们的内容。因此你可以把一个 |List| 传
+给函数，让函数向其中添加一项。如果你想确保函数不能修改某个 |List| 或
+|Dictionary|，请使用 |:lockvar|。
+
+也可以定义不带任何参数的函数。不过这时仍然必须提供 ()。
+
+允许在函数体内再定义另一个函数。
+
+						*optional-function-argument*
+你可以为按位置传入的具名参数提供默认值。这使它们在函数调用时成为可选的。当调用
+时没有指定某个位置参数，就用默认表达式来初始化它。这只对用 `:function` 声明的
+函数有效，对 lambda 表达式 |expr-lambda| 无效。
+
+示例： >
+  function Something(key, value = 10)
+     echo a:key .. ": " .. a:value
+  endfunction
+  call Something('empty')	"empty: 10"
+  call Something('key', 20)	"key: 20"
+
+参数默认表达式是在函数调用时求值的，而不是在函数定义时。因此可以使用在函数定义那
+一刻无效的表达式。这些表达式也只会在调用时未指定参数的情况下才求值。
+
+								*E989*
+带默认表达式的可选参数必须出现在所有必需参数之后。你可以在所有可选具名参数之后
+使用 "..."。
+
+后面的参数默认值可以引用前面的参数，但反过来不行。它们必须像所有参数一样以 "a:"
+为前缀。
+
+可行的示例： >
+  :function Okay(mandatory, optional = a:mandatory)
+  :endfunction
+不可行的示例： >
+  :function NoGood(first = a:second, second = 10)
+  :endfunction
+<
+当不使用 "..." 时，函数调用中的参数个数必须至少等于必需具名参数的个数。当使用
+"..." 时，参数个数可以多于必需参数与可选参数的总数。
+
+							*local-variables*
+在函数内部可以使用局部变量。它们会在函数返回时消失。全局变量需要用 "g:" 访问。
+在函数内部，访问局部变量无需加任何前缀。但你也可以加上 "l:"。对于某些保留名字
+（例如 "version"）这是必需的。
+
+示例： >
+  :function Table(title, ...)
+  :  echohl Title
+  :  echo a:title
+  :  echohl None
+  :  echo a:0 .. " items:"
+  :  for s in a:000
+  :    echon ' ' .. s
+  :  endfor
+  :endfunction
+
+然后可以这样调用这个函数： >
+  call Table("Table", "line1", "line2")
+  call Table("Empty Table")
+
+要返回多个值，请返回一个 |List|： >
+  :function Compute(n1, n2)
+  :  if a:n2 == 0
+  :    return ["fail", 0]
+  :  endif
+  :  return ["ok", a:n1 / a:n2]
+  :endfunction
+
+然后可以这样调用这个函数： >
+  :let [success, div] = Compute(102, 6)
+  :if success == "ok"
+  :  echo div
+  :endif
+<
+==============================================================================
+
+2. 调用函数 ~
+						*:cal* *:call* *E107* *E117*
+:[range]cal[l] {name}([arguments])
+		调用一个函数。函数名和它的参数与 `:function` 指定的相同。
+		最多可以使用 20 个参数。返回值被丢弃。
+		在没有范围时，对于接受范围的函数，函数会被调用一次。当
+		给出范围时，光标会在执行函数之前定位到第一行的开头。
+		当给出范围而函数不自行处理它时，函数会对范围内的每一行执行
+		一次，光标位于该行的第一列。光标最终留在最后一行（可能被
+		最后一次函数调用移动）。参数会对每一行重新求值。因此这样
+		可行：
+						*function-range-example*  >
+	:function Mynumber(arg)
+	:  echo line(".") .. " " .. a:arg
+	:endfunction
+	:1,5call Mynumber(getline("."))
+<
+		"a:firstline" 和 "a:lastline" 无论如何都会被定义，它们
+		可以用来在范围的开头或结尾做一些不同的事情。
+
+		自行处理范围的函数示例： >
+
+	:function Cont() range
+	:  execute (a:firstline + 1) .. "," .. a:lastline .. 's/^/\t\\ '
+	:endfunction
+	:4,8call Cont()
+<
+		这个函数会在范围内所有行的前面插入续行字符 "\"，第一行
+		除外。
+
+		当函数返回复合值时，还可以继续对它解引用，但那样就不会
+		使用范围了。示例： >
+	:4,8call GetDict().method()
+<	这里 GetDict() 会得到范围，而 method() 不会。
+
+								*E132*
+用户函数的递归深度由 'maxfuncdepth' 选项限制。
+
+也可以使用 `:eval`。它不支持范围，但允许方法链式调用，例如： >
+	eval GetList()->Filter()->append('$')
+
+函数也可以在求值表达式时作为其中一部分被调用，或者被当作方法使用： >
+	let x = GetList()
+	let y = GetList()->Filter()
+<
+==============================================================================
+
+3. 在函数中清理 ~
+							*:defe* *:defer*
+:defe[r] {func}({args})	在当前函数结束时调用 {func}。
+			{args} 在此处求值。
+
+函数中的命令常常具有全局效果，必须在函数结束时撤销。在各种情况下处理这件事可能
+很麻烦，尤其是在遇到意外错误时。这可以用 `try` / `finally` 块来做，但当这样的块
+不止一个时就会变得复杂。
+
+简单得多的办法是使用 `defer`。它会在函数返回时安排一次函数调用，无论是否发生
+错误。示例： >
+	func Filter(text) abort
+	  call writefile(a:text, 'Tempfile')
+	  call system('filter < Tempfile > Outfile')
+	  call Handle('Outfile')
+	  call delete('Tempfile')
+	  call delete('Outfile')
+	endfunc
+
+这里如果有什么事情导致函数中止，'Tempfile' 和 'Outfile' 都不会被删除。可以用
+`:defer` 来避免： >
+	func Filter(text) abort
+	  call writefile(a:text, 'Tempfile')
+	  defer delete('Tempfile')
+	  defer delete('Outfile')
+	  call system('filter < Tempfile > Outfile')
+	  call Handle('Outfile')
+	endfunc
+
+注意删除 "Outfile" 被安排在调用 `system()` 之前，因为即使 `system()` 失败，它也
+可能已经被创建出来。
+
+被延迟的函数按相反顺序调用，最后加入的最先执行。一个没什么用的示例： >
+	func Useless() abort
+	  for s in range(3)
+	    defer execute('echomsg "number ' .. s .. '"')
+	  endfor
+	endfunc
+
+现在 `:messages` 会显示：
+	number 2
+	number 1
+	number 0
+
+被延迟函数的任何返回值都会被丢弃。该函数后面不能跟任何东西，比如 "->func" 或
+".member"。目前 `:defer GetArg()->TheFunc()` 不起作用，将来的版本可能会支持。
+
+会报告错误，但不会导致延迟函数中止执行，也不会改变延迟函数之外的执行。
+
+不接受范围。函数可以是带额外参数的部分应用，但不能带字典。 *E1300*
+
+==============================================================================
+
+4. 自动加载函数 ~
+							*autoload-functions*
+当使用很多或很大的函数时，可以让它们只在被使用时才自动定义。有两种方法：使用
+autocommand，以及使用 'runtimepath' 中的 "autoload" 目录。
+
+
+使用 autocommand ~
+
+这在用户手册 |41.14| 一节中介绍。
+
+如果你有一个很长的 Vim 脚本文件形式的插件，autocommand 就很有用。你可以定义该
+autocommand，然后用 `:finish` 快速退出脚本。这会让 Vim 启动更快。之后
+autocommand 应该再次加载同一个文件，并设置一个变量来跳过 `:finish` 命令。
+
+使用 FuncUndefined autocommand 事件，并配以匹配待定义函数的模式。示例： >
+
+	:au FuncUndefined BufNet* source ~/vim/bufnetfuncs.vim
+
+然后文件 "~/vim/bufnetfuncs.vim" 应该定义以 "BufNet" 开头的函数。另见
+|FuncUndefined|。
+
+
+使用 autoload 脚本 ~
+							*autoload* *E746*
+这在用户手册 |41.15| 一节中介绍。
+
+使用 "autoload" 目录中的脚本更简单，但要求文件名的准确无误。一个可以被自动加载
+的函数有着这样的名字： >
+
+	:call filename#funcname()
+
+当调用这样一个函数而它尚未被定义时，Vim 会在 'runtimepath' 的 "autoload" 目录
+中查找名为 "filename.vim" 的脚本文件。例如
+"~/.config/nvim/autoload/filename.vim"。那个文件应该像这样定义函数： >
+
+	function filename#funcname()
+	   echo "Done!"
+	endfunction
+
+如果文件不存在，Vim 还会在 'packpath'（"start" 之下）中查找，以便当包还没被加入
+'runtimepath' 时能从你的 |vimrc| 调用包中的函数（见 |packages|）。
+
+文件名和函数中 # 之前使用的名字必须完全匹配，并且所定义的函数的名字必须与调用时
+完全一致。
+
+可以使用子目录。函数名中的每个 # 都像路径分隔符一样工作。因此当调用一个函数时： >
+
+	:call foo#bar#func()
+
+Vim 会在 'runtimepath' 中查找文件 "autoload/foo/bar.vim"。
+
+这在读取一个尚未设置的变量时也同样有效： >
+
+	:let l = foo#bar#lvar
+
+不过，如果 autoload 脚本已经被加载过，它不会为了一个未知变量而再次被加载。
+
+给这样的变量赋值时不会发生什么特别的事。这可以用来在 autoload 脚本被加载之前把
+设置传给它： >
+
+	:let foo#bar#toggle = 1
+	:call foo#bar#func()
+
+注意，如果你犯了错，调用一个本应在 autoload 脚本中定义的函数，而该脚本实际上并没有
+定义这个函数，你会得到函数缺失的错误信息。如果你修正了 autoload 脚本，它不会自动
+再次被加载。要么重启 Vim，要么手动 source 该脚本。
+
+还要注意，如果你有两个脚本文件，其中一个调用另一个中的函数，反之亦然，而在所用
+函数被定义之前就这样做，那么它不会起作用。避免在顶层使用 autoload 功能。
+
+提示：如果你要分发一批脚本，请阅读 |distribute-script|。
+
+
+ vim:tw=78:ts=8:noet:ft=help:norl:

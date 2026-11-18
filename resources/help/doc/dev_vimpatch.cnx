@@ -1,0 +1,331 @@
+*dev_vimpatch.txt*          Nvim
+
+                            NVIM 参考手册
+
+将 Vim 的补丁合并到 Nvim                                    *dev-vimpatch*
+
+
+Nvim 是从 Vim 7.4.160 分叉出来的；为了不做重复劳动，它持续跟进相关的 Vim
+补丁。运行 `vim-patch.sh` 可以看到 Vim 补丁的状态： >bash
+    ./scripts/vim-patch.sh -l
+<
+欢迎向 |dev-vimpatch-pull-requests| 提交相关的 Vim 补丁，但有些类型的补丁
+属于 |dev-vimpatch-not-applicable|。想立刻上手，见
+|dev-vimpatch-quickstart|。
+
+
+                                         输入 |gO| 查看目录。
+
+==============================================================================
+快速上手                                          *dev-vimpatch-quickstart*
+
+1. 拉取 Nvim 源码： >bash
+     git clone https://github.com/neovim/neovim.git
+2. 运行 `./scripts/vim-patch.sh -l` 查看缺失的 Vim 补丁列表。
+3. 从列表中选择一个补丁（通常选最旧的那个），例如 `8.0.0123`。
+   - 检查有没有开放的 vim-patch PR
+     https://github.com/neovim/neovim/pulls?q=is%3Apr+is%3Aopen+label%3Avim-patch.
+4. 运行 `./scripts/vim-patch.sh -p 8.0.0123`
+5. 按照脚本给出的指示操作。
+
+注意 ~
+
+- 强烈建议从最旧的缺失补丁开始做，因为较晚的补丁可能会依赖这些改动。
+- 用 `git log --grep` 或 `git log -G` 搜索 Nvim/Vim 的源码历史（连已删除的
+  代码也能搜到）。例如要查找 `reset_option_was_set`： >bash
+
+    git log -p -G reset_option_was_set
+<
+- 把 `--grep`、`-G` 之类的 `git log` 选项传给 `./scripts/vim-patch.sh -L`，
+  就能过滤未合并的 Vim 补丁。例如要查找 `+quickfix` 补丁： >bash
+
+    ./scripts/vim-patch.sh -L --grep quickfix -- src
+<
+==============================================================================
+拉取请求                                  *dev-vimpatch-pull-requests*
+
+注意：vim-patch.sh 会为你自动完成下列步骤。请用它！
+
+- 如果你想用 `vim-patch.sh` 自动创建 PR，请安装 `gh`（https://cli.github.com/）
+- PR 标题应当包含 `vim-patch:8.x.xxxx`（不带空白字符）
+- 提交信息
+  https://github.com/neovim/neovim/commit/4ccf1125ff569eccfc34abc4ad794044c5ab7455
+  应当包含：
+    - 一个表示 Vim 补丁编号的标记，格式如下：
+      `vim-patch:8.0.0123`（不带空白字符）
+    - 一个指向 Vim 提交的 URL：
+      https://github.com/vim/vim/commit/c8020ee825b9d9196b1329c0e097424576fc9b3a
+    - 原始的 Vim 提交信息，包括作者
+
+评审者：评审 `runtime/` 补丁的提示
+https://github.com/neovim/neovim/pull/1744#issuecomment-68202876
+
+==============================================================================
+NA（不适用）补丁                              *dev-vimpatch-not-applicable*
+
+许多 Vim 补丁并不适用于 Nvim。如果你发现 NA 补丁，请访问一个开放的
+"version.c: update" PR
+https://github.com/neovim/neovim/pulls?q=is%3Apr+author%3Aapp%2Fgithub-actions+version.c+is%3Aopen
+并在评论中提及这些 NA 补丁（请编辑/更新同一条评论，而不是为每个补丁都新增
+一条评论）。
+
+如果没有开放的 `version.c: update` PR，就把 NA 补丁写进提交信息，格式如下：
+>
+    vim-patch:<version-or-commit>
+    vim-patch:<version-or-commit>
+    ...
+<
+其中 `<version-or-commit>` 是合法的 Vim 版本号（如 `8.0.0123`）或提交 ID
+（SHA）。每个补丁各占一行。
+
+更好的做法是把 NA 补丁压缩进适用的 Vim 补丁里，尤其是当这些 Vim 补丁彼此
+相关时。提交信息的第一行应当来自那个适用的 Vim 补丁。
+>
+    ./scripts/vim-patch -p <na-patch>
+    ./scripts/vim-patch -p <na-patch>
+    ...
+    ./scripts/vim-patch -P <patch>
+    git rebase -i master
+<
+示例：
+https://github.com/neovim/neovim/commit/00f60c2ce78fc1280e93d5a36bc7b2267d5f4ac6
+
+"不适用"的 Vim 补丁类型 ~
+
+- 不受欢迎的功能：
+  - "modelinestrict" https://github.com/neovim/neovim/issues/38985
+  - "tabpanel"
+- Vim9script 特性，以及任何与 `:scriptversion` 相关的东西。（Nvim 只支持
+  Vimscript 版本 1。）注意：标着 `Vim9:` 的补丁仍可能包含对代码库其它部分
+  适用的修复，所以这些补丁需要逐个检查。
+- 对 `testdir/Makefile` 的更新通常属于 NA，因为该 Makefile 会隐式找到
+  https://github.com/neovim/neovim/commit/8a677f8a4bff6005fa39f090c14e970c3dfdbe6e#diff-b3c6ad6680a25a1b42095879e3a87104R52
+  所有 `test_*.vim` 文件。
+- 编译器警告修复：Nvim 力求完全没有警告，而且构建系统与 Vim 差别很大。
+    - 注意：Vim 里的 Coverity 修复对 Nvim 同样适用。
+- `*.proto` 改动：Nvim 自动生成函数原型
+- `#ifdef` 调整：例如 Vim 决定在所有平台上启用 `FEAT_VISUAL`，但 Nvim 早就
+  这么做了。新增 `FEAT_` 保护宏同样与 Nvim 无关。
+- 旧系统支持：针对 Amiga、OS/2 Xenix、Mac OS 9、比 XP SP2 更旧的 Windows
+  这类老平台的修复并不需要，因为 Nvim 不支持它们。
+    - NA 文件：`src/Make_*`、`src/testdir/Make__*`
+- `if_*.c` 改动：`if_python.c` 等文件已被移除。
+- 大多数 `term.c` 改动：Nvim 的 TUI 使用 `libtermkey` 读取终端序列；
+  注意：`replace_termcodes()` 是适用的，并且已移到 `src/nvim/keycodes.c`。
+- `job` 补丁：API 与实现都不兼容
+    - NA 文件：`src/channel_*`、`src/job_*`、`src/testdir/test_channel_*`、
+      `src/testdir/test_job_*`
+- 会修改 NA 文件的 `:terminal` 补丁：API 与实现都不兼容
+    - NA 文件：`src/terminal_*`、`src/testdir/test_terminal_*`
+- `defaults.vim` 补丁
+- 大多数 GUI 相关改动：Nvim 的 GUI 实现在核心 C 代码库之外。
+    - NA 文件：`src/gui_*`、`src/gvim_*`、`src/GvimExt/*`、
+      `src/testdir/test_gui*`
+- `balloon` 改动：Nvim 不支持 balloon 功能
+    - NA 文件：`src/beval_*`、`src/testdir/test_balloon_*`
+- `test_popupwin.vim`、`test_popupwin_textprop.vim` 里的截屏测试：
+  https://github.com/neovim/neovim/pull/12741#issuecomment-704677141
+- json 改动：API 不兼容 https://github.com/neovim/neovim/pull/4131
+    - NA 文件：`src/json*`、`src/testdir/test_json.vim`
+- `test_restricted.vim` 中的 restricted 模式已在
+  https://github.com/neovim/neovim/pull/11996 中移除
+- `test_prompt_buffer.vim` 里的许多测试需要 `channel` 这类不兼容的 Vim 特性；
+  它们仍应被收录，但应跳过
+- 非 runtime 文档：已移到 `BUILD.md`、`INSTALL.md`。
+    - NA 文件：`Filelist`、`README`、`INSTALL`、
+- 其它任何东西都可能相关；宁可谨慎行事，如果你不确定就提交一个 issue。
+
+==============================================================================
+VERSION.C                                          *dev-vimpatch-version.c*
+
+`src/nvim/version.c` 里的 Vim 补丁列表是根据 Nvim git 日志中是否存在
+`vim-patch:xxx` 标记自动更新的
+https://github.com/neovim/neovim/pull/7780。
+
+- 不要自己去更新 `src/nvim/version.c`。
+    - `scripts/vim-patch.sh -p` 会有意省略 `version.c`，以避免合并冲突，并
+      在移植补丁时节省时间。
+- 自动化脚本（`scripts/vimpatch.lua`）只识别 `vim-patch:8.0.1206` 这类标记，
+  不识别 `vim-patch:<hash>`。
+
+==============================================================================
+代码差异                                    *dev-vimpatch-code-differences*
+
+下列函数已被移除或废弃，改用更新的替代品。更多信息见 `memory.c`
+https://github.com/neovim/neovim/blob/master/src/nvim/memory.c。
+>
+  -----------------------------------------------------------------------
+  Deprecated or removed                                 Replacement
+  -----------------------------------------------------------------------
+  vim_free                                                 xfree
+  VIM_CLEAR(&foo)                                    XFREE_CLEAR(foo)
+  malloc alloc lalloc lalloc_id ALLOC_ONE                 xmalloc
+  calloc lalloc_clear                                     xcalloc
+  realloc vim_realloc                                    xrealloc
+  mch_memmove                                             memmove
+  vim_memset copy_chars copy_spaces                       memset
+  vim_strbyte                                             strchr
+  vim_strncpy strncpy                               xstrlcpy/xmemcpyz
+  vim_strcat strncat                                     xstrlcat
+  VIM_ISWHITE                                          ascii_iswhite
+  IS_WHITE_OR_NUL                                  ascii_iswhite_or_nul
+  IS_WHITE_NL_OR_NUL                              ascii_iswhite_nl_or_nul
+  vim_isalpha                                           mb_isalpha
+  vim_isNormalIDc                                      ascii_isident
+  vim_islower vim_isupper                          mb_islower mb_isupper
+  vim_tolower vim_toupper                          mb_tolower mb_toupper
+  mb_ptr2len                                           utfc_ptr2len
+  mb_ptr2len_len                                     utfc_ptr2len_len
+  mb_char2len                                          utf_char2len
+  mb_char2bytes                                       utf_char2bytes
+  mb_ptr2cells                                         utf_ptr2cells
+  mb_ptr2cells_len                                   utf_ptr2cells_len
+  mb_char2cells                                       utf_char2cells
+  mb_off2cells                                         utf_off2cells
+  mb_ptr2char                                          utf_ptr2char
+  mb_head_off                                          utf_head_off
+  mb_tail_off                                          utf_cp_bounds
+  mb_strnicmp2                                         utf_strnicmp
+  MB_STRNICMP2                                         utf_strnicmp
+  mb_lefthalve                                        grid_lefthalve
+  mb_fix_col                                           grid_fix_col
+  utf_off2cells                                       grid_off2cells
+  ml_get_curline                                    get_cursor_line_ptr
+  ml_get_cursor                                     get_cursor_pos_ptr
+  ml_get_curline_len                                get_cursor_line_len
+  ml_get_cursor_len                                 get_cursor_pos_len
+  screen_char                                             ui_line
+  screen_line                                        grid_put_linebuf
+  screen_* (most functions)                               grid_*
+  update_prepare, update_finish #9484                  removed; use update_screen only
+  ARRAY_LENGTH                                          ARRAY_SIZE
+  vim_strsave_escape_csi                           vim_strsave_escape_ks
+  vim_unescape_csi                                    vim_unescape_ks
+  gettail                                                path_tail
+  mch_isFullName                                     path_is_absolute
+  script_do_profile                                    profile_init
+
+  -----------------------------------------------------------------------
+<
+替换 `mb_` 函数时，务必注意 `utf_` 与 `utfc_` 的区别。另外，间接调用语法
+`(*mb_ptr2len)(...)` 应当替换为普通的函数调用 `utfc_ptr2len(...)`。
+>
+  -----------------------------------------------------------------------
+  Data type    Format (Vim source)     Portable format (Nvim source)
+  ------------ ----------------------- ----------------------------------
+  long long    "%lld"                  "%" PRId64
+  size_t       "%ld"                   "%zu"
+  linenr_T     "%ld"                   "%" PRIdLINENR
+  -----------------------------------------------------------------------
+<
+- 另见：https://github.com/neovim/neovim/pull/1729#discussion_r22423779
+- Vim 的 `ga_init2` 已改名为 `ga_init`，原来的 `ga_init` 已经不存在了。
+- "旧式" Vim 测试（`src/testdir/*.in`）应当转换为 Lua 测试
+  （见 #1286 https://github.com/neovim/neovim/issues/1286 和 #1328
+  https://github.com/neovim/neovim/pull/1328）。见迁移旧式测试的检查清单
+  https://github.com/neovim/neovim/blob/master/test/README.md#checklist-for-migrating-legacy-tests。
+    - 但是，请不要把"新式" Vim 测试（`src/testdir/*.vim`）转换成 Lua。
+      "新式" Vim 测试比旧式的更快，而转换它们所花的时间和精力，用在别处更
+      划算。只要把它们复制到 `test/old/testdir/*.vim` 即可。
+- 检查 `enc_utf8` 或 `has_mbyte` 的条件已经过时（只有"真"这一分支适用）。
+    - `enc_utf8` 和 `has_mbyte` 宏已在
+      https://github.com/neovim/neovim/pull/13293 中移除
+- 只有带 `FEAT_GUI` 的 Vim 才需要检查 typeahead buffer 中的 `CSI`。在 Nvim
+  里 `CSI` 在 typeahead buffer 中并没有特殊含义。（另见
+  https://github.com/neovim/neovim/pull/16936）
+
+==============================================================================
+list 管理                                    *dev-vimpatch-list-management*
+
+list 的管理方式（来自 vim 的 `list_T` 与 `listitem_T` 类型）已在
+https://github.com/neovim/neovim/pull/7708/ 中改变。有一项 lint 会针对"旧式"
+用法报警，但这里给出最重要的改动。
+
+表格中的声明
+
+- `list_T list`：一个 list
+- `listitem_T li`：`list` 中的一项
+- `int val`：为 `lv_copyID` 保存的一个值
+
+>
+  --------------------------------------------------------------------------------------
+  Old                             New                                  Comment
+  ------------------------------- ------------------------------------------------------
+  list->lv_first                  tv_list_first(list)
+  list->lv_last                   tv_list_last(list)
+  li->li_next                     TV_LIST_ITEM_NEXT(list, li)          To be avoided if possible, must use list which li belongs to.
+  li->li_prev                     TV_LIST_ITEM_PREV(list, li)          To be avoided if possible, must use list which li belongs to.
+                                  Suggestion by @ZyX-l:                Use TV_LIST_ITER or indexing instead of the previous two calls.
+  list->lv_len                    tv_list_len(list)
+  list->lv_lock                   tv_list_locked(list)
+  &li->li_tv                      TV_LIST_ITEM_TV(li)
+  list->lv_refcount++             tv_list_ref(list)
+  val = list->lv_copyID           val = tv_list_copyid(list)
+  list->lv_copyID = val           tv_list_set_copyid(list, val)
+
+  for (li = list->lv_first;       TV_LIST_ITER_CONST(list, li,         Use TV_LIST_ITER(...) if you need to
+  li != NULL && another_cond;     { if (another_cond) {break;} code})  modify list items (note: assigning copyID is also modification and this happens
+  li = li->li_next) code                                               always when recursively traversing a list).
+
+  --------------------------------------------------------------------------------------
+<
+更多细节和一些更高级的用法，见 `typval.h` 和 `typval.c`。
+
+==============================================================================
+文档差异                                      *dev-vimpatch-documentation*
+
+下列内容应当从所有引入的文档中删除，并且不要在新文档里使用：
+
+- `{Only when compiled with ...}`：绝大多数功能都已变成非可选的了
+  （见 https://github.com/neovim/neovim/wiki/Introduction）
+
+==============================================================================
+文件类型检测                                   *dev-vimpatch-filetype*
+
+Nvim 的文件类型检测行为与 Vim 一致，但它是作为 |vim.filetype| 的一部分实现的
+（见 `$VIMRUNTIME/lua/vim/filetype.lua`）。其逻辑编码在三张表里，按优先级
+顺序排列（返回第一个匹配项）：
+1. `filename`，用于字面完整路径或基名的查找；
+2. `pattern`，用于把文件名或路径与 |lua-pattern|s 匹配，针对快速查找做过
+   优化；
+3. `extension`，用于字面扩展名的查找。
+
+需要检查文件内容或 buffer 变量的逻辑实现在
+`$VIMRUNTIME/lua/vim/filetype/detect.lua` 中。
+
+移植 Vim 的文件类型补丁时，请记住以下几点：
+
+比起 pattern，优先使用显式文件名或扩展名，尤其是大小写不敏感的匹配
+（见 https://github.com/neovim/neovim/pull/29800）： >
+    "*[mM]akefile" regex -> "makefile", "Makefile" filenames
+    "*.js\c"       regex -> "js", "jS", "Js", "jS" extensions
+
+Pattern 匹配有若干差异：
+- 它使用显式的 Lua pattern 完成，不像 Vim 正则那样隐式锚定： >
+    "*/debian/changelog" -> "/debian/changelog$"
+    "*/bind/db.*"        -> "/bind/db%."
+<
+- 文件类型 pattern 会按其父 pattern 分组，以提升匹配性能：如果父 pattern
+  不匹配，就跳过所有子 pattern 的测试。注意：与叶子 pattern 不同，父 pattern
+  在包含 `/` 时并没有特殊的匹配行为。
+
+  添加使用 pattern 匹配的新文件类型时，请考虑以下几点：
+  - 如果已经有分组带合适的父 pattern，就用它。
+  - 如果存在足够快且足够具体的 pattern，能分组至少 3 个文件类型 pattern，
+    就把它作为单独的分组条目加入。
+
+  新的父 pattern 应当
+  - 快：经验法则是它应当是一个短的显式字符串（即不含量词或字符集）；
+  - 具体：按顺序的经验法则：
+    - 完整目录名（例如 `"/etc/"`、`"/log/"`）；
+    - 一个足够罕见目录名的一部分（例如 `"/conf"`、`"git/"`）；
+    - 在真实完整路径中很少用到的字符串（例如 `"nginx"`）。
+
+  示例：
+  - 文件类型 pattern：`".*/etc/a2ps/.*%.cfg"`
+  - 好的父 pattern：`"/etc/"` 或 `"%.cfg$"`
+  - 坏的父 pattern：`"%."`（快但不具体）或 `"/a2ps/.*%."`（具体但慢）
+
+  修改已有的普通 pattern 时，请确保它仍然适合它所在的分组。
+
+vim:tw=78:ts=8:et:ft=help:norl:

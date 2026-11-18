@@ -12,25 +12,17 @@ function M.info()
   local realpath = vim.uv.fs_realpath(vim.v.progpath) or vim.v.progpath
   local prefix = vim.fs.dirname(vim.fs.dirname(realpath))
   local mo_path = prefix .. '/share/locale/zh_CN.UTF-8/LC_MESSAGES/nvim.mo'
-  return {
+  local backend = package.loaded['nvim-zh.native_backend']
+  local current = backend and backend.info() or { active = false, status = 'idle' }
+  mo_path = current.mo_path or mo_path
+  return vim.tbl_extend('force', current, {
     progpath = realpath,
     mo_path = mo_path,
     mo_exists = stat(mo_path) ~= nil,
     v_lang = vim.v.lang,
     lc_all = vim.env.LC_ALL,
     lc_messages = vim.env.LC_MESSAGES,
-  }
-end
-
-local function locale_available()
-  if vim.fn.executable('locale') ~= 1 then return nil end
-  local ok, process = pcall(function() return vim.system({ 'locale', '-a' }):wait() end)
-  if not ok or process.code ~= 0 then return nil end
-  local wanted = normalize_locale('zh_CN.UTF-8')
-  for _, locale in ipairs(vim.split(process.stdout or '', '\n', { trimempty = true })) do
-    if normalize_locale(vim.trim(locale)) == wanted then return true end
-  end
-  return false
+  })
 end
 
 function M.check()
@@ -43,13 +35,12 @@ function M.check()
     message = command_exists and ':language 可用；检查过程不会修改 locale' or ':language 不可用',
   })
 
-  local available = locale_available()
+  local available = info.active or normalize_locale(info.v_lang or ''):find('^zhcn') ~= nil
   table.insert(results, {
     name = 'core.locale',
     status = available and 'ok' or 'warn',
-    message = available == nil and '无法执行 locale -a；请手动确认 zh_CN.UTF-8'
-      or available and '系统 locale zh_CN.UTF-8 可用'
-      or '系统缺少 zh_CN.UTF-8；请生成 locale，并在启动前设置 LC_MESSAGES，避免 LC_ALL 覆盖',
+    message = available and '当前进程已选择中文消息语言'
+      or ('中文消息语言未启用：' .. tostring(info.reason or info.status)),
   })
   table.insert(results, {
     name = 'core.catalog',
@@ -69,7 +60,7 @@ function M.check()
     name = 'core.messages',
     status = translated and 'ok' or 'warn',
     message = translated and '核心消息探针已显示中文'
-      or ('核心消息当前未启用中文（v:lang=' .. tostring(info.v_lang) .. '）；nvim-zh 不会自动修改 locale'),
+      or ('核心消息当前未启用中文（v:lang=' .. tostring(info.v_lang) .. '）：' .. tostring(info.reason or info.status)),
   })
   return results
 end

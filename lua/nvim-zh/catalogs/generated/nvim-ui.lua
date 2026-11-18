@@ -13,33 +13,17 @@ return {
       ["Last-Translator"] = "nvim-zh maintainers",
       ["MIME-Version"] = "1.0",
       ["PO-Revision-Date"] = "2026-11-03 00:00+0800",
-      ["Project-Id-Version"] = "nvim-zh phase 3",
+      ["Project-Id-Version"] = "nvim-zh",
       ["X-Generator"] = "nvim-zh catalog_tool",
     },
   },
   entries = {
     {
       context = "",
-      msgid = "Done",
-      msgstr = "完成",
-      references = {
-        "lua/nvim-zh/ui.lua",
-      },
-    },
-    {
-      context = "",
       msgid = "Empty hover response",
       msgstr = "悬停响应为空",
       references = {
         "lua/vim/lsp/buf.lua",
-      },
-    },
-    {
-      context = "",
-      msgid = "Input:",
-      msgstr = "输入：",
-      references = {
-        "lua/nvim-zh/ui.lua",
       },
     },
     {
@@ -56,14 +40,6 @@ return {
       msgstr = "语言服务器无法提供重命名结果",
       references = {
         "lua/vim/lsp/handlers.lua",
-      },
-    },
-    {
-      context = "",
-      msgid = "Loaded %s",
-      msgstr = "已加载 %s",
-      references = {
-        "lua/nvim-zh/ui.lua",
       },
     },
     {
@@ -132,30 +108,6 @@ return {
     },
     {
       context = "",
-      msgid = "Opened {name}",
-      msgstr = "已打开 {name}",
-      references = {
-        "lua/nvim-zh/ui.lua",
-      },
-    },
-    {
-      context = "",
-      msgid = "Ready",
-      msgstr = "就绪",
-      references = {
-        "lua/nvim-zh/ui.lua",
-      },
-    },
-    {
-      context = "",
-      msgid = "Select one of:",
-      msgstr = "请选择：",
-      references = {
-        "lua/nvim-zh/ui.lua",
-      },
-    },
-    {
-      context = "",
       msgid = "[LSP] Format request failed, no matching language servers.",
       msgstr = "[LSP] 格式化请求失败，没有匹配的语言服务器。",
       references = {
@@ -184,14 +136,6 @@ return {
       msgstr = "该 buffer 未启用 documentColor。",
       references = {
         "lua/vim/lsp/document_color.lua",
-      },
-    },
-    {
-      context = "echo",
-      msgid = "Echo ready",
-      msgstr = "回显就绪",
-      references = {
-        "lua/nvim-zh/ui.lua",
       },
     },
     {

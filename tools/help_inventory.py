@@ -9,7 +9,7 @@ are still untranslated and the few that are deliberately out of scope.
 This tool derives that inventory from the pinned runtime plus the upstream
 manifest, and writes `manifests/help_inventory.json`. It never edits help
 documents, PO files or tags. Tag / example-block / link counting is delegated
-to `tests/phase8/check_help_parity.py` so there is exactly one parity engine.
+to `tools/help_parity.py` so there is exactly one parity engine.
 
 Usage:
     python3 tools/help_inventory.py            # regenerate (writes the file)
@@ -28,10 +28,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-PARITY_DIR = ROOT / 'tests' / 'phase8'
-if str(PARITY_DIR) not in sys.path:
-    sys.path.insert(0, str(PARITY_DIR))
-import check_help_parity as parity  # noqa: E402
+import help_parity as parity  # noqa: E402
 from catalog_tool import atomic_write_text  # noqa: E402
 
 MANIFEST = ROOT / 'manifests' / 'upstreams.json'
@@ -137,7 +134,7 @@ def contract_fingerprint(text: str) -> dict:
     A translation must reproduce the upstream tag set, the ordered example-block
     bodies, the help-link multiset and the file footer byte for byte. Those four
     facts do not depend on which Neovim runs the test suite, so storing a digest
-    lets tests/phase8 assert the contract on *every* version instead of only on
+    lets tests/contract/help assert the contract on *every* version instead of only on
     the pinned runtime (a different runtime may not even ship the document).
 
     The digest must be reproducible in Lua with vim.fn.sha256; both sides hash
@@ -250,7 +247,7 @@ def build_inventory(runtime: Path) -> dict:
             'excluded requires manifests/help_exemptions.json evidence, and',
             'everything else is normal user-facing help that is still not_started.',
             'contract: tag/example-block/link digests of the pinned upstream text,',
-            'asserted against the translation on every Neovim version by phase8.',
+            'asserted against the translation on every Neovim version by the Help contract suite.',
         ],
         'totals': totals,
         'documents': documents,

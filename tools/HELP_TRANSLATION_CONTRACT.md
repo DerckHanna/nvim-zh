@@ -1,7 +1,7 @@
 # Help 翻译机械契约（nvim-zh）
 
 本文件是 `doc/*.cnx` 译文执行的唯一权威契约。子代理任务书只写「阅读本文件」，
-具体差异写在任务书里。校验由 `tests/phase8/check_help_parity.py` 在 pinned runtime 上
+具体差异写在任务书里。校验由 `tools/help_parity.py` 在 pinned runtime 上
 逐字节执行，并由 `manifests/help_inventory.json` 的 `contract` 摘要在**所有** Neovim
 版本上强制（见下）。
 
@@ -57,7 +57,7 @@
    （`<...>`）、寄存器名、URI/URL、路径、占位符、代码标识符、highlight 组名、
    颜色名、错误号（`E325` 等）、数值。
 8. **术语硬约束**（`translations/glossary/zh_CN.toml`，由
-   `tests/phase8/test_help_terminology.py` 强制）：Buffer / Window / Register 保留
+   `tests/contract/help/test_terminology.py` 强制）：Buffer / Window / Register 保留
    英文原词，译文正文**绝对不得出现**「缓冲区」「窗口」「寄存器」。
    - 沿用上游大小写：上游写 `window` 就写 `window`，`VIM::Buffer` 这类标识符原样保留。
 9. **输出编码**：UTF-8 无 BOM、纯 LF、以换行结尾、权限 644。
@@ -81,7 +81,7 @@ Neovim 0.10/0.11 的 `:helptags`（`src/nvim/help.c`，`helptags_one()`）**只�
 
                                     适用于 Vim 的 Windows PowerShell 语法插件   <- 中文标题
 
-`tests/phase8/test_first_lines_share_one_encoding_class` 与
+`tests/integration/help/test_tags.py::test_first_lines_share_one_encoding_class` 与
 `test_helptags_regeneration_is_not_destructive` 会在所有版本上拦住这类改动。
 
 ## 单文档自检门
@@ -89,8 +89,8 @@ Neovim 0.10/0.11 的 `:helptags`（`src/nvim/help.c`，`helptags_one()`）**只�
 复用项目现成引擎，**不要**另写第二套 parity 逻辑：
 
     cd /home/hanna/desktop/nvim-zh && XDG_STATE_HOME=$(mktemp -d) PYTHONDONTWRITEBYTECODE=1 python3 -c "
-    import sys, os; sys.path.insert(0,'tests/phase8')
-    import check_help_parity as c
+    import sys, os; sys.path.insert(0,'tools')
+    import help_parity as c
     from pathlib import Path
     n='<NAME>'
     u=Path(os.environ['VIMRUNTIME']+'/doc/'+n+'.txt').read_text(encoding='utf-8')

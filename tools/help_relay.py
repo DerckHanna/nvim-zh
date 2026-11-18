@@ -20,7 +20,7 @@ the "skeleton", and it is checkable because:
 the bodies and applies the real byte-for-byte contract.
 
 The fence predicate and the tag/block/link counters are imported from
-tests/phase8/check_help_parity.py: there is exactly one parity engine.
+tools/help_parity.py: there is exactly one parity engine.
 
 Usage:
     python3 tools/help_relay.py plan     <name.txt> [--lines N]
@@ -45,8 +45,7 @@ import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / 'tests' / 'phase8'))
-import check_help_parity as parity  # noqa: E402
+import help_parity as parity  # noqa: E402
 
 # The relay always reads the upstream the manifest pins, never "whatever Neovim
 # happens to be installed": a different runtime silently produces a plan for

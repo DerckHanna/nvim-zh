@@ -12,17 +12,379 @@ return {
       ["Language-Team"] = "Simplified Chinese",
       ["Last-Translator"] = "nvim-zh maintainers",
       ["MIME-Version"] = "1.0",
-      ["PO-Revision-Date"] = "2026-11-17 20:38+0800",
-      ["Project-Id-Version"] = "nvim-zh phase 4",
+      ["PO-Revision-Date"] = "2026-11-18 13:45+0800",
+      ["Project-Id-Version"] = "nvim-zh",
     },
   },
   entries = {
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: '%s' is not a valid value for line_width",
+      msgstr = "[telescope.%s]: “%s”不是 line_width 的有效值",
+      references = {
+        "lua/telescope/builtin/__diagnostics.lua",
+        "lua/telescope/utils.lua",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: 'ripgrep', or similar alternative, is a required dependency for the %s picker. Visit https://github.com/BurntSushi/ripgrep#installation for installation instructions.",
+      msgstr = "[telescope.%s]: %s 选择器需要 'ripgrep' 或类似的替代工具。请访问 https://github.com/BurntSushi/ripgrep#installation 查看安装说明。",
+      references = {
+        "lua/telescope/builtin/__files.lua",
+        "lua/telescope/utils.lua",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: Command missing arguments",
+      msgstr = "[telescope.%s]: 命令缺少参数",
+      references = {
+        "lua/telescope/command.lua",
+        "lua/telescope/utils.lua",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: Could not do anything with blank line...",
+      msgstr = "[telescope.%s]: 无法处理空白行……",
+      references = {
+        "lua/telescope/actions/set.lua",
+        "lua/telescope/utils.lua",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: Index too large as there are only '%s' pickers cached",
+      msgstr = "[telescope.%s]: 索引过大，当前只缓存了 %s 个选择器",
+      references = {
+        "lua/telescope/builtin/__internal.lua",
+        "lua/telescope/utils.lua",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: No buffers found with the provided options",
+      msgstr = "[telescope.%s]: 没有找到符合所给选项的Buffer",
+      references = {
+        "lua/telescope/builtin/__internal.lua",
+        "lua/telescope/utils.lua",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: No cached picker(s).",
+      msgstr = "[telescope.%s]: 没有缓存的选择器。",
+      references = {
+        "lua/telescope/builtin/__internal.lua",
+        "lua/telescope/utils.lua",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: No changes found",
+      msgstr = "[telescope.%s]: 未找到更改",
+      references = {
+        "lua/telescope/builtin/__git.lua",
+        "lua/telescope/utils.lua",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: No diagnostics found",
+      msgstr = "[telescope.%s]: 未找到诊断",
+      references = {
+        "lua/telescope/builtin/__diagnostics.lua",
+        "lua/telescope/utils.lua",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: No document_symbol locations found",
+      msgstr = "[telescope.%s]: 未找到 document_symbol 位置",
+      references = {
+        "lua/telescope/builtin/__lsp.lua",
+        "lua/telescope/utils.lua",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: No locals query for the current buffer",
+      msgstr = "[telescope.%s]: 当前Buffer没有 locals 查询",
+      references = {
+        "lua/telescope/builtin/__files.lua",
+        "lua/telescope/utils.lua",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: No loclist items",
+      msgstr = "[telescope.%s]: 没有位置列表项",
+      references = {
+        "lua/telescope/builtin/__internal.lua",
+        "lua/telescope/utils.lua",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: No matches found",
+      msgstr = "[telescope.%s]: 未找到匹配项",
+      references = {
+        "lua/telescope/actions/init.lua",
+        "lua/telescope/utils.lua",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: No name available for anonymous functions.",
+      msgstr = "[telescope.%s]: 匿名函数没有可用名称。",
+      references = {
+        "lua/telescope/actions/init.lua",
+        "lua/telescope/utils.lua",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: No parser for the current buffer",
+      msgstr = "[telescope.%s]: 当前Buffer没有可用的解析器",
+      references = {
+        "lua/telescope/builtin/__files.lua",
+        "lua/telescope/utils.lua",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: No quickfix items",
+      msgstr = "[telescope.%s]: 没有快速修复项",
+      references = {
+        "lua/telescope/builtin/__internal.lua",
+        "lua/telescope/utils.lua",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: No results from textDocument/documentSymbol",
+      msgstr = "[telescope.%s]: textDocument/documentSymbol 没有返回结果",
+      references = {
+        "lua/telescope/builtin/__lsp.lua",
+        "lua/telescope/utils.lua",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: No tags file found. Create one with ctags -R",
+      msgstr = "[telescope.%s]: 未找到 tags 文件。请使用 ctags -R 创建",
+      references = {
+        "lua/telescope/builtin/__files.lua",
+        "lua/telescope/utils.lua",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: No tagstack available",
+      msgstr = "[telescope.%s]: 没有可用的标签栈",
+      references = {
+        "lua/telescope/builtin/__internal.lua",
+        "lua/telescope/utils.lua",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: Nothing currently selected",
+      msgstr = "[telescope.%s]: 当前没有选中项",
+      references = {
+        "lua/telescope/utils.lua",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: This operation must be run in a work tree",
+      msgstr = "[telescope.%s]: 此操作必须在工作树中运行",
+      references = {
+        "lua/telescope/builtin/__git.lua",
+        "lua/telescope/utils.lua",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: Type of '%s' does not match",
+      msgstr = "[telescope.%s]: “%s”的类型不匹配",
+      references = {
+        "lua/telescope/command.lua",
+        "lua/telescope/utils.lua",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: Unknown command",
+      msgstr = "[telescope.%s]: 未知命令",
+      references = {
+        "lua/telescope/command.lua",
+        "lua/telescope/utils.lua",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: You need to install either find, fd, or rg",
+      msgstr = "[telescope.%s]: 你需要安装 find、fd 或 rg 中的任意一个",
+      references = {
+        "lua/telescope/builtin/__files.lua",
+        "lua/telescope/utils.lua",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: cmd has to be a table",
+      msgstr = "[telescope.%s]: cmd 必须是表",
+      references = {
+        "lua/telescope/utils.lua",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: no client attached",
+      msgstr = "[telescope.%s]: 没有附加的客户端",
+      references = {
+        "lua/telescope/builtin/__lsp.lua",
+        "lua/telescope/utils.lua",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: not defined for this previewer",
+      msgstr = "[telescope.%s]: 此预览器未定义该操作",
+      references = {
+        "lua/telescope/previewers/previewer.lua",
+        "lua/telescope/utils.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "Autocommands Preview",
+      msgstr = "自动命令预览",
+      references = {
+        "lua/telescope/previewers/buffer_previewer.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "Buffers",
+      msgstr = "Buffer",
+      references = {
+        "lua/telescope/builtin/__internal.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "Change Colorscheme",
+      msgstr = "更换配色方案",
+      references = {
+        "lua/telescope/builtin/__internal.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "Command History",
+      msgstr = "命令历史",
+      references = {
+        "lua/telescope/builtin/__internal.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "Commands",
+      msgstr = "命令",
+      references = {
+        "lua/telescope/builtin/__internal.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "Current Buffer Fuzzy",
+      msgstr = "当前 Buffer 模糊搜索",
+      references = {
+        "lua/telescope/builtin/__files.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "Current Buffer Tags",
+      msgstr = "当前 Buffer 标签",
+      references = {
+        "lua/telescope/builtin/__files.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "Document Diagnostics",
+      msgstr = "文档诊断",
+      references = {
+        "lua/telescope/builtin/__diagnostics.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "File Preview",
+      msgstr = "文件预览",
+      references = {
+        "lua/telescope/previewers/buffer_previewer.lua",
+        "lua/telescope/previewers/term_previewer.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "Filetypes",
+      msgstr = "文件类型",
+      references = {
+        "lua/telescope/builtin/__internal.lua",
+      },
+    },
     {
       context = "title",
       msgid = "Find Files",
       msgstr = "查找文件",
       references = {
         "lua/telescope/builtin/__files.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "Find Word (%s)",
+      msgstr = "查找单词 (%s)",
+      references = {
+        "lua/telescope/builtin/__files.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "Git BCommits",
+      msgstr = "Git Buffer提交",
+      references = {
+        "lua/telescope/builtin/__git.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "Git BCommits in range",
+      msgstr = "范围内的 Git Buffer提交",
+      references = {
+        "lua/telescope/builtin/__git.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "Git Branch Preview",
+      msgstr = "Git 分支预览",
+      references = {
+        "lua/telescope/previewers/buffer_previewer.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "Git Branches",
+      msgstr = "Git 分支",
+      references = {
+        "lua/telescope/builtin/__git.lua",
       },
     },
     {
@@ -35,8 +397,417 @@ return {
     },
     {
       context = "title",
-      msgid = "Help Tags",
-      msgstr = "帮助标签",
+      msgid = "Git Diff to Head Preview",
+      msgstr = "与 HEAD 差异预览",
+      references = {
+        "lua/telescope/previewers/buffer_previewer.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "Git Diff to Parent Preview",
+      msgstr = "与父提交差异预览",
+      references = {
+        "lua/telescope/previewers/buffer_previewer.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "Git File Diff Preview",
+      msgstr = "Git 文件差异预览",
+      references = {
+        "lua/telescope/previewers/buffer_previewer.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "Git Files",
+      msgstr = "Git 文件",
+      references = {
+        "lua/telescope/builtin/__git.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "Git Message",
+      msgstr = "Git 提交信息",
+      references = {
+        "lua/telescope/previewers/buffer_previewer.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "Git Show Preview",
+      msgstr = "Git 提交内容预览",
+      references = {
+        "lua/telescope/previewers/buffer_previewer.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "Git Stash",
+      msgstr = "Git 储藏",
+      references = {
+        "lua/telescope/builtin/__git.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "Git Stash Preview",
+      msgstr = "Git 储藏预览",
+      references = {
+        "lua/telescope/previewers/buffer_previewer.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "Git Status",
+      msgstr = "Git 状态",
+      references = {
+        "lua/telescope/builtin/__git.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "Grep Preview",
+      msgstr = "Grep 预览",
+      references = {
+        "lua/telescope/previewers/buffer_previewer.lua",
+        "lua/telescope/previewers/term_previewer.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "Help",
+      msgstr = "帮助",
+      references = {
+        "lua/telescope/builtin/__internal.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "Help Preview",
+      msgstr = "帮助预览",
+      references = {
+        "lua/telescope/previewers/buffer_previewer.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "Highlights",
+      msgstr = "高亮",
+      references = {
+        "lua/telescope/builtin/__internal.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "Highlights Preview",
+      msgstr = "高亮预览",
+      references = {
+        "lua/telescope/previewers/buffer_previewer.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "Jumplist",
+      msgstr = "跳转列表",
+      references = {
+        "lua/telescope/builtin/__internal.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "Key Maps",
+      msgstr = "键位映射",
+      references = {
+        "lua/telescope/builtin/__internal.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "LSP Definitions",
+      msgstr = "LSP 定义",
+      references = {
+        "lua/telescope/builtin/__lsp.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "LSP Document Symbols",
+      msgstr = "LSP 文档符号",
+      references = {
+        "lua/telescope/builtin/__lsp.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "LSP Dynamic Workspace Symbols",
+      msgstr = "LSP 动态工作区符号",
+      references = {
+        "lua/telescope/builtin/__lsp.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "LSP Implementations",
+      msgstr = "LSP 实现",
+      references = {
+        "lua/telescope/builtin/__lsp.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "LSP Incoming Calls",
+      msgstr = "LSP 传入调用",
+      references = {
+        "lua/telescope/builtin/__lsp.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "LSP Outgoing Calls",
+      msgstr = "LSP 传出调用",
+      references = {
+        "lua/telescope/builtin/__lsp.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "LSP References",
+      msgstr = "LSP 引用",
+      references = {
+        "lua/telescope/builtin/__lsp.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "LSP Type Definitions",
+      msgstr = "LSP 类型定义",
+      references = {
+        "lua/telescope/builtin/__lsp.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "LSP Workspace Symbols",
+      msgstr = "LSP 工作区符号",
+      references = {
+        "lua/telescope/builtin/__lsp.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "Live Grep",
+      msgstr = "实时 Grep",
+      references = {
+        "lua/telescope/builtin/__files.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "Loclist",
+      msgstr = "位置列表",
+      references = {
+        "lua/telescope/builtin/__internal.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "Man",
+      msgstr = "手册",
+      references = {
+        "lua/telescope/builtin/__internal.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "Man Preview",
+      msgstr = "手册预览",
+      references = {
+        "lua/telescope/previewers/buffer_previewer.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "Marks",
+      msgstr = "标记",
+      references = {
+        "lua/telescope/builtin/__internal.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "Oldfiles",
+      msgstr = "最近文件",
+      references = {
+        "lua/telescope/builtin/__internal.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "Packages",
+      msgstr = "插件包",
+      references = {
+        "lua/telescope/builtin/__internal.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "Pickers",
+      msgstr = "选择器",
+      references = {
+        "lua/telescope/builtin/__internal.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "Planets",
+      msgstr = "行星",
+      references = {
+        "lua/telescope/builtin/__internal.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "Prompt",
+      msgstr = "提示",
+      references = {
+        "lua/telescope/config.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "Quickfix",
+      msgstr = "快速修复",
+      references = {
+        "lua/telescope/builtin/__internal.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "Quickfix History",
+      msgstr = "快速修复历史",
+      references = {
+        "lua/telescope/builtin/__internal.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "Quickfix List Preview",
+      msgstr = "快速修复列表预览",
+      references = {
+        "lua/telescope/builtin/__internal.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "Registers",
+      msgstr = "Register",
+      references = {
+        "lua/telescope/builtin/__internal.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "Results",
+      msgstr = "结果",
+      references = {
+        "lua/telescope/config.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "Search History",
+      msgstr = "搜索历史",
+      references = {
+        "lua/telescope/builtin/__internal.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "Spelling Suggestions",
+      msgstr = "拼写建议",
+      references = {
+        "lua/telescope/builtin/__internal.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "Symbols",
+      msgstr = "符号",
+      references = {
+        "lua/telescope/builtin/__internal.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "TagStack",
+      msgstr = "标签栈",
+      references = {
+        "lua/telescope/builtin/__internal.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "Tags",
+      msgstr = "标签",
+      references = {
+        "lua/telescope/builtin/__files.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "Tags Preview",
+      msgstr = "标签预览",
+      references = {
+        "lua/telescope/previewers/buffer_previewer.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "Telescope Builtin",
+      msgstr = "Telescope 内置功能",
+      references = {
+        "lua/telescope/builtin/__internal.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "Telescope Pickers",
+      msgstr = "Telescope 选择器",
+      references = {
+        "lua/telescope/builtin/__internal.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "Treesitter Symbols",
+      msgstr = "Treesitter 符号",
+      references = {
+        "lua/telescope/builtin/__files.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "Workspace Diagnostics",
+      msgstr = "工作区诊断",
+      references = {
+        "lua/telescope/builtin/__diagnostics.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "autocommands",
+      msgstr = "自动命令",
+      references = {
+        "lua/telescope/builtin/__internal.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "options",
+      msgstr = "选项",
       references = {
         "lua/telescope/builtin/__internal.lua",
       },

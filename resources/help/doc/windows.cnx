@@ -1,0 +1,1281 @@
+*windows.txt*   Nvim
+
+
+		  VIM REFERENCE MANUAL	  by Bram Moolenaar
+
+
+用多个 window 和 buffer 进行编辑。			*windows* *buffers*
+
+这里解释为了使用多个 window 和 buffer 而新增的命令。此外，也解释了那些在与多于一个
+window 配合使用时行为不同的命令。
+
+基础知识在用户手册第 7 章和第 8 章中讲解 |usr_07.txt| |usr_08.txt|。
+
+                                    输入 |gO| 查看目录。
+
+==============================================================================
+1. 简介					*windows-intro* *window*
+
+摘要：
+   一个 buffer 是文件在内存中的文本。
+   一个 window 是 buffer 的视口。
+   一个标签页是一组 window。
+
+一个 window 是 buffer 之上的视口。你可以在一个 buffer 上使用多个 window，也可以在不同
+buffer 上使用多个 window。
+
+buffer 是被加载到内存中以便编辑的文件。在你把 buffer 写入文件之前，原始文件保持
+不变。
+
+buffer 可以处于三种状态之一：
+
+							*active-buffer*
+活动： 该 buffer 显示在某个 window 中。如果该 buffer 有关联的文件，该文件已被读入
+	 buffer。此后 buffer 可能被改动，因而与文件不同。
+							*hidden-buffer*
+隐藏： 该 buffer 未被显示。如果该 buffer 有关联的文件，该文件已被读入 buffer。
+	 除此之外它与活动 buffer 相同，只是你看不到它。
+							*inactive-buffer*
+非活动：该 buffer 未被显示，且不含任何内容。如果该文件曾被加载过，其 buffer 选项
+	 会被记住。它可能含有来自 |shada| 文件的标记。但该 buffer 不含文本。
+
+用表格表示：
+
+状态		显示在		已加载		":buffers"  ~
+		window 中			显示的标记    ~
+活动		  是		  是		  'a'
+隐藏		  否		  是		  'h'
+非活动		  否		  否		  ' '
+
+							*buffer-reuse*
+每个 buffer 都有一个唯一编号，该编号在同一个 Vim 会话内不会改变。可以用 |bufnr()|
+和 |bufname()| 函数在 buffer 名称与 buffer 编号之间转换。只有一个例外：如果创建了
+一个新的空 buffer 且它未被改动，那么在把另一个文件加载到该 buffer 时，该 buffer
+会被复用。这也意味着 buffer 编号不会改变。
+
+Vim 的主 window 可以容纳若干个 split window。此外还有 |tabpage|（标签页），每个标签页可以
+容纳多个 window。
+
+							*focusable*
+如果一个 window 是可聚焦的，它就属于"导航栈"的一部分，也就是说 :windo、|CTRL-W| 之类
+的编辑器命令会把它视为可以被设为"当前 window"的 window。不可聚焦的 window 会被这类命令跳过，
+因为它没有被分配 window 编号。可以用 |nvim_set_current_win()| 显式地让它获得焦点，
+因为它仍然被分配了 |window-ID|。如果它获得了焦点，它也会拥有一个 window 编号。
+不可聚焦的 window 不会被 |:tabs| 列出，也不被默认的 'tabline' 计入。它们的 buffer
+内容不会被包含进 'complete' 的 "w" 补全中。
+
+windows（尤其是 floating windows）可以有许多其他 |api-win_config| 属性，例如 "hide" 和
+"fixed"，它们也会影响行为。
+
+					*window-ID* *winid* *windowid*
+每个 window 都有一个唯一标识符，称为 window ID，它在 Nvim 会话期间是永久的。|win_getid()|
+和 |win_id2tabwin()| 函数在 window/标签页"编号"与标识符之间转换。
+							*window-number*
+windows 按其在一个标签页中的布局编号；这个 window"编号"由 |winnr()| 给出，并且每当 window 被
+打开或关闭时都可能变化。window 编号只在某一个特定标签页中有效，而 window ID 是全局有效的，
+可跨标签页使用。对于大多数接受 window ID 或 window 编号的函数，window 编号只适用于当前标签页，
+而 window ID 可以指向任意标签页中的 window。
+
+
+==============================================================================
+2. 启动 Vim						*windows-starting*
+
+默认情况下，Vim 像 Vi 一样以一个 window 启动。
+
+可以用 Vim 的 "-o" 和 "-O" 参数为参数列表中的每个文件打开一个 window。"-o" 参数会水平
+分割 window；"-O" 参数会垂直分割 window。如果同时给出 "-o" 和 "-O"，则由最后出现的那个
+决定分割方向。例如，下面这条命令会打开三个水平分割的 window： >
+	vim -o file1 file2 file3
+
+"-oN"（N 是一个十进制数）会打开 N 个水平分割的 window。如果文件名多于 window 数，则只打开
+N 个 window，部分文件得不到 window。如果 window 数多于文件名，那么最后几个 window 编辑的是空
+buffer。类似地，"-ON" 会打开 N 个垂直分割的 window，限制相同。
+
+如果文件名很多，windows 会变得非常小。你可能想设置 'winheight' 和/或 'winwidth' 选项
+以营造可用的局面。
+
+打开新 window 并读取文件时不会执行 Buf/Win Enter/Leave |autocommand|，只有在真正进入
+它们时才会执行。
+
+							*status-line*
+windows 之间会用状态行分隔。'laststatus' 选项决定最后一个 window 何时也有状态行：
+	'laststatus' = 0	从不显示状态行
+	'laststatus' = 1	如果有多于一个 window 则显示状态行
+	'laststatus' = 2	总是显示状态行
+	'laststatus' = 3	改为在底部使用一个全局状态行，而不是每个 window 一个
+
+你可以用 'statusline' 选项更改状态行的内容。该选项可以是 window 局部的，因此你可以让每个
+window 都有不同的状态行。
+
+通常用反显来显示状态行。这可以通过 |hl-StatusLine| 高亮组更改。如果状态行没有使用
+任何高亮，则当前 window 使用 '^' 字符，其他 windows 使用 '='。如果启用了 'mouse'，可以拖动
+状态行来调整各个 window 的大小。
+
+							*filler-lines*
+window 中最后一个 buffer 行之后的行称为填充行（filler line）。默认情况下，这些行以
+波浪号（~）字符开头。可以用 'fillchars' 选项中的 "eob" 项更改该字符。默认情况下，
+这些字符按 NonText 高亮（|hl-NonText|）。EndOfBuffer 高亮组（|hl-EndOfBuffer|）
+可用于更改填充字符的高亮。
+
+==============================================================================
+3. 打开和关闭 window				*opening-window*
+
+CTRL-W s						*CTRL-W_s*
+CTRL-W S						*CTRL-W_S*
+CTRL-W CTRL-S						*CTRL-W_CTRL-S*
+:[N]sp[lit] [++opt] [+cmd]				*:sp* *:split*
+		把当前 window 一分为二。结果是同一文件上的两个视口。
+
+		使新 window 高度为 N（默认使用当前 window 高度的一半）。会
+		缩小当前 window 高度以腾出空间（如果设置了 'equalalways'
+		选项、'eadirection' 不是 "hor"，且其他某个 window 高于当前
+		window 或新 window，则也会缩小它们）。
+
+		注意：CTRL-S 并非在所有终端上都有效，而且可能阻塞后续
+		输入，请用 CTRL-Q 恢复。
+		另见 |++opt| 和 |+cmd|。
+							*E242* *E1159*
+		在自动命令中分割 window 时要小心：如果在进行其他 window 布局
+		改动时这样做，可能会打乱 window 布局。
+
+:[N]sp[lit] [++opt] [+cmd] {file}			*:split_f*
+		与 |:split| 类似，但会创建一个新 window 并在其中开始编辑
+		文件 {file}。
+		它的行为几乎等同于先执行 ":split"、再执行 ":edit"，
+		但原 window 中的替换文件名会被设为 {file}。
+		如果给出了 [+cmd]，则在文件被加载后执行该命令 |+cmd|。
+		另见 |++opt|。
+		使新 window 高度为 N（默认使用现有高度的一半）。会缩小当前
+		window 高度以腾出空间（如果设置了 'equalalways' 选项，也会
+		缩小其他 window）。
+
+CTRL-W CTRL-V						*CTRL-W_CTRL-V*
+CTRL-W v						*CTRL-W_v*
+:[N]vs[plit] [++opt] [+cmd] [file]			*:vs* *:vsplit*
+		与 |:split| 类似，但垂直分割。满足下列条件时，windows 会
+		沿水平方向铺开：
+		1. 没有指定宽度，
+		2. 设置了 'equalalways'，
+		3. 'eadirection' 不是 "ver"，且
+		4. 其他某个 window 比当前 window 或新 window 更宽。
+		如果给出了 N，则在可能时使新 window 宽度为 N 列。
+		注意：在其他地方 CTRL-Q 与 CTRL-V 作用相同，但这里不是！
+
+CTRL-W n						*CTRL-W_n*
+CTRL-W CTRL-N						*CTRL-W_CTRL-N*
+:[N]new [++opt] [+cmd]					*:new*
+		创建一个新 window 并在其中开始编辑一个空文件。
+		使新 window 高度为 N（默认使用现有高度的一半）。会缩小当前
+		window 高度以腾出空间（如果设置了 'equalalways' 选项且
+		'eadirection' 不是 "hor"，也会缩小其他 window）。
+		另见 |++opt| 和 |+cmd|。
+		如果 'fileformats' 不为空，则新 buffer 使用其中给出的
+		第一种格式。如果 'fileformats' 为空，则使用当前 buffer
+		的 'fileformat'。这可以用 |++opt| 参数覆盖。
+		自动命令按下列顺序执行：
+		1. 当前 window 的 WinLeave
+		2. 新 window 的 WinEnter
+		3. 当前 buffer 的 BufLeave
+		4. 新 buffer 的 BufEnter
+		它的行为等同于先执行 ":split"、再执行 ":enew" 命令。
+
+:[N]new [++opt] [+cmd] {file}
+		与 |:split_f| 类似，创建一个新 window 并开始编辑 {file}。
+
+:[N]vne[w] [++opt] [+cmd] [file]			*:vne* *:vnew*
+		与 |:new| 类似，但垂直分割。如果设置了 'equalalways' 且
+		'eadirection' 不是 "ver"，windows 会沿水平方向铺开，除非
+		指定了宽度。
+
+:[N]sv[iew] [++opt] [+cmd] [file]		*:sv* *:sview* *splitview*
+		与 ":split" 相同，但为该 buffer 设置 'readonly' 选项。
+
+:[N]sf[ind] [++opt] [+cmd] {file}	     *:sf* *:sfi* *:sfind* *splitfind*
+		与 ":split" 相同，但会像 |:find| 那样在 'path' 中搜索
+		{file}。如果没有找到 {file}，则不分割。
+
+CTRL-W CTRL-^					*CTRL-W_CTRL-^* *CTRL-W_^*
+CTRL-W ^	把当前 window 一分为二并编辑替换文件。
+		给出计数 N 时，分割当前 window 并编辑第 N 个 buffer。与
+		":sp #" 和 ":sp #N" 类似，但它允许另一个 buffer 没有
+		名称。该命令与 |CTRL-^| 的行为一致，只是会先分割 window。
+
+CTRL-W ge						*CTRL-W_ge*
+		把当前 window 分离为一个外部 window。
+		仅在使用支持 |ui-multigrid| 的 UI 时可用。
+
+注意 'splitbelow' 和 'splitright' 选项会影响新 window 出现的位置。
+								*E36*
+如果空间不足，创建 window 会失败。每个 window 至少需要一屏幕行和一屏幕列，有时需要更多。
+选项 'winminheight' 和 'winminwidth' 与此相关。
+
+						*:vert* *:vertical*
+:vert[ical] {cmd}
+		执行 {cmd}。如果其中含有分割 window 的命令，则会垂直分割。
+		对于 `vertical wincmd =`，windows 只会按垂直方向调整为等大。
+		对 |:execute| 和 |:normal| 无效。
+
+						*:hor* *:horizontal*
+:hor[izontal] {cmd}
+		在水平分割的 window 中执行 {cmd}。支持下列命令：
+		- `:wincmd =`：只在水平方向上将 windows 调整为等大。
+		- |:terminal|：在分割 window 中打开一个 |terminal| buffer。
+		- |:checkhealth|：在分割 window 中打开一个 healthcheck buffer。
+
+:lefta[bove] {cmd}				*:lefta* *:leftabove*
+:abo[veleft] {cmd}				*:abo* *:aboveleft*
+		执行 {cmd}。如果其中含有分割 window 的命令，则把 window 开在
+		当前 window 的左侧（垂直分割）或上方（水平分割）。会覆盖
+		'splitbelow' 和 'splitright'。
+		对 |:execute| 和 |:normal| 无效。
+
+:rightb[elow] {cmd}				*:rightb* *:rightbelow*
+:bel[owright] {cmd}				*:bel* *:belowright*
+		执行 {cmd}。如果其中含有分割 window 的命令，则把 window 开在
+		当前 window 的右侧（垂直分割）或下方（水平分割）。会覆盖
+		'splitbelow' 和 'splitright'。
+		对 |:execute| 和 |:normal| 无效。
+
+						*:topleft* *E442*
+:to[pleft] {cmd}
+		执行 {cmd}。如果其中含有分割 window 的命令，window 会出现在
+		顶部并占据 Vim window 的整个宽度。当分割是垂直的时，window
+		出现在最左侧并占据 Vim window 的整个高度。
+		对 |:execute| 和 |:normal| 无效。
+
+						*:bo* *:botright*
+:bo[tright] {cmd}
+		执行 {cmd}。如果其中含有分割 window 的命令，window 会出现在
+		底部并占据 Vim window 的整个宽度。当分割是垂直的时，window
+		出现在最右侧并占据 Vim window 的整个高度。
+		对 |:execute| 和 |:normal| 无效。
+
+这些命令修饰符可以组合使用，使一个垂直分割的 window 占据整个高度。示例： >
+	:vertical topleft split tags
+在 Vim window 的最左侧打开 "tags" 文件的一个垂直分割、全高 window。
+
+
+------------------------------------------------------------------------------
+关闭 window
+
+:q[uit]
+:{count}q[uit]						*:count_quit*
+CTRL-W q						*CTRL-W_q*
+CTRL-W CTRL-Q						*CTRL-W_CTRL-Q*
+		不带 {count} 时：退出当前 window。如果给出了 {count}，
+		则退出第 {count} 个 window。
+							*edit-window*
+		当退出最后一个编辑 window（不计帮助 window 或预览 window）时，
+		退出 Vim。
+
+		设置了 'hidden'，且当前 buffer 只有一个 window 时，该 buffer
+		变为隐藏。未设置 'hidden'，当前 buffer 只有一个 window，且
+		该 buffer 已被改动时，该命令失败。
+		（注意：CTRL-Q 并非在所有终端上都有效）。
+		如果 [count] 大于最后一个 window 编号，则关闭最后一个 window： >
+		    :1quit  " quit the first window
+		    :$quit  " quit the last window
+		    :9quit  " quit the last window
+			    " if there are fewer than 9 windows opened
+		    :-quit  " quit the previous window
+		    :+quit  " quit the next window
+		    :+2quit " quit the second next window
+<
+		关闭帮助 window 且它不是唯一的 window 时，Vim 会尝试恢复之前的
+		window 布局，见 |:helpclose|。
+
+:q[uit]!
+:{count}q[uit]!
+		不带 {count} 时：退出当前 window。如果给出了 {count}，
+		则退出第 {count} 个 window
+		如果这是某个 buffer 的最后一个 window，对该 buffer 的任何
+		改动都会丢失。当退出最后一个 window（不计帮助 window）时，
+		退出 Vim。即使设置了 'hidden'，buffer 的内容也会丢失。
+
+:clo[se][!]
+:{count}clo[se][!]
+CTRL-W c					*CTRL-W_c* *:clo* *:close*
+		不带 {count} 时：关闭当前 window。如果给出了 {count}，
+		则关闭第 {count} 个 window。
+
+		设置了 'hidden' 时，或 buffer 已被改动且使用了 [!] 时，
+		该 buffer 变为隐藏（除非还有别的 window 在编辑它）。
+
+		当前 |tabpage| 中只有一个 |edit-window|，且还有其他
+		tabpage 时，这会关闭当前 tabpage。
+
+		下列情况下该命令失败：			*E444*
+		- 屏幕上只有一个 window。
+		- 未设置 'hidden'、未使用 [!]、buffer 有改动，且该
+		  buffer 没有其他 window。
+		对 buffer 的改动不会被写出，也不会丢失，因此这是一个
+		"安全"命令。
+
+CTRL-W CTRL-C						*CTRL-W_CTRL-C*
+		你可能以为 CTRL-W CTRL-C 会关闭当前 window，但那不管用，
+		因为 CTRL-C 会取消该命令。
+
+							*:hide*
+:hid[e]
+:{count}hid[e]
+		不带 {count} 时：退出当前 window，除非它是屏幕上的最后
+		一个 window。
+		如果给出了 {count}，则退出第 {count} 个 window。
+
+		该 buffer 变为隐藏（除非还有别的 window 在编辑它，或
+		'bufhidden' 为 `unload`、`delete` 或 `wipe`）。
+		如果该 window 是当前 |tabpage| 中的最后一个 window，则关闭该
+		tabpage。
+
+		'hidden' 的值对该命令没有影响。
+		对 buffer 的改动不会被写出，也不会丢失，因此这是一个
+		"安全"命令。
+
+:hid[e] {cmd}	在设置 'hidden' 的情况下执行 {cmd}。{cmd} 执行完毕后，
+		恢复 'hidden' 之前的值。
+		示例： >
+		    :hide edit Makefile
+<		这会编辑 "Makefile"，并在当前 buffer 有改动时把它隐藏。
+
+:on[ly][!]
+:{count}on[ly][!]
+CTRL-W o						*CTRL-W_o* *E445*
+CTRL-W CTRL-O					*CTRL-W_CTRL-O* *:on* *:only*
+		使当前 window 成为屏幕上唯一的 window。其他所有 window 都被关闭。
+		关于 {count} 见上面的 `:quit` 命令 |:count_quit|。
+
+		设置了 'hidden' 选项时，被关闭 window 中的所有 buffer 都变为
+		隐藏。
+
+		未设置 'hidden'，且设置了 'autowrite' 选项时，已改动的
+		buffer 会被写出。否则，buffer 已被改动的 window 不会被移除，
+		除非给出了 [!]，此时它们变为隐藏。但已改动的 buffer 从不
+		会被放弃，因此改动不会丢失。
+
+							*:fc* *:fclose*
+:[count]fc[lose][!]
+		关闭 zindex 值最高的 [count] 个 floating window。
+		用 '!' 关闭所有 floating window。
+
+==============================================================================
+4. 把光标移到其他 window			*window-move-cursor*
+
+CTRL-W <Down>					*CTRL-W_<Down>*
+CTRL-W CTRL-J					*CTRL-W_CTRL-J* *CTRL-W_j*
+CTRL-W j	把光标移到当前 window 之下第 N 个 window。用光标位置在多个候选
+		之间进行选择。
+
+CTRL-W <Up>					*CTRL-W_<Up>*
+CTRL-W CTRL-K					*CTRL-W_CTRL-K* *CTRL-W_k*
+CTRL-W k	把光标移到当前 window 之上第 N 个 window。用光标位置在多个候选
+		之间进行选择。
+
+CTRL-W <Left>					*CTRL-W_<Left>*
+CTRL-W CTRL-H					*CTRL-W_CTRL-H*
+CTRL-W <BS>					*CTRL-W_<BS>* *CTRL-W_h*
+CTRL-W h	把光标移到当前 window 左侧第 N 个 window。用光标位置在多个候选
+		之间进行选择。
+
+CTRL-W <Right>					*CTRL-W_<Right>*
+CTRL-W CTRL-L					*CTRL-W_CTRL-L* *CTRL-W_l*
+CTRL-W l	把光标移到当前 window 右侧第 N 个 window。用光标位置在多个候选
+		之间进行选择。
+
+CTRL-W w					*CTRL-W_w* *CTRL-W_CTRL-W*
+CTRL-W CTRL-W	不带计数时：把光标移到当前 window 下方/右侧的 |focusable|
+		window。如果没有，则转到左上角的 window。带计数时：转到第 N 个
+		window（从左上到右下编号），跳过不可聚焦的 window。要获取 window
+		编号见 |bufwinnr()| 和 |winnr()|。当 N 大于 window 数量时，
+		转到最后一个可聚焦 window。
+
+						*CTRL-W_W*
+CTRL-W W	不带计数时：把光标移到当前 window 上方/左侧的 |focusable|
+		window。如果没有，则转到右下角的 window。带计数时：转到第 N 个
+		window，与 CTRL-W w 相同。
+
+CTRL-W t					*CTRL-W_t* *CTRL-W_CTRL-T*
+CTRL-W CTRL-T	把光标移到左上角的 window。
+
+CTRL-W b					*CTRL-W_b* *CTRL-W_CTRL-B*
+CTRL-W CTRL-B	把光标移到右下角的 window。
+
+CTRL-W p					*CTRL-W_p* *CTRL-W_CTRL-P*
+CTRL-W CTRL-P	转到上一个（上次访问的）window。
+
+						*CTRL-W_P* *E441*
+CTRL-W P	转到预览 window。没有预览 window 时这是一个错误。
+
+如果可视模式处于活动状态，而新 window 不是同一个 buffer，则可视模式结束。如果该 window 在
+同一个 buffer 上，则设置光标位置以保持所选的可视区域不变。
+
+						*:winc* *:wincmd*
+这些命令也可以用 ":wincmd" 执行：
+
+:[count]winc[md] {arg}
+:winc[md] [count] {arg}
+		相当于执行 CTRL-W [count] {arg}。示例： >
+			:wincmd j
+<		移到当前 window 下方的 window。
+		当无法使用普通模式命令时（例如在 |CursorHold| 自动命令
+		事件中），该命令很有用。或者当普通模式命令不方便时。
+		计数也可以是一个 window 编号。示例： >
+			:exe nr .. "wincmd w"
+<		这会转到 window "nr"。
+
+注意：所有 CTRL-W 命令也可以用 |:wincmd| 执行，适用于那些无法使用普通模式命令或
+使用不便的场合（例如在基于浏览器的终端中）。
+
+==============================================================================
+5. 移动 window						*window-moving*
+
+CTRL-W r				*CTRL-W_r* *CTRL-W_CTRL-R* *E443*
+CTRL-W CTRL-R	向下/向右轮换 window。第一个 window 变成第二个，第二个变成第三个，
+		依此类推。最后一个 window 变成第一个 window。光标留在同一个 window 中。
+		这仅在当前 window 所在的那一行或那一列 window 内有效。
+
+						*CTRL-W_R*
+CTRL-W R	向上/向左轮换 window。第二个 window 变成第一个，第三个变成第二个，
+		依此类推。第一个 window 变成最后一个 window。光标留在同一个 window 中。
+		这仅在当前 window 所在的那一行或那一列 window 内有效。
+
+CTRL-W x					*CTRL-W_x* *CTRL-W_CTRL-X*
+CTRL-W CTRL-X	不带计数时：与下一个 window 交换。如果没有下一个 window，则
+		与前一个 window 交换。
+		带计数时：与第 N 个 window 交换（第一个 window 为 1）。光标被放到
+		另一个 window 中。
+		当垂直和水平分割混在一起时，交换只在当前 window 所在的那一行或
+		那一列 window 内进行。
+
+下列命令可用于改变 window 布局。例如，有两个垂直分割的 window 时，CTRL-W K 会把它们改为水平
+分割；CTRL-W H 则反过来。
+
+						*CTRL-W_K*
+CTRL-W K	把当前 window 移到最顶部，并使用整个屏幕宽度。这与
+		`:topleft split` 类似，区别在于它作用于当前 window，且不创建
+		新 window。
+
+						*CTRL-W_J*
+CTRL-W J	把当前 window 移到最底部，并使用整个屏幕宽度。这与
+		`:botright split` 类似，区别在于它作用于当前 window，且不
+		创建新 window。
+
+						*CTRL-W_H*
+CTRL-W H	把当前 window 移到最左侧，并使用整个屏幕高度。这与
+		`:vert topleft split` 类似，区别在于它作用于当前 window，
+		且不创建新 window。
+
+						*CTRL-W_L*
+CTRL-W L	把当前 window 移到最右侧，并使用整个屏幕高度。这与
+		`:vert botright split` 类似，区别在于它作用于当前 window，
+		且不创建新 window。
+
+						*CTRL-W_T*
+CTRL-W T	把当前 window 移到一个新的标签页。如果当前标签页只有一个 window，
+		这会失败。
+		这与 `:tab split` 类似，区别在于前一个 window 会被关闭。
+		指定计数时，新标签页会被开在该索引的标签页之前。否则它排在
+		当前标签页之后。
+
+==============================================================================
+6. 调整 window 大小					*window-resize*
+
+						*CTRL-W_=*
+CTRL-W =	使所有 window（几乎）等高、等宽，但对当前 window 使用 'winheight'
+		和 'winwidth'。
+		设置了 'winfixheight' 的 window 保持其高度，设置了 'winfixwidth'
+		的 window 保持其宽度。
+		要只按垂直方向等大（使 window 等高），请使用 `vertical wincmd =` 。
+		要只按水平方向等大（使 window 等宽），请使用
+		`horizontal wincmd =` 。
+
+:res[ize] -N					*:res* *:resize* *CTRL-W_-*
+CTRL-W -	把当前 window 高度减少 N（默认 1）。
+		如果在 |:vertical| 之后使用：把宽度减少 N。
+
+:res[ize] +N					*CTRL-W_+*
+CTRL-W +	把当前 window 高度增加 N（默认 1）。
+		如果在 |:vertical| 之后使用：把宽度增加 N。
+
+:res[ize] [N]
+CTRL-W CTRL-_					*CTRL-W_CTRL-_* *CTRL-W__*
+CTRL-W _	把当前 window 高度设为 N（默认：最大可能值）。
+
+:{winnr}res[ize] [+-]N
+		与上面的 `:resize` 类似，但把尺寸应用于 window {winnr}，而不是
+		当前 window。
+
+z{nr}<CR>	把当前 window 高度设为 {nr}。
+
+						*CTRL-W_<*
+CTRL-W <	把当前 window 宽度减少 N（默认 1）。
+
+						*CTRL-W_>*
+CTRL-W >	把当前 window 宽度增加 N（默认 1）。
+
+:vert[ical] res[ize] [N]			*:vertical-resize* *CTRL-W_bar*
+CTRL-W |	把当前 window 宽度设为 N（默认：最大可能值）。
+
+你也可以用鼠标向上或向下拖动状态行来调整 window 大小。或者向左或向右拖动垂直分隔线。
+这只有在所使用的 Vim 版本支持鼠标，且 'mouse' 选项已设置为启用鼠标时才有效。
+
+选项 'winheight'（'wh'）用于设置当前 window 的最小高度。每当另一个 window 成为当前 window 时，
+都会用到该选项。如果该选项为 '0'，则它被禁用。把 'winheight' 设成很大的值，例如
+'9999'，可让当前 window 总是占满所有可用空间。把它设成合理的值，例如 '10'，可让在当前
+window 中的编辑更舒适。
+
+等效的 'winwidth'（'wiw'）选项用于设置当前 window 的最小宽度。
+
+设置了 'equalalways'（'ea'）选项时，每次分割或关闭 window 后，所有 window 都会自动调整为
+相同大小。如果不设置该选项，分割 window 会缩小当前 window，而其他 window 保持不变。关闭 window 时，
+多出来的行会给它上方的 window。
+
+'eadirection' 选项限定 'equalalways' 选项适用的方向。默认值 "both" 会在两个方向上
+调整大小。值为 "ver" 时只等高 window。当你手动调整过某个垂直分割 window 的宽度并希望保持
+该宽度时，可以使用它。类似地，"hor" 只让 window 等宽。
+
+选项 'cmdheight'（'ch'）用于设置命令行的高度。如果你被长消息的 |hit-enter| 提示
+打扰，可以把该选项设为 2 或 3。
+
+如果只有一个 window，调整该 window 大小也会改变命令行高度。如果有多个 window，调整当前 window
+大小也会改变它下方 window 的高度（有时还有它上方 window 的高度）。
+
+window 的最小高度和宽度由 'winminheight' 和 'winminwidth' 设置。它们是硬性值，window
+永远不会变得比它们更小。
+
+
+WinScrolled 和 WinResized 自动命令 ~
+						*win-scrolled-resized*
+如果你想收到 window 尺寸变化通知，可以使用 |WinResized| 自动命令事件。
+如果你想收到 window 中文本垂直或水平滚动的通知，可以使用 |WinScrolled| 自动命令事件。
+window 尺寸变化时它也会被触发。
+例外：文本因 'incsearch' 而滚动时不会触发这些事件。
+							*WinResized-event*
+|WinResized| 事件在更新显示之后触发，此时可能有若干 window 改变了尺寸。自上次以来发生
+变化的所有 window ID 列表在 v:event.windows 变量中提供，例如：
+	[1003, 1006]
+							*WinScrolled-event*
+|WinScrolled| 事件在 |WinResized| 之后触发，window 发生滚动时也会触发。滚动可以是垂直的
+（window 中顶部的文本改变了），也可以是水平的（当 'wrap' 关闭时，或第一行首个显示部分
+改变时）。注意 |WinScrolled| 的触发次数远多于 |WinResized|，可能会稍微拖慢编辑。
+
+|WinScrolled| 提供的信息是一个字典，以 window ID 为键，对应每个有变化的 window；另有一个
+键为 "all" 的总变化计数。|v:event| 的示例值： >
+	{
+	   all:  {width: 0, height:  2, leftcol: 0, skipcol: 0, topline: 1, topfill: 0},
+	   1003: {width: 0, height: -1, leftcol: 0, skipcol: 0, topline: 0, topfill: 0},
+	   1006: {width: 0, height:  1, leftcol: 0, skipcol: 0, topline: 1, topfill: 0},
+	}
+
+注意 "all" 条目是各 window 绝对值的累加。
+
+如果你需要更多关于改了什么的信息，或者想对这些事件"去抖"（不处理每个事件以避免做太多
+工作），你可能想使用 `winlayout()` 和 `getwininfo()` 函数。
+
+添加第一个自动命令时 |WinScrolled| 和 |WinResized| 不会触发，只在第一次滚动或调整
+大小之后触发。切换到另一个标签页时它们可能会触发。
+
+所执行的命令应当不引起 window 尺寸或滚动变化。如果还是发生了，事件会很快再次触发。换句话
+说：就在触发事件之前，当前的尺寸和滚动位置会被保存，并用来判断是否发生了变化。
+
+==============================================================================
+7. 参数列表和 buffer 列表命令			*buffer-list*
+
+      args list		       buffer list	   meaning ~
+>
+ 1. :[N]argument [N]	11. :[N]buffer [N]	to arg/buf N
+ 2. :[N]next [file ..]	12. :[N]bnext [N]	to Nth next arg/buf
+ 3. :[N]Next [N]	13. :[N]bNext [N]	to Nth previous arg/buf
+ 4. :[N]previous [N]	14. :[N]bprevious [N]	to Nth previous arg/buf
+ 5. :rewind / :first	15. :brewind / :bfirst	to first arg/buf
+ 6. :last		16. :blast		to last arg/buf
+ 7. :all		17. :ball		edit all args/buffers
+ 			18. :unhide		edit all loaded buffers
+ 			19. :[N]bmod [N]	to Nth modified buf
+<
+  split & args list	  split & buffer list	   meaning ~
+>
+ 21. :[N]sargument [N]   31. :[N]sbuffer [N]	split + to arg/buf N
+ 22. :[N]snext [file ..] 32. :[N]sbnext [N]      split + to Nth next arg/buf
+ 23. :[N]sNext [N]       33. :[N]sbNext [N]      split + to Nth previous arg/buf
+ 24. :[N]sprevious [N]   34. :[N]sbprevious [N]  split + to Nth previous arg/buf
+ 25. :srewind / :sfirst	 35. :sbrewind / :sbfirst split + to first arg/buf
+ 26. :slast		 36. :sblast		split + to last arg/buf
+ 27. :sall		 37. :sball		edit all args/buffers
+ 			 38. :sunhide		edit all loaded buffers
+ 			 39. :[N]sbmod [N]	split + to Nth modified buf
+
+ 40. :args		list of arguments
+ 41. :buffers		list of buffers
+<
+[N] 的含义视命令而定：
+ [N] 是要向前/向后经过的 buffer 数量，用于 2/12/22/32、3/13/23/33 和 4/14/24/34
+ [N] 是参数编号，默认为当前参数，用于 1 和 21
+ [N] 是 buffer 编号，默认为当前 buffer，用于 11 和 31
+ [N] 是计数，用于 19 和 39
+
+注意：":next" 是个例外，因为为兼容 Vi 它必须接受一组文件名。
+
+上表中两张对照表为与上游逐字节一致的原文，其列标题与含义列未作翻译。
+
+
+------------------------------------------------------------------------------
+参数列表与多个 window
+
+参数列表中的当前位置可以因 window 而异。请记住，执行 ":e file" 时，参数列表中的位置
+保持不变，但你编辑的并不是该位置上的文件。为表明这一点，文件消息（以及标题，如果你
+有的话）会显示 "(file (N) of M)"，其中 "(N)" 是当前在文件列表中的位置，"M" 是文件
+列表中的文件数量。
+
+参数列表中的所有条目都会被加入 buffer 列表。因此你也可以用 ":bnext" 之类的 buffer
+列表命令转到它们。
+
+:[N]al[l][!] [N]				*:al* *:all* *:sal* *:sall*
+:[N]sal[l][!] [N]
+		重新排列屏幕，为每个参数打开一个 window。其他所有 window 都被
+		关闭。给出计数时，它是可打开 window 数的上限。
+		配合 |:tab| 修饰符使用时，为每个参数打开一个标签页。
+		当参数多于 'tabpagemax' 时，多出来的会在最后一个标签页中
+		变成 split window。
+		设置了 'hidden' 选项时，被关闭 window 中的所有 buffer 都变为
+		隐藏。
+		未设置 'hidden'，且设置了 'autowrite' 选项时，已改动的
+		buffer 会被写出。否则，buffer 已被改动的 window 不会被移除，
+		除非给出了 [!]，此时它们变为隐藏。但已改动的 buffer 从不
+		会被放弃，因此改动不会丢失。
+		[N] 是可打开 window 数的上限。'winheight' 也会限制所打开的
+		window 数量（如果前面加了 |:vertical|，则为 'winwidth'）。
+		这里不会为新 window 执行 Buf/Win Enter/Leave 自动命令，只有
+		在真正进入它们时才执行。
+		如果在此命令执行期间自动命令改变了 window 布局，会给出错误。
+		*E249*
+
+:[N]sa[rgument][!] [++opt] [+cmd] [N]			*:sa* *:sargument*
+		":split | argument [N]" 的简写：分割 window 并转到第 N 个
+		参数。但没有这样的参数时，window 不会被分割。另见 |++opt| 和
+		|+cmd|。
+
+:[N]sn[ext][!] [++opt] [+cmd] [file ..]			*:sn* *:snext*
+		":split | [N]next" 的简写：分割 window 并转到后第 N 个参数。
+		但没有下一个文件时，window 不会被分割。另见 |++opt| 和
+		|+cmd|。
+
+:[N]spr[evious][!] [++opt] [+cmd] [N]			*:spr* *:sprevious*
+:[N]sN[ext][!] [++opt] [+cmd] [N]			*:sN* *:sNext*
+		":split | [N]Next" 的简写：分割 window 并转到前第 N 个参数。
+		但没有上一个文件时，window 不会被分割。另见 |++opt| 和
+		|+cmd|。
+
+						*:sre* *:srewind*
+:sre[wind][!] [++opt] [+cmd]
+		":split | rewind" 的简写：分割 window 并转到第一个参数。但
+		没有参数列表时，window 不会被分割。另见 |++opt| 和 |+cmd|。
+
+						*:sfir* *:sfirst*
+:sfir[st] [++opt] [+cmd]
+		与 ":srewind" 相同。
+
+						*:sla* *:slast*
+:sla[st][!] [++opt] [+cmd]
+		":split | last" 的简写：分割 window 并转到最后一个参数。但
+		没有参数列表时，window 不会被分割。另见 |++opt| 和 |+cmd|。
+
+						*:dr* *:drop*
+:dr[op] [++opt] [+cmd] {file} ..
+		在某个 window 中编辑第一个 {file}。
+		- 如果该文件已在某个 window 中打开，则切换到那个 window。
+		- 如果该文件没有在任何 window 中打开，则在当前 window 中编辑它。
+		  如果当前 buffer 不能被 |abandon|，则先分割 window。
+		- 不在参数列表中或不是全宽的 window 会在可能时被关闭。
+		会像 |:next| 命令那样设置 |argument-list|。
+		该命令的用途是：可以让某个希望 Vim 编辑另一个文件的程序
+		（例如调试器）来调用它。
+		使用 |:tab| 修饰符时，每个参数会在一个标签页中打开。如果
+		最后一个 window 是空的，则使用它。
+		另见 |++opt| 和 |+cmd|。
+
+==============================================================================
+8. 在所有 buffer 或 window 中执行命令			*list-repeat*
+
+							*:windo*
+:[range]windo {cmd}	在每个 |focusable| window 中执行 {cmd}，或只对 window 编号
+			处于给定 [range] 范围内的 window 执行。它的效果相当于
+			依次执行： >
+				CTRL-W t
+				:{cmd}
+				CTRL-W w
+				:{cmd}
+				etc.
+<			这只在当前标签页中操作。
+			在某个 window 中检测到错误后，后续 window 不会再被访问。
+			最后一个 window（或发生错误的位置）成为当前 window。
+			{cmd} 可以包含 '|' 以连接多条命令。
+			{cmd} 不得打开或关闭 window，也不得重新排列它们。
+
+			另见 |:tabdo|、|:argdo|、|:bufdo|、|:cdo|、|:ldo|、
+			|:cfdo| 和 |:lfdo|。
+
+							*:bufdo*
+:[range]bufdo[!] {cmd}	在 buffer 列表中的每个 buffer 中执行 {cmd}；如果给出了
+			[range]，则只对 buffer 编号处于 [range] 范围内的
+			buffer 执行。它的效果相当于依次执行： >
+				:bfirst
+				:{cmd}
+				:bnext
+				:{cmd}
+				etc.
+<			当当前文件无法被 |abandon|，且没有给出 [!] 时，该
+			命令失败。
+			在某个 buffer 中检测到错误后，后续 buffer 不会被访问。
+			未列出的 buffer 会被跳过。
+			最后一个 buffer（或发生错误的位置）成为当前 buffer。
+			{cmd} 可以包含 '|' 以连接多条命令。
+			{cmd} 不得删除 buffer，也不得把 buffer 加入 buffer
+			列表。
+			注意：此命令执行期间，Syntax 自动命令事件会被禁用
+			（通过把它加入 'eventignore'）。这会显著加快编辑各个
+			buffer 的速度。
+
+			另见 |:tabdo|、|:argdo|、|:windo|、|:cdo|、|:ldo|、
+			|:cfdo| 和 |:lfdo|。
+
+示例： >
+
+	:windo set nolist foldcolumn=0 | normal! zn
+
+这会重置 'list' 选项并关闭所有 window 中的折叠。 >
+
+	:bufdo set fileencoding= | update
+
+这会重置每个 buffer 中的 'fileencoding'，并在它改变了 buffer 时写出该 buffer。结果
+是所有 buffer 都会使用 'encoding' 编码（如果转换成功）。
+
+==============================================================================
+9. 光标下的标签或文件名			*window-tag*
+
+							*:sta* *:stag*
+:sta[g][!] [tagname]
+		执行 ":tag[!] [tagname]" 并为找到的标签分割 window。关于在
+		垂直分割 window 或新标签页中跳转到标签，参见 'switchbuf'。
+		另见 |:tag|。
+
+CTRL-W ]					*CTRL-W_]* *CTRL-W_CTRL-]*
+CTRL-W CTRL-]	把当前 window 一分为二。把光标下的标识符当作标签，并在新的上方
+		window 中跳转到它。
+		在可视模式下，使用可视选中的文本作为标签。
+		使新 window 高度为 N。关于在垂直分割 window 或新标签页中跳转到
+		标签，参见 'switchbuf'。
+
+							*CTRL-W_g]*
+CTRL-W g ]	把当前 window 一分为二。把光标下的标识符当作标签，并在新的上方
+		window 中对它执行 ":tselect"。
+		在可视模式下，使用可视选中的文本作为标签。
+		使新 window 高度为 N。
+
+							*CTRL-W_g_CTRL-]*
+CTRL-W g CTRL-]	把当前 window 一分为二。把光标下的标识符当作标签，并在新的上方
+		window 中对它执行 ":tjump"。
+		在可视模式下，使用可视选中的文本作为标签。
+		使新 window 高度为 N。
+
+CTRL-W f					*CTRL-W_f* *CTRL-W_CTRL-F*
+CTRL-W CTRL-F	把当前 window 一分为二。编辑光标下的文件名。
+		类似于 ":split gf"，但文件不存在时不会分割 window。
+		把 'path' 变量用作查找该文件时所搜索的目录名列表。当前文件
+		的路径也会用于搜索该文件名。
+		如果该名称是形如 "type://machine/path" 的超文本链接，则只
+		使用 "/path"。
+		如果给出了计数，则编辑第 count 个匹配的文件。
+
+CTRL-W F						*CTRL-W_F*
+		把当前 window 一分为二。编辑光标下的文件名，并跳到文件名之后
+		给出的行号。关于如何取得行号，见 |gF|。
+
+CTRL-W gf						*CTRL-W_gf*
+		打开一个新的标签页并编辑光标下的文件名。
+		类似 "tab split" 和 "gf"，但文件不存在时不会创建新标签页。
+
+CTRL-W gF						*CTRL-W_gF*
+		打开一个新的标签页，编辑光标下的文件名，并跳到文件名之后
+		给出的行号。类似 "tab split" 和 "gF"，但文件不存在时不会
+		创建新标签页。
+
+CTRL-W gt						*CTRL-W_gt*
+		转到下一个标签页，与 `gt` 相同。
+
+CTRL-W gT						*CTRL-W_gT*
+		转到上一个标签页，与 `gT` 相同。
+
+另见 |CTRL-W_CTRL-I|：为包含光标下关键字的被包含文件打开 window。
+
+==============================================================================
+10. 预览 window				*preview-window*
+
+预览 window 是一个用于显示（预览）另一个文件的特殊 window。它通常是用来显示被包含文件或
+函数定义的小 window。
+
+（每个标签页）只能有一个预览 window。它由下列命令之一创建。可以设置 'previewheight'
+选项来指定预览 window 打开时的高度。预览 window 中会设置 'previewwindow' 选项，以便能识别
+它。还会设置 'winfixheight' 选项，使其在打开/关闭其他 window 时保持相同高度。
+
+						*:pt* *:ptag*
+:pt[ag][!] [tagname]
+		执行 ":tag[!] [tagname]"，并在一个"预览"window 中显示找到的
+		标签，而不改变当前 buffer 或光标位置。如果"预览"window 已
+		存在，则复用它（就像复用帮助 window 那样）。如果打开一个新的，
+		则用 'previewheight' 作为该 window 的高度。另见 |:tag|。
+		示例见下文。|CursorHold-example|
+		与 |:tag| 有一点小差别：当 [tagname] 等于已经显示的标签时，
+		匹配标签列表中的位置不会被重置。这使 CursorHold 示例在
+		|:ptnext| 之后仍能工作。
+
+CTRL-W z					*CTRL-W_z*
+CTRL-W CTRL-Z					*CTRL-W_CTRL-Z* *:pc* *:pclose*
+:pc[lose][!]	关闭当前打开的任何"预览"window。设置了 'hidden' 选项时，
+		或 buffer 已被改动且使用了 [!] 时，该 buffer 变为隐藏
+		（除非还有别的 window 在编辑它）。如果任何"预览"buffer 无法关闭，
+		该命令失败。另见 |:close|。
+
+							*:pp* *:ppop*
+:[count]pp[op][!]
+		在预览 window 中执行 ":[count]pop[!]"。见 |:pop| 和 |:ptag|。
+
+CTRL-W }						*CTRL-W_}*
+		把光标下的标识符当作标签并对它执行 :ptag。使新的预览 window
+		（如果需要）高度为 N。如果没有给出 N，则使用
+		'previewheight'。
+
+CTRL-W g }						*CTRL-W_g}*
+		把光标下的标识符当作标签并对它执行 :ptjump。使新的预览 window
+		（如果需要）高度为 N。如果没有给出 N，则使用
+		'previewheight'。
+
+							*:pb* *:pbuffer*
+:[N]pb[uffer][!] [+cmd] [N]
+		在预览 window 中编辑 buffer 列表中的第 [N] 个 buffer。如果没有
+		给出 [N]，则继续编辑当前 buffer。关于 [!] 见 |:buffer-!|。
+		这也会编辑不在 buffer 列表中的 buffer，且不设置 'buflisted'
+		标志。另见 |+cmd|。
+
+							*:ped* *:pedit*
+:ped[it][!] [++opt] [+cmd] {file}
+		在预览 window 中编辑 {file}。预览 window 像 |:ptag| 那样打开。
+		当前 window 和光标位置不变。有用的示例： >
+			:pedit +/fputc /usr/include/stdio.h
+<
+		另见 |++opt| 和 |+cmd|。
+
+							*:ps* *:psearch*
+:[range]ps[earch][!] [count] [/]pattern[/]
+		行为类似 |:ijump|，但在预览 window 中显示找到的匹配项。预览 window
+		像 |:ptag| 那样打开。
+		当前 window 和光标位置也不变。有用的示例： >
+			:psearch popen
+<		与 |:ptag| 命令类似，你可以用它自动显示光标下单词的
+		相关信息。这不如图 |:ptag| 那么巧妙，但你不需要 tags
+		文件，而且它也会在系统包含文件中查找匹配项。示例： >
+  :au! CursorHold *.[ch] ++nested exe "silent! psearch " .. expand("<cword>")
+<		警告：这可能很慢。
+
+示例						*CursorHold-example*  >
+
+  :au! CursorHold *.[ch] ++nested exe "silent! ptag " .. expand("<cword>")
+
+当光标在 'updatetime' 所设时间内没有移动时，这会为光标下的关键字执行 ":ptag"。
+"++nested" 使其他自动命令也被执行，从而让语法高亮在预览 window 中生效。"silent!" 避免了
+找不到标签时的错误消息。另见 |CursorHold|。要再次禁用该功能： >
+
+  :au! CursorHold
+
+一个不错的增强是：高亮找到的标签、在光标下没有单词时不执行 ":ptag"，以及另外几件
+事情： >
+
+  :au! CursorHold *.[ch] ++nested call PreviewWord()
+  :func PreviewWord()
+  :  if &previewwindow			" don't do this in the preview window
+  :    return
+  :  endif
+  :  let w = expand("<cword>")		" get the word under cursor
+  :  if w =~ '\a'			" if the word contains a letter
+  :
+  :    " Delete any existing highlight before showing another tag
+  :    silent! wincmd P			" jump to preview window
+  :    if &previewwindow		" if we really get there...
+  :      match none			" delete existing highlight
+  :      wincmd p			" back to old window
+  :    endif
+  :
+  :    " Try displaying a matching tag for the word under the cursor
+  :    try
+  :       exe "ptag " .. w
+  :    catch
+  :      return
+  :    endtry
+  :
+  :    silent! wincmd P			" jump to preview window
+  :    if &previewwindow		" if we really get there...
+  :	 if has("folding")
+  :	   silent! .foldopen		" don't want a closed fold
+  :	 endif
+  :	 call search("$", "b")		" to end of previous line
+  :	 let w = substitute(w, '\\', '\\\\', "")
+  :	 call search('\<\V' .. w .. '\>')	" position cursor on match
+  :	 " Add a match highlight to the word at this position
+  :      hi previewWord term=bold ctermbg=green guibg=green
+  :	 exe 'match previewWord "\%' .. line(".") .. 'l\%' .. col(".") .. 'c\k*"'
+  :      wincmd p			" back to old window
+  :    endif
+  :  endif
+  :endfun
+
+==============================================================================
+11. 使用隐藏 buffer				*buffer-hidden*
+
+隐藏 buffer 不显示在 window 中，但仍被加载在内存中。这样就可能在文件之间跳转，而无需
+每次在 window 中得到另一个 buffer 时都读写该文件。
+
+							*:buffer-!*
+如果设置了 'hidden'（'hid'）选项，则对那些开始编辑另一个文件的所有命令（":edit"、
+":next"、":tag" 等）都会保留被放弃的 buffer。在 buffer 列表中移动的命令有时会让
+当前 buffer 变为隐藏，即使没有设置 'hidden' 选项。这种情况发生在：某个 buffer 已被
+改动，但被强制（用 '!'）从 window 中移除，而 'autowrite' 关闭或该 buffer 无法写出时。
+
+你可以用任意命令开始编辑某个隐藏 buffer，或用 ":bdelete" 命令删除它，从而使它不再
+隐藏。
+
+'hidden' 是全局的，对所有 buffer 都生效。'bufhidden' 选项可用于为特定 buffer 做
+例外处理。它可以取这些值：
+	<empty>		使用 'hidden' 的值。
+	hide		隐藏该 buffer，即使未设置 'hidden' 也隐藏。
+	unload		不隐藏而是卸载该 buffer，即使设置了 'hidden'
+			也卸载。
+	delete		删除该 buffer。
+
+							*hidden-quit*
+当存在隐藏且已改动的 buffer 时尝试退出 Vim，你会得到一条错误消息，Vim 会把该 buffer
+设为当前 buffer。然后你可以决定写出该 buffer（":wq"）或不写出直接退出（":q!"）。
+小心：可能有不止一个隐藏且已改动的 buffer！
+
+buffer 也可以不被列出。这意味着它存在，但不在 buffer 列表中。|unlisted-buffer|
+
+
+:files[!] [flags]				*:files*
+:buffers[!] [flags]				*:buffers* *:ls*
+:ls[!] [flags]
+		显示所有 buffer。示例：
+
+			1 #h   "/test/text"		line 1 ~
+			2u     "asdf"			line 0 ~
+			3 %a + "version.c"		line 1 ~
+
+		包含 [!] 时该列表会显示未被列出的 buffer（此时
+		"unlisted" 这个词有点令人困惑……）。
+
+		每个 buffer 都有一个唯一编号。该编号不会改变，因此你
+		总是可以用 ":buffer N" 或 "N CTRL-^" 转到特定的 buffer，
+		其中 N 是 buffer 编号。
+
+		对于文件名，使用这些特殊值：
+			"[Prompt]"	|prompt-buffer|
+			"[Scratch]"	'buftype' 为 "nofile"
+			"[No Name]"	未指定文件名
+
+		指示符（同一列中的字符互斥）：
+		u	未列出的 buffer（仅在使用 [!] 时显示）
+			   |unlisted-buffer|
+		 %	当前 window 中的 buffer
+		 #	":e #" 和 CTRL-^ 的替换 buffer
+		  a	活动 buffer：已加载且可见
+		  h	隐藏 buffer：已加载，但当前未显示在 window 中
+			   |hidden-buffer|
+		   `-`	'modifiable' 关闭的 buffer
+		   =	只读 buffer
+		   R	有作业正在运行的终端 buffer
+		   F	作业已结束的终端 buffer
+		   ?    没有作业的终端 buffer：`:terminal NONE`
+		    +	已改动的 buffer
+		    x   有读取错误的 buffer
+
+		[flags] 可以是下列字符的组合，用于限定要列出的 buffer：
+			+	已改动的 buffer
+			`-`	'modifiable' 关闭的 buffer
+			=	只读 buffer
+			a	活动 buffer
+			u	未列出的 buffer（覆盖 "!"）
+			h	隐藏 buffer
+			x	有读取错误的 buffer
+			%	当前 buffer
+			#	替换 buffer
+			R	有作业正在运行的终端 buffer
+			F	作业已结束的终端 buffer
+			t	显示上次使用时间并对 buffer 排序
+		组合标志表示它们之间是"与"的关系，例如：
+			h+	已改动的隐藏 buffer
+			a+	已改动的活动 buffer
+
+		使用 |:filter| 时，模式与所显示的 buffer 名匹配，例如： >
+			filter /\.vim/ ls
+<
+						*:bad* *:badd*
+:bad[d]	[+lnum] {fname}
+		把文件名 {fname} 加入 buffer 列表而不加载它，前提是它
+		尚未被列出。如果该 buffer 之前被删除（而非彻底删除），
+		它会重新被列出。
+		如果指定了 "lnum"，则首次进入该 buffer 时光标会定位到
+		那一行。注意 + 之后的命令会被忽略。
+
+						 *:balt*
+:balt [+lnum] {fname}
+		与 `:badd` 类似，并同时把当前 window 的替换文件设为
+		{fname}。
+
+:[N]bd[elete][!]			*:bd* *:bdel* *:bdelete* *E516*
+:bd[elete][!] [N]
+		卸载 buffer [N]（默认：当前 buffer）并从 buffer 列表中
+		删除它。如果该 buffer 已被改动，这会失败，除非指定了
+		[!]，此时改动会丢失。
+		文件本身不受影响。该 buffer 的任何 window 都会被关闭。如果
+		buffer [N] 是当前 buffer，则会改为显示另一个 buffer。它
+		是跳转列表中指向已加载 buffer 的最新条目。
+
+		实际上该 buffer 并没有被完全删除，它只是从 buffer 列表
+		中被移除 |unlisted-buffer|，并且该 buffer 的选项值、变量
+		以及映射/缩写都被清除。如果 [N] 是某个 window 中最后一个被
+		列出的 buffer（也就是说没有其他被列出的 buffer 可以切换
+		过去），则该 buffer 会被清空而不是被卸载。window 不会被关闭，
+		该 buffer 可能被当作新 buffer 复用 |buffer-reuse|。这确保
+		每个 window 始终有一个有效的 buffer。
+
+		示例： >
+		    :.,$-bdelete    " delete buffers from the current one to
+				    " last but one
+		    :%bdelete	    " delete all buffers
+<
+
+:bd[elete][!] {bufname}						*E93* *E94*
+		与 ":bdelete[!] [N]" 类似，但按名称给出 buffer，见
+		|{bufname}|。
+
+:bd[elete][!] N1 N2 ...
+		对 buffer N1、N2 等分别执行 ":bdelete[!]"。参数可以是
+		buffer 编号或 buffer 名称（但不能是本身就是数字的 buffer
+		名称）。在 buffer 名称中的空格前插入一个反斜杠。
+
+:N,Mbd[elete][!]
+		对 N 到 M 范围内（|inclusive|，含两端）的所有 buffer 执行
+		":bdelete[!]"。
+
+:[N]bw[ipeout][!]			*:bw* *:bwipe* *:bwipeout* *E517*
+:bw[ipeout][!] {bufname}
+:N,Mbw[ipeout][!]
+:bw[ipeout][!] N1 N2 ...
+		与 |:bdelete| 类似，但会真正删除该 buffer。与该 buffer
+		相关的一切都会丢失。该 buffer 中的所有标记都会失效、选项
+		设置会丢失，跳转列表与标签栈数据会被清除，等等。除非你
+		清楚自己在做什么，否则不要使用它。示例： >
+		    :.+,$bwipeout   " wipe out all buffers after the current
+				    " one
+		    :%bwipeout	    " wipe out all buffers
+<
+
+:[N]bun[load][!]				*:bun* *:bunload* *E515*
+:bun[load][!] [N]
+		卸载 buffer [N]（默认：当前 buffer）。为该 buffer 分配的
+		内存会被释放。该 buffer 仍留在 buffer 列表中。
+		如果该 buffer 已被改动，这会失败，除非指定了 [!]，此时
+		改动会丢失。
+		该 buffer 的任何 window 都会被关闭。如果 buffer [N] 是当前
+		buffer，则会改为显示另一个 buffer。它是跳转列表中指向已
+		加载 buffer 的最新条目。
+
+:bun[load][!] {bufname}
+		与 ":bunload[!] [N]" 类似，但按名称给出 buffer。另见
+		|{bufname}|。
+
+:N,Mbun[load][!]
+		对 N 到 M 范围内（|inclusive|，含两端）的所有 buffer 执行
+		":bunload[!]"。
+
+:bun[load][!] N1 N2 ...
+		对 buffer N1、N2 等分别执行 ":bunload[!]"。参数可以是
+		buffer 编号或 buffer 名称（但不能是本身就是数字的 buffer
+		名称）。在 buffer 名称中的空格前插入一个反斜杠。
+
+:[N]b[uffer][!] [+cmd] [N]		*:b* *:bu* *:buf* *:buffer* *E86*
+		编辑 buffer 列表中的第 [N] 个 buffer。如果没有给出 [N]，
+		则继续编辑当前 buffer。关于 [!] 见 |:buffer-!|。这也会
+		编辑不在 buffer 列表中的 buffer，且不设置 'buflisted'
+		标志。另见 |+cmd|。
+
+:[N]b[uffer][!] [+cmd] {bufname}				*{bufname}*
+		编辑 buffer 列表中 {bufname} 对应的 buffer。只要在 buffer
+		列表中唯一，部分名称也可以。
+		注意名称本身是数字的 buffer 不能用该名称引用；请改用
+		buffer 编号。如果 buffer 名称以 `+` 开头也是如此，它会被
+		解释为 |+cmd| 的开头。
+		在 buffer 名称中的空格前插入一个反斜杠。
+		关于 [!] 见 |:buffer-!|。
+		这也会编辑不在 buffer 列表中的 buffer，且不设置
+		'buflisted' 标志。另见 |+cmd|。
+
+:[N]sb[uffer] [+cmd] [N]				*:sb* *:sbuffer*
+		分割 window 并编辑 buffer 列表中的第 [N] 个 buffer。如果没有
+		给出 [N]，则编辑当前 buffer。分割时遵循 'switchbuf' 的
+		"useopen" 设置。这也会编辑不在 buffer 列表中的 buffer，
+		且不设置 'buflisted' 标志。另见 |+cmd|。
+
+:[N]sb[uffer] [+cmd] {bufname}
+		分割 window 并编辑 buffer 列表中 |{bufname}| 对应的 buffer。
+		这也会编辑不在 buffer 列表中的 buffer，且不设置
+		'buflisted' 标志。
+		注意：如果你想要的是把该 buffer 分割出来、以另一个名称存一
+		份副本，可以这样做： >
+			:w foobar | sp #
+<		另见 |+cmd|。
+
+:[N]bn[ext][!] [+cmd] [N]				*:bn* *:bnext* *E87*
+		转到 buffer 列表中后第 [N] 个 buffer。[N] 默认为一。
+		到达 buffer 列表末尾后会绕回开头。
+		关于 [!] 见 |:buffer-!|。
+		另见 |+cmd|。
+		如果你在帮助 buffer 中，这会转到下一个帮助 buffer（如果
+		有的话）。类似地，如果你在普通（非帮助）buffer 中，这会
+		转到下一个普通 buffer。
+		这样做是为了：如果你调用过帮助，它在浏览代码/文本 buffer
+		时不会碍事。接下来三条命令的行为也是如此。
+
+								*]b*
+]b		映射到 |:bnext|。|default-mappings|
+
+							*:sbn* *:sbnext*
+:[N]sbn[ext] [+cmd] [N]
+		分割 window 并转到 buffer 列表中后第 [N] 个 buffer。
+		到达 buffer 列表末尾后会绕回开头。使用 'switchbuf'。
+		另见 |+cmd|。
+
+:[N]bN[ext][!] [+cmd] [N]		*:bN* *:bNext* *:bp* *:bprevious* *E88*
+
+								*[b*
+[b		映射到 |:bprevious|。|default-mappings|
+
+:[N]bp[revious][!] [+cmd] [N]
+		转到 buffer 列表中前第 [N] 个 buffer。[N] 默认为一。
+		到达 buffer 列表开头后会绕回末尾。
+		关于 [!] 和 'switchbuf' 见 |:buffer-!|。
+		另见 |+cmd|。
+
+:[N]sbN[ext] [+cmd] [N]			*:sbN* *:sbNext* *:sbp* *:sbprevious*
+:[N]sbp[revious] [+cmd] [N]
+		分割 window 并转到 buffer 列表中前第 [N] 个 buffer。
+		到达 buffer 列表开头后会绕回末尾。
+		使用 'switchbuf'。
+		另见 |+cmd|。
+
+:br[ewind][!] [+cmd]					*:br* *:bre* *:brewind*
+		转到 buffer 列表中的第一个 buffer。如果 buffer 列表为空，
+		则转到第一个未列出的 buffer。
+		关于 [!] 见 |:buffer-!|。
+
+								*[B*
+[B		映射到 |:brewind|。|default-mappings|
+
+:bf[irst] [+cmd]					*:bf* *:bfirst*
+		与 |:brewind| 相同。
+		另见 |+cmd|。
+
+:sbr[ewind] [+cmd]					*:sbr* *:sbrewind*
+		分割 window 并转到 buffer 列表中的第一个 buffer。如果 buffer
+		列表为空，则转到第一个未列出的 buffer。
+		遵循 'switchbuf' 选项。
+		另见 |+cmd|。
+
+:sbf[irst] [+cmd]					*:sbf* *:sbfirst*
+		与 ":sbrewind" 相同。
+
+:bl[ast][!] [+cmd]					*:bl* *:blast*
+		转到 buffer 列表中的最后一个 buffer。如果 buffer 列表为空，
+		则转到最后一个未列出的 buffer。
+		关于 [!] 见 |:buffer-!|。
+
+								*]B*
+]B		映射到 |:blast|。|default-mappings|
+
+:sbl[ast] [+cmd]					*:sbl* *:sblast*
+		分割 window 并转到 buffer 列表中的最后一个 buffer。如果 buffer
+		列表为空，则转到最后一个未列出的 buffer。
+		遵循 'switchbuf' 选项。
+
+:[N]bm[odified][!] [+cmd] [N]			*:bm* *:bmodified* *E84*
+		转到后第 [N] 个已改动的 buffer。注意：该命令也会找到未列出
+		的 buffer。如果没有已改动的 buffer，该命令失败。
+
+:[N]sbm[odified] [+cmd] [N]				*:sbm* *:sbmodified*
+		分割 window 并转到后第 [N] 个已改动的 buffer。
+		遵循 'switchbuf' 选项。
+		注意：该命令也会找到不在 buffer 列表中的 buffer。
+
+:[N]unh[ide] [N]			*:unh* *:unhide* *:sun* *:sunhide*
+:[N]sun[hide] [N]
+		重新排列屏幕，为 buffer 列表中每个已加载的 buffer 打开一个
+		window。给出计数时，它是可打开 window 数的上限。
+
+:[N]ba[ll] [N]					*:ba* *:ball* *:sba* *:sball*
+:[N]sba[ll] [N]	重新排列屏幕，为 buffer 列表中的每个 buffer 打开一个 window。
+		给出计数时，它是可打开 window 数的上限。'winheight' 也会限制
+		所打开的 window 数量（如果前面加了 |:vertical|，则为
+		'winwidth'）。
+		这里不会为新 window 执行 Buf/Win Enter/Leave 自动命令，只有在
+		真正进入它们时才执行。
+		使用 |:tab| 修饰符时，新 window 会在新标签页中打开，最多到
+		'tabpagemax'。
+
+注意：上面所有开始编辑另一个 buffer 的命令都会保持 'readonly' 标志不变。这与
+":edit" 命令不同——后者每次读取文件时都会设置 'readonly' 标志。
+
+==============================================================================
+12. 特殊种类的 buffer			*special-buffers*
+
+buffer 除了包含文件文本，还可以用于其他用途。可以设置几个选项来改变 buffer 的行为：
+	'bufhidden'	当 buffer 不再显示在 window 中时会发生什么。
+	'buftype'	这是哪种 buffer
+	'swapfile'	buffer 是否会有交换文件
+	'buflisted'	buffer 是否出现在 buffer 列表中
+
+几种有用的 buffer 类型：
+
+quickfix	用于包含错误列表或位置列表。见 |:cwindow| 和
+		|:lwindow|。该命令把 'buftype' 选项设为 "quickfix"。
+		你不应该改动它！'swapfile' 为 off。
+
+help		包含一个帮助文件。只会由 |:help| 命令创建。标识帮助
+		buffer 的标志是内部的，不能更改。帮助 buffer 的
+		'buflisted' 选项会被重置。
+
+terminal	一个终端 window buffer，见 |terminal|。在作业结束前，其
+		内容不能被读取或更改。
+
+directory	显示目录内容。可由文件浏览器插件使用。该 buffer 按这些
+		设置创建： >
+			:setlocal buftype=nowrite
+			:setlocal bufhidden=delete
+			:setlocal noswapfile
+<		buffer 名就是该目录的名称，在使用 |:cd| 命令时会被调整。
+
+						*scratch-buffer*
+scratch		包含可随时丢弃的文本。关闭 window 时它会保留，必须显式
+		删除它。
+		设置： >
+			:setlocal buftype=nofile
+			:setlocal bufhidden=hide
+			:setlocal noswapfile
+<		如果你给它一个有意义的名字，可以用 buffer 名来标识该
+		buffer。
+
+						*unlisted-buffer*
+unlisted	该 buffer 不在 buffer 列表中。它不用于普通编辑，而是用来
+		显示帮助文件、记住文件名或标记。":bdelete" 命令也会设置
+		该选项，因此它并不会完全删除该 buffer。
+		设置： >
+			:setlocal nobuflisted
+<
+
+ vim:tw=78:ts=8:noet:ft=help:norl:

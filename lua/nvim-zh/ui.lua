@@ -3,19 +3,34 @@ local M = {}
 local DOMAIN = 'nvim-ui'
 local engine = require('nvim-zh.engine')
 local records = {}
+local sources = {}
 local config = { notify = false, prompts = false, select_items = false, echo = false }
 local translating_notify = false
 
-local function translate(text, context)
+local function translate(text, context, domain)
   if type(text) ~= 'string' or text == '' then return text end
   local ok, translated = pcall(engine.translate, {
-    domain = DOMAIN,
+    domain = domain or DOMAIN,
     context = context or '',
     msgid = text,
     formatted = true,
   })
   if ok and type(translated) == 'string' then return translated end
   return text
+end
+
+local function translate_notification(msg, opts)
+  if type(msg) ~= 'string' or msg == '' then return msg end
+  local route = type(opts) == 'table' and type(opts.title) == 'string' and sources[opts.title] or nil
+  local domain, context = DOMAIN, ''
+  local prefix
+  if route then domain, context, prefix = route.domain, route.context, route.prefix end
+  if prefix and msg:sub(1, #prefix) == prefix then
+    local rest = msg:sub(#prefix + 1)
+    local whitespace, body = rest:match('^(%s*)(.*)$')
+    return prefix .. whitespace .. translate(body, context, domain)
+  end
+  return translate(msg, context, domain)
 end
 
 local function current(record)
@@ -79,7 +94,7 @@ local function install_notify()
       if not config.notify then return original(msg, level, opts) end
       if translating_notify then return original(msg, level, opts) end
       translating_notify = true
-      local translated = translate(msg, '')
+      local translated = translate_notification(msg, opts)
       translating_notify = false
       return original(translated, level, opts)
     end
@@ -159,6 +174,28 @@ local function install_echo()
   end)
 end
 
+-- Internal adapter API: route only an exact public notification title to a
+-- domain. Unknown titles always remain in nvim-ui; no text-based provenance
+-- guessing or global fuzzy replacement is involved.
+function M.register_source(spec)
+  assert(type(spec) == 'table' and type(spec.title) == 'string' and spec.title ~= '',
+    'notification source title must be a non-empty string')
+  assert(type(spec.domain) == 'string' and spec.domain:match('^[%w][%w_.%-]*$'),
+    'notification source domain is invalid')
+  assert(spec.context == nil or type(spec.context) == 'string', 'notification source context must be string')
+  assert(spec.prefix == nil or (type(spec.prefix) == 'string' and spec.prefix ~= ''),
+    'notification source prefix must be a non-empty string')
+  assert(sources[spec.title] == nil, 'notification source already registered: ' .. spec.title)
+  local record = { title = spec.title, domain = spec.domain, context = spec.context or '', prefix = spec.prefix }
+  sources[spec.title] = record
+  local released = false
+  return function()
+    if released then return end
+    released = true
+    if sources[spec.title] == record then sources[spec.title] = nil end
+  end
+end
+
 function M.setup(next_config)
   config = vim.deepcopy(next_config or config)
   if config.notify then
@@ -182,17 +219,12 @@ end
 
 function M.teardown()
   config = { notify = false, prompts = false, select_items = false, echo = false }
+  sources = {}
   restore('notify_once')
   restore('notify')
   restore('input')
   restore('select')
   restore('echo')
-end
-
-function M.reload(next_config)
-  local previous = config
-  M.teardown()
-  M.setup(next_config or previous)
 end
 
 function M.info()
@@ -214,6 +246,11 @@ function M.info()
     reason = not config.select_items and 'disabled' or not config.prompts and 'prompts_disabled'
       or select and select.reason or 'not_initialized',
   }
+  result.sources = {}
+  for _, route in pairs(sources) do
+    result.sources[#result.sources + 1] = { title = route.title, domain = route.domain, context = route.context }
+  end
+  table.sort(result.sources, function(a, b) return a.title < b.title end)
   return result
 end
 

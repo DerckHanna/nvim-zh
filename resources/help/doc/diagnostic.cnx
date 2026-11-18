@@ -1,0 +1,974 @@
+*diagnostic.txt*   Diagnostics
+
+
+                            NVIM 参考手册
+
+
+诊断框架                                                 *vim.diagnostic*
+
+Nvim 提供了一个用于显示来自外部工具的错误或警告的框架，这些错误或警告统称为
+"诊断"（diagnostics）。诊断可以来自多种来源，例如 linter 或 LSP 服务器。诊断
+框架是对现有错误处理功能（例如 |quickfix| 列表）的扩展。
+
+                                      输入 |gO| 查看目录。
+
+==============================================================================
+快速上手                                              *diagnostic-quickstart*
+
+下文把任何报告诊断的东西都称为"诊断生产者"。诊断生产者只需遵循几个简单步骤即可
+报告诊断：
+
+1. 创建一个命名空间 |nvim_create_namespace()|。注意该命名空间必须有名字。匿名
+   命名空间将**不会**生效。
+2. （可选）为诊断命名空间配置选项 |vim.diagnostic.config()|。
+3. 生成诊断。
+4. 为 buffer 设置诊断 |vim.diagnostic.set()|。
+5. 从第 3 步重复。
+
+一般来说，该 API 分为两类：供诊断生产者使用的函数，以及供诊断消费者（即希望读取
+和查看 buffer 诊断的最终用户）使用的函数。面向生产者的 API 要求把 {namespace} 作为
+第一个参数，而面向消费者的 API 通常不需要命名空间（不过通常可以选择性地提供一个）。
+一条好的经验法则是：如果一个方法旨在修改某个 buffer 的诊断（例如
+|vim.diagnostic.set()|），那么它就需要命名空间。
+
+                                *vim.diagnostic.severity* *diagnostic-severity*
+诊断中的 "severity" 键是 `vim.diagnostic.severity` 中定义的值之一： >
+
+    vim.diagnostic.severity.ERROR
+    vim.diagnostic.severity.WARN
+    vim.diagnostic.severity.INFO
+    vim.diagnostic.severity.HINT
+
+接受严重级别作为可选参数的函数（例如 |vim.diagnostic.get()|）既可以使用严重级别的
+名称（如 "ERROR"），也可以使用数值，并接受下列三种形式之一：
+
+1. 单个 |vim.diagnostic.severity| 值： >lua
+
+    vim.diagnostic.get(0, { severity = vim.diagnostic.severity.WARN })
+
+2. 含有 "min" 或 "max" 键（或两者）的表。这种形式允许用户指定严重级别范围： >lua
+
+    vim.diagnostic.get(0, { severity = { min = vim.diagnostic.severity.WARN } })
+3. 类列表的表。这种形式允许筛选特定的严重级别： >lua
+
+    vim.diagnostic.get(0, { severity = {
+        vim.diagnostic.severity.WARN,
+        vim.diagnostic.severity.INFO,
+    } })
+<
+
+==============================================================================
+默认值                                                *diagnostic-defaults*
+
+这些诊断键位映射在 Nvim 启动时被无条件创建：
+- `]d` 跳转到 buffer 中的下一条诊断。|]d-default|
+- `[d` 跳转到 buffer 中的上一条诊断。|[d-default|
+- `]D` 跳转到 buffer 中的最后一条诊断。|]D-default|
+- `[D` 跳转到 buffer 中的第一条诊断。|[D-default|
+- `<C-w>d` 在floating window 中显示光标处的诊断。|CTRL-W_d-default|
+
+==============================================================================
+处理器                                                *diagnostic-handlers*
+
+诊断通过 |vim.diagnostic.show()| 显示给用户。诊断的显示由处理器（handler）管理。
+处理器是一个含有 "show" 和（可选的）"hide" 函数的表。"show" 函数的签名为
+>
+    function(namespace, bufnr, diagnostics, opts)
+<
+它负责显示或以其他方式处理给定的诊断。"hide" 函数负责"清理" "show" 函数所做出的
+任何操作，其签名为
+>
+    function(namespace, bufnr)
+<
+处理器可以用 |vim.diagnostic.config()| 配置，并通过在 `vim.diagnostic.handlers` 中
+新建一个键来添加（见 |diagnostic-handlers-example|）。
+
+传给处理器的 {opts} 表是完整的配置选项集合（也就是说，它不限于该处理器自身的
+选项）。表中的值已经解析完毕（即如果用户为某个配置选项指定了函数，该函数已经求值
+完成）。
+
+如果某个诊断处理器配置了 "severity" 键，那么传给该处理器的诊断列表将使用该键的值
+进行过滤（见下面的示例）。
+
+Nvim 默认提供这些处理器："virtual_text"、"virtual_lines"、"signs" 和
+"underline"。
+
+                                                *diagnostic-handlers-example*
+下面的示例创建一个新处理器，用 |vim.notify()| 向用户通知诊断： >lua
+
+    -- It's good practice to namespace custom handlers to avoid collisions
+    vim.diagnostic.handlers["my/notify"] = {
+      show = function(namespace, bufnr, diagnostics, opts)
+        -- In our example, the opts table has a "log_level" option
+        local level = opts["my/notify"].log_level
+
+        local name = vim.diagnostic.get_namespace(namespace).name
+        local msg = string.format("%d diagnostics in buffer %d from %s",
+                                  #diagnostics,
+                                  bufnr,
+                                  name)
+        vim.notify(msg, level)
+      end,
+    }
+
+    -- Users can configure the handler
+    vim.diagnostic.config({
+      ["my/notify"] = {
+        log_level = vim.log.levels.INFO,
+
+        -- This handler will only receive "error" diagnostics.
+        severity = vim.diagnostic.severity.ERROR,
+      }
+    })
+<
+在这个示例中，隐藏诊断时无需做任何事，因此我们省略了 "hide" 函数。
+
+已有的处理器可以被覆盖。例如，使用下面的代码可以只在给定行上为最高严重级别的诊断
+显示标记： >lua
+
+    -- Create a custom namespace. This will aggregate signs from all other
+    -- namespaces and only show the one with the highest severity on a
+    -- given line
+    local ns = vim.api.nvim_create_namespace("my_namespace")
+
+    -- Get a reference to the original signs handler
+    local orig_signs_handler = vim.diagnostic.handlers.signs
+
+    -- Override the built-in signs handler
+    vim.diagnostic.handlers.signs = {
+      show = function(_, bufnr, _, opts)
+        -- Get all diagnostics from the whole buffer rather than just the
+        -- diagnostics passed to the handler
+        local diagnostics = vim.diagnostic.get(bufnr)
+
+        -- Find the "worst" diagnostic per line
+        local max_severity_per_line = {}
+        for _, d in pairs(diagnostics) do
+          local m = max_severity_per_line[d.lnum]
+          if not m or d.severity < m.severity then
+            max_severity_per_line[d.lnum] = d
+          end
+        end
+
+        -- Pass the filtered diagnostics (with our custom namespace) to
+        -- the original handler
+        local filtered_diagnostics = vim.tbl_values(max_severity_per_line)
+        orig_signs_handler.show(ns, bufnr, filtered_diagnostics, opts)
+      end,
+      hide = function(_, bufnr)
+        orig_signs_handler.hide(ns, bufnr)
+      end,
+    }
+<
+
+                                          *diagnostic-toggle-virtual-lines-example*
+诊断处理器也可以被切换。例如，你可能想用下面的键位映射切换 `virtual_lines` 处理器：
+>lua
+
+    vim.keymap.set('n', 'gK', function()
+      local new_config = not vim.diagnostic.config().virtual_lines
+      vim.diagnostic.config({ virtual_lines = new_config })
+    end, { desc = 'Toggle diagnostic virtual_lines' })
+<
+
+                                            *diagnostic-on-jump-example*
+你可以使用 |vim.diagnostic.jump()| 的 `on_jump` 选项，用特定处理器显示跳转到的
+诊断。例如，下面在跳转到诊断时使用 `virtual_lines` 处理器： >lua
+
+  --- @param diagnostic? vim.Diagnostic
+  --- @param bufnr integer
+  local function on_jump(diagnostic, bufnr)
+    if not diagnostic then return end
+
+    vim.diagnostic.show(
+      diagnostic.namespace,
+      bufnr,
+      { diagnostic },
+      { virtual_lines = { current_line = true }, virtual_text = false }
+    )
+  end
+
+  vim.diagnostic.config({ jump = { on_jump = on_jump } })
+<
+                                          *diagnostic-loclist-example*
+每当 |location-list| 被打开时，下面的 `show` 处理器将显示最近的诊断： >lua
+
+  vim.diagnostic.handlers.loclist = {
+    show = function(_, _, _, opts)
+      -- Generally don't want it to open on every update
+      opts.loclist.open = opts.loclist.open or false
+      local winid = vim.api.nvim_get_current_win()
+      vim.diagnostic.setloclist(opts.loclist)
+      vim.api.nvim_set_current_win(winid)
+    end
+  }
+<
+
+该处理器接受与 |vim.diagnostic.setloclist()| 相同的选项，并可以用
+|vim.diagnostic.config()| 配置： >lua
+
+  -- Open the location list on every diagnostic change (warnings/errors only).
+  vim.diagnostic.config({
+    loclist = {
+      open = true,
+      severity = { min = vim.diagnostic.severity.WARN },
+    }
+  })
+<
+
+==============================================================================
+高亮                                                *diagnostic-highlights*
+
+为诊断定义的所有高亮都以 `Diagnostic` 开头，后面跟着高亮类型（例如 `Sign`、
+`Underline` 等）和严重级别（例如 `Error`、`Warn` 等）
+
+默认情况下，标记、floating window 和虚拟文本的高亮会链接到相应的默认高亮。下划线高亮不
+会被链接，而是使用它们自己的默认高亮组。
+
+例如，|hl-DiagnosticSignError| 的默认高亮链接到 |hl-DiagnosticError|。要更改默认值
+（从而更改被链接的高亮），请使用 |:highlight| 命令： >vim
+
+    highlight DiagnosticError guifg="BrightRed"
+<
+                                                        *hl-DiagnosticError*
+DiagnosticError
+    用作基础高亮组。
+    其他 Diagnostic 高亮默认链接到此组（下划线除外）
+
+                                                        *hl-DiagnosticWarn*
+DiagnosticWarn
+    用作基础高亮组。
+    其他 Diagnostic 高亮默认链接到此组（下划线除外）
+
+                                                        *hl-DiagnosticInfo*
+DiagnosticInfo
+    用作基础高亮组。
+    其他 Diagnostic 高亮默认链接到此组（下划线除外）
+
+                                                        *hl-DiagnosticHint*
+DiagnosticHint
+    用作基础高亮组。
+    其他 Diagnostic 高亮默认链接到此组（下划线除外）
+
+                                                        *hl-DiagnosticOk*
+DiagnosticOk
+    用作基础高亮组。
+    其他 Diagnostic 高亮默认链接到此组（下划线除外）
+
+                                        *hl-DiagnosticVirtualTextError*
+DiagnosticVirtualTextError
+    用于 "Error" 诊断的虚拟文本。
+
+                                        *hl-DiagnosticVirtualTextWarn*
+DiagnosticVirtualTextWarn
+    用于 "Warn" 诊断的虚拟文本。
+
+                                                *hl-DiagnosticVirtualTextInfo*
+DiagnosticVirtualTextInfo
+    用于 "Info" 诊断的虚拟文本。
+
+                                                *hl-DiagnosticVirtualTextHint*
+DiagnosticVirtualTextHint
+    用于 "Hint" 诊断的虚拟文本。
+
+                                                *hl-DiagnosticVirtualTextOk*
+DiagnosticVirtualTextOk
+    用于 "Ok" 诊断的虚拟文本。
+
+                                            *hl-DiagnosticVirtualLinesError*
+DiagnosticVirtualLinesError
+    用于 "Error" 诊断的虚拟行。
+
+                                            *hl-DiagnosticVirtualLinesWarn*
+DiagnosticVirtualLinesWarn
+    用于 "Warn" 诊断的虚拟行。
+
+                                            *hl-DiagnosticVirtualLinesInfo*
+DiagnosticVirtualLinesInfo
+    用于 "Info" 诊断的虚拟行。
+
+                                            *hl-DiagnosticVirtualLinesHint*
+DiagnosticVirtualLinesHint
+    用于 "Hint" 诊断的虚拟行。
+
+                                                *hl-DiagnosticVirtualLinesOk*
+DiagnosticVirtualLinesOk
+    用于 "Ok" 诊断的虚拟行。
+
+                                                *hl-DiagnosticUnderlineError*
+DiagnosticUnderlineError
+    用于给 "Error" 诊断加下划线。
+
+                                                *hl-DiagnosticUnderlineWarn*
+DiagnosticUnderlineWarn
+    用于给 "Warn" 诊断加下划线。
+
+                                                *hl-DiagnosticUnderlineInfo*
+DiagnosticUnderlineInfo
+    用于给 "Info" 诊断加下划线。
+
+                                                *hl-DiagnosticUnderlineHint*
+DiagnosticUnderlineHint
+    用于给 "Hint" 诊断加下划线。
+
+                                                *hl-DiagnosticUnderlineOk*
+DiagnosticUnderlineOk
+    用于给 "Ok" 诊断加下划线。
+
+                                                *hl-DiagnosticFloatingError*
+DiagnosticFloatingError
+    用于给诊断floating window 中的 "Error" 诊断消息着色。
+    见 |vim.diagnostic.open_float()|
+
+                                                *hl-DiagnosticFloatingWarn*
+DiagnosticFloatingWarn
+    用于给诊断floating window 中的 "Warn" 诊断消息着色。
+
+                                                *hl-DiagnosticFloatingInfo*
+DiagnosticFloatingInfo
+    用于给诊断floating window 中的 "Info" 诊断消息着色。
+
+                                                *hl-DiagnosticFloatingHint*
+DiagnosticFloatingHint
+    用于给诊断floating window 中的 "Hint" 诊断消息着色。
+
+                                                *hl-DiagnosticFloatingOk*
+DiagnosticFloatingOk
+    用于给诊断floating window 中的 "Ok" 诊断消息着色。
+
+                                                *hl-DiagnosticSignError*
+DiagnosticSignError
+    用于标记列中的 "Error" 标记。
+
+                                                *hl-DiagnosticSignWarn*
+DiagnosticSignWarn
+    用于标记列中的 "Warn" 标记。
+
+                                                *hl-DiagnosticSignInfo*
+DiagnosticSignInfo
+    用于标记列中的 "Info" 标记。
+
+                                                *hl-DiagnosticSignHint*
+DiagnosticSignHint
+    用于标记列中的 "Hint" 标记。
+
+                                                *hl-DiagnosticSignOk*
+DiagnosticSignOk
+    用于标记列中的 "Ok" 标记。
+
+                                                *hl-DiagnosticDeprecated*
+DiagnosticDeprecated
+    用于已弃用或过时的代码。由 "underline" 处理器应用；
+    当 `vim.diagnostic.config({ underline = false })` 时禁用。
+
+                                                *hl-DiagnosticUnnecessary*
+DiagnosticUnnecessary
+    用于不必要或未使用的代码。由 "underline" 处理器应用；
+    当 `vim.diagnostic.config({ underline = false })` 时禁用。
+
+==============================================================================
+标记                                                    *diagnostic-signs*
+
+每种诊断严重级别都定义了标记。每个标记的默认文本是严重级别名称的首字母（例如
+ERROR 对应 "E"）。标记可以用 |vim.diagnostic.config()| 自定义。示例： >lua
+
+    -- Highlight entire line for errors
+    -- Highlight the line number for warnings
+    vim.diagnostic.config({
+        signs = {
+            text = {
+                [vim.diagnostic.severity.ERROR] = '',
+                [vim.diagnostic.severity.WARN] = '',
+            },
+            linehl = {
+                [vim.diagnostic.severity.ERROR] = 'ErrorMsg',
+            },
+            numhl = {
+                [vim.diagnostic.severity.WARN] = 'WarningMsg',
+            },
+        },
+    })
+
+当设置了 "severity_sort" 选项时（见 |vim.diagnostic.config()|），每个标记的优先级
+取决于其关联诊断的严重级别。否则，所有标记具有相同的优先级（取
+|vim.diagnostic.config()| 中 "signs" 表的 "priority" 选项值，未设置时为 10）。
+
+==============================================================================
+事件                                                   *diagnostic-events*
+
+                                                        *DiagnosticChanged*
+DiagnosticChanged       诊断发生变化后。在 Lua 中使用时，新诊断会通过
+                        autocmd 回调的 "data" 表传入。按 buffer 触发。
+
+示例： >lua
+
+    vim.api.nvim_create_autocmd('DiagnosticChanged', {
+      callback = function(ev)
+        local diagnostics = ev.data.diagnostics
+        vim.print(diagnostics)
+      end,
+    })
+<
+==============================================================================
+Lua 模块：vim.diagnostic                                 *diagnostic-api*
+
+*vim.Diagnostic*
+    继承：|vim.Diagnostic.Set|
+
+                                                        *diagnostic-structure*
+
+    诊断使用与 Nvim API 其余部分相同的索引方式（即行和列从 0 开始）。
+    |api-indexing|
+
+    字段： ~
+      • {bufnr}       (`integer`) Buffer 编号
+      • {col}         (`integer`) 诊断的起始列
+                      （从 0 开始索引）
+      • {end_col}     (`integer`) 诊断的结束列
+                      （从 0 开始索引）
+      • {end_lnum}    (`integer`) 诊断的结束行（从 0 开始索引）
+      • {namespace}?  (`integer`)
+      • {severity}    (`vim.diagnostic.Severity`) 诊断的严重级别
+                      |vim.diagnostic.severity|
+
+*vim.Diagnostic.Set*
+    诊断使用与 Nvim API 其余部分相同的索引方式（即行和列从 0 开始）。
+    |api-indexing|
+
+    字段： ~
+      • {code}?       (`string|integer`) 诊断代码
+      • {col}?        (`integer`，默认：`0`）诊断的起始列
+                      （从 0 开始索引）
+      • {end_col}?    (`integer`，默认：`col`）诊断的结束列
+                      （从 0 开始索引）
+      • {end_lnum}?   (`integer`，默认：`lnum`）诊断的结束行
+                      （从 0 开始索引）
+      • {lnum}        (`integer`) 诊断的起始行
+                      （从 0 开始索引）
+      • {message}     (`string`) 诊断文本
+      • {severity}?   (`vim.diagnostic.Severity`，默认：`vim.diagnostic.severity.ERROR`）
+                      诊断的严重级别 |vim.diagnostic.severity|
+      • {source}?     (`string`) 诊断的来源
+      • {user_data}?  (`any`) 插件可添加的任意数据
+
+*vim.diagnostic.GetOpts*
+    一个含有下列键的表：
+
+    字段： ~
+      • {enabled}?    (`boolean`，默认：`nil`）仅限定为已启用或已禁用的诊断。如果为
+                      nil，则忽略启用状态。见 |vim.diagnostic.enable()|
+      • {lnum}?       (`integer`) 仅限定为跨越指定行号的诊断。
+      • {namespace}?  (`integer[]|integer`) 仅限定为一个或多个命名空间。
+      • {severity}?   (`vim.diagnostic.SeverityFilter`) 见
+                      |diagnostic-severity|。
+
+*vim.diagnostic.JumpOpts*
+    继承：|vim.diagnostic.GetOpts|
+
+    含有下列键的配置表。某些参数的默认值可以用 |vim.diagnostic.config()| 更改。
+
+    字段： ~
+      • {count}?       (`integer`) 从 {pos} 开始要移动的诊断数量。正整数向前移动
+                       {count} 条诊断，负整数向后移动 {count} 条诊断。与 {diagnostic}
+                       互斥。
+      • {diagnostic}?  (`vim.Diagnostic`) 要跳转到的诊断。与 {count}、{namespace} 和
+                       {severity} 互斥。见 |vim.Diagnostic|。
+      • {on_jump}?     (`fun(diagnostic:vim.Diagnostic?, bufnr:integer)`)
+                       可选回调，以跳转到的诊断作为参数调用。
+      • {pos}?         (`[integer,integer]`) 光标位置，形式为 `(row, col)` 元组。
+                       见 |nvim_win_get_cursor()|。用于在使用 {count} 时查找最近的
+                       诊断。仅在 {count} 非 nil 时使用。默认为当前光标位置。
+      • {severity}?    (`vim.diagnostic.SeverityFilter`) 见
+                       |diagnostic-severity|。
+      • {winid}?       (`integer`，默认：`0`）Window ID
+      • {wrap}?        (`boolean`，默认：`true`）是否在文件首尾之间循环。类似于
+                       'wrapscan'。
+
+*vim.diagnostic.NS*
+
+    字段： ~
+      • {disabled}?  (`boolean`)
+      • {name}       (`string`)
+      • {opts}       (`vim.diagnostic.Opts`) 见 |vim.diagnostic.Opts|。
+      • {user_data}  (`table`)
+
+*vim.diagnostic.Opts*
+    下面许多配置选项接受下列之一：
+    • `false`：禁用此功能
+    • `true`：启用此功能，使用默认设置。
+    • `table`：启用此功能并使用覆盖值。使用空表以采用默认值。
+    • `function`：签名为 (namespace, bufnr) 的函数，返回上述任意之一。
+
+    字段： ~
+      • {float}?             (`boolean|vim.diagnostic.Opts.Float|fun(namespace?: integer|integer[], bufnr:integer): vim.diagnostic.Opts.Float`)
+                             floating window 的选项。见
+                             |vim.diagnostic.Opts.Float|。
+      • {jump}?              (`vim.diagnostic.Opts.Jump`) |vim.diagnostic.jump()| 的
+                             默认值。见 |vim.diagnostic.Opts.Jump|。
+      • {severity_sort}?     (`boolean|{reverse?:boolean}`，默认：`false`）
+                             按严重级别排序诊断。这会影响标记、虚拟文本和高亮的显示
+                             顺序。为 true 时，较高严重级别先于较低严重级别显示（例如
+                             ERROR 先于 WARN 显示）。选项：
+                             • {reverse}? (boolean) 反转排序顺序
+      • {signs}?             (`boolean|vim.diagnostic.Opts.Signs|fun(namespace: integer, bufnr:integer): vim.diagnostic.Opts.Signs`，默认：`true`）
+                             为诊断使用标记 |diagnostic-signs|。
+      • {status}?            (`vim.diagnostic.Opts.Status`) 状态栏组件的选项。见
+                             |vim.diagnostic.Opts.Status|。
+      • {underline}?         (`boolean|vim.diagnostic.Opts.Underline|fun(namespace: integer, bufnr:integer): vim.diagnostic.Opts.Underline`，默认：`true`）
+                             用于引起对诊断的注意（"underline" 是
+                             个并不准确的名称）。控制
+                             |hl-DiagnosticUnnecessary| 和
+                             |hl-DiagnosticDeprecated| 高亮。
+      • {update_in_insert}?  (`boolean`，默认：`false`）在插入模式中更新诊断（如果为
+                             `false`，诊断在 |InsertLeave| 时更新）
+      • {virtual_lines}?     (`boolean|vim.diagnostic.Opts.VirtualLines|fun(namespace: integer, bufnr:integer): vim.diagnostic.Opts.VirtualLines`，默认：`false`）
+                             为诊断使用虚拟行。
+      • {virtual_text}?      (`boolean|vim.diagnostic.Opts.VirtualText|fun(namespace: integer, bufnr:integer): vim.diagnostic.Opts.VirtualText`，默认：`false`）
+                             为诊断使用虚拟文本。如果为某个命名空间设置了多条诊断，
+                             则显示每条诊断一个前缀 + 最后一条诊断消息。
+
+*vim.diagnostic.Opts.Float*
+    继承：|vim.lsp.util.open_floating_preview.Opts|
+
+
+    字段： ~
+      • {bufnr}?          (`integer`，默认：当前 buffer）要从中显示诊断的 buffer
+                          编号。
+      • {format}?         (`fun(diagnostic:vim.Diagnostic): string?`) 一个以诊断作为
+                          输入并返回字符串或 nil 的函数。如果返回值为 nil，则该处理器
+                          不显示这条诊断。否则输出文本被用于显示该诊断。覆盖
+                          |vim.diagnostic.config()| 中的设置。
+      • {header}?         (`string|[string,any]`) 用作floating window 标题的字符串。如果是
+                          表，则被解释为 `[text, hl_group]` 元组。覆盖
+                          |vim.diagnostic.config()| 中的设置。
+      • {namespace}?      (`integer|integer[]`) 仅限定为给定命名空间中的诊断。
+      • {pos}?            (`integer|[integer,integer]`) 如果 {scope} 为 "line" 或
+                          "cursor"，则使用此位置而非光标位置。如果是数字，则解释为
+                          行号；否则为 (row, col) 元组。
+      • {prefix}?         (`string|table|(fun(diagnostic:vim.Diagnostic,i:integer,total:integer): string, string)`)
+                          为floating window 中的每条诊断添加前缀：
+                          • 如果是 `function`，{i} 是正在求值的诊断的索引，{total} 是
+                            window 中显示的诊断总数。该函数应返回一个 `string`，它会作为
+                            前缀添加到 window 中的每条诊断之前，以及一个（可选的）高亮组，
+                            用于给前缀加高亮。
+                          • 如果是 `table`，则像 |nvim_echo()| 中那样被解释为
+                            `[text, hl_group]` 元组
+                          • 如果是 `string`，则把它添加到 window 中每条诊断之前，不带
+                            高亮。覆盖 |vim.diagnostic.config()| 中的设置。
+      • {scope}?          (`'line'|'buffer'|'cursor'|'c'|'l'|'b'`，默认：
+                          `line`）显示整个 buffer（`buffer`）、当前光标行（`line`）
+                          或当前光标位置（`cursor`）的诊断。也接受简写形式（`c` 表示
+                          `cursor`，`l` 表示 `line`，`b` 表示 `buffer`）。
+      • {severity}?       (`vim.diagnostic.SeverityFilter`) 见
+                          |diagnostic-severity|。覆盖
+                          |vim.diagnostic.config()| 中的设置。
+      • {severity_sort}?  (`boolean|{reverse?:boolean}`，默认：`false`）
+                          按严重级别排序诊断。覆盖
+                          |vim.diagnostic.config()| 中的设置。
+      • {source}?         (`boolean|'if_many'`) 在消息中包含诊断来源。使用 "if_many"
+                          以仅在 buffer 中存在多个诊断来源时才显示来源。否则任何为真的
+                          值都表示始终显示诊断来源。覆盖
+                          |vim.diagnostic.config()| 中的设置。
+      • {suffix}?         (`string|table|(fun(diagnostic:vim.Diagnostic,i:integer,total:integer): string, string)`)
+                          与 {prefix} 相同，但把文本追加到诊断之后而非之前。覆盖
+                          |vim.diagnostic.config()| 中的设置。
+
+*vim.diagnostic.Opts.Jump*
+
+    字段： ~
+      • {on_jump}?   (`fun(diagnostic:vim.Diagnostic?, bufnr:integer)`)
+                     |vim.diagnostic.jump()| 的 {on_jump} 参数的默认值。
+      • {severity}?  (`vim.diagnostic.SeverityFilter`) |vim.diagnostic.jump()| 的
+                     {severity} 参数的默认值。
+      • {wrap}?      (`boolean`，默认：true）|vim.diagnostic.jump()| 的 {wrap}
+                     参数的默认值。
+
+*vim.diagnostic.Opts.Signs*
+
+    字段： ~
+      • {linehl}?    (`table<vim.diagnostic.Severity,string>`) 一个把
+                     |diagnostic-severity| 映射到标记所在整行所用高亮组的表。
+      • {numhl}?     (`table<vim.diagnostic.Severity,string>`) 一个把
+                     |diagnostic-severity| 映射到标记所在行号所用高亮组的表。
+      • {priority}?  (`integer`，默认：`10`）用于标记的基础优先级。使用
+                     {severity_sort} 时，标记的优先级会根据其严重级别调整。否则所有
+                     标记使用相同的优先级。
+      • {severity}?  (`vim.diagnostic.SeverityFilter`) 仅为匹配给定严重级别的诊断
+                     显示标记 |diagnostic-severity|
+      • {text}?      (`table<vim.diagnostic.Severity,string>`) 一个把
+                     |diagnostic-severity| 映射到在标记列和状态栏中显示的标记文本的
+                     表。默认情况下，错误、警告、信息和提示分别使用 `"E"`、`"W"`、
+                     `"I"` 和 `"H"`。示例： >lua
+                         vim.diagnostic.config({
+                           signs = { text = { [vim.diagnostic.severity.ERROR] = 'E', ... } }
+                         })
+<
+
+*vim.diagnostic.Opts.Status*
+
+    字段： ~
+      • {format}?  (`fun(counts:table<vim.diagnostic.Severity,integer>): string`)
+                   一个接受 |diagnostic-severity| 到相应严重级别诊断数量（仅包含至少
+                   有 1 条诊断的级别）的映射、并返回 'statusline' 组件的函数。高亮必须
+                   由 `format` 函数应用。示例： >lua
+                       local signs = {
+                         [vim.diagnostic.severity.ERROR] = "A",
+                         -- ...
+                       }
+                       local hl_map = {
+                         [vim.diagnostic.severity.ERROR] = 'DiagnosticSignError',
+                         -- ...
+                       }
+                       vim.diagnostic.config({
+                         status = {
+                           format = function(severity_counts)
+                             local items = {}
+                             for severity in ipairs(vim.diagnostic.severity) do
+                               local count = severity_counts[severity] or 0
+                               table.insert(items, ("%%#%s#%s %s"):format(hl_map[severity], signs[severity], count))
+                             end
+                             return table.concat(items, " ")
+                           end
+                         }
+                       })
+<
+
+*vim.diagnostic.Opts.Underline*
+
+    字段： ~
+      • {severity}?  (`vim.diagnostic.SeverityFilter`) 仅为匹配给定严重级别的诊断加
+                     下划线 |diagnostic-severity|。
+
+*vim.diagnostic.Opts.VirtualLines*
+
+    字段： ~
+      • {current_line}?  (`boolean`，默认：`false`）仅显示当前行的诊断。
+      • {format}?        (`fun(diagnostic:vim.Diagnostic): string?`) 一个以诊断作为
+                         输入并返回字符串或 nil 的函数。如果返回值为 nil，则该处理器
+                         不显示这条诊断。否则输出文本被用于显示该诊断。
+      • {severity}?      (`vim.diagnostic.SeverityFilter`) 仅为匹配给定严重级别的诊断
+                         显示虚拟行 |diagnostic-severity|
+
+*vim.diagnostic.Opts.VirtualText*
+
+    字段： ~
+      • {current_line}?       (`boolean`) 根据当前光标行显示或隐藏诊断。如果为
+                              `true`，则只显示当前光标行上的诊断。如果为 `false`，
+                              则显示当前光标行之外的所有诊断。如果为 `nil`，则显示
+                              所有诊断。（默认 `nil`）
+      • {format}?             (`fun(diagnostic:vim.Diagnostic): string?`) 如果不为
+                              nil，返回值即用于显示该诊断的文本。示例： >lua
+                                  function(diagnostic)
+                                    if diagnostic.severity == vim.diagnostic.severity.ERROR then
+                                      return string.format("E: %s", diagnostic.message)
+                                    end
+                                    return diagnostic.message
+                                  end
+<
+
+                              如果返回值为 nil，则该处理器不显示这条诊断。
+      • {hl_mode}?            (`'replace'|'combine'|'blend'`) 见
+                              |nvim_buf_set_extmark()|。
+      • {prefix}?             (`string|(fun(diagnostic:vim.Diagnostic,i:integer,total:integer): string)`)
+                              为诊断消息添加前缀。如果是 `function`，{i} 是正在求值
+                              的诊断的索引，{total} 是该行诊断的总数。这可用于渲染诊断
+                              符号或错误代码。
+      • {severity}?           (`vim.diagnostic.SeverityFilter`) 仅为匹配给定严重级别
+                              的诊断显示虚拟文本 |diagnostic-severity|
+      • {source}?             (`boolean|"if_many"`) 在虚拟文本中包含诊断来源。使用
+                              `'if_many'` 以仅在 buffer 中存在多个诊断来源时才显示来源。
+                              否则任何为真的值都表示始终显示诊断来源。
+      • {spacing}?            (`integer`) 在虚拟文本开头插入的空格数量。
+      • {suffix}?             (`string|(fun(diagnostic:vim.Diagnostic): string)`)
+                              为诊断消息添加后缀。这可用于渲染 LSP 诊断错误代码。
+      • {virt_text}?          (`[string,any][]`) 见 |nvim_buf_set_extmark()|。
+      • {virt_text_hide}?     (`boolean`) 见 |nvim_buf_set_extmark()|。
+      • {virt_text_pos}?      (`'eol'|'eol_right_align'|'inline'|'overlay'|'right_align'`)
+                              见 |nvim_buf_set_extmark()|。
+      • {virt_text_win_col}?  (`integer`) 见 |nvim_buf_set_extmark()|。
+
+
+config({opts}, {namespace})                          *vim.diagnostic.config()*
+    全局或为特定诊断命名空间配置诊断选项。
+
+    配置可以全局指定、按命名空间指定，或临时指定（即仅对一次
+    |vim.diagnostic.set()| 或 |vim.diagnostic.show()| 调用生效）。临时配置优先级
+    最高，其次是命名空间配置，最后是全局配置。
+
+    例如，如果用户用下面的代码全局启用虚拟文本 >lua
+        vim.diagnostic.config({ virtual_text = true })
+<
+
+    而某个诊断生产者用下面的代码设置诊断 >lua
+        vim.diagnostic.set(ns, 0, diagnostics, { virtual_text = false })
+<
+
+    那么虚拟文本不会为那些诊断启用。
+
+    参数： ~
+      • {opts}       (`vim.diagnostic.Opts?`) 省略或为 `nil` 时，获取当前配置。否则
+                     为一个配置表（见 |vim.diagnostic.Opts|）。
+      • {namespace}  (`integer?`) 更新给定命名空间的选项。省略时，更新全局诊断选项。
+
+    返回： ~
+        (`vim.diagnostic.Opts?`) 如果省略 {opts}，返回当前诊断配置。
+        见 |vim.diagnostic.Opts|。
+
+count({bufnr}, {opts})                                *vim.diagnostic.count()*
+    获取当前诊断数量。
+
+    参数： ~
+      • {bufnr}  (`integer?`) 要从中获取诊断的 buffer 编号。使用 0 表示当前
+                 buffer，或 nil 表示所有 buffer。
+      • {opts}   (`vim.diagnostic.GetOpts?`) 见 |vim.diagnostic.GetOpts|。
+
+    返回： ~
+        (`table<integer, integer>`) 以实际存在的严重级别值（见
+        |diagnostic-severity|）为键、以整数计数为值的表。
+
+enable({enable}, {filter})                           *vim.diagnostic.enable()*
+    启用或禁用诊断。
+
+    要"切换"，请传入 `is_enabled()` 的相反值： >lua
+        vim.diagnostic.enable(not vim.diagnostic.is_enabled())
+<
+
+    参数： ~
+      • {enable}  (`boolean?`) true/nil 表示启用，false 表示禁用
+      • {filter}  (`table?`) 可选的过滤器 |kwargs|，或 `nil` 表示全部。
+                  • {bufnr}? (`integer`) Buffer 编号，0 表示当前 buffer，`nil` 表示
+                    所有 buffer。
+                  • {ns_id}? (`integer`) 诊断命名空间，`nil` 表示全部。
+
+fromqflist({list}, {opts})                       *vim.diagnostic.fromqflist()*
+    把 quickfix 条目列表转换为诊断列表。
+
+    参数： ~
+      • {list}  (`vim.quickfix.entry[]`) 来自 |getqflist()| 或 |getloclist()| 的
+                quickfix 条目列表。
+      • {opts}  (`table?`) 含有下列键的配置表：
+                • {merge_lines}? (`boolean`) 为 true 时，valid=0 的条目会以换行符
+                  追加到前一个有效条目的消息之后。（默认：false）
+
+    返回： ~
+        (`vim.Diagnostic[]`) 见 |vim.Diagnostic|。
+
+get({bufnr}, {opts})                                    *vim.diagnostic.get()*
+    获取当前诊断。
+
+    修改返回表中的诊断不会产生任何效果。要在 buffer 中设置诊断，请使用
+    |vim.diagnostic.set()|。
+
+    参数： ~
+      • {bufnr}  (`integer?`) 要从中获取诊断的 buffer 编号。使用 0 表示当前
+                 buffer，或 nil 表示所有 buffer。
+      • {opts}   (`vim.diagnostic.GetOpts?`) 见 |vim.diagnostic.GetOpts|。
+
+    返回： ~
+        (`vim.Diagnostic[]`) 保证存在 `bufnr`、`end_lnum`、`end_col` 和 `severity`
+        字段。见 |vim.Diagnostic|。
+
+get_namespace({namespace})                    *vim.diagnostic.get_namespace()*
+    获取命名空间元数据。
+
+    参数： ~
+      • {namespace}  (`integer`) 诊断命名空间
+
+    返回： ~
+        (`vim.diagnostic.NS`) 命名空间元数据。见 |vim.diagnostic.NS|。
+
+get_namespaces()                             *vim.diagnostic.get_namespaces()*
+    获取当前诊断命名空间。
+
+    返回： ~
+        (`table<integer,vim.diagnostic.NS>`) 活动诊断命名空间列表
+        |vim.diagnostic|。
+
+get_next({opts})                                   *vim.diagnostic.get_next()*
+    获取最接近光标位置的下一条诊断。
+
+    参数： ~
+      • {opts}  (`vim.diagnostic.JumpOpts?`) 见 |vim.diagnostic.JumpOpts|。
+
+    返回： ~
+        (`vim.Diagnostic?`) 下一条诊断。见 |vim.Diagnostic|。
+
+get_prev({opts})                                   *vim.diagnostic.get_prev()*
+    获取最接近光标位置的上一条诊断。
+
+    参数： ~
+      • {opts}  (`vim.diagnostic.JumpOpts?`) 见 |vim.diagnostic.JumpOpts|。
+
+    返回： ~
+        (`vim.Diagnostic?`) 上一条诊断。见 |vim.Diagnostic|。
+
+hide({namespace}, {bufnr})                             *vim.diagnostic.hide()*
+    隐藏当前显示的诊断。
+
+    这只会清除 buffer 中显示的装饰。诊断可以用 |vim.diagnostic.show()| 重新显示。
+    要彻底移除诊断，请使用 |vim.diagnostic.reset()|。
+
+    要隐藏诊断并防止它们重新显示，请使用 |vim.diagnostic.enable()|。
+
+    参数： ~
+      • {namespace}  (`integer?`) 诊断命名空间。省略时，隐藏所有命名空间的诊断。
+      • {bufnr}      (`integer?`) Buffer 编号，0 表示当前 buffer。省略时，隐藏所有
+                     buffer 中的诊断。
+
+is_enabled({filter})                             *vim.diagnostic.is_enabled()*
+    检查诊断是否已启用。
+
+    属性： ~
+        自：0.10.0
+
+    参数： ~
+      • {filter}  (`table?`) 可选的过滤器 |kwargs|，或 `nil` 表示全部。
+                  • {bufnr}? (`integer`) Buffer 编号，0 表示当前 buffer，`nil` 表示
+                    所有 buffer。
+                  • {ns_id}? (`integer`) 诊断命名空间，`nil` 表示全部。
+
+    返回： ~
+        (`boolean`)
+
+jump({opts})                                           *vim.diagnostic.jump()*
+    移动到一条诊断。
+
+    参数： ~
+      • {opts}  (`vim.diagnostic.JumpOpts`) 见 |vim.diagnostic.JumpOpts|。
+
+    返回： ~
+        (`vim.Diagnostic?`) 移动到的诊断。见 |vim.Diagnostic|。
+
+                                                      *vim.diagnostic.match()*
+match({str}, {pat}, {groups}, {severity_map}, {defaults})
+    从字符串解析诊断。
+
+    例如，考虑 linter 输出中的一行： >
+        WARNING filename:27:3: Variable 'foo' does not exist
+<
+
+    可以用下面的代码把它解析为 |vim.Diagnostic| 结构： >lua
+        local s = "WARNING filename:27:3: Variable 'foo' does not exist"
+        local pattern = "^(%w+) %w+:(%d+):(%d+): (.+)$"
+        local groups = { "severity", "lnum", "col", "message" }
+        vim.diagnostic.match(s, pattern, groups, { WARNING = vim.diagnostic.WARN })
+<
+
+    参数： ~
+      • {str}           (`string`) 要从中解析诊断的字符串。
+      • {pat}           (`string`) 带捕获组的 Lua 模式。
+      • {groups}        (`string[]`) |vim.Diagnostic| 结构中要与 {pat} 的捕获关联的
+                        字段列表。
+      • {severity_map}  (`table`) 一个把 {groups} 中的 severity 字段映射到
+                        |vim.diagnostic.severity| 中某一项的表。
+      • {defaults}      (`table?`) 任何未在 {groups} 中列出的字段的默认值表。省略时，
+                        数值默认为 0，"severity" 默认为 ERROR。
+
+    返回： ~
+        (`vim.Diagnostic?`) |vim.Diagnostic| 结构，如果 {pat} 无法匹配 {str} 则为
+        `nil`。
+
+open_float({opts})                               *vim.diagnostic.open_float()*
+    在floating window 中显示诊断。
+
+    参数： ~
+      • {opts}  (`vim.diagnostic.Opts.Float?`) 见
+                |vim.diagnostic.Opts.Float|。
+
+    返回（多个）： ~
+        (`integer?`) float_bufnr
+        (`integer?`) winid
+
+reset({namespace}, {bufnr})                           *vim.diagnostic.reset()*
+    移除给定命名空间中的所有诊断。
+
+    与 |vim.diagnostic.hide()| 不同，该函数会移除所有保存的诊断。它们无法用
+    |vim.diagnostic.show()| 重新显示。如果只想移除诊断装饰并仍能重新显示它们，请
+    使用 |vim.diagnostic.hide()|。
+
+    参数： ~
+      • {namespace}  (`integer?`) 诊断命名空间。省略时，移除所有命名空间的诊断。
+      • {bufnr}      (`integer?`) 移除给定 buffer 的诊断。省略时，移除所有 buffer 的
+                     诊断。
+
+set({namespace}, {bufnr}, {diagnostics}, {opts})        *vim.diagnostic.set()*
+    为给定命名空间和 buffer 设置诊断。
+
+    参数： ~
+      • {namespace}    (`integer`) 诊断命名空间
+      • {bufnr}        (`integer`) Buffer 编号
+      • {diagnostics}  (`vim.Diagnostic.Set[]`) 见 |vim.Diagnostic.Set|。
+      • {opts}         (`vim.diagnostic.Opts?`) 传给 |vim.diagnostic.show()| 的显示
+                       选项。见 |vim.diagnostic.Opts|。
+
+setloclist({opts})                               *vim.diagnostic.setloclist()*
+    把 buffer 诊断添加到位置列表。
+
+    参数： ~
+      • {opts}  (`table?`) 含有下列键的配置表：
+                • {format}? (`fun(diagnostic:vim.Diagnostic): string?`) 一个以诊断
+                  作为输入并返回字符串或 nil 的函数。如果返回值为 nil，则该诊断不会
+                  显示在位置列表中。否则输出文本被用于显示该诊断。
+                • {namespace}? (`integer[]|integer`) 仅添加来自给定命名空间的诊断。
+                • {open}? (`boolean`，默认：`true`）设置后打开位置列表。
+                • {severity}? (`vim.diagnostic.SeverityFilter`) 见
+                  |diagnostic-severity|。
+                • {title}? (`string`) 位置列表的标题。默认为 "Diagnostics"。
+                • {winnr}? (`integer`，默认：`0`）要为其设置位置列表的 window
+                  编号。
+
+setqflist({opts})                                 *vim.diagnostic.setqflist()*
+    把所有诊断添加到 quickfix 列表。
+
+    参数： ~
+      • {opts}  (`table?`) 含有下列键的配置表：
+                • {format}? (`fun(diagnostic:vim.Diagnostic): string?`) 一个以诊断
+                  作为输入并返回字符串或 nil 的函数。如果返回值为 nil，则该诊断不会
+                  显示在 quickfix 列表中。否则输出文本被用于显示该诊断。
+                • {namespace}? (`integer[]|integer`) 仅添加来自给定命名空间的诊断。
+                • {open}? (`boolean`，默认：`true`）设置后打开 quickfix 列表。
+                • {severity}? (`vim.diagnostic.SeverityFilter`) 见
+                  |diagnostic-severity|。
+                • {title}? (`string`) quickfix 列表的标题。默认为 "Diagnostics"。
+                  如果已存在使用该标题的 quickfix 列表，则更新它。如果不存在，则创建
+                  新的 quickfix 列表。
+
+                                                       *vim.diagnostic.show()*
+show({namespace}, {bufnr}, {diagnostics}, {opts})
+    为给定命名空间和 buffer 显示诊断。
+
+    参数： ~
+      • {namespace}    (`integer?`) 诊断命名空间。省略时，显示所有命名空间的诊断。
+      • {bufnr}        (`integer?`) Buffer 编号，0 表示当前 buffer。省略时，显示所有
+                       buffer 中的诊断。
+      • {diagnostics}  (`vim.Diagnostic[]?`) 要显示的诊断。省略时，使用给定命名空间
+                       和 buffer 已保存的诊断。这可用于在不保存的情况下显示一组诊断，
+                       或只显示诊断的一个子集。当 {namespace} 或 {bufnr} 为 nil 时
+                       不可使用。见 |vim.Diagnostic|。
+      • {opts}         (`vim.diagnostic.Opts?`) 显示选项。见
+                       |vim.diagnostic.Opts|。
+
+status({bufnr})                                      *vim.diagnostic.status()*
+    返回当前 buffer 诊断的格式化字符串。诊断数为 0 的严重级别会被省略。例如
+    `E:2 W:3 I:4 H:5`
+
+    要自定义外观，见 |vim.diagnostic.Opts.Status|。
+
+    参数： ~
+      • {bufnr}  (`integer?`) 要从中获取诊断的 buffer 编号。默认为 0，即当前
+                 buffer
+
+    返回： ~
+        (`string`)
+
+toqflist({diagnostics})                            *vim.diagnostic.toqflist()*
+    把诊断列表转换为可传给 |setqflist()| 或 |setloclist()| 的 quickfix 条目列表。
+
+    参数： ~
+      • {diagnostics}  (`vim.Diagnostic[]`) 见 |vim.Diagnostic|。
+
+    返回： ~
+        (`table[]`) Quickfix 列表条目 |setqflist-what|
+
+
+ vim:tw=78:ts=8:sw=4:sts=4:et:ft=help:norl:

@@ -1,0 +1,455 @@
+*helphelp.txt*	Nvim
+
+
+		  VIM REFERENCE MANUAL	  by Bram Moolenaar
+
+
+帮助文件的帮助					*helphelp*
+
+                                      输入 |gO| 查看目录。
+
+==============================================================================
+帮助标签约定					*help-context*
+
+获取特定帮助：可以给 |:help| 命令一个参数，直接跳到你想查询帮助的对象上。
+在参数前加上某种前缀即可指定上下文。如下所示： >
+
+	  WHAT			PREPEND    EXAMPLE
+      Normal mode command		   :help x
+      Visual mode command	  v_	   :help v_u
+      Insert mode command	  i_	   :help i_<Esc>
+      Command-line command	  :	   :help :quit
+      Command-line editing	  c_	   :help c_<Del>
+      Vim command argument	  -	   :help -r
+      Option			  '	   :help 'textwidth'
+      Regular expression	  /	   :help /[
+
+更多上下文与说明见 |help-summary|。
+帮助语法的说明见 |notation|。
+
+搜索帮助
+
+输入 ":help word"，然后按 CTRL-D 查看与 "word" 匹配的帮助条目。也可以
+使用 ":helpgrep word"。|:helpgrep|
+
+==============================================================================
+记号约定						*notation*
+
+使用语法高亮阅读本文时，并非按字面输入的文字通常以 Special 高亮组显示。
+这些是 []、{}、<> 中的条目，以及 CTRL-X。
+
+注意 Vim 会在命令中用到一切可能的字符。有时 []、{} 和 <> 本身就是你要输入的
+内容，上下文应当能说明这一点。
+
+
+- []            方括号内的字符是可选的。
+
+                                                    *count* *[count]*
+- [count]       一个可选数字，可以放在命令之前，用来把命令重复执行若干次。如果
+                未给出数字，且没有其他说明，则计数为一。注意本手册在命令的说明
+                部分不会提到 [count]，只在解释中提及。这样做是为了让命令更容易
+                查阅。如果打开了 'showcmd' 选项，已（部分）输入的计数会显示在
+                window 底部。你可以用 <Del> 删除最后一位数字（|N<Del>|）。
+
+                                                        *[quotex]*
+- ["x]          一个可选的 register 标记，文本可以存放在其中。见 |registers|。
+                x 是 'a' 到 'z'、'A' 到 'Z' 或 '"' 之间的单个字符，某些情况下
+                （使用 put 命令时）也可以是 '0' 到 '9'、'%'、'#' 等。
+                大写字母和小写字母指定同一个 register，但小写字母会覆盖
+                register 原有的内容，而大写字母会追加到原有内容之后。没有 ""x"
+                或使用 """" 时，所存储的文本会被放入无名 register。
+
+                                                        *{}*
+- {}            花括号表示命令中必须出现的部分，但它可以取多种不同的值。Vim 与
+                Vi 之间的差异也用花括号给出（从上下文可以看明白）。
+
+                                                        *{char1-char2}*
+- {char1-char2} 从 char1 到 char2 范围内的单个字符。例如：{a-z} 是一个小写
+                字母。可以连接多个范围。例如，{a-zA-Z0-9} 是任意字母数字字符。
+
+                                                *{motion}* *movement*
+- {motion}      移动光标的命令。这些在 |motion.txt| 中说明。
+                - 示例：
+                  - `w`           移到下一个单词的开头
+                  - `b`           移到当前单词的开头
+                  - `4j`          向下移动四行
+                  - `/The<CR>`    移到下一处 "The"
+                - 它用在 |operator| 命令之后，用于移过将被操作的文本。
+                  - 如果移动带有计数，而操作符也带有计数，则两个计数相乘。例如：
+                    "2d3w" 删除六个单词。
+                  - 移动可以反向，例如 "db" 删除到单词开头。
+                  - 移动也可以是鼠标点击。不过并非所有终端都支持鼠标。
+                  - ":omap" 命令可用于在操作符待决时映射字符。
+                  - Ex 命令可用于移动光标。这可用于调用执行复杂移动的函数。
+                    不论使用什么 ":" 命令，该移动总是按字符的且不包含末尾字符。
+                    这意味着若不带上换行符，就无法把一行的最后一个字符包含进来
+                    （除非设置了 'virtualedit'）。如果 Ex 命令改变了操作符起始处
+                    之前的文本，或跳转到另一个 buffer，结果不可预测。改变更靠后
+                    的文本是可能的。只要当前 buffer 未被卸载，跳转到另一个 buffer
+                    也是可能的。
+
+                                                        *{Visual}*
+- {Visual}      被选中的文本区域。它用 "v"、"V" 或 CTRL-V 命令开始，然后可以
+                使用任何光标移动命令来改变选中文本的末尾。
+                它用在 |operator| 命令之前，用于高亮将被操作的文本。
+                见 |Visual-mode|。
+
+                                                        *<character>*
+- <character>   下表中的特殊字符，可以带修饰键，也可以是带修饰键的单个
+                ASCII 字符。
+
+                                                        *'character'*
+- 'c'           单个 ASCII 字符。
+
+                                                        *CTRL-{char}*
+- CTRL-{char}   {char} 作为控制字符输入；也就是按住 CTRL 键的同时输入 {char}。
+                {char} 的大小写被忽略，因此 CTRL-A 和 CTRL-a 等价。但在某些
+                终端和环境中，使用 SHIFT 键会产生不同的编码（例如 CTRL-SHIFT-a）；
+                在这些环境中，使用 SHIFT 键不会触发 CTRL-A 这类命令。
+
+                                                        *'option'*
+- 'option'      可以设为某个值的选项（或称参数），用单引号括起来。见 |options|。
+
+                                                        *quotecommandquote*
+- "command"     对可以输入的命令的引用用双引号括起来。
+- `command`     新式命令写法，以此区别于其他带引号的文本和字符串。
+
+==============================================================================
+帮助命令						*online-help*
+
+			*help* *<Help>* *:h* *:help* *<F1>* *i_<F1>* *i_<Help>*
+<Help>		或
+:h[elp]			打开一个 window，以只读模式显示帮助文件。
+			如果已经打开了一个 help window，就使用那个。否则，如果当前
+			window 使用了屏幕的整个宽度，或者至少有 80 个字符宽，
+			help window 会出现在当前 window 的正上方。否则新 window
+			会放在最顶端。
+			如果主帮助文件有多种语言版本，用 'helplang' 选项选择语言。
+
+			输入 |gO| 查看目录。
+
+							*:help!*
+:h[elp]!		从光标处的 |WORD| 猜测帮助标签，采用 DWIM（"Do What I
+			Mean"，即"做我想做的"）方式：用各种启发式规则去掉标点，
+			直到找到有效的帮助标签。
+
+			例如，把光标移到下面这段代码中的任意位置，然后运行
+			`:help!`： >
+
+				local v = vim.version.parse(vim.system({'foo'}):wait().stdout)
+<
+			然后与 `:exe 'help' expand('<cword>')` 比较。
+
+						*{subject}* *E149* *E661*
+:h[elp] {subject}	类似 ":help"，此外还跳转到标签 {subject}。
+			例如： >
+				:help options
+
+<			{subject} 可以包含通配符，如 "*"、"?" 和
+			"[a-z]"：
+			   :help z?	跳转到任意 "z" 命令的帮助
+			   :help z.	跳转到 "z." 的帮助
+			但当标签存在时，会按字面处理：
+			   :help :?	跳转到 ":?" 的帮助
+
+			如果该模式没有完全匹配项，或者有多个匹配项，会采用"最佳"匹配。
+			判定哪个匹配更好使用了一套复杂的算法。计算时考虑以下因素：
+			- 大小写相同的匹配比大小写不同的匹配好得多。
+			- 从非字母数字字符之后开始的匹配，比单词中间的匹配更好。
+			- 位于标签开头或靠近开头的匹配比靠后的匹配更好。
+			- 匹配上的字母数字字符越多越好。
+			- 匹配的长度越短越好。
+
+			如果 {subject} 有多种语言版本，'helplang' 选项用于选择语言。
+			要在特定语言中查找标签，请追加 "@ab"，其中 "ab" 是两字母语言代码。
+			见 |help-translated|。
+
+			注意你给出的 {subject} 越长，找到的匹配就越少。你可以通过命令行补全
+			来了解这一切是如何工作的（在 ":help subject" 之后按 CTRL-D
+			|c_CTRL-D|）。
+			如果有多个匹配，按 CTRL-D 可以把它们列出来。例如： >
+				:help cont<Ctrl-D>
+
+<			与其输入 ":help CTRL-V" 来查找 CTRL-V 的帮助，
+			不如直接输入： >
+				:help ^V
+<			这对其他字符同样适用，例如在 Insert 模式下查找
+			CTRL-V 的帮助： >
+				:help i^V
+<
+			也可以先执行 ":help"，然后在 help window 中使用
+			":tag {pattern}"。之后可以用 ":tnext" 命令跳转到其他
+			匹配项，用 "tselect" 列出匹配项并选择一个。 >
+				:help index
+				:tselect /.*mode
+
+<			不给参数时，你会看到与 "help" 匹配的内容，以免列出所有
+			可能的匹配（那会非常慢）。
+			显示的匹配数量限制为 300。
+
+			`:help` 命令后面可以跟 '|' 和另一条命令，但在 help
+			命令内部不需要对 '|' 进行转义。所以下面两种写法都可以： >
+				:help |
+				:help k| only
+<			注意 '|' 前面的空格会被视为 ":help" 参数的一部分。
+			也可以用 <NL> 或 <CR> 把 help 命令与后面的命令分开。
+			你需要先输入 CTRL-V 来插入 <NL> 或 <CR>。例如： >
+				:help so<C-V><CR>only
+<
+
+:h[elp]! {subject}	类似 ":help"，但优先选择与当前文件语言相同的
+			|help-translated| 标签。
+
+			与 |:help!|（不带 {subject}）无关。
+
+							*:helpc* *:helpclose*
+:helpc[lose]		关闭一个 help window（如果有的话）。
+			Vim 会尝试把 window 布局（包括光标位置）恢复为最初打开
+			help window 之前的布局。这可能会触发若干自动命令。
+
+							*:helpg* *:helpgrep*
+:helpg[rep] {pattern}[@xx]
+			搜索所有帮助文本文件，列出其中 {pattern} 匹配的行。跳转到第一个匹配处。
+			可选的 [@xx] 指定只查找 "xx" 语言中的匹配。
+			你可以用 |quickfix| 命令浏览这些匹配，例如用 |:cnext| 跳到下一个。
+			或者用 |:cwindow| 在 quickfix window 中获取匹配列表。
+			{pattern} 用作 Vim 正则表达式 |pattern|。
+			不使用 'ignorecase'，可以加入 "\c" 来忽略大小写。
+			区分大小写搜索的示例： >
+				:helpgrep Uganda
+<			忽略大小写搜索的示例： >
+				:helpgrep uganda\c
+<			在法语帮助中搜索的示例： >
+				:helpgrep backspace@fr
+<			该模式不支持换行，必须在一行内匹配。你可以改用 |:grep|，
+			但那样就需要用复杂的方式获取帮助文件列表。
+			后面不能跟另一条命令，所有内容都被当作模式的一部分。但需要时
+			可以使用 |:execute|。
+			压缩的帮助文件不会被搜索（Fedora 会压缩帮助文件）。
+
+							*:lh* *:lhelpgrep*
+:lh[elpgrep] {pattern}[@xx]
+			与 ":helpgrep" 相同，只是使用位置列表而非 quickfix 列表。
+			如果 help window 已经打开，则使用该 window 的位置列表。
+			否则会打开一个新的 help window，并设置该 window 的位置
+			列表。此时当前 window 的位置列表不会被改变。
+
+							*:exu* *:exusage*
+:exu[sage]		显示 Ex 命令的帮助。加入此命令是为了模拟 Nvi 的
+			同名命令。
+
+							*:viu* *:viusage*
+:viu[sage]		显示 Normal 模式命令的帮助。加入此命令是为了模拟
+			Nvi 的同名命令。
+
+|:help| 不带参数时，会打开 'helpfile' 选项指定的文件。否则会在 'runtimepath'
+选项所指定目录中的所有 "doc/tags" 文件里搜索指定的标签。
+
+如果你希望在当前 window 中打开帮助，请看这个提示：|help-curwin|。
+
+help window 的初始高度可以用 'helpheight' 选项设置（默认 20）。
+						*help-buffer-options*
+创建 help buffer 时，会设置若干局部选项，以确保帮助文本按预期显示：
+    'iskeyword'		除 ' '、"*"、'"' 和 '|' 之外几乎所有 ASCII 字符
+    'foldmethod'	"manual"
+    'tabstop'		8
+    'arabic'		关闭
+    'binary'		关闭
+    'buflisted'		关闭
+    'cursorbind'	关闭
+    'diff'		关闭
+    'foldenable'	关闭
+    'list'		关闭
+    'modifiable'	关闭
+    'number'		关闭
+    'relativenumber'	关闭
+    'rightleft'		关闭
+    'scrollbind'	关闭
+    'spell'		关闭
+
+用标签跳转到特定主题。可以用两种方式做到：
+- 站在命令或选项的名称上，使用 "CTRL-]" 命令。这仅在标签是关键字时有
+  效。"<C-Leftmouse>" 和 "g<LeftMouse>" 的作用与 "CTRL-]" 相同。
+- 使用 ":ta {subject}" 命令。这对非关键字的字符也有效。
+
+用 CTRL-T 或 CTRL-O 跳回。
+用 ":q" 关闭 help window。
+用 `g==` 执行当前的 Lua/Vimscript 代码块。
+
+如果你要查找的条目有多个匹配项，可以这样跳到其中的每一个：
+1. 打开一个 help window
+2. 使用 ":tag" 命令，并在标签前加一个斜杠。例如： >
+	:tag /min
+3. 使用 ":tnext" 跳到下一个匹配的标签。
+
+可以为插件和其他内容添加帮助文件。你无需为此修改随发行版分发的
+帮助文件。见 |add-local-help|。
+
+要编写本地帮助文件，见 |write-local-help|。
+
+注意，本地帮助文件的标题行会自动加入 "help.txt" 帮助文件的
+"LOCAL ADDITIONS" 小节 |local-additions|。这发生在用 Vim 查看该文件时，
+文件本身不会被改动。做法是遍历所有帮助文件，取每个文件的第一行。
+$VIMRUNTIME/doc 中的文件会被跳过。
+
+					*:helpt* *:helptags*
+			*E150* *E151* *E152* *E153* *E154* *E670* *E856*
+:helpt[ags] [++t] {dir}
+			为目录 {dir} 生成帮助标签文件。
+			当 {dir} 为 ALL 时，将使用 'runtimepath' 中的
+			所有 "doc" 目录。
+
+			该目录及其子目录中所有 "*.txt" 和 "*.??x" 文件都会被扫描，
+			查找星号之间的帮助标签定义。"*.??x" 文件用于翻译过的文档，
+			它们会生成 "tags-??" 文件，见 |help-translated|。生成的标签文件
+			会被排序。
+			出现重复时会给出错误消息。
+			已存在的标签文件会被静默覆盖。
+
+			可选的 "++t" 参数会强制加入 "help-tags" 标签。当 {dir} 等于
+			$VIMRUNTIME/doc 时也会这样做。
+
+			要重建 runtime 目录中的帮助标签（需要对该目录有写权限）： >
+				:helptags $VIMRUNTIME/doc
+<
+
+
+==============================================================================
+翻译后的帮助文件					*help-translated*
+
+可以在原始英文帮助文件之外添加翻译后的帮助文件。Vim 会在 'runtimepath'
+中的所有 "doc" 目录里搜索帮助。
+
+目前可用的翻译有：
+	中文     - 多位作者
+	法语     - 由 David Blanchet 翻译
+	意大利语 - 由 Antonio Colombo 翻译
+	日语     - 多位作者
+	波兰语   - 由 Mikolaj Machowski 翻译
+	俄语     - 由 Vassily Ragosin 翻译
+在 Vim 网站上可以找到它们：https://www.vim.org/translations.php
+
+一套翻译后的帮助文件由以下文件组成：
+
+	help.abx
+	howto.abx
+	...
+	tags-ab
+
+"ab" 是两字母语言代码。因此意大利语的文件名是：
+
+	help.itx
+	howto.itx
+	...
+	tags-it
+
+'helplang' 选项可以设为偏好的语言。默认值根据环境设置。Vim 会先在偏好语言
+中查找匹配的标签。找不到时会使用英语。
+
+要在特定语言中查找标签，请在标签后追加 "@ab"，其中 "ab" 是两字母语言代码。
+例如： >
+	:he user-manual@it
+	:he user-manual@en
+第一个会找到意大利语的用户手册，即使 'helplang' 为空。第二个会找到英语的
+用户手册，即使 'helplang' 设为 "it"。
+
+对 ":help" 命令使用命令行补全时，只有当某个标签存在多种语言版本时才会显示
+"@en" 扩展名。如果该标签只有英语版本，则省略 "@en"。如果第一个候选项带
+有 "@ab" 扩展名，且它匹配 'helplang' 中的第一种语言，也会省略 "@ab"。
+
+在非英语帮助文件中使用 |CTRL-]| 或 ":help!" 时，Vim 会尝试在相同语言中查找
+该标签。如果找不到，则用 'helplang' 来选择语言。
+
+帮助文件必须使用 latin1 或 utf-8 编码。当在第一行发现非 ASCII 字符时，Vim 会
+假定编码为 utf-8。因此你必须翻译带有 "For Vim version" 的页眉。
+
+同一目录中同一语言的帮助文件必须使用相同的编码。不同语言可以使用不同的编码，
+同一语言但位于不同目录的帮助文件也可以使用不同的编码。
+
+给译者的提示：
+- 不要翻译标签。这样才能用 'helplang' 指定偏好的语言。你可以在自己的语言中
+  添加新标签。
+- 如果你没有翻译文件中的某一部分，请用 "tag@en" 记法把标签加到英文版本上。
+- 把所有文件和标签文件打包，提供下载。用户可以把它放进某个 "doc" 目录并开始
+  使用。请向开发团队报告，以便他们在 www.vim.org 上添加链接。
+- 使用 |:helptags| 命令生成标签文件。它会查找指定目录中的所有语言。
+
+==============================================================================
+编写帮助文件					*help-writing*
+
+为了方便使用，插件的 Vim 帮助文件应遵循标准 Vim 帮助文件的格式，只有第一行
+例外。如果你在编写新的帮助文件，最好复制一个已有的文件并把它当作模板。
+
+帮助文件的第一行应具有以下格式： >
+
+	*plugin_name.txt*	{short description of the plugin}
+
+第一个字段是一个帮助标签，":help plugin_name" 会跳转到它。这一行的其余
+部分（在制表符之后）简短地描述插件的用途。它会显示在主帮助文件的
+"LOCAL ADDITIONS" 小节中。请在那里检查它是否正确显示：|local-additions|。
+
+如果你想添加版本号或最后修改日期，请把它放在第二行，并右对齐。
+
+在帮助文件的底部，放置一个 Vim modeline，用来设置 'textwidth' 和 'tabstop' 选项，
+并把 'filetype' 设为 "help"。绝不要在这样的 modeline 中设置全局选项，那可能带来
+不良后果。
+
+
+标签
+
+要定义帮助标签，请把名称放在星号之间（"*tag-name*"）。标签名应与所有 Vim 帮助
+标签名都不同，最好以 Vim 插件的名称开头。标签名通常在一行中右对齐。
+
+引用已有的帮助标签并创建热链接时，请把名称放在两条竖线之间（"|"），例如
+|help-writing|。
+
+在帮助文件中引用 Vim 选项时，请把选项名放在两个单引号之间，例如 'statusline'
+
+引用其他技术术语或符号（例如文件名或函数参数）时，请用反引号括起来，例如
+`~/.path/to/init.vim`。这会把它渲染为"行内"代码（相对于"代码块"
+|help-codeblock|）。
+
+
+高亮
+
+要定义列标题，请在行末使用一个波浪号字符，其前有一个空格。这会把列标题以不同
+的颜色高亮。例如
+
+列标题 ~
+
+要在帮助文件中分隔小节，请从第一列开始放一行 '=' 字符。小节分隔线会以不同的
+方式高亮。
+
+							      *help-codeblock*
+要原样引用一段 ex 命令，请在块之前那一行的末尾放一个大于号（>），并在块之后
+的一行中把小于号（<）作为第一个非空白字符。任何从第 1 列开始的行也会隐式地
+结束它之前的 ex 命令块。例如 >
+	function Example_Func()
+	  echo "Example"
+	endfunction
+<
+要为一段代码启用语法高亮，请在一个大于号（>）之后加上语言名标注
+（例如 "vim"）。例如 >vim
+	function Example_Func()
+	  echo "Example"
+	endfunction
+<
+						*help-notation*
+在 Vim 帮助文件中，以下内容会以不同方式高亮：
+  - 特殊键名，用 <> 记法表示，如 <PageDown>，或用 Ctrl 字符表示，
+    如 CTRL-X
+  - 花括号之间的任何内容，例如 {lhs} 和 {rhs}
+
+"Note"、"Notes" 及类似词语会自动获得特殊的高亮。下面这些也一样：
+	Todo	要做的事
+	Error	出错的地方
+
+详细信息可以在 $VIMRUNTIME/syntax/help.vim 中找到
+
+
+文件类型补全					*ft-help-omni*
+
+在编写标签引用时，要获得帮助标签的补全，可以使用 |i_CTRL-X_CTRL-O| 命令。
+
+
+ vim:tw=78:ts=8:noet:ft=help:norl:

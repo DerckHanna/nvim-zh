@@ -1,7 +1,0 @@
-{
-  "argv": ["cc", "-c", "main.cpp"],
-  "stdout": "",
-  "stderr": "main.cpp:1:5: error: use of undeclared identifier 'foo'\n    foo;\n    ^~~\n",
-  "returncode": 1,
-  "parsed": {"file": "main.cpp", "line": 1, "column": 5, "message": "use of undeclared identifier 'foo'"}
-}

@@ -1,0 +1,455 @@
+*tabpage.txt*   Nvim
+
+
+		  VIM REFERENCE MANUAL	  by Bram Moolenaar
+
+
+在多个 tabpage 中用 window 进行编辑。		*tab-page* *tabpage*
+
+这里解释为使用多个 tabpage 而新增的命令。此外，也解释了那些在与多于一个
+tabpage 配合使用时行为不同的命令。
+
+                                     输入 |gO| 查看目录。
+
+==============================================================================
+1. 简介						*tabpage-intro*
+
+一个 tabpage 容纳一个或多个 window。你可以轻松地在各 tab page 之间切换，
+从而拥有若干组 window 来处理不同的事情。
+
+通常你会在 Vim window 的顶部看到一列标签，每个 tabpage 对应一个标签。用鼠标
+点击该标签即可跳到那个 tab page。在 tabpage 之间移动还有其他方式，见下文。
+
+大多数命令只在当前 tabpage 中起作用。这包括 |CTRL-W| 命令、|:windo|、|:all| 和
+|:ball|（在不使用 |:tab| 修饰符时）。会感知到当前 tabpage 之外的 tabpage 的
+命令，在下文提及。
+
+tabpage 也是在不改变当前 window 布局的情况下临时编辑一个 buffer 的好办法。
+打开一个新的 tabpage，做你想做的事，然后关闭该 tabpage。
+
+							*tab-ID* *tabid* *tabpageid*
+每个 tabpage 都有一个唯一标识符，即使在重新排列标签之后它也不会改变。
+|nvim_get_current_tabpage()| 返回该 tab-id，|nvim_list_tabpages()| 按显示顺序列出各
+tab-id。
+							*tabpage-number*
+tabpage 从 1 开始自左向右编号：这个 tab「编号」由 |tabpagenr()| 返回。与 tab-id
+不同，tab 编号在打开、关闭或重新排列标签时可能会改变。|nvim_tabpage_get_number()|
+把一个 tab-id 转换为 tab 编号。
+
+
+==============================================================================
+2. 命令						*tabpage-commands*
+
+打开一个新的 TABPAGE：
+
+启动 Vim 时，「vim -p filename ...」把每个文件参数在一个单独的 tabpage 中打开
+（最多到 'tabpagemax'）。见 |-p|
+
+在非 GUI 的 tabpage 行上双击鼠标会打开一个新的空 tabpage。它被放在点击位置的
+左边。第一次点击可能会先选中另一个 tabpage，从而造成一次额外的屏幕刷新。
+
+这在少数 GUI 版本中也有效，尤其是 Win32。但只有在点击标签右侧时才有效。
+
+在 GUI 的 tabpage 行中，你可以用鼠标右键打开菜单。|tabline-menu|。
+
+相关 autocommand 见 |tabnew-autocmd|。
+
+:[count]tabe[dit]				*:tabe* *:tabedit* *:tabnew*
+:[count]tabnew
+		在当前 tabpage 之后打开一个带空 window 的新 tabpage。如果给出了
+		[count]，新 tabpage 出现在 tabpage [count] 之后，否则新 tabpage
+		将出现在当前这个之后。 >
+		    :tabnew     " opens tabpage after the current one
+		    :.tabnew    " as above
+		    :+tabnew    " opens tabpage after the next tabpage
+				" note: it is one further than :tabnew
+		    :-tabnew    " opens tabpage before the current
+		    :0tabnew    " opens tabpage before the first one
+		    :$tabnew    " opens tabpage after the last one
+
+:[count]tabe[dit] [++opt] [+cmd] {file}
+:[count]tabnew [++opt] [+cmd] {file}
+		打开一个新的 tabpage 并编辑 {file}，就像用 |:edit| 那样。
+		[count] 见上面的 |:tabnew|。
+
+:[count]tabf[ind] [++opt] [+cmd] {file}			*:tabf* *:tabfind*
+		打开一个新的 tabpage 并编辑 'path' 中的 {file}，就像用
+		|:find| 那样。 [count] 见上面的 |:tabnew|。
+
+:[count]tab {cmd}					*:tab*
+		执行 {cmd}，当它打开一个新 window 时改为打开一个新的 tab
+		page。对 |:diffsplit|、|:diffpatch|、|:execute| 和 |:normal|
+		不起作用。
+		如果给出了 [count]，新 tabpage 出现在 tab page [count] 之后，
+		否则新 tabpage 将出现在当前这个之后。
+		示例： >
+		    :tab split	    " opens current buffer in new tabpage
+		    :tab help gt    " opens tabpage with help for "gt"
+		    :.tab help gt   " as above
+		    :+tab help	    " opens tabpage with help after the next
+				    " tabpage
+		    :-tab help	    " opens tabpage with help before the
+				    " current one
+		    :0tab help	    " opens tabpage with help before the
+				    " first one
+		    :$tab help	    " opens tabpage with help after the last
+				    " one
+
+CTRL-W gf	打开一个新的 tabpage 并编辑光标下的文件名。
+		见 |CTRL-W_gf|。
+
+CTRL-W gF	打开一个新的 tabpage，编辑光标下的文件名，
+		并跳到该文件名之后的那个行号。
+		见 |CTRL-W_gF|。
+
+关闭一个 TABPAGE：
+
+关闭一个 tabpage 的最后一个 window 也会关闭该 tabpage，除非只有一个
+tabpage。
+
+使用鼠标：如果显示了 tabpage 行，你可以点击右上角的「X」来关闭当前
+tabpage。自定义的 'tabline' 可能显示别的东西。
+
+							*:tabc* *:tabclose*
+:tabc[lose][!]	关闭当前 tabpage。
+		该命令在以下情况失败：
+		- 屏幕上只有一个 tabpage。			*E784*
+		- 当 'hidden' 未设置、未使用 [!]、某个 buffer
+		  有改动，并且没有其他 window 显示该 buffer 时。
+		对 buffer 的改动不会被写入，也不会丢失，因此
+		这是一个「安全」命令。 >
+                    :tabclose   " close the current tabpage
+
+:{count}tabc[lose][!]
+:tabc[lose][!] {count}
+		关闭 tabpage {count}。失败情况与上面的 `:tabclose`
+		相同。 >
+		    :-tabclose	    " close the previous tabpage
+		    :+tabclose	    " close the next tabpage
+		    :1tabclose	    " close the first tabpage
+		    :$tabclose	    " close the last tabpage
+		    :tabclose -2    " close the 2nd previous tabpage
+		    :tabclose +	    " close the next tabpage
+		    :tabclose 3	    " close the third tabpage
+		    :tabclose $	    " close the last tabpage
+		    :tabclose #     " close the last accessed tabpage
+
+当一个 tabpage 被关闭时，下一个 tabpage 会成为当前 tabpage。这一行为可以用
+'tabclose' 选项定制。
+
+							*:tabo* *:tabonly*
+:tabo[nly][!]	关闭所有其他 tabpage。
+		当设置了 'hidden' 选项时，已关闭的 window 中的所有 buffer
+		变为隐藏。
+		当未设置 'hidden' 且设置了 'autowrite' 选项时，已改动的 buffer
+		会被写入。否则，含有已改动 buffer 的 window 不会被移除，除非
+		给出了 [!]，此时它们变为隐藏。但已改动的 buffer 绝不会被放弃，
+		因此改动不会丢失。 >
+		    :tabonly " close all tabpages except the current one
+
+:tabo[nly][!] {count}
+		关闭 {count} 之外的所有 tabpage。 >
+		    :.tabonly	    " as above
+		    :-tabonly	    " close all tabpages except the previous
+				    " one
+		    :+tabonly	    " close all tabpages except the next one
+		    :1tabonly	    " close all tabpages except the first one
+		    :$tabonly	    " close all tabpages except the last one
+		    :tabonly -	    " close all tabpages except the previous
+				    " one
+		    :tabonly +2     " close all tabpages except the two next
+				    " one
+		    :tabonly 1	    " close all tabpages except the first one
+		    :tabonly $	    " close all tabpages except the last one
+		    :tabonly #	    " close all tabpages except the last
+				    " accessed one
+
+
+切换到另一个 TABPAGE：
+
+使用鼠标：如果显示了 tabpage 行，你可以点击某个 tabpage 标签以切换到该
+tabpage。点击没有标签的地方则转到下一个 tabpage。'tabline'
+
+:tabn[ext]				*:tabn* *:tabnext* *gt*
+<C-PageDown>				*CTRL-<PageDown>* *<C-PageDown>*
+gt					*i_CTRL-<PageDown>* *i_<C-PageDown>*
+		转到下一个 tabpage。从最后一个绕回到第一个。
+
+:{count}tabn[ext]
+:tabn[ext] {count}
+		转到 tabpage {count}。第一个 tabpage 的编号是一。 >
+		    :-tabnext	" go to the previous tabpage
+		    :+tabnext	" go to the next tabpage
+		    :+2tabnext	" go to the two next tabpage
+		    :1tabnext	" go to the first tabpage
+		    :$tabnext	" go to the last tabpage
+		    :tabnext $	" as above
+		    :tabnext #	" go to the last accessed tabpage
+		    :tabnext -	" go to the previous tabpage
+		    :tabnext -1	" as above
+		    :tabnext +	" go to the next tabpage
+		    :tabnext +1	" as above
+
+{count}<C-PageDown>
+{count}gt	转到 tabpage {count}。第一个 tabpage 的编号是一。
+
+:tabp[revious]				*:tabp* *:tabprevious* *gT* *:tabN*
+:tabN[ext]				*:tabNext* *CTRL-<PageUp>*
+<C-PageUp>			 *<C-PageUp>* *i_CTRL-<PageUp>* *i_<C-PageUp>*
+gT		转到上一个 tabpage。从第一个绕回到最后一个。
+
+:tabp[revious] {count}
+:tabN[ext] {count}
+{count}<C-PageUp>
+{count}gT	向后转 {count} 个 tabpage。从第一个绕回到最后一个。注意 {count}
+		的用法与 |:tabnext| 不同，在那里它被用作 tabpage 编号。
+
+:tabr[ewind]			*:tabfir* *:tabfirst* *:tabr* *:tabrewind*
+:tabfir[st]	转到第一个 tabpage。
+
+							*:tabl* *:tablast*
+:tabl[ast]	转到最后一个 tabpage。
+
+<C-Tab>						*CTRL-<Tab>* *<C-Tab>*
+g<Tab>						*g<Tab>* *CTRL-W_g<Tab>*
+CTRL-W g<Tab>	转到上次访问过的 tabpage。
+
+其他命令：
+							*:tabs*
+:tabs		列出各 tabpage 及其包含的 window。
+		当前 window 显示一个「>」。
+		已改动的 buffer 显示一个「+」。
+		例如：
+			Tabpage 1 ~
+			  + tabpage.txt ~
+			    ex_docmd.c ~
+			Tabpage 2 ~
+			>   main.c ~
+
+
+重新排列 TABPAGE：
+
+:tabm[ove] [N]						*:tabm* *:tabmove*
+:[N]tabm[ove]
+		把当前 tabpage 移到 tabpage N 之后。用零使当前 tabpage 成为
+		第一个。N 是在移动之前计数的，因此如果第二个 tabpage 是当前
+		这个，`:tabmove 1` 和 `:tabmove 2` 都没有效果。
+		不带 N 时该 tabpage 被移到最后。 >
+		    :.tabmove	" do nothing
+		    :-tabmove	" move the tabpage to the left
+		    :+tabmove	" move the tabpage to the right
+		    :0tabmove	" move the tabpage to the first
+		    :tabmove 0	" as above
+		    :tabmove	" move the tabpage to the last
+		    :$tabmove	" as above
+		    :tabmove $	" as above
+		    :tabmove #	" move the tabpage after the last accessed
+				" tabpage
+
+:tabm[ove] +[N]
+:tabm[ove] -[N]
+		把当前 tabpage 向右（用 +）或向左（用 -）移 N 个位置。 >
+		    :tabmove -	" move the tabpage to the left
+		    :tabmove -1	" as above
+		    :tabmove +	" move the tabpage to the right
+		    :tabmove +1	" as above
+
+
+注意，虽然可以用 :Ntabmove 把一个 tabpage 移到第 N 个之后。也可以用
+:+Ntabmove 把它移 N 个位置。关于 +N 在此上下文中含义的说明见 |[range]|。
+
+
+在 TABPAGE 上循环：
+
+							*:tabd* *:tabdo*
+:[range]tabd[o] {cmd}
+		在每个 tabpage 中执行 {cmd}，或者如果给出了 [range]，则只在
+		tabpage 编号位于 [range] 内的那些 tabpage 中执行。它的工作
+		方式相当于这样做： >
+			:tabfirst
+			:{cmd}
+			:tabnext
+			:{cmd}
+			etc.
+<		这只会作用于每个 tabpage 的当前 window。
+		当在某个 tabpage 上检测到错误时，后续的 tabpage
+		将不会被访问。
+		最后一个 tabpage（或发生错误的地方）成为当前
+		tabpage。
+		{cmd} 可以包含 '|' 以连接若干命令。
+		{cmd} 不得打开或关闭 tabpage，也不得重新排列它们。
+		另见 |:windo|、|:argdo|、|:bufdo|、|:cdo|、|:ldo|、|:cfdo|
+		和 |:lfdo|。
+
+==============================================================================
+3. 其他事项						*tabpage-other*
+
+							*tabline-menu*
+GUI 的 tabpage 行有一个弹出菜单。它通过右键访问。
+各项为：
+	Close		关闭鼠标指针下方的 tabpage。如果鼠标
+			指针下方没有标签，则关闭当前这个。
+	New Tab		打开一个 tabpage，编辑一个空 buffer。它出现在
+			鼠标指针的左边。
+	Open Tab...	与「New Tab」相同，另外用文件选择器选择一个
+			要编辑的文件。
+
+Diff 模式按 tabpage 工作。你可以在一个 tabpage 中查看若干文件之间的差异。
+其他 tabpage 可以显示其他文件之间的差异。
+
+tabpage 局部变量以「t:」开头。|tabpage-variable|
+
+目前只有一个选项是 tabpage 局部的：'cmdheight'。
+
+						*tabnew-autocmd*
+在从一个 tabpage 切换到另一个时，可以用 TabLeave 和 TabEnter autocommand
+事件来做一些事情。确切的顺序取决于你在做什么。创建新的 tabpage 时，其工作
+方式就仿佛你在同一个 buffer 上创建一个新 window，然后再编辑另一个 buffer。
+因此「:tabnew」会触发：
+	WinLeave		离开当前 window
+	TabLeave		离开当前 tabpage
+	WinEnter		进入新 tabpage 中的 window
+	TabEnter		进入新的 tabpage
+	BufLeave		离开当前 buffer
+	BufEnter		进入新的空 buffer
+
+切换到另一个 tabpage 时顺序是：
+	BufLeave
+	WinLeave
+	TabLeave
+	WinEnter
+	TabEnter
+	BufEnter
+
+进入一个新的 tabpage（|:tabnew|）时，TabNew 在 TabEnter 之前、在 WinEnter
+之后触发。
+
+==============================================================================
+4. 设置 'tabline'					*setting-tabline*
+
+'tabline' 选项指定带 tabpage 标签的那一行看起来是什么样。它只在没有 GUI
+tab 行时使用。
+
+你可以用 'showtabline' 选项指定希望带 tabpage 标签的那一行何时出现：从不、
+在有多个 tabpage 时、或总是。
+
+tabpage 行的高亮用 TabLine、TabLineSel 和 TabLineFill 这几个组设置。
+|hl-TabLine| |hl-TabLineSel| |hl-TabLineFill|
+
+一个 tabpage 如果有已改动的 window，就会显示一个「+」。还会显示该 tabpage
+中 window 的数目。因此「3+」表示三个 window，并且其中一个有已改动的
+buffer。
+
+'tabline' 选项让你定义自己偏好的 tabpage 标签方式。这并不容易，因此这里给
+一个示例。
+
+基础知识见 'statusline' 选项。同样的项可以用在 'tabline' 选项中。此外，
+|tabpagebuflist()|、|tabpagenr()| 和 |tabpagewinnr()| 这几个函数很有用。
+
+由于 tab 标签的数目会变化，你需要为整个选项使用一个表达式。类似这样： >
+	:set tabline=%!MyTabLine()
+
+然后定义 MyTabLine() 函数来列出所有 tabpage 标签。一种方便的做法是把它分成
+两部分：先遍历所有 tab page 并为它们定义标签。然后取得每个 tabpage 的
+标签。 >
+
+	function MyTabLine()
+	  let s = ''
+	  for i in range(tabpagenr('$'))
+	    " select the highlighting
+	    if i + 1 == tabpagenr()
+	      let s ..= '%#TabLineSel#'
+	    else
+	      let s ..= '%#TabLine#'
+	    endif
+
+	    " set the tabpage number (for mouse clicks)
+	    let s ..= '%' .. (i + 1) .. 'T'
+
+	    " the label is made by MyTabLabel()
+	    let s ..= ' %{MyTabLabel(' .. (i + 1) .. ')} '
+	  endfor
+
+	  " after the last tabpage fill with TabLineFill and reset tabpage nr
+	  let s ..= '%#TabLineFill#%T'
+
+	  " right-align the label to close the current tabpage
+	  if tabpagenr('$') > 1
+	    let s ..= '%=%#TabLine#%999Xclose'
+	  endif
+
+	  return s
+	endfunction
+
+现在为每个 tabpage 调用 MyTabLabel() 函数以取得它的标签。 >
+
+	function MyTabLabel(n)
+	  let buflist = tabpagebuflist(a:n)
+	  let winnr = tabpagewinnr(a:n)
+	  return bufname(buflist[winnr - 1])
+	endfunction
+
+这只是一个简单的示例，其结果是一个类似默认样式的 tabpage 行，只是没有为
+已改动的 buffer 添加 +，也没有截断名称。当空间不足时，你会希望用巧妙的
+办法缩减标签的宽度。查看 'columns' 选项以了解可用空间。
+
+==============================================================================
+5. 设置 'guitablabel'				*setting-guitablabel*
+
+当显示 GUI 的 tabpage 行时，可以用 'guitablabel' 指定每个 tabpage 要显示的
+标签。与一次指定整行 tabpage 的 'tabline' 不同，'guitablabel' 是逐个标签
+分别使用的。
+
+'guitabtooltip' 非常相似，用于同一个标签的工具提示。它只在鼠标指针悬停在
+该标签上时出现，因此通常更长。不过只在某些系统上受支持。
+
+关于该值的格式见 'statusline' 选项。
+
+「%N」项可以用来表示当前 tabpage 编号。求值该选项时 |v:lnum| 变量也被设为
+这个编号。使用文件名的项指的是该 tabpage 的当前 window。
+
+注意该选项不使用语法高亮。%T 和 %X 项也会被忽略。
+
+一个把 tabpage 编号和 buffer 名称放进标签的简单示例： >
+	:set guitablabel=%N\ %f
+
+一个类似默认 'guitablabel' 的示例：显示 tabpage 中 window 的数目，以及
+在有已改动 buffer 时显示一个「+」： >
+
+	function GuiTabLabel()
+	  let label = ''
+	  let bufnrlist = tabpagebuflist(v:lnum)
+
+	  " Add '+' if one of the buffers in the tabpage is modified
+	  for bufnr in bufnrlist
+	    if getbufvar(bufnr, "&modified")
+	      let label = '+'
+	      break
+	    endif
+	  endfor
+
+	  " Append the number of windows in the tabpage if more than one
+	  let wincount = tabpagewinnr(v:lnum, '$')
+	  if wincount > 1
+	    let label ..= wincount
+	  endif
+	  if label != ''
+	    let label ..= ' '
+	  endif
+
+	  " Append the buffer name
+	  return label .. bufname(bufnrlist[tabpagewinnr(v:lnum) - 1])
+	endfunction
+
+	set guitablabel=%{GuiTabLabel()}
+
+注意该函数必须在设置该选项之前定义，否则你会得到一条函数未知的错误
+消息。
+
+如果你想退回默认标签，返回空字符串。
+
+如果你想为某个 tabpage 显示特定的内容，可能想使用一个 tabpage 局部变量。
+|t:var|
+
+
+ vim:tw=78:ts=8:noet:ft=help:norl:

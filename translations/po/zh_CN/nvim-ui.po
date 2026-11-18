@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: nvim-zh phase 3\n"
+"Project-Id-Version: nvim-zh\n"
 "PO-Revision-Date: 2026-11-03 00:00+0800\n"
 "Last-Translator: nvim-zh maintainers\n"
 "Language-Team: Simplified Chinese\n"
@@ -9,35 +9,6 @@ msgstr ""
 "Language: zh_CN\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: nvim-zh catalog_tool\n"
-
-#: lua/nvim-zh/ui.lua
-msgid "Ready"
-msgstr "就绪"
-
-#: lua/nvim-zh/ui.lua
-msgid "Done"
-msgstr "完成"
-
-#: lua/nvim-zh/ui.lua
-msgid "Input:"
-msgstr "输入："
-
-#: lua/nvim-zh/ui.lua
-msgid "Select one of:"
-msgstr "请选择："
-
-#: lua/nvim-zh/ui.lua
-msgid "Loaded %s"
-msgstr "已加载 %s"
-
-#: lua/nvim-zh/ui.lua
-msgid "Opened {name}"
-msgstr "已打开 {name}"
-
-#: lua/nvim-zh/ui.lua
-msgctxt "echo"
-msgid "Echo ready"
-msgstr "回显就绪"
 
 # Display strings Neovim itself sends through vim.notify() while a user drives
 # LSP features. All sources are pinned Neovim 0.12.6 Lua files; the msgid must
@@ -93,7 +64,7 @@ msgstr "代码透镜："
 # Further Neovim-owned display strings, all reached through vim.notify() while a
 # user drives LSP features: format-on-save, rename, hierarchy and document
 # color. Each msgid is verified against the pinned Neovim 0.12.6 source by
-# tests/phase8/02_lsp_ui_text_spec.lua.
+# tests/integration/nvim/lsp_literals_spec.lua.
 
 #: lua/vim/lsp/buf.lua
 msgid "[LSP] Format request failed, no matching language servers."

@@ -12,33 +12,1417 @@ return {
       ["Language-Team"] = "Simplified Chinese",
       ["Last-Translator"] = "nvim-zh maintainers",
       ["MIME-Version"] = "1.0",
-      ["PO-Revision-Date"] = "2026-11-17 20:38+0800",
-      ["Project-Id-Version"] = "nvim-zh phase 4",
+      ["PO-Revision-Date"] = "2026-11-18 13:34+0800",
+      ["Project-Id-Version"] = "nvim-zh",
     },
   },
   entries = {
     {
       context = "desc",
-      msgid = "Find File",
-      msgstr = "查找文件",
+      msgid = "\" string",
+      msgstr = "\" 字符串",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "%d keymap",
+      msgstr = "%d 个键映射",
       references = {
         "lua/which-key/view.lua",
       },
     },
     {
       context = "desc",
-      msgid = "Open",
-      msgstr = "打开",
+      msgid = "%d keymaps",
+      msgstr = "%d 个键映射",
       references = {
         "lua/which-key/view.lua",
       },
     },
     {
       context = "desc",
-      msgid = "Save File",
-      msgstr = "保存文件",
+      msgid = "' string",
+      msgstr = "' 字符串",
       references = {
-        "lua/which-key/view.lua",
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "<> block",
+      msgstr = "<> 块",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Add word to spell list",
+      msgstr = "将单词加入拼写列表",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Back to line in current buffer where jumped from",
+      msgstr = "返回当前Buffer跳转前的行",
+      references = {
+        "lua/which-key/plugins/marks.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Back to position in current buffer where jumped from",
+      msgstr = "返回当前Buffer跳转前的位置",
+      references = {
+        "lua/which-key/plugins/marks.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Bottom this line",
+      msgstr = "将当前行置底",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Break out into a new tab",
+      msgstr = "拆分到新标签页",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Center this line",
+      msgstr = "将当前行居中",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Change",
+      msgstr = "修改",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Close all folds",
+      msgstr = "关闭所有折叠",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Close all folds under cursor",
+      msgstr = "关闭光标下所有折叠",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Close all other windows",
+      msgstr = "关闭其他所有Window",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Close fold under cursor",
+      msgstr = "关闭光标下折叠",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Create fold",
+      msgstr = "创建折叠",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Cycle backwards through results",
+      msgstr = "向后循环浏览结果",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Decrease height",
+      msgstr = "降低高度",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Decrease width",
+      msgstr = "减小宽度",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Delete",
+      msgstr = "删除",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Delete all folds in file",
+      msgstr = "删除文件中所有折叠",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Delete all folds under cursor",
+      msgstr = "删除光标下所有折叠",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Delete fold under cursor",
+      msgstr = "删除光标下折叠",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Down",
+      msgstr = "下",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "End of line",
+      msgstr = "行尾",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Equally high and wide",
+      msgstr = "等高等宽",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "First line",
+      msgstr = "第一行",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Fold less",
+      msgstr = "减少折叠",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Fold more",
+      msgstr = "增加折叠",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Format",
+      msgstr = "格式化",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Go to [count] newer position in change list",
+      msgstr = "转到更改列表中第 [count] 个较新位置",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Go to [count] older position in change list",
+      msgstr = "转到更改列表中第 [count] 个较旧位置",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Go to file under cursor",
+      msgstr = "转到光标下文件",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Go to last insert",
+      msgstr = "转到最后插入位置",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Go to next tab page",
+      msgstr = "转到下一个标签页",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Go to previous tab page",
+      msgstr = "转到上一个标签页",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Go to the down window",
+      msgstr = "转到下方Window",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Go to the left window",
+      msgstr = "转到左侧Window",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Go to the right window",
+      msgstr = "转到右侧Window",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Go to the up window",
+      msgstr = "转到上方Window",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Half screen to the left",
+      msgstr = "向左移动半屏",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Half screen to the right",
+      msgstr = "向右移动半屏",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Home line of window (top)",
+      msgstr = "Window首行（顶部）",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "In last file edited",
+      msgstr = "在上次编辑的文件中",
+      references = {
+        "lua/which-key/plugins/marks.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Increase height",
+      msgstr = "增加高度",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Increase width",
+      msgstr = "增加宽度",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Indent left",
+      msgstr = "向左缩进",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Indent right",
+      msgstr = "向右缩进",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Last change in current buffer",
+      msgstr = "当前Buffer最后修改",
+      references = {
+        "lua/which-key/plugins/marks.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Last exited current buffer",
+      msgstr = "最后退出当前Buffer的位置",
+      references = {
+        "lua/which-key/plugins/marks.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Last line",
+      msgstr = "最后一行",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Last line of window",
+      msgstr = "Window末行",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Last position of cursor in insert mode",
+      msgstr = "插入模式下光标最后位置",
+      references = {
+        "lua/which-key/plugins/marks.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Last visual selection",
+      msgstr = "上次可视选择",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Left",
+      msgstr = "左",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Left this line",
+      msgstr = "将当前行左移",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Lowercase",
+      msgstr = "转为小写",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Mark word as bad/misspelling",
+      msgstr = "将单词标记为错误/拼写错误",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Matching (){}[]",
+      msgstr = "匹配 (){}[]",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Max out the height",
+      msgstr = "最大化高度",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Max out the width",
+      msgstr = "最大化宽度",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Middle line of window",
+      msgstr = "Window中间行",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Move before next char",
+      msgstr = "移动到下一个字符之前",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Move before prev char",
+      msgstr = "移动到上一个字符之前",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Move to next char",
+      msgstr = "移动到下一个字符",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Move to prev char",
+      msgstr = "移动到上一个字符",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Move window to far bottom",
+      msgstr = "将Window移到最底部",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Move window to far left",
+      msgstr = "将Window移到最左侧",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Move window to far right",
+      msgstr = "将Window移到最右侧",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Move window to far top",
+      msgstr = "将Window移到最顶部",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Next (",
+      msgstr = "下一个 (",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Next <",
+      msgstr = "下一个 <",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Next WORD",
+      msgstr = "下一个 WORD",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Next empty line",
+      msgstr = "下一个空行",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Next end of WORD",
+      msgstr = "下一个 WORD 词尾",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Next end of word",
+      msgstr = "下一个词尾",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Next ftFT",
+      msgstr = "下一个 ftFT 字符",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Next method end",
+      msgstr = "下一个方法结尾",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Next method start",
+      msgstr = "下一个方法开头",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Next misspelled word",
+      msgstr = "下一个拼写错误单词",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Next unmatched group",
+      msgstr = "下一个未匹配组",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Next word",
+      msgstr = "下一个单词",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Next {",
+      msgstr = "下一个 {",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Open all folds",
+      msgstr = "打开所有折叠",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Open all folds under cursor",
+      msgstr = "打开光标下所有折叠",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Open file with system app",
+      msgstr = "使用系统应用打开文件",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Open fold under cursor",
+      msgstr = "打开光标下折叠",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Prev WORD",
+      msgstr = "上一个 WORD",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Prev empty line",
+      msgstr = "上一个空行",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Prev end of word",
+      msgstr = "上一个词尾",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Prev ftFT",
+      msgstr = "上一个 ftFT 字符",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Prev word",
+      msgstr = "上一个单词",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Previous (",
+      msgstr = "上一个 (",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Previous <",
+      msgstr = "上一个 <",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Previous method end",
+      msgstr = "上一个方法结尾",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Previous method start",
+      msgstr = "上一个方法开头",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Previous misspelled word",
+      msgstr = "上一个拼写错误单词",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Previous unmatched group",
+      msgstr = "上一个未匹配组",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Previous {",
+      msgstr = "上一个 {",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Quit a window",
+      msgstr = "退出Window",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Replace",
+      msgstr = "替换",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Right",
+      msgstr = "右",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Right this line",
+      msgstr = "将当前行右移",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Run program",
+      msgstr = "运行程序",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Search backward",
+      msgstr = "向后搜索",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Search backwards and select",
+      msgstr = "向后搜索并选择",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Search forward",
+      msgstr = "向前搜索",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Search forwards and select",
+      msgstr = "向前搜索并选择",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Show cursor line",
+      msgstr = "显示光标行",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Spelling Suggestions",
+      msgstr = "拼写建议",
+      references = {
+        "lua/which-key/plugins/spelling.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Spelling suggestions",
+      msgstr = "拼写建议",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Split window",
+      msgstr = "水平拆分Window",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Split window vertically",
+      msgstr = "垂直拆分Window",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Start of line",
+      msgstr = "行首",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Start of line (non ws)",
+      msgstr = "行首（非空白）",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Swap current with next",
+      msgstr = "与下一个Window交换",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Switch windows",
+      msgstr = "切换Window",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "To beginning of last visual selection",
+      msgstr = "到上次可视选择的开头",
+      references = {
+        "lua/which-key/plugins/marks.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "To beginning of previously changed or yanked text",
+      msgstr = "到上次修改或复制文本的开头",
+      references = {
+        "lua/which-key/plugins/marks.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "To end of last visual selection",
+      msgstr = "到上次可视选择的结尾",
+      references = {
+        "lua/which-key/plugins/marks.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "To end of previously changed or yanked text",
+      msgstr = "到上次修改或复制文本的结尾",
+      references = {
+        "lua/which-key/plugins/marks.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Toggle all folds under cursor",
+      msgstr = "切换光标下所有折叠",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Toggle case",
+      msgstr = "切换大小写",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Toggle fold under cursor",
+      msgstr = "切换光标下折叠",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Toggle folding",
+      msgstr = "切换折叠",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Top this line",
+      msgstr = "将当前行置顶",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Up",
+      msgstr = "上",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Update folds",
+      msgstr = "更新折叠",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Uppercase",
+      msgstr = "转为大写",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Visual",
+      msgstr = "可视",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Visual Line",
+      msgstr = "可视行",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "WORD with ws",
+      msgstr = "带空白的 WORD",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "Yank",
+      msgstr = "复制",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "[(]) block",
+      msgstr = "[(]) 块",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "[] block",
+      msgstr = "[] 块",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "[{]} block",
+      msgstr = "[{]} 块",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "` string",
+      msgstr = "` 字符串",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "alternate buffer",
+      msgstr = "备用Buffer",
+      references = {
+        "lua/which-key/plugins/registers.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "around",
+      msgstr = "周围",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "black hole",
+      msgstr = "黑洞",
+      references = {
+        "lua/which-key/plugins/registers.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "deleted or changed content smaller than one line",
+      msgstr = "不足一行的删除或修改内容",
+      references = {
+        "lua/which-key/plugins/registers.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "inner \" string",
+      msgstr = "内部 \" 字符串",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "inner ' string",
+      msgstr = "内部 ' 字符串",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "inner <>",
+      msgstr = "内部 <>",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "inner WORD",
+      msgstr = "内部 WORD",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "inner [(])",
+      msgstr = "内部 [(])",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "inner []",
+      msgstr = "内部 []",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "inner [{]}",
+      msgstr = "内部 [{]}",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "inner ` string",
+      msgstr = "内部 ` 字符串",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "inner paragraph",
+      msgstr = "内部段落",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "inner sentence",
+      msgstr = "内部句子",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "inner tag block",
+      msgstr = "内部标签块",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "inner word",
+      msgstr = "内部单词",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "inside",
+      msgstr = "内部",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "last deleted, changed, or yanked content",
+      msgstr = "上次删除、修改或复制的内容",
+      references = {
+        "lua/which-key/plugins/registers.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "last inserted text",
+      msgstr = "上次插入的文本",
+      references = {
+        "lua/which-key/plugins/registers.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "last search pattern",
+      msgstr = "上次搜索模式",
+      references = {
+        "lua/which-key/plugins/registers.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "last yank",
+      msgstr = "上次复制",
+      references = {
+        "lua/which-key/plugins/registers.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "marks",
+      msgstr = "标记",
+      references = {
+        "lua/which-key/plugins/marks.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "most recent executed command",
+      msgstr = "最近执行的命令",
+      references = {
+        "lua/which-key/plugins/registers.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "name of the current file",
+      msgstr = "当前文件名",
+      references = {
+        "lua/which-key/plugins/registers.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "paragraph",
+      msgstr = "段落",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "registers",
+      msgstr = "Register",
+      references = {
+        "lua/which-key/plugins/registers.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "result of an expression",
+      msgstr = "表达式结果",
+      references = {
+        "lua/which-key/plugins/registers.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "sentence",
+      msgstr = "句子",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "synchronized with the selection clipboard",
+      msgstr = "与选择剪贴板同步",
+      references = {
+        "lua/which-key/plugins/registers.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "synchronized with the system clipboard",
+      msgstr = "与系统剪贴板同步",
+      references = {
+        "lua/which-key/plugins/registers.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "tag block",
+      msgstr = "标签块",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "window",
+      msgstr = "Window",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "desc",
+      msgid = "word with ws",
+      msgstr = "带空白的单词",
+      references = {
+        "lua/which-key/plugins/presets.lua",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "No mappings found for mode `%s` and keys `%s`",
+      msgstr = "找不到模式 `%s` 和按键 `%s` 的映射",
+      references = {
+        "lua/which-key/init.lua",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "Recursion detected.\nAre you manually loading which-key in a keymap?\nUse `opts.triggers` instead.\nPlease check the docs.",
+      msgstr = "检测到递归。\n是否在键映射中手动加载了 which-key？\n请改用 `opts.triggers`。\n请查阅文档。",
+      references = {
+        "lua/which-key/state.lua",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "There are issues with your config.\nUse `:checkhealth which-key` to find out more.",
+      msgstr = "配置存在问题。\n使用 `:checkhealth which-key` 查看详情。",
+      references = {
+        "lua/which-key/config.lua",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "There were issues reported with your **which-key** mappings.\nUse `:checkhealth which-key` to find out more.",
+      msgstr = "你的 **which-key** 映射报告了问题。\n使用 `:checkhealth which-key` 查看详情。",
+      references = {
+        "lua/which-key/mappings.lua",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "Usage: WhichKey [mode] [keys]",
+      msgstr = "用法：WhichKey [mode] [keys]",
+      references = {
+        "lua/which-key/init.lua",
       },
     },
   },

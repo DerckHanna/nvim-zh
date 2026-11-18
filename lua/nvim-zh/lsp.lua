@@ -108,7 +108,6 @@ function M.setup(next_config)
   install('$/progress', progress_wrapper, config.progress)
 end
 
-function M.reload(next_config) M.setup(next_config) end
 function M.teardown()
   config = { messages = false, progress = false }
   restore('window/showMessage')

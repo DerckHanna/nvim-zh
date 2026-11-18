@@ -1,0 +1,137 @@
+*job_control.txt*    Nvim
+
+
+		 NVIM 参考手册	  by Thiago de Arruda
+
+
+Nvim 作业控制		*job* *job-control* *E901* *E903* *E947* *E948*
+
+作业控制（job control）是在 Nvim 中实现多任务的一种方式，因此脚本可以启动和控制多个
+进程，而不会阻塞当前的 Nvim 实例。
+
+				      输入 |gO| 查看目录。
+
+==============================================================================
+概念
+
+作业 Id								       *job-id*
+
+每个作业由一个整数 id 标识，该 id 在当前 Nvim 会话的整个生存期内唯一。每个 job-id
+都是一个有效的 |channel-id|：它们共享同一个「键空间」。像 |jobstart()| 这样的函数
+返回 job id；像 |jobstop()|、|chansend()|、|rpcnotify()| 和 |rpcrequest()| 这样的
+函数接受 job id。
+
+作业的 stdio 流构成一个 |channel|，它可以收发原始字节或 |msgpack-rpc| 消息。
+
+==============================================================================
+用法							    *job-control-usage*
+
+要控制作业，请使用 "job…" 系列函数：|jobstart()|、|jobstop()| 等。
+
+示例： >vim
+
+    function! s:OnEvent(job_id, data, event) dict
+      if a:event == 'stdout'
+        let str = self.shell.' stdout: '.join(a:data)
+      elseif a:event == 'stderr'
+        let str = self.shell.' stderr: '.join(a:data)
+      else
+        let str = self.shell.' exited'
+      endif
+
+      call append(line('$'), str)
+    endfunction
+    let s:callbacks = {
+    \ 'on_stdout': function('s:OnEvent'),
+    \ 'on_stderr': function('s:OnEvent'),
+    \ 'on_exit': function('s:OnEvent')
+    \ }
+    let job1 = jobstart(['bash'], extend({'shell': 'shell 1'}, s:callbacks))
+    let job2 = jobstart(['bash', '-c', 'for i in {1..10}; do echo hello $i!; sleep 1; done'], extend({'shell': 'shell 2'}, s:callbacks))
+<
+要测试上面的脚本，请把它复制到文件 ~/foo.vim 并运行： >bash
+    nvim -u ~/foo.vim
+<
+下面说明会发生什么：
+  - |jobstart()| 会启动两个 bash shell，并把它们的 stdin/stdout/stderr 流连接到
+    nvim。
+  - 第一个 shell 空闲着，等待从其 stdin 读取命令。
+  - 第二个 shell 以 -c 启动，它会执行该命令（一个打印 0 到 9 的 for 循环），然后
+    退出。
+  - `OnEvent()` 回调会被传给 |jobstart()|，用来处理各种作业事件。它会显示从
+    shell 收到的 stdout/stderr 数据。
+
+关于 |on_stdout| 和 |on_stderr|，见 |channel-callback|。
+								      *on_exit*
+传给 on_exit 回调的参数：
+  0: |job-id|
+  1: 进程的退出码；若因信号而结束，则为 128+SIGNUM（例如收到 SIGTERM 时为
+     143）。
+  2: 事件类型："exit"
+
+
+  注意：发送方尚未刷出的缓冲 stdout/stderr 数据不会触发 on_stdout/on_stderr
+	回调（但如果进程结束，on_exit 回调仍会被调用）。
+	例如，"ruby -e" 会缓冲输出，因此短字符串会被缓冲，除非启用
+        "auto-flushing"（$stdout.sync=true）。 >vim
+          function! Receive(job_id, data, event)
+            echom printf('%s: %s',a:event,string(a:data))
+          endfunction
+          call jobstart(['ruby', '-e',
+            \ '$stdout.sync = true; 5.times do sleep 1 and puts "Hello Ruby!" end'],
+            \ {'on_stdout': 'Receive'})
+<       https://github.com/neovim/neovim/issues/1592
+
+  注意：作业事件处理函数可能会收到不完整的行。对于某一次
+	on_stdout/on_stderr 调用，并不保证 `a:data` 以换行符结尾。
+	  - `abcdefg` 可能以 `['abc']`、`['defg']` 的形式到达。
+	  - `abc\nefg` 可能以 `['abc', '']`、`['efg']` 到达，也可能以 `['abc']`、
+	    `['','efg']` 到达，甚至以 `['ab']`、`['c','efg']` 到达。
+	处理这个问题的简便办法：先把列表初始化为 `['']`，然后按如下方式追加： >vim
+	  let s:chunks = ['']
+	  func! s:on_stdout(job_id, data, event) dict
+	    let s:chunks[-1] .= a:data[0]
+	    call extend(s:chunks, a:data[1:])
+	  endf
+<
+
+|jobstart-options| 字典会作为 |self| 传给回调。
+上面的示例也可以用这种「面向对象」的风格来写： >vim
+
+    let Shell = {}
+
+    function Shell.on_stdout(_job_id, data, event)
+      call append(line('$'),
+            \ printf('[%s] %s: %s', a:event, self.name, join(a:data[:-2])))
+    endfunction
+
+    let Shell.on_stderr = function(Shell.on_stdout)
+
+    function Shell.on_exit(job_id, _data, event)
+      let msg = printf('job %d ("%s") finished', a:job_id, self.name)
+      call append(line('$'), printf('[%s] BOOM!', a:event))
+      call append(line('$'), printf('[%s] %s!', a:event, msg))
+    endfunction
+
+    function Shell.new(name, cmd)
+      let object = extend(copy(g:Shell), {'name': a:name})
+      let object.cmd = ['sh', '-c', a:cmd]
+      let object.id = jobstart(object.cmd, object)
+      $
+      return object
+    endfunction
+
+    let instance = Shell.new('bomb',
+          \ 'for i in $(seq 9 -1 1); do echo $i 1>&$((i % 2 + 1)); sleep 1; done')
+<
+要向作业的 stdin 发送数据，请使用 |chansend()|： >vim
+    :call chansend(job1, "ls\n")
+    :call chansend(job1, "invalid-command\n")
+    :call chansend(job1, "exit\n")
+<
+可以随时用 |jobstop()| 函数杀死作业： >vim
+    :call jobstop(job1)
+<
+可以在不杀死作业的情况下关闭各个流，见 |chanclose()|。
+
+ vim:tw=78:ts=8:noet:ft=help:norl:

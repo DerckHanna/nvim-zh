@@ -1,0 +1,700 @@
+*ft_sql.txt*	Nvim
+
+作者：David Fishburn
+
+这是一个用于处理 SQL 文件的 filetype 插件。
+
+结构化查询语言（SQL）是一项标准，它规定了允许用户与关系型
+数据库进行交互的语句。Vim 为此提供了导航、缩进与语法高亮
+方面的功能。
+
+                                      键入 |gO| 可查看目录。
+
+==============================================================================
+1. 导航					*sql-navigation*
+
+SQL ftplugin 提供了若干选项，用于辅助文件导航。
+
+
+
+------------------------------------------------------------------------------
+1.1 Matchit					*sql-matchit*
+
+matchit 插件（https://www.vim.org/scripts/script.php?script_id=39）
+提供了许多附加功能，并且可以针对不同语言定制。matchit 插件通过
+定义局部 buffer 变量 b:match_words 来配置。在各类关键字上按下 % 键
+时，光标会移动到与之匹配的位置。例如，光标位于某个 "if" 上时，按下
+% 将在 "else"、"elseif" 和 "end if" 关键字之间循环。
+
+
+
+支持以下关键字： >
+    if
+    elseif | elsif
+    else [if]
+    end if
+
+    [while condition] loop
+	leave
+	break
+	continue
+	exit
+    end loop
+
+    for
+	leave
+	break
+	continue
+	exit
+    end loop
+
+    do
+	statements
+    doend
+
+    case
+    when
+    when
+    default
+    end case
+
+    merge
+    when not matched
+    when matched
+
+    create[ or replace] procedure|function|event
+    returns
+
+
+------------------------------------------------------------------------------
+1.2 文本对象移动				*sql-object-motions*
+
+Vim 有许多预定义键用于处理文本 |object-motions|。
+本 filetype 插件尝试把这些键转换为对 SQL 语言有意义的映射。
+
+
+以下 |Normal| 模式与 |Visual| 模式映射存在（当你编辑 SQL
+文件时）： >
+    ]]		    move forward to the next 'begin'
+    [[		    move backwards to the previous 'begin'
+    ][		    move forward to the next 'end'
+    []		    move backwards to the previous 'end'
+
+
+------------------------------------------------------------------------------
+1.3 预定义对象移动			*sql-predefined-objects*
+
+大多数关系型数据库支持各种标准特性：表、索引、触发器与存储过程。
+每个厂商还各有多种专有对象。下面这组映射就是为了在对象之间移动
+而创建的。取决于你使用哪个数据库厂商，对象列表必须可配置。该
+filetype 插件尝试定义许多标准对象，并额外定义许多对象。为了让
+它尽可能灵活，你可以在自己的
+
+
+|vimrc| 中用以下内容覆盖对象列表： >
+    let g:ftplugin_sql_objects = 'function,procedure,event,table,trigger' ..
+		\ ',schema,service,publication,database,datatype,domain' ..
+		\ ',index,subscription,synchronization,view,variable'
+
+以下 |Normal| 模式与 |Visual| 模式映射已创建，它们使用
+上面的列表： >
+    ]}		    move forward to the next 'create <object name>'
+    [{		    move backward to the previous 'create <object name>'
+
+反复按 ]} 会在这些 create 语句之间循环： >
+    create table t1 (
+	...
+    );
+
+    create procedure p1
+    begin
+	...
+    end;
+
+    create index i1 on t1 (c1);
+
+g:ftplugin_sql_objects 的默认设置为： >
+    let g:ftplugin_sql_objects = 'function,procedure,event,' ..
+		\ '\\(existing\\\\|global\\s\\+temporary\\s\\+\\)\\\{,1}' ..
+		\ 'table,trigger' ..
+		\ ',schema,service,publication,database,datatype,domain' ..
+		\ ',index,subscription,synchronization,view,variable'
+
+上述设置还能处理以下情形： >
+    create table t1 (
+	...
+    );
+    create existing table t2 (
+	...
+    );
+    create global temporary table t3 (
+	...
+    );
+
+默认情况下，该 ftplugin 只搜索 CREATE 语句。你也可以通过
+自己的 |init.vim| 覆盖，写法如下： >
+    let g:ftplugin_sql_statements = 'create,alter'
+
+该 filetype 插件定义了三种注释： >
+    1.  --
+    2.  //
+    3.  /*
+	 *
+	 */
+
+以下 |Normal| 模式与 |Visual| 模式映射已创建，可用来处理
+注释： >
+    ]"		    move forward to the beginning of a comment
+    ["		    move forward to the end of a comment
+
+
+
+------------------------------------------------------------------------------
+1.4 宏					   *sql-macros*
+
+Vim 用于查找宏定义的功能 'define'，由以下正则表达式
+提供支持： >
+    \c\<\(VARIABLE\|DECLARE\|IN\|OUT\|INOUT\)\>
+
+这可以处理如下代码： >
+    CREATE VARIABLE myVar1 INTEGER;
+
+    CREATE PROCEDURE sp_test(
+	IN myVar2 INTEGER,
+	OUT myVar3 CHAR(30),
+	INOUT myVar4 NUMERIC(20,0)
+    )
+    BEGIN
+	DECLARE myVar5 INTEGER;
+
+	SELECT c1, c2, c3
+	  INTO myVar2, myVar3, myVar4
+	  FROM T1
+	 WHERE c4 = myVar1;
+    END;
+
+把光标放在下面这一行的 "myVar1" 上： >
+	 WHERE c4 = myVar1;
+		     ^
+
+按以下任意一个键： >
+    [d
+    [D
+    [CTRL-D
+
+
+==============================================================================
+2. SQL 方言					*sql-dialects* *sql-types*
+						*sybase* *TSQL* *Transact-SQL*
+						*sqlanywhere*
+						*oracle* *plsql* *sqlj*
+						*sqlserver*
+						*mysql* *postgresql* *psql*
+						*informix*
+
+所有关系型数据库都支持 SQL。其中有一部分 SQL 是跨厂商通用的（例如
+CREATE TABLE、CREATE INDEX），但 SQL 也有大量厂商特有的扩展。Oracle
+支持 "CREATE OR REPLACE" 语法、在 CREATE TABLE 语句中指定列默认值，
+以及过程化语言（用于存储过程和触发器）。
+
+Vim 的默认发行版自带基于 Oracle PL/SQL 的语法高亮。默认的 SQL indent
+脚本适用于 Oracle 和 SQL Anywhere。默认的 filetype 插件适用于所有厂商，
+应当保持厂商中立，但可扩展。
+
+Vim 目前支持多种不同的厂商，实现方式是 syntax 脚本。遗憾的是，要在不同
+的语法规则之间切换，你必须创建以下之一：
+    1.  新的 filetype
+    2.  自定义 autocmd
+    3.  手工步骤 / 命令
+
+大多数人只与一个厂商的数据库产品打交道，所以能在自己的 |init.vim| 中
+指定一个默认值会是件好事。
+
+
+------------------------------------------------------------------------------
+2.1 SQLSetType					*sqlsettype* *SQLSetType*
+
+对于那些需要面对多种不同数据库的人来说，能够随时以 buffer 为单位在
+各厂商的规则（indent、syntax）之间切换是件好事。ftplugin/sql.vim 文件
+定义了这个函数： >
+    SQLSetType
+
+不带任何参数执行这个函数，会把 indent 和 syntax 脚本恢复为默认值，见
+|sql-type-default|。你可以用 <Tab> 键补全那个可选参数。
+
+输入函数名和一个空格之后，你可以用补全来提供一个参数。该函数接受你
+想要 source 的 Vim 脚本名。借助 |cmdline-completion| 功能，SQLSetType
+函数会在 'runtimepath' 中搜索名称里含 "sql" 的所有 Vim 脚本。这省去了
+猜测名称拼写的麻烦。下面是一些例子： >
+    :SQLSetType
+    :SQLSetType sqloracle
+    :SQLSetType sqlanywhere
+    :SQLSetType sqlinformix
+    :SQLSetType mysql
+
+最简单的做法是使用 <Tab> 字符：它会先补全命令名（SQLSetType），然后
+输入一个空格并再按一次 <Tab>，就会显示可用的 Vim 脚本名列表： >
+    :SQL<Tab><space><Tab>
+
+
+------------------------------------------------------------------------------
+2.2 SQLGetType					*sqlgettype* *SQLGetType*
+
+任何时候你都可以通过调用 SQLGetType 命令来确定自己正在使用哪种 SQL
+方言。ftplugin/sql.vim 文件定义了这个函数： >
+    SQLGetType
+
+这会回显： >
+    Current SQL dialect in use:sqlanywhere
+
+
+------------------------------------------------------------------------------
+2.3 SQL 方言默认值				*sql-type-default*
+
+如前所述，Vim 的默认语法规则基于 Oracle（PL/SQL）。你可以把以下之一
+放进自己的 |init.vim| 来覆盖这个默认值： >
+    let g:sql_type_default = 'sqlanywhere'
+    let g:sql_type_default = 'sqlinformix'
+    let g:sql_type_default = 'mysql'
+
+如果你在自己的 |init.vim| 中加入了以下内容： >
+    let g:sql_type_default = 'sqlinformix'
+
+下次你编辑 SQL 文件时，Vim 会自动加载以下脚本： >
+    ftplugin/sql.vim
+    syntax/sqlinformix.vim
+    indent/sql.vim
+<
+注意 indent/sqlinformix.sql 没有被加载。Informix 没有对应的 indent 文件，
+如果指定的文件不存在，Vim 会加载默认文件。
+
+
+==============================================================================
+3. 添加新的 SQL 方言				*sql-adding-dialects*
+
+如果你开始使用某个 SQL 方言，而 Vim 默认发行版中没有现成的定制，你可以
+访问 https://www.vim.org 看看目前是否已有可用的定制。如果没有，可以先
+克隆一份现有的脚本。更多细节请阅读 |filetype-plugins|。
+
+为了方便识别这些脚本，请尽量用 "sql" 前缀来创建文件。如果你决定要为
+SQLite 数据库创建定制，可以创建以下任一文件： >
+    Unix
+	~/.config/nvim/syntax/sqlite.vim
+	~/.config/nvim/indent/sqlite.vim
+
+无需改动 SQLSetType 函数。它会自动识别这些新 SQL 文件，并在你执行
+SQLSetType 命令时加载它们。
+
+
+==============================================================================
+4. OMNI SQL 补全				*sql-completion*
+						*omni-sql-completion*
+
+Vim 7 提供了代码补全接口和函数，使插件开发者能为任何语言内建代码补全。
+Vim 7 还包含了针对 SQL 语言的代码补全。
+
+SQL 补全插件有两种模式：静态和动态。静态模式用当前 syntax 高亮规则生成
+的数据填充弹出列表。动态模式用直接从数据库检索的数据填充弹出列表。
+这包括表清单、列清单、过程名等等。
+
+------------------------------------------------------------------------------
+4.1 静态模式					*sql-completion-static*
+
+所创建的静态弹出列表包含编辑 filetype 为 SQL 的文件时由活动 syntax 规则
+所定义的项目。该插件（默认）定义了多种映射，帮助用户细化要显示的条目
+清单。默认的静态映射如下： >
+    imap <buffer> <C-C>a <C-\><C-O>:call sqlcomplete#Map('syntax')<CR><C-X><C-O>
+    imap <buffer> <C-C>k <C-\><C-O>:call sqlcomplete#Map('sqlKeyword')<CR><C-X><C-O>
+    imap <buffer> <C-C>f <C-\><C-O>:call sqlcomplete#Map('sqlFunction')<CR><C-X><C-O>
+    imap <buffer> <C-C>o <C-\><C-O>:call sqlcomplete#Map('sqlOption')<CR><C-X><C-O>
+    imap <buffer> <C-C>T <C-\><C-O>:call sqlcomplete#Map('sqlType')<CR><C-X><C-O>
+    imap <buffer> <C-C>s <C-\><C-O>:call sqlcomplete#Map('sqlStatement')<CR><C-X><C-O>
+
+用户可以在自己的 |init.vim| 中自行选择 "<C-C>" 的用法，因为它并非在
+所有平台上都能正常工作： >
+    let g:ftplugin_sql_omni_key = '<C-C>'
+<
+静态映射（基于 syntax 高亮组）遵循以下格式： >
+    imap <buffer> <C-C>k <C-\><C-O>:call sqlcomplete#Map('sqlKeyword')<CR><C-X><C-O>
+    imap <buffer> <C-C>k <C-\><C-O>:call sqlcomplete#Map('sqlKeyword\w*')<CR><C-X><C-O>
+
+该命令分解如下： >
+    imap		   - Create an insert map
+    <buffer>		   - Only for this buffer
+    <C-C>k		   - Your choice of key map
+    <C-\><C-O>		   - Execute one command, return to Insert mode
+    :call sqlcomplete#Map( - Allows the SQL completion plugin to perform some
+			     housekeeping functions to allow it to be used in
+			     conjunction with other completion plugins.
+			     Indicate which item you want the SQL completion
+			     plugin to complete.
+			     In this case we are asking the plugin to display
+			     items from the syntax highlight group
+			     'sqlKeyword'.
+			     You can view a list of highlight group names to
+			     choose from by executing the
+				 :syntax list
+			     command while editing a SQL file.
+    'sqlKeyword'	   - Display the items for the sqlKeyword highlight
+			     group
+    'sqlKeyword\w*'	   - A second option available with Vim 7.4 which
+			     uses a regular expression to determine which
+			     syntax groups to use
+    )<CR>		   - Execute the :let command
+    <C-X><C-O>		   - Trigger the standard omni completion key stroke.
+			     Passing in 'sqlKeyword' instructs the SQL
+			     completion plugin to populate the popup with
+			     items from the sqlKeyword highlight group.  The
+			     plugin will also cache this result until Vim is
+			     restarted.  The syntax list is retrieved using
+			     the syntaxcomplete plugin.
+
+使用 'syntax' 关键字是一种特殊情况。它指示 syntaxcomplete 插件检索所有
+syntax 项目。因此它实际上对 Vim 的任何 SQL 语法文件都有效。撰写本文时，
+这包括 10 个针对不同 SQL 方言的语法文件（见上文第 3 节 |sql-dialects|）。
+
+以下是一些从 syntax 文件中提取的条目示例： >
+     All
+	 - Contains the contents of all syntax highlight groups
+     Statements
+	 - Select, Insert, Update, Delete, Create, Alter, ...
+     Functions
+	 - Min, Max, Trim, Round, Date, ...
+     Keywords
+	 - Index, Database, Having, Group, With
+     Options
+	 - Isolation_level, On_error, Qualify_owners, Fire_triggers, ...
+     Types
+	 - Integer, Char, Varchar, Date, DateTime, Timestamp, ...
+
+
+------------------------------------------------------------------------------
+4.2 动态模式					*sql-completion-dynamic*
+
+动态模式用直接来自数据库的数据填充弹出列表。要启用动态功能，你必须安装
+dbext.vim 插件（https://www.vim.org/scripts/script.php?script_id=356）。
+
+SQL 补全插件的多项功能都使用动态模式。安装 dbext 插件之后，请参阅
+dbext-tutorial 了解额外的配置与用法。dbext 插件让 SQL 补全插件能够显示
+表、过程、视图和列的清单。 >
+     Table List
+	 - All tables for all schema owners
+     Procedure List
+	 - All stored procedures for all schema owners
+     View List
+	 - All stored procedures for all schema owners
+     Column List
+	 - For the selected table, the columns that are part of the table
+
+要启用弹出列表，在 INSERT 模式下按各组对应的按键组合（其中 <C-C> 表示
+按住 CTRL 键的同时按下空格键）：
+     表清单			   - <C-C>t
+			   - <C-X><C-O>（默认映射假定为表）
+     存储过程清单	 - <C-C>p
+     视图清单		   - <C-C>v
+     列清单		   - <C-C>c
+
+     深入 / 退出	     - 查看显示表清单的弹出列表时，你可以按 <Right>，
+			     这会用该表的列清单替换当前高亮的表名。
+			   - 查看显示列清单的弹出列表时，你可以按 <Left>，
+			     这会用表清单替换列清单。
+			   - 这让你能快速深入某个表查看它的列，再返回。
+			   - <Right> 和 <Left> 也可以在
+			     |init.vim| 中选择 >
+                                let g:ftplugin_sql_omni_key_right = '<Right>'
+                                let g:ftplugin_sql_omni_key_left  = '<Left>'
+
+SQL 补全插件会缓存弹出列表中显示的各种清单。这使得重新显示这些清单非常
+快。如果向数据库中添加了新的表或列，可能有必要清空插件的缓存。默认的
+映射是： >
+    imap <buffer> <C-C>R <C-\><C-O>:call sqlcomplete#Map('ResetCache')<CR><C-X><C-O>
+
+
+4.3 SQL 教程				*sql-completion-tutorial*
+
+本教程旨在带你走遍 SQL 补全插件的常用功能，从而让你： >
+     a) You gain familiarity with the plugin
+     b) You are introduced to some of the more common features
+     c) Show how to customize it to your preferences
+     d) Demonstrate "Best of Use" of the plugin (easiest way to configure).
+
+首先，创建一个新的 buffer： >
+     :e tutorial.sql
+
+
+静态功能 ~
+
+要带你浏览各种清单，只需进入插入模式，然后按：
+    <C-C>s   （显示 SQL 语句）
+此时你可以向下翻页浏览清单，直到找到 "select"。如果你对自己要找的条目
+很熟悉，例如你知道该语句以字母 "s" 开头，那么你可以提前输入（不带引号）
+"se"，然后按：
+    <C-Space>t
+假定弹出列表中 "select" 已高亮，按 <Enter> 选择该条目。然后输入：
+    * fr<C-C>a （显示所有 syntax 项目）
+从弹出列表中选择 "from"。
+
+在编写存储过程时，使用 "type" 清单很有用。它包含数据库支持的所有类型的
+清单。这一点是否成立，取决于你使用的 syntax 文件。SQL Anywhere 的 syntax
+文件（sqlanywhere.vim）对此提供了支持： >
+     BEGIN
+	DECLARE customer_id <C-C>T <-- Choose a type from the list
+
+
+动态功能 ~
+
+要利用动态功能，你必须先安装 dbext.vim 插件
+（https://www.vim.org/scripts/script.php?script_id=356）。它也附带一份
+教程。从 SQL 补全插件的角度看，dbext 提供的主要功能是与数据库建立连接。
+dbext 连接配置文件是定义连接信息最有效的机制。连接设置好之后，SQL 补全
+插件会在后台使用 dbext 的功能来填充弹出列表。
+
+下文假定 dbext.vim 已正确配置，一个简单的测试是执行命令 :DBListTable。
+如果显示了表清单，就说明 dbext.vim 工作正常。如果没有，请查阅 dbext.txt
+文档。
+
+假定你已按照 dbext-tutorial 做过，你可以按 <C-C>t 显示表清单。在 dbext
+生成表清单的过程中会有一小段延迟。清单显示出来之后按 <C-W>。这会同时
+移除弹出 window 和清单激活时已经选好的表名。
+
+ 4.3.1 表补全：			*sql-completion-tables*
+
+在通过 dbext 插件连接的数据库内按 <C-C>t 会显示表清单。
+注意：所有 SQL 补全弹出列表都支持在按映射键之前先输入一个前缀。这会
+把弹出 window 的内容限制为仅以这些字符开头的条目。
+
+ 4.3.2 列补全：			*sql-completion-columns*
+
+SQL 补全插件也可以显示特定表的列清单。列补全通过 <C-C>c 触发。
+
+注意：以下示例在弹出 window 活动时使用 <Right> 触发列清单。
+
+使用列补全的示例：
+     - 再按一次 <C-C>t 显示表清单。
+     - 清单显示在补全 window 中时按 <Right>，
+       这会用当前高亮表的列清单替换
+       表清单（同样有一小段延迟）。
+     - 如果按 <Left>，列清单又会换回
+       表清单。这让你能非常快地深入表
+       查看其列清单。
+     - 在同一张表高亮时再按一次 <Right>。你会
+       注意到没有延迟，因为列清单已被缓存。如果你
+       改动了已缓存表的 schema，可以按 <C-C>R，它会
+       清空 SQL 补全缓存。
+     - 注意：<Right> 和 <Left> 被设计为在
+       补全 window 活动时起作用。如果弹出 window
+       没活动，就会执行普通的 <Right> 或 <Left>。
+
+下面看一下如何动态地构建 SQL 语句。select 语句需要一份列清单。使用 SQL
+补全插件构建列清单有两种方式。 >
+    One column at a time:
+<       1. After typing SELECT press <C-C>t to display a list of tables.
+	2. Choose a table from the list.
+	3. Press <Right> to display a list of columns.
+	4. Choose the column from the list and press enter.
+	5. Enter a "," and press <C-C>c.  Generating a column list
+	   generally requires having the cursor on a table name.  The plugin
+	   uses this name to determine what table to retrieve the column list.
+	   In this step, since we are pressing <C-C>c without the cursor
+	   on a table name the column list displayed will be for the previous
+	   table.  Choose a different column and move on.
+	6. Repeat step 5 as often as necessary. >
+    All columns for a table:
+<	1. After typing SELECT press <C-C>t to display a list of tables.
+	2. Highlight the table you need the column list for.
+	3. Press <Enter> to choose the table from the list.
+	4. Press <C-C>l to request a comma-separated list of all columns
+	   for this table.
+	5. Based on the table name chosen in step 3, the plugin attempts to
+	   decide on a reasonable table alias.	You are then prompted to
+	   either accept of change the alias.  Press OK.
+	6. The table name is replaced with the column list of the table is
+	   replaced with the comma separate list of columns with the alias
+	   prepended to each of the columns.
+	7. Step 3 and 4 can be replaced by pressing <C-C>L, which has
+	   a <C-Y> embedded in the map to choose the currently highlighted
+	   table in the list.
+
+在编写 select 语句时有一项特殊处理。考虑以下语句： >
+     select *
+       from customer c,
+	    contact cn,
+	    department as dp,
+	    employee e,
+	    site_options so
+      where c.
+
+在 INSERT 模式下，输入最后那个 "c." 之后（它是 "customer" 表的别名），
+你可以按 <C-C>c 或 <C-X><C-O>。这会弹出 customer 表的列清单。它的做法是
+回溯到 select 语句的开头，从 FROM 子句中找出所指定的表清单。在本例中它
+注意到在字符串 "customer c" 里，"c" 是 customer 表的别名。可选的 "AS"
+关键字也受支持，即 "customer AS c"。
+
+
+ 4.3.3 过程补全：			*sql-completion-procedures*
+
+与表清单类似，<C-C>p 会显示数据库中存储的过程清单。
+
+ 4.3.4 视图补全：				*sql-completion-views*
+
+与表清单类似，<C-C>v 会显示数据库中的视图清单。
+
+
+------------------------------------------------------------------------------
+4.4 补全定制					*sql-completion-customization*
+
+SQL 补全插件可以通过在你的 |init.vim| 中设置各种选项来定制： >
+    omni_sql_no_default_maps
+<       - 默认值：此变量未定义
+	- 如果定义了此变量，就不会为 OMNI 补全创建任何映射。进一步讨论见
+	  |sql-completion-maps|。
+>
+    omni_sql_use_tbl_alias
+<	- 默认值：a
+	- 此设置仅在生成逗号分隔的列清单时使用。默认映射是 <C-C>l。生成
+	  列清单时，可以在每一列的开头加上别名，例如：	e.emp_id, e.emp_name。
+	  此选项有三种设置： >
+		n - do not use an alias
+		d - use the default (calculated) alias
+		a - ask to confirm the alias name
+<
+	  别名的确定遵循几条规则：
+	       1.  如果表名含 '_'，则把 '_' 用作分隔符： >
+		   MY_TABLE_NAME --> MTN
+		   my_table_name --> mtn
+		   My_table_NAME --> MtN
+<	       2.  如果表名不含 '_'，但使用了
+		   混合大小写，则把大小写用作分隔符： >
+		   MyTableName --> MTN
+<	       3.  如果表名不含 '_'，也不使用
+		   使用混合大小写，则使用表的首字母： >
+		   mytablename --> m
+		   MYTABLENAME --> M
+
+    omni_sql_ignorecase
+<	- 默认值：'ignorecase' 的当前设置
+	- 有效设置为 0 或 1。
+	- 在启动补全之前先输入几个字母时，清单会被过滤，只显示以这串字符
+	  开头的条目。当此选项设为 0 时，清单将区分大小写进行过滤。 >
+
+    omni_sql_include_owner
+<	- 默认值：0，除非已安装 dbext.vim 3.00
+	- 有效设置为 0 或 1。
+	- 在使用 dbext.vim 3.00 或更高版本补全表、过程或视图时，对象清单
+	  还会包含 owner 名。补全这些对象且启用 omni_sql_include_owner 时，
+	  owner 名会被替换。 >
+
+    omni_sql_precache_syntax_groups
+<	- 默认值：
+	  ['syntax','sqlKeyword','sqlFunction','sqlOption','sqlType','sqlStatement']
+	- sqlcomplete 可以与其他补全插件一起使用。相关说明见
+	  |sql-completion-filetypes|。当 filetype 被临时改为 SQL 时，
+	  sqlcompletion 插件会缓存此选项中指定的 List 里列出的 syntax 组。
+
+
+------------------------------------------------------------------------------
+4.5 SQL 映射					*sql-completion-maps*
+
+本文档的其他小节已经更详细地描述了默认的 SQL 映射。下面列出这些映射，
+并附上各自的简要说明。
+
+静态映射 ~
+
+这些映射使用 Vim 的 syntax 高亮规则来填充补全列表。 >
+    <C-C>a
+<       - 显示所有 SQL syntax 项目。 >
+    <C-C>k
+<       - 显示所有定义为 'sqlKeyword' 的 SQL syntax 项目。 >
+    <C-C>f
+<       - 显示所有定义为 'sqlFunction' 的 SQL syntax 项目。 >
+    <C-C>o
+<       - 显示所有定义为 'sqlOption' 的 SQL syntax 项目。 >
+    <C-C>T
+<       - 显示所有定义为 'sqlType' 的 SQL syntax 项目。 >
+    <C-C>s
+<       - 显示所有定义为 'sqlStatement' 的 SQL syntax 项目。 >
+
+动态映射 ~
+
+这些映射使用 dbext.vim 插件来填充补全列表。 >
+    <C-C>t
+<       - 显示表清单。 >
+    <C-C>p
+<       - 显示过程清单。 >
+    <C-C>v
+<       - 显示视图清单。 >
+    <C-C>c
+<       - 显示特定表的列清单。 >
+    <C-C>l
+<       - 显示特定表的逗号分隔列清单。 >
+    <C-C>L
+<       - 显示特定表的逗号分隔列清单。
+	  只应在补全 window 活动时使用。 >
+    <Right>
+<	- 显示当前在补全 window 中高亮的表的列清单。
+	  在多数 Unix 系统上无法识别 <Right>，
+	  所以此映射只在 Windows 平台创建。
+	  如果你希望在 Unix 上有同样的功能，请另选一个键，
+	  并在你的 vimrc 中做同样的映射。 >
+    <Left>
+<	- 显示表清单。
+	  多数 Unix 系统无法识别 <Left>，所以此映射
+	  只在 Windows 平台创建。如果你希望在 Unix 上有
+	  同样的功能，请另选一个键，并在你的 vimrc 中
+	  做同样的映射。 >
+    <C-C>R
+<	- 此映射会移除所有缓存条目，强制 SQL 补全
+	  重新生成条目清单。
+
+定制映射 ~
+
+你可以按需创建任意多的附加键映射。一般来说，这些映射会指定不同的
+syntax 高亮组。
+如果你不希望创建默认映射，或者这些按键选择在你的平台上不起作用（在
+unix 上常常如此），那么可以在自己的 |init.vim| 中定义以下变量： >
+    let g:omni_sql_no_default_maps = 1
+
+不要直接编辑 ftplugin/sql.vim！如果你改动了这个文件，你的改动会在未来
+更新时被覆盖。Vim 有一套特殊的目录结构，让你无需改动 Vim 发行版自带的
+文件就能做定制。如果你想定制映射，请创建 after/ftplugin/sql.vim（见
+|after-directory|），并把 ftplugin/sql.vim 中的同名映射用你自己的按键
+写进去。<C-C> 之所以被选中，是因为它在 Windows 和 unix 平台上都能用。
+在 Windows 平台上你还可以使用 <C-Space> 或 ALT 键。
+
+
+------------------------------------------------------------------------------
+4.6 与其他 filetype 一起使用			*sql-completion-filetypes*
+
+很多时候 SQL 会与不同的 filetype 一起使用。例如 Perl、Java、PHP、Javascript
+都能与数据库交互。你常常既需要 SQL 补全，也需要当前所编辑语言的补全
+能力。
+
+按以下步骤即可轻松启用（假定是一个 Perl 文件）： >
+    1.  :e test.pl
+    2.  :set filetype=sql
+    3.  :set ft=perl
+
+步骤 1 ~
+
+从编辑一个 Perl 文件开始。Vim 会自动把 filetype 设为 "perl"。默认情况下，
+Vim 会运行相应的 filetype 文件 ftplugin/perl.vim。如果你按照
+|ft-syntax-omni| 中的说明使用 syntax 补全插件，那么 'omnifunc' 选项已被
+设为 "syntax#Complete"。按 <C-X><C-O> 会显示包含 Perl syntax 项目的
+omni 弹出列表。
+
+步骤 2 ~
+
+手动把 filetype 设为 "sql" 也会触发相应的 filetype 文件 ftplugin/sql.vim。
+这个文件会定义若干针对此 buffer 的 SQL 补全映射，见 |sql-completion-maps|。
+此时这些映射已创建，SQL 补全插件也已初始化。所有 SQL syntax 项目都已
+预先缓存。SQL filetype 脚本会检测到我们试图使用两个不同的补全插件。由于
+SQL 映射以 <C-C> 开头，这些映射在使用时会切换 'omnifunc'。因此你可以用
+<C-X><C-O> 继续使用 Perl 的补全（借助 syntax 补全插件），而用 <C-C> 使用
+SQL 补全功能。
+
+步骤 3 ~
+
+把 filetype 设回 Perl，一切与 "perl" 相关的常规设置都会恢复原状。
+
+
+vim:tw=78:ts=8:noet:ft=help:norl:

@@ -1,20 +1,43 @@
 local M = {}
+local cache = { status = 'unread', results = {} }
+local task = 0
+local pending
+
+local function deliver(callback, result)
+  if not callback then return end
+  local ok, err = pcall(callback, result)
+  if not ok then vim.schedule(function() vim.notify('nvim-zh：检查回调出错：' .. tostring(err), vim.log.levels.WARN) end) end
+end
+
+local function cancel(reason)
+  local current = pending
+  pending = nil
+  if current then
+    deliver(current.fn, { ok = false, status = 'cancelled', error_code = reason,
+      error = reason == 'superseded' and '检查已被更新的检查取代' or '检查已取消', task_id = current.id })
+  end
+end
 
 local function collect()
-  local zh = require('nvim-zh')
-  local config = zh.info().config
+  local snapshot = require('nvim-zh.status').get()
+  local config = snapshot.config
   local results = {
     {
       name = 'setup',
-      status = zh.info().configured and 'ok' or 'info',
-      message = zh.info().configured and 'setup() 已执行' or '尚未执行 setup()；仅显示只读检查',
+      status = snapshot.configured and 'ok' or 'info',
+      message = snapshot.configured and 'setup() 已执行' or '尚未执行 setup()；仅显示只读检查',
     },
   }
+  local runtime = snapshot.runtime
+  table.insert(results, { name = 'resources', status = runtime.status == 'error' and 'error'
+    or runtime.status == 'ok' and 'ok' or 'info', message = runtime.error or runtime.status })
+  table.insert(results, { name = 'config.file', status = runtime.config_file.status == 'error' and 'warn' or 'info',
+    message = runtime.config_file.error or runtime.config_file.status })
   if config.modules.core.enabled then
     vim.list_extend(results, require('nvim-zh.native').check())
   end
   vim.list_extend(results, require('nvim-zh.help').check(config.modules.help))
-  local ui = require('nvim-zh.ui').info()
+  local ui = snapshot.ui
   for _, name in ipairs({ 'notify', 'notify_once', 'input', 'select', 'select_items', 'echo' }) do
     local adapter = ui[name]
     local status = adapter.active and 'ok' or adapter.enabled and 'warn' or 'info'
@@ -25,8 +48,10 @@ local function collect()
         and ('已降级：' .. tostring(adapter.reason)) or '已禁用',
     })
   end
-  local plugins = require('nvim-zh.plugins').info()
-  for _, name in ipairs({ 'which-key', 'telescope', 'lazy.nvim', 'nvim-tree', 'nvim-cmp' }) do
+  local plugins = snapshot.plugins
+  local plugin_names = vim.tbl_keys(plugins)
+  table.sort(plugin_names)
+  for _, name in ipairs(plugin_names) do
     local adapter = plugins[name]
     local status = adapter.active and 'ok'
       or adapter.enabled and adapter.reason ~= 'not_loaded' and 'warn' or 'info'
@@ -37,7 +62,7 @@ local function collect()
         and ('已降级：' .. tostring(adapter.reason)) or ('已禁用/未加载：' .. tostring(adapter.reason)),
     })
   end
-  local diagnostics = require('nvim-zh.diagnostics').info()
+  local diagnostics = snapshot.diagnostics
   for _, name in ipairs({ 'virtual_text', 'virtual_lines', 'float' }) do
     local adapter = diagnostics[name]
     local status = adapter.active and 'ok' or adapter.enabled and 'warn' or 'info'
@@ -48,7 +73,7 @@ local function collect()
         or adapter.enabled and ('已降级：' .. tostring(adapter.reason)) or '已禁用',
     })
   end
-  local lsp = require('nvim-zh.lsp').info()
+  local lsp = snapshot.lsp
   local expected = {}
   if lsp.messages then
     table.insert(expected, 'window/showMessage')
@@ -74,6 +99,44 @@ local function collect()
 end
 
 function M.collect() return collect() end
+
+function M.run(callback)
+  assert(callback == nil or type(callback) == 'function', 'check callback must be function')
+  cancel('superseded')
+  task = task + 1
+  local id = task
+  pending = callback and { fn = callback, id = id } or nil
+  cache.status = 'checking'
+  vim.schedule(function()
+    if id ~= task then return end
+    local ok, results = pcall(collect)
+    if id ~= task then return end
+    cache = { status = ok and 'complete' or 'error', checked_at = os.time(), results = ok and results or {},
+      error = not ok and tostring(results) or nil }
+    local current = pending
+    pending = nil
+    if current and current.id == id then
+      local degraded = false
+      if ok then
+        for _, result in ipairs(results) do
+          if result.status == 'warn' or result.status == 'error' then degraded = true; break end
+        end
+      end
+      deliver(current.fn, { ok = ok, status = ok and (degraded and 'degraded' or 'ok') or 'error',
+        error_code = not ok and 'check_failed' or nil, task_id = id,
+        results = ok and results or nil, error = not ok and tostring(results) or nil })
+    end
+  end)
+  return id
+end
+
+function M.stop()
+  task = task + 1
+  cancel('stopped')
+  cache.status = 'cancelled'
+end
+
+function M.info() return vim.deepcopy(cache) end
 
 function M.show()
   local results = collect()

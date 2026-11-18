@@ -1,0 +1,251 @@
+*if_perl.txt*   Nvim
+
+
+		  VIM REFERENCE MANUAL	  by Jacques Germishuys
+
+Vim 的 perl 接口				*if_perl* *perl*
+
+更多信息见 |provider-perl|。
+
+                                      输入 |gO| 查看目录。
+
+==============================================================================
+1. 命令						*perl-commands*
+
+						*:perl*
+:[range]perl {stmt}
+			执行 perl 语句 {stmt}。当前的 package 是 "main"。
+			想简单检查 `:perl` 命令是否可用： >
+				:perl print "Hello"
+
+:[range]perl << [trim] [{endmarker}]
+{script}
+{endmarker}
+			执行 perl 脚本 {script}。
+			{script} 之后的 {endmarker} 之前绝不能有任何空白字符。
+
+			如果省略了 [endmarker]，它默认是一个点 '.'，与
+			|:append| 和 |:insert| 命令相同。
+
+			可用于把 perl 代码包含进 Vim 脚本。
+			需要 perl，见 |script-here|。
+
+示例： >
+	function! MyVimMethod()
+	perl << EOF
+	sub my_vim_method
+	{
+		print "Hello World!\n";
+	}
+	EOF
+	endfunction
+
+要查看你的 perl 是什么版本： >
+
+	:perl print $^V
+<
+							*:perldo*
+:[range]perldo {cmd}	对 [range] 中的每行执行 perl 命令 {cmd}，
+			其中 $_ 依次被设为该行的文本，不带行尾 <EOL>。
+			除 $_ 之外，$line 和 $linenr 也分别被设为行内容
+			和行号。设置 $_ 会改变文本，但注意本命令无法
+			增加或删除行。
+			[range] 的默认值是整个文件："1,$"。
+
+示例： >
+	:perldo $_ = reverse($_);
+	:perldo $_ = "".$linenr." => $line";
+
+可以配合 `:perl` 使用 `:perldo`，用 perl 过滤一个 range。
+例如： >
+
+	:perl << EOF
+	sub perl_vim_string_replace
+	{
+	    my $line = shift;
+	    my $needle = $vim->eval('@a');
+	    my $replacement = $vim->eval('@b');
+	    $line =~ s/$needle/$replacement/g;
+	    return $line;
+	}
+	EOF
+	:let @a='somevalue'
+	:let @b='newvalue'
+	:'<,'>perldo $_ = perl_vim_string_replace($_)
+<
+							*:perlfile*
+:[range]perlfile {file}
+			执行 {file} 中的 perl 脚本。整个参数被当作一个单独
+			的文件名。
+
+这两个命令做的事本质上相同——它们执行一段 perl 代码，并把
+「当前 range」设为给定的行 range。
+
+在 :perl 的情形下，要执行的代码在命令行上。
+在 :perlfile 的情形下，要执行的代码是给定文件的内容。
+
+perl 命令不能在 |sandbox| 中使用。
+
+要传递参数，必须显式设置 @ARGV。示例： >
+
+	:perl @ARGV = ("foo", "bar");
+	:perlfile myscript.pl
+
+这里有一些示例					*perl-examples*  >
+
+	:perl print "Hello"
+	:perl $current->line (uc ($current->line))
+	:perl my $str = $current->buffer->[42]; print "Set \$str to: $str"
+
+注意改动（例如 "use" 语句）会从一个命令持续到下一个命令。
+
+==============================================================================
+2. VIM 模块					*perl-vim*
+
+Perl 代码通过 "VIM" 模块取得对 Nvim 的全部访问能力。
+
+概览 >
+	print "Hello"				# displays a message
+	VIM::Msg("Hello")			# displays a message
+	VIM::SetOption("ai")			# sets a vim option
+	$nbuf = VIM::Buffers()			# returns the number of buffers
+	@buflist = VIM::Buffers()		# returns array of all buffers
+	$mybuf = (VIM::Buffers('a.c'))[0]	# returns buffer object for 'a.c'
+	@winlist = VIM::Windows()		# returns array of all windows
+	$nwin = VIM::Windows()			# returns the number of windows
+	($success, $v) = VIM::Eval('&path')	# $v: option 'path', $success: 1
+	($success, $v) = VIM::Eval('&xyz')	# $v: '' and $success: 0
+	$v = VIM::Eval('expand("<cfile>")')	# expands <cfile>
+	$curwin->SetHeight(10)			# sets the window height
+	@pos = $curwin->Cursor()		# returns (row, col) array
+	@pos = (10, 10)
+	$curwin->Cursor(@pos)			# sets cursor to @pos
+	$curwin->Cursor(10,10)			# sets cursor to row 10 col 10
+	$mybuf = $curwin->Buffer()		# returns the buffer object for window
+	$curbuf->Name()				# returns buffer name
+	$curbuf->Number()			# returns buffer number
+	$curbuf->Count()			# returns the number of lines
+	$l = $curbuf->Get(10)			# returns line 10
+	@l = $curbuf->Get(1 .. 5)		# returns lines 1 through 5
+	$curbuf->Delete(10)			# deletes line 10
+	$curbuf->Delete(10, 20)			# delete lines 10 through 20
+	$curbuf->Append(10, "Line")		# appends a line
+	$curbuf->Append(10, "L1", "L2", "L3")	# appends 3 lines
+	@l = ("L1", "L2", "L3")
+	$curbuf->Append(10, @l)			# appends L1, L2 and L3
+	$curbuf->Set(10, "Line")		# replaces line 10
+	$curbuf->Set(10, "Line1", "Line2")	# replaces lines 10 and 11
+	$curbuf->Set(10, @l)			# replaces 3 lines
+
+模块函数：
+
+						*perl-Msg*
+VIM::Msg({msg})
+			显示消息 {msg}。
+
+						*perl-SetOption*
+VIM::SetOption({arg})	设置一个 vim 选项。{arg} 可以是 ":set" 命令
+			接受的任何参数。注意这意味着参数中不允许出现空格！
+			见 |:set|。
+
+						*perl-Buffers*
+VIM::Buffers([{bn}...])	不带参数时，在数组上下文中返回所有 Buffer
+			的列表，在标量上下文中返回 Buffer 的个数。对于
+			buffer 名称或编号的列表 {bn}，返回匹配 {bn} 的
+			Buffer 列表，规则与 Vim 内部的 |bufname()| 函数相同。
+			警告：使用 |:bwipe| 之后该列表即失效。
+
+						*perl-Windows*
+VIM::Windows([{wn}...])	不带参数时，在数组上下文中返回所有 Window
+			的列表，在标量上下文中返回 Window 的个数。对于
+			window 编号的列表 {wn}，返回具有这些编号的 Window
+			列表。
+			警告：某个 window 被关闭后该列表即失效。
+
+						*perl-DoCommand*
+VIM::DoCommand({cmd})	执行 Ex 命令 {cmd}。
+
+						*perl-Eval*
+VIM::Eval({expr})	求值 {expr}，在列表上下文中返回 (success,
+			value)，在标量上下文中只返回值。success=1 表示
+			val 含有 {expr} 的值；success=0 表示求值该表达式
+			失败。'@x' 返回 register x 的内容，'&x' 返回选项 x
+			的值，'x' 返回内部 |variables| x 的值，而 '$x' 等价
+			于 perl 的 $ENV{x}。命令行可访问的所有 |functions|
+			对 {expr} 都有效。
+			|List| 会通过连接各项并插入换行变成一个字符串。
+
+						*perl-Blob*
+VIM::Blob({expr})	由标量值返回 Blob 字面量字符串 0zXXXX。
+
+==============================================================================
+3. VIM::Buffer 对象				*perl-buffer*
+
+方法：
+
+						*perl-Buffer-Name*
+Name()		返回该 Buffer 的文件名。
+
+						*perl-Buffer-Number*
+Number()	返回该 Buffer 的编号。
+
+						*perl-Buffer-Count*
+Count()		返回该 Buffer 中的行数。
+
+						*perl-Buffer-Get*
+Get({lnum}, {lnum}?, ...)
+			对指定的每个 {lnum}，返回该 Buffer 中行 {lnum} 的文本
+			字符串。可以传入一个由 {lnum} 列表组成的数组。
+
+						*perl-Buffer-Delete*
+Delete({lnum}, {lnum}?)
+			删除该 Buffer 中的行 {lnum}。若给出第二个 {lnum}，
+			则删除从第一个 {lnum} 到第二个 {lnum} 的行范围。
+
+						*perl-Buffer-Append*
+Append({lnum}, {line}, {line}?, ...)
+			在该 Buffer 第 {lnum} 行之后依次追加每个 {line}
+			字符串。{line} 的列表可以是一个数组。
+
+						*perl-Buffer-Set*
+Set({lnum}, {line}, {line}?, ...)
+			从该 Buffer 第 {lnum} 行开始，用指定的
+			{lines} 替换一行或多行 Buffer 行。{line} 的列表可以
+			是一个数组。
+			若参数无效，则不会发生替换。
+
+==============================================================================
+4. VIM::Window 对象				*perl-window*
+
+方法：
+						*perl-Window-SetHeight*
+SetHeight({height})
+			在屏幕限制之内，把该 Window 的高度设为 {height}。
+
+						*perl-Window-GetCursor*
+Cursor({row}?, {col}?)
+			不带参数时，返回该 Window 中当前光标位置的 (row,
+			col) 数组。带 {row} 和 {col} 参数时，把该 Window 的
+			光标位置设为 {row} 和 {col}。注意 {col} 按 Perl 习惯
+			从 0 开始编号，因此比 Vim ruler 中的值小一。
+
+Buffer()						*perl-Window-Buffer*
+			返回给定的 Window 对应的 Buffer 对象。
+
+==============================================================================
+5. 词法变量					*perl-globals*
+
+有多个词法变量。
+
+$curwin			当前的 Window 对象。
+$curbuf			当前的 Buffer 对象。
+$vim			一个 Neovim::Ext 对象。
+$nvim			与 $nvim 相同。
+$current		一个 Neovim::Ext::Current 对象。
+
+这些也可以通过 "main" package 取得：
+
+$main::curwin		当前的 Window 对象。
+$main::curbuf		当前的 Buffer 对象。
+
+ vim:tw=78:ts=8:noet:ft=help:norl:

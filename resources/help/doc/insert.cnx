@@ -1,0 +1,2153 @@
+*insert.txt*    Nvim
+
+
+		  VIM REFERENCE MANUAL	  by Bram Moolenaar
+
+
+						*Insert* *Insert-mode*
+插入与替换文本				*mode-ins-repl*
+
+本文件大部分内容讲述插入模式与替换模式。末尾是几条以其他方式插入文本的命令。
+
+最常用命令的概览见用户手册第 24 章 |usr_24.txt|。
+
+另见 'virtualedit'，它能把光标移到没有字符的位置。编辑表格时很有用。
+
+                                      输入 |gO| 查看目录。
+
+==============================================================================
+1. 特殊按键						*ins-special-keys*
+
+在插入模式与替换模式中，下列字符具有特殊含义；
+其他字符会被直接插入。要把其中一个特殊字符插入 buffer，
+请在其前面加上 CTRL-V。要插入 <Nul> 字符，
+可使用 "CTRL-V CTRL-@" 或 "CTRL-V 000"。在某些系统上，你必须
+用 "CTRL-V 003" 才能插入 CTRL-C。注意：当 CTRL-V 被映射时，
+常常可以用 CTRL-Q 代替 |i_CTRL-Q|。
+
+插入文本时若工作在特殊语言模式下，请参阅
+'langmap' 选项，了解如何避免不停地开关该模式。
+
+字符		动作	~
+-----------------------------------------------------------------------
+						*i_CTRL-[* *i_<Esc>*
+<Esc> 或 CTRL-[	结束插入或替换模式，返回普通模式。结束
+		缩写。
+		注意：如果 <Esc> 键不好按，可以改用 CTRL-[。
+						*i_META* *i_ALT*
+		如果该组合键未被映射，ALT（|META|）可能表现得像 <Esc>。
+		例如，如果 <A-x> 没有插入模式映射，
+		那么 <A-x> 的行为就像 <Esc>x。
+						*i_CTRL-C*
+CTRL-C		退出插入模式，返回普通模式。不检查
+		缩写。不触发 |InsertLeave| 自动命令
+		事件。
+
+						*i_CTRL-@*
+CTRL-@		插入上次插入的文本并停止插入。
+
+						*i_CTRL-A*
+CTRL-A		插入上次插入的文本。
+
+						*i_CTRL-H* *i_<BS>* *i_BS*
+<BS> 或 CTRL-H	删除光标之前的字符（关于连接行，见
+		|i_backspacing|）。
+						*i_<Del>* *i_DEL*
+<Del>		删除光标下的字符。如果光标位于
+		行尾，且 'backspace' 选项包含
+		"eol"（默认值），则删除 <EOL>；下一行会
+		被追加到当前行之后。
+						*i_CTRL-W*
+CTRL-W		删除光标之前的单词（关于连接行，见
+		|i_backspacing|）。单词的定义见
+		"word motions" 一节 |word-motions|。
+						*i_CTRL-W-default*
+		默认情况下，在删除之前设置新的撤销点。
+		|default-mappings|
+						*i_CTRL-U*
+CTRL-U		删除开始插入模式之后输入、且位于当前行
+		光标之前的所有字符。
+		如果没有新输入的字符，且 'backspace'
+		不为空，则删除当前行中光标之前的所有
+		字符。
+		如果启用了 C 缩进，那么当该行变为空行时，
+		缩进会被调整。
+		关于连接行，见 |i_backspacing|。
+						*i_CTRL-U-default*
+		默认情况下，在删除之前设置新的撤销点。
+		|default-mappings|
+						*i_CTRL-I* *i_<Tab>* *i_Tab*
+<Tab> 或 CTRL-I	插入一个制表符。如果打开了 'expandtab' 选项，
+		则插入等量的空格（使用 CTRL-V <Tab> 可
+		避免这种展开；如果 CTRL-V 已被映射，则使用 CTRL-Q <Tab>
+		|i_CTRL-Q|）。另见 'smarttab' 选项和
+		|ins-expandtab|。
+						*i_CTRL-J* *i_<NL>*
+<NL> 或 CTRL-J	开始新行。
+						*i_CTRL-M* *i_<CR>*
+<CR> 或 CTRL-M	开始新行。
+						*i_CTRL-K*
+CTRL-K {char1} [char2]
+		输入二合字母（见 |digraphs|）。当 {char1} 是特殊
+		键时，该键的代码会以 <> 形式插入。例如，
+		字符串 "<S-Space>" 可以通过输入
+		<C-K><S-Space>（两个键）来输入。两个字符都不参与
+		映射。
+
+CTRL-N		查找下一个关键字（见 |i_CTRL-N|）。
+CTRL-P		查找上一个关键字（见 |i_CTRL-P|）。
+
+CTRL-R {register}				*i_CTRL-R*
+		插入 register 的内容。在输入 CTRL-R 与
+		第二个字符之间会显示 '"'，表示
+		期望你输入 register 的名称。与
+		具名 register 或剪贴板 register（A-Z,a-z,0-9,+）一起使用时，
+		文本会像用 "p" 粘贴那样按字面插入。对于其他 register，
+		文本会像你亲手输入一样插入，但不使用映射与
+		缩写。如果你设置了 'textwidth'、'formatoptions'
+		或 'autoindent' 等选项，它们会影响
+		插入的内容。这与 "p" 命令
+		以及用鼠标粘贴的行为不同。
+		特殊 register：
+						'"'	未命名 register，其中保存
+								最近一次删除或抽取的文本
+						'%'	当前文件名
+						'#'	备用文件名
+						"*"	剪贴板内容（X11：主选择区）
+						'+'	剪贴板内容
+						'/'	最近一次的搜索模式
+						':'	最近一次的命令行
+						'.'	最近插入的文本
+							*i_CTRL-R_-*
+						'-'	最近一次小删除（不足一行）的
+								register。它可以用 |.| 重复，因为它
+								记住的是要 put 的 register，而不是
+								要插入的字面文本。
+							*i_CTRL-R_=*
+						'='	表达式 register：系统会提示你
+								输入一个表达式（见 |expression|）
+								注意，0x80（十进制 128）被用于
+								特殊键。例如，你可以用它把
+								光标上移：
+										CTRL-R ="\<Up>"
+								你可以用它按输入的样子插入一个 register，
+								即 CTRL-R =@reg。
+								使用 CTRL-R CTRL-R 可按字面插入文本。
+								当结果是 |List| 时，其各项会用作
+								行。它们内部也可以有换行。
+								当结果是 Float 时，它会自动
+								转换为 String。
+								调用 append() 或 setline() 时，撤销
+								序列会被打断。
+		关于 register，见 |registers|。
+
+CTRL-R CTRL-R {register}			*i_CTRL-R_CTRL-R*
+		插入 register 的内容。其行为类似只用一次
+		CTRL-R，但文本按字面插入，而非像输入那样。
+		当 register 中含有 <BS> 这类字符时二者不同。
+		示例，其中 register a 含有 "ab^Hc"： >
+	CTRL-R a		results in "ac".
+	CTRL-R CTRL-R a		results in "ab^Hc".
+<		'textwidth'、'formatoptions' 等选项仍然生效。如果
+		你还想避免这些选项，请使用 CTRL-R CTRL-O，见下文。
+		'.' register（最近插入的文本）仍会按输入的
+		样子插入。
+		执行此命令后，'.' register 中保存的是来自该
+		register 的文本，就像它是被输入的一样。
+
+CTRL-R CTRL-O {register}			*i_CTRL-R_CTRL-O*
+		按字面插入 register 的内容，并且不做
+		自动缩进。效果与用鼠标粘贴相同
+		|<MiddleMouse>|。当该 register 是按行的时候，
+		文本会插入到当前行上方，就像使用 `P` 一样。
+		'.' register（最近插入的文本）仍会按输入的
+		样子插入。
+		执行此命令后，'.' register 中保存的是所输入的
+		命令而不是文本。也就是说，保存的是字面量 "^R^O"，而
+		不是 register 中的文本。
+		在 |Replace-mode| 中不会替换字符！
+
+CTRL-R CTRL-P {register}			*i_CTRL-R_CTRL-P*
+		按字面插入 register 的内容并修正
+		缩进，类似 |[<MiddleMouse>|。
+		'.' register（最近插入的文本）仍会按输入的
+		样子插入。
+		执行此命令后，'.' register 中保存的是所输入的
+		命令而不是文本。也就是说，保存的是字面量 "^R^P"，而
+		不是 register 中的文本。
+		在 |Replace-mode| 中不会替换字符！
+
+						*i_CTRL-T*
+CTRL-T		在当前行行首插入一个 'shiftwidth' 的
+		缩进。缩进总是按 'shiftwidth' 取整。
+						*i_CTRL-D*
+CTRL-D		在当前行行首删除一个 'shiftwidth' 的
+		缩进。缩进总是按 'shiftwidth' 取整。
+
+						*i_0_CTRL-D*
+0 CTRL-D	删除当前行中的所有缩进。
+
+						*i_^_CTRL-D*
+^ CTRL-D	删除当前行中的所有缩进。该缩进会在
+		下一行中恢复。插入标签时这很有用。
+
+						*i_CTRL-V*
+CTRL-V		按字面插入下一个非数字字符。也可以直接输入
+		某个字符的十进制、八进制或十六进制值
+		|i_CTRL-V_digit|。
+		紧跟在 CTRL-V 之后输入的字符不参与
+		映射。
+		对于特殊键，可以在键中包含 CTRL 修饰符
+		以产生控制字符。如果该键没有对应的控制
+		字符，则插入它的 |key-notation|。
+		注意：当 CTRL-V 被映射时（例如用于粘贴文本），你
+		常常可以用 CTRL-Q 代替 |i_CTRL-Q|。
+
+						*i_CTRL-Q*
+CTRL-Q		与 CTRL-V 相同。
+		注意：某些终端连接可能会吞掉 CTRL-Q，那时
+		它不起作用。在 GUI 中它可以正常工作。
+
+CTRL-SHIFT-V				*i_CTRL-SHIFT-V* *i_CTRL-SHIFT-Q*
+CTRL-SHIFT-Q	作用与 CTRL-V 完全相同，但不会尝试把 CTRL
+		修饰符包含进键中。
+		注意：当 CTRL-SHIFT-V 被系统拦截时（例如
+		用于粘贴文本），你常常可以改用 CTRL-SHIFT-Q。
+		不过，在某些终端（例如 GNOME Terminal）中，CTRL-SHIFT-Q
+		会在没有确认的情况下退出终端。
+
+CTRL-X		进入 CTRL-X 模式。这是一个子模式，可以在其中
+		执行命令来补全单词或滚动 window。见
+		|i_CTRL-X| 和 |ins-completion|。
+
+						*i_CTRL-E*
+CTRL-E		插入光标下方的字符。
+						*i_CTRL-Y*
+CTRL-Y		插入光标上方的字符。
+		注意，CTRL-E 和 CTRL-Y 不使用 'textwidth'，以便
+		能从长行中复制字符。
+
+						*i_CTRL-_*
+CTRL-_		通过切换 'revins' 在插入方向之间切换。
+
+				CTRL-_ 把光标移到已输入文本的末尾。
+
+		只有当设置了 'allowrevins' 选项时
+		此命令才可用。
+		关于从右到左模式的更多信息，请参阅
+		|rileft.txt|。
+
+						*i_CTRL-^*
+CTRL-^		切换是否使用语言字符输入。
+		当定义了语言 |:lmap| 映射时：
+		- 如果 'iminsert' 为 1（使用 langmap 映射），则变为 0（不
+		    使用 langmap 映射）。
+		- 如果 'iminsert' 是其他值，则变为 1，从而启用 langmap
+		    映射。
+		当没有定义语言映射时：
+		- 如果 'iminsert' 为 2（使用输入法），则变为 0（不
+		    使用输入法）。
+		- 如果 'iminsert' 是其他值，则变为 2，从而启用输入
+		    法。
+		设为 1 时，状态行中会显示 "b:keymap_name" 变量、
+		'keymap' 选项或 "<lang>" 的值。
+		语言映射通常用于输入与键盘
+		实际产生的字符不同的字符。
+		'keymap' 选项可用于安装成套的映射。
+
+						*i_CTRL-]*
+CTRL-]		触发缩写，而不插入字符。
+
+						*i_<Insert>*
+<Insert>	在插入模式与替换模式之间切换。
+
+-----------------------------------------------------------------------
+						*i_backspacing*
+<BS>、CTRL-W 和 CTRL-U 的效果取决于 'backspace' 选项
+（除非设置了 'revins'）。这是一个以逗号分隔的列表项：
+
+项	    动作 ~
+indent	    允许退格越过自动缩进
+eol	    允许退格越过换行（连接行）
+start	    允许退格越过插入起点；CTRL-W 和 CTRL-U 在
+	    插入起点处停止一次。
+nostop	    类似 start，但 CTRL-W 和 CTRL-U 不会在插入
+	    起点处停止。
+
+'backspace' 为空时，使用与 Vi 兼容的退格行为。你无法
+退格越过自动缩进、第 1 列之前或插入起点之前。
+
+如果 'backspace' 选项包含 "eol"，且当使用这三个键之一时
+光标位于第 1 列，则当前行会与上一行连接。这实际上
+删除了光标前面的 <EOL>。
+
+						*i_CTRL-V_digit*
+使用 CTRL-V 可以直接输入字符的十进制、八进制或十六进制值。
+这样可以输入除换行（<NL>，值 10）之外的任何字符。
+有五种输入字符值的方式：
+
+首字符		模式	     最大字符数   最大值 ~
+(无)		十进制		   3		255
+o 或 O		八进制		   3		377	 (255)
+x 或 X		十六进制	   2		ff	 (255)
+u		十六进制	   4		ffff	 (65535)
+U		十六进制	   8		7fffffff (2147483647)
+
+通常你会输入最大数量的字符。因此要输入
+空格（值 32），你会输入 <C-V>032。你可以省略前导零，
+此时数字之后输入的字符必须是非数字。
+其他模式也是如此：一旦你输入了对该模式
+无效的字符，它之前的值就会被采用，而那个 "无效"
+字符则按常规方式处理。
+
+如果你输入值 10，它在文件中会变成 0。这个 10 是
+<NL>，内部用它来表示 <Nul> 字符。在把
+buffer 写入文件时，<NL> 字符会被转换成 <Nul>。<NL>
+字符写在每一行的末尾。因此如果你想在文件中
+插入 <NL> 字符，就必须制造一个换行。
+另见 'fileformat'。
+
+						*i_CTRL-X* *insert_expand*
+CTRL-X 进入一个子模式，其中可以使用若干命令。这些命令
+大多做关键字补全；见 |ins-completion|。
+
+有两个命令可以在不退出插入模式的情况下，
+把 window 向上或向下滚动：
+
+						*i_CTRL-X_CTRL-E*
+CTRL-X CTRL-E		把 window 向上滚动一行。
+						做补全时请看这里：|complete_CTRL-E|
+
+						*i_CTRL-X_CTRL-Y*
+CTRL-X CTRL-Y		把 window 向下滚动一行。
+						做补全时请看这里：|complete_CTRL-Y|
+
+按下 CTRL-X 之后，每次 CTRL-E（CTRL-Y）都会把 window 上（下）滚动
+一行，除非那会让光标离开它在文件中的
+当前位置。一旦按下其他键，就会退出 CTRL-X 模式，
+并按插入模式解释该键。
+
+
+==============================================================================
+2. 特殊的特殊键				*ins-special-special*
+
+下列键是特殊的。它们会停止当前的插入，做某件事，
+然后重新开始插入。这意味着你可以在不离开
+插入模式的情况下做别的事。如果你喜欢一直使用插入模式，
+这会非常方便，就像那些没有独立普通模式的编辑器一样。如果
+想把某个功能键映射为命令，可以使用 CTRL-O。
+
+这些键之前和之后所做的更改（插入或删除的字符）
+可以分别撤销。只有最后一次更改可以被重做，且其行为
+总是像 "i" 命令。
+
+字符		动作	~
+-----------------------------------------------------------------------
+<Up>		光标上移一行			     *i_<Up>*
+<Down>		光标下移一行			     *i_<Down>*
+CTRL-G <Up>	光标上移一行，并回到插入起始列	     *i_CTRL-G_<Up>*
+CTRL-G k	光标上移一行，并回到插入起始列	     *i_CTRL-G_k*
+CTRL-G CTRL-K	光标上移一行，并回到插入起始列	     *i_CTRL-G_CTRL-K*
+CTRL-G <Down>	光标下移一行，并回到插入起始列    *i_CTRL-G_<Down>*
+CTRL-G j	光标下移一行，并回到插入起始列    *i_CTRL-G_j*
+CTRL-G CTRL-J	光标下移一行，并回到插入起始列    *i_CTRL-G_CTRL-J*
+<Left>		光标左移一个字符		     *i_<Left>*
+<Right>		光标右移一个字符		     *i_<Right>*
+<S-Left>	光标后移一个单词（类似 "b" 命令）	     *i_<S-Left>*
+<C-Left>	光标后移一个单词（类似 "b" 命令）	     *i_<C-Left>*
+<S-Right>	光标前移一个单词（类似 "w" 命令）   *i_<S-Right>*
+<C-Right>	光标前移一个单词（类似 "w" 命令）   *i_<C-Right>*
+<Home>		光标移到该行的第一个字符	     *i_<Home>*
+<End>		光标移到该行最后一个字符之后	     *i_<End>*
+<C-Home>	光标移到文件中的第一个字符	     *i_<C-Home>*
+<C-End>		光标移到文件中最后一个字符之后	     *i_<C-End>*
+<LeftMouse>	光标移到鼠标点击的位置	     *i_<LeftMouse>*
+<S-Up>		把 window 上移一页			     *i_<S-Up>*
+<PageUp>	把 window 上移一页			     *i_<PageUp>*
+<S-Down>	把 window 下移一页		     *i_<S-Down>*
+<PageDown>	把 window 下移一页		     *i_<PageDown>*
+<ScrollWheelDown>    把 window 下移三行	*i_<ScrollWheelDown>*
+<S-ScrollWheelDown>  把 window 下移一页		*i_<S-ScrollWheelDown>*
+<ScrollWheelUp>      把 window 上移三行		*i_<ScrollWheelUp>*
+<S-ScrollWheelUp>    把 window 上移一页		*i_<S-ScrollWheelUp>*
+<ScrollWheelLeft>    把 window 左移六列	*i_<ScrollWheelLeft>*
+<S-ScrollWheelLeft>  把 window 左移一页		*i_<S-ScrollWheelLeft>*
+<ScrollWheelRight>   把 window 右移六列	*i_<ScrollWheelRight>*
+<S-ScrollWheelRight> 把 window 右移一页		*i_<S-ScrollWheelRight>*
+CTRL-O		执行一条命令，然后返回插入模式   *i_CTRL-O*
+CTRL-\ CTRL-O	类似 CTRL-O，但不移动光标	     *i_CTRL-\_CTRL-O*
+CTRL-G u	结束撤销序列，开始新的更改	     *i_CTRL-G_u*
+CTRL-G U	如果光标停留在同一行内，就不要用接下来的   *i_CTRL-G_U*
+				左/右光标移动开始新的撤销块。
+
+-----------------------------------------------------------------------
+
+CTRL-O 命令有时会有副作用：如果光标原来在
+行尾之后，它会被放到该行的最后一个字符上。在
+映射中，通常更好的做法是使用 <Esc>（先在文本中放一个 "x"，<Esc>
+之后总会把光标放到它上面）。或者使用 CTRL-\ CTRL-O，但要
+注意光标有可能位于行尾之后。注意，
+CTRL-\ CTRL-O 之后的命令仍然可以移动光标，它不会被恢复
+到原来的位置。
+
+CTRL-O 命令会把你带到普通模式。如果你随后又用命令进入
+插入模式，通常不会嵌套。因此输入 "a<C-O>a" 之后
+再按 <Esc> 就回到普通模式，你不需要按两次 <Esc>。
+有一种例外是并非亲手输入该命令时，例如执行映射或
+source 脚本时。这使那些会短暂切到插入模式的
+映射能够正常工作。
+
+带 Shift 的光标键并非在所有终端上都可用。
+
+另一个副作用是，在 "i" 或 "a" 命令之前指定的计数会被
+忽略。因为要在 CTRL-O 之后重复该命令的效果
+太复杂了。
+
+使用 CTRL-G u 的示例： >
+
+	:inoremap <C-H> <C-G>u<C-H>
+
+这会把退格键重新定义为开始新的撤销序列。现在你可以
+用 CTRL-O u 撤销退格键的效果，而不改变在此之前
+输入的内容。另一个示例： >
+
+	:inoremap <CR> <C-]><C-G>u<CR>
+
+这会在每次换行时开始新的撤销块。它还会在此
+之前展开缩写。
+
+使用 CTRL-G U 的示例： >
+
+	inoremap <Left>  <C-G>U<Left>
+	inoremap <Right> <C-G>U<Right>
+	inoremap <expr> <Home> col('.') == match(getline('.'), '\S') + 1 ?
+	 \ repeat('<C-G>U<Left>', col('.') - 1) :
+	 \ (col('.') < match(getline('.'), '\S') ?
+	 \     repeat('<C-G>U<Right>', match(getline('.'), '\S') + 0) :
+	 \     repeat('<C-G>U<Left>', col('.') - 1 - match(getline('.'), '\S')))
+	inoremap <expr> <End> repeat('<C-G>U<Right>', col('$') - col('.'))
+	inoremap ( ()<C-G>U<Left>
+
+这样就可以在插入模式中使用光标键，而不会开始
+新的撤销块，因此使用 |.|（重做）会按预期工作。另外，
+输入这样的文本时（使用上面的 "(" 映射）：
+
+      Lorem ipsum (dolor
+
+用 |.| 重复时会得到预期的
+
+      Lorem ipsum (dolor)
+
+
+使用 CTRL-O 会拆分撤销：它之前和之后输入的文本会
+分别撤销。如果你想避免这一点（例如在映射中），也许可以
+改用 CTRL-R = |i_CTRL-R|。例如，要调用一个函数： >
+	:imap <F2> <C-R>=MyFunc()<CR>
+
+当 'whichwrap' 选项设置得当时，在一行的第一个/最后一个字符上
+按 <Left> 和 <Right> 键会让光标折行到
+上一行/下一行。
+
+CTRL-G j 和 CTRL-G k 命令可用于在一列之前插入文本。
+示例： >
+   int i;
+   int j;
+把光标放在第一个 "int" 上，输入 "istatic <C-G>j       "。
+结果是： >
+   static int i;
+	  int j;
+要在每一行的该列之前插入同样的文本时，请使用
+可视块命令 "I" |v_b_I|。
+
+==============================================================================
+3. 'textwidth' 与 'wrapmargin' 选项			*ins-textwidth*
+
+'textwidth' 选项可用于在行变得太长之前自动
+换行。把 'textwidth' 选项设为期望的最大行
+长度。如果之后你输入更多字符（不是空格或制表符），
+最后一个单词会被放到新的一行（除非它是该行
+唯一的单词）。如果把 'textwidth' 设为 0，此功能被禁用。
+
+'wrapmargin' 选项的作用几乎相同。区别在于
+'textwidth' 是固定宽度，而 'wrapmargin' 取决于
+屏幕宽度。使用 'wrapmargin' 相当于使用 'textwidth'，其值
+等于 (columns - 'wrapmargin')，其中 columns 是屏幕
+宽度。
+
+当同时设置了 'textwidth' 和 'wrapmargin' 时，使用 'textwidth'。
+
+如果你并不想真正断行，只是想在方便的位置
+显示折行，请见 'linebreak' 选项。
+
+只有在使用插入模式，或向一行追加内容时，
+才会自动断行。处在替换模式下且行长没有
+改变时，该行不会被断开。
+
+如果在边距之后输入非空白字符，长行会被断开。
+断行的情形可以通过向 'formatoptions' 选项添加
+字符来限制：
+"l"  仅当开始插入时该行不长于 'textwidth' 时才断行。
+"v"  仅在本次插入命令期间输入过空白字符的位置
+          断行。这大多与 Vi 兼容。
+"lv" 仅当开始插入时该行不长于 'textwidth'，并且只在
+          本次插入命令期间输入过空白字符的位置断行。
+          它与 "l" 的差别只在于跨越 'textwidth' 边界时
+          输入非空白字符的情形。
+
+通常情况下会使用内部函数来决定在哪里断行。
+如果你想用不同方式处理，请把 'formatexpr' 选项设为一个
+负责断行的表达式。
+
+如果你想排版一段文本，可以使用 "gq" 操作符。输入
+"gq" 再加上一个移动命令，把光标移到该块的末尾。在
+很多情况下，命令 "gq}" 就能达到目的（排版到段落
+末尾）。或者，你可以使用 "gqap"，它会排版整个
+段落，无论光标当前在哪里。你也可以使用可视
+模式：按 "v"，移到该块末尾，然后输入 "gq"。另见 |gq|。
+
+==============================================================================
+4. 'expandtab'、'softtabstop' 与 'smarttab' 选项	*ins-expandtab*
+
+如果打开了 'expandtab' 选项，将用空格来填充一个制表符的
+空白量。如果你想输入真正的 <Tab>，请先输入 CTRL-V
+（当 CTRL-V 被映射时使用 CTRL-Q |i_CTRL-Q|）。
+'expandtab' 选项默认关闭。注意，在替换模式中，一个
+字符会被替换成若干空格。其结果是该行的
+字符数增加。退格会一次删除一个
+空格。只有你退格越过的最后一个空格才会
+恢复原来的字符。
+
+							*ins-softtabstop*
+当 'softtabstop' 选项非零时，一个 <Tab> 会插入 'softtabstop'
+个位置，而用于删除空白的一个 <BS> 会删除 'softtabstop'
+个位置。这感觉就像把 'tabstop' 设成了 'softtabstop'，但真正的
+<Tab> 字符仍然占 'tabstop' 个位置，因此你的文件在被其他
+应用程序使用时看起来仍然是正确的。
+
+如果 'softtabstop' 非零，<BS> 会尽量删除足够的空白以
+移到上一个 'softtabstop' 位置，除非此前插入的
+字符是空格，那时它只会删除光标之前的那个
+字符。否则你并不总能删除光标之前的单个字符。
+你必须先删除 'softtabstop' 个字符，然后输入
+额外的空格才能到达你想要的位置。
+
+							*ins-smarttab*
+当打开 'smarttab' 选项时，如果光标位于前导空白中，
+<Tab> 键会按 'shiftwidth' 缩进。<BS> 键的效果相反。
+这相当于把 'softtabstop' 设成了 'shiftwidth' 的值。
+该选项允许用户把 'softtabstop' 设为 'shiftwidth' 以外的值，
+同时仍然使用 <Tab> 键来缩进。
+
+==============================================================================
+5. 替换模式				*Replace* *Replace-mode* *mode-replace*
+
+在普通模式下用 "R" 命令进入替换模式。
+
+在替换模式中，你每输入一个字符，该行中就有一个字符被
+删除。如果没有字符可删除（在行尾），
+输入的字符会被追加（如同插入模式）。因此
+在一行中，在你到达行尾之前，字符数保持不变。
+如果输入了 <NL>，会插入一个换行，且不删除任何字符。
+
+小心 <Tab> 字符。如果你在它的位置输入一个正常的可打印
+字符，字符数仍然相同，但列数
+会变少。
+
+如果你在替换模式中删除字符（用 <BS>、CTRL-W 或 CTRL-U），
+实际发生的是你删除了所做的更改。被替换掉的
+字符会被恢复。如果你已经输入到原有文本之后，你添加的
+字符会被删除。这实际上是一次一个字符的撤销。
+
+如果打开了 'expandtab' 选项，一个 <Tab> 会把一个字符替换成
+若干空格。其结果是该行中的字符数
+增加。退格会一次删除一个空格。只有你退格越过的
+最后一个空格才会恢复原来的
+字符。
+
+==============================================================================
+6. 虚拟替换模式		*vreplace-mode* *Virtual-Replace-mode*
+
+在普通模式下用 "gR" 命令进入虚拟替换模式。
+
+虚拟替换模式与替换模式类似，但它替换的不是文件中的
+实际字符，而是屏幕上的位置，因此文件中
+后面的字符看起来永远不会移动。
+
+因此，如果你输入一个 <Tab>，它可能替换掉若干普通字符；
+如果你在一个 <Tab> 上面输入一个字母，它可能什么都不替换，
+因为 <Tab> 仍会像之前一样对齐到同一个位置。
+
+输入 <NL> 仍然不会让文件中后面的字符看起来
+移动。当前行的其余部分会被 <NL> 替换（也就是
+被删除），替换会在下一行继续。除非你越过文件
+末尾，否则不会插入新行。
+
+使用 CTRL-T 和 CTRL-D 时会看到有趣的效果。光标之前的
+字符会照常横向移动，但该行中后面的字符
+仍然保持不动。CTRL-T 会把旧行的一部分藏在
+移位后的字符下面，而 CTRL-D 又会把它们显露出来。
+
+与替换模式一样，使用 <BS> 等会恢复被替换掉的
+字符。这在配合 'smartindent'、CTRL-T 和
+CTRL-D、'expandtab'、'smarttab'、'softtabstop' 等时仍然有效。
+
+在 'list' 模式下，虚拟替换模式的表现就像不在 'list' 模式
+一样，除非 'cpoptions' 中含有 "L"。
+
+注意，光标之外的字符应当看起来移动的情形只有
+List 模式 'list'，以及偶尔设置了 'wrap' 时
+（该行长度变化到比屏幕宽度更短或更宽）。
+在其他情况下，可能会插入空格以避免后面的字符
+移动。
+
+此模式对于编辑表格中以 <Tab> 分隔的列非常有用，
+可以在输入新数据的同时让各列保持对齐。
+
+==============================================================================
+7. 插入模式补全				*ins-completion*
+
+在插入模式与替换模式中，有几条命令可以补全已输入的
+关键字或行的一部分。当你使用复杂的关键字
+（例如带大写字母和下划线的函数名）时，这很有用。
+
+可以补全以下内容：
+
+1. 整行						|i_CTRL-X_CTRL-L|
+2. 当前文件中的关键字				|i_CTRL-X_CTRL-N|
+3. 'dictionary' 中的关键字			|i_CTRL-X_CTRL-K|
+4. 'thesaurus' 中的关键字（同义词样式）		|i_CTRL-X_CTRL-T|
+5. 当前文件与被包含文件中的关键字		|i_CTRL-X_CTRL-I|
+6. 标签						|i_CTRL-X_CTRL-]|
+7. 文件名					|i_CTRL-X_CTRL-F|
+8. 定义或宏					|i_CTRL-X_CTRL-D|
+9. Vim 命令行					|i_CTRL-X_CTRL-V|
+10. 用户自定义补全				|i_CTRL-X_CTRL-U|
+11. omni 补全					|i_CTRL-X_CTRL-O|
+12. 拼写建议					|i_CTRL-X_s|
+13. 来自 'complete' 的补全			|i_CTRL-N| |i_CTRL-P|
+14. 来自 register 的内容			|i_CTRL-X_CTRL-R|
+
+此外，|i_CTRL-X_CTRL-Z| 会在不改变文本的情况下停止补全。
+
+除 CTRL-N 和 CTRL-P 之外，以上这些都在 CTRL-X 模式中完成。这是
+插入模式与替换模式的一个子模式。输入 CTRL-X 以及某条 CTRL-X
+命令即可进入 CTRL-X 模式。输入一个不是有效 CTRL-X 模式命令的
+键即可退出 CTRL-X 模式。有效的键是 CTRL-X 命令本身、
+CTRL-N（下一个）和 CTRL-P（上一个）。
+
+默认情况下，可能的补全项会显示在菜单中，第一个
+补全项会被插入到文本中。这可以用 'completeopt'
+来调整。
+
+要获取当前补全信息，可以使用 |complete_info()|。
+如果想调整匹配项的大小写，另见 'infercase' 选项。
+
+从 |popup-menu| 插入选中的候选词时，
+该候选词中与查询不匹配的那部分会使用
+|hl-ComplMatchIns| 高亮。如果在 'completeopt' 中启用了模糊匹配，
+则不会应用高亮。
+
+							*complete_CTRL-E*
+当补全处于活动状态时，你可以用 CTRL-E 停止它，回到
+最初输入的文本。CTRL-E 不会被插入。
+
+							*complete_CTRL-Y*
+当弹出菜单显示时，CTRL-Y 会停止补全并接受
+当前选中的条目。输入空格、Enter 或其他某些不可打印
+字符会离开补全模式并插入所输入的字符。如果
+你想用 <Enter> 接受补全项，请使用这个映射： >vim
+    inoremap <expr> <cr> pumvisible() ? '<c-y>' : '<cr>'
+
+当弹出菜单显示时，还有几个特殊键，见
+|popupmenu-keys|。
+
+注意：CTRL-X 模式中有效的键不会被映射。这使得
+`:map <C-F> <C-X><C-F>` 可以工作。结束 CTRL-X 模式的键（任何
+不是有效 CTRL-X 模式命令的键）会被映射。此外，用 'complete'
+做补全时，映射照常生效。
+
+								*E565*
+注意：补全处于活动状态时，不能递归使用插入模式，
+也不能修改 buffer 文本。以某种方式调用 ":normal i.." 的
+映射会产生 E565 错误。
+
+建议使用以下映射，让输入补全命令稍微
+容易一些（不过它们会隐藏其他命令）： >
+    :inoremap <C-]> <C-X><C-]>
+    :inoremap <C-F> <C-X><C-F>
+    :inoremap <C-D> <C-X><C-D>
+    :inoremap <C-L> <C-X><C-L>
+
+作为一种特殊情况，输入 CTRL-R 执行 register 插入（见
+|i_CTRL-R|）不会退出 CTRL-X 模式。这主要是为了允许使用
+'=' register 调用某个函数来决定下一步操作。如果
+register 的内容（或 '=' register 求值的结果）
+不是有效的 CTRL-X 模式键，那么 CTRL-X 模式会像输入了那些键
+一样被退出。
+
+例如，下面这个映射会把 <Tab> 映射为：如果当前行目前
+只有空白，就真正插入一个 <Tab>；否则就开始/继续一次 CTRL-N
+补全操作： >
+
+	function! CleverTab()
+	   if strpart( getline('.'), 0, col('.')-1 ) =~ '^\s*$'
+	      return "\<Tab>"
+	   else
+	      return "\<C-N>"
+	   endif
+	endfunction
+	inoremap <Tab> <C-R>=CleverTab()<CR>
+
+
+
+补全整行					*compl-whole-line*
+
+							*i_CTRL-X_CTRL-L*
+CTRL-X CTRL-L		向后搜索一行，它开头的字符与当前行中
+						光标之前的字符相同。缩进被忽略。匹配的行会
+						被插入到光标之前。
+						'complete' 选项用来决定在哪些 buffer
+						中搜索匹配。已加载和未加载的
+						buffer 都会被使用。
+		CTRL-L	或
+		CTRL-P		向后搜索下一个匹配行。该行会
+						替换上一个匹配行。
+
+		CTRL-N		向前搜索下一个匹配行。该行会
+						替换上一个匹配行。
+
+		CTRL-X CTRL-L	展开一行之后，你还可以再次输入 CTRL-X CTRL-L
+						来取得它旁边的一行，除非
+						使用了双 CTRL-X。只对已加载的
+						buffer 有效。
+
+补全当前文件中的关键字			*compl-current*
+
+							*i_CTRL-X_CTRL-P*
+							*i_CTRL-X_CTRL-N*
+CTRL-X CTRL-N		向前搜索以光标之前的
+						关键字开头的单词。找到的关键字会被插入
+						到光标之前。
+
+CTRL-X CTRL-P		向后搜索以光标之前的
+						关键字开头的单词。找到的关键字会被插入
+						到光标之前。
+
+		CTRL-N		向前搜索下一个匹配的关键字。该
+						关键字会替换上一个匹配的关键字。
+
+		CTRL-P		向后搜索下一个匹配的关键字。该
+						关键字会替换上一个匹配的关键字。
+
+		CTRL-X CTRL-N 或
+		CTRL-X CTRL-P	进一步使用 CTRL-X CTRL-N 或 CTRL-X CTRL-P 会
+						在其他上下文中复制上一次展开之后的单词，
+						除非使用了双 CTRL-X。
+
+如果光标之前有关键字（由字母字符和 'iskeyword' 中的
+字符组成的名字），它会被用作搜索模式，
+并在前面加上 "\<"（意思是：单词的开头）。否则使用 "\<\k\k"
+作为搜索模式（任何至少两个字符的关键字的开头）。
+
+在替换模式中，被替换的字符数取决于
+匹配字符串的长度。这就像在替换模式下输入
+匹配字符串中的字符一样。
+
+如果光标之前没有有效的关键字字符，则匹配任何至少
+两个字符的关键字。
+		例如，要得到：
+	    	    printf("(%g, %g, %g)", vector[0], vector[1], vector[2]);
+		只需输入：
+	    	    printf("(%g, %g, %g)", vector[0], ^P[1], ^P[2]);
+
+搜索会绕回文件末尾，这里不使用 'wrapscan' 的
+值。
+
+同一个补全项的多次重复会被跳过；因此每次 CTRL-N 和
+CTRL-P 都会插入不同的匹配（除非只有一个
+匹配的关键字）。
+
+单字符匹配永远不会被包含，因为它们通常只会
+妨碍你真正想要的东西。
+		例如，要得到：
+				printf("name = %s\n", name);
+		只需输入：
+				printf("name = %s\n", n^P);
+		甚至只需：
+				printf("name = %s\n", ^P);
+'\n' 中的 'n' 会被跳过。
+
+展开一个单词之后，你可以用 CTRL-X CTRL-P 或 CTRL-X CTRL-N 在其他
+上下文中取得展开之后的单词。这些序列会搜索
+刚刚展开的文本，并通过再取一个单词来继续展开。如果你
+需要重复一串复杂单词，这很有用。虽然 CTRL-P
+和 CTRL-N 只查找至少两个字符的字符串，但 CTRL-X CTRL-P 和
+CTRL-X CTRL-N 可以用来展开只有一个字符的单词。
+		例如，要得到：
+				M&eacute;xico
+		你可以输入：
+				M^N^P^X^P^X^P
+CTRL-N 开始展开，然后 CTRL-P 取回单个字符
+"M"，接下来的两次 CTRL-X CTRL-P 会取得单词 "&eacute" 和 ";xico"。
+
+如果上一次展开被拆分（因为它超过了 'textwidth'），
+那么就只会使用当前行中的文本。
+
+如果找到的匹配位于一行的末尾，那么下一行中的
+第一个单词会被插入，并显示消息 "Word from other line"；如果
+接受这个单词，接下来的 CTRL-X CTRL-P 或 CTRL-X CTRL-N 就会搜索
+以该单词开头的那些行。
+
+
+补全 'dictionary' 中的关键字			*compl-dictionary*
+
+							*i_CTRL-X_CTRL-K*
+CTRL-X CTRL-K		在用 'dictionary' 选项给出的文件中
+						搜索以光标之前的关键字开头的单词。
+						这类似 CTRL-N，但只搜索 dictionary
+						文件，而不搜索当前文件。找到的
+						关键字会被插入到光标之前。这
+						可能相当慢，因为要先找到所有匹配
+						才会使用第一个匹配。默认情况下，
+						'dictionary' 选项为空。
+						关于在哪里能找到单词列表的建议，见
+						'dictionary' 选项。
+						'ignorecase'、'smartcase' 和 'infercase' 会生效。
+
+		CTRL-K	或
+		CTRL-N		向前搜索下一个匹配的关键字。该
+						关键字会替换上一个匹配的关键字。
+
+		CTRL-P		向后搜索下一个匹配的关键字。该
+						关键字会替换上一个匹配的关键字。
+
+
+补全 'thesaurus' 中的单词				*compl-thesaurus*
+
+							*i_CTRL-X_CTRL-T*
+CTRL-X CTRL-T		作用同 CTRL-X CTRL-K，但方式很特殊。它使用
+						'thesaurus' 选项而不是 'dictionary'。如果
+						在 thesaurus 文件中找到匹配，同一行中
+						其余所有单词都会被包含为
+						匹配项，即使它们并不能补全该单词。
+						因此一个单词可以被完全替换。
+
+		CTRL-T	或
+		CTRL-N		向前搜索下一个匹配的关键字。该
+						关键字会替换上一个匹配的关键字。
+
+		CTRL-P		向后搜索下一个匹配的关键字。该
+						关键字会替换上一个匹配的关键字。
+
+在 'thesaurus' 选项所用的文件中，每一行都应
+包含意思相近的单词，它们由非关键字字符分隔（首选
+空白）。行的最大长度是 510 字节。
+
+例如，设想 'thesaurus' 文件中有这样一行： >
+	angry furious mad enraged
+把光标放在字母 "ang" 之后并输入 CTRL-X CTRL-T 会
+补全出单词 "angry"；再按几次会把该单词变成
+"furious"、"mad" 等。
+
+其他用途包括在两种语言之间翻译，或按关键字
+把 API 函数分组。
+
+一个英语单词表被添加到了这个 github issue：
+https://github.com/vim/vim/issues/629#issuecomment-443293282
+解压 thesaurus_pkg.zip，把 thesaurus.txt 文件放到某处，例如
+~/.vim/thesaurus/english.txt，并把 'thesaurus' 选项设为该文件名。
+
+
+用 'thesaurusfunc' 补全关键字		*compl-thesaurusfunc*
+
+如果设置了 'thesaurusfunc' 选项，那么会调用用户指定的函数
+来取得补全匹配列表，而不再使用 'thesaurus' 选项。
+关于该函数如何被调用以及它应返回什么，见 |complete-functions|。
+
+下面是一个使用 "aiksaurus" 命令的示例（由 Magnus
+Groß 提供）： >
+
+    func Thesaur(findstart, base)
+      if a:findstart
+	return searchpos('\<', 'bnW', line('.'))[1] - 1
+      endif
+      let res = []
+      let h = ''
+      for l in systemlist('aiksaurus ' .. shellescape(a:base))
+	if l[:3] == '=== '
+	  let h = '(' .. substitute(l[4:], ' =*$', ')', '')
+	elseif l ==# 'Alphabetically similar known words are: '
+	  let h = "\U0001f52e"
+	elseif l[0] =~ '\a' || (h ==# "\U0001f52e" && l[0] ==# "\t")
+	  call extend(res, map(split(substitute(l, '^\t', '', ''), ', '), {_, val -> {'word': val, 'menu': h}}))
+	endif
+      endfor
+      return res
+    endfunc
+
+    if exists('+thesaurusfunc')
+      set thesaurusfunc=Thesaur
+    endif
+
+
+补全当前文件与被包含文件中的关键字	*compl-keyword*
+
+'include' 选项用于指定包含被包含文件名的
+行。'path' 选项用于搜索被包含文件。
+
+							*i_CTRL-X_CTRL-I*
+CTRL-X CTRL-I		在当前文件与被包含文件中搜索
+						第一个以光标之前相同字符开头的
+						关键字。匹配的关键字会
+						被插入到光标之前。
+
+		CTRL-N		向前搜索下一个匹配的关键字。该
+						关键字会替换上一个匹配的关键字。
+						注意：CTRL-I 与 <Tab> 相同，而补全成功
+						之后很可能会输入 <Tab>，因此
+						CTRL-I 不用于搜索下一个匹配。
+
+		CTRL-P		向后搜索上一个匹配的关键字。该
+						关键字会替换上一个匹配的关键字。
+
+		CTRL-X CTRL-I	进一步使用 CTRL-X CTRL-I 会在其他
+						上下文中复制上一次展开之后的单词，
+						除非使用了双 CTRL-X。
+
+补全标签						*compl-tag*
+							*i_CTRL-X_CTRL-]*
+CTRL-X CTRL-]		搜索第一个以光标之前相同
+						字符开头的标签。匹配的标签会
+						被插入到光标之前。字母
+						字符和 'iskeyword' 中的字符用来
+						决定哪些字符被包含在标签
+						名中（与关键字相同）。另见 |CTRL-]|。
+						'showfulltag' 选项可用于添加标签定义
+						周围的上下文。
+		CTRL-]	或
+		CTRL-N		向前搜索下一个匹配的标签。该标签
+						会替换上一个匹配的标签。
+
+		CTRL-P		向后搜索上一个匹配的标签。该标签
+						会替换上一个匹配的标签。
+
+
+补全文件名					*compl-filename*
+							*i_CTRL-X_CTRL-F*
+CTRL-X CTRL-F		搜索第一个以光标之前相同
+						字符开头的文件名。匹配的
+						文件名会被插入到光标之前。
+						字母字符和 'isfname' 中的字符
+						用来决定哪些字符被包含在
+						文件名中。注意：这里（还）不使用
+						'path' 选项。
+		CTRL-F	或
+		CTRL-N		向前搜索下一个匹配的文件名。该
+						文件名会替换上一个匹配的文件名。
+
+		CTRL-P		向后搜索上一个匹配的文件名。
+						该文件名会替换上一个匹配的文件
+						名。
+
+
+补全定义或宏			*compl-define*
+
+'define' 选项用于指定包含定义的行。
+'include' 选项用于指定包含被包含文件名的
+行。'path' 选项用于搜索被包含文件。
+
+							*i_CTRL-X_CTRL-D*
+CTRL-X CTRL-D		在当前文件与被包含文件中搜索
+						第一个以光标之前相同字符开头的
+						定义（或宏）名。找到的
+						定义名会被插入到光标之前。
+		CTRL-D	或
+		CTRL-N		向前搜索下一个匹配的宏名。该
+						宏名会替换上一个匹配的宏
+						名。
+
+		CTRL-P		向后搜索上一个匹配的宏名。
+						该宏名会替换上一个匹配的宏
+						名。
+
+		CTRL-X CTRL-D	进一步使用 CTRL-X CTRL-D 会在其他
+						上下文中复制上一次展开之后的单词，
+						除非使用了双 CTRL-X。
+
+
+补全 Vim 命令					*compl-vim*
+
+补全是上下文相关的。它的工作方式与在命令行上一样。它
+既能补全 Ex 命令，也能补全其参数。这在编写
+Vim 脚本时很有用。
+
+							*i_CTRL-X_CTRL-V*
+CTRL-X CTRL-V		猜测光标之前是哪一类项，并
+						找到它的第一个匹配。
+						注意：当 CTRL-V 被映射时，你常常可以用 CTRL-Q
+						代替 |i_CTRL-Q|。
+		CTRL-V	或
+		CTRL-N		向前搜索下一个匹配。该匹配会替换
+						上一个匹配。
+
+		CTRL-P		向后搜索上一个匹配。该匹配
+						会替换上一个匹配。
+
+		CTRL-X CTRL-V	进一步使用 CTRL-X CTRL-V 的作用与
+						CTRL-V 相同。这允许把某个键映射为执行 Vim 命令
+						补全，例如： >
+				:imap <Tab> <C-X><C-V>
+
+从 register 补全内容			*compl-register-words*
+							*i_CTRL-X_CTRL-R*
+CTRL-X CTRL-R		从所有 register 猜测光标之前是哪一类项，
+						并找到它的第一个匹配。
+						进一步使用 CTRL-R（不带 CTRL-X）会插入
+						register 的内容，见 |i_CTRL-R|。
+						'ignorecase' 会作用于匹配。
+
+		CTRL-N		向前搜索下一个匹配。该匹配会替换
+						上一个匹配。
+
+		CTRL-P		向后搜索上一个匹配。该匹配
+						会替换上一个匹配。
+
+		CTRL-X CTRL-R	进一步使用 CTRL-X CTRL-R 会在其他上下文
+						中复制上一次展开之后的行，
+						除非使用了双 CTRL-X（例如这会把
+						补全 register 单词切换为补全 register 内容）。
+
+用户自定义补全					*compl-function*
+
+补全由一个函数完成，该函数可以由用户用
+'completefunc' 选项定义。关于该函数如何被调用以及一个
+示例，见下文 |complete-functions|。
+
+							*i_CTRL-X_CTRL-U*
+CTRL-X CTRL-U		猜测光标之前是哪一类项，并
+						找到它的第一个匹配。
+		CTRL-U	或
+		CTRL-N		使用下一个匹配。该匹配会替换上一个
+						匹配。
+
+		CTRL-P		使用上一个匹配。该匹配会替换
+						上一个匹配。
+
+
+Omni 补全					*omnicompletion* *compl-omni*
+
+补全由一个函数完成，该函数可以由用户用
+'omnifunc' 选项定义。它用于特定于文件类型的补全。
+
+关于该函数如何被调用以及一个示例，见下文 |complete-functions|。
+关于特定文件类型的说明，见 |compl-omni-filetypes|。
+还会出现更多补全脚本，请查看 www.vim.org。目前有
+一个针对 C++ 的初版。
+
+							*i_CTRL-X_CTRL-O*
+CTRL-X CTRL-O		猜测光标之前是哪一类项，并
+						找到它的第一个匹配。
+		CTRL-O	或
+		CTRL-N		使用下一个匹配。该匹配会替换上一个
+						匹配。
+
+		CTRL-P		使用上一个匹配。该匹配会替换
+						上一个匹配。
+
+
+拼写建议					*compl-spelling*
+
+会定位光标之前或光标处的单词，并给出拼写正确的
+单词来替换它。如果该行中、光标之前或光标之下有拼写
+错误的单词，光标会被移到它之后。否则就使用光标
+之前的那个单词来做建议，即使它拼写并没有错。
+
+注意：在许多 Unix 终端中 CTRL-S 会挂起显示。请改用 's'。输入
+CTRL-Q 可恢复显示。
+
+						*i_CTRL-X_CTRL-S* *i_CTRL-X_s*
+CTRL-X CTRL-S   或
+CTRL-X s		定位光标之前的单词，并找到它的
+						第一个拼写建议。
+		CTRL-S	或
+		CTRL-N		使用下一个建议。它会替换上一个
+						建议。注意，这里不能使用 's'。
+
+		CTRL-P		使用上一个建议。它会替换
+						上一个建议。
+
+
+从不同来源补全			*compl-generic*
+
+							*i_CTRL-N*
+CTRL-N			为在光标处结束的单词查找下一个匹配，
+						使用的来源由 'complete' 选项指定。
+						所有来源都从关键字补全，函数除外，
+						它可以从非关键字补全。匹配的
+						文本会被插入到光标之前。
+
+							*i_CTRL-P*
+CTRL-P			与 CTRL-N 相同，但查找上一个匹配。
+
+		CTRL-N		在匹配中向前搜索并插入
+						下一个。
+
+		CTRL-P		在匹配中向后搜索并插入
+						上一个。
+
+		CTRL-X CTRL-N 或
+		CTRL-X CTRL-P	进一步使用 CTRL-X CTRL-N 或 CTRL-X CTRL-P 会
+						在其他上下文中复制上一次展开之后的单词，
+						除非使用了双 CTRL-X。
+
+
+停止补全						*compl-stop*
+
+							*i_CTRL-X_CTRL-Z*
+CTRL-X CTRL-Z		在不改变文本的情况下停止补全。
+
+
+自动补全						*ins-autocompletion*
+
+Vim 可以在你输入时显示补全菜单，类似使用 |i_CTRL-N|，
+但它是自动触发的。见 'autocomplete'。菜单项按顺序
+从 'complete' 选项中列出的来源收集。
+
+一个逐渐缩短的超时让 Vim 保持响应。'complete' 列表中
+较靠前的来源获得更多时间（更高优先级），但所有来源至少
+都能分到一小段时间片。
+
+此模式与其他补全模式完全兼容。你可以随时输入
+|CTRL-X| 来调用其中任何一个，这会临时挂起
+自动补全。要专门使用 |i_CTRL-N| 或 |i_CTRL-X_CTRL-N|，请先按
+|CTRL-E| 关闭弹出菜单（见 |complete_CTRL-E|）。
+
+						*ins-autocompletion-example*
+示例设置 ~
+下面是一个带弹出菜单的自动补全的典型配置： >
+	set autocomplete
+	set complete=.^5,w^5,b^5,u^5
+	set completeopt=popup
+
+	inoremap <silent><expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>"
+	inoremap <silent><expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+<
+这会启用自动补全，建议来自当前 buffer、
+其他 window 和已列出的 buffer，并显示在弹出菜单中。每个来源
+最多 5 个候选。菜单可见时，<Tab> 和 <S-Tab> 会在各项之间移动。
+可选地，向 'completeopt' 添加 "preinsert" 以自动插入
+最长的公共前缀。你也可以按需向 'complete' 添加其他补全
+来源。
+
+另见 'autocomplete'、'autocompletedelay' 和 'autocompletetimeout'。
+
+关于命令行的自动补全，见 |cmdline-autocompletion|。
+
+要获得由 LSP 驱动的自动补全，见 |lsp-completion|。
+
+
+查找补全项的函数			*complete-functions*
+
+这适用于 'completefunc'、'thesaurusfunc' 和 'omnifunc'。
+
+该函数以两种不同的方式被调用：
+- 首先调用该函数以找出要补全文本的起点。
+- 之后调用该函数来实际找出匹配项。
+
+第一次调用时，参数是：
+      a:findstart  1
+      a:base	空
+
+该函数必须返回补全开始的列。它必须是
+一个介于 0 与光标列 "col('.')" 之间的数字。这需要查看
+光标正前方的字符，并把那些可能属于
+补全项的字符包含进来。该列与
+光标列之间的文本会被替换为匹配项。如果返回的值
+大于光标列，则使用光标列。
+
+负数返回值：
+      -2	静默取消并停留在补全模式。
+      -3	静默取消并离开补全模式。
+      其他负值：补全从光标列开始
+
+第二次调用时，参数是：
+      a:findstart  0
+      a:base	匹配项应当匹配的文本；也就是第一次
+				调用中定位到的文本（可以为空）
+
+该函数必须返回一个包含匹配单词的 List。这些匹配
+通常包含 "a:base" 文本。没有匹配时返回空的
+List。注意，自第一次调用以后光标可能已经移动，
+文本也可能已经改变。
+
+为了返回比匹配单词更多的信息，请返回一个包含
+该 List 的 Dict。该 Dict 可以有以下项：
+		words		匹配单词的 List（必需）。
+		refresh		控制是否重新调用该函数的字符串
+						（可选）。
+						目前唯一被识别的值是 "always"，其
+						效果是每当开头的文本改变时
+						就调用该函数。
+其他项会被忽略。
+
+要在补全结束时采取动作，见 |CompleteDonePre| 和
+|CompleteDone| 自动命令事件。
+
+例如，该函数可以包含这段代码： >
+	let matches = ... list of words ...
+	return {'words': matches, 'refresh': 'always'}
+<
+如果查找匹配很耗时，可以使用 |complete_check()| 来
+保持响应。
+
+						*complete-items*
+每个列表项可以是字符串或 Dictionary。当它是字符串时，
+它就用作补全项。当它是 Dictionary 时，它可以包含以下
+项：
+		word		将被插入的文本，必需
+		abbr		"word" 的缩写；非空时在菜单中用它
+						代替 "word"
+		menu		弹出菜单的额外文本，显示在 "word"
+						或 "abbr" 之后
+		info		关于该项的更多信息，可以显示在
+						预览 window 中
+		kind		用单个字母表示补全的类型
+		icase		非零时，在比较项是否相等时忽略
+						大小写；省略时使用零，因此
+						只有大小写不同的项会被加入
+		equal		非零时，比较时总是把此项视为
+						相等。也就是说，"equal=1" 会禁用
+						对此项的过滤。
+		dup		非零时，即使已经存在具有相同单词的
+						项，该匹配也会被加入。
+		empty		非零时，即使它是空字符串，该匹配
+						也会被加入
+		user_data	与该条目关联的自定义数据，
+						可在 |v:completed_item| 中使用；可以是任何类型；
+						默认是空字符串
+		abbr_hlgroup	一个额外的高亮组，其属性会与弹出菜单中的
+						|hl-PmenuSel| 和 |hl-Pmenu| 或
+						|hl-PmenuMatchSel| 和 |hl-PmenuMatch| 高亮
+						属性组合，从而把 cterm 与 gui
+						属性（以更高优先级）如删除线
+						应用到补全项的缩写上
+		kind_hlgroup	一个额外的高亮组，专门用于设置
+						补全种类的高亮属性。当
+						该字段存在时，它会覆盖
+						|hl-PmenuKind| 高亮组，从而允许
+						为补全种类自定义 ctermfg 与 guifg
+						属性
+		match		见 |complete_info()| 中的 "matches"。
+
+除 "icase"、"equal"、"dup" 和 "empty" 之外，以上都必须是字符串。如果
+某个条目不满足这些要求，就会给出错误消息，并且
+列表中后面的条目不会被使用。你可以在返回的列表中混合使用
+字符串和 Dictionary 项。
+
+"menu" 项用在弹出菜单中，可能会被截断，因此它应该
+相对较短。"info" 项可以更长，当 'completeopt' 中出现
+"preview" 时，它会被显示在预览 window 中。"info" 项
+在弹出菜单被移除后仍会保持显示。这
+对函数参数很有用。把 "info" 设为单个空格可以清除
+预览 window 中已有的文本。预览 window 的大小是三
+行，但当 'previewheight' 的值为 1 或 2 时使用该值。
+
+"kind" 项用单个字母表示补全的种类。这
+可以用来以不同方式显示补全项（不同颜色或图标）。
+目前可以使用这些类型：
+		v	变量
+		f	函数或方法
+		m	结构体或类的成员
+		t	typedef
+		d	#define 或宏
+
+当查找匹配需要一些时间时，请调用 |complete_add()| 把每个
+匹配加入总列表。这些匹配随后不应出现在返回的
+列表中！请不时调用 |complete_check()|，以便用户在仍
+搜索匹配时可以按键。它在返回非零时停止搜索。
+
+							*E840*
+允许该函数移动光标，之后光标会被恢复。
+不允许该函数移到另一个 window 或删除文本。
+
+下面是一个补全月份名称的示例： >
+	fun! CompleteMonths(findstart, base)
+	  if a:findstart
+	    " locate the start of the word
+	    let line = getline('.')
+	    let start = col('.') - 1
+	    while start > 0 && line[start - 1] =~ '\a'
+	      let start -= 1
+	    endwhile
+	    return start
+	  else
+	    " find months matching with "a:base"
+	    let res = []
+	    for m in split("Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec")
+	      if m =~ '^' .. a:base
+		call add(res, m)
+	      endif
+	    endfor
+	    return res
+	  endif
+	endfun
+	set completefunc=CompleteMonths
+<
+同样的例子，但现在假装搜索匹配很慢： >
+	fun! CompleteMonths(findstart, base)
+	  if a:findstart
+	    " locate the start of the word
+	    let line = getline('.')
+	    let start = col('.') - 1
+	    while start > 0 && line[start - 1] =~ '\a'
+	      let start -= 1
+	    endwhile
+	    return start
+	  else
+	    " find months matching with "a:base"
+	    for m in split("Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec")
+	      if m =~ '^' .. a:base
+		call complete_add(m)
+	      endif
+	      sleep 300m	" simulate searching for next match
+	      if complete_check()
+		break
+	      endif
+	    endfor
+	    return []
+	  endif
+	endfun
+	set completefunc=CompleteMonths
+<
+
+插入模式补全弹出菜单				*ins-completion-menu*
+							*popupmenu-completion*
+Vim 可以把匹配项显示在弹出菜单中。
+
+在以下情况会使用菜单：
+- 'completeopt' 选项含有 "menu" 或 "menuone"。
+- 终端至少支持 8 种颜色。
+- 至少有两个匹配。如果使用 "menuone"，则一个也可以。
+
+'pumheight' 选项可用于设置最大高度。默认是
+使用所有可用空间。
+'pumwidth' 选项可用于设置最小宽度。默认是 15
+个字符。
+
+							*compl-states*
+有三种状态：
+1. 已经插入了一个完整的匹配，例如使用 CTRL-N 或 CTRL-P 之后。
+2. 使用了某个光标键来选择另一个匹配。此时并没有
+   插入该匹配，只是弹出菜单中的那个条目被高亮。
+3. 只插入了匹配的一部分，并且输入了字符或者
+   使用了退格键。匹配列表随后会根据光标
+   之前的内容进行调整。
+
+你通常从第一种状态开始，此时第一个匹配已被插入。
+当 'completeopt' 中含有 "longest" 且有多个匹配时，你会从
+第三种状态开始。
+
+如果你选择了另一个匹配，例如用 CTRL-N 或 CTRL-P，你就会进入第一种
+状态。这不会改变匹配列表。
+
+当你回到最初的文本时，你处在第三种状态。要
+立刻到达那里，可以使用一个在开始补全后紧接着
+使用 CTRL-P 的映射： >
+	:imap <F7> <C-N><C-P>
+<
+						*popupmenu-keys*
+在第一种状态下，这些键有特殊含义：
+<BS> 和 CTRL-H   删除一个字符，为光标之前的单词查找匹配项。
+		  这会把匹配列表缩小，通常缩到一个
+		  条目，并切换到第二种状态。
+		  当 'autocomplete' 处于活动状态时，清除菜单中
+		  选中的项。
+任何非特殊字符：
+		  在不变更匹配的情况下停止补全，并插入所
+		  输入的字符。
+
+在第二种和第三种状态下，这些键有特殊含义：
+<BS> 和 CTRL-H   删除一个字符，为光标之前更短的单词查找
+		  匹配项。这可能会找到更多匹配。
+		  当 'autocomplete' 处于活动状态时，清除菜单中
+		  选中的项。
+CTRL-L		  从当前匹配中添加一个字符，可能会减少
+		  匹配的数量。
+任何可打印的非空白字符：
+		  添加该字符并减少匹配的数量。
+
+在全部三种状态下都可以使用这些：
+CTRL-Y		  是：接受当前选中的匹配并停止
+		  补全。
+CTRL-E		  结束补全，回到选择某个匹配之前的状态
+		  （即所输入的文本或最长公共字符串）。
+<PageUp>	  向后选择若干个条目之前的匹配，但不插入它。
+<PageDown>	  向前选择若干个条目之后的匹配，但不插入它。
+<Up>		  选择上一个匹配，如同使用了 CTRL-P，但不
+		  插入它。
+<Down>		  选择下一个匹配，如同使用了 CTRL-N，但不
+		  插入它。
+<Space> 或 <Tab>  在不变更匹配的情况下停止补全，并插入所
+		  输入的字符。
+
+<Enter> 键的行为取决于你所在的状态：
+第一种状态：	  按文本原样使用，并插入一个换行。
+第二种状态：	  插入当前选中的匹配。
+第三种状态：	  按文本原样使用，并插入一个换行。
+
+换句话说：如果你用光标键在匹配列表中选择了另一个
+条目，那么 <Enter> 键会插入该匹配。如果你输入了
+别的内容，那么 <Enter> 会插入一个换行。
+
+
+菜单的颜色可以用这些高亮组来更改：
+Pmenu		普通项  |hl-Pmenu|
+PmenuSel	选中项  |hl-PmenuSel|
+PmenuSbar	滚动条  |hl-PmenuSbar|
+PmenuThumb	滚动条的滑块  |hl-PmenuThumb|
+
+弹出菜单可见时没有特殊的映射。不过，
+你可以使用一个检查 |pumvisible()| 函数的插入模式映射来
+做不同的事。示例： >
+	:inoremap <Down> <C-R>=pumvisible() ? "\<lt>C-N>" : "\<lt>Down>"<CR>
+
+你可以在映射中使用 <expr>，让弹出菜单在输入
+某个字符且满足某些条件时被使用。例如，输入句点时： >
+	inoremap <expr> . MayComplete()
+	func MayComplete()
+	    if (can complete)
+	      return ".\<C-X>\<C-O>"
+	    endif
+	    return '.'
+	endfunc
+
+更多信息见 |:map-<expr>|。
+
+
+OMNI 补全的文件类型相关说明	    *compl-omni-filetypes*
+
+用于 {filetype} 的文件应该是 'runtimepath' 中的
+autoload/{filetype}complete.vim。因此对于 "java"，它是 autoload/javacomplete.vim。
+
+
+C							*ft-c-omni*
+
+补全 C 代码需要 tags 文件。你应该使用 Universal/
+Exuberant ctags，因为它添加了补全所需的额外
+信息。你可以在这里找到它：
+	Universal Ctags: https://ctags.io
+
+首选 Universal Ctags，Exuberant Ctags 已不再维护。
+
+如果你想补全系统函数，可以这样做。使用
+ctags 为所有系统头文件生成 tags 文件： >
+	% ctags -R -f ~/.config/nvim/systags /usr/include /usr/local/include
+在你的 vimrc 文件中把这个 tags 文件加入 'tags' 选项： >
+	set tags+=~/.config/nvim/systags
+
+在一个不带任何 "." 或 "->" 的名字之后使用 CTRL-X CTRL-O 时，会直接从
+tags 文件补全。这对任何标识符都有效，函数名
+也一样。如果你想补全一个局部变量名，而它并不出现在
+tags 文件中，请改用 CTRL-P。
+
+在带有 "." 或 "->" 的内容之后使用 CTRL-X CTRL-O 时，Vim 会尝试
+识别该变量的类型，并推断它具有哪些成员。
+这意味着只会列出对该变量有效的成员。
+
+当一个成员名已经补全后，对于复合类型，CTRL-X CTRL-O 会添加一个 "." 或
+"->"。
+
+Vim 不包含 C 编译器，只有格式最明显的
+声明才能被识别。预处理器的内容可能会造成混乱。
+当同一个结构体名出现在多个地方时，所有可能的成员
+都会被包含进来。
+
+
+CSS							*ft-css-omni*
+
+按照 CSS 2.1 规范补全属性及其相应的
+值。
+
+
+HTML							*ft-html-omni*
+XHTML							*ft-xhtml-omni*
+
+CTRL-X CTRL-O 提供对 (X)HTML 文件各种元素的补全。它
+被设计为支持编写 XHTML 1.0 Strict 文件，但也适用于
+其他版本的 HTML。特性：
+
+- 在 "<" 之后根据上下文补全标签名（在 a 标签内部不会建议
+    div）；'/>' 表示空标签
+- 在标签内部补全合适的属性（a 标签没有 width 属性）；
+    还会显示属性的类型；"*" 表示必需属性
+- 当属性的可能取值有限时，帮助补全它们
+- 补全实体的名字
+- 用从 <style> 标签和所包含的 CSS 文件中获得的数据
+    补全 "class" 和 "id" 属性的值
+- 在补全 "style" 属性的值或在 "style" 标签内部工作时，
+    切换到 |ft-css-omni| 补全
+- 在补全事件属性的值或在 "script" 标签内部工作时，
+    切换到 |ft-javascript-omni| 补全
+- 在 "</" 之后使用时，CTRL-X CTRL-O 会闭合最后打开的标签
+
+注意：第一次使用时，补全菜单会有一点延迟才显示
+——这是加载数据文件所需的时间。
+注意：在格式很差的文档中补全可能会失败。这种情况下请尝试
+运行 |:make| 命令来检测格式问题。
+
+
+HTML 风格						*html-flavor*
+
+默认的 HTML 补全取决于文件类型。对于 HTML 文件，它是
+HTML 4.01 Transitional（'filetype' 为 "html"），对于 XHTML，它是 XHTML 1.0
+Strict（'filetype' 为 "xhtml"）。
+
+在任何其他标签之外做补全时，你将有机会
+选择 DOCTYPE，相应的数据文件会被加载并用于所有
+后续补全。
+
+关于数据文件格式的更多内容见 |xml-omni-datafile|。部分数据文件
+可以在 Vim 网站上找到（|www|）。
+
+注意，b:html_omni_flavor 可以指向带有任意 XML 数据的文件。这
+使得把 PHP（|ft-php-omni|）补全与任意 XML 方言混合使用成为可能
+（前提是你有对应的数据文件）。如果不设置该变量，将使用 XHTML 1.0
+Strict。
+
+
+JAVASCRIPT					       *ft-javascript-omni*
+
+补全 JavaScript 语言的大部分元素以及 DOM 元素。
+
+补全：
+
+- 变量
+- 函数名；显示函数参数
+- 函数参数
+- 变量属性，并尝试识别变量类型
+- 根据上下文补全 DOM 对象与属性
+- 语言的关键字
+
+补全可在独立的 JavaScript 文件（&ft==javascript）中、在 (X)HTML 的
+<script> 标签内，以及事件属性的值中工作（包括扫描
+外部文件）。
+
+DOM 兼容性
+
+目前（2006 年初）有两个主要浏览器——MS Internet
+Explorer 和 Mozilla Firefox。这两个应用程序覆盖了 90% 以上的
+市场。理论上标准由 W3C 组织制定
+（https://www.w3.org/），但它们并不总是被遵循/实现。
+>
+		IE	FF	W3C  Omni completion ~
+		+/-	+/-	+    +		     ~
+		+	+	-    +		     ~
+		+	-	-    -		     ~
+		-	+	-    -		     ~
+<
+无论浏览器中的实现状况如何，只要某个元素在标准中有定义，
+补全插件就会把它放进建议列表中。当两个主要引擎
+都实现了某个元素时，即使它不在标准中，
+它也会被建议。所有其他元素都不会被放进建议列表。
+
+
+LUA                                                     *ft-lua-omni*
+
+Lua 的 |ftplugin| 会把 'omnifunc' 设为 |vim.lua_omnifunc()|。
+
+
+PHP							*ft-php-omni*
+
+补全 PHP 代码需要 tags 文件，以便补全来自
+外部文件的数据以及进行类感知的补全。你应该使用 Universal/
+Exuberant ctags 5.5.4 或更新版本。你可以在这里找到它：
+
+	Universal Ctags: https://ctags.io
+
+脚本会补全：
+
+- 在 $ 之后补全变量名
+    - 如果变量被声明为对象，则添加 "->"；如果有 tags 文件，
+        则显示类名
+    - 在 "->" 之后只补全特定于给定类的函数名和变量名。
+        要找到类的位置和内容，需要 tags 文件。
+        因为 PHP 不是强类型语言，用户可以用 @var 标签来声明
+        类： >
+
+	/* @var $myVar myClass */
+	$myVar->
+<
+        不过，要找到 myClass 的内容仍然需要 tags 文件。
+
+- 函数名及附加信息：
+    - 对于内置函数，显示可能的参数列表，并在 | 之后显示
+        函数返回的数据类型
+    - 对于用户函数，显示参数以及定义该函数的文件
+        名（如果它不是当前文件）
+
+- 常量名
+- "new" 声明之后的类名
+
+
+注意：第一次做补全时，Vim 会把所有必要的数据加载到
+内存中。这可能需要几秒钟。之后再次使用补全时，延迟
+应该不会明显。
+
+脚本会检测光标是否在 <?php ?> 标签内。如果在外面，它会
+自动切换到 HTML/CSS/JavaScript 补全。注意：与
+原来的 HTML 文件相反，标签补全（且仅限标签）不是上下文相关的。
+
+
+RUBY						 *ft-ruby-omni*
+
+注意：Ruby 代码的 |compl-omni| 需要安装 |provider-ruby|。
+
+Ruby 补全会按需解析你的 buffer，以提供一份
+补全列表。这些补全项来自通过 "require" 加载的模块
+以及当前 buffer 中定义的模块。
+
+CTRL-X CTRL-O 提供的补全项对上下文敏感：
+
+	  	  上下文			   提供的补全 ~
+
+  1. 不在类定义内部：  类、常量和全局变量
+  2. 在类定义内部：	     该类中定义的方法或常量
+  3. 在 '.'、'::' 或 ':' 之后：	     适用于被解引用对象的
+				     			     方法
+  4. 在 ':' 或 ':foo' 之后：	     符号名（以 "foo" 开头）
+
+注意：
+- Vim 会加载/求值代码以提供补全。这可能会
+    导致一些代码被执行，这可能令人担忧。该功能已不再
+    默认启用，要启用它请添加 >
+     let g:rubycomplete_buffer_loading = 1
+- 在上面的上下文 1 中，Vim 可以解析整个 buffer，把类列表
+    加入补全结果。该功能默认关闭，
+    要启用它请添加 >
+     let g:rubycomplete_classes_in_global = 1
+<  到你的 vimrc 中
+- 在上面的上下文 2 中，不支持匿名类。
+- 在上面的上下文 3 中，Vim 会尝试确定该对象支持
+    的方法。
+- Vim 可以检测并为 rails 项目中的文件加载 Rails
+    环境。该功能默认禁用，要启用它请添加 >
+     let g:rubycomplete_rails = 1
+<  到你的 vimrc 中
+
+
+SYNTAX							*ft-syntax-omni*
+
+Vim 能够为近 500 种语言做语法高亮着色。这种
+高亮的一部分内容包括知道哪些关键字属于某种语言。许多
+文件类型已经有人为它们编写了自定义补全脚本，
+syntaxcomplete 插件为所有其他文件类型提供基本补全。它
+的做法是用 Vim 已经知道如何着色高亮的文本
+填充 omni 补全列表。它可用于任何文件类型，并提供
+最小的语言相关补全。
+
+要启用语法代码补全，可以运行： >
+    setlocal omnifunc=syntaxcomplete#Complete
+
+你可以把下面内容放在 |init.vim| 中来自动完成这件事（在任何
+":filetype" 命令之后）： >
+    if has("autocmd") && exists("+omnifunc")
+	autocmd Filetype *
+		    \	if &omnifunc == "" |
+		    \		setlocal omnifunc=syntaxcomplete#Complete |
+		    \	endif
+    endif
+
+只有在还没有针对该文件类型的特定插件时，
+上面这段才会把补全设为此脚本。
+
+每种文件类型都可能有各种语法项。该插件允许你
+定制列表中包含或排除哪些语法组。让我们
+看看 PHP 文件类型，以了解它是如何工作的。
+
+如果你编辑一个名为 index.php 的文件，请运行以下命令： >
+    syntax list
+
+你首先会注意到有许多不同的语法
+组。PHP 语言可以包含来自不同语言的元素，例如
+HTML、JavaScript 等等。语法插件只会包含以该文件类型
+（这里是 "php"）开头的语法组。例如，这些
+语法组默认包含在 PHP 中：phpEnvVar、phpIntVar、
+phpFunctions。
+
+如果你希望也包含非本文件类型的语法项，可以使用
+正则表达式语法（在
+autoload/syntaxcomplete.vim 的 13.0 版中加入）来添加项。查看
+编辑 PHP 文件时 ":syntax list" 的输出，我可以看到其中一些条目： >
+    htmlArg,htmlTag,htmlTagName,javaScriptStatement,javaScriptGlobalObjects
+
+要在编辑 PHP 文件时也拾取任何 JavaScript 和 HTML 关键字语法
+组，你可以使用 3 个不同的正则表达式，每种语言一个。或者你可以
+干脆把包含的组限定为某个特定值，而不使用
+正则表达式字符串： >
+    let g:omni_syntax_group_include_php = 'php\w\+,javaScript\w\+,html\w\+'
+    let g:omni_syntax_group_include_php = 'phpFunctions,phpMethods'
+<
+该变量的基本形式是： >
+    let g:omni_syntax_group_include_{filetype} = 'regex,comma,separated'
+
+PHP 语言有数量庞大的条目，它知道如何对它们做语法
+高亮。这些条目都会出现在 omni 补全列表中。
+
+有些人可能觉得这个列表过于庞杂，或者只对某些
+条目感兴趣。有两种方式可以（在必要时）裁剪这个列表。如果你发现
+某些语法组不希望被显示，可以用两种不同的
+方法来标识这些组。第一种按名字明确列出语法
+组。第二种使用正则表达式来标识这两种
+语法组。只需把下面之一添加到你的 vimrc 中： >
+    let g:omni_syntax_group_exclude_php = 'phpCoreConstant,phpConstant'
+    let g:omni_syntax_group_exclude_php = 'php\w*Constant'
+
+可以通过用逗号分隔来向这个列表添加任意多个语法组。该
+变量的基本形式是： >
+    let g:omni_syntax_group_exclude_{filetype} = 'regex,comma,separated'
+
+你可以按需创建任意多个这样的变量，只需改变
+变量名末尾的文件类型。
+
+插件使用 isKeyword 选项来确定语法项的单词边界
+在哪里。例如，在 Scheme 语言中，补全应当
+包含 "-"，即 call-with-output-file。取决于你的文件类型，这可能
+无法提供你期望的单词。把
+g:omni_syntax_use_iskeyword 选项设为 0 会强制语法插件在
+单词字符处断开。这可以通过把下面内容添加到你的
+vimrc 来控制： >
+    let g:omni_syntax_use_iskeyword = 0
+
+对于插件开发者，该插件暴露了一个公共函数 OmniSyntaxList。
+该函数可用于请求一个语法项的 List。在编辑
+SQL 文件（:e syntax.sql）时，你可以使用 ":syntax list" 命令来查看
+各个组和语法项。例如： >
+    syntax list
+
+产生的数据类似这样： >
+    sqlOperator    xxx some prior all like and any escape exists in is not
+                       or intersect minus between distinct
+                       links to Operator
+    sqlType        xxx varbit varchar nvarchar bigint int uniqueidentifier
+                       date money long tinyint unsigned xml text smalldate
+                       double datetime nchar smallint numeric time bit char
+                       varbinary binary smallmoney
+                       image float integer timestamp real decimal
+
+这里列出了两个语法组：sqlOperator 和 sqlType。要获取
+一个语法项的 List，你可以用多种不同方式调用
+OmniSyntaxList。要获取所有语法项，不管它们属于哪个语法组：  >
+    echo OmniSyntaxList( [] )
+
+要只获取 sqlOperator 语法组的语法项： >
+    echo OmniSyntaxList( ['sqlOperator'] )
+
+要获取 sqlOperator 和 sqlType 两个组的所有语法项： >
+    echo OmniSyntaxList( ['sqlOperator', 'sqlType'] )
+
+也可以使用正则表达式： >
+    echo OmniSyntaxList( ['sql\w\+'] )
+
+在插件内部，你通常会把输出赋给一个 List： >
+    let myKeywords = []
+    let myKeywords = OmniSyntaxList( ['sqlKeyword'] )
+
+
+SQL							*ft-sql-omni*
+
+SQL 语言的补全包括语句、函数和关键字。
+它还会用直接从数据库中取出的数据动态补全表、
+存储过程、视图和列表。详细说明
+和教程见 |omni-sql-completion|。
+
+SQL 补全插件可以与其他补全
+插件一起使用。例如，PHP 文件类型有它自己的补全插件。
+由于 PHP 常被用来通过访问数据库生成动态网站，
+所以也可以启用 SQL 补全插件。这让你可以同时
+补全 PHP 代码和 SQL 代码。
+
+
+XML							*ft-xml-omni*
+
+Vim 7 提供了一种对 XML 文件做上下文相关补全的机制。它
+依赖于一个特殊的 |xml-omni-datafile| 和两条命令：|:XMLns| 和
+|:XMLent|。特性有：
+
+- 在 "<" 之后根据上下文补全标签名
+- 在标签内部补全合适的属性
+- 当某个属性的可能取值有限时，帮助补全
+    它们
+- 补全实体的名字（定义在 |xml-omni-datafile| 中，以及在
+    当前文件中用 "<!ENTITY" 声明）
+- 在 "</" 之后使用时，CTRL-X CTRL-O 会闭合最后打开的标签
+
+XML 数据文件的格式					*xml-omni-datafile*
+
+XML 数据文件存放在 'runtimepath' 中的 "autoload/xml" 目录里。
+Vim 发行版在
+"$VIMRUNTIME/autoload/xml" 目录中提供了一些数据文件示例。它们有一个有意义的名字，
+会在命令中使用。它应当是一个不会造成冲突的
+唯一名字。例如，名字 xhtml10s.vim 表示它是
+XHTML 1.0 Strict 的数据文件。
+
+每个文件都包含一个名字类似 g:xmldata_xhtml10s 的变量。它
+由两部分组成：
+
+1. "g:xmldata_"  通用前缀，对所有数据文件都固定不变
+2. "xhtml10s"    文件名，也是所描述的 XML 方言的
+		 		 名字；它会作为 |:XMLns| 命令的
+		 		 参数使用
+
+第二部分必须与文件名完全相同。
+
+该变量是一个 |Dictionary|。键是标签名，每个值是一个两
+元素的 |List|。该 List 的第一个元素也是一个 List，包含可能的
+子元素名。第二个元素是一个 |Dictionary|，以属性名为键、
+以属性的可能取值为值。示例： >
+
+    let g:xmldata_crippled = {
+    \ "vimxmlentities": ["amp", "lt", "gt", "apos", "quot"],
+    \ 'vimxmlroot': ['tag1'],
+    \ 'tag1':
+    \ [ ['childoftag1a', 'childoftag1b'], {'attroftag1a': [],
+    \ 'attroftag1b': ['valueofattr1', 'valueofattr2']}],
+    \ 'childoftag1a':
+    \ [ [], {'attrofchild': ['attrofchild']}],
+    \ 'childoftag1b':
+    \ [ ['childoftag1a'], {'attrofchild': []}],
+    \ "vimxmltaginfo": {
+    \ 'tag1': ['Menu info', 'Long information visible in preview window']},
+    \ 'vimxmlattrinfo': {
+    \ 'attrofchild': ['Menu info', 'Long information visible in preview window']}}
+
+这个示例会被放在 "autoload/xml/crippled.vim" 文件中，它可以帮助
+编写这个文件： >
+
+    <tag1 attroftag1b="valueofattr1">
+        <childoftag1a attrofchild>
+                &amp; &lt;
+        </childoftag1a>
+        <childoftag1b attrofchild="5">
+            <childoftag1a>
+                &gt; &apos; &quot;
+            </childoftag1a>
+        </childoftag1b>
+    </tag1>
+
+在这个示例中可以看到四个特殊元素：
+
+1. "vimxmlentities" —— 一个特殊键，其 List 包含该 XML
+      方言的实体。
+2. 如果包含属性可能取值的列表中只有一个元素，并且
+      该元素等于属性名，那么这个属性会被
+      当作布尔值处理，并插入为 "attrname"，而不是 'attrname="'
+3. "vimxmltaginfo" —— 一个特殊键，其 Dictionary 以标签
+      名为键、以两元素 List 为值，用于附加的菜单信息和
+      长描述。
+4. "vimxmlattrinfo" —— 特殊键，其 Dictionary 以属性名
+      为键、以两元素 List 为值，用于附加的菜单信息和长
+      描述。
+
+注意：数据文件中的标签名绝不能包含命名空间描述。
+示例请查看 xsl.vim。
+注意：所有数据和函数都作为全局
+变量/函数公开可用，可用于个人的编辑函数。
+
+
+DTD -> Vim							*dtd2vim*
+
+|www| 上有脚本 |dtd2vim|，它会解析 DTD 并创建一个 XML 数据文件，
+供 Vim 的 XML omni 补全使用。
+
+        dtd2vim: https://www.vim.org/scripts/script.php?script_id=1462
+
+关于用法细节请查看该文件的开头。
+该脚本需要 perl 和：
+
+        perlSGML: https://savannah.nongnu.org/projects/perlsgml
+
+
+命令
+
+:XMLns {name} [{namespace}]					*:XMLns*
+
+Vim 必须知道应该使用哪个数据文件以及使用哪个命名空间。要
+加载数据文件并把数据与正确的命名空间关联起来，请使用
+|:XMLns| 命令。第一个（必需的）参数是数据的名字
+（xhtml10s、xsl）。第二个参数是命名空间的代码（h、xsl）。
+不带第二个参数使用时，该方言会被用作默认值——不声明
+命名空间。例如，要在 .xsl 文件中使用 XML 补全： >
+
+	:XMLns xhtml10s
+	:XMLns xsl xsl
+
+
+:XMLent {name}							*:XMLent*
+
+默认情况下，实体会从默认命名空间的数据文件中补全。
+在没有默认命名空间的情况下，应该使用
+XMLent 命令： >
+
+	:XMLent xhtml10s
+
+用法
+
+在这种情形下使用时（在前面部分的声明之后，| 表示
+光标位置）： >
+
+	<|
+
+会补全为合适的 XHTML 标签；而在这种情形下： >
+
+	<xsl:|
+
+会补全为合适的 XSL 标签。
+
+
+通过 |autoload| 机制提供的脚本 xmlcomplete.vim
+有一个 xmlcomplete#GetLastOpenTag() 函数，可用于在 XML 文件中
+获取最后打开的标签名（必须定义 b:unaryTagsStack）： >
+
+	:echo xmlcomplete#GetLastOpenTag("b:unaryTagsStack")
+
+
+
+==============================================================================
+8. 插入模式命令					*inserting*
+
+以下命令可用于把新文本插入 buffer。它们
+都可以撤销，并可以用 "." 命令重复。
+
+							*a*
+a			在光标之后追加文本 [count] 次。如果
+						光标位于空行的第一列，插入会从那里
+						开始。但设置了 'virtualedit' 时不是这样！
+
+							*A*
+A			在行尾追加文本 [count] 次。
+						在可视块模式下使用 "A" 见 |v_b_A|。
+
+<insert>	或				*i* *insert* *<Insert>*
+i			在光标之前插入文本 [count] 次。
+						在插入模式中使用 CTRL-O 时 |i_CTRL-O|，不支持
+						计数。
+
+							*I*
+I			在该行第一个非空白字符之前插入文本
+						[count] 次。
+						在可视块模式下使用 "I" 见 |v_b_I|。
+
+							*gI*
+gI			在第 1 列插入文本 [count] 次。
+
+							*gi*
+gi			在与当前 buffer 中上次停止插入模式的
+						位置相同的地方插入文本。
+						这使用 |'^| 标记。当该标记位于行尾之后时，
+						它不同于 "`^i"。
+						该位置会针对插入/删除的行做修正，
+						但不针对插入/删除的字符做修正。
+						使用 |:keepjumps| 命令修饰符时，|'^|
+						标记不会被改变。
+
+							*o*
+o			在光标下方开始新的一行并插入文本，
+						重复 [count] 次。
+
+							*O*
+O			在光标上方开始新的一行并插入文本，
+						重复 [count] 次。
+
+这些命令用于开始插入文本。你可以用
+<Esc> 结束插入模式。插入模式中的其他特殊字符见 |mode-ins-repl|。
+[count] 的效果在退出插入模式之后才产生。
+
+以下 |default-mappings| 会插入文本，但停留在普通模式：
+
+							*]<Space>*
+]<Space>		在光标下方插入一个空行，而不离开
+						普通模式，重复 [count] 次。
+
+							*[<Space>*
+[<Space>		在光标上方插入一个空行，而不离开
+						普通模式，重复 [count] 次。
+
+当打开 'autoindent' 时，新行的缩进取自
+上一行。当打开 'smartindent' 或 'cindent' 时，一行的缩进
+会针对 C 程序自动调整。
+
+可以把 'formatoptions' 设为在新开一行时复制注释
+引导符。
+
+可以把 'textwidth' 设为一行的最大宽度。当追加字符使
+一行变得太长时，会自动插入一个换行。
+
+
+==============================================================================
+9. Ex 插入命令					*inserting-ex*
+
+							*:a* *:append*
+:{range}a[ppend][!]	在指定行下方插入若干行
+						文本。如果省略 {range}，文本会被
+						插入到当前行之后。
+						添加 [!] 会在执行此命令期间切换
+						'autoindent'。
+
+							*:i* *:in* *:insert*
+:{range}i[nsert][!]	在指定行上方插入若干行
+						文本。如果省略 {range}，文本会被
+						插入到当前行之前。
+						添加 [!] 会在执行此命令期间切换
+						'autoindent'。
+
+这两条命令会不断询问要输入的行，直到你输入一行
+只含 "." 的内容。小心以反斜杠开头的行，见
+|line-continuation|。
+
+在 "|" 命令分隔符之后输入的文本会首先被使用。因此在 ex 模式下
+执行下列命令： >
+	:a|one
+	two
+	.
+	:visual
+会在光标所在行之后追加以下文本： >
+	one
+	two
+<
+注意：这些命令不能与 |:global| 或 |:vglobal| 一起使用。
+":append" 和 ":insert" 在 ":if" 与
+":endif"、":for" 与 ":endfor"、":while" 与 ":endwhile" 之间无法正常工作。
+
+							*:start* *:startinsert*
+:star[tinsert][!]	在执行此命令之后立即开始插入模式（或在 |terminal|
+						buffer 中开始 |Terminal-mode|）。
+						作用就像在普通模式下输入 "i"。包含 ! 时
+						作用就像 "A"，即追加到该行。
+						否则插入从光标位置开始。
+						注意，在函数或脚本中使用此命令时，
+						插入只会在该函数或脚本
+						结束之后才开始。
+						此命令不能从 |:normal| 中使用。
+
+							*:stopi* *:stopinsert*
+:stopi[nsert]		尽快停止插入模式或 |Terminal-mode|。
+						作用就像在插入模式中输入 <Esc>。
+						可以用在自动命令中，示例： >
+				:au BufEnter scratch stopinsert
+<
+					*replacing-ex* *:startreplace*
+:startr[eplace][!]	在执行此命令之后立即开始替换模式。
+						作用就像在普通模式下输入 "R"。
+						包含 ! 时，它的作用就像输入了 "$R"
+						（即在行尾开始替换模式）。否则
+						替换从光标位置开始。
+						注意，在函数或脚本中使用此命令时，
+						替换只会在该函数或脚本
+						结束之后才开始。
+
+							*:startgreplace*
+:startg[replace][!]	类似 |:startreplace|，但使用虚拟替换
+						模式，如同 |gR|。
+
+==============================================================================
+10. 插入文件					*inserting-file*
+
+							*:r* *:re* *:read*
+:r[ead] [++opt] [name]
+						在光标下方插入文件 [name]（默认：当前文件）。
+						[++opt] 的可能取值见 |++opt|。
+
+:{range}r[ead] [++opt] [name]
+						在指定行下方插入文件 [name]（默认：当前文件）。
+						[++opt] 的可能取值见 |++opt|。
+
+							*:r!* *:read!*
+:[range]r[ead] [++opt] !{cmd}
+						执行 {cmd} 并把它的标准输出插入到
+						光标或指定行下方。会用一个临时文件
+						来保存该命令的输出，然后把它
+						读入 buffer。'shellredir' 用于保存
+						命令的输出，可以把它设为包含或不包含
+						stderr。{cmd} 的执行方式同 ":!{cmd}"，
+						其中任何 '!' 都会被替换为之前的命令 |:!|。
+						[++opt] 的可能取值见 |++opt|。
+
+这些命令把文件的内容或命令的输出插入
+到 buffer 中。它们可以撤销。它们不能用 "."
+命令重复。它们按行工作，插入从光标所在行
+之下、或指定行之下开始。要把文本插入到第一行
+之前，请使用命令 ":0r {name}"。
+
+执行 ":read" 命令之后，光标会停留在第一个新行中的
+第一个非空白字符上。如果在 Ex 模式下，光标会停留在最后一个新
+行上（抱歉，这与 Vi 兼容）。
+
+如果用 ":r" 给出了文件名，它就会成为备用文件。例如，
+当你想改为编辑那个文件时，可以使用 ":e! #"。这可以
+通过从 'cpoptions' 选项中移除 'a' 标志来关闭。
+
+在 [++opt] 参数中，有一个是专门用于 ":read" 的，即 ++edit 参数。
+当 ":read" 命令实际上是被用来把一个文件读入
+buffer、就像在编辑该文件一样时，这很有用。请在空 buffer 中使用此命令： >
+	:read ++edit filename
+其效果是，'fileformat'、'fileencoding'、'bomb' 等选项会被
+设为为 "filename" 检测到的值。注意，会留下一个空行，
+你可能想把它删掉。
+
+							*file-read*
+'fileformat' 选项设置文件的 <EOL> 风格：
+'fileformat'    字符		   名称				~
+    "dos"		<CR><NL> 或 <NL>   DOS 格式
+    "unix"	<NL>		   Unix 格式
+    "mac"		<CR>		   Mac 格式
+
+如果 'fileformat' 是 "dos"，<NL> 前面的 <CR> 会被忽略，文件末尾的
+CTRL-Z 也会被忽略。
+
+如果 'fileformat' 是 "mac"，文件中的一个 <NL> 在内部会用 <CR>
+表示。这是为了避免与用于表示 <NUL> 的 <NL> 混淆。
+见 |CR-used-for-NL|。
+
+如果 'fileformats' 选项不为空，Vim 会尝试识别 <EOL> 的
+类型（见 |file-formats|）。不过，'fileformat' 选项不会
+被改变，检测到的格式只在读取文件时使用。
+'fileencodings' 也有类似的情况。
+
+在非 Win32 系统上，如果文件以 DOS 格式读入，会显示消息
+"[dos format]"，以提醒你做了不寻常的事。
+在 Macintosh 和 Win32 上，如果文件以 Unix 格式读入，
+会显示消息 "[unix format]"。
+在非 Macintosh 系统上，如果文件以 Mac 格式读入，
+会显示消息 "[mac format]"。
+
+下面是一个如何使用 ":r !" 的示例： >
+	:r !uuencode binfile binfile
+这条命令读取 "binfile"，对它做 uuencode，然后把它读入当前
+buffer。当你编辑电子邮件并想包含一个二进制文件时，
+这很有用。
+
+							*read-messages*
+读取文件时，Vim 会显示一条包含所读文件信息的
+消息。表中对其中一些项做了解释。其他项
+不言自明。使用长版本还是短版本取决于
+'shortmess' 选项。
+
+	长		短		含义 ~
+	[readonly]	{RO}		该文件是写保护的
+	[fifo/socket]			使用流
+	[fifo]			使用 fifo 流
+	[socket]			使用 socket 流
+	[CR missing]			以 "dos" 'fileformat' 读取时
+									发现没有前置 CR 的 NL。
+	[NL found]			以 "mac" 'fileformat' 读取时
+									发现了 NL（可能是 "unix" 格式）
+	[long lines split]		至少有一行被一分为二
+	[NOT converted]			期望从 'fileencoding' 转换为
+									'encoding'，但不可能
+									做到
+	[converted]			从 'fileencoding' 到
+									'encoding' 的转换已完成
+	[READ ERRORS]			未能读取整个文件
+
+
+ vim:tw=78:ts=8:noet:ft=help:norl:

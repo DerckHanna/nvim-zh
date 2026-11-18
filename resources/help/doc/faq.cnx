@@ -1,0 +1,489 @@
+*faq.txt*		 Nvim
+
+                            NVIM 参考手册
+
+
+常见问题解答                                                             *faq*
+
+                                  输入 |gO| 查看目录。
+
+==============================================================================
+一般问题                                                         *faq-general*
+
+
+------------------------------------------------------------------------------
+我该把配置（VIMRC）放在哪里？
+
+见 |config|；你可以复制（或建立符号链接）现有的 vimrc。|nvim-from-vim|
+
+
+------------------------------------------------------------------------------
+开发（预发布）版本的稳定性如何？
+
+Nvim 的不稳定（预发布）版本
+https://github.com/neovim/neovim/releases/tag/nightly （即 "HEAD"，也就是
+`master` 分支）用于激进地引入新特性与变更。它通常稳定，但偶尔会打断你的
+工作流。我们依赖 HEAD 用户报告自动化测试没有覆盖到的「盲区」。
+
+若想获得更可预期的体验，请使用稳定（发布）版本
+https://github.com/neovim/neovim/releases/latest 。
+
+
+------------------------------------------------------------------------------
+我可以使用基于 LUA 的 VIM 插件（例如 NEOCOMPLETE）吗？
+
+不可以。从 Nvim 0.2 的 PR #4411
+https://github.com/neovim/neovim/pull/4411 起，Lua 已内置于 Nvim，但传统
+Vim 的 `if_lua` 接口不受支持。
+
+
+------------------------------------------------------------------------------
+如何在终端中使用「真彩色」？
+
+如果检测到支持真彩色的终端，真彩色（24 位颜色）默认启用。如果你的终端
+未被检测到，但你确定它支持真彩色，请把下面这行加入你的 |init.vim|：
+>vim
+    set termguicolors
+<
+
+------------------------------------------------------------------------------
+NVIM 在切换模式时显示奇怪的符号（`�[2 q`）
+
+这是你的终端模拟器的 bug。出现的原因是：如果终端看起来兼容 xterm
+（`TERM=xterm-256color`），Nvim 默认会发送光标形状相关的 termcode。
+
+要绕过该问题，你可以：
+
+- 使用其它终端模拟器
+- 在 Nvim 配置中禁用 'guicursor'： >vim
+
+    :set guicursor=
+    " Workaround some broken plugins which set guicursor indiscriminately.
+    :autocmd OptionSet guicursor noautocmd set guicursor=
+<
+关于 `$TERM` 的推荐取值，另见 |$TERM|。
+
+
+------------------------------------------------------------------------------
+如何在终端中改变光标形状？
+
+- 对于 Nvim 0.1.7 或更早版本：见 `man nvim` 中关于
+  `NVIM_TUI_ENABLE_CURSOR_SHAPE` 的说明。
+- 对于 Nvim 0.2 或更新版本：光标样式由 'guicursor' 选项控制。
+    - 要 _禁用_ 光标样式，把 'guicursor' 设为空： >vim
+
+            :set guicursor=
+            " Workaround some broken plugins which set guicursor indiscriminately.
+            :autocmd OptionSet guicursor noautocmd set guicursor=
+<
+    - 如果你想要不闪烁的光标，使用 `blinkon0`。见 'guicursor'。
+    - 'guicursor' 默认启用，除非 Nvim 认为你的终端不支持它。如果你确定
+      终端支持光标形状控制，请在 |init.vim| 中设置 'guicursor'，具体做法
+      见 'guicursor'。
+- Vim 的终端选项 |t_SI| 和 `t_EI` 会被忽略，和所有其它 |t_xx| 选项一样。
+- 旧版本的 libvte（gnome-terminal、roxterm、terminator 等）不支持光标样式
+  的控制码。#2537
+  https://github.com/neovim/neovim/issues/2537
+
+
+------------------------------------------------------------------------------
+如何在终端中改变光标颜色？
+
+光标样式（形状、颜色、行为）由 'guicursor' 控制，在终端中也是如此。光标
+颜色（与形状相对）仅在设置了 'termguicolors' 时才生效。
+
+'guicursor' 中给出了一个示例，下面是一个更复杂的示例，它在插入模式和
+普通模式下分别设置不同的颜色：
+>vim
+    :set termguicolors
+    :hi Cursor guifg=green guibg=green
+    :hi Cursor2 guifg=red guibg=red
+    :set guicursor=n-v-c:block-Cursor/lCursor,i-ci-ve:ver25-Cursor2/lCursor2,r-cr:hor20,o:hor50
+<
+
+------------------------------------------------------------------------------
+退出或挂起再恢复 NVIM 之后，光标样式没有恢复
+
+Nvim 使用 "Se" terminfo 能力在退出时重置光标样式。如果你的终端的 terminfo
+没有定义该能力，请用 autocommand 来管理光标样式：
+>vim
+    au VimEnter,VimResume * set guicursor=n-v-c:block,i-ci-ve:ver25,r-cr:hor20,o:hor50
+      \,a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor
+      \,sm:block-blinkwait175-blinkoff150-blinkon175
+
+    au VimLeave,VimSuspend * set guicursor=a:block-blinkon0
+
+另一种做法是：在你的 shell 里设置所需的光标形状（例如在 bash 中使用
+PROMPT_COMMAND）。
+
+------------------------------------------------------------------------------
+在 TMUX 中光标形状不变
+
+那是 tmux 决定的，不是 Nvim。修复方法见 |tui-cursor-shape|。
+
+相关讨论见 #3165 https://github.com/neovim/neovim/pull/3165 。
+
+
+------------------------------------------------------------------------------
+在 TMUX 中光标闪烁？
+
+如果在 tmux 中打开不带文档的 nvim 时，光标 `_` 非常快地出现又消失，并且
+你在 `EndOfBuffer` 和 `Normal` 中设置了 |ctermbg|，请试着把它们设为 `NONE`：
+>vim
+    hi EndOfBuffer ctermbg=NONE ctermfg=200 cterm=NONE
+    hi Normal ctermbg=NONE ctermfg=200 cterm=NONE
+<
+
+------------------------------------------------------------------------------
+`--remote` 及其同伴怎么了？
+
+|--remote| 部分支持。|clientserver|
+
+如果你需要 Vim 有而 Nvim 缺失的某些标志，可以改用
+https://github.com/mhinz/neovim-remote 。
+
+==============================================================================
+运行时问题                                                       *faq-runtime*
+
+
+------------------------------------------------------------------------------
+用鼠标复制到 X11 PRIMARY 选区不工作
+
+`clipboard=autoselect` 尚未实现
+https://github.com/neovim/neovim/issues/2325 。你可能会觉得下面这个绕过办法
+有用：
+>vim
+    vnoremap <LeftRelease> "*ygv
+    vnoremap <2-LeftRelease> "*ygv
+<
+
+------------------------------------------------------------------------------
+我的 CTRL-H 映射不工作
+
+这个问题在 Nvim 0.2 中已修复。如果你运行的是 Nvim 0.1.7 或更早版本，请
+调整终端 terminfo 中的 "kbs"（key_backspace）条目：
+>vim
+    infocmp $TERM | sed 's/kbs=^[hH]/kbs=\\177/' > $TERM.ti
+    tic $TERM.ti
+<
+（运行上述命令后生成的临时 `*.ti` 文件可以随意删除。）
+
+
+------------------------------------------------------------------------------
+<HOME> 或其它「特殊」键不工作
+
+请确保 |$TERM| 设置正确。
+
+- 对于 screen 或 tmux，`$TERM` 应为 `screen-256color`（不是
+  `xterm-256color`！）
+- 在其它情况下，如果字符串里没有出现 "256"，那多半是错的。试试
+  `TERM=xterm-256color`。
+
+
+------------------------------------------------------------------------------
+:! 和 SYSTEM() 在处理交互式进程时行为怪异
+
+Nvim 中 |:terminal| 支持交互式命令。但 |:!| 和 |system()| 不支持交互式
+命令，主要原因是 Nvim UI 用 stdio 进行 msgpack 通信，同时也是为了性能、
+可靠性以及跨平台一致性（见
+https://vimhelp.org/gui_x11.txt.html#gui-pty）。
+
+另见 #1496 https://github.com/neovim/neovim/issues/1496 和 #8217
+https://github.com/neovim/neovim/issues/8217#issuecomment-402152307 。
+
+
+------------------------------------------------------------------------------
+PYTHON 支持不工作
+
+在 Nvim 中运行 |:checkhealth| 可自动诊断。
+
+其它提示：
+
+- 阅读 |provider-python| 以了解如何安装 `pynvim`。
+- 请确保你拥有最新版本的 `pynvim` Python 模块： >bash
+
+    uv tool install --upgrade pynvim
+<
+  关于其它安装方式，见 |provider-python|。
+- 如果你要为 `pynvim` 模块手动创建 Python 虚拟环境
+    https://pypi.org/project/pynvim/ ，则必须把 `g:python3_host_prog` 设为
+    该虚拟环境的解释器路径。
+- 用 `nvim -u NORC` 试试，以确保你的配置（|init.vim|）不是问题来源。如果
+    你得到 `E117: Unknown function`，那说明存在运行时问题：|faq-runtime|。
+- Python 的 `neovim` 模块早已改名为 `pynvim`。
+
+
+------------------------------------------------------------------------------
+:CHECKHEALTH 报告 E5009: INVALID $VIMRUNTIME
+
+这意味着 |$VIMRUNTIME| 或 'runtimepath' 已损坏。
+
+- |$VIMRUNTIME| 必须指向 Nvim 的运行时文件，而不是 Vim 的。
+- |$VIMRUNTIME| 目录的内容应可被当前用户读取。
+- 验证 `:echo &runtimepath` 中包含 $VIMRUNTIME 路径。
+
+------------------------------------------------------------------------------
+NEOVIM 找不到它的运行时
+
+如果 `:help nvim` 显示 `E149: No help for nvim`，那就是这种情况。
+
+请通过 `:echo $VIM` 和 `:echo $VIMRUNTIME` 确认 |$VIM| 与 |$VIMRUNTIME|
+指向的是 Nvim（而非 Vim）的运行时。它们应分别给出类似 `/usr/share/nvim`
+和 `/usr/share/nvim/runtime` 的结果。
+
+另外还要确保你没有意外覆盖 runtimepath（`:set runtimepath?`），它默认
+包含上面的 |$VIMRUNTIME|（见 'runtimepath'）。
+
+
+------------------------------------------------------------------------------
+NEOVIM 很慢
+
+
+请使用快速的终端模拟器：
+
+- kitty https://github.com/kovidgoyal/kitty
+- alacritty https://github.com/jwilm/alacritty
+
+
+请使用优化过的构建：
+
+`:version` 应报告下列 "build type" 之一：
+>
+    Build type: RelWithDebInfo
+    Build type: MinSizeRel
+    Build type: Release
+<
+如果它报告 `Build type: Debug`，而你是从源码构建 Nvim，见
+https://github.com/neovim/neovim/blob/master/BUILD.md 。
+
+
+------------------------------------------------------------------------------
+颜色显示不正确
+
+请确保 |$TERM| 设置正确。
+
+在 shell 中运行 `TERM=xterm-256color nvim`。如果颜色显示正确，就把该 `TERM`
+值导出到你的用户 profile（通常是 `~/.profile`）：
+>bash
+    export TERM=xterm-256color
+<
+如果你在使用 `tmux`，则改为把下面这行加入 `tmux.conf`：
+>bash
+    set -g default-terminal "tmux-256color"
+<
+
+对于 GNU `screen`，配置你的 `.screenrc`
+<https://wiki.archlinux.org/index.php/GNU_Screen#Use_256_colors>：
+>
+    term screen-256color
+<
+
+注意：Nvim 忽略 `t_Co` 以及其它 |t_xx| 终端代码。
+
+
+------------------------------------------------------------------------------
+NEOVIM 无法读取 UTF-8 字符
+
+在命令行中运行如下命令：
+>bash
+    locale | grep -E '(LANG|LC_CTYPE|LC_ALL)=(.*\.)?(UTF|utf)-?8'
+<
+如果没有输出，你可能没有使用 UTF-8 locale。见这些 issue：
+- https://github.com/neovim/neovim/issues/1601
+- https://github.com/neovim/neovim/issues/1858
+- https://github.com/neovim/neovim/issues/2386
+
+
+------------------------------------------------------------------------------
+TMUX 或 GNU SCREEN 中 ESC 有延迟
+
+这是 `tmux` / `screen` 中的常见问题
+https://www.google.com/?q=tmux%20vim%20escape%20delay （另见
+https://github.com/tmux/tmux/issues/131#issuecomment-145853211 ）。
+需要把对应的超时时间调低（10-20ms）。
+
+`.tmux.conf`：
+>
+    set -g escape-time 10
+    # Or for tmux >= 2.6
+    set -sg escape-time 10
+<
+`.screenrc`：
+>
+    maptimeout 10
+<
+
+「为什么在 VIM 中不会这样？」
+
+确实也会（试试 `vim -N -u NONE`），但如果你在按下 ESC 后迅速再按一个键，
+Vim 会把 ESC 解释为 ESC 而不是 ALT（META）。除非你仔细观察光标，否则不会
+注意到延迟。代价是 Vim 无法理解 ALT（META）组合键，因此例如 `nnoremap <M-a>`
+不会生效。在 Nvim 中 ALT（META）组合键始终可用。
+另见 Vim 中的 `:help xterm-cursor-keys`。
+
+Nvim 0.3 在完全支持 ALT 映射的同时模仿了 Vim 的这一行为。见 |i_ALT|。
+
+
+------------------------------------------------------------------------------
+GNU SCREEN 中启用鼠标模式时 ESC 丢失
+
+出现这个问题是因为 screen 的一个 bug https://savannah.gnu.org/bugs/?60196 ：
+在鼠标模式下，screen 认为 `ESC` 是某个鼠标序列的一部分，并且会无限期等待
+该序列的剩余部分，而不论 `maptimeout` 如何设置。在 screen 修复它之前，
+除了连按两次 escape（这样会让单个 escape 传递给 Nvim）之外，没有已知的
+绕过办法。
+
+
+------------------------------------------------------------------------------
+在 FILETYPE 插件和 AUTOCMD 中调用 INPUTLIST()、ECHOMSG 等不工作
+
+- https://github.com/neovim/neovim/issues/10008
+- https://github.com/neovim/neovim/issues/10116
+- https://github.com/neovim/neovim/issues/12288
+- https://github.com/vim/vim/issues/4379
+
+这是因为 Nvim 默认设置了 `shortmess+=F`。Vim 在 `set shortmess+=F` 时行为
+相同。有计划改进这一点，但在此期间可以改用 `set shortmess-=F`，或按如下
+方式使用 `unsilent`。
+>vim
+    unsilent let var = inputlist(['1. item1', '2. item2'])
+    autocmd BufNewFile * unsilent echomsg 'The autocmd has been fired.'
+<
+
+------------------------------------------------------------------------------
+G:CLIPBOARD 设置未被使用。
+
+如果 clipboard provider 已经加载，你需要在配置之后重新加载它。请使用如下
+配置。
+>vim
+    let g:clipboard = { 'name' : ... }
+    if exists('g:loaded_clipboard_provider')
+      unlet g:loaded_clipboard_provider
+      runtime autoload/provider/clipboard.vim
+    endif
+<
+
+或者，如果你希望在给 |g:clipboard| 赋值时自动重新加载，请这样设置
+|init.vim|。
+>vim
+    function! s:clipboard_changed(...) abort
+      if exists('g:loaded_clipboard_provider')
+        unlet g:loaded_clipboard_provider
+      endif
+      runtime autoload/provider/clipboard.vim
+    endfunction
+
+    if !exists('s:loaded')
+      call dictwatcheradd(g:, 'clipboard', function('s:clipboard_changed'))
+    endif
+    let s:loaded = v:true
+<
+
+==============================================================================
+构建问题                                                           *faq-build*
+
+
+------------------------------------------------------------------------------
+通用的构建问题
+
+运行 `make distclean && make`，以排除陈旧的构建环境导致的失败。
+
+
+------------------------------------------------------------------------------
+LOCAL.MK 中的设置不生效
+
+CMake 会缓存构建设置，所以在修改 `local.mk` 之后，你可能需要运行
+`rm -r build && make`。
+
+
+------------------------------------------------------------------------------
+CMAKE 错误
+
+`configure_file Problem configuring file`
+
+这很可能是权限问题，可能发生在你以 root 用户运行 `make`，之后又以普通
+用户运行 `make` 的情况下。要解决这个问题，请运行 `rm -rf build` 然后重试。
+
+
+------------------------------------------------------------------------------
+生成 HELPTAGS 失败
+
+如果重新安装失败并提示 "Generating helptags failed"，请试着删除之前安装的
+运行时目录（如果构建时未设置 `CMAKE_INSTALL_PREFIX`，默认是
+`/usr/local/share/nvim`）：
+>bash
+    rm -r /usr/local/share/nvim
+<
+
+==============================================================================
+设计                                                              *faq-design*
+
+
+------------------------------------------------------------------------------
+为什么 RPC 不使用 JSON？
+
+- JSON 无法方便、高效地处理二进制数据
+- JSON 规范存在歧义：https://seriot.ch/parsing_json.php
+
+
+------------------------------------------------------------------------------
+为什么嵌入 LUA 而不是 X？
+
+- Lua 是一门非常小的语言，非常适合嵌入。Python/Ruby 等语言最大的优势是
+  它们庞大的库集合，但这与 Nvim 无关——在 Nvim 里，Nvim 本身就是那个
+  「batteries included」的库：再引入一个标准库只会显得冗余。
+- Lua 5.1 是一门完整的语言：其语法已经冻结。这对向后兼容非常有利。
+- Nvim 内部也使用 Lua 作为 C 的替代。在那里额外的性能是有用的，而像
+  Python 或 Vim9script 那样慢的语言则不合适。
+- LuaJIT 是世界上最快的运行时之一，比 Python 和
+  "Vim9script" https://vimhelp.org/vim9.txt.html 快 10 倍，比 Vimscript
+  快 100 倍。
+- Python/JS 在体积和可移植性上的成本都高于 Lua，而且基于 Python/JS 的
+  编辑器已经很多了。所以引入 Python/JS 会让 Nvim 更大、更不可移植，换来的
+  却是一个没有差异化的特性。
+
+另见：
+
+- Why Lua https://web.archive.org/web/20150219224654/https://blog.datamules.com/blog/2012/01/30/why-lua/
+- The Design of Lua https://cacm.acm.org/research/a-look-at-the-design-of-lua/
+- Scripting architecture considerations http://oldblog.antirez.com/post/redis-and-scripting.html
+- LuaJIT performance https://julialang.org/benchmarks/
+- Discussion of JavaScript vs Lua https://github.com/vim/vim/pull/5198#issuecomment-554693754
+- Discussion Python embedding https://lobste.rs/s/pnuak4/mercurial_s_journey_reflections_on#c_zshdwy
+
+
+------------------------------------------------------------------------------
+为什么用 LUA 5.1 而不是 LUA 5.3+？
+
+Lua 5.1 与 5.3 是不同的语言。Lua 组织在每一个新版本中都会做破坏性变更，
+所以即使我们切换到（不是升级，而是切换）5.3，当他们创造出下一个新语言
+5.4、5.5 等时，我们依然什么也得不到。而且我们会失去 LuaJIT，它远比 Lua 5.3+
+更有价值。
+
+Lua 5.1 是一门完整的语言。要「升级」它，应当增加库，而不是增加语法。
+Nvim 本身已经是 Lua 相当不错的「标准库」，我们会继续扩展和改进它。在这个
+语境下改变 Lua 的规则毫无收益。
+
+
+------------------------------------------------------------------------------
+NEOVIM 会把 VIMSCRIPT 转译为 LUA，而不是直接执行 VIMSCRIPT 吗？
+
+我们没有转译 Vimscript 的计划。曾有人在 https://github.com/tjdevries/vim9jit
+中探索过。
+
+
+------------------------------------------------------------------------------
+是否鼓励插件作者从 VIMSCRIPT 移植到 LUA？会无限期支持 VIMSCRIPT 吗？
+
+我们不认为有任何理由弃用 Vimscript，它是用于文本编辑任务的有价值的 DSL
+https://en.wikipedia.org/wiki/Domain-specific_language 。维护 Vimscript
+兼容性的成本低于对现有 Vim 插件做大规模迁移。
+
+纯粹为了移植而把 Vimscript 移植到 Lua 毫无收益。Nvim 显然是 Vim 的分支，
+目的是利用已经投入在成千上万个 Vim 插件上的工作，同时支持新类型的插件与
+集成。
+
+话虽如此，用 Lua 重新实现旧插件，以便利用 Nvim API 并与 treesitter 等 Nvim
+特有特性集成，是值得做的。
+
+vim:tw=78:ts=8:noet:ft=help:norl:

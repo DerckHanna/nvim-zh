@@ -64,7 +64,7 @@
     python3 tools/help_relay.py plan     <name.txt> --lines 300   # 生成区间表
     python3 tools/help_relay.py verify   <name.txt>              # 每段之后
     python3 tools/help_relay.py assemble <name.txt>              # READY 后注入
-    # 注入后仍必须跑整篇真实门（check_help_parity 全文比对）才登记 manifest
+    # 注入后仍必须跑整篇真实门（tools/help_parity.py 全文比对）才登记 manifest
 
 `verify` 状态含义：`PARTIAL` 还有区间没写；`READY` 全部写完待注入；
 `COMPLETE` 已注入且 tag 集合、`|链接|` 多重集、示例块与术语都与上游一致；

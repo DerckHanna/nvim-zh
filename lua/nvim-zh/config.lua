@@ -2,7 +2,7 @@ local M = {}
 
 local defaults = {
   modules = {
-    core = { enabled = true, apply_language = false },
+    core = { enabled = true, apply_language = true },
     help = { enabled = true, lang = { 'cn', 'en' }, vimcdoc = false },
     ui = { notify = true, prompts = true, select_items = false, echo = false },
     plugins = { auto = true, lazy_load = true, disabled = {} },
@@ -23,12 +23,9 @@ end
 function M.resolve(opts)
   if opts == nil then opts = {} end
   expect(opts, 'table', 'setup options')
-  local config = vim.tbl_deep_extend('force', vim.deepcopy(defaults), opts)
+  local config = M.merge(defaults, opts)
   expect(config.modules.core.enabled, 'boolean', 'modules.core.enabled')
   expect(config.modules.core.apply_language, 'boolean', 'modules.core.apply_language')
-  if config.modules.core.apply_language then
-    error('nvim-zh: modules.core.apply_language is not implemented in the native MVP; configure the OS locale before startup', 2)
-  end
   expect(config.modules.plugins, 'table', 'modules.plugins')
   expect(config.modules.plugins.auto, 'boolean', 'modules.plugins.auto')
   expect(config.modules.plugins.lazy_load, 'boolean', 'modules.plugins.lazy_load')
@@ -61,10 +58,32 @@ function M.resolve(opts)
     error('nvim-zh: missing.max_entries must be a positive integer', 2)
   end
   expect(config.overrides, 'table', 'overrides')
+  require('nvim-zh.catalog').validate_overrides(config.overrides)
   if config.terminology ~= 'preserve' then
     error("nvim-zh: terminology currently supports only 'preserve'", 2)
   end
   return config
+end
+
+function M.merge(base, layer, prefix)
+  local result = vim.deepcopy(base)
+  for key, value in pairs(layer) do
+    local name = (prefix and prefix .. '.' or '') .. tostring(key)
+    assert(base[key] ~= nil, 'nvim-zh: unknown option ' .. name)
+    if name == 'overrides' then
+      result[key] = vim.tbl_deep_extend('force', result[key], value)
+    elseif name == 'modules.plugins.disabled' or name == 'modules.help.lang' then
+      assert(type(value) == 'table' and vim.islist(value) and #value <= 256, name .. ' must be an array')
+      result[key] = vim.deepcopy(value)
+    elseif type(base[key]) == 'table' then
+      assert(type(value) == 'table', name .. ' must be table')
+      result[key] = M.merge(base[key], value, name)
+    else
+      assert(type(value) == type(base[key]), name .. ' has invalid type')
+      result[key] = value
+    end
+  end
+  return result
 end
 
 return M

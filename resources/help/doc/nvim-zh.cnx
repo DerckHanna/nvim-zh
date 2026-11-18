@@ -1,0 +1,206 @@
+*nvim-zh.txt*	nvim-zh
+
+nvim-zh                                                         *nvim-zh*
+
+nvim-zh 是 Neovim 简体中文本地化插件，接入原生 gettext 消息、中文 Help、
+精确 Lua 目录、常见 UI、受支持第三方插件以及 clangd 诊断/LSP 显示文本。
+
+插件不改写编辑 Buffer、原始诊断/LSP 对象、第三方源文件、私有渲染 UI 或
+外部工具字节流。未知文本自然回退英文。
+
+要求与安装                                      *nvim-zh-setup* *nvim-zh-install*
+
+受支持的安装和更新流程要求 Neovim 0.12+ 的 vim.pack。用户不需要 Python、
+msgfmt、helptags 或构建 hook。
+
+翻译固定基线为 Neovim 0.12.6。自动原生 gettext 接线目前要求
+Linux/glibc + LuaJIT；其他环境会报告原生降级，中文 Help 和 Lua UI 仍可使用。
+
+安装并启用： >lua
+
+    vim.pack.add({ 'https://github.com/DerckHanna/nvim-zh' }, { load = true })
+    require('nvim-zh').setup()
+<
+全部运行资源随包交付。setup 校验并启用资源，不在用户机器上编译 MO 或生成
+帮助索引。
+
+命令                                                         *nvim-zh-commands*
+
+*:NvimZh*        打开或聚焦只读中文状态面板。
+*:NvimZhCheck*   显示只读检查结果，也可执行 `:checkhealth nvim-zh`。
+
+没有独立的 Update、Rollback、Reload、Info 或 Missing 命令。结构化数据通过
+|nvim-zh-api| 获取，不需要解析通知文本。
+
+面板与更新                                                     *nvim-zh-panel*
+
+:NvimZh 提供概览、翻译、缺失和检查页面。Tab/Shift-Tab 切页，j/k 滚动，
+/ 搜索，? 打开本帮助，q/Esc 关闭。面板不提供更新、配置编辑、构建或回退动作。
+
+更新只使用 vim.pack： >lua
+
+    vim.pack.update()
+<
+在 vim.pack 标准确认 Buffer 中用 :write 接受；取消不会改变活动资源。确认后
+自动同步 MO、UI/诊断/LSP 目录、中文 Help 和预生成索引。
+
+纯资源变化用于后续查询，无需重启。实现变化会报告 restart_required，并在下次
+启动自动完成同步。无效候选保留上一份已验证资源。版本回退通过 vim.pack 和
+锁文件完成。
+
+配置                                                          *nvim-zh-config*
+
+默认配置为： >lua
+
+    require('nvim-zh').setup({
+      modules = {
+        core = { enabled = true, apply_language = true },
+        help = { enabled = true, lang = { 'cn', 'en' }, vimcdoc = false },
+        ui = { notify = true, prompts = true, select_items = false, echo = false },
+        plugins = { auto = true, lazy_load = true, disabled = {} },
+        diagnostics = {
+          enabled = true,
+          virtual_text = true,
+          virtual_lines = true,
+          float = true,
+        },
+        lsp = { messages = true, progress = true },
+      },
+      terminology = 'preserve',
+      overrides = {},
+      missing = { enabled = true, max_entries = 2000 },
+    })
+<
+modules.core 只控制原生 gettext 接线。enabled=false 关闭该模块；
+apply_language=false 退出自动 MO 绑定和消息语言选择。中文 Help 与 Lua UI
+彼此独立。
+
+modules.help 设置 'helplang'。Vimcdoc 是可选外部资源，不是内嵌依赖。
+modules.ui 控制 notify、input/select、可选选择项格式化和默认关闭的 echo。
+modules.plugins.auto 只适配已加载的受支持插件，不强制加载插件本体；
+disabled 是适配器名称数组。
+
+诊断 formatter 先调用用户 formatter，保留 nil 隐藏语义、异常、原始诊断、
+范围、代码和 user_data.lsp。LSP 包装只复制显示字段，保留动作、token、
+进度值和取消逻辑。
+
+override 是按 domain、显式 context 和原始 msgid 索引的纯数据： >lua
+
+    overrides = {
+      ['my-plugin'] = {
+        [''] = { Save = '保存' },
+        menu = { Open = '展开' },
+      },
+    }
+<
+函数和可执行规则不是目录数据。Buffer、Window、Register 使用 preserve
+术语策略；运行时不做全局术语替换。
+
+可选热配置为 `stdpath('config') .. '/nvim-zh.json'`： >
+
+    {"schema":1,"modules":{"ui":{"notify":false}}}
+<
+优先级为默认值 < setup(opts) < 本地 JSON；数组整体替换。保存后校验并应用，
+无效输入或应用失败保留上一份有效配置。删除文件恢复基础 setup 配置。外部
+修改在恢复焦点或进入 Buffer 时补检。任意 Lua 文件不会作为热配置执行，包
+更新也不会覆盖此文件。
+
+Lua 接口                                                        *nvim-zh-api*
+
+公共模块只暴露以下函数；其他 nvim-zh.* 内部模块不是稳定插件 API。
+
+status()        返回有效配置、运行/安装版本、资源、native/Help/UI/插件/
+                诊断/LSP 和后台任务状态的深拷贝。查询不会隐式 setup、安装、
+                更新、生成 locale 或写资源。
+
+translate(spec) 返回 text、status、entry_id。spec 接受 domain、可选 context、
+                msgid、可选 args/formatted/translated/observe。精确条目优先于
+                锚定模板；status 为 translated 或 fallback，未知、歧义和异常
+                均回退原文。
+
+register_catalog(domain, loader, metadata?)
+                注册懒加载目录。loader 返回 schema=1、domain、locale、entries；
+                用户 override 在内置条目之后合并。
+
+stats()         返回已加载目录条目数与本进程实际观察、回退和缺失统计。
+                它们不是全 Neovim 汉化率，也不是 fixture 命中率。
+
+missing()       返回有容量上限、按次数排序的脱敏缺失记录。动态文本、路径和
+                超长原文使用 SHA-256 标签；只保存在内存中。
+
+open()          打开或聚焦面板并返回 Window；无 UI 时返回 nil 和错误。
+
+check(callback?) 启动只读检查并返回任务 id。回调包含
+                ok/status/error_code/error/task_id/results；status 为 ok、
+                degraded、error 或 cancelled。被新检查取代的 pending 检查收到
+                cancelled/superseded，teardown 使用 cancelled/stopped。
+
+refresh(callback?) 重新协调本地配置、已注册目录和当前已安装资源，返回任务
+                id；回调另含 restart_required。它不下载、不修改 vim.pack 锁
+                文件、不选择其他修订。普通 vim.pack 更新不需要手动调用。
+
+teardown()      取消 pending 工作、关闭面板，只恢复仍由 nvim-zh 持有的状态；
+                不抢回外部后来的替换。
+
+UI 与第三方插件                                               *nvim-zh-plugins*
+
+notify_once 先按英文原文去重。input/select 保留 opts、回调、异步顺序、原始
+输入和 item/index。select_items 只包装 format_item。echo 保留 chunk 高亮和
+元数据、history、opts 与消息 id；fast event 直接回退。
+
+通知来源按公开 opts.title 精确注册。固定插件前缀及其空白原样保留；未知
+title 使用 nvim-ui，未知消息回退，不会重复翻译或重复记录。
+
+which-key 通过 replace.desc 翻译真实内置 preset 描述和生成数量。该公开接缝
+没有来源信息，因此相同的用户自定义描述也可能显示同一条精确译文；原始
+mapping 不会被修改。私有 footer 不适配。
+
+Telescope 翻译初始标题显示投影和 Previewer:title，不修改
+picker.prompt_title 等内部英文行为值，因此 to_fuzzy_refine 继续按原逻辑工作。
+最终 refine change_title 接缝未覆盖。entry、finder、回调和动态路径保持原样。
+
+nvim-tree 翻译默认 on_attach 的映射后缀，保留 ASCII `nvim-tree: ` 前缀和帮助
+页解析。覆盖默认 setup 以及 lazy 先 setup 后 LazyLoad 的顺序。用户自定义
+on_attach 描述和已有 Buffer 的映射保持原样；不扫描私有 renderer/help Buffer。
+
+lazy.nvim 只提供 User LazyLoad。nvim-cmp 未找到由 cmp 自己拥有且具有安全显示
+接缝的固定标签，保持 inventory_only。固定 commit、源码 hash 和限制见
+manifests/upstreams.json。
+
+诊断与 LSP                                                *nvim-zh-diagnostics*
+
+只翻译明确识别的 clang/clangd 显示文本。virtual_text、virtual_lines 和
+open_float 使用公开 formatter 接缝。原始 vim.diagnostic 对象、quickfix、
+push/pull 数据、位置和 user_data.lsp 保持原文。
+
+showMessage/showMessageRequest 翻译显示副本并返回原 action。$/progress 只改
+title/message 显示副本，不改 token、percentage 或取消逻辑。window/logMessage
+和外部工具输出保持不变。
+
+Help 文档                                                      *nvim-zh-help*
+
+中文译文以 .cnx 和预生成 tags-cn 随包交付，默认 'helplang' 为 cn,en，缺失
+tag 回退英文。可执行 `:help <tag>@en` 显式选择英文 runtime 文档。
+
+每份文档的上游 commit、源路径、SHA-256 和 complete/partial 状态由
+manifests/upstreams.json 与 help_inventory.json 记录。tag/示例块/链接结构
+检查和 manifest 状态不代表逐句语义审校，也不代表全部 Neovim 已汉化。
+
+doc/nvim-zh.txt 与 doc/nvim-zh.cnx 是项目自有帮助，不属于上游 Neovim 译文，
+不计入上游文档数量。
+
+维护                                     *nvim-zh-maintenance* *nvim-zh-resources*
+
+编辑源、测试分类和可选真实上游检查见 CONTRIBUTING.md 与 docs/testing.md。
+常用维护命令： >
+
+    make check-syntax check-translations check-native
+    make build-resources check-resources
+    make test
+    make test-upstream
+    make check-reproducible release-check
+<
+生成的 Lua 目录、MO、帮助索引、inventory 和 resources 不手工编辑。插件用户
+无需执行这些命令。
+
+ vim:tw=78:ts=8:et:ft=help:norl:

@@ -1,0 +1,383 @@
+*deprecated.txt*       Nvim
+
+
+                             NVIM 参考手册
+
+
+Nvim 已弃用特性                                                  *deprecated*
+
+下列各项均已弃用：它们将在将来被移除。新脚本不应使用它们，旧脚本应当更新。
+
+==============================================================================
+已弃用的特性
+
+------------------------------------------------------------------------------
+0.12 版弃用							*deprecated-0.12*
+
+API
+
+• 下列函数接受和/或返回的 "buffer" 键已改名为 "buf"：
+  • |nvim_create_autocmd()|
+  • |nvim_get_autocmds()|
+  • |nvim_exec_autocmds()|
+  • |nvim_clear_autocmds()|
+• nvim_set_decoration_provider 的 `on_line`	请改用 `on_range`。
+
+诊断
+
+• |vim.diagnostic.JumpOpts| 中的 "float"。	请改用 `on_jump`。
+• |vim.diagnostic.Opts.Jump| 中的 "float"。	请改用 `on_jump`。
+
+高亮
+
+• *:ownsyntax* *w:current_syntax*	请改用 'winhighlight'。
+
+LSP
+
+• *vim.lsp.client_is_stopped()*		请改用 |vim.lsp.get_client_by_id()|。
+• *vim.lsp.util.stylize_markdown()*	请先设置 `vim.wo.conceallevel = 2`，
+					再改用 |vim.treesitter.start()|。
+• *vim.lsp.log.should_log()*		请改用 |vim.lsp.log.set_format_func()|，
+					并返回 `nil`，以把条目从日志文件中省略。
+• *vim.lsp.semantic_tokens.start()*	请改用
+					`vim.lsp.semantic_tokens.enable(true)`
+• *vim.lsp.semantic_tokens.stop()*	请改用
+					`vim.lsp.semantic_tokens.enable(false)`
+• *vim.lsp.set_log_level()*		请改用 `vim.lsp.log.set_level()`
+• *vim.lsp.get_log_path()*		请改用 `vim.lsp.log.get_filename()`
+• *vim.lsp.get_buffers_by_client_id()*	请改用
+					`vim.lsp.get_client_by_id(id).attached_buffers`
+• *vim.lsp.stop_client()*		请改用 |Client:stop()|
+• *vim.lsp.codelens.refresh()*		请改用 `vim.lsp.codelens.enable(true)`
+• *vim.lsp.codelens.clear()*		请改用 `vim.lsp.codelens.enable(false)`
+• *vim.lsp.codelens.display()*
+• *vim.lsp.codelens.save()*
+• *vim.lsp.codelens.on_codelens()*
+
+Lua
+
+• *vim.diff()*				已改名为 |vim.text.diff()|
+• `vim.keymap.set.Opts` 和 `vim.keymap.del.Opts` 中的 "buffer"	已改名为 "buf"
+
+UI
+
+• *hit-enter* *hit-enter-prompt*	在 |ui2| 下，旧式的 "Press ENTER"
+  *press-enter				提示永远不会被触发。
+
+------------------------------------------------------------------------------
+0.11 版弃用							*deprecated-0.11*
+
+API
+• nvim_notify()		请改用 |nvim_echo()| 或
+			`nvim_exec_lua("vim.notify(...)", ...)`。
+• nvim_subscribe()	插件必须自行维护其 "multicast" 频道列表。
+• nvim_unsubscribe()	插件必须自行维护其 "multicast" 频道列表。
+• nvim_out_write()	请改用 |nvim_echo()|。
+• nvim_err_write()	请改用带 `{err=true}` 的 |nvim_echo()|。
+• nvim_err_writeln()	请改用带 `{err=true}` 的 |nvim_echo()|。
+• nvim_buf_add_highlight()	请改用 |vim.hl.range()| 或 |nvim_buf_set_extmark()|
+
+诊断
+• *vim.diagnostic.goto_next()*	请改用 |vim.diagnostic.jump()|，并传递
+				`{count=1, float=true}`。
+• *vim.diagnostic.goto_prev()*	请改用 |vim.diagnostic.jump()|，并传递
+				`{count=-1, float=true}`。
+• *vim.diagnostic.get_next_pos()* 请改用 |vim.diagnostic.get_next()| 返回值中
+				的 "lnum" 和 "col" 字段。
+• *vim.diagnostic.get_prev_pos()* 请改用 |vim.diagnostic.get_prev()| 返回值中
+				的 "lnum" 和 "col" 字段。
+• 多种函数所用的 "win_id" 参数已弃用，请改用 "winid" |winid|
+• |vim.diagnostic.JumpOpts| 的 "cursor_position" 字段已改名为 "pos"。
+
+高亮
+• *TermCursorNC*	未聚焦的 |terminal| window 没有光标。
+
+LSP
+• *vim.lsp.util.jump_to_location*	请改用 |vim.lsp.util.show_document()|，
+					并传递 `{focus=true}`。
+• *vim.lsp.buf.execute_command*		请改用 |Client:exec_cmd()|。
+• *vim.lsp.buf.completion*		请改用 |vim.lsp.completion.get()|。
+• vim.lsp.buf_request_all		处理函数的结果参数中的 `error` 键
+					已改名为 `err`。
+• *vim.lsp.with()*			请把配置传给 `vim.lsp.buf.*` 中
+					的等效函数。
+• |vim.lsp.handlers| 不支持 client-to-server 响应处理函数，只支持
+  server-to-client 请求/通知处理函数。
+• *vim.lsp.handlers.signature_help()*	请改用 |vim.lsp.buf.signature_help()|。
+• `client.request()`			请改用 |Client:request()|。
+• `client.request_sync()`		请改用 |Client:request_sync()|。
+• `client.notify()`			请改用 |Client:notify()|。
+• `client.cancel_request()`		请改用 |Client:cancel_request()|。
+• `client.stop()`			请改用 |Client:stop()|。
+• `client.is_stopped()`		请改用 |Client:is_stopped()|。
+• `client.supports_method()`		请改用 |Client:supports_method()|。
+• `client.on_attach()`			请改用 |Client:on_attach()|。
+• `vim.lsp.start_client()`		请改用 |vim.lsp.start()|。
+
+Lua
+• vim.region()		请改用 |getregionpos()|。
+• *vim.highlight*	已改名为 |vim.hl|。
+• vim.validate(opts: table) 请使用第 1 种形式。见 |vim.validate()|。
+
+Vimscript
+• *termopen()* 请改用带 `{term: v:true}` 的 |jobstart()|。
+
+------------------------------------------------------------------------------
+0.10 版弃用							*deprecated-0.10*
+
+API
+• *nvim_buf_get_option()*	请改用 |nvim_get_option_value()|。
+• *nvim_buf_set_option()*	请改用 |nvim_set_option_value()|。
+• *nvim_call_atomic()*		请改用 |nvim_exec_lua()|。
+• *nvim_get_option()*		请改用 |nvim_get_option_value()|。
+• *nvim_set_option()*		请改用 |nvim_set_option_value()|。
+• *nvim_win_get_option()*	请改用 |nvim_get_option_value()|。
+• *nvim_win_set_option()*	请改用 |nvim_set_option_value()|。
+
+健康检查
+• *health#report_error* *vim.health.report_error()*	请改用 |vim.health.error()|。
+• *health#report_info* *vim.health.report_info()*	请改用 |vim.health.info()|。
+• *health#report_ok* *vim.health.report_ok()*		请改用 |vim.health.ok()|。
+• *health#report_start* *vim.health.report_start()*	请改用 |vim.health.start()|。
+• *health#report_warn* *vim.health.report_warn()*	请改用 |vim.health.warn()|。
+
+诊断
+• 用 |:sign-define| 或 |sign_define()| 来配置 |diagnostic-signs|。请改用
+  |vim.diagnostic.config()| 的 "signs" 键。
+• vim.diagnostic 函数：
+  • *vim.diagnostic.disable()*		请改用 |vim.diagnostic.enable()|
+  • *vim.diagnostic.is_disabled()*	请改用 |vim.diagnostic.is_enabled()|
+  • 旧式签名：`vim.diagnostic.enable(buf:number, namespace:number)`
+
+LSP
+• *vim.lsp.util.get_progress_messages()*	请改用 |vim.lsp.status()|。
+• *vim.lsp.get_active_clients()*		请改用 |vim.lsp.get_clients()|。
+• *vim.lsp.for_each_buffer_client()*		请改用 |vim.lsp.get_clients()|。
+• *vim.lsp.util.trim_empty_lines()*		请改用带 `trimempty` 的 |vim.split()|。
+• *vim.lsp.util.try_trim_markdown_code_blocks()*
+• *vim.lsp.util.set_lines()*
+• *vim.lsp.util.extract_completion_items()*
+• *vim.lsp.util.parse_snippet()*
+• *vim.lsp.util.text_document_completion_list_to_complete_items()*
+• *vim.lsp.util.lookup_section()*		请改用 |vim.tbl_get()|： >
+						local keys = vim.split(section, '.', { plain = true })
+						local  vim.tbl_get(table, unpack(keys))
+
+Lua
+• *vim.loop*				请改用 |vim.uv|。
+• *vim.tbl_add_reverse_lookup()*
+• *vim.tbl_flatten()*			请改用 |Iter:flatten()|。
+• *vim.tbl_islist()*			请改用 |vim.islist()|。
+
+选项
+• UI 选项 |ui-ext-options| 中的 "term_background" 已弃用，且不再被填充。背景色
+  检测现在由 Nvim 核心在 Lua 中完成，而不再由 TUI 完成。
+
+Treesitter
+• *LanguageTree:for_each_child()*	请改用 |LanguageTree:children()|（非递归）。
+
+
+------------------------------------------------------------------------------
+0.9 版弃用							*deprecated-0.9*
+
+API
+• *nvim_get_hl_by_name()*	请改用 |nvim_get_hl()|。
+• *nvim_get_hl_by_id()*		请改用 |nvim_get_hl()|。
+
+Treesitter
+• *vim.treesitter.language.require_language()*	请改用 |vim.treesitter.language.add()|。
+• *vim.treesitter.get_node_at_pos()*		请改用 |vim.treesitter.get_node()|。
+• *vim.treesitter.get_node_at_cursor()*		请改用
+						|vim.treesitter.get_node()| 和
+						|TSNode:type()|。
+• 下列顶层 Treesitter 函数已被移动：
+  • *vim.treesitter.inspect_language()*    -> |vim.treesitter.language.inspect()|
+  • *vim.treesitter.get_query_files()*     -> |vim.treesitter.query.get_files()|
+  • *vim.treesitter.set_query()*           -> |vim.treesitter.query.set()|
+  • *vim.treesitter.query.set_query()*     -> |vim.treesitter.query.set()|
+  • *vim.treesitter.get_query()*           -> |vim.treesitter.query.get()|
+  • *vim.treesitter.query.get_query()*     -> |vim.treesitter.query.get()|
+  • *vim.treesitter.parse_query()*         -> |vim.treesitter.query.parse()|
+  • *vim.treesitter.query.parse_query()*   -> |vim.treesitter.query.parse()|
+  • *vim.treesitter.add_predicate()*       -> |vim.treesitter.query.add_predicate()|
+  • *vim.treesitter.add_directive()*       -> |vim.treesitter.query.add_directive()|
+  • *vim.treesitter.list_predicates()*     -> |vim.treesitter.query.list_predicates()|
+  • *vim.treesitter.list_directives()*     -> |vim.treesitter.query.list_directives()|
+  • *vim.treesitter.query.get_range()*     -> |vim.treesitter.get_range()|
+  • *vim.treesitter.query.get_node_text()* -> |vim.treesitter.get_node_text()|
+
+Lua
+  • *nvim_exec()*				请改用 |nvim_exec2()|。
+  • *vim.pretty_print()*			请改用 |vim.print()|。
+
+
+------------------------------------------------------------------------------
+0.8 或更早版本弃用
+
+API
+• *nvim_buf_clear_highlight()*	请改用 |nvim_buf_clear_namespace()|。
+• *nvim_buf_set_virtual_text()*	请改用 |nvim_buf_set_extmark()|。
+• *nvim_command_output()*	请改用 |nvim_exec2()|。
+• *nvim_execute_lua()*		请改用 |nvim_exec_lua()|。
+• *nvim_get_option_info()*	请改用 |nvim_get_option_info2()|。
+
+命令
+• *:rv* *:rviminfo*		已弃用的 |:rshada| 命令别名。
+• *:wv* *:wviminfo*		已弃用的 |:wshada| 命令别名。
+
+环境变量
+• *$NVIM_LISTEN_ADDRESS*
+  • 已弃用的做法，用来：
+    • 设置服务器名（请改用 |--listen| 或 |serverstart()|）
+    • 获取服务器名（请改用 |v:servername|）
+    • 检测父级 Nvim（请改用 |$NVIM|）
+  • 若已给出 --listen，则忽略此项。
+  • 启动时会被取消设置（在 |v:servername| 初始化之后）。可通过 "env" 选项
+    显式提供给 |terminal| 和 |jobstart()|。示例： >vim
+	call jobstart(['foo'], { 'env': { 'NVIM_LISTEN_ADDRESS': v:servername  } })
+<
+
+事件
+• *BufCreate*		请改用 |BufAdd|。
+• *EncodingChanged*	从不触发；'encoding' 始终是 "utf-8"。
+• *FileEncoding*	从不触发；等效于 |EncodingChanged|。
+• *GUIEnter*		从不触发；请改用 |UIEnter|。
+• *GUIFailed*		从不触发。
+
+键码
+• *<MouseDown>*		请改用 <ScrollWheelUp>。
+• *<MouseUp>*		请改用 <ScrollWheelDown>。
+
+高亮
+• *hl-VertSplit*	请改用 |hl-WinSeparator|。
+
+LSP 诊断
+对下列每个函数，请改用 |vim.diagnostic| 中对应的函数（除非另有说明）。例如，
+请改用 |vim.diagnostic.get()|，而不是 |vim.lsp.diagnostic.get()|。
+
+• *vim.lsp.diagnostic.clear()*		请改用 |vim.diagnostic.hide()|。
+• *vim.lsp.diagnostic.disable()*          请改用 |vim.diagnostic.enable()|。
+• *vim.lsp.diagnostic.display()*	请改用 |vim.diagnostic.show()|。
+• *vim.lsp.diagnostic.enable()*
+• *vim.lsp.diagnostic.get()*
+• *vim.lsp.diagnostic.get_all()*	请改用 |vim.diagnostic.get()|。
+• *vim.lsp.diagnostic.get_count()*	请改用 |vim.diagnostic.count()|。
+• *vim.lsp.diagnostic.get_line_diagnostics()* 请改用 |vim.diagnostic.get()|。
+• *vim.lsp.diagnostic.get_next()*
+• *vim.lsp.diagnostic.get_next_pos()*
+• *vim.lsp.diagnostic.get_prev()*
+• *vim.lsp.diagnostic.get_prev_pos()*
+• *vim.lsp.diagnostic.get_virtual_text_chunks_for_line()* 无替代品。请用
+  |vim.diagnostic.config()| 提供的选项来定制 virtual text。
+• *vim.lsp.diagnostic.goto_next()*
+• *vim.lsp.diagnostic.goto_prev()*
+• *vim.lsp.diagnostic.redraw()*		请改用 |vim.diagnostic.show()|。
+• *vim.lsp.diagnostic.save()*		请改用 |vim.diagnostic.set()|。
+• *vim.lsp.diagnostic.set_loclist()*	请改用 |vim.diagnostic.setloclist()|。
+• *vim.lsp.diagnostic.set_qflist()*	请改用 |vim.diagnostic.setqflist()|。
+• *vim.lsp.diagnostic.show_line_diagnostics()* 请改用 |vim.diagnostic.open_float()|。
+• *vim.lsp.diagnostic.show_position_diagnostics()* 请改用 |vim.diagnostic.open_float()|。
+
+下列各项已弃用且无替代品。这些函数在内部被移动，不再作为 API 的一部分对外
+暴露。请改用 |vim.diagnostic.config()| 和 |vim.diagnostic.show()|。
+
+• *vim.lsp.diagnostic.set_signs()*
+• *vim.lsp.diagnostic.set_underline()*
+• *vim.lsp.diagnostic.set_virtual_text()*
+
+LSP 函数
+• *vim.lsp.buf.server_ready()*
+  请视你的用例改用 |LspAttach|。"Server ready" 并非 LSP 规范的一部分，因此
+  Nvim LSP client 无法有意义地实现它。"Ready" 的含义是含混的，因为：
+  • 语言服务器可能已完成对工作区的分析，但编辑随时可能再次触发分析/构建。
+  • 语言服务器即使仍在处理变更，也可以服务部分请求。
+• *vim.lsp.buf.range_code_action()*		请改用带 `range` 参数的
+						|vim.lsp.buf.code_action()|。
+• *vim.lsp.util.diagnostics_to_items()*		请改用 |vim.diagnostic.toqflist()|。
+• *vim.lsp.util.set_qflist()*			请改用 |setqflist()|。
+• *vim.lsp.util.set_loclist()*			请改用 |setloclist()|。
+• *vim.lsp.buf_get_clients()*			请改用带 {buffer=bufnr} 的
+						|vim.lsp.get_clients()|。
+• *vim.lsp.buf.formatting()*			请改用带 {async=true} 的
+						|vim.lsp.buf.format()|。
+• *vim.lsp.buf.formatting_sync()*		请改用带 {async=false} 的
+						|vim.lsp.buf.format()|。
+• *vim.lsp.buf.range_formatting()*		请改用 |vim.lsp.formatexpr()|
+						或 |vim.lsp.buf.format()|。
+
+Lua
+• vim.register_keystroke_callback()	请改用 |vim.on_key()|。
+
+普通模式命令
+• *]f* *[f*		等同于 "gf"。
+
+选项
+• *cpo-<* *:menu-<special>* *:menu-special* *:map-<special>* *:map-special*
+  `<>` 记法始终启用。
+• *'fe'*		Vim 6.0 之前的 'fenc'+'enc'；已不再使用。
+• *'gdefault'*		布尔型	（默认关）默认启用 :substitute 的 "/g" 标志。
+			见 |complex-change|。
+				命令	 'gdefault' 开	'gdefault' 关	~
+				:s///	  全部替换	  替换一处
+				:s///g	  替换一处	  全部替换
+				:s///gg	  全部替换	  替换一处
+			警告：设置此项会破坏插件，因为 "/g" 的效果
+			会反过来。|:s_g|
+• *'highlight'* *'hl'*	内建的 |highlight-groups| 名称不可更改。
+• *'langnoremap'*	已弃用的 'nolangremap' 别名。
+• *'magic'* *'nomagic'*	布尔型	（默认开）改变搜索 |pattern| 中的特殊字符。
+			警告：禁用它会让插件失效，因为大多数模式
+			都假定它已开启。另见 |/\M|。
+• *'paste'* *'nopaste'*	Just Paste It.™  'paste' 选项已过时：当你用终端或
+			GUI 的粘贴功能（CTRL-SHIFT-v、CMD-v（macOS）、
+			中键点击、…）粘贴文本时，|paste| 会被自动处理。
+			启用 "paste mode"：
+			  • 在 Insert、Cmdline 模式中禁用映射。
+			  • 禁用缩写。
+			  • 重置 'autoindent' 'expandtab' 'revins' 'ruler'
+			    'showmatch' 'smartindent' 'smarttab' 'softtabstop'
+			    'textwidth' 'wrapmargin'。
+			  • 把 'formatoptions' 视为空。
+			  • 禁用下列选项的效果：
+			    • 'cindent'
+			    • 'indentexpr'
+			    • 'lisp'
+• 'sessionoptions'	"unix"、"slash" 标志被忽略，且始终启用。
+• *'vi'*
+• 'viewoptions'		"unix"、"slash" 标志被忽略，且始终启用。
+• *'viminfo'*		已弃用的 'shada' 选项别名。
+• *'viminfofile'*	已弃用的 'shadafile' 选项别名。
+
+UI 扩展
+• *ui-wildmenu*		请改用 |ui-cmdline| 与 |ui-popupmenu|。由
+			`ext_wildmenu` |ui-option| 启用。发出这些事件：
+			• `["wildmenu_show", items]`
+			• `["wildmenu_select", selected]`
+			• `["wildmenu_hide"]`
+• *term_background*	未使用。终端背景色现在由 Nvim 核心直接检测，
+			而不再由 TUI 检测。
+
+Vimscript
+• *<sfile>*		请改用 |<script>| 或 |<stack>|。
+• *b:terminal_job_pid*	请改用 `jobpid(&channel)`。
+• *b:terminal_job_id*	请改用 `&channel`。要在非当前 buffer 中访问：
+			• Lua: `vim.bo[bufnr].channel`
+			• Vimscript: `getbufvar(bufnr, '&channel')`
+• *buffer_exists()*	|bufexists()| 的过时名称。
+• *buffer_name()*	|bufname()| 的过时名称。
+• *buffer_number()*	|bufnr()| 的过时名称。
+• *file_readable()*	|filereadable()| 的过时名称。
+• *highlight_exists()*	|hlexists()| 的过时名称。
+• *highlightID()*	|hlID()| 的过时名称。
+• *inputdialog()*	请改用 |input()|。
+• *jobclose()*		|chanclose()| 的过时名称
+• *jobsend()*		|chansend()| 的过时名称
+• *last_buffer_nr()*	bufnr("$") 的过时名称。
+• *rpcstart()*		请改用带 `{'rpc': v:true}` 的 |jobstart()|。
+• *rpcstop()*		请改用 |jobstop()| 来停止任意作业，或用
+			`chanclose(id, "rpc")` 在不停止作业的情况下
+			关闭 RPC 通信。用 chanclose(id) 关闭任何
+			socket。
+
+
+ vim:noet:tw=78:ts=8:ft=help:norl:

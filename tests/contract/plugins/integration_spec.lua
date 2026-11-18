@@ -1,0 +1,25 @@
+local h = dofile(vim.env.NVIM_ZH_ROOT .. '/tests/support/plugin_helpers.lua')
+local check, equal = h.check, h.equal
+h.setup()
+local zh = require('nvim-zh')
+equal(zh.translate({ domain = 'which-key', context = 'desc', msgid = 'Delete' }), '删除', 'built-in which-key PO')
+equal(zh.translate({ domain = 'telescope', context = 'title', msgid = 'Find Files' }), '查找文件', 'built-in Telescope PO')
+equal(zh.translate({ domain = 'nvim-tree', context = 'mapping', msgid = 'Open' }), '打开', 'built-in nvim-tree PO')
+local snapshot = zh.status()
+check(snapshot.config.modules.plugins.auto == true, 'plugins.auto default')
+check(snapshot.plugins['which-key'].reason == 'not_loaded' and snapshot.plugins.telescope.reason == 'not_loaded', 'absent plugin status')
+check(type(snapshot.version.running_version) == 'string' and #snapshot.version.running_version > 0, 'plugin version missing')
+
+local manifest = vim.json.decode(table.concat(vim.fn.readfile(vim.env.NVIM_ZH_ROOT .. '/manifests/upstreams.json'), '\n'))
+check(manifest.upstreams['which-key'].commit == snapshot.plugins['which-key'].supported_commit, 'which-key manifest/version mismatch')
+check(manifest.upstreams.telescope.commit == snapshot.plugins.telescope.supported_commit, 'Telescope manifest/version mismatch')
+check(manifest.upstreams['nvim-tree'].commit == snapshot.plugins['nvim-tree'].supported_commit, 'nvim-tree manifest/version mismatch')
+check(manifest.upstreams['lazy.nvim'].adapter.status == 'implemented', 'lazy.nvim shared public capability missing')
+check(manifest.upstreams['nvim-tree'].adapter.status == 'implemented', 'nvim-tree public capability missing')
+check(manifest.upstreams['nvim-cmp'].adapter.status == 'inventory_only', 'nvim-cmp capability inventory missing')
+
+local refreshed
+zh.refresh(function(result) refreshed = result end)
+check(refreshed and refreshed.ok and refreshed.status == 'ok', 'resource/config refresh failed')
+check(vim.fn.exists(':NvimZhReload') == 0 and vim.fn.exists(':NvimZhInfo') == 0, 'retired command still registered')
+print('PLUGIN_INTEGRATION_SPEC=PASS manifests=6 built_in_domains=which-key,telescope,nvim-tree')

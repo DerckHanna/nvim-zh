@@ -1,0 +1,448 @@
+*ft_ada.txt*	Nvim
+
+
+		    ADA 文件类型插件参考手册~
+
+ADA								*ft-ada-syntax*
+
+                    输入 |gO| 可查看目录。
+
+==============================================================================
+1. 语法高亮 ~
+
+此模式针对 Ada 2005 版（"Ada 2005"）设计，其中包含对面向对象编程、protected
+类型等的支持。它同样能处理为最初的 Ada 语言（"Ada83"、"Ada87"、"Ada95"）编写
+的代码，不过使用了 Ada 2005 专有关键字的代码会被错误着色（这类代码本来就应当
+修正）。关于 Ada 的更多信息，参见
+http://www.adapower.com。
+
+Ada 模式能干净利落地处理若干情形。
+
+例如，它知道 "-5" 中的 "-" 是数字的一部分，而 "A-5" 中的同一字符是运算符。
+通常，引用另一个编译单元的 "with" 或 "use" 子句的着色方式与 C 的 "#include"
+相同。如果你把 "Conditional" 或 "Repeat" 组着色为不同颜色，那么 "end if" 与
+"end loop" 就会作为各自所属组的一部分被着色。
+
+你可以用 vim 的 "highlight" 命令为这些设置不同的颜色（例如，要改变循环的显示
+方式，输入命令 ":hi Repeat" 后跟颜色规格；在简单终端上，颜色规格 ctermfg=White
+通常效果不错）。
+
+在此 Ada 模式中你可以选择若干选项。完整清单见 |ft-ada-options|。
+
+要启用它们，给选项赋一个值。例如，开启其中一项： >
+	let g:ada_standard_types = 1
+<
+要关闭它们，使用 ":unlet"。示例： >
+	unlet g:ada_standard_types
+<
+你可以直接用 ":" 把这些输入到命令行，在加载 Ada 文件之前临时设置。若要让这些
+选项设置永久生效，把不带冒号的 "let" 命令加入你的 |init.vim| 文件即可。
+
+即使在慢速（90Mhz）的 PC 上，此模式也运行得很快，但如果你觉得性能无法接受，
+就打开 |g:ada_withuse_ordinary|。
+
+设置了 |g:ada_folding| 时，会添加语法折叠指令（|fold-syntax|）。
+
+==============================================================================
+2. 文件类型插件 ~
+					       *ft-ada-indent* *ft-ada-plugin*
+
+Ada 插件提供对以下各项的支持：
+
+ - 自动缩进		(|indent.txt|)
+ - 插入模式补全		(|i_CTRL-N|)
+ - 用户补全		(|i_CTRL-X_CTRL-U|)
+ - tag 搜索		(|tagsrch.txt|)
+ - Quick Fix		(|quickfix.txt|)
+ - 退格处理		('backspace')
+ - 注释处理		('comments', 'commentstring')
+
+只有当打开 Ada 文件时，该插件才激活 Ada 模式的功能，并向主菜单与弹出菜单添加
+与 Ada 相关的条目。
+
+==============================================================================
+3. Omni 补全 ~
+								 *ft-ada-omni*
+
+Ada omni 补全（|i_CTRL-X_CTRL-O|）使用由 "gnat xref -v" 或 "Universal
+Ctags"（https://ctags.io）创建的 tags 数据库。补全函数会自动检测 tags 文件是由
+哪个工具创建的。
+
+------------------------------------------------------------------------------
+3.1 使用 "gnat xref" 的 Omni 补全 ~
+								   *gnat-xref*
+
+GNAT XREF 使用编译器内部信息（ali 文件）来生成 tags 文件。其优点是完全正确，
+并且可以选择深度嵌套分析。然而代码必须能编译，生成器相当慢，生成的 tags 文件
+对每个条目只包含基本的 Ctags 信息 —— 对某些更高级的 Vim 代码浏览器插件来说并
+不够用。
+
+NOTE: "gnat xref -v" 用起来很棘手，因为它几乎没有诊断输出 —— 如果什么都没打
+       印，通常说明参数错了。下面是一些重要提示：
+
+1)  你需要先编译代码，并用 "-aO" 选项指向你的 .ali 文件。
+2)  "gnat xref -v ../Include/adacl.ads" 不行 —— 改用 "gnat xref -v
+    -aI../Include adacl.ads"。
+3)  `gnat xref -v -aI../Include *.ad?` 不行 —— 先 "cd ../Include"，再用
+    `gnat xref -v *.ad?`
+4)  项目管理器支持完全是坏的 —— 连 "gnat xref -Padacl.gpr" 都不要试。
+5)  tags 文件排过序时 Vim 更快 —— 用 "sort --unique --ignore-case --output=tags
+    tags" 。
+6)  记得把 "!_TAG_FILE_SORTED 2 %sort ui" 作为第一行插入，以标记该文件已排序。
+
+------------------------------------------------------------------------------
+3.2 使用 "ctags" 的 Omni 补全~
+								   *ada-ctags*
+
+Universal/Exuberant Ctags 使用它们自己的多语言代码解析器。该解析器相当快，能产
+生大量额外信息，并且能处理当前无法编译的文件。
+
+还有许多其他 Vim 工具使用 Universal/Exuberant Ctags。推荐 Universal Ctags，
+Exuberant Ctags 已不再开发。
+
+你需要安装 Universal Ctags，可从 https://ctags.io 获取。
+
+Universal/Exuberant Ctags 的 Ada 解析器相当新 —— 还不要指望得到完整支持。
+
+==============================================================================
+4. 编译器支持 ~
+								*ada-compiler*
+
+Ada 模式支持多种 Ada 编译器，并在打开任何 Ada 源文件时自动加载
+|g:ada_default_compiler| 中设置的编译器。所提供的编译器插件分为实际的编译器插
+件与一组支持函数和变量。这样可以方便地开发针对你的开发环境做精细调整的专用编
+译器插件。
+
+------------------------------------------------------------------------------
+4.1 GNAT ~
+							       *compiler-gnat*
+
+GNAT 是唯一可用的自由（既是免费啤酒也是自由言论）Ada 编译器。它有多个版本，
+各版本使用的许可证条款不同。
+
+GNAT 编译器插件会在按下 <F7> 时执行编译，随后立即显示结果。你可以这样设置要使
+用的项目文件： >
+		call g:gnat.Set_Project_File ('my_project.gpr')
+<
+设置项目文件还会创建一个 Vim 会话（|views-sessions|），因此 —— 就像使用 GPS 时
+那样 —— 已打开的文件、window 位置等会按项目分别记住。
+
+								*gnat_members*
+GNAT 对象 ~
+
+							       *g:gnat.Make()*
+g:gnat.Make()
+		调用 |g:gnat.Make_Command| 并在 |quickfix| window 中显示结果。
+
+							     *g:gnat.Pretty()*
+g:gnat.Pretty()
+		调用 |g:gnat.Pretty_Program|
+
+							       *g:gnat.Find()*
+g:gnat.Find()
+		调用 |g:gnat.Find_Program|
+
+							       *g:gnat.Tags()*
+g:gnat.Tags()
+		调用 |g:gnat.Tags_Command|
+
+						   *g:gnat.Set_Project_File()*
+g:gnat.Set_Project_File([{file}])
+		设置 gnat 项目文件并加载关联的会话。已打开的项目会被关闭，并写入会
+		话。如果调用时不带文件名，则打开文件选择器以选择一个项目文件。如果
+		以空字符串调用，则关闭项目及关联会话。
+
+							 *g:gnat.Project_File*
+g:gnat.Project_File	string
+		当前项目文件。
+
+							 *g:gnat.Make_Command*
+g:gnat.Make_Command	string
+		用于 |g:gnat.Make()| 的外部命令（'makeprg'）。
+
+						       *g:gnat.Pretty_Program*
+g:gnat.Pretty_Program	string
+		用于 |g:gnat.Pretty()| 的外部命令
+
+							 *g:gnat.Find_Program*
+g:gnat.Find_Program	string
+		用于 |g:gnat.Find()| 的外部命令
+
+							 *g:gnat.Tags_Command*
+g:gnat.Tags_Command	string
+		用于 |g:gnat.Tags()| 的外部命令
+
+							 *g:gnat.Error_Format*
+g:gnat.Error_Format	string
+		错误格式（'errorformat'）
+
+------------------------------------------------------------------------------
+4.2 Dec Ada ~
+					    *compiler-hpada* *compiler-decada*
+					*compiler-vaxada* *compiler-compaqada*
+
+Dec Ada（按时间顺序也被称为 VAX Ada、Dec Ada、Compaq Ada 和 HP Ada）是一个相当
+老旧的 Ada 83 编译器。支持是基础的：<F7> 会编译当前单元。
+
+Dec Ada 编译器期望传入的参数是 package 名而不是文件名。编译器插件支持通常的文
+件名约定，把文件转换成单元名。'-' 与 '__' 都允许作为分隔符。
+
+							      *decada_members*
+DEC ADA 对象 ~
+
+							     *g:decada.Make()*
+g:decada.Make()		function
+		调用 |g:decada.Make_Command| 并在 |quickfix| window 中显示结果。
+
+							*g:decada.Unit_Name()*
+g:decada.Unit_Name()	function
+		获取当前文件的单元名。
+
+						       *g:decada.Make_Command*
+g:decada.Make_Command	string
+		用于 |g:decada.Make()| 的外部命令（'makeprg'）。
+
+						       *g:decada.Error_Format*
+g:decada.Error_Format	string
+		错误格式（'errorformat'）。
+
+==============================================================================
+5. 参考 ~
+							       *ada-reference*
+
+------------------------------------------------------------------------------
+5.1 选项 ~
+							      *ft-ada-options*
+
+							*g:ada_standard_types*
+g:ada_standard_types	bool (true when exists)
+		高亮 package Standard 中的类型（例如 "Float"）。
+
+							  *g:ada_space_errors*
+						  *g:ada_no_trail_space_error*
+						    *g:ada_no_tab_space_error*
+							 *g:ada_all_tab_usage*
+g:ada_space_errors	 bool (true when exists)
+		高亮多余的空格错误 ...
+		g:ada_no_trail_space_error
+		    - 但忽略行尾的尾随空格
+		g:ada_no_tab_space_error
+		    - 但忽略空格之后的 Tab
+		g:ada_all_tab_usage
+		    - 高亮所有 Tab 的使用
+
+							   *g:ada_line_errors*
+g:ada_line_errors	  bool (true when exists)
+		高亮过长的行。注意：此高亮选项相当消耗 CPU。
+
+							 *g:ada_rainbow_color*
+g:ada_rainbow_color	  bool (true when exists)
+		对 '(' 与 ')' 使用彩虹色。你需要 rainbow_parenthesis 才能生效。
+
+							       *g:ada_folding*
+g:ada_folding		  set ("sigpft")
+		对 Ada 源文件使用折叠。
+		    's':    加载时激活语法折叠
+			'p':    折叠 package
+			'f':    折叠函数与过程
+			't':    折叠类型
+			'c':    折叠条件语句
+		    'g':    加载时激活 gnat pretty print 折叠
+			'i':    单独的 "is" 与上一行一起折叠
+			'b':	单独的 "begin" 与上一行一起折叠
+			'p':	单独的 "private" 与上一行一起折叠
+			'x':	单独的 "exception" 与上一行一起折叠
+		    'i':    加载时激活 indent 折叠
+
+		注意：语法折叠处于早期（不可用）阶段，建议使用 indent 或 gnat
+		      pretty 折叠。
+
+		要让 gnat pretty 折叠生效，建议以下设置：
+		-cl3 -M79 -c2 -c3 -c4 -A1 -A2 -A3 -A4 -A5
+
+		要让 indent 折叠生效，建议以下设置：
+		shiftwidth=3 softtabstop=3
+
+								*g:ada_abbrev*
+g:ada_abbrev		  bool (true when exists)
+		添加一些缩写。此特性或多或少已被各种补全方法取代。
+
+						      *g:ada_withuse_ordinary*
+g:ada_withuse_ordinary	  bool (true when exists)
+		把 "with" 与 "use" 显示为普通关键字（当用于引用其他编译单元时，它们
+		通常会被特殊高亮）。
+
+							 *g:ada_begin_preproc*
+g:ada_begin_preproc	  bool (true when exists)
+		用 C 预处理命令的着色方式显示所有类似 begin 的关键字。
+
+						    *g:ada_omni_with_keywords*
+g:ada_omni_with_keywords
+		把 Keywords、Pragmas、Attributes 加入 omni 补全（|compl-omni|）。注
+		意：你总可以用用户补全（|i_CTRL-X_CTRL-U|）完成这些内容。
+
+						      *g:ada_extended_tagging*
+g:ada_extended_tagging	  enum ("jump", "list")
+		使用扩展 tagging，有两个选项可用
+		    "jump": 用 tjump 跳转。
+		    "list": 把 tags 加入 quick fix 列表。
+		普通 tagging 不支持函数或运算符重载，因为这些特性在 C 中不存在，而
+		tagging 最初是为 C 开发的。
+
+						   *g:ada_extended_completion*
+g:ada_extended_completion
+		对 <C-N> 与 <C-R> 补全使用扩展补全（|i_CTRL-N|）。在此模式下，'.'
+		被当作标识符的一部分，因此 'Object.Method' 或 'Package.Procedure' 会
+		被整体补全。
+
+						       *g:ada_gnat_extensions*
+g:ada_gnat_extensions	  bool (true when exists)
+		 支持 GNAT 扩展。
+
+					       *g:ada_with_gnat_project_files*
+g:ada_with_gnat_project_files	 bool (true when exists)
+		 添加 gnat 项目文件关键字与 Attributes。
+
+						      *g:ada_default_compiler*
+g:ada_default_compiler	  string
+		设置默认编译器。目前支持 "gnat" 与 "decada"。
+
+"exists" 类型是一种布尔值：变量已定义时视为 true，未定义时视为 false。变量的取
+值对此没有影响。
+
+------------------------------------------------------------------------------
+5.2 命令 ~
+							     *ft-ada-commands*
+
+:AdaRainbow							 *:AdaRainbow*
+		切换 '(' 与 ')' 的彩虹色（|g:ada_rainbow_color|）模式。
+
+:AdaLines							   *:AdaLines*
+		切换行错误（|g:ada_line_errors|）的显示。
+
+:AdaSpaces							  *:AdaSpaces*
+		切换空格错误（|g:ada_space_errors|）的显示。
+
+:AdaTagDir							  *:AdaTagDir*
+		为当前文件所在目录创建 tags 文件。
+
+:AdaTagFile							 *:AdaTagFile*
+		为当前文件创建 tags 文件。
+
+:AdaTypes							   *:AdaTypes*
+		切换标准类型（|g:ada_standard_types|）的着色。
+
+:GnatFind							   *:GnatFind*
+		调用 |g:gnat.Find()|
+
+:GnatPretty							 *:GnatPretty*
+		调用 |g:gnat.Pretty()|
+
+:GnatTags							   *:GnatTags*
+		调用 |g:gnat.Tags()|
+
+------------------------------------------------------------------------------
+5.3 变量 ~
+							    *ft-ada-variables*
+
+								      *g:gnat*
+g:gnat			    object
+		管理 GNAT 编译的控制对象。在加载第一份 Ada 源代码时创建该对象，前提
+		是 |g:ada_default_compiler| 设置为 "gnat"。详见 |gnat_members|。
+
+								    *g:decada*
+g:decada		      object
+		管理 Dec Ada 编译的控制对象。在加载第一份 Ada 源代码时创建该对象，
+		前提是 |g:ada_default_compiler| 设置为 "decada"。详见
+		|decada_members|。
+
+------------------------------------------------------------------------------
+5.4 常量 ~
+							    *ft-ada-constants*
+
+所有常量都是锁定的。详见 |:lockvar|。
+
+							     *g:ada#WordRegex*
+g:ada#WordRegex		string
+		用于搜索 Ada 单词的正则表达式。
+
+							  *g:ada#DotWordRegex*
+g:ada#DotWordRegex	string
+		用于搜索以点分隔的 Ada 单词的正则表达式。
+
+							       *g:ada#Comment*
+g:ada#Comment		string
+		用于搜索 Ada 注释的正则表达式。
+
+							      *g:ada#Keywords*
+g:ada#Keywords		list of dictionaries
+		关键字、属性等的列表，采用 omni 补全使用的格式。详见
+		|complete-items|。
+
+							   *g:ada#Ctags_Kinds*
+g:ada#Ctags_Kinds	dictionary of lists
+		Ctags 的 Ada 支持所生成的各种条目种类的字典。
+
+------------------------------------------------------------------------------
+5.5 函数 ~
+							    *ft-ada-functions*
+
+ada#Word([{line}, {col}])					  *ada#Word()*
+		返回光标之下（或指定行/列）的 Ada 实体的完整名称，必要时去除空白
+		与换行。
+
+ada#List_Tag([{line}, {col}])				      *ada#Listtags()*
+		在 quick-fix window 内列出光标之下（或指定行/列）的 Ada 实体的所有
+		出现。
+
+ada#Jump_Tag ({ident}, {mode})				      *ada#Jump_Tag()*
+		在 tag 跳转列表中列出光标之下（或指定行/列）的 Ada 实体的所有出现。
+		模式可以是 "tjump" 或 "stjump"。
+
+ada#Create_Tags ({option})				   *ada#Create_Tags()*
+		使用 Ctags 创建 tag 文件。选项可以是 "file"（当前文件）、"dir"（当前
+		文件所在目录）或一个文件名。
+
+gnat#Insert_Tags_Header()			   *gnat#Insert_Tags_Header()*
+		把当前文件缺失的 tag 文件头（!_TAG_）信息添加进去（这些信息在 GNAT
+		XREF 输出中没有）。
+
+ada#Switch_Syntax_Option ({option})		  *ada#Switch_Syntax_Option()*
+		切换高亮选项的开或关。用于 Ada 菜单。
+
+								  *gnat#New()*
+gnat#New ()
+		创建一个新的 gnat 对象。详见 |g:gnat|。
+
+
+==============================================================================
+6. 额外插件 ~
+							   *ada-extra-plugins*
+
+你可以选择安装以下额外插件。它们与 Ada 配合良好，并增强 Ada 模式的能力：
+
+backup.vim
+	https://www.vim.org/scripts/script.php?script_id=1537
+	保留任意多的备份，这样你就不必自己动手了。
+
+rainbow_parenthesis.vim
+	https://www.vim.org/scripts/script.php?script_id=1561
+	非常有帮助，因为 Ada 只使用 '(' 与 ')'。
+
+nerd_comments.vim
+	https://www.vim.org/scripts/script.php?script_id=1218
+	对几乎所有编程语言都提供出色的注释与取消注释支持。
+
+matchit.vim
+	https://www.vim.org/scripts/script.php?script_id=39
+	适用于任何语言的 '%' 跳转。普通的 '%' 跳转只对 '{}' 风格的语言有效。
+	Ada 模式会设置所需的搜索模式。
+
+taglist.vim
+	https://www.vim.org/scripts/script.php?script_id=273
+	源代码浏览器侧边栏。有一个适用于 Ada 的补丁。
+
+Vim 的 GNU Ada Project 发行版
+（https://sourceforge.net/projects/gnuada/）包含上述全部内容。
+
+ vim:tw=78:ts=8:noet:ft=help:norl:

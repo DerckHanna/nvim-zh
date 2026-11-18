@@ -1,0 +1,500 @@
+{
+  "domain": "telescope",
+  "entries": [
+    {
+      "context": "notification",
+      "msgid": "[telescope.%s]: '%s' is not a valid value for line_width",
+      "msgstr": "[telescope.%s]: “%s”不是 line_width 的有效值"
+    },
+    {
+      "context": "notification",
+      "msgid": "[telescope.%s]: 'ripgrep', or similar alternative, is a required dependency for the %s picker. Visit https://github.com/BurntSushi/ripgrep#installation for installation instructions.",
+      "msgstr": "[telescope.%s]: %s 选择器需要 'ripgrep' 或类似的替代工具。请访问 https://github.com/BurntSushi/ripgrep#installation 查看安装说明。"
+    },
+    {
+      "context": "notification",
+      "msgid": "[telescope.%s]: Command missing arguments",
+      "msgstr": "[telescope.%s]: 命令缺少参数"
+    },
+    {
+      "context": "notification",
+      "msgid": "[telescope.%s]: Could not do anything with blank line...",
+      "msgstr": "[telescope.%s]: 无法处理空白行……"
+    },
+    {
+      "context": "notification",
+      "msgid": "[telescope.%s]: Index too large as there are only '%s' pickers cached",
+      "msgstr": "[telescope.%s]: 索引过大，当前只缓存了 %s 个选择器"
+    },
+    {
+      "context": "notification",
+      "msgid": "[telescope.%s]: No buffers found with the provided options",
+      "msgstr": "[telescope.%s]: 没有找到符合所给选项的Buffer"
+    },
+    {
+      "context": "notification",
+      "msgid": "[telescope.%s]: No cached picker(s).",
+      "msgstr": "[telescope.%s]: 没有缓存的选择器。"
+    },
+    {
+      "context": "notification",
+      "msgid": "[telescope.%s]: No changes found",
+      "msgstr": "[telescope.%s]: 未找到更改"
+    },
+    {
+      "context": "notification",
+      "msgid": "[telescope.%s]: No diagnostics found",
+      "msgstr": "[telescope.%s]: 未找到诊断"
+    },
+    {
+      "context": "notification",
+      "msgid": "[telescope.%s]: No document_symbol locations found",
+      "msgstr": "[telescope.%s]: 未找到 document_symbol 位置"
+    },
+    {
+      "context": "notification",
+      "msgid": "[telescope.%s]: No locals query for the current buffer",
+      "msgstr": "[telescope.%s]: 当前Buffer没有 locals 查询"
+    },
+    {
+      "context": "notification",
+      "msgid": "[telescope.%s]: No loclist items",
+      "msgstr": "[telescope.%s]: 没有位置列表项"
+    },
+    {
+      "context": "notification",
+      "msgid": "[telescope.%s]: No matches found",
+      "msgstr": "[telescope.%s]: 未找到匹配项"
+    },
+    {
+      "context": "notification",
+      "msgid": "[telescope.%s]: No name available for anonymous functions.",
+      "msgstr": "[telescope.%s]: 匿名函数没有可用名称。"
+    },
+    {
+      "context": "notification",
+      "msgid": "[telescope.%s]: No parser for the current buffer",
+      "msgstr": "[telescope.%s]: 当前Buffer没有可用的解析器"
+    },
+    {
+      "context": "notification",
+      "msgid": "[telescope.%s]: No quickfix items",
+      "msgstr": "[telescope.%s]: 没有快速修复项"
+    },
+    {
+      "context": "notification",
+      "msgid": "[telescope.%s]: No results from textDocument/documentSymbol",
+      "msgstr": "[telescope.%s]: textDocument/documentSymbol 没有返回结果"
+    },
+    {
+      "context": "notification",
+      "msgid": "[telescope.%s]: No tags file found. Create one with ctags -R",
+      "msgstr": "[telescope.%s]: 未找到 tags 文件。请使用 ctags -R 创建"
+    },
+    {
+      "context": "notification",
+      "msgid": "[telescope.%s]: No tagstack available",
+      "msgstr": "[telescope.%s]: 没有可用的标签栈"
+    },
+    {
+      "context": "notification",
+      "msgid": "[telescope.%s]: Nothing currently selected",
+      "msgstr": "[telescope.%s]: 当前没有选中项"
+    },
+    {
+      "context": "notification",
+      "msgid": "[telescope.%s]: This operation must be run in a work tree",
+      "msgstr": "[telescope.%s]: 此操作必须在工作树中运行"
+    },
+    {
+      "context": "notification",
+      "msgid": "[telescope.%s]: Type of '%s' does not match",
+      "msgstr": "[telescope.%s]: “%s”的类型不匹配"
+    },
+    {
+      "context": "notification",
+      "msgid": "[telescope.%s]: Unknown command",
+      "msgstr": "[telescope.%s]: 未知命令"
+    },
+    {
+      "context": "notification",
+      "msgid": "[telescope.%s]: You need to install either find, fd, or rg",
+      "msgstr": "[telescope.%s]: 你需要安装 find、fd 或 rg 中的任意一个"
+    },
+    {
+      "context": "notification",
+      "msgid": "[telescope.%s]: cmd has to be a table",
+      "msgstr": "[telescope.%s]: cmd 必须是表"
+    },
+    {
+      "context": "notification",
+      "msgid": "[telescope.%s]: no client attached",
+      "msgstr": "[telescope.%s]: 没有附加的客户端"
+    },
+    {
+      "context": "notification",
+      "msgid": "[telescope.%s]: not defined for this previewer",
+      "msgstr": "[telescope.%s]: 此预览器未定义该操作"
+    },
+    {
+      "context": "title",
+      "msgid": "Autocommands Preview",
+      "msgstr": "自动命令预览"
+    },
+    {
+      "context": "title",
+      "msgid": "Buffers",
+      "msgstr": "Buffer"
+    },
+    {
+      "context": "title",
+      "msgid": "Change Colorscheme",
+      "msgstr": "更换配色方案"
+    },
+    {
+      "context": "title",
+      "msgid": "Command History",
+      "msgstr": "命令历史"
+    },
+    {
+      "context": "title",
+      "msgid": "Commands",
+      "msgstr": "命令"
+    },
+    {
+      "context": "title",
+      "msgid": "Current Buffer Fuzzy",
+      "msgstr": "当前 Buffer 模糊搜索"
+    },
+    {
+      "context": "title",
+      "msgid": "Current Buffer Tags",
+      "msgstr": "当前 Buffer 标签"
+    },
+    {
+      "context": "title",
+      "msgid": "Document Diagnostics",
+      "msgstr": "文档诊断"
+    },
+    {
+      "context": "title",
+      "msgid": "File Preview",
+      "msgstr": "文件预览"
+    },
+    {
+      "context": "title",
+      "msgid": "Filetypes",
+      "msgstr": "文件类型"
+    },
+    {
+      "context": "title",
+      "msgid": "Find Files",
+      "msgstr": "查找文件"
+    },
+    {
+      "context": "title",
+      "msgid": "Find Word (%s)",
+      "msgstr": "查找单词 (%s)"
+    },
+    {
+      "context": "title",
+      "msgid": "Git BCommits",
+      "msgstr": "Git Buffer提交"
+    },
+    {
+      "context": "title",
+      "msgid": "Git BCommits in range",
+      "msgstr": "范围内的 Git Buffer提交"
+    },
+    {
+      "context": "title",
+      "msgid": "Git Branch Preview",
+      "msgstr": "Git 分支预览"
+    },
+    {
+      "context": "title",
+      "msgid": "Git Branches",
+      "msgstr": "Git 分支"
+    },
+    {
+      "context": "title",
+      "msgid": "Git Commits",
+      "msgstr": "Git 提交"
+    },
+    {
+      "context": "title",
+      "msgid": "Git Diff to Head Preview",
+      "msgstr": "与 HEAD 差异预览"
+    },
+    {
+      "context": "title",
+      "msgid": "Git Diff to Parent Preview",
+      "msgstr": "与父提交差异预览"
+    },
+    {
+      "context": "title",
+      "msgid": "Git File Diff Preview",
+      "msgstr": "Git 文件差异预览"
+    },
+    {
+      "context": "title",
+      "msgid": "Git Files",
+      "msgstr": "Git 文件"
+    },
+    {
+      "context": "title",
+      "msgid": "Git Message",
+      "msgstr": "Git 提交信息"
+    },
+    {
+      "context": "title",
+      "msgid": "Git Show Preview",
+      "msgstr": "Git 提交内容预览"
+    },
+    {
+      "context": "title",
+      "msgid": "Git Stash",
+      "msgstr": "Git 储藏"
+    },
+    {
+      "context": "title",
+      "msgid": "Git Stash Preview",
+      "msgstr": "Git 储藏预览"
+    },
+    {
+      "context": "title",
+      "msgid": "Git Status",
+      "msgstr": "Git 状态"
+    },
+    {
+      "context": "title",
+      "msgid": "Grep Preview",
+      "msgstr": "Grep 预览"
+    },
+    {
+      "context": "title",
+      "msgid": "Help",
+      "msgstr": "帮助"
+    },
+    {
+      "context": "title",
+      "msgid": "Help Preview",
+      "msgstr": "帮助预览"
+    },
+    {
+      "context": "title",
+      "msgid": "Highlights",
+      "msgstr": "高亮"
+    },
+    {
+      "context": "title",
+      "msgid": "Highlights Preview",
+      "msgstr": "高亮预览"
+    },
+    {
+      "context": "title",
+      "msgid": "Jumplist",
+      "msgstr": "跳转列表"
+    },
+    {
+      "context": "title",
+      "msgid": "Key Maps",
+      "msgstr": "键位映射"
+    },
+    {
+      "context": "title",
+      "msgid": "LSP Definitions",
+      "msgstr": "LSP 定义"
+    },
+    {
+      "context": "title",
+      "msgid": "LSP Document Symbols",
+      "msgstr": "LSP 文档符号"
+    },
+    {
+      "context": "title",
+      "msgid": "LSP Dynamic Workspace Symbols",
+      "msgstr": "LSP 动态工作区符号"
+    },
+    {
+      "context": "title",
+      "msgid": "LSP Implementations",
+      "msgstr": "LSP 实现"
+    },
+    {
+      "context": "title",
+      "msgid": "LSP Incoming Calls",
+      "msgstr": "LSP 传入调用"
+    },
+    {
+      "context": "title",
+      "msgid": "LSP Outgoing Calls",
+      "msgstr": "LSP 传出调用"
+    },
+    {
+      "context": "title",
+      "msgid": "LSP References",
+      "msgstr": "LSP 引用"
+    },
+    {
+      "context": "title",
+      "msgid": "LSP Type Definitions",
+      "msgstr": "LSP 类型定义"
+    },
+    {
+      "context": "title",
+      "msgid": "LSP Workspace Symbols",
+      "msgstr": "LSP 工作区符号"
+    },
+    {
+      "context": "title",
+      "msgid": "Live Grep",
+      "msgstr": "实时 Grep"
+    },
+    {
+      "context": "title",
+      "msgid": "Loclist",
+      "msgstr": "位置列表"
+    },
+    {
+      "context": "title",
+      "msgid": "Man",
+      "msgstr": "手册"
+    },
+    {
+      "context": "title",
+      "msgid": "Man Preview",
+      "msgstr": "手册预览"
+    },
+    {
+      "context": "title",
+      "msgid": "Marks",
+      "msgstr": "标记"
+    },
+    {
+      "context": "title",
+      "msgid": "Oldfiles",
+      "msgstr": "最近文件"
+    },
+    {
+      "context": "title",
+      "msgid": "Packages",
+      "msgstr": "插件包"
+    },
+    {
+      "context": "title",
+      "msgid": "Pickers",
+      "msgstr": "选择器"
+    },
+    {
+      "context": "title",
+      "msgid": "Planets",
+      "msgstr": "行星"
+    },
+    {
+      "context": "title",
+      "msgid": "Prompt",
+      "msgstr": "提示"
+    },
+    {
+      "context": "title",
+      "msgid": "Quickfix",
+      "msgstr": "快速修复"
+    },
+    {
+      "context": "title",
+      "msgid": "Quickfix History",
+      "msgstr": "快速修复历史"
+    },
+    {
+      "context": "title",
+      "msgid": "Quickfix List Preview",
+      "msgstr": "快速修复列表预览"
+    },
+    {
+      "context": "title",
+      "msgid": "Registers",
+      "msgstr": "Register"
+    },
+    {
+      "context": "title",
+      "msgid": "Results",
+      "msgstr": "结果"
+    },
+    {
+      "context": "title",
+      "msgid": "Search History",
+      "msgstr": "搜索历史"
+    },
+    {
+      "context": "title",
+      "msgid": "Spelling Suggestions",
+      "msgstr": "拼写建议"
+    },
+    {
+      "context": "title",
+      "msgid": "Symbols",
+      "msgstr": "符号"
+    },
+    {
+      "context": "title",
+      "msgid": "TagStack",
+      "msgstr": "标签栈"
+    },
+    {
+      "context": "title",
+      "msgid": "Tags",
+      "msgstr": "标签"
+    },
+    {
+      "context": "title",
+      "msgid": "Tags Preview",
+      "msgstr": "标签预览"
+    },
+    {
+      "context": "title",
+      "msgid": "Telescope Builtin",
+      "msgstr": "Telescope 内置功能"
+    },
+    {
+      "context": "title",
+      "msgid": "Telescope Pickers",
+      "msgstr": "Telescope 选择器"
+    },
+    {
+      "context": "title",
+      "msgid": "Treesitter Symbols",
+      "msgstr": "Treesitter 符号"
+    },
+    {
+      "context": "title",
+      "msgid": "Workspace Diagnostics",
+      "msgstr": "工作区诊断"
+    },
+    {
+      "context": "title",
+      "msgid": "autocommands",
+      "msgstr": "自动命令"
+    },
+    {
+      "context": "title",
+      "msgid": "options",
+      "msgstr": "选项"
+    }
+  ],
+  "locale": "zh_CN",
+  "metadata": {
+    "headers": {
+      "Content-Transfer-Encoding": "8bit",
+      "Content-Type": "text/plain; charset=UTF-8",
+      "Language": "zh_CN",
+      "Language-Team": "Simplified Chinese",
+      "Last-Translator": "nvim-zh maintainers",
+      "MIME-Version": "1.0",
+      "PO-Revision-Date": "2026-11-18 13:45+0800",
+      "Project-Id-Version": "nvim-zh"
+    },
+    "source": "telescope.po"
+  },
+  "schema": 1
+}

@@ -10,7 +10,7 @@
     "excluded requires manifests/help_exemptions.json evidence, and",
     "everything else is normal user-facing help that is still not_started.",
     "contract: tag/example-block/link digests of the pinned upstream text,",
-    "asserted against the translation on every Neovim version by phase8."
+    "asserted against the translation on every Neovim version by the Help contract suite."
   ],
   "totals": {
     "documents": 135,

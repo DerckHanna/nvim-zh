@@ -2,10 +2,12 @@
   "baseline": "0.12.6",
   "domains": {
     "clangd": 4,
+    "nvim-dap": 147,
+    "nvim-dap-ui": 41,
     "nvim-tree": 97,
     "nvim-ui": 18,
     "telescope": 96,
-    "which-key": 176
+    "which-key": 195
   },
   "help": {
     "complete": 133,
@@ -25,7 +27,7 @@
   "native": {
     "probe": {
       "msgid": "type  :help nvim<Enter>     if you are new! ",
-      "msgstr": "输入  :help nvim<Enter>     查看入门指南"
+      "msgstr": "输入  :help nvim<Enter>     新手必读！      "
     },
     "supplement": 118
   },

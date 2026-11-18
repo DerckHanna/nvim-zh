@@ -5,49 +5,57 @@
         "sha256": "d5c902092bb41038496b2f5eddfbe65836cdc046ecbf4b5cc9fed554c2409540",
         "size": 1081
       },
+      "catalogs/nvim-dap-ui.json": {
+        "sha256": "decd2b44877ce046d71bbaed3f2754823b4cf32309342b51d0489098822ca145",
+        "size": 5138
+      },
+      "catalogs/nvim-dap.json": {
+        "sha256": "3fcc69088941f996b1405df53567cd2e5acb4415b7d170b23b5de290ef792a70",
+        "size": 23214
+      },
       "catalogs/nvim-tree.json": {
-        "sha256": "ee5d1c3a2b67fc602fbafe4fdbdab3137ea704062fb70671a8f85f36e8188fc1",
-        "size": 13788
+        "sha256": "2aaab83d00718c119b76bf2f501b8dbfde7e0b652d72700e03ac90f278e27b6e",
+        "size": 13794
       },
       "catalogs/nvim-ui.json": {
-        "sha256": "439d4363ef8f6b26fead31b74e896f2d8435bd743800dda8f83550e4f20adea6",
-        "size": 2955
+        "sha256": "8bfe4d5d9fc213de315cc5cfb79b961fb551365167fea9aeb0584de6a09f1f54",
+        "size": 2949
       },
       "catalogs/telescope.json": {
-        "sha256": "39882b34d76b176b15e508f813acf003e7b475799295947e0a8953cfc04720c4",
-        "size": 12614
+        "sha256": "3d9c2d4e1f5e379fda3e558d09cfba3ed5873d8f390daf194ed4b917ac82d2f4",
+        "size": 12619
       },
       "catalogs/which-key.json": {
-        "sha256": "07cbcc00c2f3d6e979ac35ad8b82bee9209ddc2ee4f57ac9db7ca39c698d783f",
-        "size": 20566
+        "sha256": "938407e55aabda39690d11ab708c8af26bf6d2e1cb7eb5d74c1740885b1a7ea3",
+        "size": 23306
       },
       "help/doc/api-ui-events.cnx": {
-        "sha256": "0d2ecf088fc965651eb1ed220aa2ce15b616d347eb9b70330089c03324c8c43d",
-        "size": 37174
+        "sha256": "05274fc6480f2865cf68e7295716b1f5e89c61af6462629226431472b711d09b",
+        "size": 37253
       },
       "help/doc/api.cnx": {
-        "sha256": "fec55c88996b63a9d45eff7657e33273249a1367037565e9682f906cc346460d",
-        "size": 168673
+        "sha256": "bbc766f4ed105cd888c7a4f6ac97397b508812515ed6a80316458b88967f4e2a",
+        "size": 168742
       },
       "help/doc/autocmd.cnx": {
-        "sha256": "6386137be6da2d7080e639c4f18182bbe1cbf970e005ddc6e31a6b3d71f16f25",
-        "size": 70653
+        "sha256": "702519a2cb4001bab04fa247f224ffa8bcc5392bfd55ae0113b83ac7c566ab61",
+        "size": 70661
       },
       "help/doc/change.cnx": {
-        "sha256": "aac0c19bb7dc9638b85a9fecb0f01010983396d999f545f970d3f863cd7658be",
-        "size": 74205
+        "sha256": "c21b76a253c6ddfb591186ce77da4d5c9cd77ba72ae88403f87f6965aba09f55",
+        "size": 74642
       },
       "help/doc/channel.cnx": {
         "sha256": "6929e3d2006e98b69f5e33c00a7021465abbc76eda559f476ad8ca00fd699668",
         "size": 10579
       },
       "help/doc/cmdline.cnx": {
-        "sha256": "ea37211aba2745bee0c6463ad5c509bdec08051b1642311263914ae44bd41c6d",
-        "size": 51987
+        "sha256": "24e747755f7557b402eea2f5c1eabe879791951181d8edb92e47d85326427e78",
+        "size": 52249
       },
       "help/doc/deprecated.cnx": {
-        "sha256": "c9dfe810bb892f461f9b5044831b9ce6ff93e6b33944d61ab95845d1d5537971",
-        "size": 17538
+        "sha256": "67b7c37af015f821de6441a271e1dd7e5b7082766b4fad614760832310a7d614",
+        "size": 17534
       },
       "help/doc/dev.cnx": {
         "sha256": "2eb95e836a2df3872d86f72ab1fbe5f5a73ab4334222444820b7e72c003dcbf2",
@@ -62,16 +70,16 @@
         "size": 28964
       },
       "help/doc/dev_test.cnx": {
-        "sha256": "c827cd737cf8254ba7956d4eb65645224e320c456034b7f643e77ddedbdf9fd1",
-        "size": 22164
+        "sha256": "1371b96f9cd58b435afa9a69ceb4165f6c7de1f310fde27ce17c63e678b1cde0",
+        "size": 22186
       },
       "help/doc/dev_theme.cnx": {
-        "sha256": "2a0eabfd59bbce4264c701db43516168b889783c0147e6fa44ec91f60b361ccd",
-        "size": 4769
+        "sha256": "f3da9f163fabaf269d5549034a0cfe32384e554772262b44e0d7872ab641adf1",
+        "size": 4774
       },
       "help/doc/dev_tools.cnx": {
-        "sha256": "5831f4d28f24822718eed84efeb80b12bad902609d4bf043d52a2921feea0876",
-        "size": 18761
+        "sha256": "7dafbd5e4edb21d12890c94c639729c03d8ba749e0972ea8213f9c8814c0c56a",
+        "size": 18786
       },
       "help/doc/dev_vimpatch.cnx": {
         "sha256": "433fef8093a8f4996a7c9d42e1b917743aa35d1ae72cea70367b7a34245d2d63",
@@ -82,211 +90,211 @@
         "size": 46631
       },
       "help/doc/diff.cnx": {
-        "sha256": "50eb9fc2725a7a364e9067c1e753a730836ae41133866f1c5805542bec211ae5",
-        "size": 21707
+        "sha256": "35aa27dd0a3c0a9a35273b9b22ee7071ceedeb33db2b65d93d011b8cda11e57a",
+        "size": 21698
       },
       "help/doc/digraph.cnx": {
-        "sha256": "9885fbcf4a19b39e66b2b1aaf4195ac40f47d337398cab9b6e02a6da3ac8a663",
-        "size": 64369
+        "sha256": "45d3ea81563be019ab2d047562c8f241798859c5934dcf7a950a0f3357821bca",
+        "size": 64370
       },
       "help/doc/editing.cnx": {
-        "sha256": "b491ad224dfe4d62f088b2d2457d83d76cee3e1e8085af209fc188dde728c987",
-        "size": 67560
+        "sha256": "8088252e16ccb79931ea98777e26b197fe77efd550cd9a760c38590b765e3099",
+        "size": 67685
       },
       "help/doc/faq.cnx": {
         "sha256": "16cd95924d75aa041a7a0da4800c59da3897566dc1a3ebadc806a9599a93e495",
         "size": 19231
       },
       "help/doc/filetype.cnx": {
-        "sha256": "d18f9162eed7a8867d8809be54cb8efb22b79501fd9793a568f53dc7fc3570de",
-        "size": 42967
+        "sha256": "0f76eec72f44827a865b9ba8cd9d9628c74922b853bb4318b60ee5c1c0d46d49",
+        "size": 43090
       },
       "help/doc/fold.cnx": {
-        "sha256": "b2627c1305c5853864a839226f055e9cfb403b21a5037894693f7214e8f71b85",
-        "size": 24464
+        "sha256": "6ce87a1f9aa20ec244f8e2fcf9d303f9fc7c5e74511152e46acfb17904b3e14d",
+        "size": 24465
       },
       "help/doc/ft_ada.cnx": {
         "sha256": "d7f6a3ae2aa362f0fccf2ae816c65e1a29adf377e97d80da7f962508dff699c7",
         "size": 16625
       },
       "help/doc/ft_hare.cnx": {
-        "sha256": "cd3809ab4caf05b6af69f27ea80bbc93be7ca1777704649d09185954ea268958",
-        "size": 2663
+        "sha256": "01723b2bf4ecd319e52ba697abe3cacd59e981024227dc7cb6d60bf9cfdf02be",
+        "size": 2664
       },
       "help/doc/ft_ps1.cnx": {
-        "sha256": "a0e4174ee6786051b2bc187147fa883b6ddd781f6f1d0dacdead15fb33033a20",
-        "size": 2121
+        "sha256": "c80716ee3d3808d52900d1edb4826e85a41e01a825d48445a4efc9d4bd205956",
+        "size": 2119
       },
       "help/doc/ft_raku.cnx": {
-        "sha256": "a72f08556e46367e5c8338addef915367f1c21ef261bfb105ee62fdbec3394a3",
-        "size": 4319
+        "sha256": "9fa7d216e07f8e88066484a12e0dc9902f16e593a97d18eeb88bb2d853e28285",
+        "size": 4318
       },
       "help/doc/ft_rust.cnx": {
-        "sha256": "0629e9aa26abce05aaf0be3b118f34b1a068ed5f3a3b2c965e652c27b672005f",
-        "size": 19192
+        "sha256": "7917871ca75dfc72cda623c7fb117bb71a7758a3dee8d01e3862caf2f740e4a3",
+        "size": 19194
       },
       "help/doc/ft_sql.cnx": {
-        "sha256": "4e8258b8e7101de97df21d19ef055a1c9e07d822524bb959b56fcab859ddd0cf",
-        "size": 27744
+        "sha256": "cf8aa0890f673de823a8905d90826b4bce422f55b9bb1718540459ad9b95f293",
+        "size": 27466
       },
       "help/doc/gui.cnx": {
-        "sha256": "4f01cd024e81590b40f287d046548957a511461bbb3ce8c988b5440d3882d311",
-        "size": 43632
+        "sha256": "4d3763fad62de0431150aa2eebdd9fa5b5410854a9d11b33516498e3b7fe751e",
+        "size": 43660
       },
       "help/doc/health.cnx": {
-        "sha256": "46bb99a099e329ffdaec56288e495c2840543053d83225cef77faa3f6ca51cf2",
-        "size": 5515
+        "sha256": "682de0588ac956ec3491e7698f8af8c9ca98ec1346dee50c05e922b9d1fca623",
+        "size": 5524
       },
       "help/doc/help.cnx": {
-        "sha256": "769245f59021ee89d6dcc20ba444dc1f34fe83e65f4e94b57d3065b9ec98e22b",
-        "size": 5261
+        "sha256": "d59af9ec0e28b43f81603164530e1600d4d4adff60c8b4987c929ac0e99970be",
+        "size": 5262
       },
       "help/doc/helphelp.cnx": {
-        "sha256": "9a0ed15768b50255914d231cc69cae9fff5d9fe4a2786523c6a005fbf85782a9",
-        "size": 20776
+        "sha256": "5923480887e97786444cd511f645ef0cf804e0e6f34a0a4e039d9393f281705c",
+        "size": 20833
       },
       "help/doc/if_perl.cnx": {
-        "sha256": "1fddc10f8e97c862c053b262740ca54b034370784a28da396d2638b17c336aff",
-        "size": 8409
+        "sha256": "ca4f4b10ff36769a5f75ad4007b83cde51ad1f2564f3b2ef90d348dd9df9caff",
+        "size": 8431
       },
       "help/doc/if_pyth.cnx": {
-        "sha256": "75867cf8a1d7f5014d0f2e9c04cca179b113a03c8be84f421c36b4e88f2afd83",
-        "size": 23864
+        "sha256": "2253c678da7735872a7e530a0081e64d71fa9c5ca1797b5015000d633e90456b",
+        "size": 23872
       },
       "help/doc/if_ruby.cnx": {
-        "sha256": "c1d8f84eb516c6a4c9fefdbee5a7712970774484f85f2a4bbfe2d01dc704b41d",
-        "size": 5923
+        "sha256": "788f5d116bdce5c513d14704a4cc34a615938b9fc44b0ea315ccf5a4120d99ed",
+        "size": 5929
       },
       "help/doc/indent.cnx": {
-        "sha256": "3504e1b0b6e039de55d7914f88f2bb499543907ca6b41b555a635e3afc4d2538",
-        "size": 40942
+        "sha256": "921105841e6a4baa004f857ae097ff5cbe7d013df136284e939728d9b7ca26c0",
+        "size": 40973
       },
       "help/doc/index.cnx": {
-        "sha256": "ca40f6bfb1021da4bc4177bce7630207b888582a673414366a5ceff3fde81f5a",
-        "size": 76110
+        "sha256": "1a2f8ba04614a02476dd64d91f6699c3d1f08b9786e6d37fa8b03ff4e6238bb1",
+        "size": 76425
       },
       "help/doc/insert.cnx": {
-        "sha256": "583a326085d91b987318422e804f4c957c1b07c0c3230475c6f54e5fb7d03ea3",
-        "size": 84202
+        "sha256": "32178565e5f680c280a11d0947ac0f5e3a97a91dac0a0e9b52ab4137f9b32f90",
+        "size": 84252
       },
       "help/doc/intro.cnx": {
-        "sha256": "88ee2e57186445a7577b8571da6dd2d7266cb76a29fbce8f7d2d1bebd69b75f3",
-        "size": 28855
+        "sha256": "9975b7dba8fb7a6b240efcdbc9be946687d01cebc984f466d833303dd205ebc2",
+        "size": 28848
       },
       "help/doc/job_control.cnx": {
         "sha256": "cbfdf459867f4ede6b84e25c53829c831a1b94a1b085f53bd1ab9a63c6a0c4cc",
         "size": 5348
       },
       "help/doc/l10n-arabic.cnx": {
-        "sha256": "34400cfdef286a97c0c70b2de6c7380fc2290fba1b779cee2e4994632f59fa79",
-        "size": 12011
+        "sha256": "01820c33f9f215900633f5d407f8f5f20d0e1415e14873cc74124815dfa3d17e",
+        "size": 12012
       },
       "help/doc/l10n-hebrew.cnx": {
-        "sha256": "a0ee0e7526bfd75f7987a1a16a9cde60d69e142586c84b77c744e7bdbb2e158a",
-        "size": 4179
+        "sha256": "2109a38d455c4e621fb4fdc3e7934a40f3fb08d2b81845c1e6f09cdf43fa9f69",
+        "size": 4181
       },
       "help/doc/l10n-russian.cnx": {
-        "sha256": "76a00dfe4afce7384788a24e9b7b8ee03c02f50a9ee2164efff3658adda234be",
-        "size": 2422
+        "sha256": "13fa5fd0687e68c63c9643a13b9fd44ef4886317616b96f1971e3b52254898cd",
+        "size": 2424
       },
       "help/doc/l10n-vietnamese.cnx": {
         "sha256": "4e5671975c2ce05ac643cfd51fcec636d7b6cc0076b2f1067daedd59a4fa7c33",
         "size": 2902
       },
       "help/doc/lsp.cnx": {
-        "sha256": "f308dd4296b88bccbd89c5ee9ac1f62166bd4d52133515cf606bedeae3122509",
-        "size": 137468
+        "sha256": "fba6d24b344b75af599df9b5148d5c8b16844cd819940f0a4109bcccb816799d",
+        "size": 137464
       },
       "help/doc/lua-bit.cnx": {
-        "sha256": "2d76429f03c4c48ac6a93760276a19552d1769bf64c6829f7cdab65d274d4421",
-        "size": 15791
+        "sha256": "38f93e4b07a0c0cbdb618ca9707286698a3df27e21d8e40637f2246e3e1c5005",
+        "size": 15794
       },
       "help/doc/lua-guide.cnx": {
-        "sha256": "631c4388d07b2cd95924bd3d6f7200945444ac2377b60c23e78dfd9d646d6a75",
-        "size": 28103
+        "sha256": "ee6162fe7c526d681bd92dc6c4f113b2d4a12c5228164dbb5445bbf9a05725c4",
+        "size": 28168
       },
       "help/doc/lua-plugin.cnx": {
-        "sha256": "24f8e931b12674d5f320181b2594de7209592900bd13f26c09dd236868aacb8d",
+        "sha256": "4e3dfd6082614b85fa1d176ad7c3e6613de06ea6da4d9664669ae1131694f7e1",
         "size": 13839
       },
       "help/doc/lua.cnx": {
-        "sha256": "5e671130017ef833704d3b677a5fa53f894a752dfadd465ccd47e166fc40a2fd",
-        "size": 201961
+        "sha256": "75abac5d992961d302d28c6b574d17a8a9723e603fbcac1990833a35f9367789",
+        "size": 202122
       },
       "help/doc/luaref.cnx": {
-        "sha256": "704f18dd3ca6648d23c51a598cb64595251f0ca50a6f96a1c39e3199d0735a97",
-        "size": 210110
+        "sha256": "d324347abf4e55ced90a8686952bf64162bbbb954fee353cc564e2033e40164e",
+        "size": 210118
       },
       "help/doc/luvref.cnx": {
-        "sha256": "79194dd0720d7dac4a0da6455d423ac2a1dd3c0f09df62e510ebe7883a44e504",
-        "size": 170485
+        "sha256": "3a1dd73a58ff0ceecf6c295b34fab11e777a66f6f6aa11330b9ce76bd7f44b58",
+        "size": 170667
       },
       "help/doc/map.cnx": {
-        "sha256": "bda10e5d5980d55cf477b707ed1b71e46e210c2d799e9053cdbce8744a0c2842",
-        "size": 68921
+        "sha256": "917cc0f18c45fe9973f0677c3f6e7cbfbaddbbd8b282856f07a8831fb22c28cc",
+        "size": 68856
       },
       "help/doc/mbyte.cnx": {
-        "sha256": "a7f4f53bba30724400cd67b3f50a0912d4d894edac080e04f94f02cde104ad1d",
-        "size": 28095
+        "sha256": "cdabac8329c88aedcd03f3c47d85477a29c0360a05876e69b2a9bc830ee96bbd",
+        "size": 27908
       },
       "help/doc/message.cnx": {
-        "sha256": "8244bf85535309fc1b5b7ef9f630f368df300a90f385bae8b2ac8bf42ef9d0fd",
-        "size": 29864
+        "sha256": "05a2d2fd45d5f593a8d2a3809b598d0d0fce7457aca8a837e281c3fd56943be2",
+        "size": 29879
       },
       "help/doc/mlang.cnx": {
         "sha256": "818289e7545dd952f0a557a52ffce2dc068e8fc9362a5627d3f7c7612195b549",
         "size": 6782
       },
       "help/doc/motion.cnx": {
-        "sha256": "296312da6a8a5e3c6292c08088a42e240d624605069fe6e14f1e11925237076e",
-        "size": 50984
+        "sha256": "17de4de8d5487da768cee822b8804844c5d54a7501ec1666f7b4bfa8e33ea312",
+        "size": 50992
       },
       "help/doc/news-0.10.cnx": {
-        "sha256": "40d7e6587047e641ff0ddc6c59c392cfb2bc8850a9514c19e5e4d3c99ee8f6e5",
-        "size": 23296
+        "sha256": "e351c500ed2089426617425b38fb46bc7841ebc6328e63c1b13a428b3d8d7214",
+        "size": 23302
       },
       "help/doc/news-0.11.cnx": {
-        "sha256": "2f81a657b16935cbe083d6a802d3a2c88d66ebc79daadae678ff5a8d400579b4",
-        "size": 23370
+        "sha256": "e33d0a9c6c3906088f245d124ce773349310804a8747a2ecdbf508a52ee364d9",
+        "size": 23369
       },
       "help/doc/news-0.9.cnx": {
-        "sha256": "755043bb9c1a5160f1fc194b2e6055f3777c405618c7bd5ff424666661cad5db",
-        "size": 11421
+        "sha256": "b37c4c1c9803ab60b635fb85656dab3398d64943e35cc710b9e281988c4119e9",
+        "size": 11428
       },
       "help/doc/news.cnx": {
         "sha256": "f1365bafefcb9d9ff3ff0f46a500717e42c127b29338bbcd1581d8a3344ac539",
         "size": 25427
       },
       "help/doc/nvim-zh.cnx": {
-        "sha256": "d25393955f62d34faf5897598780fec71022afa08c685fe3abf8331c217e91ad",
-        "size": 9928
+        "sha256": "6d6e51de81355ab4d9f9753b705ad08ea1bc17a1f506ca62dd37be85e55d59c0",
+        "size": 10719
       },
       "help/doc/nvim-zh.txt": {
-        "sha256": "0101493c567d9701516a5d7205133df77c2a6227953be5ceaf1ffea2f46e2e9d",
-        "size": 10969
+        "sha256": "937fda16c18f5889e73fde49e7b4d20530382a544c158e63f9bcc54ffe6fdc51",
+        "size": 11893
       },
       "help/doc/nvim.cnx": {
-        "sha256": "254f49d455d329138ea25da5cf2785906ce95f0b556592bf964111f34c6962de",
-        "size": 3552
+        "sha256": "0c2832c7f7592a7d8f25aef17287c1ec042a0a66b41e2c470848b2376119efe5",
+        "size": 3581
       },
       "help/doc/options.cnx": {
-        "sha256": "f5fca99f0f4e5a62aa2d4cca8f210fa93dd8684e7793e979f03a540d8200846a",
-        "size": 315094
+        "sha256": "d11a90f74cfe6897dee2e241c535155949d90461e9b1fdaa788e3a6742190b19",
+        "size": 316309
       },
       "help/doc/pack.cnx": {
-        "sha256": "9ca3c64a8b78908600b04b3b19788d6cb062a496403a66fdb7176f75c47c7b48",
-        "size": 23480
+        "sha256": "0d8c36f02611bfaa2516ee44fb487ae6e86898be57bb4f7e705dbd8c244bdf3d",
+        "size": 23500
       },
       "help/doc/pattern.cnx": {
-        "sha256": "88136ba82b3da3aa0f48caa491c6f94d0a3ed28dee37d5a7da78784bc6ec4a15",
-        "size": 59751
+        "sha256": "8d5cf206ad8eff88abb86bc5537a63edd6b792102a4a7b088ff8af152cd0ce83",
+        "size": 59783
       },
       "help/doc/pi_gzip.cnx": {
-        "sha256": "060025c92b37fe6218c7e07984d26f2011a01967ee37ddb27b82246248d5b416",
-        "size": 1457
+        "sha256": "1b677166546917247a0b24dc26ad8cc041554e03000b3019763193c2a109204e",
+        "size": 1455
       },
       "help/doc/pi_msgpack.cnx": {
-        "sha256": "8a954c013f5407748313d7c3383b02068f1bc6ff7e39873cc07fddff0b47b553",
+        "sha256": "a921502d729831ec8274bd5d6207b955086883ca7c4674a1311ad10edacae736",
         "size": 5453
       },
       "help/doc/pi_paren.cnx": {
@@ -298,80 +306,80 @@
         "size": 4251
       },
       "help/doc/pi_tar.cnx": {
-        "sha256": "b4919d7e88f509fcf4775dcf28a01a2936565fb6efc741ea9dc2d6b7d7a4cd68",
-        "size": 6805
+        "sha256": "7548ba66a4b3846aef39b7508c575360a7466315b2bdb9956e9745193f8b8bad",
+        "size": 6808
       },
       "help/doc/pi_tutor.cnx": {
-        "sha256": "9fdab638a960e518efd91a7d77a5dea871c0353b8426b26824210ac23e3d0957",
-        "size": 1679
+        "sha256": "f512f218b9c1409addb06ee0999315fe2c49ad3072c6ad72dc3d7a9482a750d6",
+        "size": 1678
       },
       "help/doc/pi_zip.cnx": {
-        "sha256": "1a1e244a35e716d993d8091b738cb79a491a1409e10436b39884116acfa58d49",
-        "size": 9314
+        "sha256": "f831ec9fd19deaa3637c1717380490740f0a93b8305ae1ca4398631666e2d51b",
+        "size": 9315
       },
       "help/doc/plugins.cnx": {
-        "sha256": "b700658d2fb1c0629217debed0ee52d96a622efcff3884bfdc1ac1e9de1cad8e",
-        "size": 12560
+        "sha256": "617c08d9f3411ee159877a7fe469f7fa384cd9abd4474990c7769301efad4d5c",
+        "size": 12590
       },
       "help/doc/provider.cnx": {
-        "sha256": "95c584db5f61a079f409d794e7ad043ac6d2f75bbd1cd718abc17da6f8bc967d",
-        "size": 13827
+        "sha256": "d434980ee9b64a2939bee0345013b983c12ca0fd953a561bf04a49fadbe42da8",
+        "size": 13829
       },
       "help/doc/quickfix.cnx": {
-        "sha256": "308b13cf41c97387b49a8a8a816ef87d1569796e20cf540847e4fc3adb6b9530",
-        "size": 93919
+        "sha256": "13067263307fe4825db2c7c61a2f10bfb7fcd9a34b3e9f09fbc973e14b35682d",
+        "size": 93976
       },
       "help/doc/quickref.cnx": {
-        "sha256": "a4645750857cfe3ec82e5630ea5b156b5b0b2690be8759456a33bb2e24acfed3",
-        "size": 65917
+        "sha256": "40c1feb9a3a6f3bccba1fcc57beb70cdb2e4025d79d72c76a521cd0baa807999",
+        "size": 65926
       },
       "help/doc/recover.cnx": {
         "sha256": "321c157532cd83b241081b82844b15e4cdff50a236ef226a6c9cc542e45ae430",
         "size": 7784
       },
       "help/doc/remote.cnx": {
-        "sha256": "7b2319116c23aec753944236cad2ba9de28d3d9ae880b2eb448d90dd25680883",
-        "size": 4812
+        "sha256": "5f00e3221df5f9760ae92df64bb027f698bd0182993ed3295f01fddd92cc6a45",
+        "size": 4813
       },
       "help/doc/remote_plugin.cnx": {
-        "sha256": "58d4733193f80a0ec4146b0b35e6929a039bef43fd9c9c0a7fc1e459d8f05be8",
-        "size": 5777
+        "sha256": "97d69804c9d7c6d4ff31fe0b8aa949ffb5cf66caa07d4f1cc092a4cc807d81f5",
+        "size": 5778
       },
       "help/doc/repeat.cnx": {
-        "sha256": "f4c8661e035d6eab534e946b796195423475c01e40de6db96cadd1d278a5a9c5",
-        "size": 33782
+        "sha256": "c5316128cd863afd25e677f6e9142661a1b3559c5bcb38706fd95d6e3ae701c2",
+        "size": 33815
       },
       "help/doc/rileft.cnx": {
-        "sha256": "82e7655173b4390f96e2e835d9f000151b376625130bd5ae11a2e2d9b7059e6d",
-        "size": 4548
+        "sha256": "5b608a20e7d71e33806f8a7fba58c83c78379f8e504671494b0fe6afb54a813c",
+        "size": 4550
       },
       "help/doc/scroll.cnx": {
-        "sha256": "5b9245dd5c674dcc7e84109c0eb8f399def220456bc5f1813bb954779c1e6e31",
-        "size": 9887
+        "sha256": "daf57f15f15041a4b90ebd0105b3a376424480e6790c747972883349f4a9063d",
+        "size": 9902
       },
       "help/doc/sign.cnx": {
-        "sha256": "3334d8f5d711d10d18a9183a058202bb0f857bec99be17634b6e631cd8111382",
-        "size": 12508
+        "sha256": "35638d6cfa163d7f04ecd64283fe9bdbbe3aa97e54407beaa3e96c5d43e85945",
+        "size": 12509
       },
       "help/doc/spell.cnx": {
-        "sha256": "c051c186b416e44a9537d01bfeb85951498150a9acf623bcca5ba178d0d50493",
-        "size": 62959
+        "sha256": "265208abfd50a0770278723c89c8dfa2c34fc7dc381bcdf4c92f7207992be21b",
+        "size": 62980
       },
       "help/doc/starting.cnx": {
-        "sha256": "82940417eedc1d288286e31d4d046d4979298f9284d0a0ddd8653b517171c724",
-        "size": 73053
+        "sha256": "033265ccb52b9dd9961f872f6a4f6a5a946adc6bdd76dd64d8193dc3bc4b55e1",
+        "size": 73055
       },
       "help/doc/support.cnx": {
         "sha256": "d330e0e954f384d5764091194c407801c661c9e8893627acc38c2a5ce1a21dc6",
         "size": 2205
       },
       "help/doc/syntax.cnx": {
-        "sha256": "940ee11771c106fd5939ebc05849698e4ed9aec24650e7c13d668a3fc96a2609",
-        "size": 206286
+        "sha256": "6ae3e3b2a01eaf09a84dfacd03d2c29c0a174b54645f7a482d7f328a1e54f7e5",
+        "size": 206152
       },
       "help/doc/tabpage.cnx": {
-        "sha256": "d657ad9149fed347d3569bc1fc5504e66265f5d81d668d2302017a0fbb002a62",
-        "size": 17230
+        "sha256": "a76745cef3ec3fd5738769918ef8f27e635f95af2bb83c7c240c1775f65afe9d",
+        "size": 17234
       },
       "help/doc/tags": {
         "sha256": "8192faa1884aaf608ed389fd3d9f364b3d9eafd8536fd0e96751c429c0830892",
@@ -382,56 +390,56 @@
         "size": 400491
       },
       "help/doc/tagsrch.cnx": {
-        "sha256": "9746916ce420008e79cdb9164b06cbdcb6b79b01ee0d913b4ad659cbe3d8efcf",
-        "size": 38436
+        "sha256": "8a7ff1209ffc537dc0f292579ce54a12cc3d47205e1e322d4ca15ff6f3b7f4a8",
+        "size": 38439
       },
       "help/doc/terminal.cnx": {
-        "sha256": "5932db4a5d4de6fff430d99ff0fc229b315b56c27f0a289e921c6af5d6631a12",
-        "size": 28847
+        "sha256": "2d9f9ef74ec2d6e5e2051372a22c7e2d76d628ec239a2e88bcf2d2b53d581156",
+        "size": 28869
       },
       "help/doc/tips.cnx": {
-        "sha256": "2e74b200a75a3d222b80cb4e3eb288bfe7bbcf1770cf54a74eba7b53b137adc3",
-        "size": 16860
+        "sha256": "2afb42bbd58a4122bc6688664968300ade8886583a1456e340b8b6e216aecc5c",
+        "size": 16864
       },
       "help/doc/treesitter.cnx": {
-        "sha256": "c15da32773e89f8edff1248438cfec4d19265d633fd950d469ecbe7851ae2063",
-        "size": 74107
+        "sha256": "180fc020b4f1f1fe06e330ca3589babf0338f3dc243aa67bc1285fe2c3912dc6",
+        "size": 74129
       },
       "help/doc/tui.cnx": {
-        "sha256": "25b5ca4a39f8843068505fd2b6ff26b4b933366162c474f276401c3ed6d2ffd6",
-        "size": 13641
+        "sha256": "260782c8b01aee34a0c4c59c2a71c5b8719adfccf6975fad01403c02c079bfd1",
+        "size": 13645
       },
       "help/doc/undo.cnx": {
-        "sha256": "916506f401becdedd9abc309d38633023811d3bf0efd33415703930d4b129050",
-        "size": 16335
+        "sha256": "699095ad75ed6924a1a323531b1ace4ee6704dd3745b219653b40945ea493e95",
+        "size": 16336
       },
       "help/doc/userfunc.cnx": {
-        "sha256": "2dcf6aec5f82dc58913e7046d1b90c8315f101654176fa8e51aed88f45ba678f",
-        "size": 17373
+        "sha256": "0de44ee0b4d1db54c9afea428ef81ae3a1d83065dcc521b2bd76d529a9bb341b",
+        "size": 17367
       },
       "help/doc/usr_01.cnx": {
-        "sha256": "e1b0df6a4ea17f2400c1daf3c0462959b95c99a87195700bc984ac3b29f55117",
-        "size": 3666
+        "sha256": "b3552c4bff91eaa9c6d0a58c2cca3f80f3804fa27afe901c26adcec0cce6742b",
+        "size": 3667
       },
       "help/doc/usr_02.cnx": {
-        "sha256": "a68ed8015629163f002ebaab98db9787d677bcb360e91bd4f71e2a6c9b0c5bec",
-        "size": 22274
+        "sha256": "ff27cbfc1b8f7fd7f4b605d4bd0e4c41f4ee3bbf19f1ebaf6ee61fbb7aac8838",
+        "size": 22275
       },
       "help/doc/usr_03.cnx": {
-        "sha256": "415cb9d0ba27edea3fcbf93d4aaa68fd16de2669a6a96adaa5cfb67a7690af7d",
-        "size": 21721
+        "sha256": "5fc9f51a7cf948b1bd8ad1dd3e9d30b32c4e5f03bed066895bcda20e63c3124d",
+        "size": 21730
       },
       "help/doc/usr_04.cnx": {
-        "sha256": "70f583d73daa4a6bc9eb59b32ff340b2f4a63cc9587621d3a937d408612eafc3",
-        "size": 17853
+        "sha256": "1ab6f2b32ce8638ec875f635213d27002358c22cc64decb593b5aaf73b09adeb",
+        "size": 17852
       },
       "help/doc/usr_05.cnx": {
-        "sha256": "59fa66ab0830aaedd535d01590a7075c5dd503f7af10e74bcdef6c9aebb79496",
-        "size": 20259
+        "sha256": "608cb391d2be1aca7c735a8848780d88c5240fdd7e37a80fd052dcc2db62597e",
+        "size": 20261
       },
       "help/doc/usr_06.cnx": {
-        "sha256": "e7994d86a0262a437012d6ced573a10eb721809e4fc9e8dadaef22d2cd2f2ea2",
-        "size": 6597
+        "sha256": "2e19185e29d31be597128f592087b9558f6ce72566bc3d425beab560e940030f",
+        "size": 6598
       },
       "help/doc/usr_07.cnx": {
         "sha256": "18ef4b6c6a5822ea145dfcc4647c749dab65590f8834e4b07a7294ac1e292f6c",
@@ -446,39 +454,39 @@
         "size": 9904
       },
       "help/doc/usr_10.cnx": {
-        "sha256": "d03216f577eb8750701e28843339bb72bd08d21f53bb45d5e5f4f23753f4a95b",
+        "sha256": "12e28ae80ced25b143a266e76edf3d0eef574d2ab32b2c92b8d9368a34d23c98",
         "size": 26945
       },
       "help/doc/usr_11.cnx": {
-        "sha256": "d41bf2d0b6263d273d907b7a6500dda57c153a34170427c424e28671a8b87b4d",
+        "sha256": "1891b9804ea23ec4aae38302e1b5ffc48ccb8a81ad3b67eb6e1e541bfd0b5137",
         "size": 11954
       },
       "help/doc/usr_12.cnx": {
-        "sha256": "fc9faaf549bbee39c0eeb73714f32fae4c2420584dc42f102e55555e9f43de98",
-        "size": 12264
+        "sha256": "7b4ecba47d9f7b805c1a1e703181eff51fe7ebe869fe3b51da2791c3f936684f",
+        "size": 12276
       },
       "help/doc/usr_20.cnx": {
         "sha256": "4ce872ab9f93ad3266ffdd49830ffba478204f58fbe427a9d6dd1a74cd88f88d",
         "size": 12192
       },
       "help/doc/usr_21.cnx": {
-        "sha256": "a1b221622ceb8c9f6885a428cc8dc533b0a59b146d9d4f8099bbd78051f677ae",
-        "size": 16738
+        "sha256": "a78df70dd0a5168c6abc22fc34ef0378b319c3c52368083d8683e388d29d5520",
+        "size": 16729
       },
       "help/doc/usr_22.cnx": {
-        "sha256": "dda974de1a7386d78d690d03629dbf5e0045bed3363c7e92998ea7bcb3277e7f",
-        "size": 13938
+        "sha256": "5547a830b85fc903ebf704f1447d39837038db44e8bf44fa8141843cb9338f5f",
+        "size": 13935
       },
       "help/doc/usr_23.cnx": {
         "sha256": "670ee89e0dd107bc07538516f709136f27dec561b9c2610305e9f9958895724b",
         "size": 8263
       },
       "help/doc/usr_24.cnx": {
-        "sha256": "6b10f0f4a5e58a1427e7e8561d6a1bedb9d2dff2ef4542db4178e2d2bb75b357",
-        "size": 18909
+        "sha256": "14ff6f5bd4edcbf194268651948bf1d51cb1f54917182ce662945bd1a226d650",
+        "size": 18937
       },
       "help/doc/usr_25.cnx": {
-        "sha256": "8f5e2b19b30302bcfda93d8a71ca69e97aa3eed3a97fc31b8f04333a00cbae63",
+        "sha256": "c9d6f4ac8e610be140ebb0d5fc3612432902019636e0ba0e662610c60d7c38c5",
         "size": 17592
       },
       "help/doc/usr_26.cnx": {
@@ -486,36 +494,36 @@
         "size": 7538
       },
       "help/doc/usr_27.cnx": {
-        "sha256": "44f38aa7b8ae640d440c53b67c057ce50a92c5d5dea61f981bad8ba4e79e605c",
-        "size": 16484
+        "sha256": "c5e164bff3326437a1b822dba8240ffca1fac8cd0266fae6a592fbcee54afe1c",
+        "size": 16448
       },
       "help/doc/usr_28.cnx": {
         "sha256": "d802e788ceb8c8cf741cd32c115b6bf705a82d98fc58ccfe7546c26b88cc526d",
         "size": 15275
       },
       "help/doc/usr_29.cnx": {
-        "sha256": "a01c4ff64dd6853578ab65b2ba4ad9d0b585006676a29c8f5d314f2a5c9aa74f",
-        "size": 18832
+        "sha256": "ef3b001806d14047f8bc562cb6b5bd1a5996d5093a56492e748e4f876d48460e",
+        "size": 18870
       },
       "help/doc/usr_30.cnx": {
-        "sha256": "7edf39437372ffcb8f347ba1be538a4a54d9273bcf792a34ea144eef4f15aeca",
-        "size": 24119
+        "sha256": "096629d3a3e45477e96a123c6e5dccefe84a6e6491135c671c52b6377a86616d",
+        "size": 24113
       },
       "help/doc/usr_31.cnx": {
-        "sha256": "be414e8767359315faf28d78e8775a5cb8fdc0de818c07f74beae6c954ccb204",
-        "size": 8652
+        "sha256": "f276a17f9e06a8c5fa5b5ec5c7be07a59ac27d7d00771f5f7290b1335000972b",
+        "size": 8658
       },
       "help/doc/usr_32.cnx": {
         "sha256": "c5c7a92d14e5acb795d377c83f0e64bcdea288d74cf5d78f76f459940f3c3dd3",
         "size": 5369
       },
       "help/doc/usr_40.cnx": {
-        "sha256": "b2f067f79ef40495703e0c521e58b40cf3442c82bf975452648d9b8a7eb734d3",
-        "size": 21757
+        "sha256": "7ad363c3df3366f5664a4baa1922924cd35b65bc117163035a20896085ffc687",
+        "size": 21763
       },
       "help/doc/usr_41.cnx": {
-        "sha256": "e7b1586b67984ad3eb24eebba1d4b582c00fa28182f1666c8213883af2f20b07",
-        "size": 87025
+        "sha256": "a2894896091abe3305fc7cc6e174f050bbead36bab34c4f4053945bf78cf459e",
+        "size": 87056
       },
       "help/doc/usr_42.cnx": {
         "sha256": "910b9a493bc3b82398d11e567e6e1d67bdef8fbf5c75b13728052cc3e83eeea3",
@@ -526,59 +534,59 @@
         "size": 7365
       },
       "help/doc/usr_44.cnx": {
-        "sha256": "1f13768360bb4ec17c4331a8bc4349f10072ef1df83b8ced095405c52b5ac986",
+        "sha256": "6d6cdf4f390e5a583a07f05af5ca9119d20166238e4fdea639e6145cec10498a",
         "size": 25946
       },
       "help/doc/usr_45.cnx": {
-        "sha256": "8f9b559b8aaf0758471b2d6d8ebabc1d9246a145ac25c52bcfae1ca0142f36e6",
-        "size": 14814
+        "sha256": "5f647265607306830e46a430f6c971647039c3fdcd53a5ebdd8f878370205ed3",
+        "size": 14817
       },
       "help/doc/usr_toc.cnx": {
         "sha256": "16c65d4c97651b007de4e4e356a8703f10be1e386bca8081e99629157c399250",
         "size": 8039
       },
       "help/doc/various.cnx": {
-        "sha256": "ae0a2017ab3e3de03f100aeee247a67247d061ab3231daa672f3e03e26a149df",
-        "size": 22335
+        "sha256": "e926b85d39571010a43ed4fca87caaef5ceb53cfd101a30f033e838c7f83cca3",
+        "size": 22344
       },
       "help/doc/vi_diff.cnx": {
-        "sha256": "0f36dbcebbb962266b85c6d4425d785a993ea8c7f05077e86f745d8eeffd9226",
-        "size": 15302
+        "sha256": "d99edc99d40b5d08d53b4c7ff124ccadb13c708f8cde7237c4a236b6d0350a58",
+        "size": 15303
       },
       "help/doc/vim_diff.cnx": {
-        "sha256": "040bca1b4e14631a9caa786e26765bdf010d0de98b737ac63c74f803c42479f7",
-        "size": 36576
+        "sha256": "43a92c4f6e5b2c4d58fb69b00d959b1f8ecd51dbffaaa6b245d7e5902b7c2318",
+        "size": 36658
       },
       "help/doc/vimeval.cnx": {
-        "sha256": "af4ce4ac1b3145af2d37dec3c079d22e251b607b33e5d098ab05737ca1e0d7c9",
-        "size": 129251
+        "sha256": "c4a184d21711c22f3635a28d2b64ed0fe2f1c944dbaed40891bfec11ac54fdaa",
+        "size": 130064
       },
       "help/doc/vimfn.cnx": {
-        "sha256": "703d27334fe1f8442023aaaefb33079d9c56b64a247b40bfaa2b2c580f4e380a",
-        "size": 432237
+        "sha256": "5b63da250144245132c291aad9e575f509d663122e3053ec77ab4e1634da502a",
+        "size": 432232
       },
       "help/doc/visual.cnx": {
-        "sha256": "b35b518cdae00dc795d53e120218e484af222a5dc7b5fd90056bb81d0c0e8729",
-        "size": 20532
+        "sha256": "ec31f8a2266d638ffa4886a07e23cf330d529aa558afe79228fd8ea74f95c069",
+        "size": 20552
       },
       "help/doc/vvars.cnx": {
-        "sha256": "d7bd8bd524dc11e2e4fd9a19051689127a83aa7b2415553b276de76bcc6d9a92",
-        "size": 27841
+        "sha256": "d4d9d1d8856bd035e15a17e0cc294595d4143e9364537535ba30294aef1aa872",
+        "size": 27877
       },
       "help/doc/windows.cnx": {
-        "sha256": "4b5f557112b06ce49bfee68332b1c3a59f7a5698217bd740024abca5ac61ce4f",
-        "size": 57180
+        "sha256": "dd62f6bb4ac4581b37ddff11245c2792f0bf35fa4d61894597962f67a562ed0c",
+        "size": 57186
       },
       "native/zh_CN.UTF-8/LC_MESSAGES/nvim.mo": {
-        "sha256": "d8874c6022d4aa1b5318d13682aac20f55f336907417dbaed604210457183997",
-        "size": 212825
+        "sha256": "9d8ff03d3c16c59a1e4fcd651525addb967aa71e52cb05d380fb7369c479617c",
+        "size": 213466
       },
       "summary.json": {
-        "sha256": "75312d973ccc1fa021f06935bab86dd6d47c480e33cf294304b735a2fcabc48c",
-        "size": 675
+        "sha256": "a5e95011389db0dc54c10d2a6de7cba780f232282fd1e98a998d517a562dd0c2",
+        "size": 722
       }
     },
-    "id": "dbcde563a28eecab42f64aef1814f68d5d0b975b7559b06245b347534c816363"
+    "id": "38c9bfc027b936941841c12153d9b14ca5ff7ba719728cc8601f2ddc32f8efc1"
   },
   "implementation": {
     "files": {
@@ -586,21 +594,29 @@
         "sha256": "3d2be2ef7536264a42251ff589dc3f8dec61ebfdae6fdf5b211d48b43e4cca94",
         "size": 2104
       },
+      "lua/nvim-zh/adapters/nvim_dap.lua": {
+        "sha256": "2634e392171e8ce909ce52fd9775947b73939522ca0c337329b197aa4f78ae02",
+        "size": 17099
+      },
+      "lua/nvim-zh/adapters/nvim_dap_ui.lua": {
+        "sha256": "a63da7d188ebaeeed1264a95f0dc0d3cf56858c99f9965355d76b3b925cb041b",
+        "size": 17438
+      },
       "lua/nvim-zh/adapters/nvim_tree.lua": {
         "sha256": "179c7461f6b3fc39f417b2e6e2a2af50a539d2ead673b6f71b54e919b5fbb528",
         "size": 6886
       },
       "lua/nvim-zh/adapters/telescope.lua": {
-        "sha256": "4f7ebb34dfdbf7a9b7d3863e7380be085597eebf2b9daf275b3a7f41499cb3a1",
-        "size": 7452
+        "sha256": "07c8e46f20b90e84981814372bddea7ba94d69398a8433bb2adc8686d96b4b08",
+        "size": 8414
       },
       "lua/nvim-zh/adapters/which_key.lua": {
         "sha256": "be8483a333418864cecb40ceb07632330e9b692fd6e689ec9942bb1390d86964",
         "size": 6208
       },
       "lua/nvim-zh/catalog.lua": {
-        "sha256": "be3e85f9d47cc3323ab08da0508c834ee735589db976b2dd3368d949b2b4a3c4",
-        "size": 8732
+        "sha256": "1a6217edb4d8d0787cd6496188860c5aed4313296e1d95061da254f96344b6a0",
+        "size": 8846
       },
       "lua/nvim-zh/config.lua": {
         "sha256": "56e9617909cd55769ece70686053ab5e5434adabc3d9a866907ef82a0a350ee4",
@@ -659,8 +675,8 @@
         "size": 338
       },
       "lua/nvim-zh/plugins.lua": {
-        "sha256": "174b8fb373e6e59216e61a97c6fb4dab6d8c1dfedaacdb0aa6e36efc27ecc3af",
-        "size": 3371
+        "sha256": "36e6ffd7c2e9d8ad6b7f40b8eda96ada89490f513520f785d0ca0977bd4f18d1",
+        "size": 5209
       },
       "lua/nvim-zh/resources.lua": {
         "sha256": "4e6415d826eb6ae67fec7763192c5fe31a4c814b2b46e2d9690debc93f56ad57",
@@ -691,7 +707,7 @@
         "size": 448
       }
     },
-    "id": "f0dbae1e00eae3dc71687ebf48a153326f68d3136feb301b3e6dd9e83cf5a628"
+    "id": "e2d030ab203122450d8806ff7d6988aed9b86f8ae890ecf0e8913bf581d1dd6d"
   },
   "runtime_api": 1,
   "schema": 1,

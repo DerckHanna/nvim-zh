@@ -11,7 +11,7 @@ NVim 的 Python 接口				*if_pyth* *python* *Python*
                                       输入 |gO| 查看目录。
 
 ==============================================================================
-命令						*python-commands*
+命令							*python-commands*
 
 					*:python* *:py* *E263* *E264* *E887*
 :[range]py[thon] {stmt}
@@ -94,7 +94,7 @@ Python 命令不能在 |sandbox| 中使用。
 	:python sys.argv = ["foo", "bar"]
 	:pyfile myscript.py
 
-这里有些例子					*python-examples*
+这里有些例子						*python-examples*
 >vim
 	:python from vim import *
 	:python current.line = str.upper(current.line)
@@ -116,7 +116,7 @@ Python 命令不能在 |sandbox| 中使用。
 注意 "EOF" 必须位于行首，前面不能有空白。
 
 ==============================================================================
-vim 模块						*python-vim*
+vim 模块							*python-vim*
 
 Python 代码对 vim 的所有访问（有一个例外——见下方
 |python-output|）都通过 "vim" 模块完成。 vim 模块实现了两个
@@ -469,7 +469,7 @@ Range 对象表示 vim buffer 的一部分。 可以通过多种方式
 
 Range 对象在操作上与 Buffer 对象几乎相同。 但是，
 所有操作都被限制在 range 内的行（这个行 range
-当然会因切片赋值、行删除或 range.append()
+当然可能因切片赋值、行删除或 range.append()
 方法而改变）。
 
 Range 对象的属性有：
@@ -537,7 +537,7 @@ Window 属性有：
 Window 对象类型可通过 vim 模块的 "Window" 属性获得。
 
 ==============================================================================
-Tab page 对象					*python-tabpage*
+Tab page 对象						*python-tabpage*
 
 Tab page 对象表示 vim tab page。可以通过多种方式
 获得它们：
@@ -559,7 +559,7 @@ Tab page 属性有：
 TabPage 对象类型可通过 vim 模块的 "TabPage" 属性获得。
 
 ==============================================================================
-pyeval() 和 py3eval() Vim 函数			*python-pyeval*
+pyeval() 和 py3eval() Vim 函数				*python-pyeval*
 
 为了便于双向接口，你可以用 |pyeval()| 和 |py3eval()|
 函数求值 Python 表达式并把它们的值传给 Vim script。

@@ -125,7 +125,7 @@
 的最佳方式。
 
 ==============================================================================
-2. 查看差异						*view-diffs*
+2. 查看差异							*view-diffs*
 
 效果是 diff window 显示相同的文本，并将差异高亮。滚动文本时，'scrollbind' 选项
 会使其他 window 中的文本也一起滚动。使用垂直分割时，文本应当正确对齐。
@@ -214,7 +214,7 @@
 如果没有可供光标移动到的修改，则报错。
 
 ==============================================================================
-4. 复制差异						*copy-diffs* *E99* *E100* *E101* *E102* *E103*
+4. 复制差异			*copy-diffs* *E99* *E100* *E101* *E102* *E103*
 								*merge*
 有两个命令可以把文本从一个 buffer 复制到另一个 buffer。其结果是，在指定
 范围内这些 buffer 会变为相同。
@@ -415,8 +415,8 @@ diff 锚点让你可以控制 diff 算法在何处对齐并同步各文件之间
 
 其中的 ">" 会被替换为 'shellredir' 的值。
 
-"diff" 的输出必须是普通的 "ed" 风格 diff 或 unified diff。context diff 不会
-有效。对于 unified diff，不能使用上下文行。使用 "diff -u" 不会有效，请使用
+"diff" 的输出必须是普通的 "ed" 风格 diff 或 unified diff。context diff 行
+不通。对于 unified diff，不能使用上下文行。使用 "diff -u" 行不通，请使用
 "diff -U0"。
 
 这个示例说明了 Vim 对 "ed" 风格 diff 所期望的格式： >
@@ -489,7 +489,7 @@ Vim 会做一次测试，检查 diff 的输出是否正常。如果不正常，�
 https://gnuwin32.sourceforge.net/packages/diffutils.htm 下载。
 
 
-使用补丁						*diff-patchexpr*
+使用补丁					*diff-patchexpr*
 
 可以把 'patchexpr' 选项设置为使用标准 "patch" 程序之外的其他方式。
 

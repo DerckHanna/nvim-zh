@@ -84,7 +84,7 @@ Nvim 的启动尽可能快，即使安装了许多插件/宿主。
 |:UpdateRemotePlugins| 生成远端插件清单。
 
 ==============================================================================
-4. 远端插件清单				    *remote-plugin-manifest*
+4. 远端插件清单					    *remote-plugin-manifest*
 						      *:UpdateRemotePlugins*
 
 仅仅把远端插件安装到 "rplugin/{host}" 并不足以让它们在需要时被自动加载。每当

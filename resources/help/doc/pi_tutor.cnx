@@ -7,7 +7,6 @@ vim-tutor-mode 提供了一套用于跟随和创建 vim 及第三方插件交互
 它取代了古老的 `vimtutor` 系统。
 
 原作者：Felipe Morales <https://github.com/fmoralesc>
-
 ==============================================================================
 1. 用法                                                       *vim-tutor-usage*
 

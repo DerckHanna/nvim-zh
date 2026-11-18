@@ -9,7 +9,7 @@
                                       输入 |gO| 查看目录。
 
 ==============================================================================
-1. C 风格程序的缩进				*C-indenting*
+1. C 风格程序的缩进					*C-indenting*
 
 C 风格缩进的基础知识在用户手册的 |30.2| 节中说明。
 
@@ -62,7 +62,7 @@ C++）都严格遵循由 C 确立的格式约定。这些选项只影响缩进�
 	"O"	如果使用 "O" 命令（不在插入模式中！）
 	"e"	如果在一行开头的 "else" 处输入第二个 'e'
 
-可以出现在每个按键之前的字符：				*i_CTRL-F*
+可以出现在每个按键之前的字符：					*i_CTRL-F*
 !	当 "!" 位于按键之前时，Vim 不会插入该按键，而是重新缩进当前行。这样你就
 	可以定义一个用于重新缩进当前行的命令键。CTRL-F 是默认的这种键。如果为此定义
 	CTRL-I 要小心，因为 CTRL-I 是 <Tab> 的 ASCII 码。
@@ -196,6 +196,7 @@ e	当你输入第二个 'e' 时，重新缩进以 "else" 开头的行。
 							*cino-L*
 	LN    控制跳转标签的位置。如果 N 为负数，标签会被放在第 1 列。如果 N 为非负数，
 	      标签的缩进将是基准缩进减去 N。（默认为 -1）。
+
 		cino=               cino=L2             cino=Ls >
 		  func()              func()              func()
 		  {                   {                   {
@@ -207,6 +208,7 @@ e	当你输入第二个 'e' 时，重新缩进以 "else" 开头的行。
 <
 							*cino-:*
 	:N    把 case 标签放在距 switch() 的缩进 N 个字符处。（默认为 'shiftwidth'）。
+
 		cino=		    cino=:0 >
 		  switch (x)	      switch(x)
 		  {		      {
@@ -218,12 +220,14 @@ e	当你输入第二个 'e' 时，重新缩进以 "else" 开头的行。
 							*cino-=*
 	=N    把出现在 case 标签之后的语句放在距该标签的缩进 N 个字符处。
 	      （默认为 'shiftwidth'）。
+
 		cino=		    cino==10 >
 		   case 11:		case 11:  a = a + 1;
 		       a = a + 1;		  b = b + 1;
 <
 							*cino-l*
 	lN    如果 N != 0，Vim 会对齐到 case 标签，而不是同一行中它之后的语句。
+
 		cino=			    cino=l1 >
 		    switch (a) {	      switch (a) {
 			case 1: {		  case 1: {
@@ -233,6 +237,7 @@ e	当你输入第二个 'e' 时，重新缩进以 "else" 开头的行。
 							*cino-b*
 	bN    如果 N != 0，Vim 会把最后的 "break" 与 case 标签对齐，使 case..break 看起来像
 	      一种块。（默认为 0）。使用 1 时，请考虑向 'cinkeys' 加入 "0=break"。
+
 		cino=		    cino=b1 >
 		  switch (x)	      switch(x)
 		  {		      {
@@ -249,6 +254,7 @@ e	当你输入第二个 'e' 时，重新缩进以 "else" 开头的行。
 	gN    把 C++ 作用域声明放在距其所在块的缩进 N 个字符处。（默认为 'shiftwidth'）。
 	      默认情况下，作用域声明是 "public:"、"protected:" 或 "private:"。
 	      这可以用 'cinscopedecls' 选项调整。
+
 		cino=		    cino=g0 >
 		  {		      {
 		      public:	      public:
@@ -259,12 +265,14 @@ e	当你输入第二个 'e' 时，重新缩进以 "else" 开头的行。
 							*cino-h*
 	hN    把出现在 C++ 作用域声明之后的语句放在距该标签的缩进 N 个字符处。
 	      （默认为 'shiftwidth'）。
+
 		cino=		    cino=h10 >
 		   public:		public:   a = a + 1;
 		       a = a + 1;		  b = b + 1;
 <
 							*cino-N*
 	NN    C++ namespace 内部的缩进比普通块多 N 个字符。（默认为 0）。
+
 		cino=			   cino=N-s >
 		  namespace {                namespace {
 		      void function();       void function();
@@ -278,6 +286,7 @@ e	当你输入第二个 'e' 时，重新缩进以 "else" 开头的行。
 							*cino-E*
 	EN    C++ 链接说明（extern "C" 或 extern "C++"）内部的缩进比普通块多 N 个字符。
 	      （默认为 0）。
+
 		cino=			   cino=E-s >
 		  extern "C" {               extern "C" {
 		      void function();       void function();
@@ -290,6 +299,7 @@ e	当你输入第二个 'e' 时，重新缩进以 "else" 开头的行。
 <
 							*cino-p*
 	pN    K&R 风格函数声明的参数声明将从页边起缩进 N 个字符。（默认为 'shiftwidth'）。
+
 		cino=		    cino=p0		cino=p2s >
 		  func(a, b)	      func(a, b)	  func(a, b)
 		      int a;	      int a;			  int a;
@@ -297,6 +307,7 @@ e	当你输入第二个 'e' 时，重新缩进以 "else" 开头的行。
 <
 							*cino-t*
 	tN    把函数返回类型声明从页边起缩进 N 个字符。（默认为 'shiftwidth'）。
+
 		cino=		    cino=t0		cino=t7 >
 		      int	      int			 int
 		  func()	      func()		  func()
@@ -304,6 +315,7 @@ e	当你输入第二个 'e' 时，重新缩进以 "else" 开头的行。
 							*cino-i*
 	iN    如果 C++ 基类声明和构造函数初始化列表从新的一行开始，则对它们缩进
 	      （否则它们会对齐到 ':' 的右侧）。（默认为 'shiftwidth'）。
+
 		cino=			  cino=i0 >
 		  class MyClass :	    class MyClass :
 		      public BaseClass      public BaseClass
@@ -315,6 +327,7 @@ e	当你输入第二个 'e' 时，重新缩进以 "else" 开头的行。
 							*cino-+*
 	+N    把函数内部的续行（延伸到下一行的行）额外缩进 N 个字符。（默认为 'shiftwidth'）。
 	      在函数之外，如果上一行以反斜杠结尾，则使用 2 * N。
+
 		cino=			  cino=+10 >
 		  a = b + 9 *		    a = b + 9 *
 		      c;			      c;
@@ -322,6 +335,7 @@ e	当你输入第二个 'e' 时，重新缩进以 "else" 开头的行。
 							*cino-c*
 	cN    当注释起始符之后没有其他文本可以对齐时，把注释行从注释起始符起缩进 N 个字符。
 	      （默认为 3）。另见 |format-comments|。
+
 		cino=			  cino=c5 >
 		  /*			    /*
 		     text.			 text.
@@ -330,6 +344,7 @@ e	当你输入第二个 'e' 时，重新缩进以 "else" 开头的行。
 							*cino-C*
 	CN    当 N 非零时，即使注释起始符之后还有其他文本，也按上面的 c 标志所指定的量
 	      缩进注释行。（默认为 0）。
+
 		cino=c0			  cino=c0,C1 >
 		  /********		    /********
 		    text.		    text.
@@ -348,6 +363,7 @@ e	当你输入第二个 'e' 时，重新缩进以 "else" 开头的行。
 	      未闭合的圆括号就加上一个 'shiftwidth'。当 N 为 0，或该未闭合括号是其所在行的
 	      第一个非空白字符时，则与未闭合括号之后的第一个非空白字符对齐。
 	      （默认为 'shiftwidth' * 2）。
+
 		cino=			  cino=(0 >
 		  if (c1 && (c2 ||	    if (c1 && (c2 ||
 			      c3))		       c3))
@@ -358,6 +374,7 @@ e	当你输入第二个 'e' 时，重新缩进以 "else" 开头的行。
 <
 							*cino-u*
 	uN    与 (N 相同，但针对深一层的嵌套。（默认为 'shiftwidth'）。
+
 		cino=			  cino=u2 >
 		  if (c123456789	    if (c123456789
 			  && (c22345		    && (c22345
@@ -366,6 +383,7 @@ e	当你输入第二个 'e' 时，重新缩进以 "else" 开头的行。
 							*cino-U*
 	UN    当 N 非零时，如果未闭合的圆括号是其所在行的第一个非空白字符，则不要忽略
 	      由 ( 或 u 指定的缩进。（默认为 0）。
+
 		cino= or cino=(s	  cino=(s,U1 >
 		  c = c1 &&		    c = c1 &&
 		      (				(
@@ -377,6 +395,7 @@ e	当你输入第二个 'e' 时，重新缩进以 "else" 开头的行。
 	wN    当处于未闭合的圆括号中，且 N 非零，并且分别使用了 "(0" 或 "u0"，或者使用了
 	      "U0" 且该未闭合括号是其所在行的第一个非空白字符时，与该未闭合括号之后紧邻
 	      的字符对齐，而不是与第一个非空白字符对齐。（默认为 0）。
+
 		cino=(0			  cino=(0,w1 >
 		  if (   c1		    if (   c1
 			 && (   c2		&& (   c2
@@ -387,6 +406,7 @@ e	当你输入第二个 'e' 时，重新缩进以 "else" 开头的行。
 	WN    当处于未闭合的圆括号中，且 N 非零，并且分别使用了 "(0" 或 "u0"，而该未闭合
 	      括号是其所在行的最后一个非空白字符且它不是闭括号时，相对于外层上下文（即该行
 	      的开头或下一个未闭合的括号）把下一行缩进 N 个字符。（默认为 0）。
+
 		cino=(0			   cino=(0,W4 >
 		  a_long_line(		    a_long_line(
 			      argument,		argument,
@@ -400,6 +420,7 @@ e	当你输入第二个 'e' 时，重新缩进以 "else" 开头的行。
 	      那一行）为 N 个字符。对更深层的嵌套没有影响。只对 "if"、"for" 和 "while"
 	      的条件影响 "wN" 之类的标志。如果为 0，则采用 "(N" 标志定义的行为。
 	      （默认为 0）。
+
 		cino=(0			   cino=(0,ks >
 		  if (condition1	    if (condition1
 		      && condition2)		    && condition2)
@@ -410,6 +431,7 @@ e	当你输入第二个 'e' 时，重新缩进以 "else" 开头的行。
 							*cino-m*
 	mN    当 N 非零时，把以闭括号开头的行与含与之匹配的开括号的那一行的第一个字符
 	      对齐。（默认为 0）。
+
 		cino=(s			  cino=(s,m1 >
 		  c = c1 && (		    c = c1 && (
 		      c2 ||			c2 ||
@@ -422,6 +444,7 @@ e	当你输入第二个 'e' 时，重新缩进以 "else" 开头的行。
 <
 							*cino-M*
 	MN    当 N 非零时，把以闭括号开头的行与上一行的第一个字符对齐。（默认为 0）。
+
 		cino=			  cino=M1 >
 		  if (cond1 &&		    if (cond1 &&
 			 cond2			   cond2
@@ -484,7 +507,7 @@ Vim 在下列情况下会把一行放在第 1 列：
 - 任何缩进的组合导致该行的缩进小于 0。
 
 ==============================================================================
-2. 通过表达式缩进				*indent-expression*
+2. 通过表达式缩进					*indent-expression*
 
 关于使用灵活缩进的基础知识在用户手册的 |30.3| 节中说明。
 
@@ -516,6 +539,7 @@ Clojure 的缩进与传统 Lisp 有些不同，部分原因在于方括号和花
 
 'lispwords' 选项是一个以逗号分隔的单词列表，用于标记那些其子 form 应当以两个
 空格缩进的特殊 form。
+
 例如：
 >
 	(defn bad []
@@ -533,6 +557,7 @@ Clojure 的缩进与传统 Lisp 有些不同，部分原因在于方括号和花
 		\ ['-fn$', '\v^with-%(meta|out-str|loading-context)$']
 <
 |g:clojure_fuzzy_indent_patterns| 和 |g:clojure_fuzzy_indent_blacklist| 是模式列表，
+
 它们会与列表头部的非限定符号进行匹配。这意味着像 `"^foo"` 这样的模式会匹配所有
 这些候选：`foobar`、`my.ns/foobar` 和 `#'foobar`。
 每个候选单词按以下顺序进行特殊处理测试：
@@ -557,6 +582,7 @@ Clojure 中有些 form 的缩进方式是每个子 form 只缩进两个空格，
 					*g:clojure_align_multiline_strings*
 
 把多行字符串中的后续行对齐到开引号之后的列，而不是同一列。
+
 例如：
 >
 	(def default
@@ -742,6 +768,7 @@ PHP 的缩进可以通过修改若干全局变量的值，以几种方式改变�
     :let g:PHP_outdentSLComments = N
 
 其中 N 是要增加的 'shiftwidth' 个数。
+
 只有单行注释会受影响，例如： >
     # Comment
     // Comment
@@ -859,6 +886,7 @@ PYTHON							*ft-python-indent*
 	let g:python_indent = {}
 给出的例子就是默认值。注意，dictionary 的值被设置为一个表达式，这样你以后改变
 'shiftwidth' 的值时不必更新这些值。
+
 开括号之后的缩进： >
 	let g:python_indent.open_paren = 'shiftwidth() * 2'
 嵌套括号之后的缩进： >

@@ -10,7 +10,7 @@ Vimscript 函数				*vimscript-functions* *builtin.txt*
 
 				      输入 |gO| 查看目录。
 ==============================================================================
-1. 详情					*vimscript-functions-details*
+1. 详情						*vimscript-functions-details*
 
 abs({expr})                                                              *abs()*
 		返回 {expr} 的绝对值。当 {expr} 求值为 |Float| 时，abs() 返回
@@ -2017,7 +2017,7 @@ extend({expr1}, {expr2} [, {expr3}])                                  *extend()*
 		该怎么做：
 		{expr3} = "keep"：保留 {expr1} 的值
 		{expr3} = "force"：使用 {expr2} 的值
-		{expr3} = "error"：给出错误消息		*E737*
+		{expr3} = "error"：给出错误消息				*E737*
 		省略 {expr3} 时假定为 "force"。
 
 		当 {expr2} 非空时 {expr1} 会被改变。必要时先复制 {expr1}，
@@ -2746,7 +2746,7 @@ getbufinfo([{dict}])
 			    endif
 			endfor
 <
-		要用 Buffer 局部选项： >vim
+		要获取 Buffer 局部选项，请用： >vim
 			getbufvar({bufnr}, '&option_name')
 <
 
@@ -7088,7 +7088,7 @@ range({expr} [, {max} [, {stride}]])                         *range()* *E726* *E
 		- 若指定 {stride}：[{expr}, {expr} + {stride}, ...,
 		  {max}]（每次以 {stride} 递增 {expr}，不会产生超过
 		  {max} 的值）。
-		当最大值比起始值小 1 时结果为 空列表。当最大值比起始值
+		当最大值比起始值小 1 时结果为空列表。当最大值比起始值
 		小超过 1 时这是错误。
 		示例： >vim
 			echo range(4)		" [0, 1, 2, 3]
@@ -7187,7 +7187,7 @@ readfile({fname} [, {type} [, {max}]])                              *readfile()*
 			endfor
 <		当 {max} 为负数时，返回文件末尾的 -{max} 行，或尽可能
 		多的行。
-		当 {max} 为零时结果为 空列表。
+		当 {max} 为零时结果为空列表。
 		注意：不给 {max} 时整个文件会被读入内存。
 		另请注意：不识别编码。若有需要，请把文件读入 buffer。
 		已废弃（改用 |readblob()|）：当 {type} 含有 "B" 时返回
@@ -7426,7 +7426,9 @@ reverse({object})                                                    *reverse()*
 		若 {object} 不是 List、Blob 或 String 则返回零。
 		若想让 List 或 Blob 保持不被修改，请先做一份副本： >vim
 			let revlist = reverse(copy(mylist))
-<                参数: ~
+<
+
+                参数: ~
                   • {object} (`T[]`)
 
                 返回值: ~
@@ -7457,7 +7459,9 @@ rpcnotify({channel}, {event} [, {args}...])                        *rpcnotify()*
 		若 {channel} 为 0，则该事件广播到所有 channel。
 		示例： >vim
 			au VimLeave call rpcnotify(0, "leaving")
-<                参数: ~
+<
+
+                参数: ~
                   • {channel} (`integer`)
                   • {event} (`string`)
                   • {...} (`any`)
@@ -7470,7 +7474,9 @@ rpcrequest({channel}, {method} [, {args}...])                     *rpcrequest()*
 		并阻塞直到收到响应。
 		示例： >vim
 			let result = rpcrequest(rpc_chan, "func", 1, 2, 3)
-<                参数: ~
+<
+
+                参数: ~
                   • {channel} (`integer`)
                   • {method} (`string`)
                   • {...} (`any`)
@@ -7543,7 +7549,9 @@ screencol()                                                        *screencol()*
 			nnoremap <expr> GG ":echom " .. screencol() .. "\n"
 			nnoremap <silent> GG :echom screencol()<CR>
 			noremap GG <Cmd>echom screencol()<CR>
-<                返回值: ~
+<
+
+                返回值: ~
                   (`integer`)
 
 screenpos({winid}, {lnum}, {col})                                  *screenpos()*
@@ -7650,7 +7658,7 @@ search({pattern} [, {flags} [, {stopline} [, {timeout} [, {skip}]]]]) *search()*
 		字符串中的匹配。
 		{skip} 可以是字符串，按表达式求值，也可以是
 		函数引用或 lambda。
-		省略或 {skip} 为空时接受每个匹配。
+		省略 {skip} 或其为空时，接受每个匹配。
 		若求值 {skip} 导致错误，则中止搜索并返回 -1。
 							*search()-sub-match*
 		使用 'p' 标志时，返回值为 \(\) 中第一个子匹配的编号加一。
@@ -7813,6 +7821,7 @@ searchcount([{options}])                                         *searchcount()*
 
                 返回值: ~
                   (`any`)
+
 searchdecl({name} [, {global} [, {thisblock}]])                   *searchdecl()*
 		搜索 {name} 的声明。
 
@@ -7829,7 +7838,9 @@ searchdecl({name} [, {global} [, {thisblock}]])                   *searchdecl()*
 			if searchdecl('myvar') == 0
 			   echo getline('.')
 			endif
-<                参数: ~
+<
+
+                参数: ~
                   • {name} (`string`)
                   • {global} (`boolean?`)
                   • {thisblock} (`boolean?`)
@@ -7837,7 +7848,7 @@ searchdecl({name} [, {global} [, {thisblock}]])                   *searchdecl()*
                 返回值: ~
                   (`any`)
 
-                                                                   *searchpair()*
+                                                                  *searchpair()*
 searchpair({start}, {middle}, {end} [, {flags} [, {skip} [, {stopline} [, {timeout}]]]])
 		搜索嵌套 start-end 对的匹配。这可用于找到与 "if" 匹配
 		的 "endif"，同时忽略中间其他 if/endif 对。
@@ -7863,7 +7874,7 @@ searchpair({start}, {middle}, {end} [, {flags} [, {skip} [, {stopline} [, {timeo
 		当找到 {start}、{middle} 或 {end} 的匹配时，会在 cursor
 		位于匹配起点时对 {skip} 表达式求值。若该匹配应被跳过，
 		它应返回非零。例如因为它位于注释或字符串中。
-		省略或 {skip} 为空时接受每个匹配。
+		省略 {skip} 或其为空时，接受每个匹配。
 		若求值 {skip} 导致错误，则中止搜索并返回 -1。
 		{skip} 可以是字符串、lambda、funcref 或 partial。
 		其他任何东西都会使该函数失败。
@@ -7906,7 +7917,9 @@ searchpair({start}, {middle}, {end} [, {flags} [, {skip} [, {stopline} [, {timeo
 
 			echo searchpair('{', '', '}', 'bW',
 			     \ 'synIDattr(synID(line("."), col("."), 0), "name") =~? "string"')
-<                参数: ~
+<
+
+                参数: ~
                   • {start} (`string`)
                   • {middle} (`string`)
                   • {end} (`string`)
@@ -8517,12 +8530,12 @@ setreg({regname}, {value} [, {options}])                              *setreg()*
 			call setreg('a', '', 'al')
 <
 
-                参数：~
+                参数: ~
                   • {regname} (`string`)
                   • {value} (`any`)
                   • {options} (`string?`)
 
-                返回值：~
+                返回值: ~
                   (`any`)
 
 settabvar({tabnr}, {varname}, {val})                               *settabvar()*
@@ -8533,12 +8546,12 @@ settabvar({tabnr}, {varname}, {val})                               *settabvar()*
 		tabpage 编号从 1 开始。
 		此函数在 |sandbox| 中不可用。
 
-                参数：~
+                参数: ~
                   • {tabnr} (`integer`)
                   • {varname} (`string`)
                   • {val} (`any`)
 
-                返回值：~
+                返回值: ~
                   (`any`)
 
 settabwinvar({tabnr}, {winnr}, {varname}, {val})                *settabwinvar()*
@@ -8557,13 +8570,13 @@ settabwinvar({tabnr}, {winnr}, {varname}, {val})                *settabwinvar()*
 			call settabwinvar(3, 2, "myvar", "foobar")
 <		此函数在 |sandbox| 中不可用。
 
-                参数：~
+                参数: ~
                   • {tabnr} (`integer`)
                   • {winnr} (`integer`)
                   • {varname} (`string`)
                   • {val} (`any`)
 
-                返回值：~
+                返回值: ~
                   (`any`)
 
 settagstack({nr}, {dict} [, {action}])                           *settagstack()*
@@ -8600,12 +8613,12 @@ settagstack({nr}, {dict} [, {action}])                           *settagstack()*
 			unlet stack
 <
 
-                参数：~
+                参数: ~
                   • {nr} (`integer`)
                   • {dict} (`any`)
                   • {action} (`string?`)
 
-                返回值：~
+                返回值: ~
                   (`any`)
 
 setwinvar({nr}, {varname}, {val})                                  *setwinvar()*
@@ -8615,12 +8628,12 @@ setwinvar({nr}, {varname}, {val})                                  *setwinvar()*
 			call setwinvar(2, "myvar", "foobar")
 <
 
-                参数：~
+                参数: ~
                   • {nr} (`integer`)
                   • {varname} (`string`)
                   • {val} (`any`)
 
-                返回值：~
+                返回值: ~
                   (`any`)
 
 sha256({expr})                                                        *sha256()*
@@ -8628,10 +8641,10 @@ sha256({expr})                                                        *sha256()*
 		校验和。
 		{expr} 是字符串或 Blob。
 
-                参数：~
+                参数: ~
                   • {expr} (`string`)
 
-                返回值：~
+                返回值: ~
                   (`string`)
 
 shellescape({string} [, {special}])                              *shellescape()*
@@ -8666,11 +8679,11 @@ shellescape({string} [, {special}])                              *shellescape()*
 		    call system("chmod +w -- " .. shellescape(expand("%")))
 <		另见 |::S|。
 
-                参数：~
+                参数: ~
                   • {string} (`string`)
                   • {special} (`boolean?`)
 
-                返回值：~
+                返回值: ~
                   (`string`)
 
 shiftwidth([{col}])                                               *shiftwidth()*
@@ -8694,10 +8707,10 @@ shiftwidth([{col}])                                               *shiftwidth()*
 		'vartabstop' 设置且未给出 {col} 参数，则
 		假定为第 1 列。
 
-                参数：~
+                参数: ~
                   • {col} (`integer?`)
 
-                返回值：~
+                返回值: ~
                   (`integer`)
 
 sign_define({name} [, {dict}])                                   *sign_define()*
@@ -8748,10 +8761,10 @@ sign_define({list})
 				\ ])
 <
 
-                参数：~
+                参数: ~
                   • {list} (`vim.fn.sign_define.dict[]`)
 
-                返回值：~
+                返回值: ~
                   (`(0|-1)[]`)
 
 sign_getdefined([{name}])                                    *sign_getdefined()*
@@ -8791,10 +8804,10 @@ sign_getdefined([{name}])                                    *sign_getdefined()*
 			echo sign_getdefined("mySign")
 <
 
-                参数：~
+                参数: ~
                   • {name} (`string?`)
 
-                返回值：~
+                返回值: ~
                   (`vim.fn.sign_getdefined.ret.item[]`)
 
 sign_getplaced([{buf} [, {dict}]])                            *sign_getplaced()*
@@ -8858,11 +8871,11 @@ sign_getplaced([{buf} [, {dict}]])                            *sign_getplaced()*
 			echo sign_getplaced()
 <
 
-                参数：~
+                参数: ~
                   • {buf} (`integer|string?`)
                   • {dict} (`vim.fn.sign_getplaced.dict?`)
 
-                返回值：~
+                返回值: ~
                   (`vim.fn.sign_getplaced.ret.item[]`)
 
 sign_jump({id}, {group}, {buf})                                    *sign_jump()*
@@ -8881,12 +8894,12 @@ sign_jump({id}, {group}, {buf})                                    *sign_jump()*
 			call sign_jump(10, '', '')
 <
 
-                参数：~
+                参数: ~
                   • {id} (`integer`)
                   • {group} (`string`)
                   • {buf} (`integer|string`)
 
-                返回值：~
+                返回值: ~
                   (`integer`)
 
 sign_place({id}, {group}, {name}, {buf} [, {dict}])               *sign_place()*
@@ -8938,14 +8951,14 @@ sign_place({id}, {group}, {name}, {buf} [, {dict}])               *sign_place()*
 					\ {'lnum' : 40, 'priority' : 90})
 <
 
-                参数：~
+                参数: ~
                   • {id} (`integer`)
                   • {group} (`string`)
                   • {name} (`string`)
                   • {buf} (`integer|string`)
                   • {dict} (`vim.fn.sign_place.dict?`)
 
-                返回值：~
+                返回值: ~
                   (`integer`)
 
 sign_placelist({list})                                        *sign_placelist()*
@@ -9008,10 +9021,10 @@ sign_placelist({list})                                        *sign_placelist()*
 				\ ])
 <
 
-                参数：~
+                参数: ~
                   • {list} (`vim.fn.sign_placelist.list.item[]`)
 
-                返回值：~
+                返回值: ~
                   (`integer[]`)
 
 sign_undefine([{name}])                                        *sign_undefine()*
@@ -9038,10 +9051,10 @@ sign_undefine({list})
 			call sign_undefine()
 <
 
-                参数：~
+                参数: ~
                   • {list} (`string[]?`)
 
-                返回值：~
+                返回值: ~
                   (`integer[]`)
 
 sign_unplace({group} [, {dict}])                                *sign_unplace()*
@@ -9087,11 +9100,11 @@ sign_unplace({group} [, {dict}])                                *sign_unplace()*
 			call sign_unplace('*')
 <
 
-                参数：~
+                参数: ~
                   • {group} (`string`)
                   • {dict} (`vim.fn.sign_unplace.dict?`)
 
-                返回值：~
+                返回值: ~
                   (`0|-1`)
 
 sign_unplacelist({list})                                    *sign_unplacelist()*
@@ -10253,7 +10266,6 @@ systemlist({cmd} [, {input} [, {keepempty}]])                     *systemlist()*
 
                 返回值: ~
                   (`string[]`)
-
 tabpagebuflist([{arg}])                                       *tabpagebuflist()*
 		返回指定 tabpage 中每个 window 对应的 buffer 编号组成的 |List|。
 		{arg} 指定要使用的 tabpage 编号。省略时使用当前 tabpage。
@@ -10389,7 +10401,8 @@ tanh({expr})                                                            *tanh()*
                   (`number`)
 
 tempname()                                                          *tempname()*
-		生成一个（不存在的）文件名，位于 Nvim 根目录下的 |tempdir| 中。脚本可以把该文件名用作临时文件。
+		生成一个（不存在的）文件名，位于 Nvim 的根 |tempdir| 中。脚本可以
+		把该文件名用作临时文件。
 		示例： >vim
 			let tmpfile = tempname()
 			exe "redir > " .. tmpfile
@@ -10772,12 +10785,12 @@ virtcol({expr} [, {list} [, {winid}]])                               *virtcol()*
 		    echo max(map(range(1, line('$')), "virtcol([v:val, '$'])"))
 <
 
-                Parameters: ~
+                参数: ~
                   • {expr} (`string|any[]`)
                   • {list} (`boolean?`)
                   • {winid} (`integer?`)
 
-                Return: ~
+                返回值: ~
                   (`integer|[integer, integer]`)
 
 virtcol2col({winid}, {lnum}, {col})                              *virtcol2col()*
@@ -10799,12 +10812,12 @@ virtcol2col({winid}, {lnum}, {col})                              *virtcol2col()*
 
 		另请参阅 |screenpos()|、|virtcol()| 和 |col()|。
 
-                Parameters: ~
+                参数: ~
                   • {winid} (`integer`)
                   • {lnum} (`integer`)
                   • {col} (`integer`)
 
-                Return: ~
+                返回值: ~
                   (`integer`)
 
 visualmode([{expr}])                                              *visualmode()*
@@ -10821,10 +10834,10 @@ visualmode([{expr}])                                              *visualmode()*
 		如果提供 {expr} 且其求值为非零 Number 或非空 String，
 		那么 Visual mode 将被清除并返回旧值。请参阅 |non-zero-arg|。
 
-                Parameters: ~
+                参数: ~
                   • {expr} (`boolean?`)
 
-                Return: ~
+                返回值: ~
                   (`string`)
 
 wait({timeout}, {condition} [, {interval}])                             *wait()*
@@ -10842,12 +10855,12 @@ wait({timeout}, {condition} [, {interval}])                             *wait()*
 			-2	如果函数被中断（被 |CTRL-C|）
 			-3	如果发生错误
 
-                Parameters: ~
+                参数: ~
                   • {timeout} (`integer`)
                   • {condition} (`any`)
                   • {interval} (`number?`)
 
-                Return: ~
+                返回值: ~
                   (`any`)
 
 wildmenumode()                                                  *wildmenumode()*
@@ -10861,7 +10874,7 @@ wildmenumode()                                                  *wildmenumode()*
 <
 		（注意：这需要恰当设置 'wildcharm' 选项）。
 
-                Return: ~
+                返回值: ~
                   (`any`)
 
 wildtrigger()                                                    *wildtrigger()*
@@ -10882,7 +10895,7 @@ wildtrigger()                                                    *wildtrigger()*
 
 		返回值总是 0。
 
-                Return: ~
+                返回值: ~
                   (`number`)
 
 win_execute({id}, {command} [, {silent}])                        *win_execute()*
@@ -10897,22 +10910,22 @@ win_execute({id}, {command} [, {silent}])                        *win_execute()*
 
 		当 window {id} 不存在时，不会给出错误，并返回空字符串。
 
-                Parameters: ~
+                参数: ~
                   • {id} (`integer`)
                   • {command} (`string`)
                   • {silent} (`boolean?`)
 
-                Return: ~
+                返回值: ~
                   (`any`)
 
 win_findbuf({bufnr})                                             *win_findbuf()*
 		返回一个 |List|，其中包含含有 buffer {bufnr} 的各个
 		window 的 |window-ID|。如果没有，则该 List 为空。
 
-                Parameters: ~
+                参数: ~
                   • {bufnr} (`integer`)
 
-                Return: ~
+                返回值: ~
                   (`integer[]`)
 
 win_getid([{win} [, {tab}]])                                       *win_getid()*
@@ -10923,11 +10936,11 @@ win_getid([{win} [, {tab}]])                                       *win_getid()*
 		|tabpage-number|。
 		如果找不到该 window，则返回零。
 
-                Parameters: ~
+                参数: ~
                   • {win} (`integer?`)
                   • {tab} (`integer?`)
 
-                Return: ~
+                返回值: ~
                   (`integer`)
 
 win_gettype([{nr}])                                              *win_gettype()*
@@ -10948,20 +10961,20 @@ win_gettype([{nr}])                                              *win_gettype()*
 
 		另请参阅 'buftype' 选项。
 
-                Parameters: ~
+                参数: ~
                   • {nr} (`integer?`)
 
-                Return: ~
+                返回值: ~
                   (`'autocmd'|'command'|''|'loclist'|'popup'|'preview'|'quickfix'|'unknown'`)
 
 win_gotoid({expr})                                                *win_gotoid()*
 		转到 |window-ID| {expr}。可能会改变当前 tabpage。
 		如果成功则返回 TRUE，如果找不到该 window 则返回 FALSE。
 
-                Parameters: ~
+                参数: ~
                   • {expr} (`integer`)
 
-                Return: ~
+                返回值: ~
                   (`0|1`)
 
 win_id2tabwin({expr})                                          *win_id2tabwin()*
@@ -10969,20 +10982,20 @@ win_id2tabwin({expr})                                          *win_id2tabwin()*
 		其中 tabnr 是 |tabpage-number|，winnr 是 |window-number|。
 		如果找不到该 window，则返回 [0, 0]。
 
-                Parameters: ~
+                参数: ~
                   • {expr} (`integer`)
 
-                Return: ~
+                返回值: ~
                   (`any`)
 
 win_id2win({expr})                                                *win_id2win()*
 		返回给定 |window-ID| {expr} 的 |window-number|。
 		如果在当前 tabpage 中找不到该 window，则返回 0。
 
-                Parameters: ~
+                参数: ~
                   • {expr} (`integer`)
 
-                Return: ~
+                返回值: ~
                   (`integer`)
 
 win_move_separator({nr}, {offset})                        *win_move_separator()*
@@ -10997,11 +11010,11 @@ win_move_separator({nr}, {offset})                        *win_move_separator()*
 		右侧没有分隔线。
 		只对当前 tabpage 有效。 *E1308*
 
-                Parameters: ~
+                参数: ~
                   • {nr} (`integer`)
                   • {offset} (`integer`)
 
-                Return: ~
+                返回值: ~
                   (`any`)
 
 win_move_statusline({nr}, {offset})                      *win_move_statusline()*
@@ -11014,11 +11027,11 @@ win_move_statusline({nr}, {offset})                      *win_move_statusline()*
 		如果找到该 window 则返回 TRUE，否则返回 FALSE。
 		只对当前 tabpage 有效。
 
-                Parameters: ~
+                参数: ~
                   • {nr} (`integer`)
                   • {offset} (`integer`)
 
-                Return: ~
+                返回值: ~
                   (`any`)
 
 win_screenpos({nr})                                            *win_screenpos()*
@@ -11029,10 +11042,10 @@ win_screenpos({nr})                                            *win_screenpos()*
 		window。
 		如果找不到该 window，则返回 [0, 0]。
 
-                Parameters: ~
+                参数: ~
                   • {nr} (`integer`)
 
-                Return: ~
+                返回值: ~
                   (`any`)
 
 win_splitmove({nr}, {target} [, {options}])                    *win_splitmove()*
@@ -11054,12 +11067,12 @@ win_splitmove({nr}, {target} [, {options}])                    *win_splitmove()*
 				上方或左侧（若为垂直分割）。未提供时，
 				使用 'splitbelow' 和 'splitright' 的值。
 
-                Parameters: ~
+                参数: ~
                   • {nr} (`integer`)
                   • {target} (`integer`)
                   • {options} (`table?`)
 
-                Return: ~
+                返回值: ~
                   (`any`)
 
 winbufnr({nr})                                                      *winbufnr()*
@@ -11071,17 +11084,17 @@ winbufnr({nr})                                                      *winbufnr()*
 		  echo "The file in the current window is " .. bufname(winbufnr(0))
 <
 
-                Parameters: ~
+                参数: ~
                   • {nr} (`integer`)
 
-                Return: ~
+                返回值: ~
                   (`integer`)
 
 wincol()                                                              *wincol()*
 		返回 window 中光标的虚拟列。
 		这是从 window 左侧开始计算的屏幕单元。最左边的列是 1。
 
-                Return: ~
+                返回值: ~
                   (`integer`)
 
 windowsversion()                                              *windowsversion()*
@@ -11091,7 +11104,7 @@ windowsversion()                                              *windowsversion()*
 
 		Lua：请参阅 |uv.os_uname()|。
 
-                Return: ~
+                返回值: ~
                   (`string`)
 
 winheight({nr})                                                    *winheight()*
@@ -11103,10 +11116,10 @@ winheight({nr})                                                    *winheight()*
 		  echo "Current window has " .. winheight(0) .. " lines."
 <
 
-                Parameters: ~
+                参数: ~
                   • {nr} (`integer`)
 
-                Return: ~
+                返回值: ~
                   (`integer`)
 
 winlayout([{tabnr}])                                               *winlayout()*
@@ -11144,10 +11157,10 @@ winlayout([{tabnr}])                                               *winlayout()*
 					    ['leaf', 1001]]], ['leaf', 1000]]]
 <
 
-                Parameters: ~
+                参数: ~
                   • {tabnr} (`integer?`)
 
-                Return: ~
+                返回值: ~
                   (`vim.fn.winlayout.ret`)
 
 winline()                                                            *winline()*
@@ -11155,7 +11168,7 @@ winline()                                                            *winline()*
 		这是从 window 顶部开始计算的屏幕行。第一行是 1。
 		如果光标被移动，文件的视图会先被更新，这可能导致滚动。
 
-                Return: ~
+                返回值: ~
                   (`integer`)
 
 winnr([{arg}])                                                         *winnr()*
@@ -11186,10 +11199,10 @@ winnr([{arg}])                                                         *winnr()*
 			let wnum = winnr('3k')
 <
 
-                Parameters: ~
+                参数: ~
                   • {arg} (`string|integer?`)
 
-                Return: ~
+                返回值: ~
                   (`integer`)
 
 winrestcmd()                                                      *winrestcmd()*
@@ -11202,7 +11215,7 @@ winrestcmd()                                                      *winrestcmd()*
 			exe cmd
 <
 
-                Return: ~
+                返回值: ~
                   (`string`)
 
 winrestview({dict})                                              *winrestview()*
@@ -11218,10 +11231,10 @@ winrestview({dict})                                              *winrestview()*
 		如果你改动了这些值，结果不可预测。
 		如果 window 大小改变了，结果也不会相同。
 
-                Parameters: ~
+                参数: ~
                   • {dict} (`vim.fn.winrestview.dict`)
 
-                Return: ~
+                返回值: ~
                   (`any`)
 
 winsaveview()                                                    *winsaveview()*
@@ -11246,7 +11259,7 @@ winsaveview()                                                    *winsaveview()*
 			skipcol		跳过的列
 		注意不会保存任何选项值。
 
-                Return: ~
+                返回值: ~
                   (`vim.fn.winsaveview.ret`)
 
 winwidth({nr})                                                      *winwidth()*
@@ -11264,10 +11277,10 @@ winwidth({nr})                                                      *winwidth()*
 		    :echo getwininfo(win_getid())[0].width - getwininfo(win_getid())[0].textoff
 <		要获取 Nvim 屏幕尺寸，请参阅 'columns' 选项。
 
-                Parameters: ~
+                参数: ~
                   • {nr} (`integer`)
 
-                Return: ~
+                返回值: ~
                   (`integer`)
 
 wordcount()                                                        *wordcount()*
@@ -11290,7 +11303,7 @@ wordcount()                                                        *wordcount()*
 			visual_words    被可视选择的单词数
 					（仅在 Visual mode 中）
 
-                返回值：~
+                返回值: ~
                   (`any`)
 
 writefile({data}, {fname} [, {flags}])                             *writefile()*
@@ -11341,12 +11354,12 @@ writefile({data}, {fname} [, {flags}])                             *writefile()*
 			call writefile(fl, "foocopy", "b")
 <
 
-                参数：~
+                参数: ~
                   • {data} (`any`)
                   • {fname} (`string`)
                   • {flags} (`string?`)
 
-                返回值：~
+                返回值: ~
                   (`any`)
 
 xor({expr}, {expr})                                                      *xor()*
@@ -11357,15 +11370,15 @@ xor({expr}, {expr})                                                      *xor()*
 			let bits = xor(bits, 0x80)
 <
 
-                参数：~
+                参数: ~
                   • {expr} (`integer`)
                   • {expr1} (`integer`)
 
-                返回值：~
+                返回值: ~
                   (`integer`)
 
 ==============================================================================
-2. 在 String 中匹配模式			*string-match*
+2. 在 String 中匹配模式					*string-match*
 
 这在多个函数中是通用的。|pattern| 中说明的正则表达式模式
 通常用于在 buffer 的行中查找匹配。当把模式用于在 String 中

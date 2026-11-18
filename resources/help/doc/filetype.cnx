@@ -90,15 +90,15 @@ Vim 能够检测所编辑文件的类型。这是通过检查文件名，有时�
 
 概览：						*:filetype-overview*
 
-命令				检测	插件		缩进 ~
-:filetype on			开启		不变	不变
-:filetype off			关闭		不变	不变
+命令				检测		插件		缩进 ~
+:filetype on			开启		不变		不变
+:filetype off			关闭		不变		不变
 :filetype plugin on		开启		开启		不变
-:filetype plugin off		不变	关闭		不变
-:filetype indent on		开启		不变	开启
-:filetype indent off		不变	不变	关闭
+:filetype plugin off		不变		关闭		不变
+:filetype indent on		开启		不变		开启
+:filetype indent off		不变		不变		关闭
 :filetype plugin indent on	开启		开启		开启
-:filetype plugin indent off	不变	关闭		关闭
+:filetype plugin indent off	不变		关闭		关闭
 
 要查看当前状态，输入： >
 	:filetype
@@ -119,6 +119,7 @@ Vim 能够检测所编辑文件的类型。这是通过检查文件名，有时�
    当文件类型检测被关闭时，会先启用它，就像使用了 "on" 参数一样。
 
 							*filetype-overrule*
+当同一扩展名用于多种文件类型时，Vim 会尝试猜测文件种类。这并不总能
 奏效。可以使用若干全局变量来覆盖某些扩展名所使用的文件类型：
 
 	文件名	变量 ~
@@ -447,7 +448,7 @@ g:changelog_new_date_format
 				%p	插入以下内容的结果
 					b:changelog_entry_prefix
 				%c	完成后光标所在的位置
-			默认值是 "%d  %u\n\n\t* %p%c\n\n"，它会产生类似下面这样的内容（| 表示
+			默认值是 "%d        %u\n\n\t* %p%c\n\n"，它会产生类似下面这样的内容（| 表示
 			光标将出现的位置，除非位于行首，此时它表示行的开头）： >
 				|2003-01-14  Full Name  <user@host>
 				|
@@ -498,7 +499,7 @@ Changelog 条目会被插入到增加文本最少的位置。在确定当前日�
 FORTRAN							*ft-fortran-plugin*
 
 选项：
-'expandtab'	被打开，以避免使用 Fortran 标准所要求的制表符，
+'expandtab'	被打开，以改用空格、避免制表符（Fortran 标准的要求），
 		除非用户在 vimrc 中设置了 fortran_have_tabs。
 'textwidth'	对于固定源码格式设为 80，而对于自由源码格式设为 132。设置
 		fortran_extended_line_length 变量会把固定源码格式的宽度增加到 132。

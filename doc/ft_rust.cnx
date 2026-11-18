@@ -1,7 +1,7 @@
 *ft_rust.txt*      Filetype plugin for Rust
 
 ==============================================================================
-CONTENTS                                                              *rust*
+CONTENTS                                                      *rust*
 
 1. 简介                                                          |rust-intro|
 2. 设置                                                       |rust-settings|
@@ -35,19 +35,19 @@ g:rustc_makeprg_no_percent ~
 	    let g:rustc_makeprg_no_percent = 1
 <
 
-                                                               *g:rust_conceal*
+                                                              *g:rust_conceal*
 g:rust_conceal ~
 	将此选项设为 1 以开启基本的 |conceal| 支持： >vim
 	    let g:rust_conceal = 1
 <
 
-                                                      *g:rust_conceal_mod_path*
+                                                     *g:rust_conceal_mod_path*
 g:rust_conceal_mod_path ~
 	将此选项设为 1，对连接记号 "::" 的路径开启 |conceal|： >vim
 	    let g:rust_conceal_mod_path = 1
 <
 
-                                                           *g:rust_conceal_pub*
+                                                          *g:rust_conceal_pub*
 g:rust_conceal_pub ~
 	将此选项设为 1，对 "pub" 记号开启 |conceal|： >vim
 	    let g:rust_conceal_pub = 1
@@ -193,7 +193,7 @@ g:cargo_shell_command_runner ~
 <
 
 ------------------------------------------------------------------------------
-与 Syntastic 集成                                          *rust-syntastic*
+与 Syntastic 集成                                             *rust-syntastic*
 
 本插件会自动与 Syntastic 检查器集成。共提供两个检查器：`rustc` 和
 `cargo`。后者调用 `cargo` 来构建代码，前者则把单个被编辑的 '.rs' 文件作为
@@ -251,7 +251,7 @@ g:rust_cargo_check_benches ~
 	默认值为 0。
 
 ------------------------------------------------------------------------------
-与 auto-pairs 集成                                          *rust-auto-pairs*
+与 auto-pairs 集成                                             *rust-auto-pairs*
 
 本插件会自动配置 auto-pairs 插件，使其不重复输入单引号——单引号更多被
 用于生命周期标注，而非单字符字面量。
@@ -262,7 +262,7 @@ g:rust_keep_autopairs_default ~
 	不覆盖 auto-pairs 针对 Rust 文件类型的默认行为。默认值为 0。
 
 ==============================================================================
-命令                                                        *rust-commands*
+命令                                                           *rust-commands*
 
 调用 Cargo ~
 
@@ -434,7 +434,7 @@ rust.vim 调试 ~
 		把 Vim Rust 插件的调试信息保存到给定文件，并覆盖该文件。
 
 ==============================================================================
-映射                                                       *rust-mappings*
+映射                                                           *rust-mappings*
 
 本插件为 |[[| 和 |]]| 定义了映射，以支持悬挂缩进。
 

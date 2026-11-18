@@ -762,7 +762,6 @@ Lua 会把它看作单条语句 `a = f(g).x(a)`。所以，若你想要两条语
 
        `local f = function f ()`  `body`  `end`
 
-
 （这一点只在函数体内含有对 `f` 的引用时才有区别。）
 
                                                               *lua-closure*
@@ -821,7 +820,6 @@ Lua 会把它看作单条语句 `a = f(g).x(a)`。所以，若你想要两条语
        `t.a.b.c:f = function (`  `self`,  `params`  `)`  `body`  `end`
 
 的语法糖。
-
 ==============================================================================
 2.6  可见性规则                                          *lua-visibility*
 
@@ -1921,10 +1919,10 @@ lua_pcall                                                          *lua_pcall()*
 
         `lua_pcall` 函数成功时返回 0，或返回以下错误码之一（定义于 `lua.h`）：
 
-         - `LUA_ERRRUN`  运行时错误。
-         - `LUA_ERRMEM`  内存分配错误。对于这类错误，Lua 不会调用
+        - `LUA_ERRRUN`  运行时错误。
+        - `LUA_ERRMEM`  内存分配错误。对于这类错误，Lua 不会调用
            错误处理函数。
-         - `LUA_ERRERR`  运行错误处理函数时出错。
+        - `LUA_ERRERR`  运行错误处理函数时出错。
 
 lua_pop                                                              *lua_pop()*
 >c
@@ -1963,6 +1961,8 @@ lua_pushcfunction                                          *lua_pushcfunction()*
         `lua_pushcfunction` 定义为一个宏：
 >c
             #define lua_pushcfunction(L,f)  lua_pushcclosure(L,f,0)
+<
+
 lua_pushfstring                                              *lua_pushfstring()*
 >c
     const char *lua_pushfstring (lua_State *L, const char *fmt, ...);
@@ -1977,6 +1977,7 @@ lua_pushfstring                                              *lua_pushfstring()*
            串，无大小限制）、`%f`（插入一个 `lua_Number`）、`%p`（把指针
            以十六进制数字形式插入）、`%d`（插入一个 `int`），以及 `%c`
            （把一个 `int` 作为字符插入）。
+
 lua_pushinteger                                              *lua_pushinteger()*
 >c
     void lua_pushinteger (lua_State *L, lua_Integer n);
@@ -2104,6 +2105,8 @@ lua_register                                                    *lua_register()*
 >c
             #define lua_register(L,n,f) \
                    (lua_pushcfunction(L, f), lua_setglobal(L, n))
+<
+
 lua_remove                                                        *lua_remove()*
 >c
     void lua_remove (lua_State *L, int index);
@@ -2165,6 +2168,8 @@ lua_setglobal                                                  *lua_setglobal()*
         从栈中弹出一个值，并把它设为全局变量 `name` 的新值。它定义为一个宏：
 >c
             #define lua_setglobal(L,s)   lua_setfield(L, LUA_GLOBALSINDEX, s)
+<
+
 lua_setmetatable                                            *lua_setmetatable()*
 >c
     int lua_setmetatable (lua_State *L, int index);
@@ -2378,6 +2383,8 @@ lua_Debug                                                            *lua_Debug*
         /* private part */
         other fields
     } lua_Debug;
+<
+
 用于携带关于活动函数的不同信息的结构。`lua_getstack`（见 |lua_getstack()|）
 只填充该结构的私有部分，以供后续使用。要用有用信息填充 `lua_Debug` 的其它
 字段，请调用 `lua_getinfo`（见 |lua_getinfo()|）。

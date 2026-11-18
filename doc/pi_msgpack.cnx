@@ -12,7 +12,6 @@ runtime/doc/pi_msgpack.txt 和 test/functional/plugin/msgpack_spec.lua。与其�
 持有人在任何情况下都不对因使用本软件而产生的任何损害承担责任。使用风险自负！
 
                                       输入 |gO| 查看目录。
-
 ==============================================================================
 Msgpack.vim 简介				*msgpack.vim-intro*
 
@@ -21,7 +20,7 @@ Msgpack.vim 简介				*msgpack.vim-intro*
 ==============================================================================
 Msgpack.vim 手册				*msgpack.vim-manual*
 
-函数参数				*msgpack.vim-arguments*
+函数参数					*msgpack.vim-arguments*
 
 下文所述参数的消歧说明。注意：如果某个函数被列为接受 |{msgpack-integer}|
 （或任何其他类型），这只表示该函数不会检查参数是否符合其描述。

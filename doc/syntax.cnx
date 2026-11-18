@@ -18,7 +18,7 @@ Vim 在所有终端上支持语法高亮。不过由于大多数普通终端的�
 |usr_06.txt| 介绍语法高亮。
 |usr_44.txt| 介绍如何编写 syntax 文件。
 
-                                       Type |gO| to see the table of contents.
+                                       输入 |gO| 查看目录。
 
 ==============================================================================
 1. 快速上手						*:syn-qstart*
@@ -132,7 +132,7 @@ syntax 文件可以包含任意 Ex 命令，就像 vimrc 文件一样。但思�
 你可以使用 'runtimepath' 里的另一个目录。
 
 
-添加到已有的 SYNTAX 文件		*mysyntaxfile-add*
+添加到已有的 SYNTAX 文件			*mysyntaxfile-add*
 
 如果你对现有的 syntax 文件大体满意，但想增加几项或更改高亮，请按这些步骤：
 
@@ -156,7 +156,7 @@ syntax 文件可以包含任意 Ex 命令，就像 vimrc 文件一样。但思�
 	~/.config/nvim/after/syntax/c/two.vim
 
 
-替换已有的 SYNTAX 文件			*mysyntaxfile-replace*
+替换已有的 SYNTAX 文件					*mysyntaxfile-replace*
 
 如果你不喜欢某个随附的 syntax 文件，或者你下载了一个新版本，按上面
 |mysyntaxfile| 的同样步骤做。只要保证你把 syntax 文件写进 'runtimepath' 中
@@ -236,7 +236,7 @@ Removed		diff 中删除的行
 使用 Ignore 组时，你也许还可以考虑使用 conceal 机制。见 |conceal|。
 
 ==============================================================================
-3. Syntax 加载流程				*syntax-loading*
+3. Syntax 加载流程					*syntax-loading*
 
 这里说明发出 ":syntax enable" 命令时发生的细节。当 Vim 初始化自身时，它会
 查明 runtime 文件位于何处。这里用变量 |$VIMRUNTIME| 表示它。
@@ -263,7 +263,8 @@ Removed		diff 中删除的行
     |	|   已知文件类型的文件名与文件类型，就在这里建立关联。 *synload-3*
     |	|
     |	+-  从 *myfiletypefile* 变量 source 用户的可选文件。
-    |	|   仅为兼容 Vim 5.x。 *synload-4*
+    |	|   仅为兼容 Vim 5.x。
+    |	|   *synload-4*
     |	|
     |	+-  安装一个 autocommand，在尚未检测出文件类型时
     |	|   source scripts.vim。 *synload-5*
@@ -311,6 +312,7 @@ Removed		diff 中删除的行
 4. 转换为 HTML				*convert-to-HTML* *2html.vim*
 
 旧的 to html 转换器已被 Lua 版本取代，相关文档已移到 |:TOhtml|。
+
 ==============================================================================
 5. Syntax 文件说明					*:syn-file-remarks*
 
@@ -642,6 +644,7 @@ CLOJURE							*ft-clojure-syntax*
 	    \ }
 <
 有关有效的 syntax 组名，请参考 Clojure 的 syntax 脚本。
+
 此外还有 *b:clojure_syntax_keywords*  ，它是该变量的 buffer 局部变体，供插件
 作者动态高亮符号时使用。
 
@@ -764,7 +767,7 @@ C# 的原始字符串字面量可以用任意数量的引号包住整个块，�
 默认情况下，Vim 高亮 3 到 8 个引号，以及 1 到 8 个插值大括号。可识别的引号
 与大括号的最大数量可以用下面这些变量配置：
 
-    变量				默认值 ~
+    变量					默认值 ~
     g:cs_raw_string_quote_count			8
     g:cs_raw_string_interpolation_brace_count	8
 
@@ -2669,7 +2672,7 @@ Ruby filetype 时启用基于语法的折叠。
 <
 其值是以空格分隔的关键字列表：
 
-    关键字      含义 ~
+    关键字        含义 ~
     --------  ------------------------------------- ~
     ALL        大多数块语法（默认）
     NONE       什么都不算
@@ -3490,7 +3493,7 @@ syntax iskeyword 设置					*:syn-iskeyword*
 	建议在编写 syntax 文件时用这条命令为具体的 syntax 语言设置正确的
 	值，而不要去改 'iskeyword' 选项。
 
-定义关键字					*:syn-keyword*
+定义关键字						*:syn-keyword*
 
 :sy[ntax] keyword {group-name} [{options}] {keyword} ... [{options}]
 
@@ -3562,6 +3565,8 @@ syntax iskeyword 设置					*:syn-iskeyword*
 
 	示例（匹配一个字符常量）： >
   :syntax match Character /'.'/hs=s+1,he=e-1
+<
+
 定义区域	*:syn-region* *:syn-start* *:syn-skip* *:syn-end*
 							*E398* *E399*
 :sy[ntax] region {group-name} [{options}]
@@ -3698,7 +3703,7 @@ syntax iskeyword 设置					*:syn-iskeyword*
    :hi par2 ctermfg=blue guifg=blue
    :hi par3 ctermfg=darkgreen guifg=darkgreen
 <
-										*E849*
+						*E849*
 系统里最多可以有 19999 个 syntax group。
 
 ==============================================================================
@@ -4073,8 +4078,7 @@ region item end     -	 yes  -    yes	-    yes  yes
 <
 Leading context			*:syn-lc* *:syn-leading* *:syn-context*
 
-注意：这是一个过时的特性，只是为了向后兼容才保留
-了与先前 Vim 版本的兼容性而保留。现在建议在模式里使用 |/\@<=| 结构。你也
+注意：这是一个过时的特性，仅为与先前 Vim 版本向后兼容而保留。现在建议在模式里使用 |/\@<=| 结构。你也
 常常可以使用 |/\zs|。
 
 "lc" 偏移指定 leading context —— 模式里必须存在、但不被算作匹配的一部分的
@@ -4082,10 +4086,6 @@ Leading context			*:syn-lc* *:syn-leading* *:syn-context*
 模式里已经匹配过的字符也被用作这次匹配的 leading context。例如，这可以用
 来规定一个"转义"字符不能出现在该匹配之前： >
 
-  :syn match ZNoBackslash "[^\\]z"ms=s+1
-  :syn match WNoBackslash "[^\\]w"lc=1
-  :syn match Underline "_\+"
-<
   :syn match ZNoBackslash "[^\\]z"ms=s+1
   :syn match WNoBackslash "[^\\]w"lc=1
   :syn match Underline "_\+"
@@ -4997,7 +4997,7 @@ syntax。
 这取决于配色方案文件。见 |:colorscheme|。
 
 ==============================================================================
-16. 高亮标签					*tag-highlight*
+16. 高亮标签						*tag-highlight*
 
 如果你想高亮文件中的所有标签，可以使用下面的映射。
 

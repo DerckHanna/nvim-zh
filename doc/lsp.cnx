@@ -49,8 +49,8 @@ Nvim 提供了 LSP 客户端，但服务器由第三方提供。按下列步骤�
    示例： >lua
      vim.lsp.enable('lua_ls')
 4. 打开一个与配置中 `filetypes` 之一匹配的代码文件。
-   注意：视 LSP 服务器而定，你可能需要确保项目中存在某个 |lsp-root_markers| 文件，
-   工作区才能被识别。
+   注意：视 LSP 服务器而定，你可能需要确保项目中存在某个 |lsp-root_markers| 文
+件，    工作区才能被识别。
 5. 检查该 buffer 的 LSP 是否已激活（"已附加"）： >vim
      :checkhealth vim.lsp
 6. 注意：某些 LSP 功能默认被禁用，你可以手动启用它们：
@@ -644,7 +644,7 @@ LSP 客户端会为每个 token 添加一个或多个高亮。高亮组由 token
 @lsp.mod.readonly        只读变量和成员字段（常量）
 @lsp.mod.static          类成员（静态成员）
 
-================================================================================
+==============================================================================
 事件                                                            *lsp-events*
 
 LspAttach                                                          *LspAttach*
@@ -812,7 +812,7 @@ LspTokenUpdate                                                *LspTokenUpdate*
     注意：除了调用 |vim.lsp.semantic_tokens.highlight_token()| 之外，做其他任何
     事情都被视为实验性的。
 
-================================================================================
+==============================================================================
 Lua 模块：vim.lsp                                      *lsp-core*
 
 *vim.lsp.Config*
@@ -1288,7 +1288,7 @@ tagfunc({pattern}, {flags})                                *vim.lsp.tagfunc()*
 
     与普通模式命令（例如 |CTRL-]|）一起使用时，它会调用
     "textDocument/definition" LSP 方法来查找光标下的标签。否则使用
-    "workspace/symbol"。如果任何 LSP 服务器都没有返回结果，则回退到使用内置的
+    "workspace/symbol"。如果所有 LSP 服务器都没有返回结果，则回退到使用内置的
     tags。
 
     参数：~
@@ -1979,12 +1979,12 @@ Lua 模块：vim.lsp.completion                                *lsp-completion*
 LSP 的 `triggerCharacters` 字段决定何时触发自动补全。如果你想在每次按键时都触发，
 可以：
 
+
 • 在 `LspAttach` 时、调用
   `vim.lsp.completion.enable(… {autotrigger=true})` 之前，扩展
   `client.server_capabilities.completionProvider.triggerCharacters`。见 |lsp-attach|
   中的示例。
 • 在 |InsertCharPre| 自动命令中调用 `vim.lsp.completion.get()`。
-
 
                                                  *vim.lsp.completion.enable()*
 enable({enable}, {client_id}, {bufnr}, {opts})
@@ -2020,7 +2020,6 @@ get({opts})                                         *vim.lsp.completion.get()*
     由默认的 LSP |omnicompletion| 提供者 |vim.lsp.omnifunc()| 使用，因此在已启用
     LSP 的 buffer 中 |i_CTRL-X_CTRL-O| 会调用它。用 CTRL-Y 从补全菜单中选择一项。
     |complete_CTRL-Y|
-
     要用 CTRL-空格 手动调用，请使用这个映射： >lua
         -- Use CTRL-space to trigger LSP completion.
         -- Use CTRL-Y to select an item. |complete_CTRL-Y|

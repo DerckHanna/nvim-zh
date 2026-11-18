@@ -15,15 +15,18 @@
 1. 删除文本					*deleting* *E470*
 
 ["x]<Del>	或					*<Del>* *x* *dl*
-["x]x			删除光标所在位置及其后的 [count] 个字符（非 |linewise|）
+["x]x			删除光标所在位置及其后的 [count] 个字符 [存入
+			register x]（非 |linewise|）。与 "dl" 相同。
 			<Del> 键不接收 [count]，它删除的是 count 中的最后一个字符。
 			删除换行（连接行）见 'whichwrap'。
 
 							*X* *dh*
-["x]X			删除光标之前的 [count] 个字符（非 |linewise|）
+["x]X			删除光标之前的 [count] 个字符 [存入 register x]
+			（非 |linewise|）。与 "dh" 相同。另见 'whichwrap'。
 
 							*d*
-["x]d{motion}		删除 {motion} 移过的文本 [存入
+["x]d{motion}		删除 {motion} 移过的文本 [存入 register x]。
+			例外情况见下文。
 
 							*dd*
 ["x]dd			删除 [count] 行 [存入 register x] |linewise|。
@@ -37,8 +40,9 @@
 {Visual}["x]d   或
 {Visual}["x]<Del>	删除高亮的文本 [存入 register x]（{Visual} 见 |Visual-mode|）
 
-{Visual}["x]CTRL-H	或					*v_CTRL-H* *v_<BS>*
+{Visual}["x]CTRL-H	或				*v_CTRL-H* *v_<BS>*
 {Visual}["x]<BS>	在 Select 模式中：删除高亮的文本 [存入
+			register x]。
 
 {Visual}["x]X	或					*v_X* *v_D* *v_b_D*
 {Visual}["x]D		删除高亮的行 [存入 register x]（{Visual} 见
@@ -47,6 +51,7 @@
 
 					*:d* *:de* *:del* *:delete* *:dl* *:dp*
 :[range]d[elete] [x]	删除 [range] 行（默认：当前行）[存入
+			register x]。
 			注意这些奇怪的缩写：
 			   :dl		删除并列出
 			   :dell	同上
@@ -381,7 +386,7 @@ CTRL-A 命令在宏中非常有用。示例：用以下步骤制作编号列表�
 7. <count>@a	 - 重复抽取、放置和递增 <count> 次
 
 
-左右移动行				*shift-left-right*
+左右移动行						*shift-left-right*
 
 							*<*
  <{motion}		把 {motion} 行向左移动一个 'shiftwidth'。
@@ -449,9 +454,9 @@ CTRL-A 命令在宏中非常有用。示例：用以下步骤制作编号列表�
 	:5>>		move line 5 2 indents to the right
 
 ==============================================================================
-4. 复杂修改					*complex-change*
+4. 复杂修改						*complex-change*
 
-4.1 过滤命令					*filter*
+4.1 过滤命令						*filter*
 
 过滤器是一个从标准输入接收文本、以某种方式修改它并把结果送到标准输出的
 程序。你可以用下面的命令把一些文本送入过滤器，从而让它被过滤器输出替换。
@@ -581,6 +586,14 @@ g&			`:%s//~/&` 的同义词（用上次的搜索模式在所有行上以相同�
 
 [c]	确认每次替换。Vim 会高亮匹配的字符串（使用
 	|hl-IncSearch|）。你可以输入：				*:s_c*
+	    'y'	    替换此匹配
+	    'l'	    替换此匹配后退出（"last"）
+	    'n'	    跳过此匹配
+	    <Esc>   退出替换
+	    'a'	    替换此处及剩余全部匹配
+	    'q'	    退出替换
+	    CTRL-E  向上滚动屏幕
+	    CTRL-Y  向下滚动屏幕
 
 							*:s_e*
 [e]     当搜索模式失败时，不发出错误消息，尤其是在映射中继续执行，就像
@@ -677,7 +690,7 @@ magic	nomagic	  动作    ~
       \9	  替换为第 9 对 () 中匹配到的
 		  模式					     *s/\9*
   ~	  \~	  替换为上一次
-		  替换的 {string}					     *s~*
+		  替换的 {string}				     *s~*
  \~	   ~	  替换为 ~				     *s/\~*
       \u	  下一个字符转为大写			     *s/\u*
       \U	  后续字符转为大写，直到 \E      *s/\U*
@@ -771,7 +784,7 @@ magic	nomagic	  动作    ~
      :sre  即  `:srewind`
 
 
-用表达式替换			*sub-replace-expression*
+用表达式替换					*sub-replace-expression*
 						*sub-replace-\=* *s/\=*
 当替换字符串以 "\=" 开头时，其余部分会被解释为表达式。
 
@@ -801,7 +814,7 @@ magic	nomagic	  动作    ~
 这会把每个 'E' 字符替换为欧元符号。更多内容见 |<Char->|。
 
 
-4.3 修改制表符					*change-tabs*
+4.3 修改制表符						*change-tabs*
 							*:ret* *:retab* *:retab!*
 :[range]ret[ab][!] [-indentonly] [{new-tabstop}]
 			把含有 <Tab> 的空白序列替换为使用 {new-tabstop} 的新空白
@@ -832,7 +845,7 @@ magic	nomagic	  动作    ~
   :auto BufNewFile	*.xx	set ts=4
 
 ==============================================================================
-5. 复制与移动文本				*copy-move*
+5. 复制与移动文本					*copy-move*
 
 							*quote*
 "{register}		把 {register} 用于下一次删除、抽取或放置。用大写字符
@@ -890,7 +903,6 @@ magic	nomagic	  动作    ~
 							*:y* *:yank* *E850*
 :[range]y[ank] [x]	抽取 [range] 行 [存入 register x]。
 
-:[range]y[ank] [x] {count}
 :[range]y[ank] [x] {count}
 			抽取 {count} 行，从 [range] 中的最后一个行号开始（默认：
 			当前行 |cmdline-ranges|）[存入 register x]。
@@ -1061,9 +1073,6 @@ Vim 用抽取和删除命令的文本填充这些 register。
 
 每经过一次删除或修改，Vim 都会把 register 1 的先前内容移到 register 2，
 2 移到 3，依此类推，并丢失 register 9 的先前内容。
-
-
-
 							*yankring*
 			要把抽取（不只是删除）也存入 register 1-9，可以试试： >lua
     -- Yank-ring: store yanked text in registers 1-9.
@@ -1187,7 +1196,7 @@ register 标记为 '"'）。
 			把 [range] 给出的行移动到 {address} 给出的行之下。
 
 ==============================================================================
-6. 格式化文本					*formatting*
+6. 格式化文本						*formatting*
 
 :[range]ce[nter] [width]				*:ce* *:center*
 			把 [range] 中的行居中于 [width] 列（默认 'textwidth'，

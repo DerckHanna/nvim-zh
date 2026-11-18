@@ -50,7 +50,7 @@ Copyright 2005-2017：					*tar-copyright*
 	let g:loaded_tarPlugin= 1
 	let g:loaded_tar      = 1
 <
-						*tar-mappings*
+							*tar-mappings*
    映射~
 
    在 tar buffer 中可以使用下列（buffer 局部的）映射：
@@ -60,7 +60,7 @@ Copyright 2005-2017：					*tar-copyright*
 	x		提取选中的文件。
 
 ==============================================================================
-3. 选项						*tar-options*
+3. 选项							*tar-options*
 
    这些选项是可以修改的变量，通常写在你的 <.vimrc> 文件里。
                           默认值
@@ -73,7 +73,7 @@ Copyright 2005-2017：					*tar-copyright*
 
 
 ==============================================================================
-4. 历史						*tar-history*
+4. 历史							*tar-history*
 
 	unreleased:
 		Jul 13, 2025	* 去掉开头的 /

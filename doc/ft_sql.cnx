@@ -11,10 +11,9 @@
                                       键入 |gO| 可查看目录。
 
 ==============================================================================
-1. 导航					*sql-navigation*
+1. 导航						*sql-navigation*
 
 SQL ftplugin 提供了若干选项，用于辅助文件导航。
-
 
 
 ------------------------------------------------------------------------------
@@ -25,8 +24,6 @@ matchit 插件（https://www.vim.org/scripts/script.php?script_id=39）
 定义局部 buffer 变量 b:match_words 来配置。在各类关键字上按下 % 键
 时，光标会移动到与之匹配的位置。例如，光标位于某个 "if" 上时，按下
 % 将在 "else"、"elseif" 和 "end if" 关键字之间循环。
-
-
 
 支持以下关键字： >
     if
@@ -72,7 +69,6 @@ matchit 插件（https://www.vim.org/scripts/script.php?script_id=39）
 Vim 有许多预定义键用于处理文本 |object-motions|。
 本 filetype 插件尝试把这些键转换为对 SQL 语言有意义的映射。
 
-
 以下 |Normal| 模式与 |Visual| 模式映射存在（当你编辑 SQL
 文件时）： >
     ]]		    move forward to the next 'begin'
@@ -82,15 +78,13 @@ Vim 有许多预定义键用于处理文本 |object-motions|。
 
 
 ------------------------------------------------------------------------------
-1.3 预定义对象移动			*sql-predefined-objects*
+1.3 预定义对象移动				*sql-predefined-objects*
 
 大多数关系型数据库支持各种标准特性：表、索引、触发器与存储过程。
 每个厂商还各有多种专有对象。下面这组映射就是为了在对象之间移动
 而创建的。取决于你使用哪个数据库厂商，对象列表必须可配置。该
 filetype 插件尝试定义许多标准对象，并额外定义许多对象。为了让
 它尽可能灵活，你可以在自己的
-
-
 |vimrc| 中用以下内容覆盖对象列表： >
     let g:ftplugin_sql_objects = 'function,procedure,event,table,trigger' ..
 		\ ',schema,service,publication,database,datatype,domain' ..
@@ -410,7 +404,8 @@ SQL 补全插件会缓存弹出列表中显示的各种清单。这使得重新�
     imap <buffer> <C-C>R <C-\><C-O>:call sqlcomplete#Map('ResetCache')<CR><C-X><C-O>
 
 
-4.3 SQL 教程				*sql-completion-tutorial*
+------------------------------------------------------------------------------
+4.3 SQL 教程					*sql-completion-tutorial*
 
 本教程旨在带你走遍 SQL 补全插件的常用功能，从而让你： >
      a) You gain familiarity with the plugin
@@ -457,13 +452,13 @@ dbext 连接配置文件是定义连接信息最有效的机制。连接设置�
 生成表清单的过程中会有一小段延迟。清单显示出来之后按 <C-W>。这会同时
 移除弹出 window 和清单激活时已经选好的表名。
 
- 4.3.1 表补全：			*sql-completion-tables*
+ 4.3.1 表补全：					*sql-completion-tables*
 
 在通过 dbext 插件连接的数据库内按 <C-C>t 会显示表清单。
 注意：所有 SQL 补全弹出列表都支持在按映射键之前先输入一个前缀。这会
 把弹出 window 的内容限制为仅以这些字符开头的条目。
 
- 4.3.2 列补全：			*sql-completion-columns*
+ 4.3.2 列补全：					*sql-completion-columns*
 
 SQL 补全插件也可以显示特定表的列清单。列补全通过 <C-C>c 触发。
 
@@ -488,32 +483,26 @@ SQL 补全插件也可以显示特定表的列清单。列补全通过 <C-C>c �
 下面看一下如何动态地构建 SQL 语句。select 语句需要一份列清单。使用 SQL
 补全插件构建列清单有两种方式。 >
     One column at a time:
-<       1. After typing SELECT press <C-C>t to display a list of tables.
-	2. Choose a table from the list.
-	3. Press <Right> to display a list of columns.
-	4. Choose the column from the list and press enter.
-	5. Enter a "," and press <C-C>c.  Generating a column list
-	   generally requires having the cursor on a table name.  The plugin
-	   uses this name to determine what table to retrieve the column list.
-	   In this step, since we are pressing <C-C>c without the cursor
-	   on a table name the column list displayed will be for the previous
-	   table.  Choose a different column and move on.
-	6. Repeat step 5 as often as necessary. >
+<       1. 输入 SELECT 后按 <C-C>t 显示表清单。
+	2. 从清单中选择一个表。
+	3. 按 <Right> 显示列清单。
+	4. 从清单中选择列并按回车。
+	5. 输入 "," 并按 <C-C>c。生成列清单通常要求光标
+	   位于表名上。插件用该名字确定要取哪个表的列清单。
+	   这一步中，由于按 <C-C>c 时光标不在表名上，
+	   显示的列清单会是上一个表的。另选一列，继续。
+	6. 按需重复第 5 步。 >
     All columns for a table:
-<	1. After typing SELECT press <C-C>t to display a list of tables.
-	2. Highlight the table you need the column list for.
-	3. Press <Enter> to choose the table from the list.
-	4. Press <C-C>l to request a comma-separated list of all columns
-	   for this table.
-	5. Based on the table name chosen in step 3, the plugin attempts to
-	   decide on a reasonable table alias.	You are then prompted to
-	   either accept of change the alias.  Press OK.
-	6. The table name is replaced with the column list of the table is
-	   replaced with the comma separate list of columns with the alias
-	   prepended to each of the columns.
-	7. Step 3 and 4 can be replaced by pressing <C-C>L, which has
-	   a <C-Y> embedded in the map to choose the currently highlighted
-	   table in the list.
+<	1. 输入 SELECT 后按 <C-C>t 显示表清单。
+	2. 高亮你需要列清单的那个表。
+	3. 按 <Enter> 从清单中选择该表。
+	4. 按 <C-C>l 请求该表全部列的逗号分隔清单。
+	5. 插件会根据第 3 步选择的表名，尝试确定一个合理的
+	   表别名。随后会提示你接受或修改该别名。按 OK。
+	6. 表名会被替换为该表的列清单：逗号分隔的各列，
+	   且每列前面都加上别名。
+	7. 第 3、4 步可以用按 <C-C>L 代替，该映射内嵌了
+	   一个 <C-Y>，用于选择清单中当前高亮的表。
 
 在编写 select 语句时有一项特殊处理。考虑以下语句： >
      select *
@@ -531,7 +520,7 @@ SQL 补全插件也可以显示特定表的列清单。列补全通过 <C-C>c �
 关键字也受支持，即 "customer AS c"。
 
 
- 4.3.3 过程补全：			*sql-completion-procedures*
+ 4.3.3 过程补全：				*sql-completion-procedures*
 
 与表清单类似，<C-C>p 会显示数据库中存储的过程清单。
 
@@ -567,7 +556,7 @@ SQL 补全插件可以通过在你的 |init.vim| 中设置各种选项来定制�
 		   混合大小写，则把大小写用作分隔符： >
 		   MyTableName --> MTN
 <	       3.  如果表名不含 '_'，也不使用
-		   使用混合大小写，则使用表的首字母： >
+		   混合大小写，则使用表的首字母： >
 		   mytablename --> m
 		   MYTABLENAME --> M
 
@@ -650,6 +639,7 @@ SQL 补全插件可以通过在你的 |init.vim| 中设置各种选项来定制�
 
 你可以按需创建任意多的附加键映射。一般来说，这些映射会指定不同的
 syntax 高亮组。
+
 如果你不希望创建默认映射，或者这些按键选择在你的平台上不起作用（在
 unix 上常常如此），那么可以在自己的 |init.vim| 中定义以下变量： >
     let g:omni_sql_no_default_maps = 1

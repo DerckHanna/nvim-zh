@@ -545,7 +545,7 @@ filename        一个或多个文件名。第一个文件成为当前文件并�
 1. 移除或禁用一半的 |config|。
 2. 重启 Nvim。
 3. 如果问题仍然出现，转到 1。
-4. 如果问题消失了，恢复被移除的那一半行。
+4. 如果问题消失了，恢复被移除行中的一半。
 5. 用这种方式继续缩小配置范围，直到找到导致问题的设置或插件。
 
 
@@ -1119,8 +1119,8 @@ ShaDa 文件是若干个 MessagePack 条目的拼接。每个条目恰好由四�
                                                compatibility reasons, see
                                                |shada-compatibility|.
 <
-   - 9 (BufferList)    array，含有若干 map。数组中的每个 map 代表一个 buffer。可能
-                       的键：
+   - 9 (BufferList)    array，含有若干 map。数组中的每个 map 代表一个 buffer。
+可能                        的键：
                        Key  Type      Default  Description >
                        l    UInteger  1        Position line number.  Must be
                                                greater then zero.
@@ -1233,8 +1233,8 @@ $NVIM_APPNAME 的一个用途是 "隔离" Nvim 应用。另一种方式，在 Li
 除了 'debug' 和 'verbose' 之外，Nvim 还保留一个通用日志文件，供内部调试、插件和 RPC
 客户端使用。 >
         :echo $NVIM_LOG_FILE
-默认位置是 stdpath("log")/log（$XDG_STATE_HOME/nvim/nvim.log），除非该路径不可访问，
-或者在 |startup| 之前设置了 $NVIM_LOG_FILE。
+默认位置是 stdpath("log")/log（$XDG_STATE_HOME/nvim/nvim.log），除非该路径不可
+访问， 或者在 |startup| 之前设置了 $NVIM_LOG_FILE。
 
 
  vim:et:tw=78:ts=8:sw=4:ft=help:norl:

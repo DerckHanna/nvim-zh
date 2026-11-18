@@ -34,6 +34,7 @@ Nvim 采用客户端-服务器架构：默认情况下运行 `nvim` 时，会启
 
 Nvim 会在启动时推测终端类型（|--embed| 和 |--headless| 模式除外）。|$TERM| 环境
 变量是决定终端类型的主要线索。
+
 					*terminfo* *E557* *E558* *E559*
 为了显示自己的用户界面，Nvim 会从系统 terminfo 数据库（若找不到 terminfo，则使用
 内置默认值）中读取一份“终端能力”列表。如果这些信息有误，屏幕可能会显示错乱，或者
@@ -77,6 +78,7 @@ $TERM 之所以也很重要，是因为与其他大多数环境变量不同，�
   Windows/VTP console         vtpcon                              Y
   xterm or compatible         xterm, xterm-256color               Y
 <
+
 					*builtin-terms* *builtin_terms*
 如果满足以下条件，Nvim 会把 |$TERM| 按上表映射到某个内置条目：
 
@@ -91,7 +93,7 @@ $TERM 之所以也很重要，是因为与其他大多数环境变量不同，�
 例如，"TERM=putty-256color" 会被映射到内置的 "putty" 条目。
 另见 |tui-colors|。
 
-取决于终端的设置			*term-dependent-settings*
+取决于终端的设置				*term-dependent-settings*
 
 如果你想设置取决于终端的选项或映射，可以在自己的 init.vim 中这样做。示例： >vim
 
@@ -237,7 +239,7 @@ window。]
 正确的值。参见 |:mode|。
 
 ==============================================================================
-慢速与快速终端				*slow-fast-terminal*
+慢速与快速终端					*slow-fast-terminal*
 						*slow-terminal*
 
 如果你的终端很慢，可能想关闭 'showcmd' 和 'ruler' 选项。这样命令字符和光标位置就

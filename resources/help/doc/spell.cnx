@@ -123,7 +123,7 @@ zuG			撤销 |zW| 和 |zG|，从内部单词表中移除该单词。
 			于 |zw|。没有计数时使用第一个名称，计数为二时
 			使用第二个条目，以此类推。
 
-			没有把单词标记为生僻的正常模式命令，因为这是
+			没有把单词标记为生僻的普通模式命令，因为这是
 			一个相当少用的命令，而且所有直观的命令都已被
 			占用。如果愿意，你可以用例如下面的方式添加
 			映射： >
@@ -153,8 +153,8 @@ zuG			撤销 |zW| 和 |zG|，从内部单词表中移除该单词。
 内部单词表用于所有设置了 'spell' 的 buffer。它不会被保存，退出 Vim 时就会丢失。
 设置 'encoding' 时它也会被清空。
 
-找到错误单词的建议：
 
+找到错误单词的建议：
 							*z=*
 z=			为光标之下/之后的单词建议拼写正确的单词。这也
 			可用于查找未被高亮为错误单词的单词的替代词，
@@ -165,7 +165,7 @@ z=			为光标之下/之后的单词建议拼写正确的单词。这也
 
 			如果命令不带计数，会列出各替代词，你可以输入
 			所选的编号，或在不想替换时按 <Enter>。你也
-			可以用鼠标点击所选项（仅当鼠标可用于正常模式
+			可以用鼠标点击所选项（仅当鼠标可用于普通模式
 			且没有折行时有效）。点击第一行（表头）可取消。
 
 			列出的建议通常会替换一个被高亮的错误单词。有时
@@ -205,7 +205,7 @@ Vim 会统计遇到正确单词的次数。这用于对建议排序：以前见�
 这一机制在新文件或短文件中也能起作用 |spell-COMMON|。
 
 ==============================================================================
-2. 关于拼写检查的说明				*spell-remarks*
+2. 关于拼写检查的说明					*spell-remarks*
 
 性能
 
@@ -330,7 +330,7 @@ Vim 会查找：
 被修改，或者是为另一个 Vim 版本准备的。
 
 
-拼写文件清理					*spellfile-cleanup*
+拼写文件清理						*spellfile-cleanup*
 
 |zw| 命令会把 'spellfile' 中已有的条目变成注释行。这避免了每次都要写一个新文件，
 但导致文件只会越来越长，绝不会变短。要清理所有 ".add" 拼写文件中的注释行，请
@@ -374,7 +374,7 @@ Vim 使用固定的方法识别单词。这独立于 'iskeyword'，因此它在�
 注释就能被检查拼写。
 
 
-语法高亮					*spell-syntax*
+语法高亮						*spell-syntax*
 
 使用语法高亮的文件可以指定应当在何处做拼写检查：
 
@@ -409,7 +409,7 @@ VIM 脚本
 用户偏好别的值。
 
 
-双重评分					*spell-double-scoring*
+双重评分						*spell-double-scoring*
 
 'spellsuggest' 选项可用于选择 "double" 评分。这一机制基于这样一个原理：拼写
 错误有两种：
@@ -426,7 +426,7 @@ VIM 脚本
 设为选择给建议评分的首选方法。
 
 ==============================================================================
-3. 生成拼写文件					*spell-mkspell*
+3. 生成拼写文件						*spell-mkspell*
 
 Vim 使用二进制文件格式来保存拼写。这大大加快了单词表的加载速度，并使其保持
 较小。
@@ -491,7 +491,6 @@ OpenOffice.org 和 Mozilla 使用。OpenOffice 的 .oxt 文件是包含 .aff 和
 			与上面的 ":mkspell" 类似，使用 {name} 作为输入
 			文件，并在同一目录中生成一个追加了 ".{enc}.spl"
 			的输出文件。
-
 
 Vim 会报告重复单词的数目。这可能是单词表中的错误。但有时人们用它对同一个基本
 单词使用不同的前缀和后缀，以避免它们组合（例如捷克语就这样用）。如果你想让
@@ -565,7 +564,7 @@ Vim 报告所有重复单词，请设置 'verbose' 选项。
 注意，SpellFileMissing 自动命令不得修改或销毁用户当时正在编辑的 buffer。
 
 ==============================================================================
-4. 拼写文件格式					*spell-file-format*
+4. 拼写文件格式						*spell-file-format*
 
 这是创建和维护单词表的人所使用的文件的格式。
 
@@ -579,7 +578,7 @@ Myspell（Mozilla 和 OpenOffice.org）使用。这需要两个文件，一个�
 另一个为 .dic。
 
 
-直接单词表的格式				*spell-wordlist-format*
+直接单词表的格式					*spell-wordlist-format*
 
 单词必须每行一个。这就是全部要求。
 
@@ -719,7 +718,7 @@ SLASH 项定义，见 |spell-SLASH|。注意，如果没有这个 SLASH 项，�
 	KEEPCASE =  # 为带此标志的单词固定大小写 ~
 
 
-编码							*spell-SET*
+编码								*spell-SET*
 
 词缀文件可以是 "iconv" 支持的任何编码。然而在某些情况下，调用 |:mkspell| 时
 当前 locale 也应当设置正确。添加 FOL/LOW/UPP 行可去除这一要求 |spell-FOL|。
@@ -909,7 +908,7 @@ IGNOREEXTRA 标志。
 	SFX a 0 on . ~
 
 
-词缀标志					*spell-affix-flags*
+词缀标志						*spell-affix-flags*
 
 这是来自 Hunspell 的一个特性：词缀可以指定标志。这类似于在基本单词上指定的
 标志。这些标志作用于基本单词加词缀（但有一些限制）。示例：
@@ -945,14 +944,14 @@ IGNOREEXTRA 标志。
 - CIRCUMFIX，见下面紧接着的说明。
 
 
-IGNOREEXTRA					*spell-IGNOREEXTRA*
+IGNOREEXTRA						*spell-IGNOREEXTRA*
 
 通常 Vim 会对不以 '#' 开头的额外字段报错。这可以避免错误不被察觉。然而，一些
 为 Myspell 或 Hunspell 创建的文件可能含有许多带额外字段的条目。使用
 IGNOREEXTRA 标志可以避免大量错误。
 
 
-CIRCUMFIX					*spell-CIRCUMFIX*
+CIRCUMFIX						*spell-CIRCUMFIX*
 
 CIRCUMFIX 标志意味着必须同时添加一个前缀和一个后缀。如果某个前缀带有
 CIRCUMFIX 标志，则只能添加带 CIRCUMFIX 标志的后缀，反之亦然。
@@ -960,7 +959,7 @@ CIRCUMFIX 标志，则只能添加带 CIRCUMFIX 标志的后缀，反之亦然�
 |spell-NEEDAFFIX|
 
 
-PFXPOSTPONE					*spell-PFXPOSTPONE*
+PFXPOSTPONE						*spell-PFXPOSTPONE*
 
 当一个词缀文件含有非常多可应用于许多单词的前缀时，无法在内存中构建整个单词表。
 这适用于希伯来语（包含所有单词的列表超过一 Gbyte）。这种情况下必须推迟应用
@@ -973,7 +972,7 @@ PFXPOSTPONE					*spell-PFXPOSTPONE*
 字符，但为小写。因此截断字符串可用于允许后续单词以大写字母开头。
 
 
-含斜杠的单词					*spell-SLASH*
+含斜杠的单词						*spell-SLASH*
 
 斜杠在 .dic 文件中用于把基本单词与词缀字母及其他标志分隔开。不幸的是，这意味
 着你不能在单词中使用斜杠。因此 "TCP/IP" 不是单词，而是带标志 "IP" 的 "TCP"。
@@ -982,7 +981,7 @@ PFXPOSTPONE					*spell-PFXPOSTPONE*
 反斜杠的任何其他用法都保留供将来扩展。
 
 
-保留大小写的单词				*spell-KEEPCASE*
+保留大小写的单词					*spell-KEEPCASE*
 
 在词缀文件中可以用 KEEPCASE 行定义用于保留大小写单词的词缀名。示例：
 
@@ -998,7 +997,7 @@ Myspell 不支持这个标志。它的含义是大小写有意义。当单词在
 该标志也可用于避免单词在全大写形式时匹配。
 
 
-生僻词						*spell-RARE*
+生僻词							*spell-RARE*
 
 在词缀文件中可以用 RARE 行定义用于生僻词的词缀名。示例：
 
@@ -1012,7 +1011,7 @@ Myspell 不支持这个标志。它的含义是大小写有意义。当单词在
 正确单词出现，它就不会被标记为生僻。
 
 
-错误单词					*spell-BAD*
+错误单词						*spell-BAD*
 
 在词缀文件中可以用 BAD 行定义用于错误单词的词缀名。示例：
 
@@ -1029,7 +1028,6 @@ Myspell 不支持这个标志。它的含义是大小写有意义。当单词在
 							*spell-FORBIDDENWORD*
 FORBIDDENWORD 的用法与 BAD 相同。为了与 Hunspell 兼容。
 
-
 							*spell-NEEDAFFIX*
 NEEDAFFIX 标志用于要求某个单词必须与词缀一起使用。该单词本身不是正确单词
 （除非存在一个空词缀）。示例：
@@ -1037,7 +1035,7 @@ NEEDAFFIX 标志用于要求某个单词必须与词缀一起使用。该单词�
 	NEEDAFFIX + ~
 
 
-复合词						*spell-compound*
+复合词							*spell-compound*
 
 复合词是由 .dic 文件中出现的单词连接而成的更长单词。为指定哪些单词可以连接，
 使用一个字符。该字符放在单词后面的词缀列表中。我们在这里把这个字符称为标志。
@@ -1200,7 +1198,7 @@ SYLLABLE 项定义用于计算单词音节数目的字符或字符序列。示�
 |spell-COMPOUNDFORBIDFLAG| 标志会使所有用该词缀构成的单词都不被用于复合。
 
 
-无限复合					*spell-NOBREAK*
+无限复合						*spell-NOBREAK*
 
 对某些语言（例如泰语），单词之间没有空格。这看起来就像所有单词都复合在一起。
 要指定这一点，请在词缀文件中使用不带参数的 NOBREAK 项：
@@ -1231,7 +1229,7 @@ Vim 会尝试弄清一个单词在哪里结束、下一个在哪里开始。当�
 	NOSUGGEST % ~
 
 
-替换						*spell-REP*
+替换							*spell-REP*
 
 在词缀文件中可以用 REP 项定义常见错误。这用于生成拼写建议。这些项定义 "from"
 文本和 "to" 替换文本。示例：
@@ -1268,7 +1266,7 @@ Vim 会尝试弄清一个单词在哪里结束、下一个在哪里开始。当�
 符号的字母，会稍微更高效一些。
 
 
-.SUG 文件					*spell-NOSUGFILE*
+.SUG 文件						*spell-NOSUGFILE*
 
 当词缀文件中指定了发音折叠时，":mkspell" 通常会在 .spl 文件旁生成一个 .sug
 文件。该文件用于快速按发音相似形式查找建议。代价是占用大量内存（数量取决于单词
@@ -1281,7 +1279,7 @@ Vim 会尝试弄清一个单词在哪里结束、下一个在哪里开始。当�
 如果用户不想使用 .sug 文件，直接省略它即可。
 
 
-发音相似					*spell-SAL*
+发音相似						*spell-SAL*
 
 在词缀文件中可以用 SAL 项定义要使用的发音相似机制。主要的项定义 "from" 文本和
 "to" 替换文本。简单的例子：
@@ -1327,7 +1325,7 @@ SAL 机制复杂而缓慢。一种更简单的机制是把所有字符映射到�
 输出中看到分数。
 
 
-不受支持的项				*spell-affix-not-supported*
+不受支持的项					*spell-affix-not-supported*
 
 这些项出现在其他拼写检查器的词缀文件中。在 Vim 中它们被忽略、不受支持，或以
 另一种方式定义。
@@ -1380,7 +1378,6 @@ COMPOUNDLAST	(Hunspell)				*spell-COMPOUNDLAST*
 		最后一个元素。
 		请改用 COMPOUNDRULE。|spell-COMPOUNDRULE|
 
-
 COMPOUNDEND	(Hunspell)				*spell-COMPOUNDEND*
 		可能与 COMPOUNDLAST 相同
 
@@ -1430,7 +1427,7 @@ WORDCHARS	(Hunspell)				*spell-WORDCHARS*
 		无需把它们分开（使用 trie 而不是 hashtable）。
 
 ==============================================================================
-5. 拼写检查器设计				*develop-spell*
+5. 拼写检查器设计					*develop-spell*
 
 当准备把拼写检查加入 Vim 时，对可用的拼写检查库和程序做了一次调研。不幸的是，
 结果是它们都没有提供足够的能力来作为 Vim 中的拼写检查引擎，原因有若干：
@@ -1455,7 +1452,7 @@ WORDCHARS	(Hunspell)				*spell-WORDCHARS*
   很可能不同，建议可能是错误的单词。
 
 
-拼写建议				*develop-spell-suggestions*
+拼写建议					*develop-spell-suggestions*
 
 生成建议有两种基本机制：
 1. 尝试把错误单词改动一点点，并检查是否与某个正确单词匹配。或者遍历正确单词

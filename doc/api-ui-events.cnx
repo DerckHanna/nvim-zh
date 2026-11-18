@@ -33,7 +33,7 @@ grid 上，并让某些元素（"widgets"）由 UI 自身呈现，而非由 Nvim
 - `override`		决定 UI 能力如何解析。
 			- true: 启用所请求的 UI 能力，即使并非所有已连接的 UI
 			  （含 |TUI|）都支持它。
-			- false:（默认）禁用并非所有已连接的 UI 都支持
+			- false:（默认）禁用并非所有已连接的 UI（含 TUI）都支持
 			  的能力。
 
 							*ui-ext-options*
@@ -133,7 +133,7 @@ Nvim 会在加载启动文件与读取 buffer 之前暂停，以便 UI 有机会
    的处理函数内部，UI 可以安全地做进入普通模式之前的任何初始化，例如读取
    init.vim 设置的变量。
 
-							*ui-startup-stdin*
+							   *ui-startup-stdin*
 UI 可以通过如下方式支持从 stdin 读取（类似 `command | nvim -`，见 |--|）：
 
 1. 嵌入进程检测到 stdin fd 不是终端。
@@ -236,7 +236,7 @@ Global 事件							*ui-global*
 	2. 附加到 `listen_addr` 处的新服务器。
 
 ["suspend"] ~
-	使用了 |:suspend| 命令或 |CTRL-Z| 映射。终端客户端（或其它意义相当的
+	使用了 |:suspend| 命令或 |CTRL-Z| 映射。终端客户端（或其它适合这样做的
 	客户端）可以挂起自身。其它客户端可以安全地忽略它。
 
 ["update_menu"] ~
@@ -557,8 +557,8 @@ window 框架在 Nvim 中的尺寸）。一旦 UI 设置了某个 grid 的尺寸
 	定位该 window 有两种可选做法：
 	  - 手动定位 —— 该 window 应显示在另一个 grid `anchor_grid` 之上，
 	    位置为给定的 `anchor_row` 与 `anchor_col`。`anchor` 的含义及定位的
-	    更多细节见 |nvim_open_win()|。注意：你必须自行确保该 window 能装下
-	    屏幕，可能需要进一步重新定位。这种情况下请忽略 `screen_row` 与
+	    更多细节见 |nvim_open_win()|。注意：你必须自行确保该 window 不超出
+	    屏幕（能放进屏幕），必要时进一步调整其位置。这种情况下请忽略 `screen_row` 与
 	    `screen_col`。
 	  - 让 nvim 处理定位 —— 你可以忽略 `anchor`，把 window 显示在
 	    `screen_row` 与 `screen_col` 处。
@@ -595,8 +595,8 @@ window 框架在 Nvim 中的尺寸）。一旦 UI 设置了某个 grid 的尺寸
 
 ["win_viewport", grid, win, topline, botline, curline, curcol, line_count, scroll_delta] ~
 	指示该 window 中显示的 buffer 文本范围，以及光标在 buffer 中的位置。
-	所有位置都从零开始计数。如果行尾之后还有填充行，`botline` 被设为该
-	buffer 行数加一。`scroll_delta` 含自上次发出 `win_viewport` 以来该 window
+	所有位置都从零开始计数。如果 buffer 末尾之后还有填充行（diff 对齐用），
+	`botline` 会被设为该 buffer 行数加一。`scroll_delta` 含自上次发出 `win_viewport` 以来该 window
 	顶行的移动量。它用于实现平滑滚动。为此它只统计"虚拟"或"显示"行，因此
 	折叠只算作一行。当滚动超过一整屏时，它是一个近似值。
 
@@ -640,20 +640,20 @@ Popupmenu 事件						 *ui-popupmenu*
 	隐藏 popupmenu。
 
 ==============================================================================
-Tabline 事件						   *ui-tabline*
+Tabline 事件							   *ui-tabline*
 
 由 `ext_tabline` |ui-option| 激活。
 
 ["tabline_update", curtab, tabs, curbuf, buffers] ~
 	tabline 已更新。UI 应在自定义 tabline widget 中呈现这些数据。注：
-	`curbuf` + `buffers` 选项是在 API7 中添加的。
+	可选参数 `curbuf` 与 `buffers` 是在 API7 加入的。
 	curtab:   当前 Tabpage
 	tabs:     Dicts 列表 [{ "tab": Tabpage, "name": String }, ...]
 	curbuf:   当前 buffer 句柄。
 	buffers:  Dicts 列表 [{ "buffer": buffer 句柄, "name": String}, ...]
 
 ==============================================================================
-Cmdline 事件						   *ui-cmdline*
+Cmdline 事件							   *ui-cmdline*
 
 由 `ext_cmdline` |ui-option| 激活。
 

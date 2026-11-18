@@ -5,7 +5,7 @@
 					  updated by Nadim Shaikli
 
 
-Vim 的从右到左显示模式				*rileft*
+Vim 的从右到左显示模式						*rileft*
 
 
 这些函数最初由 Avner Lottem 创建：

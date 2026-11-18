@@ -83,6 +83,7 @@ Pseudo-Types ~
   可变参数（`...`）；参数个数上限为 9。
 
 ==============================================================================
+
 CONTENTS                                                          *luv-contents*
 
 本文档主要是把 libuv API 文档
@@ -402,6 +403,12 @@ uv.loop_configure({option}, {...})                         *uv.loop_configure()*
                     >lua
                     uv.loop_configure("block_signal", "sigprof")
 <
+
+                返回：`0` 或 `fail`。
+
+                注：要做好处理 `ENOSYS` 错误的准备；它表示该平台不支持此
+                loop 选项。
+
 uv.loop_mode()                                                  *uv.loop_mode()*
 
                 若 loop 正在运行，返回一个表示所用 mode 的 string。若 loop 未
@@ -483,6 +490,7 @@ uv.walk({callback})                                                  *uv.walk()*
                       end
                     end)
 <
+
 ==============================================================================
 `uv_req_t` — Base request                              *luv-base-request* *uv_req_t*
 
@@ -831,6 +839,7 @@ uv.timer_get_due_in({timer})                             *uv.timer_get_due_in()*
                 注：libuv 1.40.0 版本新增。
 
 ==============================================================================
+
 `uv_prepare_t` — Prepare handle                  *luv-prepare-handle* *uv_prepare_t*
 
 > |uv_handle_t| 函数同样适用。
@@ -873,6 +882,7 @@ uv.prepare_stop({prepare})                                   *uv.prepare_stop()*
                 返回：`0` 或 `fail`
 
 ==============================================================================
+
 `uv_check_t` — Check handle                          *luv-check-handle* *uv_check_t*
 
 > |uv_handle_t| 函数同样适用。
@@ -915,6 +925,7 @@ uv.check_stop({check})                                         *uv.check_stop()*
                 返回：`0` 或 `fail`
 
 ==============================================================================
+
 `uv_idle_t` — Idle handle                              *luv-idle-handle* *uv_idle_t*
 
 > |uv_handle_t| 函数同样适用。
@@ -964,6 +975,7 @@ uv.idle_stop({check})                                           *uv.idle_stop()*
                 返回：`0` 或 `fail`
 
 ==============================================================================
+
 `uv_async_t` — Async handle                          *luv-async-handle* *uv_async_t*
 
 > |uv_handle_t| 函数同样适用。
@@ -1012,6 +1024,7 @@ uv.async_send({async}, {...})                                  *uv.async_send()*
                 callback 已被调用之后再次调用 `uv.async_send()`，它会被再次调用。
 
 ==============================================================================
+
 `uv_poll_t` — Poll handle                              *luv-poll-handle* *uv_poll_t*
 
 > |uv_handle_t| 函数同样适用。
@@ -1192,6 +1205,7 @@ uv.signal_stop({signal})                                      *uv.signal_stop()*
                 返回：`0` 或 `fail`
 
 ==============================================================================
+
 `uv_process_t` — Process handle                  *luv-process-handle* *uv_process_t*
 
 > |uv_handle_t| 函数同样适用。
@@ -4222,6 +4236,7 @@ uv.metrics_info()                                            *uv.metrics_info()*
                 - `loop_count`：`integer`
                 - `events`：`integer`
                 - `events_waiting`：`integer`
+
 ==============================================================================
 STRING MANIPULATION FUNCTIONS                          *luv-string-manipulation*
 

@@ -360,19 +360,18 @@ buffer 一个名称。
 
 使用空搜索模式时，会沿用上一次的搜索模式。但如果先前没有搜索过，就不可能这样做。
 
-
 							*E24*  >
   No such abbreviation
 
 你使用的 ":unabbreviate" 命令带有一个并不存在的缩写作为参数。该命令的所有变体
-都会给出同样的消息：":cunabbrev"、":iunabbrev" 等。请检查行尾是否有空白。
+都会给出同样的消息：":cunabbrev"、":iunabbrev" 等。请检查末尾是否有多余空白。
 
 							*E31*  >
   No such mapping
 
 你使用的 ":unmap" 命令带有一个并不存在的映射作为参数。该命令的所有变体都会给出
 同样的消息：":cunmap"、":unmap!" 等。几点提示：
-- 检查行尾是否有空白。
+- 检查末尾是否有多余空白。
 - 如果该映射是 buffer 局部的，你需要使用 ":unmap <buffer>"。|:map-<buffer>|
 
 							*E37* *E89*  >
@@ -464,8 +463,8 @@ Vim 试图从 |swap-file| 读取文本，但出了点问题。相关 buffer 中�
 
 当 Vim 试图打开 swap 文件却发现它已存在、或者发现该位置是一个符号链接时，会出
 现这条消息。这本来不该发生，因为 Vim 已经检查过该文件不存在。要么是别人恰好在
-同一时刻打开了同一个文件（可能性很小），要么是有人正在尝试符号链接攻击（在 /
-tmp 中编辑文件时、或者 'directory' 以 "/tmp" 开头时可能发生，后者是个糟糕的选
+同一时刻打开了同一个文件（可能性很小），要么是有人正在尝试符号链接攻击
+（在 /tmp 中编辑文件时、或者 'directory' 以 "/tmp" 开头时可能发生，后者是个糟糕的选
 择）。
 
 							*E432*  >
@@ -562,8 +561,8 @@ Vim 无法创建 swap 文件。你仍然可以编辑该文件，但如果 Vim �
   Warning: Mode of file "{filename}" has changed since editing started
 
 当某个 buffer 的时间戳变了、内容仍然相同，但模式（权限）发生了变化时。这通常发
-生在从版本控制系统检出文件时，它会把只读位重置。重新加载该文件应当是安全的。把
-'autoread' 设为自动重新加载该文件。
+生在从版本控制系统检出文件时，它会把只读位重置。重新加载该文件应当是安全的。设置
+'autoread' 即可自动重新加载该文件。
 
 							*E211*  >
   File "{filename}" no longer available
@@ -717,12 +716,10 @@ Lua chunk 编译失败。loadstring() 函数在试图编译 Lua 代码时返回�
 
 Lua chunk 在成功编译之后执行失败。{error} 包含 Lua 运行时错误消息和 traceback。
 
-
 							*E5114*  >
   Converting print argument #{i}: {error}
 
 Lua `print()` 未能把第 {i} 个参数转换为字符串。{error} 包含转换错误的详细信息。
-
 
 							*E5115*  >
   Loading Lua debug string: {error}
@@ -735,7 +732,7 @@ Lua `print()` 未能把第 {i} 个参数转换为字符串。{error} 包含转�
 执行 Lua 调试命令字符串失败。{error} 包含运行时错误消息和 traceback。
 
 ==============================================================================
-消息						*messages*
+消息							*messages*
 
 消息显示在 |ui2| 消息区域中。如果它们超出（"overflow"）该区域，就会被折叠，并
 用一个 "spill" 指示符表明折叠了多少行。用 |g<| 可以查看完整的消息。
@@ -778,7 +775,7 @@ Lua `print()` 未能把第 {i} 个参数转换为字符串。{error} 包含转�
 
 
 ==============================================================================
-进度消息					*progress-message*
+进度消息						*progress-message*
 
 插件和 Nvim 核心功能可以发出 "progress" |ui-messages|，用来报告长时间运行任务
 的状态。
@@ -791,7 +788,7 @@ Lua `print()` 未能把第 {i} 个参数转换为字符串。{error} 包含转�
     • msg_show |ui-messages| 事件会在创建/更新一条进度消息时为 ext-ui 触发
     • 更新或创建一条进度消息还会触发 |Progress| 自动命令。
 
-Example: >lua
+示例： >lua
     local progress = {
       kind = 'progress',
       percent = 10,

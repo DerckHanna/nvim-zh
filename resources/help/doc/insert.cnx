@@ -5,7 +5,7 @@
 
 
 						*Insert* *Insert-mode*
-插入与替换文本				*mode-ins-repl*
+插入与替换文本						*mode-ins-repl*
 
 本文件大部分内容讲述插入模式与替换模式。末尾是几条以其他方式插入文本的命令。
 
@@ -329,7 +329,7 @@ CTRL-X CTRL-Y		把 window 向下滚动一行。
 
 
 ==============================================================================
-2. 特殊的特殊键				*ins-special-special*
+2. 特殊的特殊键					*ins-special-special*
 
 下列键是特殊的。它们会停止当前的插入，做某件事，
 然后重新开始插入。这意味着你可以在不离开
@@ -366,14 +366,14 @@ CTRL-G CTRL-J	光标下移一行，并回到插入起始列    *i_CTRL-G_CTRL-J*
 <PageUp>	把 window 上移一页			     *i_<PageUp>*
 <S-Down>	把 window 下移一页		     *i_<S-Down>*
 <PageDown>	把 window 下移一页		     *i_<PageDown>*
-<ScrollWheelDown>    把 window 下移三行	*i_<ScrollWheelDown>*
-<S-ScrollWheelDown>  把 window 下移一页		*i_<S-ScrollWheelDown>*
-<ScrollWheelUp>      把 window 上移三行		*i_<ScrollWheelUp>*
-<S-ScrollWheelUp>    把 window 上移一页		*i_<S-ScrollWheelUp>*
-<ScrollWheelLeft>    把 window 左移六列	*i_<ScrollWheelLeft>*
-<S-ScrollWheelLeft>  把 window 左移一页		*i_<S-ScrollWheelLeft>*
-<ScrollWheelRight>   把 window 右移六列	*i_<ScrollWheelRight>*
-<S-ScrollWheelRight> 把 window 右移一页		*i_<S-ScrollWheelRight>*
+<ScrollWheelDown>    把 window 下移三行			*i_<ScrollWheelDown>*
+<S-ScrollWheelDown>  把 window 下移一页			*i_<S-ScrollWheelDown>*
+<ScrollWheelUp>      把 window 上移三行			*i_<ScrollWheelUp>*
+<S-ScrollWheelUp>    把 window 上移一页			*i_<S-ScrollWheelUp>*
+<ScrollWheelLeft>    把 window 左移六列			*i_<ScrollWheelLeft>*
+<S-ScrollWheelLeft>  把 window 左移一页			*i_<S-ScrollWheelLeft>*
+<ScrollWheelRight>   把 window 右移六列			*i_<ScrollWheelRight>*
+<S-ScrollWheelRight> 把 window 右移一页			*i_<S-ScrollWheelRight>*
 CTRL-O		执行一条命令，然后返回插入模式   *i_CTRL-O*
 CTRL-\ CTRL-O	类似 CTRL-O，但不移动光标	     *i_CTRL-\_CTRL-O*
 CTRL-G u	结束撤销序列，开始新的更改	     *i_CTRL-G_u*
@@ -604,7 +604,7 @@ List 模式 'list'，以及偶尔设置了 'wrap' 时
 可以在输入新数据的同时让各列保持对齐。
 
 ==============================================================================
-7. 插入模式补全				*ins-completion*
+7. 插入模式补全						*ins-completion*
 
 在插入模式与替换模式中，有几条命令可以补全已输入的
 关键字或行的一部分。当你使用复杂的关键字
@@ -700,7 +700,7 @@ register 的内容（或 '=' register 求值的结果）
 
 
 
-补全整行					*compl-whole-line*
+补全整行						*compl-whole-line*
 
 							*i_CTRL-X_CTRL-L*
 CTRL-X CTRL-L		向后搜索一行，它开头的字符与当前行中
@@ -721,7 +721,7 @@ CTRL-X CTRL-L		向后搜索一行，它开头的字符与当前行中
 						使用了双 CTRL-X。只对已加载的
 						buffer 有效。
 
-补全当前文件中的关键字			*compl-current*
+补全当前文件中的关键字					*compl-current*
 
 							*i_CTRL-X_CTRL-P*
 							*i_CTRL-X_CTRL-N*
@@ -799,7 +799,7 @@ CTRL-N 开始展开，然后 CTRL-P 取回单个字符
 以该单词开头的那些行。
 
 
-补全 'dictionary' 中的关键字			*compl-dictionary*
+补全 'dictionary' 中的关键字				*compl-dictionary*
 
 							*i_CTRL-X_CTRL-K*
 CTRL-X CTRL-K		在用 'dictionary' 选项给出的文件中
@@ -858,7 +858,7 @@ https://github.com/vim/vim/issues/629#issuecomment-443293282
 ~/.vim/thesaurus/english.txt，并把 'thesaurus' 选项设为该文件名。
 
 
-用 'thesaurusfunc' 补全关键字		*compl-thesaurusfunc*
+用 'thesaurusfunc' 补全关键字				*compl-thesaurusfunc*
 
 如果设置了 'thesaurusfunc' 选项，那么会调用用户指定的函数
 来取得补全匹配列表，而不再使用 'thesaurus' 选项。
@@ -890,7 +890,7 @@ Groß 提供）： >
     endif
 
 
-补全当前文件与被包含文件中的关键字	*compl-keyword*
+补全当前文件与被包含文件中的关键字			*compl-keyword*
 
 'include' 选项用于指定包含被包含文件名的
 行。'path' 选项用于搜索被包含文件。
@@ -932,7 +932,7 @@ CTRL-X CTRL-]		搜索第一个以光标之前相同
 						会替换上一个匹配的标签。
 
 
-补全文件名					*compl-filename*
+补全文件名						*compl-filename*
 							*i_CTRL-X_CTRL-F*
 CTRL-X CTRL-F		搜索第一个以光标之前相同
 						字符开头的文件名。匹配的
@@ -950,7 +950,7 @@ CTRL-X CTRL-F		搜索第一个以光标之前相同
 						名。
 
 
-补全定义或宏			*compl-define*
+补全定义或宏						*compl-define*
 
 'define' 选项用于指定包含定义的行。
 'include' 选项用于指定包含被包含文件名的
@@ -975,7 +975,7 @@ CTRL-X CTRL-D		在当前文件与被包含文件中搜索
 						除非使用了双 CTRL-X。
 
 
-补全 Vim 命令					*compl-vim*
+补全 Vim 命令						*compl-vim*
 
 补全是上下文相关的。它的工作方式与在命令行上一样。它
 既能补全 Ex 命令，也能补全其参数。这在编写
@@ -998,7 +998,7 @@ CTRL-X CTRL-V		猜测光标之前是哪一类项，并
 						补全，例如： >
 				:imap <Tab> <C-X><C-V>
 
-从 register 补全内容			*compl-register-words*
+从 register 补全内容					*compl-register-words*
 							*i_CTRL-X_CTRL-R*
 CTRL-X CTRL-R		从所有 register 猜测光标之前是哪一类项，
 						并找到它的第一个匹配。
@@ -1017,7 +1017,7 @@ CTRL-X CTRL-R		从所有 register 猜测光标之前是哪一类项，
 						除非使用了双 CTRL-X（例如这会把
 						补全 register 单词切换为补全 register 内容）。
 
-用户自定义补全					*compl-function*
+用户自定义补全						*compl-function*
 
 补全由一个函数完成，该函数可以由用户用
 'completefunc' 选项定义。关于该函数如何被调用以及一个
@@ -1055,7 +1055,7 @@ CTRL-X CTRL-O		猜测光标之前是哪一类项，并
 						上一个匹配。
 
 
-拼写建议					*compl-spelling*
+拼写建议						*compl-spelling*
 
 会定位光标之前或光标处的单词，并给出拼写正确的
 单词来替换它。如果该行中、光标之前或光标之下有拼写
@@ -1077,7 +1077,7 @@ CTRL-X s		定位光标之前的单词，并找到它的
 						上一个建议。
 
 
-从不同来源补全			*compl-generic*
+从不同来源补全						*compl-generic*
 
 							*i_CTRL-N*
 CTRL-N			为在光标处结束的单词查找下一个匹配，
@@ -1146,7 +1146,7 @@ Vim 可以在你输入时显示补全菜单，类似使用 |i_CTRL-N|，
 要获得由 LSP 驱动的自动补全，见 |lsp-completion|。
 
 
-查找补全项的函数			*complete-functions*
+查找补全项的函数					*complete-functions*
 
 这适用于 'completefunc'、'thesaurusfunc' 和 'omnifunc'。
 
@@ -1320,7 +1320,7 @@ List。注意，自第一次调用以后光标可能已经移动，
 	set completefunc=CompleteMonths
 <
 
-插入模式补全弹出菜单				*ins-completion-menu*
+插入模式补全弹出菜单					*ins-completion-menu*
 							*popupmenu-completion*
 Vim 可以把匹配项显示在弹出菜单中。
 
@@ -1913,7 +1913,7 @@ XMLent 命令： >
 
 
 ==============================================================================
-8. 插入模式命令					*inserting*
+8. 插入模式命令						*inserting*
 
 以下命令可用于把新文本插入 buffer。它们
 都可以撤销，并可以用 "." 命令重复。
@@ -1984,7 +1984,7 @@ O			在光标上方开始新的一行并插入文本，
 
 
 ==============================================================================
-9. Ex 插入命令					*inserting-ex*
+9. Ex 插入命令						*inserting-ex*
 
 							*:a* *:append*
 :{range}a[ppend][!]	在指定行下方插入若干行
@@ -2050,7 +2050,7 @@ O			在光标上方开始新的一行并插入文本，
 						模式，如同 |gR|。
 
 ==============================================================================
-10. 插入文件					*inserting-file*
+10. 插入文件						*inserting-file*
 
 							*:r* *:re* *:read*
 :r[ead] [++opt] [name]
@@ -2097,9 +2097,9 @@ buffer、就像在编辑该文件一样时，这很有用。请在空 buffer 中
 							*file-read*
 'fileformat' 选项设置文件的 <EOL> 风格：
 'fileformat'    字符		   名称				~
-    "dos"		<CR><NL> 或 <NL>   DOS 格式
+    "dos"	<CR><NL> 或 <NL>   DOS 格式
     "unix"	<NL>		   Unix 格式
-    "mac"		<CR>		   Mac 格式
+    "mac"	<CR>               Mac 格式
 
 如果 'fileformat' 是 "dos"，<NL> 前面的 <CR> 会被忽略，文件末尾的
 CTRL-Z 也会被忽略。

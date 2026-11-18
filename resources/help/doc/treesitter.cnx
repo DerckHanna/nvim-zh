@@ -4,7 +4,7 @@
                             NVIM 参考手册
 
 
-Treesitter 集成                                                   *treesitter*
+Treesitter 集成                                        *treesitter*
 
 Nvim 集成了 `tree-sitter` 库，用于对 buffer 进行增量解析：
 https://tree-sitter.github.io/tree-sitter/
@@ -88,53 +88,53 @@ TREESITTER 查询谓词                                    *treesitter-predicate
 
 内置谓词如下：
 
-    `eq?`                                           *treesitter-predicate-eq?*
+    `eq?`                                            *treesitter-predicate-eq?*
         将字符串与节点对应的文本进行匹配： >query
             ((identifier) @variable.builtin (#eq? @variable.builtin "self"))
             ((node1) @left (node2) @right (#eq? @left @right))
 <
-    `any-eq?`                                   *treesitter-predicate-any-eq?*
+    `any-eq?`                                    *treesitter-predicate-any-eq?*
         类似 `eq?`，但仅针对量化的模式：只需有一个被捕获的节点匹配即可。
 
-    `match?`                                     *treesitter-predicate-match?*
-    `vim-match?`                             *treesitter-predicate-vim-match?*
+    `match?`                                      *treesitter-predicate-match?*
+    `vim-match?`                              *treesitter-predicate-vim-match?*
          将 |regexp| 与节点对应的文本进行匹配： >query
             ((identifier) @constant (#match? @constant "^[A-Z_]+$"))
 <
          注意：`^` 和 `$` 锚点将匹配节点文本的开头和结尾。
 
-    `any-match?`                             *treesitter-predicate-any-match?*
-    `any-vim-match?`                     *treesitter-predicate-any-vim-match?*
+    `any-match?`                              *treesitter-predicate-any-match?*
+    `any-vim-match?`                      *treesitter-predicate-any-vim-match?*
         类似 `match?`，但仅针对量化的模式：只需有一个被捕获的节点匹配即可。
 
-    `lua-match?`                             *treesitter-predicate-lua-match?*
+    `lua-match?`                              *treesitter-predicate-lua-match?*
          将 |lua-pattern| 与节点对应的文本进行匹配，类似 `match?`
 
-    `any-lua-match?`                     *treesitter-predicate-any-lua-match?*
+    `any-lua-match?`                      *treesitter-predicate-any-lua-match?*
          类似 `lua-match?`，但仅针对量化的模式：只需有一个被捕获的节点匹配即可。
 
-    `contains?`                               *treesitter-predicate-contains?*
+    `contains?`                                *treesitter-predicate-contains?*
         将字符串与节点对应文本的各个部分进行匹配： >query
             ((identifier) @foo (#contains? @foo "foo"))
             ((identifier) @foo-bar (#contains? @foo-bar "foo" "bar"))
 <
-    `any-contains?`                       *treesitter-predicate-any-contains?*
+    `any-contains?`                        *treesitter-predicate-any-contains?*
         类似 `contains?`，但仅针对量化的模式：只需有一个被捕获的节点匹配即可。
 
-    `any-of?`                                   *treesitter-predicate-any-of?*
+    `any-of?`                                    *treesitter-predicate-any-of?*
         将给定的任一字符串与节点对应的文本进行匹配： >query
             ((identifier) @foo (#any-of? @foo "foo" "bar"))
 <
         这是检查节点是否匹配众多关键字之一的推荐方式，因为它已针对此用途做过
         优化。
 
-    `has-ancestor?`                       *treesitter-predicate-has-ancestor?*
+    `has-ancestor?`                        *treesitter-predicate-has-ancestor?*
         将给定的任一节点类型与节点的所有祖先进行匹配： >query
             ((identifier) @variable.builtin
               (#any-of? @variable.builtin "begin" "end")
               (#has-ancestor? @variable.builtin range_expression))
 <
-    `has-parent?`                           *treesitter-predicate-has-parent?*
+    `has-parent?`                            *treesitter-predicate-has-parent?*
         将给定的任一节点类型与节点的直接祖先进行匹配： >query
             (((field_expression
                  (field_identifier) @method)) @_parent
@@ -179,7 +179,7 @@ Treesitter 指令为节点或匹配存储元数据，并产生副作用。例如
 <
 内置指令如下：
 
-    `set!`                                         *treesitter-directive-set!*
+    `set!`                                          *treesitter-directive-set!*
         为特定匹配或捕获设置键/值元数据。值可通过 `metadata[key]`（匹配专属）或
         `metadata[capture_id][key]`（捕获专属）访问。
 
@@ -193,7 +193,7 @@ Treesitter 指令为节点或匹配存储元数据，并产生副作用。例如
             ((node1) @left (node2) @right (#set! type "pair"))
             ((codeblock) @markup.raw.block (#set! priority 90))
 <
-    `offset!`                                   *treesitter-directive-offset!*
+    `offset!`                                      *treesitter-directive-offset!*
         取被捕获节点的范围并施加偏移。这会为该捕获节点设置一个新范围，形式为类似
         { {start_row}, {start_col}, {end_row}, {end_col} } 的列表，存放在
         `metadata[capture_id].offset`（`capture_id` 即该捕获的 id）。该偏移会应用
@@ -210,7 +210,7 @@ Treesitter 指令为节点或匹配存储元数据，并产生副作用。例如
         示例： >query
             ((identifier) @constant (#offset! @constant 0 1 0 -1))
 <
-    `gsub!`                                       *treesitter-directive-gsub!*
+    `gsub!`                                          *treesitter-directive-gsub!*
         使用 |lua-pattern| 转换节点的内容。这会设置新的
         `metadata[capture_id].text`。
 
@@ -222,7 +222,7 @@ Treesitter 指令为节点或匹配存储元数据，并产生副作用。例如
         示例： >query
             (#gsub! @_node ".*%.(.*)" "%1")
 <
-    `trim!`                                       *treesitter-directive-trim!*
+    `trim!`                                          *treesitter-directive-trim!*
         去除节点中的空白。设置新的 `metadata[capture_id].range`。接受一个捕获 ID，
         以及可选的四整数来自定义修剪行为（`1` 表示修剪，`0` 表示不修剪）。只给出
         捕获 ID 时，会从节点末尾去除空行（仅含空白或为空的行）（为向后兼容而
@@ -250,18 +250,18 @@ Treesitter 指令为节点或匹配存储元数据，并产生副作用。例如
 |vim.treesitter.query.list_directives()| 列出所有可用的指令。
 
 
-TREESITTER 查询 modeline                           *treesitter-query-modeline*
+TREESITTER 查询 modeline                            *treesitter-query-modeline*
 
 Nvim 支持用一组「modeline」（即查询中以 `;` 开头的注释）来自定义查询的行为。目前
 支持的 modeline 如下：
 
-    `inherits: {lang}...`                 *treesitter-query-modeline-inherits*
+    `inherits: {lang}...`                     *treesitter-query-modeline-inherits*
         指定该查询应当继承来自 {lang} 的查询。这会递归下降到 {lang} 的查询中，
         除非用括号包裹：`({lang})`。
         注意：这用于包含另一语言的查询。如果你想让自己的查询扩展同一语言的查询，
         请使用 `extends`。
 
-    `extends`                              *treesitter-query-modeline-extends*
+    `extends`                                  *treesitter-query-modeline-extends*
         指定该查询应当用作查询的扩展，也就是说，它应与其他查询合并。
         注意：扩展的顺序，以及用作基础的查询，取决于你的 'runtimepath' 值。
 
@@ -1481,7 +1481,7 @@ get({lang}, {query_name})                         *vim.treesitter.query.get()*
         (`vim.treesitter.Query?`) 已解析的查询。如果没有找到查询文件则为 `nil`。
         见 |vim.treesitter.Query|。
 
-                                           *vim.treesitter.query.get_files()*
+                                            *vim.treesitter.query.get_files()*
 get_files({lang}, {query_name}, {is_included})
     获取构成某个查询的文件列表
 

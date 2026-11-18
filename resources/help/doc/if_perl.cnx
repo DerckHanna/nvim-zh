@@ -10,9 +10,9 @@ Vim 的 perl 接口				*if_perl* *perl*
                                       输入 |gO| 查看目录。
 
 ==============================================================================
-1. 命令						*perl-commands*
+1. 命令							*perl-commands*
 
-						*:perl*
+							*:perl*
 :[range]perl {stmt}
 			执行 perl 语句 {stmt}。当前的 package 是 "main"。
 			想简单检查 `:perl` 命令是否可用： >
@@ -100,7 +100,7 @@ perl 命令不能在 |sandbox| 中使用。
 注意改动（例如 "use" 语句）会从一个命令持续到下一个命令。
 
 ==============================================================================
-2. VIM 模块					*perl-vim*
+2. VIM 模块						*perl-vim*
 
 Perl 代码通过 "VIM" 模块取得对 Nvim 的全部访问能力。
 
@@ -139,33 +139,33 @@ Perl 代码通过 "VIM" 模块取得对 Nvim 的全部访问能力。
 
 模块函数：
 
-						*perl-Msg*
+							*perl-Msg*
 VIM::Msg({msg})
 			显示消息 {msg}。
 
-						*perl-SetOption*
+							*perl-SetOption*
 VIM::SetOption({arg})	设置一个 vim 选项。{arg} 可以是 ":set" 命令
 			接受的任何参数。注意这意味着参数中不允许出现空格！
 			见 |:set|。
 
-						*perl-Buffers*
+							*perl-Buffers*
 VIM::Buffers([{bn}...])	不带参数时，在数组上下文中返回所有 Buffer
 			的列表，在标量上下文中返回 Buffer 的个数。对于
 			buffer 名称或编号的列表 {bn}，返回匹配 {bn} 的
 			Buffer 列表，规则与 Vim 内部的 |bufname()| 函数相同。
 			警告：使用 |:bwipe| 之后该列表即失效。
 
-						*perl-Windows*
+							*perl-Windows*
 VIM::Windows([{wn}...])	不带参数时，在数组上下文中返回所有 Window
 			的列表，在标量上下文中返回 Window 的个数。对于
 			window 编号的列表 {wn}，返回具有这些编号的 Window
 			列表。
 			警告：某个 window 被关闭后该列表即失效。
 
-						*perl-DoCommand*
+							*perl-DoCommand*
 VIM::DoCommand({cmd})	执行 Ex 命令 {cmd}。
 
-						*perl-Eval*
+							*perl-Eval*
 VIM::Eval({expr})	求值 {expr}，在列表上下文中返回 (success,
 			value)，在标量上下文中只返回值。success=1 表示
 			val 含有 {expr} 的值；success=0 表示求值该表达式
@@ -175,39 +175,39 @@ VIM::Eval({expr})	求值 {expr}，在列表上下文中返回 (success,
 			对 {expr} 都有效。
 			|List| 会通过连接各项并插入换行变成一个字符串。
 
-						*perl-Blob*
+							*perl-Blob*
 VIM::Blob({expr})	由标量值返回 Blob 字面量字符串 0zXXXX。
 
 ==============================================================================
-3. VIM::Buffer 对象				*perl-buffer*
+3. VIM::Buffer 对象					*perl-buffer*
 
 方法：
 
-						*perl-Buffer-Name*
+							*perl-Buffer-Name*
 Name()		返回该 Buffer 的文件名。
 
-						*perl-Buffer-Number*
+							*perl-Buffer-Number*
 Number()	返回该 Buffer 的编号。
 
-						*perl-Buffer-Count*
+							*perl-Buffer-Count*
 Count()		返回该 Buffer 中的行数。
 
-						*perl-Buffer-Get*
+							*perl-Buffer-Get*
 Get({lnum}, {lnum}?, ...)
 			对指定的每个 {lnum}，返回该 Buffer 中行 {lnum} 的文本
 			字符串。可以传入一个由 {lnum} 列表组成的数组。
 
-						*perl-Buffer-Delete*
+							*perl-Buffer-Delete*
 Delete({lnum}, {lnum}?)
 			删除该 Buffer 中的行 {lnum}。若给出第二个 {lnum}，
 			则删除从第一个 {lnum} 到第二个 {lnum} 的行范围。
 
-						*perl-Buffer-Append*
+							*perl-Buffer-Append*
 Append({lnum}, {line}, {line}?, ...)
 			在该 Buffer 第 {lnum} 行之后依次追加每个 {line}
 			字符串。{line} 的列表可以是一个数组。
 
-						*perl-Buffer-Set*
+							*perl-Buffer-Set*
 Set({lnum}, {line}, {line}?, ...)
 			从该 Buffer 第 {lnum} 行开始，用指定的
 			{lines} 替换一行或多行 Buffer 行。{line} 的列表可以
@@ -215,14 +215,14 @@ Set({lnum}, {line}, {line}?, ...)
 			若参数无效，则不会发生替换。
 
 ==============================================================================
-4. VIM::Window 对象				*perl-window*
+4. VIM::Window 对象					*perl-window*
 
 方法：
-						*perl-Window-SetHeight*
+							*perl-Window-SetHeight*
 SetHeight({height})
 			在屏幕限制之内，把该 Window 的高度设为 {height}。
 
-						*perl-Window-GetCursor*
+							*perl-Window-GetCursor*
 Cursor({row}?, {col}?)
 			不带参数时，返回该 Window 中当前光标位置的 (row,
 			col) 数组。带 {row} 和 {col} 参数时，把该 Window 的
@@ -233,7 +233,7 @@ Buffer()						*perl-Window-Buffer*
 			返回给定的 Window 对应的 Buffer 对象。
 
 ==============================================================================
-5. 词法变量					*perl-globals*
+5. 词法变量						*perl-globals*
 
 有多个词法变量。
 

@@ -4,14 +4,14 @@
 		  VIM REFERENCE MANUAL	  by Bram Moolenaar
 
 
-标签与特殊搜索				*tags-and-searches*
+标签与特殊搜索						*tags-and-searches*
 
 介绍请见用户手册第 |29.1| 节。
 
                                     输入 |gO| 查看目录。
 
 ==============================================================================
-1. 跳转到标签					*tag-commands*
+1. 跳转到标签						*tag-commands*
 
 							*tag* *tags*
 标签是出现在 "tags" 文件中的标识符。它是一种可以跳转到的标记。例如：在 C 程序中，

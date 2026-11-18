@@ -4,7 +4,7 @@
                             NVIM 参考手册
 
 
-Nvim 与 Vim 的差异						*vim-differences*
+Nvim 与 Vim 的差异                                             *vim-differences*
 
 Nvim 在许多方面与 Vim 不同，不过编辑器与 Vimscript（并非 Vim9script）特性基本
 一致。本文档是这些差异的完整且集中的参考。
@@ -98,7 +98,7 @@ Nvim 在许多方面与 Vim 不同，不过编辑器与 Vimscript（并非 Vim9s
 - |g:vimsyn_embed| 默认为 "l"，以启用 Lua 高亮
 
 默认 MOUSE
-						*default-mouse* *disable-mouse*
+                                                *default-mouse* *disable-mouse*
 默认启用 mouse。这意味着 |scroll-mouse-wheel| 会滚动 window 而不是移动光标；
 <LeftMouse> 点击会放置光标；<RightMouse> 点击会打开带标准操作的默认
 |popup-menu|。
@@ -298,7 +298,7 @@ Python 与 Ruby 插件也在进程外运行，因此它们不会使 Nvim 崩溃�
 - |:trust|
 - 用户命令可以支持 |:command-preview|，在输入时显示结果
 - 带 "++p" 标志的 |:write| 会创建父目录。
-- |:update| 命令即使对未修改的 buffers 也会写入新文件。
+- |:update| 命令即使未修改也会写入尚无文件的新 buffer。
 
 编辑器：
 - |prompt-buffer| 支持多行输入/粘贴、撤销/重做，以及 o/O 普通模式命令。

@@ -1,9 +1,8 @@
 *ft_hare.txt*	Support for the Hare programming language
 
                             Hare 编程语言支持
-
 ==============================================================================
-目录								*hare*
+目录									*hare*
 
 1. 简介							  |hare-intro|
 2. 文件类型插件						 |hare-plugin|
@@ -16,7 +15,7 @@
 README 文件，但必须通过设置 |g:filetype_haredoc| 来启用。
 
 ==============================================================================
-文件类型插件						 *hare-plugin*
+文件类型插件							 *hare-plugin*
 
 该插件会自动设置 'path' 的值，使其包含 HAREPATH 环境变量的内容，从而让 |gf|
 之类的命令能够直接打开标准库或第三方模块。如果未设置 HAREPATH，则默认为大多数

@@ -7,24 +7,24 @@
 快速参考指南
 
 						       *quickref* *Contents*
- 标签	  主题			 标签	  主题	~
-|Q_ct|	帮助文件列表		|Q_re|	重复命令
-|Q_lr|	移动：左右		|Q_km|	按键映射
+ 标签	  主题				 标签	  主题	~
+|Q_ct|	帮助文件列表			|Q_re|	重复命令
+|Q_lr|	移动：左右			|Q_km|	按键映射
 |Q_ud|	移动：上下			|Q_ab|	缩写
-|Q_tm|	移动：文本对象		|Q_op|	选项
-|Q_pa|	移动：模式搜索	|Q_ur|	撤销/重做命令
+|Q_tm|	移动：文本对象			|Q_op|	选项
+|Q_pa|	移动：模式搜索			|Q_ur|	撤销/重做命令
 |Q_ma|	移动：标记			|Q_et|	外部命令
 |Q_vm|	移动：各种			|Q_qf|	quickfix 命令
-|Q_ta|	移动：使用标签		|Q_vc|	各种命令
+|Q_ta|	移动：使用标签			|Q_vc|	各种命令
 |Q_sc|	滚动				|Q_ce|	Ex：命令行编辑
-|Q_in|	插入：插入文本		|Q_ra|	Ex：范围
+|Q_in|	插入：插入文本			|Q_ra|	Ex：范围
 |Q_ai|	插入：按键			|Q_ex|	Ex：特殊字符
-|Q_ss|	插入：特殊键		|Q_st|	启动 Vim
-|Q_di|	插入：二合字母		|Q_ed|	编辑文件
-|Q_si|	插入：特殊插入		|Q_fl|	使用参数列表
-|Q_de|	修改：删除文本		|Q_wq|	写入与退出
-|Q_cm|	修改：拷贝与移动	|Q_ac|	自动命令
-|Q_ch|	修改：更改文本		|Q_wi|	多 window 命令
+|Q_ss|	插入：特殊键			|Q_st|	启动 Vim
+|Q_di|	插入：二合字母			|Q_ed|	编辑文件
+|Q_si|	插入：特殊插入			|Q_fl|	使用参数列表
+|Q_de|	修改：删除文本			|Q_wq|	写入与退出
+|Q_cm|	修改：拷贝与移动		|Q_ac|	自动命令
+|Q_ch|	修改：更改文本			|Q_wi|	多 window 命令
 |Q_co|	修改：复杂操作			|Q_bu|	buffer 列表命令
 |Q_vi|	可视模式			|Q_sy|	语法高亮
 |Q_to|	文本对象			|Q_gu|	GUI 命令
@@ -613,7 +613,7 @@ N 表示一个可选的计数，可以给出在命令之前。
 					  带一行说明以及指向
 					  帮助的链接
 
-每个选项的简要说明：			*option-list*
+每个选项的简要说明：				*option-list*
 'allowrevins'	  'ari'     允许在插入模式中使用 CTRL-_
 'ambiwidth'	  'ambw'    如何处理宽度不确定的 Unicode 字符
 'arabic'	  'arab'    把阿拉伯语作为默认的第二语言
@@ -1214,7 +1214,7 @@ N 表示一个可选的计数，可以给出在命令之前。
 |:q|	  :q[uit]!		总是退出当前 buffer，丢弃任何
 				   改动。当没有其他非帮助 buffer 时
 				   退出 Vim
-|:qa|	  :qa[ll]		退出 Vim，除非已有改动做过
+|:qa|	  :qa[ll]		退出 Vim，除非已有改动
 |:qa|	  :qa[ll]!		总是退出 Vim，丢弃任何改动
 |:cq|	  :cq			退出不写入并返回错误码
 

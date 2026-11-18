@@ -41,7 +41,7 @@ Nvim 收录了多种 Lua 与 Vim 插件或模块，它们可能提供命令（�
 |pi_zip.txt|		是	Zip 归档浏览器
 
 ==============================================================================
-内置插件：difftool                                            *difftool*
+内置插件：difftool                                                  *difftool*
 
 
 :DiffTool {left} {right}                                           *:DiffTool*
@@ -82,7 +82,7 @@ open({left}, {right}, {opt})                                 *difftool.open()*
 
 
 ==============================================================================
-内置插件：editorconfig                                    *editorconfig*
+内置插件：editorconfig                                          *editorconfig*
 
 EditorConfig 就像是作用于整个（递归）目录的 'modeline'。当打开一个文件时，
 在运行 |ftplugin| 和 |FileType| 自动命令之后，EditorConfig 功能会在该文件的
@@ -175,7 +175,7 @@ trim_trailing_whitespace               *editorconfig.trim_trailing_whitespace*
 
 
 ==============================================================================
-内置插件：spellfile                                  *package-spellfile*
+内置插件：spellfile                                        *package-spellfile*
 
 提示用户下载缺失的拼写文件。拼写文件会被写入
 `stdpath('data') .. 'site/spell'`，或 'runtimepath' 中第一个可写的目录。
@@ -223,7 +223,7 @@ get({lang})                                                  *spellfile.get()*
 
 
 ==============================================================================
-内置插件：tohtml                                        *package-tohtml*
+内置插件：tohtml                                              *package-tohtml*
 
 
 :[range]TOhtml {file}                                                *:TOhtml*
@@ -257,7 +257,7 @@ tohtml({winid}, {opt})                                       *tohtml.tohtml()*
 
 
 ==============================================================================
-内置插件：undotree                                    *package-undotree*
+内置插件：undotree                                          *package-undotree*
 
 open({opts})                                                 *undotree.open()*
     打开一个 window，以文本形式显示 |undo-tree|，如果该 window 已经打开则关闭它。

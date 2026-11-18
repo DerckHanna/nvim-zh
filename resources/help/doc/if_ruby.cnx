@@ -15,7 +15,7 @@ Ruby 的链接。
                                       输入 |gO| 查看目录。
 
 ==============================================================================
-1. 命令						*ruby-commands*
+1. 命令							*ruby-commands*
 
 							*:ruby* *:rub*
 :rub[y] {cmd}		执行 Ruby 命令 {cmd}。 可以用来试手的命令： >
@@ -69,7 +69,7 @@ Vim script 示例： >
 在 |sandbox| 中无法执行 Ruby 命令。
 
 ==============================================================================
-2. VIM 模块					*ruby-vim*
+2. VIM 模块						*ruby-vim*
 
 Ruby 代码对 vim 的所有访问都经由 "VIM" 模块。
 
@@ -118,7 +118,7 @@ VIM::evaluate({expr})
 	|List| 会通过连接各项并插入换行而转成字符串。
 
 ==============================================================================
-3. VIM::Buffer 对象				*ruby-buffer*
+3. VIM::Buffer 对象					*ruby-buffer*
 
 VIM::Buffer 对象表示 vim Buffer。
 
@@ -148,7 +148,7 @@ line_number     如果 Buffer 处于活动状态，返回该 Buffer
 		当前行的编号。
 
 ==============================================================================
-4. VIM::Window 对象				*ruby-window*
+4. VIM::Window 对象					*ruby-window*
 
 VIM::Window 对象表示 vim Window。
 
@@ -172,7 +172,7 @@ cursor = [{row}, {col}]
 		把光标位置设为 {row} 和 {col}。
 
 ==============================================================================
-5. 全局变量					*ruby-globals*
+5. 全局变量						*ruby-globals*
 
 有两个全局变量。
 
@@ -180,7 +180,7 @@ $curwin		当前的 Window 对象。
 $curbuf		当前的 Buffer 对象。
 
 ==============================================================================
-6. rubyeval() Vim 函数				*ruby-rubyeval*
+6. rubyeval() Vim 函数					*ruby-rubyeval*
 
 为了支持双向接口，你可以使用 |rubyeval()| 函数来求值 Ruby 表达式，
 并把它们的值传给 Vim script。

@@ -18,7 +18,7 @@ Nvim 将某些功能委托给动态的 "provider"。本文档介绍这些 provid
 				      输入 |gO| 查看目录。
 
 ==============================================================================
-Python 集成				*provider-python*
+Python 集成					*provider-python*
 
 Nvim 支持 Python |remote-plugin|，以及 Vim 遗留的 |python3| 和 |pythonx| 接口
 （它们本身是作为 remote-plugin 实现的）。
@@ -102,7 +102,7 @@ RUBY PROVIDER 配置 ~
     let g:ruby_host_prog = 'rvm system do neovim-ruby-host'
 
 ==============================================================================
-Perl 集成				*provider-perl*
+Perl 集成					*provider-perl*
 
 Nvim 在 Unix 平台上支持 Perl |remote-plugin|。目前在已知的所有事件循环实现
 中，都缺少在 MS-Windows 上轮询 STDIN 的支持。也支持 Vim 遗留的 |perl-vim|
@@ -129,7 +129,7 @@ PERL PROVIDER 配置 ~
     let g:perl_host_prog = '/path/to/perl'
 <
 ==============================================================================
-Node.js 集成				*provider-nodejs*
+Node.js 集成					*provider-nodejs*
 
 Nvim 支持 Node.js |remote-plugin|。
 https://github.com/neovim/node-client/
@@ -339,6 +339,5 @@ X11 有三种已有文档记载的 selection：PRIMARY、SECONDARY 和 CLIPBOARD
 
 Nvim 的 X11 剪贴板 provider 只使用 PRIMARY 和 CLIPBOARD 这两种 selection，
 分别对应 "*" 和 "+" register。
-
 
  vim:tw=78:ts=8:noet:ft=help:norl:

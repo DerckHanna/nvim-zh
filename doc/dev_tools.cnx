@@ -4,14 +4,14 @@
                             NVIM 参考手册
 
 
-开发 Nvim 的工具与技巧                                       *dev-tools*
+开发 Nvim 的工具与技巧                                          *dev-tools*
 
 本篇讨论 Nvim 本身的开发与调试。
 
                                   输入 |gO| 查看目录。
 
 ==============================================================================
-Nvim 开发快速入门                                          *dev-quickstart*
+Nvim 开发快速入门                                             *dev-quickstart*
 
 你可以在 5 分钟以内开始动手修改 Nvim：
 
@@ -53,7 +53,7 @@ Nvim 开发快速入门                                          *dev-quickstart
 |dev-arch|。
 
 ==============================================================================
-日志                                                        *dev-tools-logs*
+日志                                                          *dev-tools-logs*
 
 底层日志消息会写入 `$NVIM_LOG_FILE`。
 
@@ -84,23 +84,23 @@ cb757f2663e6950e655c6306d713338dfa66b18d。
 
 
 ==============================================================================
-调试 TUI                                              *dev-tools-tui*
+调试 TUI                                                       *dev-tools-tui*
 
-TUI INSPECT
+TUI 检查
 
 使用 Ghostty https://ghostty.org/ 提供的检查器工具，可以观察并查询任何终端应用
 （例如 Nvim）的输出与事件。
 
 在 Ghostty 检查器中点击 "Terminal IO" 标签页即可获得跟踪记录。
 
-TERMINFO LOGGING
+terminfo 日志
 
 在 'verbose' 级别 3 时，Nvim 会记录其内部的 terminfo 状态，因此你能确切看到
 它在当前系统上使用了哪些 terminfo 值。 >
 
     nvim -V3log
 
-TUI DEBUGGING WITH GDB LLDB
+用 GDB/LLDB 调试 TUI
 
 启动 Nvim TUI 涉及两个进程，一个负责编辑器主状态，一个负责渲染 TUI。这两个
 进程都使用 nvim 二进制文件，所以有点令人困惑：在其中任意一个里设断点通常都
@@ -122,7 +122,7 @@ remote-ui 进程，而不丢失编辑器的状态。
 关于使用 nvim-dap 并自动调试子（主）进程的细节，参见
 [here](https://zignar.net/2023/02/17/debugging-neovim-with-neovim-and-nvim-dap/)
 
-TUI REDRAW
+TUI 重绘
 
 调试 Nvim TUI 重绘行为时，减慢它的重绘有时很有用。设置 'writedelay' 和
 'redrawdebug' 选项，就能看到 UI 在何处、何时被绘制。 >
@@ -134,7 +134,7 @@ TUI REDRAW
 
     :set writedelay=50 rdb=compositor,nodelta
 
-TUI TRACE
+TUI 跟踪
 
 在 Ghostty 检查器中点击 "Terminal IO" 标签页即可获得跟踪记录。
 
@@ -152,16 +152,16 @@ TUI TRACE
 
 然后你可以把 `bar` 与另一次会话比较，以调试 TUI 行为。
 
-TERMINAL REFERENCE
+终端参考
 
 - `man terminfo`
 - https://github.com/vim/vim/blob/0124320c97b0fbbb44613f42fc1c34fee6181fc8/src/libvterm/doc/seqs.txt
 - https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
 
 ==============================================================================
-调试性能                                               *dev-tools-perf*
+调试性能                                                      *dev-tools-perf*
 
-PROFILING (EASY)
+性能剖析（简单）
 
 要调试任何代码中的性能瓶颈，有一个简单（而且非常有效）的办法：
 
@@ -170,12 +170,12 @@ PROFILING (EASY)
 3. 瓶颈的成因会（几乎总是）出现在大多数栈回溯中。
 
 
-PROFILING (FANCY)
+性能剖析（进阶）
 
 若需要更高级的性能剖析，可以考虑 `perf` + `flamegraph`。
 
 
-USDT PROFILING (POWERFUL)
+USDT 剖析（强大）
 
 或者，你可以通过 `NVIM_PROBE`（[#12036](https://github.com/neovim/neovim/pull/12036)）使用 USDT 探针。
 
@@ -259,7 +259,7 @@ USDT PROFILING (POWERFUL)
 <
 
 ==============================================================================
-栈回溯                                              *dev-tools-backtrace*
+栈回溯                                                   *dev-tools-backtrace*
 
 LINUX
 
@@ -370,7 +370,7 @@ Find Symbols 对话框会打开，寻找 (g)vim.pdb。定位到你存放 PDB 文
 ==============================================================================
 Gdb                                                          *dev-tools-gdb*
 
-USING GDB TO STEP THROUGH FUNCTIONAL TESTS
+用 GDB 单步执行功能测试
 
 用 `TEST_TAG` 运行匹配 `#foo` 标签的测试（例如
 `it("test #foo ...", ...)`）：
@@ -384,12 +384,12 @@ USING GDB TO STEP THROUGH FUNCTIONAL TESTS
 
 -- 参见 https://github.com/neovim/neovim/blob/master/test/functional/testnvim.lua 中的 `nvim_argv`。
 
-USING LLDB TO STEP THROUGH UNIT TESTS
+用 LLDB 单步执行单元测试
 
 >
     lldb build/bin/nvim -- -ll test/runner.lua --lpath=./build/?.lua test/unit/
 <
-USING GDB
+使用 GDB
 
 要用 gdb 附着到 pid 为 1234 的运行中 `nvim` 进程（提示：运行中 Nvim 实例的
 pid 可以通过调用 |getpid()| 获得），例如：
@@ -410,14 +410,14 @@ pid 可以通过调用 |getpid()| 获得），例如：
   视图。这极其有用，因为它省掉了对 gdb "前端"的需求。
 - 用 `<up>` 和 `<down>` 滚动源文件视图
 
-GDB REVERSE DEBUGGING
+GDB 反向调试
 
 - `set record full insn-number-max unlimited`
 - `continue` 运行一会儿（至少执行到 `main()`）
 - `record`
 - 触发 bug，然后用 `revert-next`、`reverse-step` 等回退调试器
 
-USING GDBSERVER
+使用 gdbserver
 
 你可能想把多个 `gdb` 客户端连接到同一个运行中的 `nvim` 进程，或者想用本地
 `gdb` 连接远程的 `nvim` 进程。借助 `gdbserver`，你可以附着到单个进程，并从
@@ -446,7 +446,7 @@ SIGTTIN 信号），和/或无法输出数据（SIGTTOU 信号）。要强制让
 <
 这段代码。
 
-USING GDBSERVER IN TMUX
+在 tmux 中使用 gdbserver
 
 考虑使用自定义 makefile
 https://github.com/neovim/neovim/blob/master/BUILD.md#custom-makefile
@@ -473,9 +473,9 @@ https://github.com/neovim/neovim/blob/master/BUILD.md#custom-makefile
     (gdb) br main
 <
 ==============================================================================
-调试崩溃或内存泄漏                                      *dev-tools-asan*
+调试崩溃或内存泄漏                                            *dev-tools-asan*
 
-BUILD WITH ASAN
+用 ASAN 构建
 
 用 Clang 的 sanitizer（Address Sanitizer: ASan、Undefined Behavior Sanitizer:
 UBSan、Memory Sanitizer: MSan、Thread Sanitizer: TSan）构建 Nvim，是尽早捕获

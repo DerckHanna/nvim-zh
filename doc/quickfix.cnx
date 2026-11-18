@@ -64,10 +64,9 @@ quickfix 列表编号，只要加入 quickfix 栈的列表超过 'chistory' 个�
 
 							*:cc*
 :cc[!] [nr]		显示第 [nr] 个错误。如果省略 [nr]，则再次显示
-:[nr]cc[!]		同一个错误。没有 [!] 时，下列情形下该命令无法工作：
-			跳转到另一个 buffer、当前 buffer 已被改动、
-			该 buffer 只有一个 window，并且 'hidden' 与
-			'autowrite' 都处于关闭状态。
+:[nr]cc[!]		同一个错误。没有 [!] 时，若跳转到另一个 buffer，
+			且当前 buffer 已被改动、该 buffer 只有这一个 window、
+			'hidden' 与 'autowrite' 又都关闭，则该命令无法工作。
 			带 [!] 跳转到另一个 buffer 时，对当前 buffer
 			的所有改动都会丢失，除非设置了 'hidden' 或者
 			该 buffer 还有另一个 window。
@@ -80,8 +79,8 @@ quickfix 列表编号，只要加入 quickfix 栈的列表超过 'chistory' 个�
 :[nr]ll[!]		列表，而不是 quickfix 列表。
 
 						*:cn* *:cne* *:cnext* *E553*
-:[count]cn[ext][!]	显示列表中带有文件名的后 [count] 个错误。如果列表中
-			完全没有文件名，则跳到后 [count] 个错误。关于
+:[count]cn[ext][!]	显示列表中（带有文件名的条目里）向后第 [count] 个错误。如果列表中
+			完全没有文件名，则跳到向后第 [count] 个错误。关于
 			[!] 和 'switchbuf' 见 |:cc|。
 
 								*]q*
@@ -95,8 +94,8 @@ quickfix 列表编号，只要加入 quickfix 栈的列表超过 'chistory' 个�
 ]l			映射到 |:lnext|。|default-mappings|
 
 :[count]cN[ext][!]		*:cp* *:cprevious*  *:cprev* *:cN* *:cNext*
-:[count]cp[revious][!]	显示列表中带有文件名的前 [count] 个错误。如果列表中
-			完全没有文件名，则跳到前 [count] 个错误。关于
+:[count]cp[revious][!]	显示列表中（带有文件名的条目里）向前第 [count] 个错误。如果列表中
+			完全没有文件名，则跳到向前第 [count] 个错误。关于
 			[!] 和 'switchbuf' 见 |:cc|。
 
 								*[q*
@@ -159,7 +158,7 @@ quickfix 列表编号，只要加入 quickfix 栈的列表超过 'chistory' 个�
 							*:cnf* *:cnfile*
 :[count]cnf[ile][!]	显示列表中带有文件名的后 [count] 个文件中的第一个
 			错误。如果完全没有文件名，或者没有下一个文件，则
-			跳到后 [count] 个错误。关于 [!] 和 'switchbuf' 见
+			跳到向后第 [count] 个错误。关于 [!] 和 'switchbuf' 见
 			|:cc|。
 
 							*]_CTRL-Q*
@@ -175,7 +174,7 @@ quickfix 列表编号，只要加入 quickfix 栈的列表超过 'chistory' 个�
 :[count]cNf[ile][!]			*:cpf* *:cpfile* *:cNf* *:cNfile*
 :[count]cpf[ile][!]	显示列表中带有文件名的前 [count] 个文件中的最后一个
 			错误。如果完全没有文件名，或者没有下一个文件，则
-			跳到前 [count] 个错误。关于 [!] 和 'switchbuf' 见
+			跳到向前第 [count] 个错误。关于 [!] 和 'switchbuf' 见
 			|:cc|。
 
 								*[_CTRL-Q*
@@ -538,7 +537,7 @@ quickfix 列表。示例： >
 回到未过滤的列表。
 
 =============================================================================
-2. 错误 window					*quickfix-window*
+2. 错误 window						*quickfix-window*
 
 					    *:cope* *:copen* *w:quickfix_title*
 :cope[n] [height]	打开一个 window 来显示当前的错误列表。
@@ -782,7 +781,7 @@ window 的 ID（如果存在）。示例： >
     :call setloclist(3, [], 'r', {'items' : newItems})
 <
 =============================================================================
-3. 使用多个错误列表			*quickfix-error-lists*
+3. 使用多个错误列表					*quickfix-error-lists*
 
 到目前为止，一直假定只有一个错误列表。实际上可以有多个被记住的列表在使用；见
 'chistory' 和 'lhistory'。
@@ -1119,7 +1118,7 @@ msg() 取得新参数，因此也需要改动那里。于是你使用： >
 做，就无需写下 "todo" 列表也能找到所有位置。
 
 =============================================================================
-6. 选择编译器					*compiler-select*
+6. 选择编译器						*compiler-select*
 
 						*:comp* *:compiler* *E666*
 :comp[iler][!] {name}		设置选项以配合编译器 {name} 工作。
@@ -1459,7 +1458,7 @@ Perl 编译器插件实际上并不编译，而是调用 Perl 内部的语法检
 这一点，请把 g:perl_compiler_force_warnings 设为 0 值。例如： >
 	let g:perl_compiler_force_warnings = 0
 
-MYPY 类型检查器					*compiler-mypy*
+MYPY 类型检查器						*compiler-mypy*
 
 通过设置 b/g:mypy_makeprg_params 变量，可以把常用的编译器选项加入 'makeprg'。
 例如： >
@@ -1580,7 +1579,7 @@ Vim 包含一个用于 Typst 文件的编译器插件。该编译器由 Typst �
 	let g:typst_cmd = "/path/to/other/command"
 
 =============================================================================
-7. 错误格式					*error-file-format*
+7. 错误格式						*error-file-format*
 
 					*errorformat* *E372* *E373* *E374*
 						*E375* *E376* *E377* *E378*
@@ -1666,7 +1665,7 @@ Vim 会读取任意长度的行，但只使用前 4095 字节，其余部分被�
 处，至多只能给出其中一个作为前缀。
 某些编译器产生的消息由目录名组成，这些目录名必须加到 %f 读取的每个文件名之前
 （例如 GNU make）。可以使用下列代码来扫描这些目录名；它们会被存入一个内部的目录栈。
-									*E379*
+								*E379*
 	%D		"进入目录"格式字符串；期望后面跟一个能找到
 			目录名的 %f
 	%X		"离开目录"格式字符串；期望后面跟一个 %f
@@ -1676,7 +1675,7 @@ Vim 会读取任意长度的行，但只使用前 4095 字节，其余部分被�
 |quickfix-directory-stack|。
 
 
-多行消息				*errorformat-multi-line*
+多行消息					*errorformat-multi-line*
 
 可以读取那些产生多行消息的程序的输出，即占用不止一行的错误字符串。可能的前缀有：
 	%E		多行错误消息的开头
@@ -1752,7 +1751,7 @@ bb，再匹配 cc，依此类推。仅仅因为 cc 匹配了上一行错误，�
 
 
 
-分离的文件名			*errorformat-separate-filename*
+分离的文件名				*errorformat-separate-filename*
 
 如果文件名只给出一次，而其后又跟着多条引用该文件名的消息，下列前缀就很有用。
 	%O		单行文件消息：读过匹配的部分
@@ -1793,7 +1792,7 @@ bb，再匹配 cc，依此类推。仅仅因为 cc 匹配了上一行错误，�
 |errorformat-LaTeX|。
 
 
-忽略和使用整条消息			*efm-ignore*
+忽略和使用整条消息					*efm-ignore*
 
 '+' 或 '-' 代码可以与上面的大写代码组合使用；此时它们必须出现在字母之前，例如
 '%+A' 或 '%-G'：
@@ -1825,7 +1824,7 @@ bb，再匹配 cc，依此类推。仅仅因为 cc 匹配了上一行错误，�
 重要提示：不能在格式规范中使用 \(...\) 分组子匹配，因为它被保留用于内部转换。
 
 
-'errorformat' 中的多个条目			*efm-entries*
+'errorformat' 中的多个条目				*efm-entries*
 
 为了能够识别多个编译器的输出，可以在 'errorformat' 中放入多个格式模式，彼此用逗号
 分隔（注意：逗号后的空白会被忽略）。第一个完全匹配的模式会被使用。如果没有任何
@@ -1892,7 +1891,7 @@ bb，再匹配 cc，依此类推。仅仅因为 cc 匹配了上一行错误，�
 set 命令所要求的。
 
 =============================================================================
-8. 目录栈				*quickfix-directory-stack*
+8. 目录栈					*quickfix-directory-stack*
 
 Quickfix 维护一个栈，用于保存从 make 输出中解析出的所有用过的目录。对于 GNU make
 这相当简单，因为它总是打印它进入和离开的所有目录的绝对路径。无论这是通过在
@@ -1961,7 +1960,7 @@ Unix：
 使用消息 "Leaving dir"。
 
 =============================================================================
-9. 特定的错误文件格式			*errorformats*
+9. 特定的错误文件格式				*errorformats*
 
 						*errorformat-Jikes*
 Jikes(TM) 是 IBM Research 发布的一种把源码转换为字节码的 Java 编译器，它产生简单的
@@ -2094,7 +2093,7 @@ javac 输出行前面的 [javac] 前缀： >
 
 
 =============================================================================
-10. 自定义 quickfix window		*quickfix-window-function*
+10. 自定义 quickfix window			*quickfix-window-function*
 
 quickfix window 和位置列表 window 中所显示行的默认格式是：
 >

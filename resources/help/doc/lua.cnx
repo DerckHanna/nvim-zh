@@ -9,7 +9,7 @@ Lua 引擎                                                *lua* *Lua*
                                           输入 |gO| 查看目录。
 
 ==============================================================================
-简介                                                       *lua-intro*
+简介                                                               *lua-intro*
 
 Lua 5.1 脚本引擎是内建的，始终可用。试试这条命令，感受一下底层藏着什么： >vim
 
@@ -59,7 +59,7 @@ LuaJIT 或其兼容分支来构建。LuaJIT 还带来 `ffi`、|lua-profile| 以�
     :lua vim.cmd.edit(package.searchpath('jit.p', package.path))
 
 ==============================================================================
-LUA 概念与惯用法                                           *lua-concepts*
+LUA 概念与惯用法                                                *lua-concepts*
 
 Lua 非常简单，而且 _一致_：虽然有一些怪癖，但一旦你把它们内化，一切在任何
 地方都以同样的方式工作。尤其是作用域（闭包）非常一致，不像 JavaScript 或大
@@ -76,10 +76,10 @@ https://www.lua.org/doc/cacm2018.pdf
 - 有栈协程（stackful coroutine）支持协作式多线程、生成器，以及为 Lua 及其宿主
   （Nvim）提供灵活的控制。
 
-                                                       *lua-error-handling*
+                                                          *lua-error-handling*
 Lua 函数可能抛出 |lua-errors| 表示异常（意外）的失败，你可以用 |pcall()|
 处理。
-                                                    *lua-result-or-message*
+                                                       *lua-result-or-message*
 当失败是正常且可预期的，惯用法是返回 `nil`，向调用者表明该失败不是"异常"、
 必须被处理。这种 "result-or-message" 模式表示为多值返回类型
 `any|nil,nil|string`，或用 LuaLS 记法写成： >
@@ -103,22 +103,22 @@ Lua 函数可能抛出 |lua-errors| 表示异常（意外）的失败，你可�
 - 返回值的函数，例如 Foo:new()。
 - 有一组已知错误码可以作为第三个值返回时（如 |luv-error-handling|）。
 <
-                                                                *iterator*
+                                                                    *iterator*
 迭代器只是一个可以反复调用的函数，用于取出集合（或任何其他 |iterable|）的
 "下一个"值。|for-in| 循环期待这种接口，|pairs()| 会产生它，|vim.iter| 支持
 它，等等。
 https://www.lua.org/pil/7.1.html
 
-                                                                *iterable*
+                                                                    *iterable*
 "iterable" 是任何 |vim.iter()| 可以消费的东西：table、dict、list、迭代器函数、
 实现了 |__call()| 元方法的 table，以及 |vim.iter()| 对象。
 
-                                                           *list-iterator*
+                                                               *list-iterator*
 |lua-list| table 上的迭代器有"中间"和"结尾"，而一般意义上的迭代器在逻辑上
 可能是无限的。因此某些 |vim.iter| 操作（例如 |Iter:rev()|）只对类似 list 的
 table（按定义是有限的）才有意义。
 
-                                                       *lua-function-call*
+                                                           *lua-function-call*
 Lua 函数可以用多种方式调用。考虑下面这个函数： >lua
     local foo = function(a, b)
         print("A: ", a)
@@ -138,7 +138,7 @@ Lua 函数可以用多种方式调用。考虑下面这个函数： >lua
     -- A: 1
     -- B: nil
 <
-                                                                  *kwargs*
+                                                                      *kwargs*
 调用函数时，如果该函数恰好接收一个字面量字符串（`"foo"`）或字面量 table
 （`{1,2,3}`），你可以省略括号。后者常被用来模仿 Python、C# 等语言中的
 "命名参数"（"kwargs" 或 "keyword args"）。示例： >lua
@@ -153,7 +153,7 @@ Lua 函数可以用多种方式调用。考虑下面这个函数： >lua
 这里并没有什么特别之处，只是括号被隐式补上了。但从观感上说，这一点点语法糖
 已经相当接近"关键字参数"接口了。
 
-                                                               *lua-regex*
+                                                                   *lua-regex*
 Lua 刻意不支持正则表达式，而是提供能力有限、可避开扩展正则性能陷阱的
 |lua-pattern|。Lua 脚本也可以通过 |vim.regex()| 使用 Vim 正则。
 
@@ -173,7 +173,7 @@ Lua 刻意不支持正则表达式，而是提供能力有限、可避开扩展�
 
 
 ==============================================================================
-导入 LUA 模块                                             *lua-module-load*
+导入 LUA 模块                                                *lua-module-load*
 
 模块会在 'runtimepath' 与 |packages-runtimepath| 指定的目录中搜索，顺序与下面
 这条命令输出中出现的顺序一致： >vim
@@ -212,13 +212,13 @@ Nvim 回退到 Lua 默认的搜索机制。找到的第一个脚本会被执行�
   |package.cpath|。考虑到有些写得糟糕的插件会调用 shell，而 shell 无法处理
   含分号的路径，最好根本不要让这类路径出现在 'runtimepath' 里。
 
-                                                     *lua-script-location*
+                                                         *lua-script-location*
 Lua 脚本/模块可用 |debug.getinfo()| 取得自身位置： >
     debug.getinfo(1, 'S').source:gsub('^@', '')
 <
 
 ==============================================================================
-命令                                                         *lua-commands*
+命令                                                            *lua-commands*
 
 这些命令从命令行（:lua、:luado）或文件（:luafile）执行一块 Lua 代码，作用于
 给定的行 [range]。与 Lua 中一贯的情况一样，每个块都有自己的作用域（闭包），
@@ -250,7 +250,7 @@ Lua 的 print() 函数把输出重定向到 Nvim 的消息区，参数之间用 
         print(string.format(
             'unix time: %s', os.time()))
 <
-                                                            *:lua-heredoc*
+                                                                *:lua-heredoc*
 :lua << [trim] [{endmarker}]
 {script}
 {endmarker}
@@ -269,7 +269,7 @@ Lua 的 print() 函数把输出重定向到 Nvim 的消息区，参数之间用 
 <
     注意代码块结束时 `local` 变量会消失，全局变量则不会。
 
-                                                                  *:luado*
+                                                                      *:luado*
 :[range]luado {body}
     对 [range] 中的每个 buffer 行执行 Lua 代码块
     "function(line, linenr) {body} end"，其中 `line` 是当前行的文本（不含
@@ -284,7 +284,7 @@ Lua 的 print() 函数把输出重定向到 Nvim 的消息区，参数之间用 
         :lua bp = lpeg.P{ "(" * ((1 - lpeg.S"()") + lpeg.V(1))^0 * ")" }
         :luado if bp:match(line) then return "=>\t" .. line end
 <
-                                                                *:luafile*
+                                                                    *:luafile*
 :luafile {file}
     执行 {file} 中的 Lua 脚本。
     整个参数都作为文件名使用（类似 |:edit|），空格无需转义。你也可以用
@@ -320,7 +320,7 @@ Lua 的 nil、number、string、table 和 boolean 会转换成对应的 Vimscrip
     :echo luaeval('string.match(_A, "[a-z]+")', 'XYXfoo123')
     " foo
 <
-                                                     *lua-table-ambiguous*
+                                                         *lua-table-ambiguous*
 Lua 的 table 既用作字典又用作列表，因此无法判断空 table 是 list 还是 dict。
 另外 Lua 没有整数类型。为消除这些歧义，我们这样定义：
                                                                     *lua-list*
@@ -357,7 +357,7 @@ Lua 容器的改动不会影响 Vimscript 中的值。返回值也总是被转�
 |msgpack-special-dict| 会被特殊处理。
 
 ==============================================================================
-Vimscript 的 v:lua 接口                                      *v:lua-call*
+Vimscript 的 v:lua 接口                                           *v:lua-call*
 
 在 Vimscript 中，可以用特殊的 `v:lua` 前缀调用全局的、或可从全局 table 访问的
 Lua 函数。表达式 >vim
@@ -401,7 +401,7 @@ Lua 函数。下面这些是错误： >vim
     let g:foo = v:['lua']             " Error
 <
 ==============================================================================
-Lua 标准模块                                                  *lua-stdlib*
+Lua 标准模块                                                      *lua-stdlib*
 
 Nvim 的 Lua "标准库"（stdlib）就是 `vim` 模块，它提供各种函数和子模块。它
 始终处于已加载状态，因此不需要 `require("vim")`。
@@ -474,7 +474,7 @@ VIM.UV                                                   *lua-loop* *vim.uv*
     end)
     print('sleeping');
 <
-示例：文件变更检测                                        *watch-file*
+示例：文件变更检测                                                *watch-file*
     1. 把这段代码保存到一个文件。
     2. 用 ":luafile %" 执行它。
     3. 用 ":Watch %" 监视任意文件。
@@ -499,7 +499,7 @@ VIM.UV                                                   *lua-loop* *vim.uv*
     vim.api.nvim_command(
       "command! -nargs=1 Watch call luaeval('watch_file(_A)', expand('<args>'))")
 <
-                                                     *inotify-limitations*
+                                                         *inotify-limitations*
 在 Linux 上，你可能需要增大 `inotify` 监视和排队事件的最大数量，因为默认上限
 可能太低。要增大上限，运行： >bash
     sysctl fs.inotify.max_user_watches=494462
@@ -511,7 +511,7 @@ VIM.UV                                                   *lua-loop* *vim.uv*
 事实上一个监视最多可占用 1KB 空间。这意味着百万个监视可能带来 1GB 的额外
 内存占用。
 
-示例：TCP echo 服务器                                        *tcp-server*
+示例：TCP echo 服务器                                             *tcp-server*
     1. 把这段代码保存到一个文件。
     2. 用 ":luafile %" 执行它。
     3. 记下端口号。
@@ -540,7 +540,7 @@ VIM.UV                                                   *lua-loop* *vim.uv*
     end)
     print('TCP echo-server listening on port: '..server:getsockname().port)
 <
-多线程                                            *lua-loop-threading*
+多线程                                                    *lua-loop-threading*
 
 插件可以用 luv 中的线程 API 在独立（操作系统级）线程中执行工作，例如
 `vim.uv.new_thread`。每个线程都有自己独立的 Lua 解释器状态，无法访问主线程上
@@ -559,7 +559,7 @@ VIM.UV                                                   *lua-loop* *vim.uv*
 
 
 ==============================================================================
-VIM                                                          *vim.builtin*
+VIM                                                              *vim.builtin*
 
 
 vim.api.{func}({...})                                                *vim.api*
@@ -886,6 +886,7 @@ Vimscript 变量。
     vim.g.foo = nil   -- Delete (:unlet) the Vimscript variable.
     vim.b[2].foo = 6  -- Set b:foo for buffer 2
 <
+
 注意，直接设置字典字段不会把它们写回 Nvim。这是因为对该命名空间的索引只是
 返回一份副本。相反，必须把整个字典一次性写入。这可以通过创建一个短命的临时
 变量来实现。
@@ -1140,7 +1141,7 @@ vim.wo[{winid}][{bufnr}]                                              *vim.wo*
 
 
 ==============================================================================
-Lua 模块：vim                                                       *lua-vim*
+Lua 模块：vim                                                        *lua-vim*
 
 vim.cmd({cmd})                                                     *vim.cmd()*
     执行 Vimscript（|Ex-command| 命令）。
@@ -2054,7 +2055,7 @@ vim.trim({s})                                                     *vim.trim()*
       • |lua-pattern|s
       • https://www.lua.org/pil/20.2.html
 
-                                                               *vim.validate()*
+                                                              *vim.validate()*
 vim.validate({name}, {value}, {validator}, {optional}, {message})
     校验函数参数。
 
@@ -2129,7 +2130,7 @@ vim.validate({name}, {value}, {validator}, {optional}, {message})
 
 
 ==============================================================================
-Lua 模块：vim.base64                                            *vim.base64*
+Lua 模块：vim.base64                                              *vim.base64*
 
 vim.base64.decode({str})                                 *vim.base64.decode()*
     解码一个 Base64 编码的字符串。
@@ -2151,7 +2152,7 @@ vim.base64.encode({str})                                 *vim.base64.encode()*
 
 
 ==============================================================================
-Lua 模块：vim.filetype                                        *vim.filetype*
+Lua 模块：vim.filetype                                          *vim.filetype*
 
 vim.filetype.add({filetypes})                             *vim.filetype.add()*
     添加新的 filetype 映射。
@@ -2318,7 +2319,7 @@ vim.filetype.match({args})                              *vim.filetype.match()*
 
 
 ==============================================================================
-Lua 模块：vim.fs                                                    *vim.fs*
+Lua 模块：vim.fs                                                      *vim.fs*
 
                                                                *vim.fs.copy()*
 
@@ -2328,7 +2329,7 @@ Lua 模块：vim.fs                                                    *vim.fs*
     vim.fn.filecopy('foo.txt', 'bar.txt')
 <
 
-                                                              *vim.fs.exists()*
+                                                             *vim.fs.exists()*
 
 要用 |uv.fs_stat()| 检查文件的类型，以及它是否存在。
 
@@ -2654,7 +2655,7 @@ vim.fs.root({source}, {marker})                                *vim.fs.root()*
 
 
 ==============================================================================
-Lua 模块：vim.glob                                                *vim.glob*
+Lua 模块：vim.glob                                                  *vim.glob*
 
 Glob 到 LPeg 转换器（Peglob）本模块按 LSP 3.17 规范把 glob 模式转换为
 LPeg 模式：
@@ -2696,7 +2697,7 @@ vim.glob.to_lpeg({pattern})                               *vim.glob.to_lpeg()*
 
 
 ==============================================================================
-Lua 模块：vim.hl                                                    *vim.hl*
+Lua 模块：vim.hl                                                      *vim.hl*
 
 vim.hl.on_yank({opts})                                      *vim.hl.on_yank()*
     在 |TextYankPost| 事件期间高亮被 yank 的文本。
@@ -2752,7 +2753,7 @@ vim.hl.range({buf}, {ns}, {higroup}, {start}, {finish}, {opts})
 
 
 ==============================================================================
-Lua 模块：vim.iter                                                *vim.iter*
+Lua 模块：vim.iter                                                  *vim.iter*
 
 *vim.iter()* 是 |iterable| 的接口：它把 table 或函数参数包装成 *Iter*
 对象，其方法（如 |Iter:filter()| 与 |Iter:map()|）可变换底层源数据。这些
@@ -2815,7 +2816,7 @@ Lua 模块：vim.iter                                                *vim.iter*
 <
 
 
-Iter:all({pred})                                                *Iter:all()*
+Iter:all({pred})                                                  *Iter:all()*
     若迭代器中所有项都匹配给定谓词，返回 true。
 
     属性：~
@@ -2825,7 +2826,7 @@ Iter:all({pred})                                                *Iter:all()*
       • {pred}  (`fun(...):boolean`) 谓词函数。把管道上一阶段返回的所有
                 值作为参数传入；谓词匹配时返回 true。
 
-Iter:any({pred})                                                *Iter:any()*
+Iter:any({pred})                                                  *Iter:any()*
     若迭代器中任一项匹配给定谓词，返回 true。
 
     属性：~
@@ -2835,7 +2836,7 @@ Iter:any({pred})                                                *Iter:any()*
       • {pred}  (`fun(...):boolean`) 谓词函数。把管道上一阶段返回的所有
                 值作为参数传入；谓词匹配时返回 true。
 
-Iter:each({f})                                                 *Iter:each()*
+Iter:each({f})                                                   *Iter:each()*
     对管道中每一项调用一次函数，从而耗尽该迭代器。
 
     适用于有副作用的函数。若要修改迭代器中的值，请用 |Iter:map()|。
@@ -2847,7 +2848,7 @@ Iter:each({f})                                                 *Iter:each()*
       • {f}  (`fun(...)`) 对管道中每一项执行的函数。把管道上一阶段返回的
              所有值作为参数传入。
 
-Iter:enumerate()                                          *Iter:enumerate()*
+Iter:enumerate()                                            *Iter:enumerate()*
     为迭代器管道的每一项产生项索引（计数）与值。
 
     对列表 table，这样更高效： >lua
@@ -2875,7 +2876,7 @@ Iter:enumerate()                                          *Iter:enumerate()*
     返回值：~
         (`Iter`)
 
-Iter:filter({f})                                             *Iter:filter()*
+Iter:filter({f})                                               *Iter:filter()*
     过滤迭代器管道。
 
     示例： >lua
@@ -2889,7 +2890,7 @@ Iter:filter({f})                                             *Iter:filter()*
     返回值：~
         (`Iter`)
 
-Iter:find({f})                                                 *Iter:find()*
+Iter:find({f})                                                   *Iter:find()*
     查找迭代器中满足给定谓词的第一个值。
 
     会推进迭代器。若未找到值，则返回 nil 并耗尽迭代器。
@@ -2918,7 +2919,7 @@ Iter:find({f})                                                 *Iter:find()*
     返回值：~
         (`any`)
 
-Iter:flatten({depth})                                       *Iter:flatten()*
+Iter:flatten({depth})                                         *Iter:flatten()*
     展平一个 |list-iterator|，按给定的 {depth} 解除嵌套值。若试图展平
     类 dict 的值则报错。
 
@@ -3964,7 +3965,7 @@ vim.net.request({url}, {opts}, {on_response})              *vim.net.request()*
 
 
 ==============================================================================
-Lua 模块：vim.pos                                                  *vim.pos*
+Lua 模块：vim.pos                                                    *vim.pos*
 
 实验性（EXPERIMENTAL）：此 API 尚不稳定，请勿使用。它的语义尚未最终确定。
 订阅下面这个 issue 以获取更新：
@@ -4088,7 +4089,7 @@ to_offset({pos})                                         *vim.pos.to_offset()*
 
 
 ==============================================================================
-Lua 模块：vim.range                                            *vim.range*
+Lua 模块：vim.range                                                *vim.range*
 
 实验性（EXPERIMENTAL）：此 API 尚不稳定，请勿使用。它的语义尚未最终确定。
 订阅下面这个 issue 以获取更新：
@@ -4255,7 +4256,7 @@ to_lsp({range}, {position_encoding})                      *vim.range.to_lsp()*
 
 
 ==============================================================================
-Lua 模块：vim.re                                                    *vim.re*
+Lua 模块：vim.re                                                      *vim.re*
 
 `vim.re` 模块提供一种惯用的、类似 regex 的语法，用于在 LPeg |vim.lpeg| 中
 使用模式。（与 |vim.regex| 无关，后者从 Lua 提供 Vim 的 |regexp|。）
@@ -4323,7 +4324,7 @@ vim.re.updatelocale()                                  *vim.re.updatelocale()*
 
 
 ==============================================================================
-Lua 模块：vim.regex                                              *vim.regex*
+Lua 模块：vim.regex                                                *vim.regex*
 
 `vim.regex` 接口允许 Lua 代码使用 Vim 正则表达式。
 • 只在单行内匹配。
@@ -4373,7 +4374,7 @@ vim.regex({re})                                                  *vim.regex()*
 
 
 ==============================================================================
-Lua 模块：vim.secure                                            *vim.secure*
+Lua 模块：vim.secure                                              *vim.secure*
 
 vim.secure.read({path})                                    *vim.secure.read()*
     如果 {path} 是文件：尝试读取该文件，若需要判断该文件是否应被信任，则
@@ -4421,7 +4422,7 @@ vim.secure.trust({opts})                                  *vim.secure.trust()*
 
 
 ==============================================================================
-Lua 模块：vim.snippet                                          *vim.snippet*
+Lua 模块：vim.snippet                                            *vim.snippet*
 
 Snippet 的展开与跳转。
 
@@ -4485,7 +4486,7 @@ vim.snippet.stop()                                        *vim.snippet.stop()*
 
 
 ==============================================================================
-Lua 模块：vim.spell                                              *vim.spell*
+Lua 模块：vim.spell                                                *vim.spell*
 
 vim.spell.check({str})                                     *vim.spell.check()*
     检查 {str} 中的拼写错误。与 Vimscript 函数 |spellbadword()| 类似。
@@ -4512,8 +4513,9 @@ vim.spell.check({str})                                     *vim.spell.check()*
           区域有效的词 "caps" 该词应以大写开头
         • 该单词在 {str} 中开始的位置。
 
+
 ==============================================================================
-Lua 模块：vim.system                                        *lua-vim-system*
+Lua 模块：vim.system                                          *lua-vim-system*
 
 *vim.SystemCompleted*
 
@@ -4666,7 +4668,7 @@ vim.system({cmd}, {opts}, {on_exit})                            *vim.system()*
 
 
 ==============================================================================
-Lua 模块：vim.text                                                *vim.text*
+Lua 模块：vim.text                                                  *vim.text*
 
 vim.text.diff({a}, {b}, {opts})                              *vim.text.diff()*
     对字符串 {a} 与 {b} 运行 diff。本函数直接返回或在回调参数中返回的任何
@@ -4782,7 +4784,7 @@ vim.text.indent({size}, {text}, {opts})                    *vim.text.indent()*
 
 
 ==============================================================================
-Lua 模块：vim.ui                                                    *vim.ui*
+Lua 模块：vim.ui                                                      *vim.ui*
 
 vim.ui.input({opts}, {on_confirm})                            *vim.ui.input()*
     提示用户输入，允许在此期间进行任意（可能异步的）工作，直到
@@ -4912,8 +4914,9 @@ vim.ui.select({items}, {opts}, {on_choice})                  *vim.ui.select()*
                      `idx` 是 `item` 在 `items` 中的 1 基索引，若用户中止
                      对话框则为 `nil`。
 
+
 ==============================================================================
-Lua 模块：vim.uri                                                  *vim.uri*
+Lua 模块：vim.uri                                                    *vim.uri*
 
 vim.uri_decode({str})                                       *vim.uri_decode()*
     对一个含百分号转义的字符串做 URI 解码。
@@ -4973,7 +4976,7 @@ vim.uri_to_fname({uri})                                   *vim.uri_to_fname()*
 
 
 ==============================================================================
-Lua 模块：vim.version                                          *vim.version*
+Lua 模块：vim.version                                            *vim.version*
 
 `vim.version` 模块提供用于比较符合 https://semver.org 规范的版本与版本区间
 的函数。插件以及插件管理器可以用它来检查当前系统上可用的工具与依赖。

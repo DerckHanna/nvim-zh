@@ -11,7 +11,7 @@
 				      输入 |gO| 查看目录。
 
 ==============================================================================
-1. 变量						*variables*
+1. 变量							*variables*
 
 1.1 变量类型 ~
 						*E712* *E896* *E897* *E899* *E908* *E909*
@@ -177,7 +177,7 @@ Funcref 也可以配合 |:call| 命令使用： >
 参数： >
 	:let r = call(Fn, mylist)
 <
-							*Partial*
+								*Partial*
 Funcref 可以选择绑定一个 Dictionary 和/或参数。这也叫
 Partial。创建方式是给 function() 或 funcref() 传
 Dictionary 和/或参数。调用该函数时 Dictionary 和/或
@@ -708,8 +708,10 @@ Blob 拼接 ~
 两个 blob 可以用 "+" 运算符拼接： >
 	:let longblob = myblob + 0z4455
 	:let longblob = 0z4455 + myblob
+<
 一个 blob 可以用 |:let+=| 就地与另一个拼接： >
 	:let myblob += 0z6677
+<
 关于就地修改 blob 的更多内容，见下面的 |blob-modification|。
 
 
@@ -750,6 +752,7 @@ Blob 修改 ~
 要就地给 Blob 添加项，可以使用 |:let+=|（|blob-concatenation|）： >
 	:let blobA = 0z1122
 	:let blobA += 0z3344
+<
 当两个变量引用同一个 Blob 时，就地修改其中一个会导致被引用的 Blob 也被就地
 修改： >
 	:let blobA = 0z1122
@@ -757,6 +760,7 @@ Blob 修改 ~
 	:let blobB += 0z3344
 	:echo blobA
 	0z11223344
+<
 你也可以使用函数 |add()|、|remove()| 和 |insert()|。
 
 
@@ -805,7 +809,7 @@ MY_VAR_6	shada 文件
 可以用花括号组成变量名，见 |curly-braces-names|。
 
 ==============================================================================
-2. 表达式语法					*expression-syntax*
+2. 表达式语法						*expression-syntax*
 
 表达式语法概览，从最不具结合力到最具结合力：
 
@@ -939,8 +943,8 @@ falsy 运算符 ~
 ------------------------------------------------------------------------------
 expr2 与 expr3						*expr2* *expr3*
 
-expr3 || expr3 ..	logical OR（逻辑或）		*expr-barbar*
-expr4 && expr4 ..	logical AND（逻辑与）		*expr-&&*
+expr3 || expr3 ..	logical OR（逻辑或）	*expr-barbar*
+expr4 && expr4 ..	logical AND（逻辑与）	*expr-&&*
 
 "||" 与 "&&" 运算符在两侧各接受一个参数。参数会被（转换）为 Number。结果：
 
@@ -1060,29 +1064,28 @@ stricmp()：忽略大小写。
 无论 'magic' 或 'cpoptions' 的实际值为何，这种匹配总是如同设置了 'magic'
 且 'cpoptions' 为空。这让脚本可移植。为避免正则模式中的反斜杠被重复转义，
 请使用单引号字符串，见 |literal-string|。
-由于字符串被视为单独一行（包含 \n，即反斜杠-n）的多行模式不会匹配。
+由于字符串被视为单独一行，包含 \n（反斜杠-n）的多行模式不会匹配。
 不过，字面的 NL 字符可以像普通字符一样被匹配。示例：
 	"foo\nbar" =~ "\n"	求值为 1
 	"foo\nbar" =~ "\\n"	求值为 0
-
 
 
 ------------------------------------------------------------------------------
 expr5 与 expr6						*expr5* *expr6*
 
 expr6 + expr6   Number 加法、|List| 或 |Blob| 拼接		*expr-+*
-expr6 - expr6   Number 减法				*expr--*
-expr6 . expr6   String 拼接				*expr-.*
-expr6 .. expr6  String 拼接				*expr-..*
+expr6 - expr6   Number 减法					*expr--*
+expr6 . expr6   String 拼接					*expr-.*
+expr6 .. expr6  String 拼接					*expr-..*
 
 对 |Lists| 只可能用 "+"，且此时两个 expr6 都必须是 list。结果是一个新 list，
 由两个 list 拼接而成。
 
 String 拼接首选 ".."，因为 "." 有歧义，它也被用于 |Dict| 成员访问和浮点数。
 
-expr7 * expr7  Number 乘法				*expr-star*
-expr7 / expr7  Number 除法				*expr-/*
-expr7 % expr7  Number 取模				*expr-%*
+expr7 * expr7  Number 乘法					*expr-star*
+expr7 / expr7  Number 除法					*expr-/*
+expr7 % expr7  Number 取模					*expr-%*
 
 除 "." 与 ".." 外，所有运算都会把 Strings 转换为 Numbers。
 按位运算符见 |and()|、|or()| 和 |xor()|。
@@ -1124,9 +1127,9 @@ Number 除以零时结果取决于被除数的值：
 ------------------------------------------------------------------------------
 expr7							*expr7*
 
-! expr7			logical NOT（逻辑非）		*expr-!*
-- expr7			unary minus（一元负号）		*expr-unary--*
-+ expr7			unary plus（一元正号）		*expr-unary-+*
+! expr7			logical NOT（逻辑非）	*expr-!*
+- expr7			unary minus（一元负号）	*expr-unary--*
++ expr7			unary plus（一元正号）	*expr-unary-+*
 
 对 '!'，|TRUE| 变为 |FALSE|，|FALSE| 变为 |TRUE|（即一）。
 对 '-'，数字的符号被改变。
@@ -1201,6 +1204,7 @@ expr8[expr1a : expr1b]	substring 或 |sublist|		*expr-[:]* *substring*
 	:let c = name[-2:-2]		" last but one byte of a string
 	:let s = line(".")[4:]		" from the fifth byte to the end
 	:let s = s[:-3]			" remove last two bytes
+<
 <							*slice*
 若 expr8 是 |List|，这得到一个新的 |List|，包含由索引 expr1a 与 expr1b 指定
 的项。其行为与 String 一样，如上所述。另见下面的 |sublist|。示例： >
@@ -1277,7 +1281,6 @@ expr8->{lambda}([args])
 	\ ->join()
 
 使用 lambda 形式时，} 与 ( 之间不得有空白。
-
 
 
 							*expr9*
@@ -1405,8 +1408,8 @@ literal-string						*literal-string* *E115*
 ------------------------------------------------------------------------------
 interpolated-string				*$quote* *interpolated-string*
 
-$"string"		插值字符串常量			*expr-$quote*
-$'string'		插值字面量字符串常量		*expr-$'*
+$"string"		插值字符串常量				*expr-$quote*
+$'string'		插值字面量字符串常量			*expr-$'*
 
 插值字符串是 |string| 与 |literal-string| 的扩展，允许在其中包含
 Vim script 表达式（见 |expr1|）。任何返回值的表达式都可以放在花括号之间。
@@ -1584,7 +1587,7 @@ lambda 表达式有类似 '<lambda>42' 这样的内部名字。如果某个 lamb
 另见：|numbered-function|
 
 ==============================================================================
-3. Internal variable				*internal-variables* *E461*
+3. 内部变量				*internal-variables* *E461*
 
 内部变量名可以由字母、数字和 '_' 组成。但它不能以数字开头。
 也可以使用花括号，见 |curly-braces-names|。
@@ -1721,7 +1724,7 @@ PREDEFINED VIM VARIABLES			*vim-variable* *v:var* *v:*
 所有内建变量的字母序列表和细节在另一个 help 文件中：|vvars|。
 
 ==============================================================================
-4. Builtin Functions				*vim-function* *functions*
+4. 内建函数				*vim-function* *functions*
 
 Vimscript 子系统（内部称为 "eval"）提供内建函数。script 也可以定义
 |user-function|。
@@ -1731,7 +1734,7 @@ Vimscript 子系统（内部称为 "eval"）提供内建函数。script 也可�
 所有内建函数的字母序列表和细节在另一个 help 文件中：|vimscript-functions|。
 
 ==============================================================================
-5. Defining functions					*user-function*
+5. 定义函数						*user-function*
 
 可以定义新函数。它们可以像内建函数一样被调用。函数接收参数、执行一串
 Ex 命令，并可以返回一个值。
@@ -1739,7 +1742,7 @@ Ex 命令，并可以返回一个值。
 关于定义函数的绝大部分信息可以在 |userfunc.txt| 中找到。
 
 ==============================================================================
-6. Curly braces names					*curly-braces-names*
+6. 花括号名字						*curly-braces-names*
 
 在大多数可以使用变量的地方，都可以使用「花括号名字」变量。这是普通的变量
 名，其中有一个或多个用花括号 {} 包起来的表达式，像这样： >
@@ -1782,7 +1785,7 @@ Ex 命令，并可以返回一个值。
   :echo @{i}      " error
 
 ==============================================================================
-7. Commands						*expression-commands*
+7. 命令							*expression-commands*
 
 :let {var-name} = {expr1}				*:let* *E18*
 			把内部变量 {var-name} 设为表达式 {expr1} 的结果。
@@ -1990,9 +1993,9 @@ text...
 				   let n = {MyFunc(3, 4)}
 				CODE
 <
-									*E121*
+								*E121*
 :let {var-name}	...	列出变量 {var-name} 的值。可给出多个
-			变量名。此处可识别的特殊名称：				*E738*
+			变量名。此处可识别的特殊名称：	*E738*
 			  g:	全局变量
 			  b:	局部的 buffer 变量
 			  w:	局部的 window 变量
@@ -2103,7 +2106,7 @@ text...
 				let mylist[0] = 77	" OK
 				call add(mylist, 4)	" OK
 				let mylist = [7, 8, 9]  " Error!
-<							*E743*
+<								*E743*
 			要使用不限深度，请用 [!] 并省略 [depth]。
 			不过最大深度为 100，以防止出现循环。
 
@@ -2243,7 +2246,6 @@ text...
 :endt[ry]		更改 `:try` 与 `:endtry` 之间命令的错误
 			处理方式，包括跨越 `:source` 命令、函数调用
 			或 autocommand 调用而执行的所有内容。
-
 			当检测到错误或中断，且有后续的 `:finally`
 			命令时，执行从 `:finally` 之后继续。否则，
 			或在随后到达 `:endtry` 时，会检查下一个
@@ -2333,7 +2335,7 @@ text...
 			其后不能跟注释。
 			示例： >
 		:echo "the value of 'shell' is" &shell
-<				*:echo-redraw*
+<							*:echo-redraw*
 			稍后的重绘可能让消息再次消失。
 			而且由于 Vim 通常会把重绘推迟到一系列命令
 			执行完毕之后，这种情况相当常见。为避免
@@ -2341,7 +2343,7 @@ text...
 			（重绘常常被推迟到你输入某些内容），
 			请用 `:redraw` 命令强制重绘。示例： >
 		:new | redraw | echo "there is a new window"
-<				*:echo-self-refer*
+<							*:echo-self-refer*
 			打印嵌套容器时，echo 会用
 			"[...@level]"（自引用的 |List|）或
 			"{...@level}"（自引用的 |Dict|）来表示
@@ -2354,7 +2356,7 @@ text...
 <			会输出 "[[...@0]] [[[...@0]]]"。输出 "[l]" 则会
 			输出 "[[[...@1]]]"，因为 l 首次出现是在第二层。
 
-				*:echon*
+							*:echon*
 :echon {expr1} ...	输出每个 {expr1}，不附加任何内容。另见
 			|:comment|。
 			使用由 `:echohl` 命令设置的高亮。
@@ -2413,7 +2415,7 @@ text...
 			要发出 beep 声： >
 		:exe "normal \<Esc>"
 <
-				*:eval*
+							*:eval*
 :eval {expr}		求值 {expr} 并丢弃结果。示例： >
 				:eval Getlist()->Filter()->append('$')
 
@@ -2427,6 +2429,7 @@ text...
 
 			该命令后面不能跟 "|" 和另一条命令，因为
 			"|" 会被视为表达式的一部分。
+
 
 				*:exe* *:execute*
 :exe[cute] {expr1} ...	把 {expr1} 求值所得的字符串作为 Ex 命令执行。
@@ -2474,14 +2477,15 @@ text...
 			字符串中： >
 		:execute 'while i < 5 | echo i | let i = i + 1 | endwhile'
 <
-				*:exe-comment*
+
+							*:exe-comment*
 			":execute"、":echo" 与 ":echon" 后面不能直接跟
 			注释，因为它们会把 '"' 视为字符串的开头。
 			不过，你可以用 '|' 后接注释。示例： >
 		:echo "foo" | "this is a comment
 
 ==============================================================================
-8. 异常处理				*exception-handling*
+8. 异常处理						*exception-handling*
 
 Vim 脚本语言包含异常处理特性。本节说明如何在 Vim 脚本中使用它。
 
@@ -2490,7 +2494,7 @@ Vim 脚本语言包含异常处理特性。本节说明如何在 Vim 脚本中�
 |throw-catch|。
 
 
-TRY 条件					*try-conditionals*
+TRY 条件						*try-conditionals*
 
 异常可以被捕获，也可以触发清理代码的执行。你可以用 try 条件来指定
 catch 子句（捕获异常）和/或 finally 子句（用于清理）。
@@ -2560,7 +2564,7 @@ catch 子句先前的一次 ":break"、":continue"、":return" 或 ":finish"
 示例见 |throw-catch| 与 |try-finally|。
 
 
-TRY 条件的嵌套				*try-nesting*
+TRY 条件的嵌套						*try-nesting*
 
 try 条件可以任意嵌套。也就是说，一个完整的 try 条件可以放在另一个
 try 条件的 try 块、catch 子句或 finally 子句中。若内层 try 条件没有
@@ -2578,7 +2582,7 @@ try 条件的 try 块、catch 子句或 finally 子句中。若内层 try 条件
 示例见 |throw-catch|。
 
 
-检查异常处理代码				*except-examine*
+检查异常处理代码					*except-examine*
 
 异常处理代码可能变得很棘手。若不确定发生了什么，可把 'verbose' 设为
 13，或在 source 脚本文件时使用 ":13verbose" 命令修饰符。然后你就能
@@ -2587,7 +2591,7 @@ try 条件的 try 块、catch 子句或 finally 子句中。若内层 try 条件
 （见 |debug-scripts|）。
 
 
-抛出与捕获异常				*throw-catch*
+抛出与捕获异常						*throw-catch*
 
 你可以抛出任意数字或字符串作为异常。使用 |:throw| 命令，并把要抛出的值作为参数
 传入： >
@@ -2669,7 +2673,8 @@ catch 子句就会执行。
 	:  catch /^\d\+$/
 	:    echo "Number thrown.  Value is" v:exception
 
-|v:throwpoint|。此外还可以从 |v:stacktrace| 取得调用栈。
+你可能还想知道异常是在哪里抛出的。这一信息存放在 |v:throwpoint| 中。此外还可以从
+|v:stacktrace| 取得调用栈。
 需注意，"v:exception"、"v:stacktrace" 和 "v:throwpoint" 仅在最近捕获的那个异常
 尚未结束时对它有效。
    示例： >
@@ -3032,6 +3037,7 @@ autocommand。那样你就会把错误对用户隐藏起来。
 若要测试在脚本的某个特定行上按 CTRL-C 会发生什么，请使用调试模式，并在该行执行
 |>quit| 或 |>interrupt| 命令。见 |debug-scripts|。
 
+
 捕获全部						*catch-all*
 
 这些命令 >
@@ -3072,7 +3078,7 @@ autocommand。那样你就会把错误对用户隐藏起来。
 	:endwhile
 
 
-异常与 AUTOCOMMAND				*except-autocmd*
+异常与 AUTOCOMMAND					*except-autocmd*
 
 异常可以在 autocommand 执行期间使用。示例： >
 
@@ -3225,7 +3231,7 @@ autocommand。那样你就会把错误对用户隐藏起来。
 	:write
 
 
-异常层次与参数化异常				*except-hier-param*
+异常层次与参数化异常					*except-hier-param*
 
 有些编程语言允许使用异常类的层次结构，或者让异常类的对象携带附加信息。在 Vim
 里也能做类似的事情。
@@ -3312,7 +3318,7 @@ Vim 自身抛出的异常（出错时或按下 CTRL-C 时）使用扁平的层�
 
 这个问题是通过把错误转换成异常、并且只在 try 条件处于活动状态时才使用立即中止
 （除非被 ":silent!" 抑制）来解决的。这不算限制，因为（错误）异常只能从活动的
-try 条件中捕获。如果你想在捕获错误的同时立即终止，只要用一个不带 catch 子句的
+try 条件中捕获。如果你想立即终止而不捕获错误，只要用一个不带 catch 子句的
 try 条件即可。（通过指定 finally 子句，可以让清理代码在终止之前执行。）
 
 当没有活动的 try 条件时，使用的是通常的中止与继续行为，而不是立即中止。这样
@@ -3390,7 +3396,7 @@ try 条件内部错误异常的值是： >
 "E600: Missing :endtry" 错误消息，参见 |except-single-line|。
 
 ==============================================================================
-9. 示例						*eval-examples*
+9. 示例							*eval-examples*
 
 以二进制打印 ~
 >
@@ -3558,7 +3564,7 @@ dist#vim#IsSafeExecutable(filetype, executable) ~
 	executable	string
 
 ==============================================================================
-命令行表达式高亮					*expr-highlight*
+命令行表达式高亮				*expr-highlight*
 
 用户在 |i_CTRL-R_=|、|c_CTRL-\_e|、|quote=| 中输入的表达式由内置的表达式解析器
 高亮。它使用下表中描述的高亮组，这些组可以被 colorscheme 覆盖。
@@ -3602,31 +3608,37 @@ Group                              默认链接                彩色表达式 ~
 *hl-NvimTernaryColon*               NvimTernary             |expr1| 中的 `:`
 
 *hl-NvimParenthesis*                Delimiter               通用括号
-*hl-NvimLambda*                     NvimParenthesis         |lambda| 中的 `{`/`}`
+*hl-NvimLambda*                      NvimParenthesis         |lambda| 中的
+                                                             `{`/`}`
 *hl-NvimNestingParenthesis*         NvimParenthesis         |expr-nesting| 中的 `(`/`)`
 *hl-NvimCallingParenthesis*         NvimParenthesis         |expr-function| 中的 `(`/`)`
 
 *hl-NvimSubscript*                  NvimParenthesis         通用下标
 *hl-NvimSubscriptBracket*           NvimSubscript           |expr-[]| 中的 `[`/`]`
 *hl-NvimSubscriptColon*             NvimSubscript           |expr-[:]| 中的 `:`
-*hl-NvimCurly*                      NvimSubscript           |curly-braces-names| 中的 `{`/`}`
+*hl-NvimCurly*                       NvimSubscript       |curly-braces-names|
+                                                         中的 `{`/`}`
 
 *hl-NvimContainer*                  NvimParenthesis        通用容器
 *hl-NvimDict*                       NvimContainer          |dict| 字面量中的 `{`/`}`
 *hl-NvimList*                       NvimContainer          |list| 字面量中的 `[`/`]`
 
 *hl-NvimIdentifier*                 Identifier              通用标识符
-*hl-NvimIdentifierScope*            NvimIdentifier          |internal-variables| 中 `:` 之前的命名空间字母
-*hl-NvimIdentifierScopeDelimiter*   NvimIdentifier          命名空间字母之后的 `:`
+*hl-NvimIdentifierScope*             NvimIdentifier      |internal-variables| 中
+                                                         `:` 之前的命名空间字母
+*hl-NvimIdentifierScopeDelimiter*    NvimIdentifier          命名空间字母之后的
+                                                             `:`
 *hl-NvimIdentifierName*             NvimIdentifier          标识符的其余部分
-*hl-NvimIdentifierKey*              NvimIdentifier          |expr-entry| 之后的标识符
+*hl-NvimIdentifierKey*               NvimIdentifier          |expr-entry| 之后的
+                                                             标识符
 
 *hl-NvimColon*                      Delimiter               |dict| 字面量中的 `:`
 *hl-NvimComma*                      Delimiter               |dict| 或 |list| 字面量或 |expr-function| 中的 `,`
 *hl-NvimArrow*                      Delimiter               |lambda| 中的 `->`
 
 *hl-NvimRegister*                   SpecialChar             |expr-register|
-*hl-NvimNumber*                     Number                  整数 |expr-number| 中的非前缀数字
+*hl-NvimNumber*                      Number                  整数 |expr-number|
+                                                             中的非前缀数字
 *hl-NvimNumberPrefix*               Type                    |octal-number| 的 `0`、|hex-number| 的 `0x`、|binary-number| 的 `0b`
 *hl-NvimFloat*                      NvimNumber             浮点数
 
@@ -3642,15 +3654,21 @@ Group                              默认链接                彩色表达式 ~
 *hl-NvimString*                     String                  通用字符串
 *hl-NvimStringBody*                 NvimString              通用字符串字面量主体
 *hl-NvimStringQuote*                NvimString              通用字符串引号
-*hl-NvimStringSpecial*              SpecialChar            通用字符串非字面量主体
+*hl-NvimStringSpecial*               SpecialChar             通用字符串非字面量
+                                                             主体
 
 *hl-NvimSingleQuote*                NvimStringQuote         |expr-'| 中的 `'`
-*hl-NvimSingleQuotedBody*           NvimStringBody          |expr-'| 字符串主体的字面量部分
+*hl-NvimSingleQuotedBody*            NvimStringBody          |expr-'| 字符串主体
+                                                             的字面量部分
 *hl-NvimSingleQuotedQuote*          NvimStringSpecial       |expr-'| 字符串主体中的 `''`
 
-*hl-NvimDoubleQuote*                NvimStringQuote         |expr-quote| 中的 `"`
-*hl-NvimDoubleQuotedBody*           NvimStringBody          |expr-quote| 主体的字面量部分
-*hl-NvimDoubleQuotedEscape*         NvimStringSpecial       合法的 |expr-quote| 转义序列
-*hl-NvimDoubleQuotedUnknownEscape*  NvimInvalidValue        无法识别的 |expr-quote| 转义序列
+*hl-NvimDoubleQuote*                 NvimStringQuote         |expr-quote| 中的
+                                                             `"`
+*hl-NvimDoubleQuotedBody*            NvimStringBody          |expr-quote| 主体的
+                                                             字面量部分
+*hl-NvimDoubleQuotedEscape*          NvimStringSpecial       合法的 |expr-quote|
+                                                             转义序列
+*hl-NvimDoubleQuotedUnknownEscape*   NvimInvalidValue    无法识别的
+                                                         |expr-quote| 转义序列
 
  vim:tw=78:ts=8:noet:ft=help:norl:

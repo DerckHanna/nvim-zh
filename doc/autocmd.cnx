@@ -11,7 +11,7 @@
 				      输入 |gO| 查看目录。
 
 ==============================================================================
-1. 简介						*autocmd-intro*
+1. 简介							*autocmd-intro*
 
 你可以指定一些命令，让它们在读取或写入文件时、进入或离开 buffer 或 window 时，
 以及退出 Vim 时自动执行。例如，你可以创建一条自动命令，为匹配 `*.c` 的文件
@@ -30,7 +30,7 @@
   事件使用相同的自动命令。
 
 ==============================================================================
-2. 定义自动命令				*autocmd-define*
+2. 定义自动命令						*autocmd-define*
 
 使用 |nvim_create_autocmd()| 从 Lua 定义事件处理器。
 
@@ -38,8 +38,8 @@ Vimscript 命令如下所述。
 
 							*:au* *:autocmd*
 :au[tocmd] [group] {event} {aupat} [++once] [++nested] {cmd}
-			把 {cmd} 加入 Vim 会自动执行的命令列表，在 {event}
-			针对匹配 {aupat} 的文件触发时执行 |autocmd-pattern|。
+			把 {cmd} 加入命令列表：当 {event} 发生且文件匹配
+			{aupat}（|autocmd-pattern|）时，Vim 自动执行这些命令。
 			这里 {event} 不能是 "*"。  *E1155*
 			注意：引号字符会被视为 :autocmd 的参数，而不会开始
 			一条注释。
@@ -150,7 +150,7 @@ Vimscript 命令如下所述。
 [group] 指定的组。
 
 ==============================================================================
-4. 列出自动命令					*autocmd-list*
+4. 列出自动命令						*autocmd-list*
 
 :au[tocmd] [group] {event} {aupat}
 			显示与 {event} 和 {aupat} 关联的自动命令。
@@ -1391,7 +1391,7 @@ WinScrolled			当前标签页中任何 window 滚动文本（水平或
 因此那些自动命令仍会被执行。
 
 ==============================================================================
-7. Buffer 局部的自动命令		*autocmd-buflocal* *autocmd-buffer-local*
+7. Buffer 局部的自动命令	*autocmd-buflocal* *autocmd-buffer-local*
 				*<buffer>* *<buffer=N>* *<buffer=abuf>* *E680*
 
 buffer 局部的自动命令依附于某个特定的 buffer。当 buffer 没有名字、或者名字
@@ -1436,7 +1436,7 @@ buffer 局部的自动命令不使用模式，而是使用下列形式之一：
 无法为一个不存在的 buffer 定义 buffer 局部的自动命令。
 
 ==============================================================================
-8. 组						*autocmd-groups*
+8. 组							*autocmd-groups*
 
 自动命令可以放在一个组里。这对于移除或执行一组自动命令很有用。例如，所有
 用于语法高亮的自动命令都放在 "highlight" 组里，以便在 GUI 启动时执行
@@ -1487,7 +1487,7 @@ buffer 局部的自动命令不使用模式，而是使用下列形式之一：
 	browse edit
 
 ==============================================================================
-9. 执行自动命令				*autocmd-execute*
+9. 执行自动命令						*autocmd-execute*
 
 Vim 也可以非自动地执行自动命令。如果你改过自动命令，或者 Vim 执行了错误的
 自动命令（例如文件模式匹配错了），这很有用。
@@ -1730,7 +1730,7 @@ Vim 只读取交换文件中没有的那些文件部分。由于 BufReadCmd 无�
 示例见 $VIMRUNTIME/pack/dist/opt/netrw/plugin/netrwPlugin.vim。
 
 ==============================================================================
-11. 禁用自动命令				*autocmd-disable*
+11. 禁用自动命令					*autocmd-disable*
 
 要暂时禁用自动命令，请使用 'eventignore' 选项。注意这可能造成意外行为，
 请务必在之后恢复 'eventignore'，可以使用带 |:finally| 的 |:try| 块。
@@ -1748,5 +1748,6 @@ Vim 只读取交换文件中没有的那些文件部分。由于 BufReadCmd 无�
 
 注意，有些自动命令不会立即触发，而是稍后才触发。这尤其适用于
 |CursorMoved| 和 |TextChanged|。
+
 
  vim:tw=78:ts=8:noet:ft=help:norl:

@@ -15,7 +15,7 @@
                                       按 |gO| 查看目录。
 
 ==============================================================================
-开始使用							*mbyte-first*
+开始使用						*mbyte-first*
 
 本节概述 Nvim 中的多字节功能。
 
@@ -124,13 +124,13 @@ Territory 指国家（或其一部分），codeset 指 |charset|。例如 locale
 针对特定语言、地区与 codeset 的 locale 名称并不统一，取决于你的系统。
 
 locale 名称的示例：
-    charset	    language		  locale name ~
-    GB2312	    Chinese (simplified)  zh_CN.EUC, zh_CN.GB2312
-    Big5	    Chinese (traditional) zh_TW.BIG5, zh_TW.Big5
-    CNS-11643	    Chinese (traditional) zh_TW
-    EUC-JP	    Japanese		  ja, ja_JP.EUC, ja_JP.ujis, ja_JP.eucJP
-    Shift_JIS	    Japanese		  ja_JP.SJIS, ja_JP.Shift_JIS
-    EUC-KR	    Korean		  ko, ko_KR.EUC
+    字符集	    语言		  locale 名称 ~
+    GB2312	    简体中文	  zh_CN.EUC, zh_CN.GB2312
+    Big5	    繁体中文	  zh_TW.BIG5, zh_TW.Big5
+    CNS-11643	    繁体中文	  zh_TW
+    EUC-JP	    日文		  ja, ja_JP.EUC, ja_JP.ujis, ja_JP.eucJP
+    Shift_JIS	    日文		  ja_JP.SJIS, ja_JP.Shift_JIS
+    EUC-KR	    韩文		  ko, ko_KR.EUC
 
 
 使用 locale
@@ -183,71 +183,70 @@ Charset 是编码的另一个名称。两者有细微差别，但在使用 Vim �
 							*encoding-names*
 Vim 可以编辑采用不同字符编码的文件。主要有三大类：
 
-1   8bit	Single-byte encodings, 256 different characters.  Mostly used
-		in USA and Europe.  Example: ISO-8859-1 (Latin1).  All
-		characters occupy one screen cell only.
+1   8bit	单字节编码，256 个不同字符。多用于美国和欧洲。
+		例：ISO-8859-1（Latin1）。所有字符都只占一个
+		屏幕单元格。
 
-2   2byte	Double-byte encodings, over 10000 different characters.
-		Mostly used in Asian countries.  Example: euc-kr (Korean)
-		The number of screen cells is equal to the number of bytes
-		(except for euc-jp when the first byte is 0x8e).
+2   2byte	双字节编码，超过 10000 个不同字符。多用于亚洲
+		国家。例：euc-kr（韩文）。屏幕单元格数等于字节数
+		（euc-jp 首字节为 0x8e 时除外）。
 
-u   Unicode	Universal encoding, can replace all others.  ISO 10646.
-		Millions of different characters.  Example: UTF-8.  The
-		relation between bytes and screen cells is complex.
+u   Unicode	通用编码，可替代所有其他编码。ISO 10646。
+		数百万个不同字符。例：UTF-8。字节与屏幕单元格
+		的关系较复杂。
 
 Vim 内部只使用 UTF-8。但其他编码的文件可以通过转换来编辑，见 'fileencoding'。
 
-可识别的 'fileencoding' 取值包括:				*encoding-values*
-1   latin1	8-bit characters (ISO 8859-1, also used for cp1252)
-1   iso-8859-n	ISO_8859 variant (n = 2 to 15)
-1   koi8-r	Russian
-1   koi8-u	Ukrainian
-1   macroman    MacRoman (Macintosh encoding)
-1   8bit-{name} any 8-bit encoding (Vim specific name)
-1   cp437	similar to iso-8859-1
-1   cp737	similar to iso-8859-7
-1   cp775	Baltic
-1   cp850	similar to iso-8859-4
-1   cp852	similar to iso-8859-1
-1   cp855	similar to iso-8859-2
-1   cp857	similar to iso-8859-5
-1   cp860	similar to iso-8859-9
-1   cp861	similar to iso-8859-1
-1   cp862	similar to iso-8859-1
-1   cp863	similar to iso-8859-8
-1   cp865	similar to iso-8859-1
-1   cp866	similar to iso-8859-5
-1   cp869	similar to iso-8859-7
-1   cp874	Thai
-1   cp1250	Czech, Polish, etc.
-1   cp1251	Cyrillic
-1   cp1253	Greek
-1   cp1254	Turkish
-1   cp1255	Hebrew
-1   cp1256	Arabic
-1   cp1257	Baltic
-1   cp1258	Vietnamese
-1   cp{number}	MS-Windows: any installed single-byte codepage
-2   cp932	Japanese (Windows only)
-2   euc-jp	Japanese
-2   sjis	Japanese
-2   cp949	Korean
-2   euc-kr	Korean
-2   cp936	simplified Chinese (Windows only)
-2   euc-cn	simplified Chinese
-2   cp950	traditional Chinese (alias for big5)
-2   big5	traditional Chinese (alias for cp950)
-2   euc-tw	traditional Chinese
-2   2byte-{name} any double-byte encoding (Vim-specific name)
-2   cp{number}	MS-Windows: any installed double-byte codepage
-u   utf-8	32 bit UTF-8 encoded Unicode (ISO/IEC 10646-1)
-u   ucs-2	16 bit UCS-2 encoded Unicode (ISO/IEC 10646-1)
-u   ucs-2le	like ucs-2, little endian
-u   utf-16	ucs-2 extended with double-words for more characters
-u   utf-16le	like utf-16, little endian
-u   ucs-4	32 bit UCS-4 encoded Unicode (ISO/IEC 10646-1)
-u   ucs-4le	like ucs-4, little endian
+可识别的 'fileencoding' 取值包括:			*encoding-values*
+1   latin1	8 位字符（ISO 8859-1，cp1252 也用此名）
+1   iso-8859-n	ISO_8859 变体（n = 2 到 15）
+1   koi8-r	俄文
+1   koi8-u	乌克兰文
+1   macroman    MacRoman（Macintosh 编码）
+1   8bit-{name} 任意 8 位编码（Vim 专有名称）
+1   cp437	类似 iso-8859-1
+1   cp737	类似 iso-8859-7
+1   cp775	波罗的海语言
+1   cp850	类似 iso-8859-4
+1   cp852	类似 iso-8859-1
+1   cp855	类似 iso-8859-2
+1   cp857	类似 iso-8859-5
+1   cp860	类似 iso-8859-9
+1   cp861	类似 iso-8859-1
+1   cp862	类似 iso-8859-1
+1   cp863	类似 iso-8859-8
+1   cp865	类似 iso-8859-1
+1   cp866	类似 iso-8859-5
+1   cp869	类似 iso-8859-7
+1   cp874	泰文
+1   cp1250	捷克文、波兰文等
+1   cp1251	西里尔文
+1   cp1253	希腊文
+1   cp1254	土耳其文
+1   cp1255	希伯来文
+1   cp1256	阿拉伯文
+1   cp1257	波罗的海语言
+1   cp1258	越南文
+1   cp{number}	MS-Windows：任意已安装的单字节代码页
+2   cp932	日文（仅 Windows）
+2   euc-jp	日文
+2   sjis	日文
+2   cp949	韩文
+2   euc-kr	韩文
+2   cp936	简体中文（仅 Windows）
+2   euc-cn	简体中文
+2   cp950	繁体中文（big5 的别名）
+2   big5	繁体中文（cp950 的别名）
+2   euc-tw	繁体中文
+2   2byte-{name} 任意双字节编码（Vim 专有名称）
+2   cp{number}	MS-Windows：任意已安装的双字节代码页
+u   utf-8	32 位 UTF-8 编码的 Unicode（ISO/IEC 10646-1）
+u   ucs-2	16 位 UCS-2 编码的 Unicode（ISO/IEC 10646-1）
+u   ucs-2le	同 ucs-2，小端序
+u   utf-16	ucs-2 扩展双字以容纳更多字符
+u   utf-16le	同 utf-16，小端序
+u   ucs-4	32 位 UCS-4 编码的 Unicode（ISO/IEC 10646-1）
+u   ucs-4le	同 ucs-4，小端序
 
 {name} 可以是你的系统支持的任何编码名称。它被传给 iconv()，用于在 UTF-8
 与该文件的编码之间转换。
@@ -261,20 +260,20 @@ MS-Windows 的代码页 1252 与 latin1 非常相似。出于实际考虑，使�
 
 可以使用若干别名，它们会被转换为上面某个名称。不完整的列表如下：
 
-1   ansi	same as latin1 (obsolete, for backward compatibility)
-2   japan	Japanese: "euc-jp"
-2   korea	Korean: "euc-kr"
-2   prc		simplified Chinese: "euc-cn"
-2   chinese     same as "prc"
-2   taiwan	traditional Chinese: "euc-tw"
-u   utf8	same as utf-8
-u   unicode	same as ucs-2
-u   ucs2be	same as ucs-2 (big endian)
-u   ucs-2be	same as ucs-2 (big endian)
-u   ucs-4be	same as ucs-4 (big endian)
-u   utf-32	same as ucs-4
-u   utf-32le	same as ucs-4le
-    default     the encoding of the current locale.
+1   ansi	同 latin1（过时，仅为向后兼容）
+2   japan	日文："euc-jp"
+2   korea	韩文："euc-kr"
+2   prc		简体中文："euc-cn"
+2   chinese     同 "prc"
+2   taiwan	繁体中文："euc-tw"
+u   utf8	同 utf-8
+u   unicode	同 ucs-2
+u   ucs2be	同 ucs-2（大端序）
+u   ucs-2be	同 ucs-2（大端序）
+u   ucs-4be	同 ucs-4（大端序）
+u   utf-32	同 ucs-4
+u   utf-32le	同 ucs-4le
+    default     当前 locale 的编码。
 
 对于 UCS 编码，字节序很重要。这很棘手，只要可能就使用 UTF-8。默认使用
 大端序（最高有效字节在前）：
@@ -319,7 +318,7 @@ Vim 会在若干场合自动从一种编码转换为另一种编码：
 	超出 Vim 愿意提供的量）。试着换用另一个 iconv() 实现。
 
 ==============================================================================
-用键盘映射输入							*mbyte-keymap*
+用键盘映射输入						*mbyte-keymap*
 
 当键盘无法产生你想输入到文本中的字符时，可以使用 'keymap' 选项。它会把一个
 或多个（英文）字符转换成另一个（非英文）字符。这只在输入文本时发生，输入
@@ -384,7 +383,7 @@ Vim 命令时不会。这样就避免了在两个键盘设置之间来回切换�
 由于该映射是用 |:lmap| 定义的，得到的引号不会被用作 'keymap' 中定义的
 另一个字符的开头。
 它可以用在标准的 |:imap| 映射中。
-"accents" 键盘映射就用到了这一点。					*keymap-accents*
+"accents" 键盘映射就用到了这一点。			*keymap-accents*
 
 第一列也可以采用 |<>| 形式：
 	<C-c>		Ctrl-C
@@ -415,7 +414,7 @@ Vim 命令时不会。这样就避免了在两个键盘设置之间来回切换�
 <maintainer@vim.org>
 
 
-希伯来语键盘映射						*keymap-hebrew*
+希伯来语键盘映射					*keymap-hebrew*
 
 本节说明 UTF-8 与 CP1255 编码中有哪些字符可用，以及取得这些字符的键盘
 映射是什么（表中 glyph 为字形，encoding 两列为 UTF-8 与 cp1255 编码，
@@ -618,7 +617,7 @@ NUL（零），它被显示为 "<00>"。
 说明，以及 'langmenu'。
 
 
-在 X-Windows 中使用 UTF-8					*utf-8-in-xwindows*
+在 X-Windows 中使用 UTF-8				*utf-8-in-xwindows*
 
 你需要指定要使用的字体。双宽字符还需要另一种字体，它正好是两倍宽。有两种
 做法：
@@ -648,7 +647,7 @@ NUL（零），它被显示为 "<00>"。
 "1234" 被解释为十六进制数。你必须输入四个字符，如有必要在前面补零。
 
 
-命令行参数							*utf-8-char-arg*
+命令行参数						*utf-8-char-arg*
 
 像 |f|、|F|、|t| 和 |r| 这样的命令接受一个字符作为参数。对 UTF-8 而言，该
 参数可以包含一个或两个组合字符。这些字符需要与基字符一起产生，Nvim 不会
@@ -660,7 +659,7 @@ NUL（零），它被显示为 "<00>"。
 组合字符的情况。这样实现是因为并非所有人都能输入组合字符。
 
 ==============================================================================
-选项总览							*mbyte-options*
+选项总览						*mbyte-options*
 
 这些选项与编辑多字节文件有关。
 

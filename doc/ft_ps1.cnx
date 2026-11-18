@@ -8,21 +8,20 @@ URL：    https://github.com/PProvost/vim-ps1
 
 简介                                                            *ps1-syntax*
 
+
 该插件为 Windows PowerShell 脚本、模块和 XML 配置文件提供 Vim 语法、
 缩进和文件类型检测。
-
 
 关于                                                            *ps1-about*
 
 在 GitHub 上获取最新版本或报告 bug：
 
-https://github.com/PProvost/vim-ps1
 
+https://github.com/PProvost/vim-ps1
 
 折叠                                                            *ps1-folding*
 
 ps1 语法文件为脚本中的脚本块和数字签名提供语法折叠（见 |:syn-fold|）。
-
 当 'foldmethod' 设为 "syntax" 时，函数脚本块会被折叠，除非你在 .vimrc 中
 或打开脚本之前使用以下设置： >
 
@@ -49,7 +48,7 @@ PowerShell 的 `:compiler` 脚本配置 |:make|，以便在 PowerShell 中执行
     :let g:ps1_efm_show_error_categories = 1
 <
 
-关键字查询                                                      *ps1-keyword*
+关键字查询                                                     *ps1-keyword*
 
 要使用 PowerShell 的 Get-Help 查询关键字，请按 |K| 键。为了翻页更方便，
 应当安装分页器 `less`，它包含在许多 Linux 发行版和 macOS 中。

@@ -58,7 +58,7 @@ NL 字符表示。当你写文件时，它就会变成 NUL 字符。
 ==============================================================================
 2. 使用 digraph						*digraphs-use*
 
-输入 digraph 有两种方法：				*i_digraph*
+输入 digraph 有两种方法：					*i_digraph*
 	CTRL-K {char1} {char2}		或
 	{char1} <BS> {char2}
 第一种始终可用；第二种仅在设置了 'digraph' 选项时可用。

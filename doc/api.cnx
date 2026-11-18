@@ -37,7 +37,7 @@ MessagePack-RPC 规范：
 
 RPC API 像是 Vim 的 "clientserver" 功能的更强版本。
 
-连接                                              *rpc-connecting*
+连接                                                    *rpc-connecting*
 
 打开 channel 的各种方式见 |channel-intro|。打开 channel 的函数会接受选项
 字典中的 `rpc` 键。其它进程也可以连接到 Nvim 监听的 TCP/IP socket 或命名
@@ -82,8 +82,9 @@ Nvim 在 |startup| 时创建一个默认 RPC socket，其地址由 |v:servername
     echo rpcrequest(nvim, 'nvim_eval', '"Hello " . "world!"')
     call jobstop(nvim)
 <
+
 ==============================================================================
-API 定义                                         *api-definitions*
+API 定义                                                *api-definitions*
 
                                                         *api-types*
 Nvim C API 为所有函数参数定义了自定义类型。其中一些只是 C99 标准类型的
@@ -155,7 +156,7 @@ API 的大部分都使用 0 基索引，且范围是尾端开区间。对于范�
   调度，或等到 `vim.in_fast_event()` 返回 `false`。
 
 ==============================================================================
-API 元数据                                            *api-metadata*
+API 元数据                                              *api-metadata*
 
 Nvim C API 由构建系统自动暴露给 RPC：构建系统解析 src/nvim/api/* 中的头文件，
 生成把 RPC API 方法名映射到公开 C API 函数的 dispatch 函数，并负责参数与
@@ -203,7 +204,7 @@ Nvim 以 Dictionary 的形式暴露它的 API 元数据，其中包含以下各�
 <
 
 ==============================================================================
-API 契约                                                     *api-contract*
+API 契约                                                         *api-contract*
 
 Nvim API 由函数和事件构成。
 
@@ -239,7 +240,7 @@ Nvim API 由函数和事件构成。
 - 强化某项承诺应当是兼容的变更。
 
 ==============================================================================
-Buffer 更新事件                                    *api-buffer-updates*
+Buffer 更新事件                                         *api-buffer-updates*
 
 API 客户端可以「附着」（attach）到 Nvim buffer，以订阅 buffer 更新事件。
 这类似 |TextChanged|，但更强大、粒度更细。
@@ -348,7 +349,7 @@ LUA ~
 
 
 ==============================================================================
-Buffer 高亮                                             *api-highlights*
+Buffer 高亮                                                    *api-highlights*
 
 Nvim 允许插件为 buffer 添加基于位置的高亮。这类似 |matchaddpos()|，但有
 一些关键差异。添加的高亮与某个 buffer 关联，并能适应行的插入与删除，类似
@@ -462,6 +463,7 @@ Extmark 具有「前向重力」：如果你把光标直接放在某个 extmark 
       01 2345678
     0 ex|ample..
         ^ extmark position
+<
 >vim
     let g:mark_ns = nvim_create_namespace('myplugin')
     let g:mark_id = nvim_buf_set_extmark(0, g:mark_ns, 0, 2, {})
@@ -484,6 +486,7 @@ Extmark 具有「前向重力」：如果你把光标直接放在某个 extmark 
       0 12345678
     0 e|ample..
        ^ extmark position
+<
 >vim
     echo nvim_buf_get_extmark_by_id(0, g:mark_ns, g:mark_id, {})
     " => [0, 1]
@@ -493,12 +496,11 @@ Extmark 具有「前向重力」：如果你把光标直接放在某个 extmark 
 
 Namespace 允许任何插件只管理自己的 extmark，而忽略其它插件创建的 extmark。
 
-
 被编辑改变的 extmark 位置会在 undo/redo 时被恢复。创建与删除 extmark 不算
 buffer 变更，因此不会为 extmark 变更创建新的 undo 状态。
 
 ==============================================================================
-全局事件                                                     *api-events*
+全局事件                                                          *api-events*
 
 nvim_error_event({type}, {msg})                             *nvim_error_event*
     当某个异步 API 请求返回错误响应时，在客户端 channel 上发出。
@@ -527,7 +529,7 @@ nvim_ui_term_event({event}, {value})                      *nvim_ui_term_event*
 
 
 ==============================================================================
-全局函数                                                  *api-global*
+全局函数                                                          *api-global*
 
 nvim_chan_send({chan}, {data})                              *nvim_chan_send()*
     向 channel `chan` 发送原始数据。|channel-bytes|
@@ -1366,7 +1368,7 @@ nvim_set_client_info({name}, {version}, {type}, {methods}, {attributes})
       • {methods}     (`table<string,any>`) 客户端中的内置方法。对 host
                       而言，这不包含稍后才会被发现的插件方法。键应是方法名，
                       值是带以下（可选）键的 dict（未来版本的 Nvim 可能加入
-                      更多键，因此未知键会被忽略。客户端只能使用本版本或更早
+                      更多键，因此未知键会被忽略。客户端只能使用本版本或更新
                       版本 Nvim 中定义的键）：
                       • "async" 若为 true 则作为通知发送。若为 false 或未指定，
                         则使用阻塞请求
@@ -1759,7 +1761,7 @@ nvim__stats()                                                  *nvim__stats()*
 
 
 ==============================================================================
-Vimscript 函数                                               *api-vimscript*
+Vimscript 函数                                                 *api-vimscript*
 
                                                    *nvim_call_dict_function()*
 nvim_call_dict_function({dict}, {fn}, {args})
@@ -1917,7 +1919,7 @@ nvim_parse_expression({expr}, {flags}, {hl})         *nvim_parse_expression()*
 
 
 ==============================================================================
-Autocmd 函数                                                  *api-autocmd*
+Autocmd 函数                                                     *api-autocmd*
 
 nvim_clear_autocmds({opts})                            *nvim_clear_autocmds()*
     清除所有匹配 {opts} 查询的 autocommand。要删除 autocmd 见
@@ -2006,7 +2008,7 @@ nvim_create_autocmd({event}, {opts})                   *nvim_create_autocmd()*
                    即一个带有以下键的表：                          *event-args*
                    • buf: (`number`) <abuf>
                    • data: (`any`) 从 |nvim_exec_autocmds()| 传入的任意数据
-                                                              *event-data*
+                                                                  *event-data*
                    • event: (`vim.api.keyset.events`) 被触发事件的名称
                      |autocmd-events|
                    • file: (`string`) <afile>（不展开为完整路径）
@@ -2152,7 +2154,7 @@ nvim_get_autocmds({opts})                                *nvim_get_autocmds()*
 
 
 ==============================================================================
-Buffer 函数                                                    *api-buffer*
+Buffer 函数                                                       *api-buffer*
 
 
 关于 Buffer 的更多信息见 |buffers|。
@@ -2736,7 +2738,7 @@ nvim_cmd({cmd}, {opts})                                           *nvim_cmd()*
       • |nvim_exec2()|
       • |nvim_parse_cmd()|
 
-                                                   *nvim_create_user_command()*
+                                                  *nvim_create_user_command()*
 nvim_create_user_command({name}, {cmd}, {opts})
     创建一条全局 |user-commands| 命令。
 
@@ -3329,7 +3331,7 @@ nvim_set_option_value({name}, {value}, {opts})
 
 
 ==============================================================================
-Tabpage 函数                                                  *api-tabpage*
+Tabpage 函数                                                     *api-tabpage*
 
 nvim_open_tabpage({buf}, {enter}, {config})              *nvim_open_tabpage()*
     打开一个新 tabpage。
@@ -3445,7 +3447,7 @@ nvim_tabpage_set_win({tabpage}, {win})                *nvim_tabpage_set_win()*
 
 
 ==============================================================================
-UI 函数                                                             *api-ui*
+UI 函数                                                               *api-ui*
 
 nvim_ui_attach({width}, {height}, {options})                *nvim_ui_attach()*
     在该 channel 上激活 UI 事件。
@@ -3564,9 +3566,10 @@ nvim_ui_try_resize_grid({grid}, {width}, {height})
       • {width}   (`integer`) 新的请求宽度。
       • {height}  (`integer`) 新的请求高度。
 
-
 ==============================================================================
-Win_config 函数                                            *api-win_config*
+
+
+Win_config 函数                                               *api-win_config*
 
 nvim_open_win({buf}, {enter}, {config})                      *nvim_open_win()*
     打开一个新的分割 window、float window 或外部 window。
@@ -3970,7 +3973,7 @@ nvim_win_set_height({win}, {height})                   *nvim_win_set_height()*
       • {win}     (`integer`) |window-ID|，或 0 表示当前 window
       • {height}  (`integer`) 以行数计的高度
 
-nvim_win_set_hl_ns({win}, {ns_id})                     *nvim_win_set_hl_ns()*
+nvim_win_set_hl_ns({win}, {ns_id})                      *nvim_win_set_hl_ns()*
     为某个 window 设置高亮 namespace。这会使用该 namespace 下由
     |nvim_set_hl()| 定义的高亮，缺失时回退到全局高亮（ns=0）。
 

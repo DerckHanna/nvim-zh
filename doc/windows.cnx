@@ -118,7 +118,7 @@ window 中最后一个 buffer 行之后的行称为填充行（filler line）。
 可用于更改填充字符的高亮。
 
 ==============================================================================
-3. 打开和关闭 window				*opening-window*
+3. 打开和关闭 window					*opening-window*
 
 CTRL-W s						*CTRL-W_s*
 CTRL-W S						*CTRL-W_S*
@@ -304,7 +304,7 @@ CTRL-W c					*CTRL-W_c* *:clo* *:close*
 		当前 |tabpage| 中只有一个 |edit-window|，且还有其他
 		tabpage 时，这会关闭当前 tabpage。
 
-		下列情况下该命令失败：			*E444*
+		下列情况下该命令失败：				*E444*
 		- 屏幕上只有一个 window。
 		- 未设置 'hidden'、未使用 [!]、buffer 有改动，且该
 		  buffer 没有其他 window。
@@ -358,7 +358,7 @@ CTRL-W CTRL-O					*CTRL-W_CTRL-O* *:on* *:only*
 		用 '!' 关闭所有 floating window。
 
 ==============================================================================
-4. 把光标移到其他 window			*window-move-cursor*
+4. 把光标移到其他 window				*window-move-cursor*
 
 CTRL-W <Down>					*CTRL-W_<Down>*
 CTRL-W CTRL-J					*CTRL-W_CTRL-J* *CTRL-W_j*
@@ -578,7 +578,7 @@ window 尺寸变化时它也会被触发。
 说：就在触发事件之前，当前的尺寸和滚动位置会被保存，并用来判断是否发生了变化。
 
 ==============================================================================
-7. 参数列表和 buffer 列表命令			*buffer-list*
+7. 参数列表和 buffer 列表命令				*buffer-list*
 
       args list		       buffer list	   meaning ~
 >
@@ -614,7 +614,6 @@ window 尺寸变化时它也会被触发。
  [N] 是计数，用于 19 和 39
 
 注意：":next" 是个例外，因为为兼容 Vi 它必须接受一组文件名。
-
 上表中两张对照表为与上游逐字节一致的原文，其列标题与含义列未作翻译。
 
 
@@ -694,7 +693,7 @@ window 尺寸变化时它也会被触发。
 		另见 |++opt| 和 |+cmd|。
 
 ==============================================================================
-8. 在所有 buffer 或 window 中执行命令			*list-repeat*
+8. 在所有 buffer 或 window 中执行命令				*list-repeat*
 
 							*:windo*
 :[range]windo {cmd}	在每个 |focusable| window 中执行 {cmd}，或只对 window 编号
@@ -750,7 +749,7 @@ window 尺寸变化时它也会被触发。
 是所有 buffer 都会使用 'encoding' 编码（如果转换成功）。
 
 ==============================================================================
-9. 光标下的标签或文件名			*window-tag*
+9. 光标下的标签或文件名					*window-tag*
 
 							*:sta* *:stag*
 :sta[g][!] [tagname]
@@ -808,7 +807,7 @@ CTRL-W gT						*CTRL-W_gT*
 另见 |CTRL-W_CTRL-I|：为包含光标下关键字的被包含文件打开 window。
 
 ==============================================================================
-10. 预览 window				*preview-window*
+10. 预览 window					*preview-window*
 
 预览 window 是一个用于显示（预览）另一个文件的特殊 window。它通常是用来显示被包含文件或
 函数定义的小 window。
@@ -871,7 +870,7 @@ CTRL-W g }						*CTRL-W_g}*
 		当前 window 和光标位置也不变。有用的示例： >
 			:psearch popen
 <		与 |:ptag| 命令类似，你可以用它自动显示光标下单词的
-		相关信息。这不如图 |:ptag| 那么巧妙，但你不需要 tags
+		相关信息。这不如 |:ptag| 那么巧妙，但你不需要 tags
 		文件，而且它也会在系统包含文件中查找匹配项。示例： >
   :au! CursorHold *.[ch] ++nested exe "silent! psearch " .. expand("<cword>")
 <		警告：这可能很慢。
@@ -928,7 +927,7 @@ CTRL-W g }						*CTRL-W_g}*
   :endfun
 
 ==============================================================================
-11. 使用隐藏 buffer				*buffer-hidden*
+11. 使用隐藏 buffer					*buffer-hidden*
 
 隐藏 buffer 不显示在 window 中，但仍被加载在内存中。这样就可能在文件之间跳转，而无需
 每次在 window 中得到另一个 buffer 时都读写该文件。
@@ -1232,7 +1231,7 @@ buffer 也可以不被列出。这意味着它存在，但不在 buffer 列表�
 ":edit" 命令不同——后者每次读取文件时都会设置 'readonly' 标志。
 
 ==============================================================================
-12. 特殊种类的 buffer			*special-buffers*
+12. 特殊种类的 buffer				*special-buffers*
 
 buffer 除了包含文件文本，还可以用于其他用途。可以设置几个选项来改变 buffer 的行为：
 	'bufhidden'	当 buffer 不再显示在 window 中时会发生什么。

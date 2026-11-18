@@ -4,7 +4,7 @@
 		  VIM REFERENCE MANUAL	  by Bram Moolenaar
 
 
-用 Vim 编辑压缩文件					*gzip* *bzip2* *compress*
+用 Vim 编辑压缩文件				*gzip* *bzip2* *compress*
 
 1. 自动命令							|gzip-autocmd|
 
@@ -21,7 +21,7 @@
 <
 
 ==============================================================================
-1. 自动命令							*gzip-autocmd*
+1. 自动命令						*gzip-autocmd*
 
 该插件安装自动命令，以拦截读取和写入具有下列扩展名的文件：
 

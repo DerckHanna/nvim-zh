@@ -4,7 +4,7 @@
 		  VIM REFERENCE MANUAL	  by Ron Aaron and Avner Lottem
 
 
-Vim 的希伯来语支持（选项与映射）		*hebrew*
+Vim 的希伯来语支持（选项与映射）				*hebrew*
 
 对 'rightleft' 的支持功能最初由 Avner Lottem 创建
 <alottem at gmail dot com>。Ron Aaron <ron at ronware dot org> 目前正在协助

@@ -210,7 +210,7 @@ shell 可以发出语义转义序列（OSC 133）来标记每个提示符开始�
 提示符。
 
                                                *shell-prompt-signs*
-要用标记为每个终端提示符添加注释，请在 |TermRequest| 处理器中调用
+要在标记列中为每个终端提示符显示一个 sign（标记），请在 |TermRequest| 处理器中调用
 |nvim_buf_set_extmark()|： >lua
 
     vim.api.nvim_create_autocmd('TermOpen', {
@@ -317,14 +317,15 @@ shell 可以发出语义转义序列（OSC 133）来标记每个提示符开始�
     run
 Vim 会在 program window 中开始运行。把焦点放到那里并输入： >vim
     :help gui
-Gdb 会命中的 ex_help 断点。source window 现在显示 ex_cmds.c 文件。设置断点的位置
+Gdb 会命中 ex_help 断点。source window 现在显示 ex_cmds.c 文件。设置断点的位置
 会在标记列中出现一个红色的 "1 " 标记。调试器停止的那一行会被高亮。你现在可以单步
 执行程序。随着调试器执行源代码的每一行，你会看到高亮随之移动。
 
 运行几次 |:Over|，直到 for 循环被高亮。把光标放到 "eap->arg" 的末尾，然后调用
 ":Eval"。你会看到如下显示： >
     "eap->arg": 0x555555e68855 "gui"
-这样你就可以检查局部变量的值。你也可以把焦点切到 gdb window 并使用 "print" 命令，
+这样你就可以检查局部变量的值。你也可以把焦点切到 gdb window 并使用 "print" 命
+令，
 例如： >
     print *eap
 如果鼠标移动可用，当鼠标停留在可被 gdb 求值的文本上时，Vim 还会显示气泡提示。
@@ -553,8 +554,8 @@ GDB 命令 ~
     nnoremap <RightMouse> :Break<CR>
 
 
-为了调试器能正常工作，会向 gdb 添加若干参数。如果你想修改它们，请添加一个用于过滤
-参数列表的函数： >vim
+为了调试器能正常工作，会向 gdb 添加若干参数。如果你想修改它们，请添加一个用于
+过滤 参数列表的函数： >vim
     let g:termdebug_config['command_filter'] = MyDebugFilter
 
 如果你不想添加这些参数，但又确实需要设置 "pty"，请用一个函数来添加必要的参数：

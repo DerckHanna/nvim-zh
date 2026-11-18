@@ -4,7 +4,7 @@
 		  VIM REFERENCE MANUAL	  by Bram Moolenaar
 
 
-Vim 客户端-服务器通信				*client-server*
+Vim 客户端-服务器通信					*client-server*
 
                                       输入 |gO| 查看目录。
 

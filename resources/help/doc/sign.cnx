@@ -331,7 +331,7 @@ JUMPING TO A SIGN					*:sign-jump* *E157*
 
 
 ==============================================================================
-3. 函数					*sign-functions-details*
+3. 函数						*sign-functions-details*
 
 见：
   - |sign_define()|

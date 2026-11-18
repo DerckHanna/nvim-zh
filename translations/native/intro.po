@@ -12,25 +12,25 @@ msgstr ""
 
 #: ../version.c:4245
 msgid "type  :help nvim<Enter>     if you are new! "
-msgstr "输入  :help nvim<Enter>     查看入门指南"
+msgstr "输入  :help nvim<Enter>     新手必读！      "
 
 #: ../version.c:4246
 msgid "type  :checkhealth<Enter>   to optimize Nvim"
-msgstr "输入  :checkhealth<Enter>   检查运行环境"
+msgstr "输入  :checkhealth<Enter>   优化 Nvim       "
 
 #: ../version.c:4247
 msgid "type  :q<Enter>             to exit         "
-msgstr "输入  :q<Enter>             退出 Neovim"
+msgstr "输入  :q<Enter>             退出 Neovim     "
 
 #: ../version.c:4248
 msgid "type  :help<Enter>          for help        "
-msgstr "输入  :help<Enter>          查看帮助"
+msgstr "输入  :help<Enter>          查看帮助        "
 
 #: ../version.c:4250
 #, c-format
 msgid "type  :help news<Enter>     for v%s.%s notes "
-msgstr "输入  :help news<Enter>     查看 v%s.%s 更新"
+msgstr "输入  :help news<Enter>     查看 v%s.%s 更新 "
 
 #: ../version.c:4253
 msgid "type  :help Kuwasha<Enter>  for information "
-msgstr "输入  :help Kuwasha<Enter>  了解援助项目"
+msgstr "输入  :help Kuwasha<Enter>  了解援助项目    "

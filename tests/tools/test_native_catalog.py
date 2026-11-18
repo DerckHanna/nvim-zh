@@ -82,6 +82,20 @@ class ManifestContractTest(unittest.TestCase):
         runtime_msgids = {item['runtime_literal'] for item in self.manifest['prefix_repairs']}
         self.assertEqual(len(runtime_msgids), len(self.manifest['prefix_repairs']))
 
+    def test_quote_drift_repairs_are_evidenced_and_distinct(self) -> None:
+        quote_drift = self.manifest['repairs'].get('quote_drift', [])
+        self.assertTrue(quote_drift, 'expected quote-drift repairs for E15/E856/E1115/E1116')
+        entries, _ = nc.parse_po(ROOT / self.manifest['repairs']['po'])
+        by_msgid = {entry['msgid']: entry for entry in entries}
+        gaps = {item['msgid'] for item in self.manifest['gaps']}
+        for item in quote_drift:
+            self.assertTrue(item['evidence'])
+            self.assertNotIn(item['upstream_msgid'], gaps)
+            self.assertNotEqual(item['runtime_msgid'], item['upstream_msgid'])
+            self.assertIn(item['runtime_msgid'], by_msgid)
+            self.assertIn(item['upstream_msgid'], self.manifest['repairs']['upstream_msgids'])
+            self.assertIn(item['runtime_msgid'], self.manifest['repairs']['runtime_msgids'])
+
 
 class CheckContractTest(unittest.TestCase):
     def test_check_passes(self) -> None:
@@ -89,7 +103,7 @@ class CheckContractTest(unittest.TestCase):
         self.assertEqual(result['gaps'], 130)
         self.assertEqual(result['supplement'], 118)
         self.assertEqual(result['exemptions'], 12)
-        self.assertEqual(result['repairs'], 4)
+        self.assertEqual(result['repairs'], 8)
         self.assertEqual(result['prefix_repairs'], 25)
 
     def test_placeholder_change_is_rejected(self) -> None:

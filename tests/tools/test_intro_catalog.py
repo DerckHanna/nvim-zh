@@ -18,12 +18,12 @@ import test_native_catalog as native
 
 ROOT = native.ROOT
 INTRO = {
-    'type  :help nvim<Enter>     if you are new! ': '输入  :help nvim<Enter>     查看入门指南',
-    'type  :checkhealth<Enter>   to optimize Nvim': '输入  :checkhealth<Enter>   检查运行环境',
-    'type  :q<Enter>             to exit         ': '输入  :q<Enter>             退出 Neovim',
-    'type  :help<Enter>          for help        ': '输入  :help<Enter>          查看帮助',
-    'type  :help news<Enter>     for v%s.%s notes ': '输入  :help news<Enter>     查看 v%s.%s 更新',
-    'type  :help Kuwasha<Enter>  for information ': '输入  :help Kuwasha<Enter>  了解援助项目',
+    'type  :help nvim<Enter>     if you are new! ': '输入  :help nvim<Enter>     新手必读！      ',
+    'type  :checkhealth<Enter>   to optimize Nvim': '输入  :checkhealth<Enter>   优化 Nvim       ',
+    'type  :q<Enter>             to exit         ': '输入  :q<Enter>             退出 Neovim     ',
+    'type  :help<Enter>          for help        ': '输入  :help<Enter>          查看帮助        ',
+    'type  :help news<Enter>     for v%s.%s notes ': '输入  :help news<Enter>     查看 v%s.%s 更新 ',
+    'type  :help Kuwasha<Enter>  for information ': '输入  :help Kuwasha<Enter>  了解援助项目    ',
 }
 SHIPPED = ROOT / 'build/native/zh_CN.UTF-8/LC_MESSAGES/nvim.mo'
 

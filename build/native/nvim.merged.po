@@ -1639,9 +1639,21 @@ msgstr "E1113: 重叠范围为 0x%lx"
 msgid "E1114: Only values of 0x100 and higher supported"
 msgstr "E1114: 只支持 0x100 或更高的值"
 
+#. upstream msgid: E1115: assert_fails() fourth argument must be a number
+#. evidence: 固定 src/nvim/testing.c 定义 e_assert_fails_fourth_argument = N_("E1115: \"assert_fails()\" fourth argument must be a number")，运行时键带双引号；上游 po 抽取丢失引号。
+#: ../testing.c
+msgid "E1115: \"assert_fails()\" fourth argument must be a number"
+msgstr "E1115: \"assert_fails()\" 的第四个参数必须是数字"
+
 #: ../testing.c:40
 msgid "E1115: assert_fails() fourth argument must be a number"
 msgstr "E1115: assert_fails() 的第四个参数必须是整数"
+
+#. upstream msgid: E1116: assert_fails() fifth argument must be a string
+#. evidence: 固定 src/nvim/testing.c 定义 e_assert_fails_fifth_argument = N_("E1116: \"assert_fails()\" fifth argument must be a string")，运行时键带双引号；上游 po 抽取丢失引号。
+#: ../testing.c
+msgid "E1116: \"assert_fails()\" fifth argument must be a string"
+msgstr "E1116: \"assert_fails()\" 的第五个参数必须是字符串"
 
 #: ../testing.c:42
 msgid "E1116: assert_fails() fifth argument must be a string"
@@ -2140,6 +2152,13 @@ msgstr "E15: 应为值，却得到问号：%.*s"
 #, c-format
 msgid "E15: Invalid control character present in input: %.*s"
 msgstr "E15: 输入中存在无效的控制字符：%.*s"
+
+#. upstream msgid: E15: Invalid expression: %s
+#. evidence: 固定 src/nvim/errors.h:37 定义 e_invexpr2 = N_("E15: Invalid expression: \"%s\"")，运行时 gettext 键带双引号；上游 po 抽取时丢失了 %s 外的双引号，导致已译条目永不命中。这里按运行时精确键补译。
+#: ../errors.h:37
+#, c-format
+msgid "E15: Invalid expression: \"%s\""
+msgstr "E15: 无效的表达式：\"%s\""
 
 #: ../globals.h:885
 #, c-format
@@ -3544,7 +3563,7 @@ msgstr "E474: 期望值：%.*s"
 
 #: ../context.c:335
 msgid "E474: Failed to convert list to msgpack string buffer"
-msgstr "E474: 无法将列表转换为 msgpack 字符串缓存"
+msgstr "E474: 无法将列表转换为 msgpack 字符串 buffer"
 
 #: ../eval/funcs.c:4743
 msgid "E474: Failed to convert list to string"
@@ -4088,7 +4107,7 @@ msgstr "E520: 不允许在 modeline 中使用"
 #: ../globals.h:898
 #, c-format
 msgid "E5210: dict key '%s' already set for buffered stream in channel %<PRIu64>"
-msgstr "E5210: 字典键 '%s' 已为通道 %<PRIu64> 中的缓冲流设置"
+msgstr "E5210: 字典键 '%s' 已为通道 %<PRIu64> 中的 buffered stream 设置"
 
 #: ../option.c:115
 msgid "E521: Number required after ="
@@ -4332,7 +4351,7 @@ msgstr "E5601: 无法关闭窗口，不然就只剩下浮动窗口了"
 
 #: ../globals.h:1005
 msgid "E5602: Cannot exchange or rotate float"
-msgstr "E5602: 无法交换或轮换浮点数"
+msgstr "E5602: 无法交换或轮换浮动 window"
 
 #: ../globals.h:956
 msgid "E565: Not allowed to change text or change window"
@@ -5378,6 +5397,12 @@ msgstr "E854: 补全用的路径太长"
 #: ../buffer.c:109
 msgid "E855: Autocommands caused command to abort"
 msgstr "E855: 自动命令导致命令被停止"
+
+#. upstream msgid: E856: assert_fails() second argument must be a string or a list with one or two strings
+#. evidence: 固定 src/nvim/testing.c 定义 e_assert_fails_second_arg = N_("E856: \"assert_fails()\" second argument must be a string or a list with one or two strings")，运行时键带双引号；上游 po 抽取丢失引号。
+#: ../testing.c
+msgid "E856: \"assert_fails()\" second argument must be a string or a list with one or two strings"
+msgstr "E856: \"assert_fails()\" 的第二个参数必须是字符串，或包含一或两个字符串的列表"
 
 #: ../globals.h:991
 msgid "E856: Filename too long"
@@ -8388,7 +8413,7 @@ msgstr "部分"
 
 #: ../eval/encode.c:128
 msgid "partial self dictionary"
-msgstr "部分自引用字典"
+msgstr "partial 的 self 字典"
 
 #: ../../../runtime/optwin.vim:233
 msgid "paste mode, insert typed text literally"
@@ -8782,11 +8807,11 @@ msgstr "输入  :checkhealth<Enter>     优化 Neovim     "
 
 #: ../version.c:4246
 msgid "type  :checkhealth<Enter>   to optimize Nvim"
-msgstr "输入  :checkhealth<Enter>   检查运行环境"
+msgstr "输入  :checkhealth<Enter>   优化 Nvim       "
 
 #: ../version.c:4253
 msgid "type  :help Kuwasha<Enter>  for information "
-msgstr "输入  :help Kuwasha<Enter>  了解援助项目"
+msgstr "输入  :help Kuwasha<Enter>  了解援助项目    "
 
 #: ../version.c:2817
 msgid "type  :help iccf<Enter>       for information "
@@ -8795,7 +8820,7 @@ msgstr "输入  :help iccf<Enter>       查看说明        "
 #: ../version.c:4250
 #, c-format
 msgid "type  :help news<Enter>     for v%s.%s notes "
-msgstr "输入  :help news<Enter>     查看 v%s.%s 更新"
+msgstr "输入  :help news<Enter>     查看 v%s.%s 更新 "
 
 #: ../version.c:2813
 #, c-format
@@ -8808,7 +8833,7 @@ msgstr "输入  :help nvim<Enter>       了解 Neovim！   "
 
 #: ../version.c:4245
 msgid "type  :help nvim<Enter>     if you are new! "
-msgstr "输入  :help nvim<Enter>     查看入门指南"
+msgstr "输入  :help nvim<Enter>     新手必读！      "
 
 #: ../version.c:2855
 msgid "type  :help register<Enter>   for information "
@@ -8824,7 +8849,7 @@ msgstr "输入  :help<Enter>            查看帮助        "
 
 #: ../version.c:4248
 msgid "type  :help<Enter>          for help        "
-msgstr "输入  :help<Enter>          查看帮助"
+msgstr "输入  :help<Enter>          查看帮助        "
 
 #: ../version.c:2810
 msgid "type  :q<Enter>               to exit         "
@@ -8832,7 +8857,7 @@ msgstr "输入  :q<Enter>               退出            "
 
 #: ../version.c:4247
 msgid "type  :q<Enter>             to exit         "
-msgstr "输入  :q<Enter>             退出 Neovim"
+msgstr "输入  :q<Enter>             退出 Neovim     "
 
 #: ../../../runtime/optwin.vim:397
 msgid "type of file; triggers the FileType event when set"

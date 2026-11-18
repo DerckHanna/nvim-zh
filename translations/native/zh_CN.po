@@ -20,7 +20,7 @@ msgstr "只能在 headless 模式下打开"
 
 #: ../context.c:335
 msgid "E474: Failed to convert list to msgpack string buffer"
-msgstr "E474: 无法将列表转换为 msgpack 字符串缓存"
+msgstr "E474: 无法将列表转换为 msgpack 字符串 buffer"
 
 #: ../eval.c:1095
 msgid "E5700: Expression from 'spellsuggest' must yield lists with exactly two values"
@@ -58,7 +58,7 @@ msgstr "来自特殊映射的键 %s（索引 %i）"
 
 #: ../eval/encode.c:128
 msgid "partial self dictionary"
-msgstr "部分自引用字典"
+msgstr "partial 的 self 字典"
 
 #: ../eval/encode.c:203
 msgid "itself"
@@ -125,7 +125,7 @@ msgstr "E513: 写入错误，行 % 处转换失败"
 #: ../globals.h:898
 #, c-format
 msgid "E5210: dict key '%s' already set for buffered stream in channel %<PRIu64>"
-msgstr "E5210: 字典键 '%s' 已为通道 %<PRIu64> 中的缓冲流设置"
+msgstr "E5210: 字典键 '%s' 已为通道 %<PRIu64> 中的 buffered stream 设置"
 
 #: ../globals.h:998
 msgid "E5521: <Cmd> mapping must end with <CR> before second <Cmd>"
@@ -138,7 +138,7 @@ msgstr "E5555: API 调用：%s"
 
 #: ../globals.h:1005
 msgid "E5602: Cannot exchange or rotate float"
-msgstr "E5602: 无法交换或轮换浮点数"
+msgstr "E5602: 无法交换或轮换浮动 window"
 
 #: ../globals.h:1018
 msgid "E5767: Cannot use :undo! to redo or move to a different undo branch"

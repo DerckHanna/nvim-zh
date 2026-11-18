@@ -49,11 +49,16 @@ def contents(root=ROOT):
     files['native/zh_CN.UTF-8/LC_MESSAGES/nvim.mo'] = mo.read_bytes()
     inventory = json.loads((root / 'manifests/help_inventory.json').read_text())
     native = json.loads((root / 'manifests/native.json').read_text())
+    # The MO probe must match the shipped intro translation exactly. Derive it
+    # from intro.po (the source of truth) so editing the welcome screen cannot
+    # leave a stale hardcoded probe that fails runtime validation.
+    probe_msgid = 'type  :help nvim<Enter>     if you are new! '
+    intro_entries, _ = ct.parse_po(root / native['intro']['po'])
+    probe_msgstr = next(e['msgstr'] for e in intro_entries if e['msgid'] == probe_msgid)
     files['summary.json'] = encoded(dict(schema=1, domains=domains,
         help=inventory['totals'], baseline=inventory['pinned']['neovim'],
         native={'supplement': native['supplement']['entries'],
-                'probe': {'msgid': 'type  :help nvim<Enter>     if you are new! ',
-                          'msgstr': '输入  :help nvim<Enter>     查看入门指南'}}))
+                'probe': {'msgid': probe_msgid, 'msgstr': probe_msgstr}}))
     implementation = {}
     for folder in ('lua', 'plugin'):
         for source in sorted((root / folder).rglob('*.lua')):

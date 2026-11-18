@@ -298,6 +298,11 @@ def check(root: Path) -> dict:
         raise NativeError('manifest: exemptions must be a subset of gaps')
     supplement_ids = {entry['msgid'] for entry in supplement}
     repair_upstream = set(manifest['repairs']['upstream_msgids'])
+    # Quote/punctuation-drift repairs fix an upstream entry that IS translated but
+    # whose runtime gettext key differs (e.g. extraction dropped surrounding
+    # quotes). They are evidenced separately and must not be pinned gaps.
+    quote_drift = manifest['repairs'].get('quote_drift', [])
+    quote_drift_upstream = {item['upstream_msgid'] for item in quote_drift}
     if len(supplement_ids) != len(supplement):
         raise NativeError('supplement: duplicate msgids')
     if supplement_ids & exemptions:
@@ -306,11 +311,22 @@ def check(root: Path) -> dict:
         missing = sorted(gaps - supplement_ids - exemptions)
         extra = sorted(supplement_ids - gaps)
         raise NativeError(f'supplement does not cover the pinned gaps (missing={missing[:3]}, extra={extra[:3]})')
-    if repair_upstream - gaps:
+    if (repair_upstream - quote_drift_upstream) - gaps:
         raise NativeError('repairs: upstream msgid is not one of the pinned gaps')
+    for item in quote_drift:
+        if not item.get('evidence'):
+            raise NativeError(f"quote-drift repair {item['upstream_msgid']!r}: evidence is required")
+        if item['upstream_msgid'] in gaps:
+            raise NativeError(f"quote-drift repair {item['upstream_msgid']!r}: upstream entry is a gap, use a truncation repair")
+        if item['runtime_msgid'] == item['upstream_msgid']:
+            raise NativeError(f"quote-drift repair {item['upstream_msgid']!r}: runtime key must differ from upstream")
     translated_repairs = {entry['msgid'] for entry in repairs}
     if translated_repairs & (supplement_ids | exemptions):
         raise NativeError('repairs: runtime msgid collides with an upstream msgid')
+    if quote_drift_upstream and not quote_drift_upstream <= repair_upstream:
+        raise NativeError('repairs: quote-drift upstream msgid missing from repairs.upstream_msgids')
+    if {item['runtime_msgid'] for item in quote_drift} - translated_repairs:
+        raise NativeError('repairs: quote-drift runtime msgid has no translation entry')
     intro = []
     if 'intro' in manifest:
         info = manifest['intro']

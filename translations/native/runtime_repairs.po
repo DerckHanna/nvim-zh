@@ -40,3 +40,28 @@ msgstr "E5404: 数据块 %i 的结束 %<PRIdVARNUMBER> 不在范围 (%<PRIdVARNU
 #, c-format
 msgid "E5406: Chunk %i end %<PRIdVARNUMBER> splits multibyte character"
 msgstr "E5406: 数据块 %i 的结束 %<PRIdVARNUMBER> 分割了多字节字符"
+
+#. upstream msgid: E15: Invalid expression: %s
+#. evidence: 固定 src/nvim/errors.h:37 定义 e_invexpr2 = N_("E15: Invalid expression: \"%s\"")，运行时 gettext 键带双引号；上游 po 抽取时丢失了 %s 外的双引号，导致已译条目永不命中。这里按运行时精确键补译。
+#: ../errors.h:37
+#, c-format
+msgid "E15: Invalid expression: \"%s\""
+msgstr "E15: 无效的表达式：\"%s\""
+
+#. upstream msgid: E856: assert_fails() second argument must be a string or a list with one or two strings
+#. evidence: 固定 src/nvim/testing.c 定义 e_assert_fails_second_arg = N_("E856: \"assert_fails()\" second argument must be a string or a list with one or two strings")，运行时键带双引号；上游 po 抽取丢失引号。
+#: ../testing.c
+msgid "E856: \"assert_fails()\" second argument must be a string or a list with one or two strings"
+msgstr "E856: \"assert_fails()\" 的第二个参数必须是字符串，或包含一或两个字符串的列表"
+
+#. upstream msgid: E1115: assert_fails() fourth argument must be a number
+#. evidence: 固定 src/nvim/testing.c 定义 e_assert_fails_fourth_argument = N_("E1115: \"assert_fails()\" fourth argument must be a number")，运行时键带双引号；上游 po 抽取丢失引号。
+#: ../testing.c
+msgid "E1115: \"assert_fails()\" fourth argument must be a number"
+msgstr "E1115: \"assert_fails()\" 的第四个参数必须是数字"
+
+#. upstream msgid: E1116: assert_fails() fifth argument must be a string
+#. evidence: 固定 src/nvim/testing.c 定义 e_assert_fails_fifth_argument = N_("E1116: \"assert_fails()\" fifth argument must be a string")，运行时键带双引号；上游 po 抽取丢失引号。
+#: ../testing.c
+msgid "E1116: \"assert_fails()\" fifth argument must be a string"
+msgstr "E1116: \"assert_fails()\" 的第五个参数必须是字符串"

@@ -3,7 +3,8 @@
   "notes": [
     "Generated/maintained for nvim-zh; msgids in translations/native/*.po are copied verbatim from the pinned upstream catalog.",
     "gaps = every entry in the pinned upstream catalog whose msgstr is empty; exemptions are gaps that upstream itself marks as “do not translate”.",
-    "repairs rebuild four msgids whose upstream extraction is truncated, using the pinned C sources as evidence."
+    "repairs rebuild four msgids whose upstream extraction is truncated, using the pinned C sources as evidence.",
+    "quote_drift repairs rebuild four msgids whose upstream entry IS translated but whose runtime gettext key gained surrounding quotes that extraction dropped (E15, E856, E1115, E1116); each records pinned C-source evidence."
   ],
   "upstream": {
     "repository": "https://github.com/neovim/neovim",
@@ -22,18 +23,48 @@
   },
   "repairs": {
     "po": "translations/native/runtime_repairs.po",
-    "entries": 4,
+    "entries": 8,
     "upstream_msgids": [
       "E5403: Chunk %i start %",
       "E5405: Chunk %i start %",
       "E5404: Chunk %i end %",
-      "E5406: Chunk %i end %"
+      "E5406: Chunk %i end %",
+      "E15: Invalid expression: %s",
+      "E856: assert_fails() second argument must be a string or a list with one or two strings",
+      "E1115: assert_fails() fourth argument must be a number",
+      "E1116: assert_fails() fifth argument must be a string"
     ],
     "runtime_msgids": [
       "E5403: Chunk %i start %<PRIdVARNUMBER> not in range [%<PRIdVARNUMBER>, %i)",
       "E5405: Chunk %i start %<PRIdVARNUMBER> splits multibyte character",
       "E5404: Chunk %i end %<PRIdVARNUMBER> not in range (%<PRIdVARNUMBER>, %i]",
-      "E5406: Chunk %i end %<PRIdVARNUMBER> splits multibyte character"
+      "E5406: Chunk %i end %<PRIdVARNUMBER> splits multibyte character",
+      "E15: Invalid expression: \"%s\"",
+      "E856: \"assert_fails()\" second argument must be a string or a list with one or two strings",
+      "E1115: \"assert_fails()\" fourth argument must be a number",
+      "E1116: \"assert_fails()\" fifth argument must be a string"
+    ],
+    "quote_drift": [
+      {
+        "upstream_msgid": "E15: Invalid expression: %s",
+        "runtime_msgid": "E15: Invalid expression: \"%s\"",
+        "evidence": "pinned src/nvim/errors.h:37 e_invexpr2 = N_(\"E15: Invalid expression: \\\"%s\\\"\"); upstream PO extraction dropped the quotes around %s, so the translated unquoted key never matches the runtime gettext query."
+      },
+      {
+        "upstream_msgid": "E856: assert_fails() second argument must be a string or a list with one or two strings",
+        "runtime_msgid": "E856: \"assert_fails()\" second argument must be a string or a list with one or two strings",
+        "evidence": "pinned src/nvim/testing.c e_assert_fails_second_arg = N_(\"E856: \\\"assert_fails()\\\" second argument ...\"); upstream PO extraction dropped the quotes around assert_fails()."
+      },
+      {
+        "upstream_msgid": "E1115: assert_fails() fourth argument must be a number",
+        "runtime_msgid": "E1115: \"assert_fails()\" fourth argument must be a number",
+        "evidence": "pinned src/nvim/testing.c e_assert_fails_fourth_argument = N_(\"E1115: \\\"assert_fails()\\\" fourth argument must be a number\"); upstream PO extraction dropped the quotes."
+      },
+      {
+        "upstream_msgid": "E1116: assert_fails() fifth argument must be a string",
+        "runtime_msgid": "E1116: \"assert_fails()\" fifth argument must be a string",
+        "evidence": "pinned src/nvim/testing.c e_assert_fails_fifth_argument = N_(\"E1116: \\\"assert_fails()\\\" fifth argument must be a string\"); upstream PO extraction dropped the quotes."
+      }
     ]
   },
   "intro": {

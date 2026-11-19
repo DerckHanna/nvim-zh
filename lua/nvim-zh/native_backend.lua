@@ -173,7 +173,7 @@ function M.start(config, resource, callback)
   -- A private locale is an environment cache, never a system installation.
   local cache = paths.data() .. '/native/locales/glibc-' .. ffi.string(C.gnu_get_libc_version()) .. '-' .. ffi.arch
   local locale = cache .. '/zh_CN.UTF-8'
-  if (vim.uv or vim.loop).fs_stat(locale .. '/LC_MESSAGES') then
+  if vim.uv.fs_stat(locale .. '/LC_MESSAGES') then
     success, why = pcall(apply, cache)
     if success then callback(); return end
     restored, restore_error, external = restore()
@@ -215,8 +215,8 @@ function M.start(config, resource, callback)
           external_during_prepare = true
           return
         end
-        local renamed = (vim.uv or vim.loop).fs_rename(staged .. '/zh_CN.UTF-8', locale)
-        assert(renamed or (vim.uv or vim.loop).fs_stat(locale), '私有 locale 发布失败')
+        local renamed = vim.uv.fs_rename(staged .. '/zh_CN.UTF-8', locale)
+        assert(renamed or vim.uv.fs_stat(locale), '私有 locale 发布失败')
         apply(cache)
       end)
       vim.fn.delete(staged, 'rf')

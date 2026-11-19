@@ -149,6 +149,62 @@ return {
       },
     },
     {
+      context = "deprecation",
+      msgid = "dap.ext.vscode.load_launchjs is deprecated as it is no longer needed. ./.vscode/launch.json files are read automatically on-demand. See :help dap-providers",
+      msgstr = "dap.ext.vscode.load_launchjs 已弃用，不再需要。./.vscode/launch.json 文件会按需自动读取。参见 :help dap-providers",
+      references = {
+        "lua/dap/ext/vscode.lua:212",
+      },
+    },
+    {
+      context = "deprecation",
+      msgid = "dap.utils.to_dict is deprecated for removal in nvim-dap 0.10.0",
+      msgstr = "dap.utils.to_dict 已弃用，将在 nvim-dap 0.10.0 中移除",
+      references = {
+        "lua/dap/utils.lua:26",
+      },
+    },
+    {
+      context = "diagnostic",
+      msgid = "Description: %s",
+      msgstr = "描述：%s",
+      references = {
+        "lua/dap/session.lua:360",
+      },
+    },
+    {
+      context = "diagnostic",
+      msgid = "Inner Exceptions:",
+      msgstr = "内部异常：",
+      references = {
+        "lua/dap/session.lua:368",
+      },
+    },
+    {
+      context = "diagnostic",
+      msgid = "Stack trace:",
+      msgstr = "栈跟踪：",
+      references = {
+        "lua/dap/session.lua:364",
+      },
+    },
+    {
+      context = "diagnostic",
+      msgid = "Thread stopped due to exception (%s)",
+      msgstr = "线程因异常而停止（%s）",
+      references = {
+        "lua/dap/session.lua:358",
+      },
+    },
+    {
+      context = "diagnostic",
+      msgid = "Thread stopped due to exception of type %s (%s)",
+      msgstr = "线程因类型 %s 的异常而停止（%s）",
+      references = {
+        "lua/dap/session.lua:358",
+      },
+    },
+    {
       context = "health",
       msgid = "\n  id: %s\n  type: %s\n  started, but not initialized. Either the adapter definition or the used configuration is wrong, or the defined adapter doesn't speak DAP",
       msgstr = "\n  id：%s\n  类型：%s\n  已启动，但尚未初始化。适配器定义或所用配置有误，或者所定义的适配器未实现 DAP 通信",
@@ -639,6 +695,7 @@ return {
       msgstr = "运行 `%s`（所属 `%s`）时出错： ",
       references = {
         "lua/dap/session.lua:1313",
+        "lua/dap/session.lua:1627",
       },
     },
     {
@@ -671,6 +728,7 @@ return {
       msgstr = "找不到可执行文件 `%s`，请修正 `%s` 的适配器定义（%s）",
       references = {
         "lua/dap/session.lua:1305",
+        "lua/dap/session.lua:1627",
       },
     },
     {
@@ -957,6 +1015,7 @@ return {
       msgstr = "适配器 `%s` 的 `command` 不能为空",
       references = {
         "lua/dap/session.lua:1311",
+        "lua/dap/session.lua:1627",
       },
     },
     {
@@ -1197,6 +1256,64 @@ return {
       msgstr = "（在行上按 Enter 跳转到帧）",
       references = {
         "lua/dap/repl.lua:169",
+      },
+    },
+    {
+      context = "repl_message",
+      msgid = "No active debug session",
+      msgstr = "没有活动的调试会话",
+      references = {
+        "lua/dap/repl.lua:299",
+      },
+    },
+    {
+      context = "session",
+      msgid = "Could not resolve %s",
+      msgstr = "无法解析 %s",
+      references = {
+        "lua/dap/session.lua:1486",
+      },
+    },
+    {
+      context = "widget",
+      msgid = "Error evaluating '%s':",
+      msgstr = "求值 '%s' 时出错：",
+      references = {
+        "lua/dap/ui/widgets.lua:423",
+      },
+    },
+    {
+      context = "widget",
+      msgid = "No active session",
+      msgstr = "没有活动会话",
+      references = {
+        "lua/dap/ui/widgets.lua:207",
+        "lua/dap/ui/widgets.lua:251",
+        "lua/dap/ui/widgets.lua:402",
+      },
+    },
+    {
+      context = "widget",
+      msgid = "Not stopped at any breakpoint. No frames available",
+      msgstr = "未停在任何断点处，没有可用的栈帧",
+      references = {
+        "lua/dap/ui/widgets.lua:255",
+      },
+    },
+    {
+      context = "widget",
+      msgid = "Stopped thread (%d) not found. Can't display frames",
+      msgstr = "未找到已停止的线程（%d）。无法显示栈帧",
+      references = {
+        "lua/dap/ui/widgets.lua:261",
+      },
+    },
+    {
+      context = "widget",
+      msgid = "Stopped thread has no frames",
+      msgstr = "已停止的线程没有栈帧",
+      references = {
+        "lua/dap/ui/widgets.lua:271",
       },
     },
     {

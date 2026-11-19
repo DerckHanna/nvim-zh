@@ -1538,6 +1538,174 @@ return {
       },
     },
     {
+      context = "footer",
+      msgid = "back",
+      msgstr = "返回",
+      references = {
+        "lua/which-key/view.lua:445",
+      },
+    },
+    {
+      context = "footer",
+      msgid = "close",
+      msgstr = "关闭",
+      references = {
+        "lua/which-key/view.lua:442",
+      },
+    },
+    {
+      context = "footer",
+      msgid = "scroll",
+      msgstr = "滚动",
+      references = {
+        "lua/which-key/view.lua:448",
+      },
+    },
+    {
+      context = "health",
+      msgid = "Checking for duplicate mappings",
+      msgstr = "检查重复映射",
+      references = {
+        "lua/which-key/health.lua:147",
+      },
+    },
+    {
+      context = "health",
+      msgid = "Checking for issues with your mappings",
+      msgstr = "检查映射中的问题",
+      references = {
+        "lua/which-key/health.lua:61",
+      },
+    },
+    {
+      context = "health",
+      msgid = "Checking your config",
+      msgstr = "检查你的配置",
+      references = {
+        "lua/which-key/health.lua:29",
+      },
+    },
+    {
+      context = "health",
+      msgid = "Duplicate mappings are only reported for informational purposes.\nThis doesn't necessarily mean there is a problem with your config.",
+      msgstr = "重复映射仅供参考。\n这不一定表示你的配置有问题。",
+      references = {
+        "lua/which-key/health.lua:177",
+      },
+    },
+    {
+      context = "health",
+      msgid = "Duplicates for <%s> in mode `%s`:\n%s",
+      msgstr = "在模式 `%s` 中，<%s> 的重复项：\n%s",
+      references = {
+        "lua/which-key/health.lua:157",
+      },
+    },
+    {
+      context = "health",
+      msgid = "In mode `%s`, <%s> overlaps with %s:\n%s",
+      msgstr = "在模式 `%s` 中，<%s> 与 %s 重叠：\n%s",
+      references = {
+        "lua/which-key/health.lua:121",
+      },
+    },
+    {
+      context = "health",
+      msgid = "Keymap icon support will be limited.",
+      msgstr = "键映射图标支持将受限。",
+      references = {
+        "lua/which-key/health.lua:58",
+      },
+    },
+    {
+      context = "health",
+      msgid = "Most of these checks are for informational purposes only.\nWARNINGS should be treated as a warning, and don't necessarily indicate a problem with your config.\nPlease |DON'T| report these warnings as an issue.",
+      msgstr = "这些检查大多仅供参考。\nWARNINGS 应视为警告，不一定表示你的配置有问题。\n请|DON'T|将这些警告作为 issue 上报。",
+      references = {
+        "lua/which-key/health.lua:24",
+      },
+    },
+    {
+      context = "health",
+      msgid = "No duplicate mappings found",
+      msgstr = "未发现重复映射",
+      references = {
+        "lua/which-key/health.lua:150",
+      },
+    },
+    {
+      context = "health",
+      msgid = "No issues reported",
+      msgstr = "未报告问题",
+      references = {
+        "lua/which-key/health.lua:63",
+      },
+    },
+    {
+      context = "health",
+      msgid = "No overlapping keymaps found",
+      msgstr = "未发现重叠的键映射",
+      references = {
+        "lua/which-key/health.lua:144",
+      },
+    },
+    {
+      context = "health",
+      msgid = "Overlapping keymaps are only reported for informational purposes.\nThis doesn't necessarily mean there is a problem with your config.",
+      msgstr = "重叠的键映射仅供参考。\n这不一定表示你的配置有问题。",
+      references = {
+        "lua/which-key/health.lua:140",
+      },
+    },
+    {
+      context = "health",
+      msgid = "Please refer to the docs for more info.",
+      msgstr = "更多信息请参阅文档。",
+      references = {
+        "lua/which-key/health.lua:41",
+      },
+    },
+    {
+      context = "health",
+      msgid = "There are issues with your config:",
+      msgstr = "你的配置存在问题：",
+      references = {
+        "lua/which-key/health.lua:33",
+      },
+    },
+    {
+      context = "health",
+      msgid = "checking for overlapping keymaps",
+      msgstr = "检查重叠的键映射",
+      references = {
+        "lua/which-key/health.lua:77",
+      },
+    },
+    {
+      context = "health",
+      msgid = "|%s| is installed",
+      msgstr = "|%s| 已安装",
+      references = {
+        "lua/which-key/health.lua:51",
+      },
+    },
+    {
+      context = "health",
+      msgid = "|%s| is not installed",
+      msgstr = "|%s| 未安装",
+      references = {
+        "lua/which-key/health.lua:54",
+      },
+    },
+    {
+      context = "mark_file",
+      msgid = "file: %s",
+      msgstr = "文件：%s",
+      references = {
+        "lua/which-key/plugins/marks.lua:54",
+      },
+    },
+    {
       context = "notification",
       msgid = "No mappings found for mode `%s` and keys `%s`",
       msgstr = "找不到模式 `%s` 和按键 `%s` 的映射",
@@ -1575,6 +1743,14 @@ return {
       msgstr = "用法：WhichKey [mode] [keys]",
       references = {
         "lua/which-key/config.lua",
+      },
+    },
+    {
+      context = "register_notice",
+      msgid = "OSC 52 detected, register not checked to maintain compatibility",
+      msgstr = "检测到 OSC 52，为保持兼容未检查该 Register",
+      references = {
+        "lua/which-key/plugins/registers.lua:50",
       },
     },
   },

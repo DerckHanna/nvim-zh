@@ -1,0 +1,203 @@
+{
+  "contracts": [
+    "tests/upstream/nvim-dap/nvim_dap_upstream_spec.lua"
+  ],
+  "domain": "nvim-dap",
+  "entry": "nvim-zh.adapters.nvim_dap",
+  "help": {
+    "doc/dap.txt": [
+      "dap-configuration.cnx",
+      "dap-mappings.cnx",
+      "dap-user-commands.cnx",
+      "dap-widgets.cnx"
+    ]
+  },
+  "id": "nvim-dap",
+  "lazy_names": [
+    "nvim-dap"
+  ],
+  "modules": [
+    "dap"
+  ],
+  "notes": {
+    "domain": "nvim-dap",
+    "excluded": "DAP protocol data, logs, debugger output, raw variables/frames/threads, REPL command tokens/completions, existing Buffer contents, eager user-command descriptions, launch.json prompt text and internal quickfix/Buffer identities",
+    "limitations": "existing REPL prompt callbacks are not reattached; DapNew/DapEval command descriptions stay English because re-registration cannot preserve command identity; launch.json promptString/pickString descriptions and options are user configuration data; duplicate quickfix locations fall back when raw breakpoint ownership is ambiguous",
+    "public_path": "exact vim.notify title; structured dap.ui selectors; scoped REPL/new-buffer and vim.fn.input display hooks; breakpoint quickfix display projection; health.check; dap.ui.widgets builder/view layer; Session exception diagnostics, spawn and connect; deprecated utils/vscode notify_once",
+    "seam": "vim.notify:title=DAP; dap.ui.pick_one(_sync); scoped REPL execute/append/open/toggle and no-session reply; session.set_exception_breakpoints and variable.tree_spec.compute_actions vim.fn.input; breakpoints.to_qf_list; health.check; synthetic thread root; dap.ui.widgets fixed messages via call-site-gated layer proxy; Session:_show_exception_info scoped vim.diagnostic.set; Session.spawn scoped vim.notify; Session.connect on_connect; dap.utils.to_dict and dap.ext.vscode.load_launchjs scoped vim.notify_once",
+    "status": "implemented",
+    "version_related": "REPL new_buf and help execution are pinned synchronous scopes; quickfix text is reprojected from raw breakpoint fields; direct input prompts are scoped to their owning public action; widget messages, exception diagnostics, spawn/connect failures and deprecated-API notifications are gated on the pinned source digests and on the real call site",
+    "writes": "fixed_display_strings_only"
+  },
+  "scenarios": {
+    "deprecation": {
+      "surfaces": [
+        "notifications"
+      ],
+      "tui": "tests/upstream/nvim-dap/tui.py"
+    },
+    "diagnostic": {
+      "surfaces": [
+        "diagnostics"
+      ],
+      "tui": "tests/upstream/nvim-dap/tui.py"
+    },
+    "health": {
+      "surfaces": [
+        "health"
+      ],
+      "tui": "tests/upstream/nvim-dap/tui.py"
+    },
+    "help": {
+      "surfaces": [
+        "help"
+      ],
+      "tui": "tests/upstream/nvim-dap/tui.py"
+    },
+    "input": {
+      "surfaces": [
+        "input"
+      ],
+      "tui": "tests/upstream/nvim-dap/tui.py"
+    },
+    "launch_error": {
+      "surfaces": [
+        "notifications"
+      ],
+      "tui": "tests/upstream/nvim-dap/tui.py"
+    },
+    "notification": {
+      "surfaces": [
+        "notifications"
+      ],
+      "tui": "tests/upstream/nvim-dap/tui.py"
+    },
+    "quickfix": {
+      "surfaces": [
+        "quickfix"
+      ],
+      "tui": "tests/upstream/nvim-dap/tui.py"
+    },
+    "repl": {
+      "surfaces": [
+        "repl"
+      ],
+      "tui": "tests/upstream/nvim-dap/tui.py"
+    },
+    "repl_no_session": {
+      "surfaces": [
+        "repl"
+      ],
+      "tui": "tests/upstream/nvim-dap/tui.py"
+    },
+    "resolve_error": {
+      "surfaces": [
+        "notifications"
+      ],
+      "tui": "tests/upstream/nvim-dap/tui.py"
+    },
+    "selection": {
+      "surfaces": [
+        "selectors"
+      ],
+      "tui": "tests/upstream/nvim-dap/tui.py"
+    },
+    "spawn_error": {
+      "surfaces": [
+        "notifications"
+      ],
+      "tui": "tests/upstream/nvim-dap/tui.py"
+    },
+    "threads": {
+      "surfaces": [
+        "threads"
+      ],
+      "tui": "tests/upstream/nvim-dap/tui.py"
+    },
+    "widget": {
+      "surfaces": [
+        "widgets"
+      ],
+      "tui": "tests/upstream/nvim-dap/tui.py"
+    }
+  },
+  "schema": 1,
+  "status": "implemented",
+  "surfaces": {
+    "diagnostics": {
+      "kind": "versioned",
+      "modules": {
+        "dap.session": "lua/dap/session.lua"
+      },
+      "status_key": "exception_info"
+    },
+    "health": {
+      "kind": "api"
+    },
+    "help": {
+      "kind": "help"
+    },
+    "input": {
+      "kind": "api",
+      "status_key": "exception_input"
+    },
+    "notifications": {
+      "kind": "api",
+      "source": [
+        "lua/dap/utils.lua",
+        "lua/dap.lua",
+        "lua/dap/session.lua",
+        "lua/dap/ext/vscode.lua"
+      ],
+      "status_key": "notification"
+    },
+    "quickfix": {
+      "kind": "api"
+    },
+    "repl": {
+      "kind": "api",
+      "status_key": "repl_append"
+    },
+    "selectors": {
+      "kind": "api",
+      "status_key": "pick_one"
+    },
+    "threads": {
+      "kind": "api",
+      "status_key": "thread_root"
+    },
+    "widgets": {
+      "kind": "versioned",
+      "modules": {
+        "dap.ui.widgets": "lua/dap/ui/widgets.lua"
+      },
+      "status_key": "widgets_builder"
+    }
+  },
+  "targets": {
+    "baseline": {
+      "commit": "cfa2d58f4537aca6ca83e2de1a0d9f1491121264",
+      "dependencies": [],
+      "neovim": "0.12.6",
+      "sources": {
+        "doc/dap.txt": "96acf99ec2b4dabe62993b54504df77bc783b149c6e06c99e09f9b4a3bee7b15",
+        "lua/dap.lua": "64b278643f19f44d474531356881ff9d2c922c57a28dd1e63ae6524ab972b285",
+        "lua/dap/breakpoints.lua": "2ed707bfb9b87dc4107033133cbe00e1569d8c1f3bfbeba211bf131b90f6e621",
+        "lua/dap/entity.lua": "ee56d3ed625e4949ab839f3e34d02440bee7d80d4dede2530de0356c0639a6b4",
+        "lua/dap/ext/vscode.lua": "6bd49ffe7a055de8885fcbd44a7e94745a93739cae822db5aaa45c4614cd3bee",
+        "lua/dap/health.lua": "5b12cab31a580577c4e19b581b252577959c0da40d74dfb5810f1aebe6393da8",
+        "lua/dap/repl.lua": "22088588e0d55e36ffd0e94276189320bba3bf16381b7bf063bff82d540b0406",
+        "lua/dap/session.lua": "2c0b59c6383b6899eac2d281f8ddb01ae960f8b667856a674b939fa3aa04a121",
+        "lua/dap/ui.lua": "68fafc5e37e19ed714fdd01707bd97e7dc5bc40ca123cbf641b47d714e2aa932",
+        "lua/dap/ui/widgets.lua": "3b7eb7d86186d618bfb73c008d72a6dccaa1aadde2858367a60e19d06f98ad7e",
+        "lua/dap/utils.lua": "8126189ccdcceaec17616f0e50e32ff73f9fe80f7d84651872e6637fc51b898f"
+      }
+    }
+  },
+  "upstream": {
+    "follow": {
+      "kind": "default_branch"
+    },
+    "repository": "https://github.com/mfussenegger/nvim-dap"
+  }
+}

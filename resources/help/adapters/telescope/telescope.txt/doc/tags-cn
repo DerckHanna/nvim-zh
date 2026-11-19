@@ -1,0 +1,6 @@
+telescope-command.cnx	telescope-command.cnx	/*telescope-command.cnx*
+telescope-mappings.cnx	telescope-mappings.cnx	/*telescope-mappings.cnx*
+telescope-sorting.cnx	telescope-sorting.cnx	/*telescope-sorting.cnx*
+telescope.command	telescope-command.cnx	/*telescope.command*
+telescope.defaults.sorting_strategy	telescope-sorting.cnx	/*telescope.defaults.sorting_strategy*
+telescope.mappings	telescope-mappings.cnx	/*telescope.mappings*

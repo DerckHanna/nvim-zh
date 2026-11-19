@@ -92,7 +92,9 @@ class MaintenanceTests(unittest.TestCase):
         self.assertNotIn('v0.10.4', workflow)
         self.assertNotIn('test-foundation', workflow)
         self.assertIn('make test-upstream', workflow)
-        self.assertIn("item['commit']", workflow)
+        self.assertIn('adapter_tool.py lock all', workflow)
+        self.assertIn('libvterm-dev', workflow)
+        self.assertIn('watch --source-root', workflow)
         self.assertIn('upstream-smoke:', workflow)
 
     def test_help_runtime_comparisons_are_pinned_guarded(self):

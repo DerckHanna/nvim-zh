@@ -63,7 +63,8 @@ zh.refresh(function(value) after_stop = value end)
 assert(after_stop and after_stop.status == 'cancelled' and after_stop.error_code == 'stopped',
   'refresh after teardown was not rejected')
 assert(after_stop.error and type(after_stop.restart_required) == 'boolean', 'stopped callback contract incomplete')
-assert(zh.status().runtime.status == 'disabled', 'refresh after teardown resurrected runtime')
+local stopped = zh.status().runtime
+assert(stopped.status == 'disabled' and stopped.error == nil, 'successful teardown reported a runtime error')
 zh.setup({ modules = { core = { enabled = false } } })
 assert(zh.status().runtime.status == 'ok', 'stopped runtime could not restart')
 assert(#vim.api.nvim_get_autocmds({ group = 'NvimZhRuntime', event = 'BufWritePost' }) == 1)

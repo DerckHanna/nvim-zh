@@ -1,17 +1,12 @@
 # nvim-zh
 
-面向 Neovim 的简体中文本地化插件。它把核心 gettext 消息、中文 Help、常见 Lua UI、受支持第三方插件以及 clangd 诊断/LSP 的**显示文本**接入同一套精确翻译与资源同步机制。
-
-插件不扫描或改写编辑 Buffer，不修改原始诊断/LSP 协议对象、第三方源文件或外部工具输出；没有可靠译文的文本自然保留英文。
+Neovim 简体中文本地化插件，覆盖核心消息、中文帮助、常见 UI、五个第三方插件的部分界面，以及 clangd 的部分诊断和 LSP 提示。命令、快捷键、用户输入和协议数据沿用原值。
 
 ## 要求
 
 - Neovim **0.12+**，使用内置 `vim.pack` 安装和更新。
-- 中文 Help 和 Lua UI 适配不需要 Python、gettext 命令行工具或构建步骤。
-- 自动绑定核心 MO 当前要求 **Linux/glibc + LuaJIT**；其他环境会明确报告原生部分不支持或降级，Help/UI 仍可使用。
-- 翻译与固定上游基线为 Neovim **0.12.6**。支持边界和未验证项见[兼容性说明](docs/compatibility.md)。
-
-项目仍处于开发期，当前版本为 `0.1.0-dev`。
+- 安装包自带帮助、翻译目录与 MO。自动启用核心消息需要 **Linux/glibc + LuaJIT**，中文帮助与 Lua UI 可独立使用。
+- 当前开发版本为 `0.1.0-dev`，固定验证版本为 Neovim **0.12.6**。见[兼容性说明](docs/compatibility.md)。
 
 ## 安装
 
@@ -20,15 +15,13 @@ vim.pack.add({ 'https://github.com/DerckHanna/nvim-zh' }, { load = true })
 require('nvim-zh').setup()
 ```
 
-这就是最短可用配置。MO、中文 Help、帮助索引和翻译目录均随包交付；首次 setup 会校验并启用资源，不需要手动编译 MO、生成 helptags 或执行 Reload。
+首次 `setup()` 会校验并启用随包资源。使用受支持的第三方插件时，把上面的配置放在目标插件加载之前。标准 `vim.pack` 按仓库地址识别固定接缝，镜像或其他管理器可显式登记源码。见[第三方插件适配](docs/adapters.md#启用版本相关接缝)。
 
 ## 日常使用
 
-- `:NvimZh`：打开只读中文面板，查看版本、翻译资源、缺失记录和健康状态。
-- `:NvimZhCheck`：显示只读检查；也可使用 `:checkhealth nvim-zh`。
-- 面板中 `Tab` / `Shift-Tab` 切页，`j` / `k` 滚动，`/` 搜索，`?` 打开 Help，`q` / `Esc` 关闭。
-
-面板不下载更新、不编辑配置、不提供另一套回退命令。headless 环境可使用[结构化 Lua 接口](docs/api.md)。
+- 用 `:NvimZh` 查看版本、资源、缺失记录和健康状态。`Tab` 与 `Shift-Tab` 切页，`j` 与 `k` 滚动，`/` 搜索，`?` 打开帮助，`q` 或 `Esc` 关闭。
+- 用 `:NvimZhCheck` 或 `:checkhealth nvim-zh` 查看检查结果。
+- 用 `:help nvim-zh` 打开帮助，或用 `:help nvim-zh@en` 选择英文版本。
 
 ### 更新
 
@@ -36,16 +29,14 @@ require('nvim-zh').setup()
 vim.pack.update()
 ```
 
-在 vim.pack 的标准确认界面用 `:write` 接受；取消确认不会应用候选资源。确认后，插件自动同步同一安装修订中的 MO、Help、索引和翻译目录：
+在 vim.pack 的确认界面用 `:write` 接受更新。插件随安装修订同步 MO、Help、索引和翻译目录。
 
-- 纯资源更新直接用于后续查询，不需要重启或手动 Reload。
-- 实现代码变化会明确提示重启，下次启动自动完成同步。
-- 损坏或不兼容的候选资源不会替换上一份已验证资源。
-- 版本回退同样通过 vim.pack 与锁文件完成，资源跟随选中的安装修订。
+- 纯资源更新用于后续查询。实现变化会提示重启，并在下一次启动时应用。
+- 取消更新或资源校验失败时继续使用上一份已验证资源。包版本和回退由 vim.pack 的锁文件管理。
 
-### 少量常用配置
+### 常用配置
 
-默认配置通常足够。以下示例仅演示可选项，不是安装所必需：
+按需启用选择项格式化、禁用单个适配器或覆盖译文。
 
 ```lua
 require('nvim-zh').setup({
@@ -59,7 +50,7 @@ require('nvim-zh').setup({
 })
 ```
 
-需要持久热配置时，可创建 `stdpath('config')/nvim-zh.json`。保存后自动校验并应用；无效文件保留上一份有效配置，包更新不会覆盖该文件或其中的覆盖数据。
+需要持久热配置时，可创建 `stdpath('config')/nvim-zh.json`。保存后自动校验并应用。校验失败时保留上一份有效配置。
 
 完整默认值、模块开关、JSON 格式和优先级见[配置文档](docs/configuration.md)。
 
@@ -74,14 +65,7 @@ require('nvim-zh').setup({
 | 诊断与 LSP | 只翻译明确拥有的 clang/clangd 显示字段，原始数据、动作和取消语义不变 |
 | 状态与排错 | 面板、健康检查、结构化状态、实际观察与脱敏缺失记录 |
 
-具体接缝、固定 commit 和限制见[第三方插件适配](docs/adapters.md)。Help 与 native 的机器清单位于 `manifests/`；清单状态、结构校验和实际运行时观察是不同概念，均不代表“全部汉化”。
-
-已知限制：
-
-- 已显示的历史通知、旧 Help Buffer 和第三方私有视图不会被强制改写；后续自然刷新使用新资源。
-- 未接入的插件、私有 UI、未知服务器和未知文本保留英文。
-- 某些平台缺少原生 locale 能力时，只有核心原生消息降级，不会据此宣称全部中文可用。
-- 固定 fixture 的命中数不是整个插件或 clangd 的汉化率。
+缺少中文帮助主题或匹配译文时使用上游文字。后续打开的帮助及新通知使用当前资源。逐插件的实际验证与剩余英文来源见[验证记录](docs/verification.md)。
 
 ## Lua 接口摘要
 
@@ -96,7 +80,7 @@ local task_id = zh.refresh(function(result)
 end)
 ```
 
-`translate()`、`register_catalog()`、`open()`、`check()` 和 `teardown()` 的参数、返回值及错误契约见[Lua API](docs/api.md)。
+完整接口、回调和错误字段见[Lua API](docs/api.md)。
 
 ## 文档与帮助
 

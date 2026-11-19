@@ -493,3 +493,402 @@ msgstr "setup 收到的配置类型 \"%s\" 无效，使用默认配置"
 msgctxt "notification"
 msgid "Modifier %s is not in allowed list : %s"
 msgstr "修饰符 %s 不在允许列表中：%s"
+
+# 以下固定通知补齐盘点发现的未登记条目。全部经 nvim-tree/notify.lua:38-41
+# 以 title=NvimTree 发出（无 title 支持时保留 [NvimTree] 前缀）。动态段保留
+# %s/%d/%q，路径、URL、`:help` 引用、配置字段名与 OS 错误原文不译。
+
+#: lua/nvim-tree/actions/fs/clipboard.lua:22
+msgctxt "notification"
+msgid "copied"
+msgstr "已复制"
+
+#: lua/nvim-tree/actions/fs/clipboard.lua:23
+msgctxt "notification"
+msgid "cut"
+msgstr "已剪切"
+
+#: lua/nvim-tree/actions/fs/clipboard.lua:128
+msgctxt "notification"
+msgid "Could not %s %s - %s"
+msgstr "无法%s %s - %s"
+
+#: lua/nvim-tree/actions/fs/clipboard.lua:148
+msgctxt "notification"
+msgid "%s %s to clipboard."
+msgstr "已将 %s %s 到剪贴板。"
+
+#: lua/nvim-tree/actions/fs/clipboard.lua:180
+msgctxt "notification"
+msgid "%d nodes %s to clipboard."
+msgstr "已将 %d 个节点 %s 到剪贴板。"
+
+#: lua/nvim-tree/actions/fs/clipboard.lua:467
+msgctxt "notification"
+msgid " * "
+msgstr " * "
+
+#: lua/nvim-tree/actions/fs/clipboard.lua:488
+msgctxt "notification"
+msgid "Copied %s to %s clipboard!"
+msgstr "已将 %s 复制到 %s 剪贴板！"
+
+#: lua/nvim-tree/actions/fs/clipboard.lua:561
+msgctxt "notification"
+msgid "%s %s copied to register"
+msgstr "%s %s 已复制到 Register"
+
+#: lua/nvim-tree/actions/fs/clipboard.lua:561
+msgctxt "notification"
+msgid "absolute paths"
+msgstr "绝对路径"
+
+#: lua/nvim-tree/actions/fs/rename-file.lua:33
+msgctxt "notification"
+msgid "Cannot rename %s -> %s: %s"
+msgstr "无法把 %s 重命名为 %s：%s"
+
+#: lua/nvim-tree/actions/fs/rename-file.lua:55
+msgctxt "notification"
+msgid "file already exists"
+msgstr "文件已存在"
+
+#: lua/nvim-tree/watcher.lua:8
+msgctxt "notification"
+msgid "fs.inotify.max_user_watches exceeded, see https://github.com/nvim-tree/nvim-tree.lua/wiki/Troubleshooting"
+msgstr "已超出 fs.inotify.max_user_watches，请参阅 https://github.com/nvim-tree/nvim-tree.lua/wiki/Troubleshooting"
+
+#: lua/nvim-tree/config.lua:444
+msgctxt "notification"
+msgid "Invalid value for field %s%s: Expected one of enum '%s', got '%s'"
+msgstr "字段 %s%s 的值无效：应为枚举 '%s' 之一，实际为 '%s'"
+
+#: lua/nvim-tree/config.lua:450
+msgctxt "notification"
+msgid "Unknown option: %s%s"
+msgstr "未知选项：%s%s"
+
+#: lua/nvim-tree/config.lua:464
+msgctxt "notification"
+msgid "Invalid option: %s%s. Expected %s, got %s"
+msgstr "选项无效：%s%s。应为 %s，实际为 %s"
+
+#: lua/nvim-tree/config.lua:468
+msgctxt "notification"
+msgid "Invalid value for field %s%s: '%s'"
+msgstr "字段 %s%s 的值无效：'%s'"
+
+#: lua/nvim-tree/config.lua:489
+msgctxt "notification"
+msgid "%s\n\nsee :help nvim-tree-config for available configuration options"
+msgstr "%s\n\n可用配置选项见 :help nvim-tree-config"
+
+#: lua/nvim-tree/api/impl.lua:14
+msgctxt "notification"
+msgid "nvim-tree setup not called"
+msgstr "尚未调用 nvim-tree setup"
+
+#: lua/nvim-tree/log.lua:124
+msgctxt "notification"
+msgid "nvim-tree.lua logging to %s"
+msgstr "nvim-tree.lua 日志写入 %s"
+
+#: lua/nvim-tree/legacy.lua:122
+msgctxt "notification"
+msgid "view.hide_root_folder is deprecated, please set renderer.root_folder_label = false"
+msgstr "view.hide_root_folder 已弃用，请改为设置 renderer.root_folder_label = false"
+
+#: lua/nvim-tree/legacy.lua:131
+msgctxt "notification"
+msgid "auto close feature has been removed: https://github.com/nvim-tree/nvim-tree.lua/wiki/Auto-Close"
+msgstr "自动关闭功能已移除：https://github.com/nvim-tree/nvim-tree.lua/wiki/Auto-Close"
+
+#: lua/nvim-tree/legacy.lua:138
+msgctxt "notification"
+msgid "focus_empty_on_setup has been removed: https://github.com/nvim-tree/nvim-tree.lua/wiki/Open-At-Startup"
+msgstr "focus_empty_on_setup 已移除：https://github.com/nvim-tree/nvim-tree.lua/wiki/Open-At-Startup"
+
+#: lua/nvim-tree/legacy.lua:145
+msgctxt "notification"
+msgid "create_in_closed_folder has been removed and is now the default behaviour. You may use api.fs.create to add a file under your desired node."
+msgstr "create_in_closed_folder 已移除，现为默认行为。可以用 api.fs.create 在目标节点下新建文件。"
+
+#: lua/nvim-tree/legacy.lua:152
+msgctxt "notification"
+msgid "system_open has been removed, now uses the system default handler: vim.ui.open()"
+msgstr "system_open 已移除，现使用系统默认处理程序：vim.ui.open()"
+
+#: lua/nvim-tree/diagnostics.lua:66
+msgctxt "notification"
+msgid "Diagnostics update from coc.nvim failed. %s"
+msgstr "来自 coc.nvim 的诊断更新失败。%s"
+
+#: lua/nvim-tree/events.lua:27
+msgctxt "notification"
+msgid "Handler for event %s errored. %s"
+msgstr "事件 %s 的处理程序出错。%s"
+
+#: lua/nvim-tree/view.lua:174
+msgctxt "notification"
+msgid "Failed to close window: %s"
+msgstr "关闭 Window 失败：%s"
+
+# Confirmation prompts dispatched by lib.prompt (lib.lua:73-95). Only the
+# prompt_select / prompt_input display copy is projected; the dynamic segments
+# (node name, destination path, counts) and the items_short protocol codes
+# ("y"/"n"/"") stay byte-identical. Count forms live in their own context so a
+# "%s" node template can never capture a "%d selected" prompt.
+
+#: lua/nvim-tree/actions/fs/remove-file.lua:150
+msgctxt "prompt"
+msgid "Remove %s?"
+msgstr "删除 %s？"
+
+#: lua/nvim-tree/actions/fs/remove-file.lua:150
+msgctxt "prompt"
+msgid "Remove %s? y/N: "
+msgstr "删除 %s？y/N: "
+
+#: lua/nvim-tree/actions/fs/remove-file.lua:150
+msgctxt "prompt"
+msgid "Remove %s? Y/n: "
+msgstr "删除 %s？Y/n: "
+
+#: lua/nvim-tree/actions/fs/trash.lua:101
+msgctxt "prompt"
+msgid "Trash %s?"
+msgstr "将 %s 移到回收站？"
+
+#: lua/nvim-tree/actions/fs/trash.lua:101
+msgctxt "prompt"
+msgid "Trash %s? y/N: "
+msgstr "将 %s 移到回收站？y/N: "
+
+#: lua/nvim-tree/actions/fs/trash.lua:101
+msgctxt "prompt"
+msgid "Trash %s? Y/n: "
+msgstr "将 %s 移到回收站？Y/n: "
+
+#: lua/nvim-tree/marks/init.lua:202
+msgctxt "prompt"
+msgid "Remove bookmarked ?"
+msgstr "删除书签节点？"
+
+#: lua/nvim-tree/marks/init.lua:203
+msgctxt "prompt"
+msgid "Remove bookmarked ? y/N: "
+msgstr "删除书签节点？y/N: "
+
+#: lua/nvim-tree/marks/init.lua:231
+msgctxt "prompt"
+msgid "Trash bookmarked ?"
+msgstr "将书签节点移到回收站？"
+
+#: lua/nvim-tree/marks/init.lua:232
+msgctxt "prompt"
+msgid "Trash bookmarked ? y/N: "
+msgstr "将书签节点移到回收站？y/N: "
+
+#: lua/nvim-tree/actions/fs/clipboard.lua:263
+msgctxt "prompt"
+msgid "Overwrite %s ?"
+msgstr "覆盖 %s？"
+
+#: lua/nvim-tree/actions/fs/clipboard.lua:264
+msgctxt "prompt"
+msgid "Overwrite %s ? R(ename)/y/n: "
+msgstr "覆盖 %s？R(ename)/y/n: "
+
+#: lua/nvim-tree/actions/fs/remove-file.lua:190
+msgctxt "prompt_count"
+msgid "Remove %d selected?"
+msgstr "删除选中的 %d 个节点？"
+
+#: lua/nvim-tree/actions/fs/remove-file.lua:190
+msgctxt "prompt_count"
+msgid "Remove %d selected? y/N: "
+msgstr "删除选中的 %d 个节点？y/N: "
+
+#: lua/nvim-tree/actions/fs/remove-file.lua:190
+msgctxt "prompt_count"
+msgid "Remove %d selected? Y/n: "
+msgstr "删除选中的 %d 个节点？Y/n: "
+
+#: lua/nvim-tree/actions/fs/trash.lua:133
+msgctxt "prompt_count"
+msgid "Trash %d selected?"
+msgstr "将选中的 %d 个节点移到回收站？"
+
+#: lua/nvim-tree/actions/fs/trash.lua:133
+msgctxt "prompt_count"
+msgid "Trash %d selected? y/N: "
+msgstr "将选中的 %d 个节点移到回收站？y/N: "
+
+#: lua/nvim-tree/actions/fs/trash.lua:133
+msgctxt "prompt_count"
+msgid "Trash %d selected? Y/n: "
+msgstr "将选中的 %d 个节点移到回收站？Y/n: "
+
+#: lua/nvim-tree/actions/fs/clipboard.lua:282
+msgctxt "prompt_count"
+msgid "%d file(s) already exist"
+msgstr "%d 个文件已存在"
+
+#: lua/nvim-tree/actions/fs/clipboard.lua:283
+msgctxt "prompt_count"
+msgid "%d file(s) already exist. R(ename suffix)/y/n: "
+msgstr "%d 个文件已存在。R(ename suffix)/y/n: "
+
+# items_long labels rendered by lib.prompt's format_item. Display only: the
+# callback still receives the original items_short code.
+
+#: lua/nvim-tree/utils.lua:505
+msgctxt "select_item"
+msgid "Yes"
+msgstr "是"
+
+#: lua/nvim-tree/utils.lua:505
+msgctxt "select_item"
+msgid "No"
+msgstr "否"
+
+#: lua/nvim-tree/actions/fs/clipboard.lua:265
+msgctxt "select_item"
+msgid "Rename"
+msgstr "重命名"
+
+#: lua/nvim-tree/actions/fs/clipboard.lua:287
+msgctxt "select_item"
+msgid "Rename (suffix)"
+msgstr "重命名（加后缀）"
+
+#: lua/nvim-tree/actions/fs/clipboard.lua:287
+msgctxt "select_item"
+msgid "Overwrite all"
+msgstr "全部覆盖"
+
+#: lua/nvim-tree/actions/fs/clipboard.lua:287
+msgctxt "select_item"
+msgid "Skip all"
+msgstr "全部跳过"
+
+# Help buffer header computed by help.lua:90-92 inside the local compute(). The
+# `q`/`s` key tokens are behaviour and stay verbatim.
+
+#: lua/nvim-tree/help.lua:90
+msgctxt "help_buffer"
+msgid "nvim-tree mappings"
+msgstr "nvim-tree 映射"
+
+#: lua/nvim-tree/help.lua:91
+msgctxt "help_buffer"
+msgid "exit: q"
+msgstr "退出：q"
+
+#: lua/nvim-tree/help.lua:92
+msgctxt "help_buffer"
+msgid "sort by %s: s"
+msgstr "按%s排序：s"
+
+#: lua/nvim-tree/help.lua:92
+msgctxt "help_buffer"
+msgid "description"
+msgstr "描述"
+
+#: lua/nvim-tree/help.lua:92
+msgctxt "help_buffer"
+msgid "keymap"
+msgstr "按键"
+
+# Window picker prompt printed when cmdheight is non-zero.
+
+#: lua/nvim-tree/actions/node/open-file.lua:139
+msgctxt "window_picker"
+msgid "Pick window: "
+msgstr "选择 Window："
+
+# File info popup. Every translated label keeps the upstream 11 display columns
+# so the value column stays aligned; `size:     ` keeps its padding.
+
+#: lua/nvim-tree/actions/node/file-popup.lua:13
+msgctxt "popup"
+msgid "  Can't retrieve file information"
+msgstr "  无法获取文件信息"
+
+#: lua/nvim-tree/actions/node/file-popup.lua:18
+msgctxt "popup"
+msgid " fullpath: "
+msgstr " 完整路径："
+
+#: lua/nvim-tree/actions/node/file-popup.lua:19
+msgctxt "popup"
+msgid " created:  "
+msgstr " 创建时间："
+
+#: lua/nvim-tree/actions/node/file-popup.lua:20
+msgctxt "popup"
+msgid " modified: "
+msgstr " 修改时间："
+
+#: lua/nvim-tree/actions/node/file-popup.lua:21
+msgctxt "popup"
+msgid " accessed: "
+msgstr " 访问时间："
+
+#: lua/nvim-tree/actions/node/file-popup.lua:22
+msgctxt "popup"
+msgid " size:     "
+msgstr " 大小：    "
+
+# Renderer hidden-count labels produced by utils.default_format_hidden_count
+# (utils.lua:141); the count and the reason list are data.
+
+#: lua/nvim-tree/utils.lua:141
+msgctxt "tree_window"
+msgid "(%d hidden)"
+msgstr "（隐藏 %d 个）"
+
+#: lua/nvim-tree/utils.lua:141
+msgctxt "tree_window"
+msgid "(%d total %s)"
+msgstr "（隐藏 %d：%s）"
+
+#: lua/nvim-tree/help.lua:240
+msgctxt "help_buffer"
+msgid "nvim-tree: exit help"
+msgstr "nvim-tree: 退出帮助"
+
+#: lua/nvim-tree/help.lua:242
+msgctxt "help_buffer"
+msgid "nvim-tree: toggle sorting method"
+msgstr "nvim-tree: 切换排序方式"
+
+#: lua/nvim-tree/_meta/config/renderer.lua:380
+msgctxt "hidden_reason"
+msgid "bookmark"
+msgstr "书签"
+
+#: lua/nvim-tree/_meta/config/renderer.lua:381
+msgctxt "hidden_reason"
+msgid "buf"
+msgstr "Buffer"
+
+#: lua/nvim-tree/_meta/config/renderer.lua:382
+msgctxt "hidden_reason"
+msgid "custom"
+msgstr "自定义"
+
+#: lua/nvim-tree/_meta/config/renderer.lua:383
+msgctxt "hidden_reason"
+msgid "dotfile"
+msgstr "点文件"
+
+#: lua/nvim-tree/_meta/config/renderer.lua:384
+msgctxt "hidden_reason"
+msgid "git"
+msgstr "Git"
+
+#: lua/nvim-tree/_meta/config/renderer.lua:385
+msgctxt "hidden_reason"
+msgid "live filter"
+msgstr "实时过滤"

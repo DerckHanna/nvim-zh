@@ -33,15 +33,15 @@
 
 | 插件 | 固定 commit | 已验证接缝边界 |
 |---|---|---|
-| which-key | `3aab2147e74890957785941f0c1ad87d0a44c15a` | preset desc、生成数量、精确 title 通知；footer 与私有 Buffer 不覆盖 |
-| Telescope | `40aedd8a68c78a656a10a8d62d80c54af59420fb` | 初始标题显示投影、静态/动态 previewer 标题、通知；内部英文行为值和最终 refine 标题不覆盖 |
-| nvim-tree | `69eb0c34ed3d836d5a0d92d913b77dd73b054f2f` | 默认 on_attach 映射后缀与通知；用户自定义描述、已有 Buffer 和私有 renderer 不覆盖 |
-| nvim-dap | `cfa2d58f4537aca6ca83e2de1a0d9f1491121264` | 精确 title 通知、结构化选择器、REPL 帮助、直接输入提示、quickfix 显示副本与健康报告；协议、日志、调试器输出和已有 REPL 不覆盖 |
-| nvim-dap-ui | `cc9dd33aade7f20bae414d0cba163bc60d4d4b43` | 高亮限定的固定 render 文本、mapping 描述、浮窗标题、选择器、默认 Window 提示与通知；动态 DAP 数据和已有 Buffer 不改写 |
-| lazy.nvim | `306a05526ada86a7b30af95c5cc81ffba93fef97` | `User LazyLoad`；主面板私有 view 不覆盖 |
-| nvim-cmp | `2ffe79f1f021def8dd1fcd81deb16f1bb0d989f3` | inventory-only，没有可证明安全的 cmp 自有固定标签 |
+| which-key | `3aab2147e74890957785941f0c1ad87d0a44c15a` | preset、动态数量、底部提示、marks/Register 标签、通知、健康检查和 3 篇中文帮助 |
+| Telescope | `1e1bab730218eaf97fce743be3f56e51075928ac` | 首开与动态标题、精炼、映射浮窗、Git 和 Register 提示、通知、操作输出、健康检查和 3 篇中文帮助 |
+| nvim-tree | `dbc9d96a3633c2de85f409416ebd4a3aacf4220a` | 默认映射、通知、文件操作、文件信息、Window 选择、帮助浮窗、隐藏统计和 4 篇中文帮助 |
+| nvim-dap | `cfa2d58f4537aca6ca83e2de1a0d9f1491121264` | 通知、选择器、REPL、输入、quickfix、健康检查、Widget、诊断前缀和 4 篇中文帮助 |
+| nvim-dap-ui | `cc9dd33aade7f20bae414d0cba163bc60d4d4b43` | 固定渲染文案、映射、浮窗、选择器、Window 提示、通知和 3 篇中文帮助 |
+| lazy.nvim | `306a05526ada86a7b30af95c5cc81ffba93fef97` | `User LazyLoad` 生命周期桥接 |
+| nvim-cmp | `2ffe79f1f021def8dd1fcd81deb16f1bb0d989f3` | inventory-only，实测公共 formatter 与输入数据契约 |
 
-这些固定版本和实际检查的源码 SHA-256 见 `manifests/upstreams.json`。相同 API 形状的其他版本可能工作，但不自动获得“已验证”结论。详细限制见[第三方插件适配](adapters.md)。
+固定组合和实际检查的源码 SHA-256 见 `manifests/adapters/`。正式显示 API 与固定源码接缝的证据各自记录。详细范围和加载方法见[第三方插件适配](adapters.md)。
 
 ## 诊断、LSP 与外部工具
 

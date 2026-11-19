@@ -1,0 +1,147 @@
+{
+  "contracts": [
+    "tests/upstream/which-key/which_key_upstream_spec.lua"
+  ],
+  "domain": "which-key",
+  "entry": "nvim-zh.adapters.which_key",
+  "help": {
+    "doc/which-key.nvim.txt": [
+      "which-key-mappings.cnx",
+      "which-key-triggers.cnx",
+      "which-key-usage.cnx"
+    ]
+  },
+  "id": "which-key",
+  "lazy_names": [
+    "which-key.nvim"
+  ],
+  "modules": [
+    "which-key",
+    "which-key.config",
+    "which-key.text",
+    "which-key.health",
+    "which-key.plugins.marks",
+    "which-key.plugins.registers"
+  ],
+  "notes": {
+    "domain": "which-key",
+    "excluded": "raw user mapping data, register contents, mark paths and spelling suggestions",
+    "limitations": "replace.desc has no provenance; identical user descriptions may display the same exact translation",
+    "seam": "replace.desc; setup; exact vim.notify title; Text.new/render footer projection; health.check; marks/registers expand display copies",
+    "status": "implemented",
+    "writes": "preset_desc_notification_footer_health_plugin_label_display_only"
+  },
+  "runtime_references": {
+    "../../../neovim/runtime/lua/vim/_core/defaults.lua": {
+      "path": "lua/vim/_core/defaults.lua",
+      "sha256": "59c5279b602650b42acbb051e6ee5a36dfc6ee1f8f92e625c8d2d4b461f55368"
+    }
+  },
+  "scenarios": {
+    "footer": {
+      "surfaces": [
+        "popup_footer"
+      ],
+      "tui": "tests/upstream/which-key/tui.py"
+    },
+    "health": {
+      "surfaces": [
+        "health"
+      ],
+      "tui": "tests/upstream/which-key/tui.py"
+    },
+    "help": {
+      "surfaces": [
+        "help"
+      ],
+      "tui": "tests/upstream/which-key/tui.py"
+    },
+    "mappings": {
+      "surfaces": [
+        "preset_descriptions"
+      ],
+      "tui": "tests/upstream/which-key/tui.py"
+    },
+    "notification": {
+      "surfaces": [
+        "notifications"
+      ],
+      "tui": "tests/upstream/which-key/tui.py"
+    },
+    "plugin_labels": {
+      "surfaces": [
+        "plugin_labels"
+      ],
+      "tui": "tests/upstream/which-key/tui.py"
+    }
+  },
+  "schema": 1,
+  "status": "implemented",
+  "surfaces": {
+    "health": {
+      "kind": "versioned",
+      "modules": {
+        "vim.health": "lua/vim/health.lua",
+        "which-key.health": "lua/which-key/health.lua"
+      }
+    },
+    "help": {
+      "kind": "help"
+    },
+    "notifications": {
+      "kind": "api",
+      "source": "lua/which-key/util.lua",
+      "status_key": "notification"
+    },
+    "plugin_labels": {
+      "kind": "versioned",
+      "modules": {
+        "which-key.plugins.marks": "lua/which-key/plugins/marks.lua",
+        "which-key.plugins.registers": "lua/which-key/plugins/registers.lua"
+      },
+      "status_key": "marks"
+    },
+    "popup_footer": {
+      "kind": "versioned",
+      "modules": {
+        "which-key.text": "lua/which-key/text.lua",
+        "which-key.view": "lua/which-key/view.lua"
+      },
+      "status_key": "popup_footer"
+    },
+    "preset_descriptions": {
+      "kind": "api"
+    }
+  },
+  "targets": {
+    "baseline": {
+      "commit": "3aab2147e74890957785941f0c1ad87d0a44c15a",
+      "dependencies": [],
+      "neovim": "0.12.6",
+      "sources": {
+        "doc/which-key.nvim.txt": "fcfbaf5e887dd2e314d210f587ffa8d9b20c353f32e729d4b67c55f2159a09e6",
+        "lua/vim/health.lua": "c664ab88afbac7e20dbe3d000bb0775a630ca2da1a73cb7d17a8d53d4ab537c6",
+        "lua/which-key/config.lua": "babf424328f261c7334868a55af8573bb70d8cba7e4928700cedecce39c5db69",
+        "lua/which-key/health.lua": "2485752bfbfbbd0b7b29b3d87fcd0cda413767c31e15339418875eee2fed41c7",
+        "lua/which-key/init.lua": "c7385b09dd512dcb5a617b564614e5303fb1e9080fab9ca6ffbd9f3c67702a45",
+        "lua/which-key/mappings.lua": "f9eb63cfb17a81696b63aeb3a60193360e5b4e941d03bf84f45159ec27be1780",
+        "lua/which-key/node.lua": "13a850370bfdff67ad96b2a0164464f937a81a5eaadb137fb69c1b628bc40e21",
+        "lua/which-key/plugins/init.lua": "8d9ae3620f02da83be692eb66515a891597e5c7c5c65376fb994506b12d755db",
+        "lua/which-key/plugins/marks.lua": "fa9f5b1fe4798499423e019bc038a197438a1cd1570bacd71630db1f44db6811",
+        "lua/which-key/plugins/presets.lua": "5e5ebb3011642422228c6ee6afb611da23fe023d337b61a80edbd32356eb2e6e",
+        "lua/which-key/plugins/registers.lua": "895f300b9cc2e92d811e5845ad7b61644634bb9db3ccee96d408bf0c52f3df88",
+        "lua/which-key/plugins/spelling.lua": "e7e04ab60da04a828c44efc6453809863e0ae85c1cc89a80ee8394d3ee92a6e6",
+        "lua/which-key/state.lua": "8794572bb50580828396b5e8e6ca4608ca1aa5009a5f2f0849c959135fd5b919",
+        "lua/which-key/text.lua": "13eb73e6dc6e6af6d377d56ef90a056dc453f5a6e273889e354dae2427a8d1e4",
+        "lua/which-key/util.lua": "ff51a10b4c338d37463891b8756b68e57763a651799df9d4f18685e28b03a02d",
+        "lua/which-key/view.lua": "4c7b445633ce97f36a6422b31aea981d56babc245e4d32d74d65571e7f430b45"
+      }
+    }
+  },
+  "upstream": {
+    "follow": {
+      "kind": "default_branch"
+    },
+    "repository": "https://github.com/folke/which-key.nvim"
+  }
+}

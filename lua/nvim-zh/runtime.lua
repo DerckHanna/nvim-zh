@@ -87,13 +87,13 @@ function M.refresh(callback)
   local previous_native = native_backend.info()
   local effective = config_file.resolve(base)
   local previous = resources.active()
-  local prepared, candidate = pcall(function()
+  local prepared, candidate, deferred = pcall(function()
     resources.freeze()
     return resources.prepare()
   end)
   local resource_error
-  if not prepared then
-    resource_error = tostring(candidate)
+  if not prepared or deferred == 'adapter_restart' then
+    if not prepared then resource_error = tostring(candidate) end
     candidate = previous or resources.recover()
   end
 
@@ -204,7 +204,7 @@ end
 
 function M.request(reason)
   if stopped or not session then return end
-  if timer then timer:stop() else timer = (vim.uv or vim.loop).new_timer() end
+  if timer then timer:stop() else timer = vim.uv.new_timer() end
   timer:start(reason == 'pack' and 0 or 180, 0, vim.schedule_wrap(function()
     if not stopped then M.refresh() end
   end))
@@ -228,13 +228,15 @@ function M.setup(opts, injected_session)
         changed('adapters')
       end
     end })
-    if vim.fn.exists('##PackChanged') == 1 then
-      vim.api.nvim_create_autocmd('PackChanged', { group = group, callback = function(event)
-        local data = event.data or {}
-        local path = data.path and ((vim.uv or vim.loop).fs_realpath(data.path) or data.path)
-        if path == paths.root and (data.kind == 'update' or data.kind == 'install') then M.request('pack') end
-      end })
-    end
+    vim.api.nvim_create_autocmd('PackChanged', { group = group, callback = function(event)
+      local data = event.data or {}
+      local path = data.path and (vim.uv.fs_realpath(data.path) or data.path)
+      if path == paths.root and (data.kind == 'update' or data.kind == 'install') then
+        M.request('pack')
+      elseif require('nvim-zh.plugins').package_changed(data) then
+        changed('adapters')
+      end
+    end })
     vim.api.nvim_create_autocmd('VimLeavePre', { group = group, callback = function() M.stop() end })
   end
   return M.refresh()
@@ -258,7 +260,7 @@ function M.stop()
   if group then pcall(vim.api.nvim_del_augroup_by_id, group); group = nil end
   local ok, err = native_backend.stop()
   state.status = ok and 'disabled' or 'restore_failed'
-  state.error = ok and nil or tostring(err)
+  state.error = not ok and tostring(err) or nil
   state.generation = state.generation + 1
   changed('stop')
   return ok, err

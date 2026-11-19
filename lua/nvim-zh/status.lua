@@ -9,7 +9,7 @@ function M.get()
     help = require('nvim-zh.help').info(session.config.modules.help),
     native = require('nvim-zh.native').info(),
     ui = require('nvim-zh.ui').info(),
-    plugins = require('nvim-zh.plugins').info(),
+    adapters = require('nvim-zh.plugins').info(),
     diagnostics = require('nvim-zh.diagnostics').info(),
     lsp = require('nvim-zh.lsp').info(),
     v_lang = vim.v.lang,

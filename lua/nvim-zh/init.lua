@@ -19,6 +19,14 @@ function M.register_catalog(domain, loader, metadata)
   return require('nvim-zh.catalog').register(domain, loader, metadata)
 end
 
+function M.register_adapter_source(id, directory)
+  return require('nvim-zh.plugins').register_source(id, directory)
+end
+
+function M.register_adapter(definition)
+  return require('nvim-zh.plugins').register_adapter(definition)
+end
+
 function M.stats()
   return require('nvim-zh.engine').stats()
 end

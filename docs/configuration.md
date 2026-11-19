@@ -14,7 +14,7 @@ require('nvim-zh').setup()
 require('nvim-zh').setup({
   modules = {
     core = { enabled = true, apply_language = true },
-    help = { enabled = true, lang = { 'cn', 'en' }, vimcdoc = false },
+    help = { enabled = true, lang = { 'cn', 'en' } },
     ui = { notify = true, prompts = true, select_items = false, echo = false },
     plugins = { auto = true, lazy_load = true, disabled = {} },
     diagnostics = {
@@ -25,7 +25,6 @@ require('nvim-zh').setup({
     },
     lsp = { messages = true, progress = true },
   },
-  terminology = 'preserve',
   overrides = {},
   missing = { enabled = true, max_entries = 2000 },
 })
@@ -46,7 +45,6 @@ require('nvim-zh').setup({
 
 - `enabled`：是否把中文 Help 加入 `'helplang'` 选择。
 - `lang`：按优先级排列的语言列表，默认 `{ 'cn', 'en' }`；数组整体替换。
-- `vimcdoc`：是否在健康检查中另行检测独立的 Vimcdoc 兼容资源。Vimcdoc 不是本插件的依赖，也不会随包安装。
 
 重复设置或关闭模块时，只移除本插件拥有语言项，保留用户后来添加的其他语言。缺少中文 tag 的主题由 Neovim 自然回退英文。
 
@@ -97,7 +95,7 @@ require('nvim-zh').setup({
 
 覆盖在内置目录之后合并。函数、loader 和可执行规则不属于覆盖数据。动态模板只支持经过校验的 `{name}` 或 printf 占位符；未命中或有歧义时回退原文。命令、代码、路径、快捷键和用户数据不会因全局术语替换而被改写。
 
-`terminology = 'preserve'` 是当前唯一的术语策略：维护端的术语表约束编辑源，运行时不对最终文本再做全局替换。
+维护端术语表约束编辑源。升级时请从 Lua 和 `nvim-zh.json` 删除 `terminology` 与 `modules.help.vimcdoc`。
 
 ## 缺失记录
 

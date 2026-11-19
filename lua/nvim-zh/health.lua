@@ -48,7 +48,7 @@ local function collect()
         and ('已降级：' .. tostring(adapter.reason)) or '已禁用',
     })
   end
-  local plugins = snapshot.plugins
+  local plugins = snapshot.adapters
   local plugin_names = vim.tbl_keys(plugins)
   table.sort(plugin_names)
   for _, name in ipairs(plugin_names) do
@@ -56,11 +56,19 @@ local function collect()
     local status = adapter.active and 'ok'
       or adapter.enabled and adapter.reason ~= 'not_loaded' and 'warn' or 'info'
     table.insert(results, {
-      name = 'plugins.' .. name,
+      name = 'adapters.' .. name,
       status = status,
       message = adapter.active and ('已启用：' .. adapter.seam) or adapter.enabled
         and ('已降级：' .. tostring(adapter.reason)) or ('已禁用/未加载：' .. tostring(adapter.reason)),
     })
+    for _, surface in ipairs(vim.fn.sort(vim.tbl_keys(adapter.surfaces))) do
+      local display = adapter.surfaces[surface]
+      table.insert(results, {
+        name = 'adapters.' .. name .. '.' .. surface,
+        status = display.active and 'ok' or 'info',
+        message = display.status .. (display.evidence and (' · ' .. display.evidence.kind) or ''),
+      })
+    end
   end
   local diagnostics = snapshot.diagnostics
   for _, name in ipairs({ 'virtual_text', 'virtual_lines', 'float' }) do

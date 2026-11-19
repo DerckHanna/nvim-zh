@@ -1,0 +1,98 @@
+*dap-configuration.cnx*       nvim-dap: Debugee Configuration
+
+                            nvim-dap debugee 配置
+
+DEBUGEE 配置                                        *dap-configuration*
+
+
+除了（可能）启动并连接调试适配器之外，Neovim 还需要告诉调试适配器本身如何启动
+并连接 debugee。debugee 就是你想调试的应用程序。
+
+这由 `Configuration` 控制，它有三个必填字段：
+
+>
+    type: string        -- Which debug adapter to use.
+    request: string     -- Either `attach` or `launch`. Indicates whether the
+                        -- debug adapter should launch a debugee or attach to
+                        -- one that is already running.
+    name: string        -- A user-readable name for the configuration.
+<
+
+此外，`Configuration` 还接受任意数量的其他选项，这些选项由具体调试适配器定义。
+
+配置放在 `dap.configurations` 表中，键是文件类型。运行 |dap.continue()| 时，
+它会按当前文件类型查找配置。
+
+例如：
+
+>lua
+    local dap = require('dap')
+    dap.configurations.python = {
+      {
+        type = 'debugpy';
+        request = 'launch';
+        name = "Launch file";
+        program = "${file}";
+        pythonPath = function()
+          return '/usr/bin/python'
+        end;
+      },
+    }
+<
+
+需要注意的地方：
+
+- `type`、`request` 与 `name` 这 3 个必填属性之外的属性值可以是函数。若某个值
+  以函数给出，则在使用该配置时会调用该函数以取得属性值。
+
+  为支持异步操作，该函数可以返回一个 `thread`（由 `coroutine.create` 创建），
+  并需满足两条约束：
+
+    - coroutine/thread 必须处于挂起状态
+    - coroutine/thread 必须带着结果恢复 nvim-dap 的 `run` coroutine
+      result
+
+  例如：
+
+>lua
+    foo = function()
+      return coroutine.create(function(dap_run_co)
+        local items = {'one', 'two'}
+        vim.ui.select(items, { label = 'foo> '}, function(choice)
+          coroutine.resume(dap_run_co, choice)
+        end)
+      end)
+    end,
+<
+
+- 顶层属性的函数可以返回 `dap.ABORT` 常量，以表示你要中止启动调试会话。例如：
+
+>lua
+    program = function()
+      local path = vim.fn.input({
+        prompt = 'Path to executable: ',
+        default = vim.fn.getcwd() .. '/',
+        completion = 'file'
+      })
+      return (path and path ~= "") and path or dap.ABORT
+    end
+<
+
+- 该配置可以带一个实现了 `__call` 的可选 metatable。在使用该配置时会调用这个
+  函数，它必须返回一个新的配置 table。可用来一次性动态添加多个属性。
+
+- 支持以下变量：
+  - `${file}`：当前文件名
+  - `${fileBasename}`：当前文件的 basename
+  - `${fileBasenameNoExtension}`：当前文件的 basename，不含扩展名
+  - `${fileDirname}`：当前文件的 dirname
+  - `${fileExtname}`：当前文件的扩展名
+  - `${relativeFile}`：当前文件相对于 |getcwd()| 的路径
+  - `${relativeFileDirname}`：当前文件的 dirname 相对于 |getcwd()| 的路径
+  - `${workspaceFolder}`：Neovim 的当前工作目录
+  - `${workspaceFolderBasename}`：在 Neovim 中打开的文件夹名
+  - `${command:pickProcess}`：用 |vim.ui.select| 打开对话框选择进程
+  - `${command:pickFile}`：用 |vim.ui.select| 打开对话框选择文件
+  - `${env:Name}`：名为 `Name` 的环境变量，例如 `${env:HOME}`。
+
+vim:ft=help

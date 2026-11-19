@@ -66,7 +66,7 @@ translate / register_catalog ──► catalog / engine / missing
 6. teardown 只恢复仍由本插件持有的函数；
 7. 返回可诊断的 `active/reason/seam` 状态。
 
-找不到可靠接缝时保持 `not_loaded`、`unsupported_api` 或明确的 inventory-only 状态。私有渲染 Buffer、第三方源文件、原始诊断、LSP 协议对象和外部工具输出不属于适配目标。
+固定源码接缝由加载器核对实际执行的模块字节、模块身份和更新代次。上游更新使旧代次失效，缺证据时该接缝返回上游文案。Help 按实际上游文档摘要启用。清单、接缝状态和回退规则见[适配系统设计](adapter-system-design.md)。
 
 通知采用内部的精确来源注册：适配器按公开 `opts.title` 注册 domain，公共 UI 在调用原通知实现前完成一次翻译。固定前缀和空白原样保留，未知 title 仍走 `nvim-ui`，避免插件层与公共层重复翻译或制造伪缺失记录。
 
@@ -84,7 +84,7 @@ translate / register_catalog ──► catalog / engine / missing
 资源与实现分别计算内容标识：
 
 - PO、生成的 JSON/Lua 目录、Help、MO 或 `VERSION` 变化只改变资源集，不单独要求重启。
-- 非生成运行 Lua 或插件入口变化改变实现标识；当前进程继续冻结旧实现，提示重启。
+- 非生成运行 Lua、插件入口或生成的适配索引变化会改变实现标识。当前进程继续使用已加载的实现并提示重启。
 - 下次启动从 vim.pack 选中的安装修订加载新实现，并自动完成资源同步，无需手动 Reload。
 
 旧实现遇到未知资源格式时保留旧资源并提示重启。纯资源更新不通过清空全部 `package.loaded` 热执行新代码。
@@ -103,6 +103,7 @@ translate / register_catalog ──► catalog / engine / missing
 - `translations/native/*.po`、固定上游缓存和修复清单经 `native_catalog.py` 生成合并 MO。
 - `doc/tags`、`doc/tags-cn` 由 Neovim `:helptags` 生成。
 - `manifests/help_inventory.json` 由 Help 清单工具生成。
+- `manifests/adapters/` 生成运行时适配索引，并为固定上游测试提供源码和场景清单。
 - `resources/` 由完整资源构建器确定性生成，包含内容哈希与资源摘要。
 
 生成文件不手工编辑。运行用户不需要 Python、gettext 工具、帮助索引生成命令或构建 hook。

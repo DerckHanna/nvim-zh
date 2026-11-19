@@ -1,0 +1,112 @@
+*dap-widgets.cnx*             nvim-dap: Widget API
+
+                             nvim-dap Widget API
+
+Widget API                                                       *dap-widgets*
+
+
+警告：此 API 为实验性，可能发生变化。
+
+
+nvim-dap 的界面默认极简且不打扰，但它提供了可用于构建和自定义界面的
+widget 基础构件。
+
+一些例子：
+
+
+在侧栏中查看当前作用域：
+
+>lua
+  local widgets = require('dap.ui.widgets')
+  local my_sidebar = widgets.sidebar(widgets.scopes)
+  my_sidebar.open()
+<
+
+在侧栏中查看当前栈帧：
+
+>lua
+  local widgets = require('dap.ui.widgets')
+  local my_sidebar = widgets.sidebar(widgets.frames)
+  my_sidebar.open()
+<
+
+
+在居中的浮动 window 中查看当前作用域：
+
+>lua
+  local widgets = require('dap.ui.widgets')
+  widgets.centered_float(widgets.scopes)
+<
+
+
+在浮动 window 中查看光标下表达式的值：
+
+>lua
+  require('dap.ui.widgets').hover()
+<
+
+
+这些 widget 可能启用了以下自定义映射：
+
+- `<CR>` 展开或折叠某一项
+- `a` 显示含可用动作的菜单
+
+
+可用的 widget 实体：
+
+- sessions
+- scopes
+- frames
+- expression
+- threads
+
+
+可用的 widget 构建函数：
+
+- sidebar({widget}, {winopts}, {wincmd})
+    为侧栏创建视图。必须对返回值调用 `open` 才会打开 window。
+
+    `winopts` 与 `wincmd` 的说明见 |dap.repl.open()|。
+
+- cursor_float({widget}, {winopts})
+    在锚定于光标的浮动 window 中打开 widget 的内容。
+
+- centered_float({widget}, {winopts})
+    在居中的浮动 window 中打开 widget 的内容。
+
+- hover({expr}, {winopts})
+    对表达式求值，并在浮动 window 中显示结果。
+
+    {expr} 默认为 `<cexpr>`。
+    它可以是 |expand()| 中所述的字符串，也可以是一个函数，该函数应返回需要
+    求值的变量或表达式。
+
+- preview({expr}, {opts})
+    类似 hover，但使用 preview window
+
+    {opts} 为可选 table，包含：
+
+      - listener?: string[]
+          触发视图更新的命令或事件名称。
+          默认为无，即冻结该值。
+
+          可用命令、事件以及 listener 系统的说明见 |dap-extensions|。
+
+所有 widget 构建函数都返回一个 `view`。view 有以下方法：
+
+- open()
+- close()
+- toggle()
+
+
+你也可以用底层构建器自定义 buffer 与 window 的创建：
+
+>lua
+  local widgets = require('dap.ui.widgets')
+  widgets.builder(widgets.scopes)
+    .new_buf(function_that_creates_and_returns_a_buffer)
+    .new_win(function_that_creates_and_returns_a_window)
+    .build()
+<
+
+vim:ft=help

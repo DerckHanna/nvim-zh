@@ -1,0 +1,86 @@
+*dapui-config.cnx*            nvim-dap-ui: Configuration
+
+                              nvim-dap-ui 配置项
+
+dapui.config                                                      *dapui.config*
+
+                                                                  *dapui.Config*
+Fields~
+{icons} `(dapui.Config.icons)`
+{mappings} `(table<dapui.Action, string|string[]>)` 用于在元素中触发动作的按键
+{element_mappings} `(table<string, table<dapui.Action, string|string[]>>)`
+对全局映射按元素分别覆盖
+{expand_lines} `(boolean)` 当内容超过 window 高度时，把当前行展开到 hover
+window
+{force_buffers} `(boolean)` 阻止其它 buffer 被加载到 nvim-dap-ui 的 window
+中
+{layouts} `(dapui.Config.layout[])` 用于在其中显示元素的布局。布局按定义的
+顺序打开
+{floating} `(dapui.Config.floating)` 浮动 window 专属选项
+{controls} `(dapui.Config.controls)` 控件配置
+{render} `(dapui.Config.render)` 渲染选项，可在初始设置之后更新
+{select_window?} `(fun(): integer)` 返回一个 window 的函数，用于打开诸如栈帧
+位置之类的 buffer。
+
+                                                            *dapui.Config.icons*
+Fields~
+{expanded} `(string)`
+{collapsed} `(string)`
+{current_frame} `(string)`
+
+                                                           *dapui.Config.layout*
+Fields~
+{elements} `(string[]|dapui.Config.layout.element[])` 要在该布局中显示的
+元素
+{size} `(number)` 布局的大小，以行/列计
+{position} `("left"|"right"|"top"|"bottom")` 在编辑器的哪一侧打开布局
+
+                                                   *dapui.Config.layout.element*
+Fields~
+{id} `(string)` 元素 ID
+{size} `(number)` 元素的大小，以行/列计，或占编辑器总大小的比例（0-1）
+
+                                                         *dapui.Config.floating*
+Fields~
+{max_height?} `(number)` 浮动 window 的最大高度（整数，或 0 到 1 之间的浮点
+数）
+{max_width?} `(number)` 浮动 window 的最大宽度（整数，或 0 到 1 之间的浮点
+数）
+{border} `(string|string[])` 传给 `nvim_open_win` 的边框参数
+{mappings} `(table<dapui.FloatingAction, string|string[]>)` 用于在元素中触发
+动作的按键
+
+                                                         *dapui.Config.controls*
+Fields~
+{enabled} `(boolean)` 在元素上显示控件（需要 winbar 特性）
+{element} `(string)` 在哪个元素上显示控件
+{icons} `(dapui.Config.controls.icons)`
+
+                                                   *dapui.Config.controls.icons*
+Fields~
+{pause} `(string)`
+{play} `(string)`
+{step_into} `(string)`
+{step_over} `(string)`
+{step_out} `(string)`
+{step_back} `(string)`
+{run_last} `(string)`
+{terminate} `(string)`
+
+                                                           *dapui.Config.render*
+Fields~
+{indent} `(integer)` 默认缩进大小
+{max_type_length?} `(integer)` 类型名在截断之前允许占用的最大字符数
+{max_value_lines?} `(integer)` 值在截断之前允许占用的最大行数
+{sort_variables?} `(fun(a: dapui.types.Variable, b: dapui.types.Variable):boolean)`
+用于决定变量渲染顺序的排序函数。
+
+                                                                  *dapui.Action*
+Alias~
+`dapui.Action` → `"expand"|"open"|"remove"|"edit"|"repl"|"toggle"|"watch"`
+
+                                                          *dapui.FloatingAction*
+Alias~
+`dapui.FloatingAction` → `"close"`
+
+ vim:tw=78:ts=8:noet:ft=help:norl:

@@ -8,6 +8,7 @@ import json
 from pathlib import Path
 
 import catalog_tool as ct
+import adapter_manifest as adapters
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -45,6 +46,13 @@ def contents(root=ROOT):
             if source.is_symlink():
                 raise ValueError(f'symlink resource: {source}')
             files['help/doc/' + source.name] = source.read_bytes()
+    help_tags = {}
+    for id, source, path, tags in adapters.help_inputs(root, adapters.load(root)):
+        prefix = f'help/adapters/{id}/{Path(source).name}/doc/'
+        files[prefix + path.name] = path.read_bytes()
+        help_tags.setdefault(prefix, []).extend(f'{tag}\t{path.name}\t/*{tag}*\n' for tag in tags)
+    for prefix, tags in help_tags.items():
+        files[prefix + 'tags-cn'] = ''.join(sorted(tags)).encode()
     mo = root / 'build/native/zh_CN.UTF-8/LC_MESSAGES/nvim.mo'
     files['native/zh_CN.UTF-8/LC_MESSAGES/nvim.mo'] = mo.read_bytes()
     inventory = json.loads((root / 'manifests/help_inventory.json').read_text())
@@ -67,8 +75,15 @@ def contents(root=ROOT):
             if source.is_symlink():
                 raise ValueError(f'symlink implementation: {source}')
             implementation[source.relative_to(root).as_posix()] = source.read_bytes()
-    impl_index, resource_index = descriptor(implementation), descriptor(files)
+    impl_index = descriptor(implementation)
+    adapter_contract = index_id({name: value for name, value in impl_index.items()
+                                 if name.startswith('lua/nvim-zh/adapters/') or name in (
+                                     'lua/nvim-zh/plugins.lua', 'lua/nvim-zh/ui.lua', 'lua/nvim-zh/help.lua',
+                                     'lua/nvim-zh/catalog.lua')})
+    files['adapter-contract.json'] = encoded({'id': adapter_contract})
+    resource_index = descriptor(files)
     manifest = dict(schema=1, runtime_api=1, version=(root / 'VERSION').read_text().strip(),
+                    adapter_contract=adapter_contract,
                     implementation=dict(id=index_id(impl_index), files=impl_index),
                     bundle=dict(id=index_id(resource_index), files=resource_index))
     files['manifest.json'] = encoded(manifest)
@@ -92,6 +107,11 @@ def main():
     output.parent.mkdir(parents=True, exist_ok=True)
     # Each file is atomically replaced; manifest is published last. Users only
     # consume committed checkouts, and the runtime validates the entire payload.
+    write(output, files)
+    print(f'RESOURCE_BUNDLE=BUILT {len(files)} files')
+
+
+def write(output, files):
     output.mkdir(exist_ok=True)
     for name, data in sorted(files.items(), key=lambda item: item[0] == 'manifest.json'):
         path = output / name
@@ -100,7 +120,6 @@ def main():
     for path in sorted(output.rglob('*'), reverse=True):
         if path.is_file() and path.relative_to(output).as_posix() not in files:
             path.unlink()
-    print(f'RESOURCE_BUNDLE=BUILT {len(files)} files')
 
 
 if __name__ == '__main__':

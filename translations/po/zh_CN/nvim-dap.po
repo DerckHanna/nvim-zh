@@ -10,6 +10,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 # Notifications routed only by the exact public title DAP.
+# Upstream (lua/dap.lua:319) builds this message as
+# "Can't get configurations from launch.json:\n%s" .. configs, so the rendered
+# text keeps a literal "%s" between the prefix and the caught error. The entry
+# therefore names the literal text and carries no format placeholder; the
+# adapter formats the prefix and appends the unchanged payload.
 #: lua/dap.lua:319
 msgctxt "notification"
 msgid "Can't get configurations from launch.json:\n%s"
@@ -139,6 +144,14 @@ msgstr "配置必须包含 `request` 属性，其值须为 `attach` 或 `launch`
 msgctxt "notification"
 msgid "Couldn't connect to %s:%s: %s"
 msgstr "无法连接到 %s:%s：%s"
+
+# lua/dap.lua:1255 (already translated) formats this inner value into
+# "Couldn't connect to %s:%s: %s", so it is projected on its own only through the
+# on_connect callback that Session.connect hands to its caller.
+#: lua/dap/session.lua:1486
+msgctxt "session"
+msgid "Could not resolve %s"
+msgstr "无法解析 %s"
 
 #: lua/dap/session.lua:19
 msgctxt "notification"
@@ -275,17 +288,20 @@ msgctxt "notification"
 msgid "command `%s` of adapter `%s` exited with %d. Run :DapShowLog to open logs"
 msgstr "命令 `%s`（适配器 `%s`）以退出码 %d 退出。运行 :DapShowLog 打开日志"
 
-#: lua/dap/session.lua:1305
+# Session.spawn reports the same three spawn failures through a bare vim.notify
+# (:1628, no title) instead of utils.notify (:1358); the adapter projects them
+# inside that one public call, so this single entry serves both branches.
+#: lua/dap/session.lua:1305 lua/dap/session.lua:1627
 msgctxt "notification"
 msgid "Executable `%s` not found, fix the adapter definition for `%s` (%s)"
 msgstr "找不到可执行文件 `%s`，请修正 `%s` 的适配器定义（%s）"
 
-#: lua/dap/session.lua:1311
+#: lua/dap/session.lua:1311 lua/dap/session.lua:1627
 msgctxt "notification"
 msgid "`command` of adapter `%s` must not be empty"
 msgstr "适配器 `%s` 的 `command` 不能为空"
 
-#: lua/dap/session.lua:1313
+#: lua/dap/session.lua:1313 lua/dap/session.lua:1627
 msgctxt "notification"
 msgid "Error running `%s` of `%s`: "
 msgstr "运行 `%s`（所属 `%s`）时出错： "
@@ -621,6 +637,37 @@ msgctxt "action"
 msgid "Stop thread"
 msgstr "停止线程"
 
+# Exception diagnostics. Session:_show_exception_info builds msg_parts from
+# session.lua:357-371 and hands the joined text to one vim.diagnostic.set at :373.
+# Each line is projected independently; the exception type, break mode,
+# description, stack trace and vim.inspect'd inner exceptions stay verbatim.
+#: lua/dap/session.lua:358
+msgctxt "diagnostic"
+msgid "Thread stopped due to exception of type %s (%s)"
+msgstr "线程因类型 %s 的异常而停止（%s）"
+
+# Same upstream line when details.typeName is absent (:357 builds an empty
+# ' of type ' suffix, so the longer template above cannot match).
+#: lua/dap/session.lua:358
+msgctxt "diagnostic"
+msgid "Thread stopped due to exception (%s)"
+msgstr "线程因异常而停止（%s）"
+
+#: lua/dap/session.lua:360
+msgctxt "diagnostic"
+msgid "Description: %s"
+msgstr "描述：%s"
+
+#: lua/dap/session.lua:364
+msgctxt "diagnostic"
+msgid "Stack trace:"
+msgstr "栈跟踪："
+
+#: lua/dap/session.lua:368
+msgctxt "diagnostic"
+msgid "Inner Exceptions:"
+msgstr "内部异常："
+
 #: lua/dap/utils.lua:243
 msgctxt "process"
 msgid "id=%d name=%s"
@@ -747,3 +794,54 @@ msgstr "  id：%s\n  类型：%s"
 msgctxt "health"
 msgid "\n  id: %s\n  type: %s\n  started, but not initialized. Either the adapter definition or the used configuration is wrong, or the defined adapter doesn't speak DAP"
 msgstr "\n  id：%s\n  类型：%s\n  已启动，但尚未初始化。适配器定义或所用配置有误，或者所定义的适配器未实现 DAP 通信"
+
+# Fixed messages rendered by dap.ui.widgets through the shared ui.layer.render
+# path. The adapter projects xs[1] only when the layer.render call site is one of
+# the pinned widgets.lua lines below, so debugger data, hover results and user
+# expressions in the same layer are never touched.
+#: lua/dap/ui/widgets.lua:207 lua/dap/ui/widgets.lua:251 lua/dap/ui/widgets.lua:402
+msgctxt "widget"
+msgid "No active session"
+msgstr "没有活动会话"
+
+#: lua/dap/ui/widgets.lua:255
+msgctxt "widget"
+msgid "Not stopped at any breakpoint. No frames available"
+msgstr "未停在任何断点处，没有可用的栈帧"
+
+#: lua/dap/ui/widgets.lua:261
+msgctxt "widget"
+msgid "Stopped thread (%d) not found. Can't display frames"
+msgstr "未找到已停止的线程（%d）。无法显示栈帧"
+
+#: lua/dap/ui/widgets.lua:271
+msgctxt "widget"
+msgid "Stopped thread has no frames"
+msgstr "已停止的线程没有栈帧"
+
+# The expression is user data: the template captures it and re-emits it
+# byte-identically, so only the fixed wording around it is translated.
+#: lua/dap/ui/widgets.lua:423
+msgctxt "widget"
+msgid "Error evaluating '%s':"
+msgstr "求值 '%s' 时出错："
+
+# REPL replies. 'No active debug session' is force-appended by repl.lua:299 when
+# a command runs without a session (autostart exhausted); it is projected only
+# inside the public REPL execution scope, never in general buffer output.
+#: lua/dap/repl.lua:299
+msgctxt "repl_message"
+msgid "No active debug session"
+msgstr "没有活动的调试会话"
+
+# Deprecated public APIs. Both notify_once calls carry one exact fixed string and
+# no title, so the public module function owns the branch.
+#: lua/dap/utils.lua:26
+msgctxt "deprecation"
+msgid "dap.utils.to_dict is deprecated for removal in nvim-dap 0.10.0"
+msgstr "dap.utils.to_dict 已弃用，将在 nvim-dap 0.10.0 中移除"
+
+#: lua/dap/ext/vscode.lua:212
+msgctxt "deprecation"
+msgid "dap.ext.vscode.load_launchjs is deprecated as it is no longer needed. ./.vscode/launch.json files are read automatically on-demand. See :help dap-providers"
+msgstr "dap.ext.vscode.load_launchjs 已弃用，不再需要。./.vscode/launch.json 文件会按需自动读取。参见 :help dap-providers"

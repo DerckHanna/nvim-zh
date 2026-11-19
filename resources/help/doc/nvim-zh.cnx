@@ -55,7 +55,7 @@ Linux/glibc + LuaJIT；其他环境会报告原生降级，中文 Help 和 Lua U
     require('nvim-zh').setup({
       modules = {
         core = { enabled = true, apply_language = true },
-        help = { enabled = true, lang = { 'cn', 'en' }, vimcdoc = false },
+        help = { enabled = true, lang = { 'cn', 'en' } },
         ui = { notify = true, prompts = true, select_items = false, echo = false },
         plugins = { auto = true, lazy_load = true, disabled = {} },
         diagnostics = {
@@ -66,7 +66,6 @@ Linux/glibc + LuaJIT；其他环境会报告原生降级，中文 Help 和 Lua U
         },
         lsp = { messages = true, progress = true },
       },
-      terminology = 'preserve',
       overrides = {},
       missing = { enabled = true, max_entries = 2000 },
     })
@@ -75,7 +74,7 @@ modules.core 只控制原生 gettext 接线。enabled=false 关闭该模块；
 apply_language=false 退出自动 MO 绑定和消息语言选择。中文 Help 与 Lua UI
 彼此独立。
 
-modules.help 设置 'helplang'。Vimcdoc 是可选外部资源，不是内嵌依赖。
+modules.help 设置 'helplang'，中文标签缺失时由 Neovim 查找英文帮助。
 modules.ui 控制 notify、input/select、可选选择项格式化和默认关闭的 echo。
 modules.plugins.auto 只适配已加载的受支持插件，不强制加载插件本体；
 disabled 是适配器名称数组。
@@ -122,6 +121,13 @@ register_catalog(domain, loader, metadata?)
                 注册懒加载目录。loader 返回 schema=1、domain、locale、entries；
                 用户 override 在内置条目之后合并。
 
+register_adapter_source(id, directory)
+                为镜像或其他管理器登记插件源码目录，须在目标模块首次加载前调用。
+                标准 vim.pack 按清单仓库地址自动识别。
+
+register_adapter(definition)
+                注册外置适配器，返回释放函数。定义见 docs/api.md。
+
 stats()         返回已加载目录条目数与本进程实际观察、回退和缺失统计。
                 它们不是全 Neovim 汉化率，也不是 fixture 命中率。
 
@@ -151,31 +157,27 @@ notify_once 先按英文原文去重。input/select 保留 opts、回调、异�
 通知来源按公开 opts.title 精确注册。固定插件前缀及其空白原样保留；未知
 title 使用 nvim-ui，未知消息回退，不会重复翻译或重复记录。
 
-which-key 通过 replace.desc 翻译真实内置 preset 描述和生成数量。该公开接缝
-没有来源信息，因此相同的用户自定义描述也可能显示同一条精确译文；原始
-mapping 不会被修改。私有 footer 不适配。
+which-key 翻译内置 preset、动态数量、弹窗底部提示、marks/Register 标签、
+通知和健康报告。replace.desc 只收到描述字符串，因此用户描述恰好等于内置
+文案时也可能显示同一译文。
 
-Telescope 翻译初始标题显示投影和 Previewer:title，不修改
-picker.prompt_title 等内部英文行为值，因此 to_fuzzy_refine 继续按原逻辑工作。
-最终 refine change_title 接缝未覆盖。entry、finder、回调和动态路径保持原样。
+Telescope 翻译首开与动态标题、精炼和按键映射浮窗、Git 与 Register 操作提示、
+通知和健康报告。内部选择器标题、路径、条目、查询与回调使用原始值。
 
-nvim-tree 翻译默认 on_attach 的映射后缀，保留 ASCII `nvim-tree: ` 前缀和帮助
-页解析。覆盖默认 setup 以及 lazy 先 setup 后 LazyLoad 的顺序。用户自定义
-on_attach 描述和已有 Buffer 的映射保持原样；不扫描私有 renderer/help Buffer。
+nvim-tree 翻译默认 on_attach 的映射后缀，保留 ASCII `nvim-tree: ` 前缀。
+还覆盖文件操作、信息浮窗、Window 选择、帮助浮窗和隐藏统计。用户自定义
+on_attach 描述及插件登记的用户命令描述使用原文。
 
-nvim-dap 翻译精确 DAP title 通知、结构化选择器、REPL 帮助和固定输入提示，
-并投影断点 quickfix 文本与健康报告。REPL prompt/命令 token、补全、协议、
-日志、调试器输出和动态变量保持原文；已有 REPL callback 不重建。无 title
-通知、加载时立即注册的用户命令描述及 launch.json 动态输入不在安全范围内。
+nvim-dap 翻译结构化选择器、REPL 帮助、固定输入、断点 quickfix、Widget 空
+状态、通知和健康报告。REPL 命令 token、协议、日志、调试器输出和动态变量
+使用来源值。launch.json 用户描述和缺省 Input 提示沿用上游。
 
-nvim-dap-ui 只投影固定显示文本：三类高亮下的 render 标签、mapping 描述、
-浮窗标题、元素选择器、默认 Window 选择提示和精确 title 通知。共享 nio.ui
-选择器要求 setup 完成以及固定元素 ID/formatter 标签；原始 item 和回调不变。
-已有 Buffer 不扫描，动态变量、表达式、栈帧、路径和调试器输出保持原文。
+nvim-dap-ui 翻译固定渲染文案、映射、浮窗标题、元素选择器、Window 选择提示
+与通知。调试变量、表达式、栈帧、路径、协议对象和调试器输出使用原始值。
 
-lazy.nvim 只提供 User LazyLoad。nvim-cmp 未找到由 cmp 自己拥有且具有安全显示
-接缝的固定标签，保持 inventory_only。固定 commit、源码 hash 和限制见
-manifests/upstreams.json。
+五个适配器均提供常用中文帮助。lazy.nvim 提供 User LazyLoad 生命周期事件。
+nvim-cmp 的补全内容来自补全源或用户 formatter。固定 commit、源码摘要和支持
+范围见 manifests/adapters/ 与 docs/adapters.md。
 
 诊断与 LSP                                                *nvim-zh-diagnostics*
 

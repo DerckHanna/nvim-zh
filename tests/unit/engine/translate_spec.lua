@@ -25,6 +25,9 @@ local function loader()
       { context = '', msgid = 'File {name}: {action}', msgstr = '文件 {name}：{action}' },
       { context = '', msgid = 'Cannot open %s: %s', msgstr = '无法打开 %s：%s' },
       { context = '', msgid = 'Progress %d/%d', msgstr = '进度 %d/%d' },
+      { context = '', msgid = 'Field %s%s invalid', msgstr = '字段 %s%s 无效' },
+      { context = '', msgid = 'Fields %s%s invalid', msgstr = '字段 %s 和 %s 无效' },
+      { context = '', msgid = 'Move {from}{to}', msgstr = '移到 {to}，来自 {from}' },
       { context = '', msgid = 'A', msgstr = 'B' },
       { context = '', msgid = 'B', msgstr = 'C' },
     },
@@ -61,6 +64,14 @@ equal(zh.translate({ domain = domain, msgid = 'File {name}: {action}', args = { 
 equal(zh.translate({ domain = domain, msgid = 'Cannot open %s: %s', args = { 'x' } }), 'Cannot open %s: %s', 'printf arity fallback')
 equal(zh.translate({ domain = domain, msgid = 'Progress two/eight', formatted = true }), 'Progress two/eight', 'unsafe numeric match fallback')
 equal(zh.translate({ domain = domain, msgid = 'File x: y: z', formatted = true }), '文件 x：y: z', 'last named capture should retain suffix')
+equal(zh.translate({ domain = domain, msgid = 'Field a.b invalid', formatted = true }),
+  '字段 a.b 无效', 'adjacent printf run preserves rendered bytes')
+equal(zh.translate({ domain = domain, msgid = 'Fields a.b invalid', formatted = true }),
+  'Fields a.b invalid', 'adjacent printf capture cannot be split')
+equal(zh.translate({ domain = domain, msgid = 'Fields %s%s invalid', args = { 'a', '.b' } }),
+  '字段 a 和 .b 无效', 'explicit args may split a printf run')
+equal(zh.translate({ domain = domain, msgid = 'Move ab', formatted = true }),
+  'Move ab', 'adjacent names cannot be recovered')
 
 text = zh.translate({ domain = domain, msgid = 'A' })
 equal(text, 'B', 'idempotence setup')

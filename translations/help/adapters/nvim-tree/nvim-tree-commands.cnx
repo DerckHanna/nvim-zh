@@ -1,0 +1,85 @@
+*nvim-tree-commands.cnx*      nvim-tree: Commands
+
+                                nvim-tree 命令
+
+命令                                                      *nvim-tree-commands*
+
+有些命令可以用 |<bang>| `!` 执行，或接受一个 `path` 字符串参数。
+
+所有命令都执行公开 API。
+
+*:NvimTreeOpen*                            |nvim_tree.api.tree.open()| >lua
+
+  require("nvim-tree.api").tree.open({
+    path = "<args>"
+  })
+<
+*:NvimTreeClose*                           |nvim_tree.api.tree.close()| >lua
+
+  require("nvim-tree.api").tree.close()
+<
+*:NvimTreeToggle*                          |nvim_tree.api.tree.toggle()| >lua
+
+  require("nvim-tree.api").tree.toggle({
+    path = "<args>",
+    find_file = false,
+    update_root = false,
+    focus = true,
+  })
+<
+*:NvimTreeFocus*                           |nvim_tree.api.tree.open()| >lua
+
+  require("nvim-tree.api").tree.open()
+<
+*:NvimTreeRefresh*                         |nvim_tree.api.tree.reload()| >lua
+
+  require("nvim-tree.api").tree.reload()
+<
+*:NvimTreeFindFile*                        |nvim_tree.api.tree.find_file()| >lua
+
+  require("nvim-tree.api").tree.find_file({
+    open = true,
+    update_root = "<bang>",
+    focus = true,
+  })
+<
+*:NvimTreeFindFileToggle*                  |nvim_tree.api.tree.toggle()| >lua
+
+  require("nvim-tree.api").tree.toggle({
+    path = "<args>",
+    find_file = true,
+    update_root = "<bang>",
+    focus = true,
+  })
+<
+*:NvimTreeClipboard*                       |nvim_tree.api.fs.print_clipboard()| >lua
+
+  require("nvim-tree.api").fs.print_clipboard()
+<
+*:NvimTreeCollapse*                        |nvim_tree.api.tree.collapse_all()| >lua
+
+  require("nvim-tree.api").tree.collapse_all({
+    keep_buffers = false
+  })
+<
+*:NvimTreeCollapseKeepBuffers*             |nvim_tree.api.tree.collapse_all()| >lua
+
+  require("nvim-tree.api").tree.collapse_all({
+    keep_buffers = true
+  })
+<
+*:NvimTreeHiTest*                         |nvim_tree.api.appearance.hi_test()| >lua
+
+  require("nvim-tree.api").appearance.hi_test()
+<
+*:NvimTreeResize*                          |nvim_tree.api.tree.resize()| >lua
+
+  local sign = c.args:sub(1, 1)
+  if sign == "+" or sign == "-" then
+    require("nvim-tree.api").tree.resize({ relative = tonumber(c.args) })
+  else
+    require("nvim-tree.api").tree.resize({ absolute = tonumber(c.args) })
+  end
+<
+
+ vim:tw=78:ts=8:sw=4:sts=4:et:ft=help:norl:

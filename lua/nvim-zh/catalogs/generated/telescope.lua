@@ -18,6 +18,136 @@ return {
   },
   entries = {
     {
+      context = "health",
+      msgid = "%s installed.",
+      msgstr = "%s 已安装。",
+      references = {
+        "lua/telescope/health.lua:64",
+      },
+    },
+    {
+      context = "health",
+      msgid = "%s not found.",
+      msgstr = "%s 未找到。",
+      references = {
+        "lua/telescope/health.lua:66",
+      },
+    },
+    {
+      context = "health",
+      msgid = "%s: found %s",
+      msgstr = "%s：找到 %s",
+      references = {
+        "lua/telescope/health.lua:97",
+      },
+    },
+    {
+      context = "health",
+      msgid = "%s: not found.",
+      msgstr = "%s：未找到。",
+      references = {
+        "lua/telescope/health.lua:83",
+      },
+    },
+    {
+      context = "health",
+      msgid = "%s: not found. Install %s for extended capabilities",
+      msgstr = "%s：未找到。安装 %s 以获得扩展能力",
+      references = {
+        "lua/telescope/health.lua:83",
+        "lua/telescope/health.lua:85",
+      },
+    },
+    {
+      context = "health",
+      msgid = "%s: not found. `%s` finder will not function without %s installed.",
+      msgstr = "%s：未找到。`%s` 查找器在未安装 %s 时无法工作。",
+      references = {
+        "lua/telescope/health.lua:83",
+        "lua/telescope/health.lua:90",
+      },
+    },
+    {
+      context = "health",
+      msgid = "(unknown version)",
+      msgstr = "（未知版本）",
+      references = {
+        "lua/telescope/health.lua:96",
+      },
+    },
+    {
+      context = "health",
+      msgid = "===== Installed extensions =====",
+      msgstr = "===== 已安装的扩展 =====",
+      references = {
+        "lua/telescope/health.lua:103",
+      },
+    },
+    {
+      context = "health",
+      msgid = "Checking external dependencies",
+      msgstr = "检查外部依赖",
+      references = {
+        "lua/telescope/health.lua:77",
+      },
+    },
+    {
+      context = "health",
+      msgid = "Checking for required plugins",
+      msgstr = "检查必需的插件",
+      references = {
+        "lua/telescope/health.lua:61",
+      },
+    },
+    {
+      context = "health",
+      msgid = "Install %s for extended capabilities",
+      msgstr = "安装 %s 以获得扩展能力",
+      references = {
+        "lua/telescope/health.lua:85",
+      },
+    },
+    {
+      context = "health",
+      msgid = "No healthcheck provided",
+      msgstr = "未提供健康检查",
+      references = {
+        "lua/telescope/health.lua:118",
+      },
+    },
+    {
+      context = "health",
+      msgid = "Telescope Extension: `%s`",
+      msgstr = "Telescope 扩展：`%s`",
+      references = {
+        "lua/telescope/health.lua:114",
+      },
+    },
+    {
+      context = "health",
+      msgid = "`%s` finder will not function without %s installed.",
+      msgstr = "`%s` 查找器在未安装 %s 时无法工作。",
+      references = {
+        "lua/telescope/health.lua:90",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: %s ignore_symbol(s) have removed everything from the query result",
+      msgstr = "[telescope.%s]: %s 个 ignore_symbol 已把查询结果全部过滤掉",
+      references = {
+        "lua/telescope/utils.lua:164",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: %s symbol(s) were not part of the query results",
+      msgstr = "[telescope.%s]: %s 个符号不在查询结果中",
+      references = {
+        "lua/telescope/utils.lua:158",
+      },
+    },
+    {
       context = "notification",
       msgid = "[telescope.%s]: '%s' is not a valid value for line_width",
       msgstr = "[telescope.%s]: “%s”不是 line_width 的有效值",
@@ -33,6 +163,14 @@ return {
       references = {
         "lua/telescope/builtin/__files.lua",
         "lua/telescope/utils.lua",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: Checked out: %s",
+      msgstr = "[telescope.%s]: 已检出：%s",
+      references = {
+        "lua/telescope/actions/init.lua:617",
       },
     },
     {
@@ -55,11 +193,139 @@ return {
     },
     {
       context = "notification",
+      msgid = "[telescope.%s]: Deleted branch: %s",
+      msgstr = "[telescope.%s]: 已删除分支：%s",
+      references = {
+        "lua/telescope/actions/init.lua:774",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: Either opts.symbols or opts.ignore_symbols, can't process opposing options at the same time!",
+      msgstr = "[telescope.%s]: opts.symbols 与 opts.ignore_symbols 只能取其一，无法同时处理这两个相反的选项！",
+      references = {
+        "lua/telescope/utils.lua:106",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: Error when applying: %s. Git returned: '%s'",
+      msgstr = "[telescope.%s]: 应用时出错：%s。Git 返回：'%s'",
+      references = {
+        "lua/telescope/actions/init.lua:598",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: Error when checking out: %s. Git returned: '%s'",
+      msgstr = "[telescope.%s]: 检出时出错：%s。Git 返回：'%s'",
+      references = {
+        "lua/telescope/actions/init.lua:624",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: Error when creating new branch: '%s' Git returned '%s'",
+      msgstr = "[telescope.%s]: 创建新分支出错：'%s'，Git 返回 '%s'",
+      references = {
+        "lua/telescope/actions/init.lua:571",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: Error when deleting branch: %s. Git returned: '%s'",
+      msgstr = "[telescope.%s]: 删除分支时出错：%s。Git 返回：'%s'",
+      references = {
+        "lua/telescope/actions/init.lua:779",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: Error when merging branch: %s. Git returned: '%s'",
+      msgstr = "[telescope.%s]: 合并分支时出错：%s。Git 返回：'%s'",
+      references = {
+        "lua/telescope/actions/init.lua:794",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: Error when rebasing branch: %s. Git returned: '%s'",
+      msgstr = "[telescope.%s]: 变基分支时出错：%s。Git 返回：'%s'",
+      references = {
+        "lua/telescope/actions/init.lua:807",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: Error when renaming branch: %s. Git returned: '%s'",
+      msgstr = "[telescope.%s]: 重命名分支时出错：%s。Git 返回：'%s'",
+      references = {
+        "lua/telescope/actions/init.lua:695",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: Error when switching to: %s. Git returned: '%s'",
+      msgstr = "[telescope.%s]: 切换时出错：%s。Git 返回：'%s'",
+      references = {
+        "lua/telescope/actions/init.lua:659",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: Error when tracking branch: %s. Git returned: '%s'",
+      msgstr = "[telescope.%s]: 跟踪分支时出错：%s。Git 返回：'%s'",
+      references = {
+        "lua/telescope/actions/init.lua:748",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: Git does not support both --others and --recurse-submodules",
+      msgstr = "[telescope.%s]: Git 不支持同时使用 --others 和 --recurse-submodules",
+      references = {
+        "lua/telescope/builtin/__git.lua:38",
+      },
+    },
+    {
+      context = "notification",
       msgid = "[telescope.%s]: Index too large as there are only '%s' pickers cached",
       msgstr = "[telescope.%s]: 索引过大，当前只缓存了 %s 个选择器",
       references = {
         "lua/telescope/builtin/__internal.lua",
         "lua/telescope/utils.lua",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: Invalid severity parameters. Both a specific severity and a limit/bound is not allowed",
+      msgstr = "[telescope.%s]: severity 参数无效。不允许同时指定具体 severity 与 limit/bound",
+      references = {
+        "lua/telescope/builtin/__diagnostics.lua:76",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: Merged branch: %s",
+      msgstr = "[telescope.%s]: 已合并分支：%s",
+      references = {
+        "lua/telescope/actions/init.lua:793",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: Missing the new branch name",
+      msgstr = "[telescope.%s]: 缺少新分支名",
+      references = {
+        "lua/telescope/actions/init.lua:547",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: No %s found",
+      msgstr = "[telescope.%s]: 未找到%s",
+      references = {
+        "lua/telescope/builtin/__lsp.lua:209",
       },
     },
     {
@@ -172,6 +438,30 @@ return {
     },
     {
       context = "notification",
+      msgid = "[telescope.%s]: No results from workspace/symbol. Maybe try a different query: 'Telescope lsp_workspace_symbols query=example'",
+      msgstr = "[telescope.%s]: workspace/symbol 没有结果。也许可以换个查询：'Telescope lsp_workspace_symbols query=example'",
+      references = {
+        "lua/telescope/builtin/__lsp.lua:394",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: No sources found! Check out https://github.com/nvim-telescope/telescope-symbols.nvim for some prebuild symbols or how to create you own symbol source.",
+      msgstr = "[telescope.%s]: 未找到符号源！请查看 https://github.com/nvim-telescope/telescope-symbols.nvim 获取预置符号，或了解如何创建自己的符号源。",
+      references = {
+        "lua/telescope/builtin/__internal.lua:311",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: No tag pre-filtering set for this picker",
+      msgstr = "[telescope.%s]: 此选择器未设置标签预过滤",
+      references = {
+        "lua/telescope/actions/init.lua:1081",
+      },
+    },
+    {
+      context = "notification",
       msgid = "[telescope.%s]: No tags file found. Create one with ctags -R",
       msgstr = "[telescope.%s]: 未找到 tags 文件。请使用 ctags -R 创建",
       references = {
@@ -198,11 +488,83 @@ return {
     },
     {
       context = "notification",
+      msgid = "[telescope.%s]: Please pass filtering symbols as either a string or a list of strings",
+      msgstr = "[telescope.%s]: 请把过滤符号传为字符串或字符串列表",
+      references = {
+        "lua/telescope/utils.lua:134",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: Please pass ignore_symbols as either a string or a list of strings",
+      msgstr = "[telescope.%s]: 请把 ignore_symbols 传为字符串或字符串列表",
+      references = {
+        "lua/telescope/utils.lua:118",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: Rebased branch: %s",
+      msgstr = "[telescope.%s]: 已变基分支：%s",
+      references = {
+        "lua/telescope/actions/init.lua:806",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: Renamed branch: '%s'",
+      msgstr = "[telescope.%s]: 已重命名分支：'%s'",
+      references = {
+        "lua/telescope/actions/init.lua:689",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: Reset to: '%s'",
+      msgstr = "[telescope.%s]: 已重置到：'%s'",
+      references = {
+        "lua/telescope/actions/init.lua:835",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: Rest to: %s. Git returned: '%s'",
+      msgstr = "[telescope.%s]: 重置到 %s 时出错。Git 返回：'%s'",
+      references = {
+        "lua/telescope/actions/init.lua:840",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: Switched to a new branch: %s",
+      msgstr = "[telescope.%s]: 已切换到新分支：%s",
+      references = {
+        "lua/telescope/actions/init.lua:565",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: Switched to: '%s'",
+      msgstr = "[telescope.%s]: 已切换到：'%s'",
+      references = {
+        "lua/telescope/actions/init.lua:653",
+      },
+    },
+    {
+      context = "notification",
       msgid = "[telescope.%s]: This operation must be run in a work tree",
       msgstr = "[telescope.%s]: 此操作必须在工作树中运行",
       references = {
         "lua/telescope/builtin/__git.lua",
         "lua/telescope/utils.lua",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: Tracking branch: %s",
+      msgstr = "[telescope.%s]: 正在跟踪分支：%s",
+      references = {
+        "lua/telescope/actions/init.lua:747",
       },
     },
     {
@@ -225,11 +587,59 @@ return {
     },
     {
       context = "notification",
+      msgid = "[telescope.%s]: You are cycling to next the history item but history is disabled. Read ':help telescope.defaults.history'",
+      msgstr = "[telescope.%s]: 你正在循环到下一个历史项，但历史记录已禁用。请阅读 ':help telescope.defaults.history'",
+      references = {
+        "lua/telescope/actions/history.lua:119",
+      },
+    },
+    {
+      context = "notification",
       msgid = "[telescope.%s]: You need to install either find, fd, or rg",
       msgstr = "[telescope.%s]: 你需要安装 find、fd 或 rg 中的任意一个",
       references = {
         "lua/telescope/builtin/__files.lua",
         "lua/telescope/utils.lua",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: [%s] - module reloaded",
+      msgstr = "[telescope.%s]: [%s] - 模块已重新加载",
+      references = {
+        "lua/telescope/builtin/__internal.lua:930",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: `initial_mode` should be one of ['normal', 'insert'] but passed %s",
+      msgstr = "[telescope.%s]: `initial_mode` 应为 ['normal', 'insert'] 之一，但传入的是 %s",
+      references = {
+        "lua/telescope/pickers.lua:604",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: action canceled",
+      msgstr = "[telescope.%s]: 操作已取消",
+      references = {
+        "lua/telescope/actions/init.lua:719",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: applied: '%s' ",
+      msgstr = "[telescope.%s]: 已应用：'%s' ",
+      references = {
+        "lua/telescope/actions/init.lua:593",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: branch creation canceled: '%s'",
+      msgstr = "[telescope.%s]: 已取消创建分支：'%s'",
+      references = {
+        "lua/telescope/actions/init.lua:554",
       },
     },
     {
@@ -256,6 +666,102 @@ return {
       references = {
         "lua/telescope/previewers/previewer.lua",
         "lua/telescope/utils.lua",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "[telescope.%s]: server does not support %s",
+      msgstr = "[telescope.%s]: 服务器不支持 %s",
+      references = {
+        "lua/telescope/builtin/__lsp.lua:482",
+      },
+    },
+    {
+      context = "print",
+      msgid = "Deleting branch %s",
+      msgstr = "正在删除分支 %s",
+      references = {
+        "lua/telescope/actions/init.lua:770",
+      },
+    },
+    {
+      context = "print",
+      msgid = "Enjoy astronomy! You viewed:",
+      msgstr = "享受天文吧！你查看了：",
+      references = {
+        "lua/telescope/builtin/__internal.lua:279",
+      },
+    },
+    {
+      context = "print",
+      msgid = "You selected autocmd: %s",
+      msgstr = "你选中了自动命令：%s",
+      references = {
+        "lua/telescope/builtin/__internal.lua:1435",
+      },
+    },
+    {
+      context = "print",
+      msgid = "[telescope] Nothing currently selected",
+      msgstr = "[telescope] 当前没有选中项",
+      references = {
+        "lua/telescope/builtin/__internal.lua:1340",
+      },
+    },
+    {
+      context = "prompt",
+      msgid = "Create new branch '%s'? [y/n]: ",
+      msgstr = "创建新分支 '%s'？[y/n]：",
+      references = {
+        "lua/telescope/actions/init.lua:551",
+      },
+    },
+    {
+      context = "prompt",
+      msgid = "Do you really want to %s reset to %s? [Y/n] ",
+      msgstr = "确实要 %s 重置到 %s 吗？[Y/n] ",
+      references = {
+        "lua/telescope/actions/init.lua:822",
+      },
+    },
+    {
+      context = "prompt",
+      msgid = "Do you really want to delete the selected branches? [Y/n] ",
+      msgstr = "确实要删除选中的分支吗？[Y/n] ",
+      references = {
+        "lua/telescope/actions/init.lua:757",
+      },
+    },
+    {
+      context = "prompt",
+      msgid = "Do you really want to merge branch %s? [Y/n] ",
+      msgstr = "确实要合并分支 %s 吗？[Y/n] ",
+      references = {
+        "lua/telescope/actions/init.lua:792",
+      },
+    },
+    {
+      context = "prompt",
+      msgid = "Do you really want to rebase branch %s? [Y/n] ",
+      msgstr = "确实要变基到分支 %s 吗？[Y/n] ",
+      references = {
+        "lua/telescope/actions/init.lua:805",
+      },
+    },
+    {
+      context = "prompt",
+      msgid = "Edit [%s] ❯ ",
+      msgstr = "编辑 [%s] ❯ ",
+      references = {
+        "lua/telescope/actions/init.lua:447",
+      },
+    },
+    {
+      context = "prompt",
+      msgid = "New branch name: ",
+      msgstr = "新分支名：",
+      references = {
+        "lua/telescope/actions/init.lua:678",
       },
     },
     {
@@ -352,7 +858,18 @@ return {
       msgid = "Find Word (%s)",
       msgstr = "查找单词 (%s)",
       references = {
+        "lua/telescope/actions/init.lua:1489",
+        "lua/telescope/actions/init.lua:1504",
         "lua/telescope/builtin/__files.lua",
+      },
+    },
+    {
+      context = "title",
+      msgid = "Fuzzy over (%s)",
+      msgstr = "模糊搜索 (%s)",
+      references = {
+        "lua/telescope/actions/init.lua:1497",
+        "lua/telescope/actions/init.lua:1504",
       },
     },
     {
@@ -598,6 +1115,15 @@ return {
     },
     {
       context = "title",
+      msgid = "LSP Workspace Symbols (%s)",
+      msgstr = "LSP 工作区符号 (%s)",
+      references = {
+        "lua/telescope/actions/init.lua:1491",
+        "lua/telescope/actions/init.lua:1504",
+      },
+    },
+    {
+      context = "title",
       msgid = "Live Grep",
       msgstr = "实时 Grep",
       references = {
@@ -810,6 +1336,33 @@ return {
       msgstr = "选项",
       references = {
         "lua/telescope/builtin/__internal.lua",
+      },
+    },
+    {
+      context = "which_key_title",
+      msgid = "Insert Mode Keymaps",
+      msgstr = "插入模式按键映射",
+      references = {
+        "lua/telescope/actions/init.lua:1376",
+        "lua/telescope/actions/init.lua:1377",
+      },
+    },
+    {
+      context = "which_key_title",
+      msgid = "Keymaps",
+      msgstr = "按键映射",
+      references = {
+        "lua/telescope/actions/init.lua:1376",
+        "lua/telescope/actions/init.lua:1377",
+      },
+    },
+    {
+      context = "which_key_title",
+      msgid = "Normal Mode Keymaps",
+      msgstr = "普通模式按键映射",
+      references = {
+        "lua/telescope/actions/init.lua:1376",
+        "lua/telescope/actions/init.lua:1377",
       },
     },
   },

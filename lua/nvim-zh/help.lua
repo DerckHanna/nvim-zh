@@ -4,9 +4,53 @@ local function project_root()
   return require('nvim-zh.paths').root
 end
 local resource_root
+local adapter_enabled = false
+local owned_roots, adapter_states = {}, {}
+
+function M.sync_adapters(specs, enabled)
+  local desired, states = {}, {}
+  if resource_root and adapter_enabled then
+    for id, spec in pairs(specs) do
+      if enabled(id) and spec.help then
+        states[id] = 'unknown_version'
+        for source in pairs(spec.help) do
+          local file = vim.api.nvim_get_runtime_file(source, false)[1]
+          if file then
+            local ok, bytes = pcall(require('nvim-zh.fs').read, file, 4 * 1024 * 1024)
+            local hash = ok and vim.fn.sha256(bytes)
+            for _, target in pairs(spec.targets) do
+              local root = resource_root .. '/adapters/' .. id .. '/' .. vim.fs.basename(source)
+              if hash and hash == target.sources[source] and vim.uv.fs_stat(root .. '/doc/tags-cn') then
+                desired[root] = true
+                states[id] = 'active'
+                break
+              end
+            end
+          end
+        end
+      end
+    end
+  end
+  local paths = vim.opt.runtimepath:get()
+  for root in pairs(owned_roots) do
+    if not desired[root] then vim.opt.runtimepath:remove(root); owned_roots[root] = nil end
+  end
+  for _, root in ipairs(vim.fn.sort(vim.tbl_keys(desired))) do
+    if not vim.tbl_contains(paths, root) then
+      vim.opt.runtimepath:prepend(root)
+      owned_roots[root] = true
+    end
+  end
+  adapter_states = states
+end
+
+function M.adapter_status(id)
+  return adapter_states[id] or 'disabled'
+end
 
 function M.set_resource_root(root)
   if resource_root == root then return end
+  M.sync_adapters({}, function() return false end)
   if resource_root then vim.opt.runtimepath:remove(resource_root) end
   resource_root = root
   if root then vim.opt.runtimepath:prepend(root) end
@@ -29,6 +73,7 @@ local function remove_owned_languages()
 end
 
 function M.setup(config)
+  adapter_enabled = config.enabled
   if not config.enabled and next(owned_langs) == nil then return end
   local base, base_seen = remove_owned_languages()
   if not config.enabled then
@@ -58,26 +103,6 @@ function M.info(config)
   }
 end
 
-local function external_chinese_help()
-  local own_doc = project_root() .. '/doc'
-  own_doc = vim.uv.fs_realpath(own_doc) or own_doc
-  for _, path in ipairs(vim.api.nvim_get_runtime_file('doc/usr_01.cnx', true)) do
-    local doc = vim.fs.dirname(vim.uv.fs_realpath(path) or path)
-    -- Resolve aliases too: a second runtimepath entry pointing at this plugin
-    -- does not prove an independent installation. Require a usable help index.
-    local active_doc = resource_root and (vim.uv.fs_realpath(resource_root .. '/doc') or resource_root .. '/doc')
-    if doc ~= own_doc and doc ~= active_doc then
-      local ok, rows = pcall(vim.fn.readfile, doc .. '/tags-cn')
-      if ok then
-        for _, row in ipairs(rows) do
-          if row:find('usr_01.txt\tusr_01.cnx\t', 1, true) == 1 then return true end
-        end
-      end
-    end
-  end
-  return false
-end
-
 function M.check(config)
   local info = M.info(config)
   if not config.enabled then
@@ -96,15 +121,6 @@ function M.check(config)
     status = chinese_selected and 'ok' or 'warn',
     message = chinese_selected and ('helplang=' .. vim.o.helplang) or ('helplang=' .. vim.o.helplang .. '；中文不是首选帮助语言'),
   })
-  if config.vimcdoc then
-    local found = external_chinese_help()
-    table.insert(results, {
-      name = 'help.vimcdoc',
-      status = found and 'ok' or 'warn',
-      message = found and '检测到独立中文帮助资源（Vimcdoc 兼容）'
-        or '启用了 vimcdoc 选项，但未检测到带可用索引的独立中文帮助资源',
-    })
-  end
   return results
 end
 

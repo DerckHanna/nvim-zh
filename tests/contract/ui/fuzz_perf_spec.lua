@@ -47,7 +47,7 @@ local selected, selected_index
 vim.ui.select({ original_item }, { prompt = long_prompt }, function(item, index) selected, selected_index = item, index end)
 check(selected == original_item and selected_index == 1, 'fuzzy select changed item/index')
 
-local clock = vim.uv and vim.uv.hrtime or vim.loop.hrtime
+local clock = vim.uv.hrtime
 local iterations = 5000
 local function measure(message)
   local started = clock()

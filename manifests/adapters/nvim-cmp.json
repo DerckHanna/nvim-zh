@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "id": "nvim-cmp",
+  "status": "inventory_only",
+  "upstream": {
+    "repository": "https://github.com/hrsh7th/nvim-cmp",
+    "follow": {
+      "kind": "default_branch"
+    }
+  },
+  "targets": {
+    "baseline": {
+      "commit": "2ffe79f1f021def8dd1fcd81deb16f1bb0d989f3",
+      "neovim": "0.12.6",
+      "dependencies": [],
+      "sources": {
+        "lua/cmp/init.lua": "f6070a511d27c9dc39bea910ba3078a84651025bbd1657ce291680aa3bf108aa",
+        "lua/cmp/config/default.lua": "2c6ec1dac07f4cf5de74e844915a3fef02f5dd8376980ec0a3039b74e3a4c0cc",
+        "lua/cmp/entry.lua": "810422a540f640ba6783d1adfddc1c6d9600d3c397a0dd495ff21ea669e756b5"
+      }
+    }
+  },
+  "modules": [
+    "cmp"
+  ],
+  "lazy_names": [
+    "nvim-cmp"
+  ],
+  "notes": {
+    "status": "inventory_only",
+    "public_path": "formatting.format for cmp-owned labels only",
+    "excluded": "completion abbr, kind/menu labels, source data and documentation: no fixed cmp-owned label safe to translate",
+    "reviewed_contract": "fixed public formatter and entry source fields"
+  },
+  "surfaces": {},
+  "scenarios": {},
+  "contracts": [
+    "tests/upstream/nvim-cmp/cmp_seam.py"
+  ]
+}

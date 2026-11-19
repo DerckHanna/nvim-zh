@@ -3,13 +3,12 @@ local M = {}
 local defaults = {
   modules = {
     core = { enabled = true, apply_language = true },
-    help = { enabled = true, lang = { 'cn', 'en' }, vimcdoc = false },
+    help = { enabled = true, lang = { 'cn', 'en' } },
     ui = { notify = true, prompts = true, select_items = false, echo = false },
     plugins = { auto = true, lazy_load = true, disabled = {} },
     diagnostics = { enabled = true, virtual_text = true, virtual_lines = true, float = true },
     lsp = { messages = true, progress = true },
   },
-  terminology = 'preserve',
   overrides = {},
   missing = { enabled = true, max_entries = 2000 },
 }
@@ -47,7 +46,6 @@ function M.resolve(opts)
   expect(config.modules.ui.echo, 'boolean', 'modules.ui.echo')
   expect(config.modules.help.enabled, 'boolean', 'modules.help.enabled')
   expect(config.modules.help.lang, 'table', 'modules.help.lang')
-  expect(config.modules.help.vimcdoc, 'boolean', 'modules.help.vimcdoc')
   for index, lang in ipairs(config.modules.help.lang) do
     expect(lang, 'string', ('modules.help.lang[%d]'):format(index))
   end
@@ -59,9 +57,6 @@ function M.resolve(opts)
   end
   expect(config.overrides, 'table', 'overrides')
   require('nvim-zh.catalog').validate_overrides(config.overrides)
-  if config.terminology ~= 'preserve' then
-    error("nvim-zh: terminology currently supports only 'preserve'", 2)
-  end
   return config
 end
 
@@ -71,6 +66,7 @@ function M.merge(base, layer, prefix)
     local name = (prefix and prefix .. '.' or '') .. tostring(key)
     assert(base[key] ~= nil, 'nvim-zh: unknown option ' .. name)
     if name == 'overrides' then
+      expect(value, 'table', name)
       result[key] = vim.tbl_deep_extend('force', result[key], value)
     elseif name == 'modules.plugins.disabled' or name == 'modules.help.lang' then
       assert(type(value) == 'table' and vim.islist(value) and #value <= 256, name .. ' must be an array')

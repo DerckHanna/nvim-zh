@@ -1,0 +1,310 @@
+{
+  "contracts": [
+    "tests/upstream/telescope/telescope_first_picker_spec.lua",
+    "tests/upstream/telescope/upstream_smoke_spec.lua"
+  ],
+  "domain": "telescope",
+  "entry": "nvim-zh.adapters.telescope",
+  "help": {
+    "doc/telescope.txt": [
+      "telescope-command.cnx",
+      "telescope-mappings.cnx",
+      "telescope-sorting.cnx"
+    ]
+  },
+  "id": "telescope",
+  "lazy_names": [
+    "telescope.nvim"
+  ],
+  "modules": [
+    "telescope",
+    "telescope.pickers",
+    "telescope.pickers.window",
+    "telescope.previewers.previewer",
+    "telescope.actions",
+    "telescope.actions.generate",
+    "telescope.actions.mt",
+    "telescope.health"
+  ],
+  "notes": {
+    "domain": "telescope",
+    "excluded": "picker internal titles, Lua error() values, entry data (\"Untitled\" quickfix row) and private buffers",
+    "seam": "pickers.window title projection; Previewer:title; exact vim.notify title; actions.generate.refine display copies; actions.which_key plenary popup border title; scoped vim.fn.input prompts on the owning public actions; scoped print for git_delete_branch and the three internal select callbacks; isolated health module environment proxy-bound telescope.health",
+    "status": "implemented",
+    "version_related": "get_initial_window_options is pinned as a display-only projection; pickers.new is the lifecycle hook that also owns select-callback registration; generate.refine, actions.which_key, the input/print actions and telescope.health are pinned synchronous scopes",
+    "writes": "fixed_display_strings_only"
+  },
+  "scenarios": {
+    "action_output": {
+      "surfaces": [
+        "action_output"
+      ],
+      "tui": "tests/upstream/telescope/tui.py"
+    },
+    "action_output_filetypes": {
+      "surfaces": [
+        "action_output"
+      ],
+      "tui": "tests/upstream/telescope/tui.py"
+    },
+    "error_branch": {
+      "surfaces": [
+        "notifications"
+      ],
+      "tui": "tests/upstream/telescope/tui.py"
+    },
+    "find_files": {
+      "surfaces": [
+        "initial_titles",
+        "preview_titles"
+      ],
+      "tui": "tests/upstream/telescope/tui.py"
+    },
+    "health": {
+      "surfaces": [
+        "health"
+      ],
+      "tui": "tests/upstream/telescope/tui.py"
+    },
+    "help": {
+      "surfaces": [
+        "help"
+      ],
+      "tui": "tests/upstream/telescope/tui.py"
+    },
+    "input_prompts": {
+      "surfaces": [
+        "input_prompts"
+      ],
+      "tui": "tests/upstream/telescope/tui.py"
+    },
+    "input_prompts_create": {
+      "surfaces": [
+        "input_prompts"
+      ],
+      "tui": "tests/upstream/telescope/tui.py"
+    },
+    "input_prompts_merge": {
+      "surfaces": [
+        "input_prompts"
+      ],
+      "tui": "tests/upstream/telescope/tui.py"
+    },
+    "input_prompts_rebase": {
+      "surfaces": [
+        "input_prompts"
+      ],
+      "tui": "tests/upstream/telescope/tui.py"
+    },
+    "notification": {
+      "surfaces": [
+        "notifications"
+      ],
+      "tui": "tests/upstream/telescope/tui.py"
+    },
+    "notification_matrix": {
+      "surfaces": [
+        "notifications"
+      ],
+      "tui": "tests/upstream/telescope/tui.py"
+    },
+    "refine": {
+      "surfaces": [
+        "refine_titles"
+      ],
+      "tui": "tests/upstream/telescope/tui.py"
+    },
+    "resources_update": {
+      "differential": false,
+      "surfaces": [
+        "initial_titles"
+      ],
+      "tui": "tests/upstream/telescope/resources_tui.py"
+    },
+    "update": {
+      "differential": false,
+      "surfaces": [
+        "initial_titles",
+        "preview_titles"
+      ],
+      "tui": "tests/upstream/telescope/update_tui.py"
+    },
+    "which_key": {
+      "surfaces": [
+        "which_key_titles"
+      ],
+      "tui": "tests/upstream/telescope/tui.py"
+    }
+  },
+  "schema": 1,
+  "status": "implemented",
+  "surfaces": {
+    "action_output": {
+      "kind": "versioned",
+      "modules": {
+        "telescope.actions": "lua/telescope/actions/init.lua",
+        "telescope.actions.mt": "lua/telescope/actions/mt.lua",
+        "telescope.builtin": "lua/telescope/builtin/init.lua",
+        "telescope.builtin.__internal": "lua/telescope/builtin/__internal.lua",
+        "telescope.pickers": "lua/telescope/pickers.lua"
+      },
+      "status_key": "action_output"
+    },
+    "health": {
+      "kind": "versioned",
+      "modules": {
+        "telescope.health": "lua/telescope/health.lua",
+        "vim.health": "lua/vim/health.lua"
+      }
+    },
+    "help": {
+      "kind": "help"
+    },
+    "initial_titles": {
+      "kind": "versioned",
+      "modules": {
+        "telescope.actions": "lua/telescope/actions/init.lua",
+        "telescope.pickers": "lua/telescope/pickers.lua",
+        "telescope.pickers.window": "lua/telescope/pickers/window.lua"
+      },
+      "status_key": "window"
+    },
+    "input_prompts": {
+      "kind": "versioned",
+      "modules": {
+        "telescope.actions": "lua/telescope/actions/init.lua"
+      },
+      "status_key": "prompts"
+    },
+    "notifications": {
+      "kind": "api",
+      "source": "lua/telescope/utils.lua",
+      "status_key": "notification"
+    },
+    "preview_titles": {
+      "kind": "versioned",
+      "modules": {
+        "telescope.previewers.previewer": "lua/telescope/previewers/previewer.lua"
+      },
+      "status_key": "previewer"
+    },
+    "refine_titles": {
+      "kind": "versioned",
+      "modules": {
+        "telescope.actions": "lua/telescope/actions/init.lua",
+        "telescope.actions.generate": "lua/telescope/actions/generate.lua"
+      },
+      "status_key": "refine"
+    },
+    "which_key_titles": {
+      "kind": "versioned",
+      "modules": {
+        "telescope.actions": "lua/telescope/actions/init.lua"
+      },
+      "status_key": "which_key"
+    }
+  },
+  "targets": {
+    "baseline": {
+      "commit": "1e1bab730218eaf97fce743be3f56e51075928ac",
+      "dependencies": [
+        "plenary",
+        "which-key"
+      ],
+      "neovim": "0.12.6",
+      "sources": {
+        "doc/secret.txt": "d31e8de70b8cceededd75f0426655b53d9eec8251f531293e1a18b3fc5dae18d",
+        "doc/telescope.txt": "eba6c004858a0bfa090c574abca23390d67eec7fdb69f4f4db3ca81bfc0fcc1e",
+        "doc/telescope_changelog.txt": "7ec1a81f71fa8c3f92932493f14220e71ad84f5681d429946dab4d1ed6a47c6a",
+        "ftplugin/TelescopePrompt.lua": "4d231f45e76166068bc1e25eb1c095bbe48691574d04f925f7dca39734c95d1c",
+        "ftplugin/TelescopeResults.lua": "9388e94f4b9c1afbc7b8fe1b891c0bab5763310ab82960d0685cef4d717b73f1",
+        "lua/telescope/_extensions/init.lua": "f5bd323d63582577b7bcac73d92602a299cb7c751c1cf0d86d84090cf565cbed",
+        "lua/telescope/actions/generate.lua": "771f48a69867bdc31384a022e3c994d85fecd22ce7dcdfecc408145778ce219a",
+        "lua/telescope/actions/history.lua": "2293d07cbdc3ac99987881067679823791f9b0ebcfcc64612a191c31c6d49817",
+        "lua/telescope/actions/init.lua": "d7c9347c119b453832e2b27fb9a7bd6ef46ea79dc8a820a0160fa052f2e323b4",
+        "lua/telescope/actions/layout.lua": "8d479b71528de4fe0eb47cd6f37c301921231f38583e756c05739e875910ca4c",
+        "lua/telescope/actions/mt.lua": "0fd1f85e243229761ce1d549d3128c2852563cfe60ad1e05441cc1a193fcb223",
+        "lua/telescope/actions/set.lua": "320e2d3480e16693d3d5083ff93c974fe4d89992657aab12a6806fc37ec566e7",
+        "lua/telescope/actions/state.lua": "fa11f81e929f6eea49e3c4ab8f7c240028296ace48e4d6f4d337655237fbd8a7",
+        "lua/telescope/actions/utils.lua": "db23ec2a9c74ee048e7af5e30b2f87f64b8c870181e2dff11f802dd86d1a0886",
+        "lua/telescope/algos/fzy.lua": "641a9bb02c7575dbff50c482ad8eef1d3fd231374534c0768807420d616c2582",
+        "lua/telescope/algos/linked_list.lua": "73a6aaaec14dac7f4240cec55e77bfcb5e952ed820a301a0636e300c239e05bb",
+        "lua/telescope/algos/string_distance.lua": "372f5dccd1443e38b2705c05c6fc093da919c5c8d4f22c7d595db9fd6c9d64f9",
+        "lua/telescope/async_job.lua": "201a522d92836c05ce07304fa4c707461caf732f1dbe82d1db46ce4f2458cb3c",
+        "lua/telescope/builtin/__diagnostics.lua": "80b0b742ec91bcbe1a98b9e16a5098fb787e8cc4aaded23bb1d88c5c0ec22a11",
+        "lua/telescope/builtin/__files.lua": "c854bd86c8d67a675a499150de1380eb25fe8d7c1c512ad27297c4feebb88696",
+        "lua/telescope/builtin/__git.lua": "814873ef08b58acd1f8f9bced88c782c6958c8a26876e321d2aa5635409d230a",
+        "lua/telescope/builtin/__internal.lua": "95c5a947e120f8345494f6d5b4d6d161ef6db8aa7ad537d988194aca9b9196aa",
+        "lua/telescope/builtin/__lsp.lua": "164fbb107783b3b6f02131682b8849fbaf5c87ce786b0ed5b3ebca5946c6f7ea",
+        "lua/telescope/builtin/init.lua": "9404fd667988278955b951238fe17dcae2643ccf0ff5c2bdf9283f211d861898",
+        "lua/telescope/command.lua": "7a6db7ab0ff68bf327e96f215a2c47e8afcd31a76b24f9b99d63b6c42823d758",
+        "lua/telescope/config.lua": "5b6612a7694176d9d686316a25945f895d701c749730058a26c2b3fb5c50e87e",
+        "lua/telescope/config/resolve.lua": "3b822042e91242a2fc04700bfa56fe005bcda089d1ec41140c432a1cbd1acbc8",
+        "lua/telescope/debounce.lua": "448d8118159f9e6537b30d3dff1fba81c1c410f3129040cf7984f231046562c3",
+        "lua/telescope/entry_manager.lua": "19f7ba154a6df8f9be2691fb3cec4fd44bef18c6b4606db334455b229c66cf10",
+        "lua/telescope/finders.lua": "f3012aeb8d7fe443d1549235d55165ce35413ae453a5b7119797133e7972a13a",
+        "lua/telescope/finders/async_job_finder.lua": "a3e5d188ca6df3bd0eebee3c562adb2de237f12f7ee61439d6faa70c55ed3ffc",
+        "lua/telescope/finders/async_oneshot_finder.lua": "502f083893dc3381fffd7d37953a43089af7bce936f8cd7cd869c3901f5e0ae9",
+        "lua/telescope/finders/async_static_finder.lua": "8d5036db336a03412a8d0c6476bb02e149ac37ddf49b29cdaab070d91215453b",
+        "lua/telescope/from_entry.lua": "7a43a23ad8e092bb6b53460673446b894d447bac65db142040d4a3dfc72a79a9",
+        "lua/telescope/health.lua": "06c7c5bcfb700248bf9aa7eda9df1b7c0129138d1687eba8781e7c2ecafafa60",
+        "lua/telescope/init.lua": "be28166ba0cda05c67b84bce14fb2d395fb2450dad5dbfb3ac4b08743cedfd4e",
+        "lua/telescope/log.lua": "056d38313e32e2c757b794543f21c76f18d67f4df53a44a5d5622f783385e4a2",
+        "lua/telescope/make_entry.lua": "ca79949a212e93a5390cdf8ed2c17397f89fd8817f1ce02b15595af73757f55a",
+        "lua/telescope/mappings.lua": "77b024e16a930af5206244f8e17f60bd65b12224e24fbc2e528dae9f27771b32",
+        "lua/telescope/operators.lua": "d9a3cf091c6c24881f9de6eacd8330e882cdf05f0cddd2e2e0210fdbd1c38924",
+        "lua/telescope/pickers.lua": "a9d66b553c399c175a5c2190c6f6aa035ebb80d048978bb5e9df02172198a6f6",
+        "lua/telescope/pickers/entry_display.lua": "12b6fb238cdadade7f634dfb31bd12ffe56f998575b43077ce56fe93fd6d16ab",
+        "lua/telescope/pickers/highlights.lua": "84d6c2bcc2f267dc50a837af46871f3c6d01510c003ed00e6b7cb04ccc4aebdf",
+        "lua/telescope/pickers/layout.lua": "ca9a6fb37c932eeb3592c48a4631a4d0927e7f5283fd6ae690c4bc9110a73861",
+        "lua/telescope/pickers/layout_strategies.lua": "f4a2bac4ad60fbff1fd1b4e85e818fa3641bc18fa2f0443ccc4cf51da4a4b6f8",
+        "lua/telescope/pickers/multi.lua": "ad12cdc5ac4583581587d7a02af2eeab1a3a7081d3cf4ef7d8e44a6ad1ef420e",
+        "lua/telescope/pickers/scroller.lua": "c80dc5c60102fa663ff288a56e72c4f4eaa3481aadbf83ade4cf4eb60274edd6",
+        "lua/telescope/pickers/window.lua": "61d0c06419de8ebee6755164a5d53ec01cefe0dc9ec65158e72a8b30b674f90b",
+        "lua/telescope/previewers/buffer_previewer.lua": "d17f4e5de5ff7e17de02f7123c4cfe8b349ea5db7d71b8f35925757c7c3aa819",
+        "lua/telescope/previewers/init.lua": "312a890faeffc2fa4c222a8f6136fbe5f15e81637027fa92981930996166f7e1",
+        "lua/telescope/previewers/previewer.lua": "d9ac15de490082a0e1e23ccb8a26693f7bc37a4f78b4c6cf55ea7ad2644dffb1",
+        "lua/telescope/previewers/term_previewer.lua": "3e0a718da5edc2abbfaca5ae69985650518f7ab515a871312e2296a7f239f97f",
+        "lua/telescope/previewers/utils.lua": "4619e7168c2767fbcb188244974e4ad694f329021448d923d6f85c45ec50949b",
+        "lua/telescope/sorters.lua": "90ab612f2bb32a7447a32f78a0abc9318c4c7843bf140a0e7b00ba29c12944c6",
+        "lua/telescope/state.lua": "ab81d07e45e96d6e40397e883af1ee284546f182f9cfef49e29e6779f16480e5",
+        "lua/telescope/testharness/helpers.lua": "98e7451b80f2b1db97bad3d8424642359ede53f5679b229ee2317da13540146c",
+        "lua/telescope/testharness/init.lua": "0e330454ed5b33da3a029c85712fee80ca685f40fbb2164b625c7d621f3ca5fa",
+        "lua/telescope/testharness/runner.lua": "5c3e199f4e28e265b09d4d799763b7a64b6c74e484a63a0499aebcd8b3605a95",
+        "lua/telescope/themes.lua": "7f5b3f0336e31a3c49d27463a3808c7173a255961c3b40075ef6150729747072",
+        "lua/telescope/utils.lua": "4b8587ff0a604bd3426d709197ef7cff92f26870d3c60769fd8722abe182534b",
+        "lua/tests/automated/action_spec.lua": "ae291ea9ca5cc81967a7c0cd2d87ec7b2e8682421c9e702075e32cad1fcd7ef5",
+        "lua/tests/automated/command_spec.lua": "bf118c17bc800606d9fdef97d5551c49781ae8636e7207c3a0996a53b145cc38",
+        "lua/tests/automated/diagnostics_spec.lua": "b640793644bd663d8c01326ffb223c3835aed23038ada302bd4435152c5be447",
+        "lua/tests/automated/entry_display_spec.lua": "29e608fe9ee5e2572f75e68ff0e386c96d153cc6f2bad89fc933c00257bb04f6",
+        "lua/tests/automated/entry_manager_spec.lua": "1e228f0598a2fb4dd1a8aabe0e25ca30708e551c879834ae82a112a08b79211c",
+        "lua/tests/automated/layout_strategies_spec.lua": "59aadf701dd1b14ca236ac636009744315a73ec71a634e4eef9ba1d6e5d7070c",
+        "lua/tests/automated/linked_list_spec.lua": "3fc9cac3b9f9a1e6922cf9e0889d380f5d4d78232b2e2441783b71a7e7bdef8d",
+        "lua/tests/automated/pickers/find_files_spec.lua": "8313efc6fd67f862449d4c75a09dc86e70cc48533eebcd6dd7f9b98eae48e51b",
+        "lua/tests/automated/pickers/live_grep_spec.lua": "09ec815d400bfe0e53885b144a1d3386656424afa377e74c99be09dab9791790",
+        "lua/tests/automated/previewer_spec.lua": "80ba101c648f07ee54ce2d3605873522a226f4e1bdc5257d0180f8d05458a429",
+        "lua/tests/automated/resolver_spec.lua": "93862843a308f24a56a2515a0c295f1f61314b0fc7bd66dc91657552afd013ea",
+        "lua/tests/automated/scroller_spec.lua": "dc1ba9699c462dc519c58dc724953222d3f1ff611f1c56ed7c54d9d4747ffdf0",
+        "lua/tests/automated/sorters_spec.lua": "5bd2b66006b086ba8cb4fead64a3886a8ac5778173a383241e55872308ab95a4",
+        "lua/tests/automated/telescope_spec.lua": "cc68e234dcfa8e61330f978ab04874a0432e31d2b25ef104eb2054ee660369a0",
+        "lua/tests/automated/utils_spec.lua": "3ceefca9ca289f2535e4112fb9fa03ec7ebe96882f2e995d77603d720b91b374",
+        "lua/tests/fixtures/find_files/file_a.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "lua/tests/fixtures/find_files/file_abc.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "lua/tests/fixtures/live_grep/a.txt": "1b6cc0ce94a22f8d2f22455bb093c7c2eb248fe36a5ac47e987c24237f7bf237",
+        "lua/tests/helpers.lua": "5841ec149a289e539d10e1b0fda23eec0fc79f0bd9ddc34b6bcadbff7d11a2cb",
+        "lua/tests/pickers/find_files__readme.lua": "431cc2bfc7df06a53fc9fb4b229c2328423a4df4e5db651ff69053eb3080a491",
+        "lua/tests/pickers/find_files__scrolling_descending_cycle.lua": "fa64918f9ba137b49487f4b8e2c3b7883f76cde31a422f8f2f2e6549f0a3c9a1",
+        "lua/vim/health.lua": "c664ab88afbac7e20dbe3d000bb0775a630ca2da1a73cb7d17a8d53d4ab537c6",
+        "plugin/telescope.lua": "efd058ea9e5c0c053da641b40e0948645da6c2cae24649655a8658d9bb564e9d",
+        "scripts/gendocs.lua": "c007e4fcd7aeed96d49d714d720b44256b58006aec94957979902ed479750683",
+        "scripts/minimal_init.vim": "fe7842e9ee4da3b8a127cce22afc2cc9ea11f5209dd8fd22ade40afbb88c1dfa"
+      }
+    }
+  },
+  "upstream": {
+    "follow": {
+      "kind": "default_branch"
+    },
+    "repository": "https://github.com/nvim-telescope/telescope.nvim"
+  }
+}

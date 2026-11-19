@@ -2,6 +2,71 @@
   "domain": "nvim-tree",
   "entries": [
     {
+      "context": "help_buffer",
+      "msgid": "description",
+      "msgstr": "描述"
+    },
+    {
+      "context": "help_buffer",
+      "msgid": "exit: q",
+      "msgstr": "退出：q"
+    },
+    {
+      "context": "help_buffer",
+      "msgid": "keymap",
+      "msgstr": "按键"
+    },
+    {
+      "context": "help_buffer",
+      "msgid": "nvim-tree mappings",
+      "msgstr": "nvim-tree 映射"
+    },
+    {
+      "context": "help_buffer",
+      "msgid": "nvim-tree: exit help",
+      "msgstr": "nvim-tree: 退出帮助"
+    },
+    {
+      "context": "help_buffer",
+      "msgid": "nvim-tree: toggle sorting method",
+      "msgstr": "nvim-tree: 切换排序方式"
+    },
+    {
+      "context": "help_buffer",
+      "msgid": "sort by %s: s",
+      "msgstr": "按%s排序：s"
+    },
+    {
+      "context": "hidden_reason",
+      "msgid": "bookmark",
+      "msgstr": "书签"
+    },
+    {
+      "context": "hidden_reason",
+      "msgid": "buf",
+      "msgstr": "Buffer"
+    },
+    {
+      "context": "hidden_reason",
+      "msgid": "custom",
+      "msgstr": "自定义"
+    },
+    {
+      "context": "hidden_reason",
+      "msgid": "dotfile",
+      "msgstr": "点文件"
+    },
+    {
+      "context": "hidden_reason",
+      "msgid": "git",
+      "msgstr": "Git"
+    },
+    {
+      "context": "hidden_reason",
+      "msgid": "live filter",
+      "msgstr": "实时过滤"
+    },
+    {
       "context": "mapping",
       "msgid": "CD",
       "msgstr": "切换目录"
@@ -283,8 +348,18 @@
     },
     {
       "context": "notification",
+      "msgid": " * ",
+      "msgstr": " * "
+    },
+    {
+      "context": "notification",
       "msgid": "%d git jobs have timed out after git.timeout %dms, disabling git integration.",
       "msgstr": "%d 个 Git 任务在 git.timeout %dms 后超时，正在禁用 Git 集成。"
+    },
+    {
+      "context": "notification",
+      "msgid": "%d nodes %s to clipboard.",
+      "msgstr": "已将 %d 个节点 %s 到剪贴板。"
     },
     {
       "context": "notification",
@@ -295,6 +370,21 @@
       "context": "notification",
       "msgid": "%d nodes removed from clipboard.",
       "msgstr": "已从剪贴板移除 %d 个节点。"
+    },
+    {
+      "context": "notification",
+      "msgid": "%s\n\nsee :help nvim-tree-config for available configuration options",
+      "msgstr": "%s\n\n可用配置选项见 :help nvim-tree-config"
+    },
+    {
+      "context": "notification",
+      "msgid": "%s %s copied to register",
+      "msgstr": "%s %s 已复制到 Register"
+    },
+    {
+      "context": "notification",
+      "msgid": "%s %s to clipboard.",
+      "msgstr": "已将 %s %s 到剪贴板。"
     },
     {
       "context": "notification",
@@ -333,8 +423,23 @@
     },
     {
       "context": "notification",
+      "msgid": "Cannot rename %s -> %s: %s",
+      "msgstr": "无法把 %s 重命名为 %s：%s"
+    },
+    {
+      "context": "notification",
       "msgid": "Clipboard has been emptied.",
       "msgstr": "剪贴板已清空。"
+    },
+    {
+      "context": "notification",
+      "msgid": "Copied %s to %s clipboard!",
+      "msgstr": "已将 %s 复制到 %s 剪贴板！"
+    },
+    {
+      "context": "notification",
+      "msgid": "Could not %s %s - %s",
+      "msgstr": "无法%s %s - %s"
     },
     {
       "context": "notification",
@@ -368,8 +473,18 @@
     },
     {
       "context": "notification",
+      "msgid": "Diagnostics update from coc.nvim failed. %s",
+      "msgstr": "来自 coc.nvim 的诊断更新失败。%s"
+    },
+    {
+      "context": "notification",
       "msgid": "Disabling watchers: %s",
       "msgstr": "正在禁用监视器：%s"
+    },
+    {
+      "context": "notification",
+      "msgid": "Failed to close window: %s",
+      "msgstr": "关闭 Window 失败：%s"
     },
     {
       "context": "notification",
@@ -398,8 +513,18 @@
     },
     {
       "context": "notification",
+      "msgid": "Handler for event %s errored. %s",
+      "msgstr": "事件 %s 的处理程序出错。%s"
+    },
+    {
+      "context": "notification",
       "msgid": "Invalid bookmarks.persist, disabling persistence: %s",
       "msgstr": "bookmarks.persist 无效，禁用持久化：%s"
+    },
+    {
+      "context": "notification",
+      "msgid": "Invalid option: %s%s. Expected %s, got %s",
+      "msgstr": "选项无效：%s%s。应为 %s，实际为 %s"
     },
     {
       "context": "notification",
@@ -410,6 +535,16 @@
       "context": "notification",
       "msgid": "Invalid session file (%s): %s",
       "msgstr": "会话文件无效（%s）：%s"
+    },
+    {
+      "context": "notification",
+      "msgid": "Invalid value for field %s%s: '%s'",
+      "msgstr": "字段 %s%s 的值无效：'%s'"
+    },
+    {
+      "context": "notification",
+      "msgid": "Invalid value for field %s%s: Expected one of enum '%s', got '%s'",
+      "msgstr": "字段 %s%s 的值无效：应为枚举 '%s' 之一，实际为 '%s'"
     },
     {
       "context": "notification",
@@ -453,8 +588,33 @@
     },
     {
       "context": "notification",
+      "msgid": "Unknown option: %s%s",
+      "msgstr": "未知选项：%s%s"
+    },
+    {
+      "context": "notification",
       "msgid": "Unrecognized git state '%s'",
       "msgstr": "无法识别的 Git 状态 '%s'"
+    },
+    {
+      "context": "notification",
+      "msgid": "absolute paths",
+      "msgstr": "绝对路径"
+    },
+    {
+      "context": "notification",
+      "msgid": "auto close feature has been removed: https://github.com/nvim-tree/nvim-tree.lua/wiki/Auto-Close",
+      "msgstr": "自动关闭功能已移除：https://github.com/nvim-tree/nvim-tree.lua/wiki/Auto-Close"
+    },
+    {
+      "context": "notification",
+      "msgid": "copied",
+      "msgstr": "已复制"
+    },
+    {
+      "context": "notification",
+      "msgid": "create_in_closed_folder has been removed and is now the default behaviour. You may use api.fs.create to add a file under your desired node.",
+      "msgstr": "create_in_closed_folder 已移除，现为默认行为。可以用 api.fs.create 在目标节点下新建文件。"
     },
     {
       "context": "notification",
@@ -463,8 +623,28 @@
     },
     {
       "context": "notification",
+      "msgid": "cut",
+      "msgstr": "已剪切"
+    },
+    {
+      "context": "notification",
       "msgid": "expansion iteration was halted after %d discovered folders",
       "msgstr": "展开迭代在发现 %d 个目录后中止"
+    },
+    {
+      "context": "notification",
+      "msgid": "file already exists",
+      "msgstr": "文件已存在"
+    },
+    {
+      "context": "notification",
+      "msgid": "focus_empty_on_setup has been removed: https://github.com/nvim-tree/nvim-tree.lua/wiki/Open-At-Startup",
+      "msgstr": "focus_empty_on_setup 已移除：https://github.com/nvim-tree/nvim-tree.lua/wiki/Open-At-Startup"
+    },
+    {
+      "context": "notification",
+      "msgid": "fs.inotify.max_user_watches exceeded, see https://github.com/nvim-tree/nvim-tree.lua/wiki/Troubleshooting",
+      "msgstr": "已超出 fs.inotify.max_user_watches，请参阅 https://github.com/nvim-tree/nvim-tree.lua/wiki/Troubleshooting"
     },
     {
       "context": "notification",
@@ -473,8 +653,23 @@
     },
     {
       "context": "notification",
+      "msgid": "nvim-tree setup not called",
+      "msgstr": "尚未调用 nvim-tree setup"
+    },
+    {
+      "context": "notification",
+      "msgid": "nvim-tree.lua logging to %s",
+      "msgstr": "nvim-tree.lua 日志写入 %s"
+    },
+    {
+      "context": "notification",
       "msgid": "nvim-tree.lua requires Nvim >= 0.10. You may use a compat-nvim-0.X tag for earlier Nvim versions, however they will receive no updates or support.",
       "msgstr": "nvim-tree.lua 需要 Nvim >= 0.10。较早的 Nvim 版本可使用 compat-nvim-0.X 标签，但这些版本不会获得更新或支持。"
+    },
+    {
+      "context": "notification",
+      "msgid": "system_open has been removed, now uses the system default handler: vim.ui.open()",
+      "msgstr": "system_open 已移除，现使用系统默认处理程序：vim.ui.open()"
     },
     {
       "context": "notification",
@@ -485,6 +680,186 @@
       "context": "notification",
       "msgid": "trash.cmd '%s' is not an executable.",
       "msgstr": "trash.cmd '%s' 不是可执行程序。"
+    },
+    {
+      "context": "notification",
+      "msgid": "view.hide_root_folder is deprecated, please set renderer.root_folder_label = false",
+      "msgstr": "view.hide_root_folder 已弃用，请改为设置 renderer.root_folder_label = false"
+    },
+    {
+      "context": "popup",
+      "msgid": "  Can't retrieve file information",
+      "msgstr": "  无法获取文件信息"
+    },
+    {
+      "context": "popup",
+      "msgid": " accessed: ",
+      "msgstr": " 访问时间："
+    },
+    {
+      "context": "popup",
+      "msgid": " created:  ",
+      "msgstr": " 创建时间："
+    },
+    {
+      "context": "popup",
+      "msgid": " fullpath: ",
+      "msgstr": " 完整路径："
+    },
+    {
+      "context": "popup",
+      "msgid": " modified: ",
+      "msgstr": " 修改时间："
+    },
+    {
+      "context": "popup",
+      "msgid": " size:     ",
+      "msgstr": " 大小：    "
+    },
+    {
+      "context": "prompt",
+      "msgid": "Overwrite %s ?",
+      "msgstr": "覆盖 %s？"
+    },
+    {
+      "context": "prompt",
+      "msgid": "Overwrite %s ? R(ename)/y/n: ",
+      "msgstr": "覆盖 %s？R(ename)/y/n: "
+    },
+    {
+      "context": "prompt",
+      "msgid": "Remove %s?",
+      "msgstr": "删除 %s？"
+    },
+    {
+      "context": "prompt",
+      "msgid": "Remove %s? Y/n: ",
+      "msgstr": "删除 %s？Y/n: "
+    },
+    {
+      "context": "prompt",
+      "msgid": "Remove %s? y/N: ",
+      "msgstr": "删除 %s？y/N: "
+    },
+    {
+      "context": "prompt",
+      "msgid": "Remove bookmarked ?",
+      "msgstr": "删除书签节点？"
+    },
+    {
+      "context": "prompt",
+      "msgid": "Remove bookmarked ? y/N: ",
+      "msgstr": "删除书签节点？y/N: "
+    },
+    {
+      "context": "prompt",
+      "msgid": "Trash %s?",
+      "msgstr": "将 %s 移到回收站？"
+    },
+    {
+      "context": "prompt",
+      "msgid": "Trash %s? Y/n: ",
+      "msgstr": "将 %s 移到回收站？Y/n: "
+    },
+    {
+      "context": "prompt",
+      "msgid": "Trash %s? y/N: ",
+      "msgstr": "将 %s 移到回收站？y/N: "
+    },
+    {
+      "context": "prompt",
+      "msgid": "Trash bookmarked ?",
+      "msgstr": "将书签节点移到回收站？"
+    },
+    {
+      "context": "prompt",
+      "msgid": "Trash bookmarked ? y/N: ",
+      "msgstr": "将书签节点移到回收站？y/N: "
+    },
+    {
+      "context": "prompt_count",
+      "msgid": "%d file(s) already exist",
+      "msgstr": "%d 个文件已存在"
+    },
+    {
+      "context": "prompt_count",
+      "msgid": "%d file(s) already exist. R(ename suffix)/y/n: ",
+      "msgstr": "%d 个文件已存在。R(ename suffix)/y/n: "
+    },
+    {
+      "context": "prompt_count",
+      "msgid": "Remove %d selected?",
+      "msgstr": "删除选中的 %d 个节点？"
+    },
+    {
+      "context": "prompt_count",
+      "msgid": "Remove %d selected? Y/n: ",
+      "msgstr": "删除选中的 %d 个节点？Y/n: "
+    },
+    {
+      "context": "prompt_count",
+      "msgid": "Remove %d selected? y/N: ",
+      "msgstr": "删除选中的 %d 个节点？y/N: "
+    },
+    {
+      "context": "prompt_count",
+      "msgid": "Trash %d selected?",
+      "msgstr": "将选中的 %d 个节点移到回收站？"
+    },
+    {
+      "context": "prompt_count",
+      "msgid": "Trash %d selected? Y/n: ",
+      "msgstr": "将选中的 %d 个节点移到回收站？Y/n: "
+    },
+    {
+      "context": "prompt_count",
+      "msgid": "Trash %d selected? y/N: ",
+      "msgstr": "将选中的 %d 个节点移到回收站？y/N: "
+    },
+    {
+      "context": "select_item",
+      "msgid": "No",
+      "msgstr": "否"
+    },
+    {
+      "context": "select_item",
+      "msgid": "Overwrite all",
+      "msgstr": "全部覆盖"
+    },
+    {
+      "context": "select_item",
+      "msgid": "Rename",
+      "msgstr": "重命名"
+    },
+    {
+      "context": "select_item",
+      "msgid": "Rename (suffix)",
+      "msgstr": "重命名（加后缀）"
+    },
+    {
+      "context": "select_item",
+      "msgid": "Skip all",
+      "msgstr": "全部跳过"
+    },
+    {
+      "context": "select_item",
+      "msgid": "Yes",
+      "msgstr": "是"
+    },
+    {
+      "context": "tree_window",
+      "msgid": "(%d hidden)",
+      "msgstr": "（隐藏 %d 个）"
+    },
+    {
+      "context": "tree_window",
+      "msgid": "(%d total %s)",
+      "msgstr": "（隐藏 %d：%s）"
+    },
+    {
+      "context": "window_picker",
+      "msgid": "Pick window: ",
+      "msgstr": "选择 Window："
     }
   ],
   "locale": "zh_CN",

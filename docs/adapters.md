@@ -2,6 +2,8 @@
 
 第三方适配的目标是改善常见交互，而不是追求插件数量。每个适配器只处理固定上游中能够证明来源和生命周期的显示文本；原始条目、回调参数、快捷键、路径、代码和用户数据仍由原插件拥有。
 
+接入契约、上游更新机制与完整 TUI 门禁见[第三方插件中文适配系统设计](adapter-system-design.md)。
+
 ## 通用行为
 
 - 默认只检查 `package.loaded` 中已经加载的模块，不为了汉化强制加载插件。
@@ -9,10 +11,28 @@
 - `lazy_load = true` 时使用 `User LazyLoad`，并在后续 Buffer/焦点边界补检已加载模块。
 - 重复 setup 不叠加 wrapper。模块表被整体替换时按新代际重新接入；同一模块的函数被外部替换时报告 `external_override`，不抢回。
 - 翻译目录更新用于后续自然调用。已经显示的边框、帮助 Buffer 或已创建 keymap 不会被强制重写。
-- 通知只在公开 `vim.notify` 边界按精确 `opts.title` 注册 domain；可选的固定插件前缀及其空白原样保留。未知 title 继续使用 `nvim-ui`，不按消息内容猜测来源，也不让同一通知经过两次翻译。
-- `status().plugins` 分别报告接缝、活动状态、原因和未覆盖范围；wrapper 存在不等于整个插件已汉化。
+- 通知通过精确 `opts.title` 和上游通知入口的来源匹配 domain。固定插件前缀及空白原样保留，标题碰撞时保留用户的原文。
+- `status().adapters` 按插件和接缝报告活动状态、运行时证据和降级原因。
 
-固定 commit、实际检查的源码 SHA-256 和版本相关接缝依据见 `manifests/upstreams.json`。其他版本只有在 API 形状兼容时才可能工作，不据此声称经过验证。
+固定 commit、源码 SHA-256 和测试组合位于 `manifests/adapters/`。正式接口可以在其他满足契约的修订上工作，版本相关接缝需要加载源码证据。
+
+### 启用版本相关接缝
+
+先调用 `require('nvim-zh').setup()`，再加载目标插件。使用 `vim.pack` 且 `src` 与清单仓库地址一致时，适配器会识别实际加载目录，即使包名经过重命名。
+
+```lua
+require('nvim-zh').setup()
+vim.pack.add({
+  { src = 'https://github.com/nvim-lua/plenary.nvim' },
+  { src = 'https://github.com/nvim-telescope/telescope.nvim',
+    version = '1e1bab730218eaf97fce743be3f56e51075928ac' },
+})
+```
+
+使用其他管理器或镜像时，在首次加载目标模块前调用
+`require('nvim-zh').register_adapter_source('telescope', plugin_dir)`。若启用 `vim.loader`，应在设置 nvim-zh 前启用缓存加载器。
+
+缺少加载证据或实际源码已经变化时，相关显示面使用上游文案。上游包更新后，可从 `:checkhealth nvim-zh` 查看哪些接缝需要重新加载，以及哪些接缝仍然可用。
 
 ## which-key
 
@@ -22,7 +42,7 @@
 
 - 内置 operators、motions、text objects、windows、z、nav、g presets 的固定描述。
 - marks/registers 的组名和固定含义，以及拼写建议入口。
-- 自动生成的 keymap 数量文本，保留实际数字。
+- 自动生成的 keymap 数量、弹窗底部的关闭/返回/滚动、健康检查和常用中文帮助主题。
 - 通过精确 `which-key.nvim` 通知标题路由的固定通知，保留 level、once、title 和 Markdown 通知行为。
 
 原始 mapping、lhs/rhs/mode、buffer 和执行回调不被替换。用户 spec、寄存器内容、mark 路径和拼写建议词不属于目录数据。
@@ -31,16 +51,17 @@
 
 `replace.desc` 是公开显示接缝，但只收到字符串，没有条目来源。精确 msgid 避免了模糊替换，却不能排除用户自定义描述恰好等于内置文本时也显示译文；原始用户 mapping 不会被修改。状态中的来源说明保留这个限制。
 
-底部 `close/back/scroll` 等私有 footer 没有等价的公开纯显示接缝，保持英文；不通过 Buffer 扫描补齐。
+底部提示、marks/Register 标签和健康报告依赖固定加载证据。图标、来源数据、用户分组描述和其余上游帮助主题可能继续显示英文。
 
 ## Telescope
 
-固定上游：`40aedd8a68c78a656a10a8d62d80c54af59420fb`。
+固定上游：`1e1bab730218eaf97fce743be3f56e51075928ac`。
 
 ### 已接入
 
 - 内置 picker 的 prompt、results 和初始 preview 标题。
-- 全局默认 `Prompt` / `Results`。
+- 默认 `Prompt` / `Results`、模糊精炼后的标题、按键映射浮窗标题和常用中文帮助主题。
+- Git 分支操作及编辑 Register 的固定提示、选中项操作消息和健康报告。
 - `Previewer:title` 的静态和动态标题；动态路径等未知值自然回退。
 - 通过精确 `telescope.nvim` 通知标题路由的固定通知，保留 `[telescope.<function>]: ` 前缀、level、once 和 title。
 
@@ -51,13 +72,13 @@
 ### 边界
 
 - entry/display/ordinal/value、finder、sorter、previewer 对象、quickfix 内容和用户查询保持不变。
-- 模糊精练最终调用 `border:change_title` 的动态标题没有同等安全的统一接缝，未命中时保留原文。
+- `actions.generate.refine` 在上游完成分支判断后翻译显示标题，查询词沿用原值。上游直接抛出的 Lua 错误和 `Untitled` 搜索结果字段沿用上游。
 - 已打开的静态 border 不随目录更新强制刷新；动态 preview 在下一次自然标题查询时使用当前目录。
 - 空结果行和数字进度没有需要翻译的固定文本，不修改用户自定义 `get_status_text`。
 
 ## nvim-tree
 
-固定上游：`69eb0c34ed3d836d5a0d92d913b77dd73b054f2f`。
+固定上游：`dbc9d96a3633c2de85f409416ebd4a3aacf4220a`。
 
 ### 已接入
 
@@ -68,9 +89,9 @@
 
 ### 边界
 
-- 用户自定义 `on_attach` 的描述默认保持原文，避免因字符串碰撞改写用户数据。
+- 文件操作选择与确认、文件信息、Window 选择、帮助浮窗和过滤统计使用固定上游接缝。用户自定义 `on_attach` 描述沿用原文。
 - 已有 Buffer 的 keymap 不会在目录更新或普通 explorer 刷新后自动重建；重新 attach/创建时才使用当前译文。
-- 主 tree renderer、私有帮助 Buffer 和用户命令描述没有稳定逐文本公开接缝，不扫描 Buffer。
+- 插件载入时登记的 12 条用户命令描述，以及 `:NvimTreeHiTest` 的开发者诊断表头沿用上游。
 - prompt/select 的原始 items 和回调值保持原样。没有可靠来源信息时，不把 Yes/No、文件名或路径塞进全局目录猜测翻译。
 
 ## nvim-dap
@@ -89,9 +110,9 @@
 ### 边界
 
 - 已有 REPL Buffer 的 prompt callback 和历史行不会重建；适配器只接入后续自然创建/执行的接缝。
-- 无 title 通知、插件加载时立即注册的用户命令描述、launch.json 的动态输入没有同等安全的来源接缝，保持原文；不为此包装全局 `vim.fn.input` 或扫描 Buffer。
+- 插件加载时登记的 `DapNew` / `DapEval` 命令描述沿用上游。launch.json 的 `Input` 回退提示与用户显式描述重名时无法区分；用户描述和选项也沿用原文。
 - quickfix 同一 Buf/行存在多个断点且无法无歧义对应原始字段时回退原文，避免错配条件或日志消息。
-- 日志、协议对象、异常诊断正文、变量/帧/线程名称和外部进程输出不属于目录数据。
+- Widget 的固定空状态、异常诊断前缀及部分启动与解析错误有中文投影。调试器返回的正文、变量/帧/线程名称、日志和进程输出沿用来源文字。
 
 ## nvim-dap-ui
 
@@ -116,12 +137,12 @@
 
 ## lazy.nvim 与 nvim-cmp
 
-- lazy.nvim 的 `User LazyLoad` 用于受支持适配器的晚加载发现，通知继续使用 Neovim 公共 UI 接缝；lazy 主面板私有 view/Buffer 不适配。
+- lazy.nvim 提供 `User LazyLoad`，用于发现受支持插件。Lazy 主面板、安装进度、插件自有通知和 Help 沿用上游。
 - nvim-cmp 固定版本的审查仍未找到可证明由 cmp 自己拥有、且不会触及 completion item/source 的固定标签，保持 `inventory_only`。不翻译 abbr、kind/menu、文档或用户 formatter 数据。
 
 ## 新增适配器的要求
 
-1. 在 `lua/nvim-zh/adapters/` 新建一个模块，并在薄管理器注册；不要把插件分支继续堆进核心模块。
+1. 在 `lua/nvim-zh/adapters/` 新建一个模块，并在 `manifests/adapters/<id>.json` 声明入口。使用 `make build-resources` 更新生成索引与发布资源。
 2. 固定完整上游 commit，记录实际检查源码 hash 和公开/版本相关接缝依据。
 3. 编辑对应 domain 的 PO，使用稳定 context 和真实 source reference；不从 fixture 编造产品条目。
 4. 先写差分和负向契约，再实现。至少覆盖默认流程、重复 setup、晚加载、外部替换、模块换代、未知文本和 teardown。

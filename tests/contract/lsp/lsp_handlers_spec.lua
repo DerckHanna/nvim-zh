@@ -60,6 +60,7 @@ equal(calls[#calls][3].message, 'Unknown message', 'unknown message changed')
 local original_show = vim.lsp.handlers['window/showMessage']
 require('nvim-zh').setup({ modules = { diagnostics = { enabled = false }, lsp = { messages = true, progress = true } }, overrides = overrides })
 equal(vim.lsp.handlers['window/showMessage'], original_show, 'handler duplicated on setup')
+equal(require('nvim-zh.lsp').info()['window/showMessage'].reason, 'active', 'owned handler reported external replacement')
 local external = function() return 'external' end
 vim.lsp.handlers['window/showMessage'] = external
 dofile(vim.env.NVIM_ZH_ROOT .. '/tests/support/public.lua').refresh()

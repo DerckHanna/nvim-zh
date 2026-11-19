@@ -157,14 +157,16 @@ msgstr "切换 Window 和 Register"
         (source / 'lua/nvim-zh').mkdir(parents=True)
         shutil.copyfile(ROOT / 'lua/nvim-zh/catalog.lua', source / 'lua/nvim-zh/catalog.lua')
         shutil.copytree(ROOT / 'translations/po', source / 'translations/po')
+        shutil.copytree(ROOT / 'manifests/adapters', source / 'manifests/adapters')
         actual = catalog_tool.builtin_sources(source)
-        self.assertEqual(set(actual), {'nvim-ui', 'which-key', 'telescope', 'nvim-tree', 'nvim-dap', 'nvim-dap-ui', 'clangd'})
+        from adapter_manifest import po_sources
+        self.assertEqual(set(actual), {'nvim-ui', 'clangd'} | po_sources(source).keys())
         extra = source / 'translations/po/zh_CN/unregistered.po'
         extra.write_text(VALID_PO)
         with self.assertRaisesRegex(catalog_tool.CatalogError, 'differ'):
             catalog_tool.builtin_sources(source)
         extra.unlink()
-        (source / 'translations/po/zh_CN/which-key.po').unlink()
+        (source / 'translations/po/zh_CN/nvim-ui.po').unlink()
         with self.assertRaisesRegex(catalog_tool.CatalogError, 'differ'):
             catalog_tool.builtin_sources(source)
 

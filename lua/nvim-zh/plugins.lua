@@ -1,42 +1,16 @@
 local M = {}
 
-local adapters = {
-  require('nvim-zh.adapters.which_key'),
-  require('nvim-zh.adapters.telescope'),
-  require('nvim-zh.adapters.nvim_tree'),
-  require('nvim-zh.adapters.nvim_dap'),
-  require('nvim-zh.adapters.nvim_dap_ui'),
-  {
-    name = 'lazy.nvim',
-    modules = { 'lazy' },
-    attach = function() end,
-    detach = function() end,
-    info = function(ctx)
-      return {
-        active = ctx.enabled() and ctx.lazy_load(),
-        reason = ctx.lazy_load() and 'shared_notify_and_lazy_load' or 'disabled',
-        seam = 'vim.notify; User LazyLoad',
-        domain = 'nvim-ui',
-        supported_commit = '306a05526ada86a7b30af95c5cc81ffba93fef97',
-      }
-    end,
-  },
-  {
-    name = 'nvim-cmp',
-    modules = { 'cmp' },
-    attach = function() end,
-    detach = function() end,
-    info = function()
-      return {
-        active = false,
-        reason = 'inventory_only_no_cmp_owned_fixed_labels',
-        seam = 'none',
-        domain = 'nvim-cmp',
-        supported_commit = '2ffe79f1f021def8dd1fcd81deb16f1bb0d989f3',
-      }
-    end,
-  },
-}
+local specs = require('nvim-zh.adapters.index')
+local evidence = require('nvim-zh.adapters.evidence')
+local common = require('nvim-zh.adapters.common')
+local uv = vim.uv
+local adapters, names, failures = {}, {}, {}
+local installed, external = {}, {}
+
+for id, spec in pairs(specs) do
+  names[#names + 1] = id
+end
+table.sort(names)
 
 local config = { auto = false, lazy_load = true, disabled = {} }
 local AUGROUP = 'NvimZhPluginLateLoad'
@@ -46,9 +20,9 @@ local AUGROUP = 'NvimZhPluginLateLoad'
 -- re-attaches adapters when that happens. It never forces a plugin to load and
 -- stops as soon as the signature is stable; FocusGained/BufEnter and LazyLoad
 -- remain the long-term boundaries.
-local startup_timers = {}
+local startup_timers, startup_group = {}, nil
 local startup_signature
-local STARTUP_DELAYS = { 300, 800, 1600 }
+local STARTUP_DELAYS = { 60, 200, 500, 1000, 1600 }
 
 local function enabled(name)
   if not config.auto then return false end
@@ -58,24 +32,88 @@ local function enabled(name)
   return true
 end
 
-local function context(adapter)
+-- A notification belongs to a plugin only when a frame of that plugin's own
+-- pinned source is on the stack. `paths` may name more than one real dispatch
+-- origin (a plugin can call vim.notify from its util module and, on some
+-- branches, straight from a public module); each origin is checked against the
+-- concrete file the loader would resolve, so an unrelated caller that merely
+-- looks similar never matches.
+local function match_notification(paths, opts)
+  if type(paths) == 'string' then paths = { paths } end
+  if type(paths) ~= 'table' then return false end
+  local provenance = {}
+  local function matches(info)
+    local source = info and info.source
+    if type(source) ~= 'string' or source:sub(1, 1) ~= '@' then return false end
+    local file = source:sub(2)
+    for _, path in ipairs(paths) do
+      if source:sub(-#path - 1) == '/' .. path then
+        provenance[path] = provenance[path] or vim.api.nvim_get_runtime_file(path, false)[1]
+        if provenance[path] and uv.fs_realpath(file) == uv.fs_realpath(provenance[path]) then
+          return true
+        end
+      end
+    end
+    return false
+  end
+  if type(opts.on_open) == 'function' and matches(debug.getinfo(opts.on_open, 'S')) then return true end
+  for level = 3, 12 do
+    local info = debug.getinfo(level, 'S')
+    if not info then return false end
+    if matches(info) then return true end
+  end
+  return false
+end
+
+local function context(id)
   return {
-    enabled = function() return enabled(adapter.name) end,
-    lazy_load = function() return config.auto and config.lazy_load end,
-    translate = require('nvim-zh.adapters.common').translate,
+    enabled = function() return enabled(id) end,
+    translate = common.translate,
+    verify = function(surface)
+      local spec = specs[id]
+      local rule = spec.surfaces[surface]
+      if not rule then return nil, 'unsupported_api' end
+      if rule.kind ~= 'versioned' then return { kind = 'api_contract' } end
+      return evidence.verify(id, spec, rule)
+    end,
     register_source = function(spec)
+      local rule = specs[id].surfaces.notifications
+      if rule and rule.source then
+        spec = vim.tbl_extend('force', spec, { matches = function(opts)
+          return match_notification(rule.source, opts)
+        end })
+      end
       return require('nvim-zh.ui').register_source(spec)
     end,
   }
 end
 
-local function attach_one(adapter)
-  local ctx = context(adapter)
-  if ctx.enabled() then adapter.attach(ctx) else adapter.detach() end
+local function attach_one(id)
+  local spec = specs[id]
+  if not spec.entry and not external[id] then return end
+  local adapter = adapters[id]
+  if not enabled(id) then
+    if adapter then adapter.detach() end
+    failures[id] = nil
+    return
+  end
+  local ok, failure = pcall(function()
+    if not adapter then
+      adapter = require(spec.entry)
+      adapters[id] = adapter
+    end
+    adapter.attach(context(id))
+  end)
+  failures[id] = not ok and tostring(failure) or nil
+  if not ok and adapter then pcall(adapter.detach) end
 end
 
 local function clear_lazy_load()
   pcall(vim.api.nvim_del_augroup_by_name, AUGROUP)
+end
+
+local function sync_help()
+  require('nvim-zh.help').sync_adapters(specs, enabled)
 end
 
 local function setup_lazy_load()
@@ -87,24 +125,53 @@ local function setup_lazy_load()
     pattern = 'LazyLoad',
     desc = 'nvim-zh: adapt supported plugins after lazy.nvim loads them',
     callback = function(event)
-      for _, adapter in ipairs(adapters) do
-        if adapter.lazy_name == event.data then attach_one(adapter) end
+      local matched = false
+      for _, id in ipairs(names) do
+        if vim.tbl_contains(specs[id].lazy_names, event.data) then
+          attach_one(id)
+          matched = true
+        end
       end
+      if matched then sync_help() end
     end,
   })
 end
 
 local function clear_startup_timers()
+  if startup_group then
+    vim.api.nvim_del_augroup_by_id(startup_group)
+    startup_group = nil
+  end
   for _, timer in ipairs(startup_timers) do
-    timer:stop()
-    if not timer:is_closing() then timer:close() end
+    if not timer:is_closing() then
+      timer:stop()
+      timer:close()
+    end
   end
   startup_timers = {}
   startup_signature = nil
 end
 
 local function attach_all()
-  for _, adapter in ipairs(adapters) do attach_one(adapter) end
+  for _, id in ipairs(names) do attach_one(id) end
+  sync_help()
+end
+
+local pending = {}
+local function source_loaded(id)
+  if pending[id] then return end
+  pending[id] = true
+  vim.schedule(function()
+    pending[id] = nil
+    if enabled(id) then attach_one(id); sync_help() end
+  end)
+end
+
+local function translate_health(id, text)
+  if enabled(id) and evidence.verify(id, specs[id], specs[id].surfaces.health) then
+    return common.translate(specs[id].domain, 'health', text)
+  end
+  return text
 end
 
 -- Re-attach only when the loaded-module signature actually changed, so a stable
@@ -121,13 +188,25 @@ local function schedule_startup_sweep()
   clear_startup_timers()
   if not config.auto then return end
   startup_signature = M.loaded_signature()
+  -- VimEnter is the earliest point after plugins and their auto-setup timers
+  -- have run; sweep there first so a first popup right after startup already
+  -- sees the owned display seam instead of waiting for the first timer tick.
+  -- The bounded timers below still cover plugins that finish later.
+  if vim.v.vim_did_enter == 0 then
+    startup_group = vim.api.nvim_create_augroup('NvimZhPluginStartup', { clear = true })
+    vim.api.nvim_create_autocmd('VimEnter', {
+      group = startup_group,
+      once = true,
+      desc = 'nvim-zh: adapt plugins loaded during startup',
+      callback = function() vim.schedule(startup_sweep) end,
+    })
+  end
   for _, delay in ipairs(STARTUP_DELAYS) do
-    local timer = (vim.uv or vim.loop).new_timer()
+    local timer = vim.uv.new_timer()
     startup_timers[#startup_timers + 1] = timer
-    -- One-shot timers stop themselves; handles are closed centrally on the next
-    -- setup or teardown, never from inside a running callback.
     timer:start(delay, 0, vim.schedule_wrap(function()
-      timer:stop()
+      if timer:is_closing() then return end
+      timer:close()
       startup_sweep()
     end))
   end
@@ -135,6 +214,11 @@ end
 
 function M.setup(next_config)
   config = vim.deepcopy(next_config or config)
+  if config.auto then
+    evidence.setup(specs, source_loaded, translate_health)
+  else
+    evidence.stop()
+  end
   setup_lazy_load()
   attach_all()
   schedule_startup_sweep()
@@ -142,19 +226,23 @@ end
 
 function M.teardown()
   config = { auto = false, lazy_load = false, disabled = {} }
+  evidence.stop()
   clear_lazy_load()
   clear_startup_timers()
-  for _, adapter in ipairs(adapters) do adapter.detach() end
+  for _, adapter in pairs(adapters) do adapter.detach() end
+  sync_help()
 end
 
 function M.loaded_signature()
-  local values = {}
-  for _, adapter in ipairs(adapters) do
-    values[#values + 1] = adapter.name
-    if adapter.signature then
+  local values = { vim.o.runtimepath }
+  for _, id in ipairs(names) do
+    local adapter = adapters[id]
+    local spec = specs[id]
+    values[#values + 1] = id
+    if adapter and adapter.signature then
       values[#values + 1] = adapter.signature()
     else
-      for _, name in ipairs(adapter.modules or {}) do
+      for _, name in ipairs(spec.modules) do
         values[#values + 1] = tostring(package.loaded[name])
       end
     end
@@ -164,13 +252,119 @@ end
 
 function M.info()
   local result = {}
-  for _, adapter in ipairs(adapters) do
-    local ctx = context(adapter)
-    local info = adapter.info(ctx) or {}
+  for _, id in ipairs(names) do
+    local spec, adapter = specs[id], adapters[id]
+    local ctx = context(id)
+    local info = adapter and adapter.info(ctx) or {}
     info.enabled = ctx.enabled()
-    result[adapter.name] = info
+    info.reason = failures[id] and 'attach_failed' or spec.status == 'inventory_only' and 'inventory_only'
+      or not info.enabled and 'disabled' or info.reason or 'not_loaded'
+    info.error = failures[id]
+    info.seam = info.seam or 'none'
+    info.active = info.active == true
+    info.installed = vim.deepcopy(installed[id])
+    info.targets = {}
+    info.surfaces = {}
+    for name, target in pairs(spec.targets) do info.targets[name] = target.commit end
+    for name, rule in pairs(spec.surfaces) do
+      local verification, reason = ctx.verify(name)
+      local key = rule.status_key or name
+      local status = (info.slots and info.slots[key]) or info[key]
+      if type(status) ~= 'table' then status = {} end
+      if name == 'health' and rule.kind == 'versioned' then status = evidence.health_status(id, spec) end
+      if rule.kind == 'help' then
+        local help = require('nvim-zh.help').adapter_status(id)
+        status = { active = help == 'active', reason = help }
+        verification = status.active and { kind = 'document_sha256' } or nil
+      end
+      local active = info.enabled and verification ~= nil and status.active == true
+      info.surfaces[name] = {
+        active = active,
+        status = active and 'active' or failures[id] and 'attach_failed'
+          or not info.enabled and 'disabled' or reason or status.reason or 'not_loaded',
+        evidence = vim.deepcopy(verification),
+        error = status.error,
+      }
+    end
+    result[id] = info
   end
   return result
+end
+
+function M.register_adapter(definition)
+  assert(type(definition) == 'table' and definition.api == 1, 'unsupported adapter API')
+  local id, domain = definition.id, definition.domain
+  assert(type(id) == 'string' and id:match('^[a-z0-9][a-z0-9_.%-]*$') and not specs[id],
+    'invalid or duplicate adapter ID')
+  assert(type(domain) == 'string' and domain:match('^[a-z0-9][a-z0-9_.%-]*$'),
+    'external adapter needs a valid domain')
+  assert(type(definition.surfaces) == 'table' and next(definition.surfaces), 'adapter needs surfaces')
+  local spec = { domain = domain, status = 'implemented', surfaces = {},
+    modules = {}, lazy_names = vim.deepcopy(definition.lazy_names or {}), targets = {} }
+  assert(vim.islist(spec.lazy_names), 'adapter lazy_names must be an array')
+  for name, handler in pairs(definition.surfaces) do
+    assert(type(name) == 'string' and name:match('^[a-z0-9][a-z0-9_.%-]*$') and type(handler) == 'table'
+      and type(handler.module) == 'string' and handler.module:match('^[%w_.%-]+$')
+      and type(handler.probe) == 'function' and type(handler.mount) == 'function', 'invalid adapter surface')
+    spec.surfaces[name] = { kind = 'api' }
+    spec.modules[#spec.modules + 1] = handler.module
+  end
+  local catalog = require('nvim-zh.catalog')
+  assert(not catalog.is_builtin(domain) and not catalog.is_registered(domain), 'adapter domain is already owned')
+  local source = catalog.prepare_sources({ [domain] = definition.catalog })[domain]
+  assert(source, 'external adapter needs a catalog')
+  local release = catalog.register_owned(domain, function() return source end, { locale = source.locale })
+  local entry = require('nvim-zh.adapters.scope').adapter(spec, vim.deepcopy(definition.surfaces))
+  specs[id], adapters[id], external[id] = spec, entry, release
+  names[#names + 1] = id
+  table.sort(names)
+  local function unregister()
+    if external[id] ~= release then return end
+    entry.detach()
+    failures[id], specs[id], adapters[id], external[id] = nil, nil, nil, nil
+    table.remove(names, vim.fn.index(names, id) + 1)
+    release()
+  end
+  if config.auto then
+    attach_one(id)
+    local failure = failures[id]
+    local states = entry.info().slots
+    for name in pairs(spec.surfaces) do
+      if states[name] and states[name].reason == 'attach_failed' then
+        failure = failure or states[name].error
+      end
+    end
+    if failure then
+      unregister()
+      error(failure, 0)
+    end
+  end
+  return unregister
+end
+
+function M.register_source(id, directory)
+  local spec = assert(specs[id], 'unknown adapter ' .. tostring(id))
+  evidence.register(id, spec, directory)
+  if config.auto then attach_one(id); sync_help() end
+end
+
+function M.package_changed(data)
+  if type(data) ~= 'table' or (data.kind ~= 'install' and data.kind ~= 'update' and data.kind ~= 'delete') then
+    return false
+  end
+  local matched = evidence.changed(data.path)
+  local changed = false
+  for _, id in ipairs(names) do
+    local spec = specs[id]
+    local repo = data.spec and data.spec.src
+    if matched == id or spec.repository and (repo == spec.repository or repo == spec.repository .. '.git') then
+      installed[id] = { path = data.path, revision = data.rev or data.revision, kind = data.kind }
+      if config.auto then attach_one(id) end
+      changed = true
+    end
+  end
+  if changed then sync_help() end
+  return changed
 end
 
 return M

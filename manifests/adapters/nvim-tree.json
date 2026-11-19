@@ -1,0 +1,279 @@
+{
+  "contracts": [
+    "tests/upstream/nvim-tree/additional_upstream_smoke_spec.lua"
+  ],
+  "domain": "nvim-tree",
+  "entry": "nvim-zh.adapters.nvim_tree",
+  "help": {
+    "doc/nvim-tree-lua.txt": [
+      "nvim-tree-commands.cnx",
+      "nvim-tree-mappings.cnx",
+      "nvim-tree-prompts.cnx",
+      "nvim-tree-setup.cnx"
+    ]
+  },
+  "id": "nvim-tree",
+  "lazy_names": [
+    "nvim-tree.lua"
+  ],
+  "modules": [
+    "nvim-tree",
+    "nvim-tree.actions.node.file-popup",
+    "nvim-tree.actions.node.open-file",
+    "nvim-tree.help",
+    "nvim-tree.keymap",
+    "nvim-tree.lib",
+    "nvim-tree.renderer.builder"
+  ],
+  "notes": {
+    "domain": "nvim-tree",
+    "excluded": "private renderer contributions other than the hidden-count skeleton, user command descs registered during plugin load, hi-test developer scratch buffer, create/rename/search/move/suffix bare vim.ui.input prompts",
+    "limitations": "existing buffer mappings are not rebuilt on translation refresh",
+    "public_path": "default on_attach mapping descriptions; exact vim.notify title; api.fs.remove/trash/paste/marks.bulk.* prompts; api.tree.toggle_help; api.node.open.*; api.node.show_info_popup; renderer.hidden_display simple/all labels",
+    "seam": "keymap.on_attach_default; setup lifecycle; exact vim.notify title; lib.prompt display arguments (prompts/select_item); help toggle headers; open-file fn window-picker print; file-popup toggle_file_info; builder hidden-display closure",
+    "status": "implemented",
+    "version_related": "the default attach function is pinned so the first default mapping and lazy setup order are covered",
+    "writes": "default_mapping_suffix_and_notification_display_only"
+  },
+  "scenarios": {
+    "file_info": {
+      "surfaces": [
+        "file_info"
+      ],
+      "tui": "tests/upstream/nvim-tree/tui.py"
+    },
+    "help": {
+      "surfaces": [
+        "help"
+      ],
+      "tui": "tests/upstream/nvim-tree/tui.py"
+    },
+    "help_buffer": {
+      "surfaces": [
+        "help_buffer"
+      ],
+      "tui": "tests/upstream/nvim-tree/tui.py"
+    },
+    "notification": {
+      "surfaces": [
+        "notifications"
+      ],
+      "tui": "tests/upstream/nvim-tree/tui.py"
+    },
+    "notification_matrix": {
+      "surfaces": [
+        "notifications"
+      ],
+      "tui": "tests/upstream/nvim-tree/tui.py"
+    },
+    "prompts": {
+      "surfaces": [
+        "prompts"
+      ],
+      "tui": "tests/upstream/nvim-tree/tui.py"
+    },
+    "renderer_hidden": {
+      "surfaces": [
+        "renderer_hidden"
+      ],
+      "tui": "tests/upstream/nvim-tree/tui.py"
+    },
+    "tree": {
+      "surfaces": [
+        "default_mappings"
+      ],
+      "tui": "tests/upstream/nvim-tree/tui.py"
+    },
+    "window_picker": {
+      "surfaces": [
+        "window_picker"
+      ],
+      "tui": "tests/upstream/nvim-tree/tui.py"
+    }
+  },
+  "schema": 1,
+  "status": "implemented",
+  "surfaces": {
+    "default_mappings": {
+      "kind": "api"
+    },
+    "file_info": {
+      "kind": "versioned",
+      "modules": {
+        "nvim-tree.actions.node.file-popup": "lua/nvim-tree/actions/node/file-popup.lua"
+      }
+    },
+    "help": {
+      "kind": "help"
+    },
+    "help_buffer": {
+      "kind": "versioned",
+      "modules": {
+        "nvim-tree.help": "lua/nvim-tree/help.lua"
+      }
+    },
+    "notifications": {
+      "kind": "api",
+      "source": "lua/nvim-tree/notify.lua",
+      "status_key": "notification"
+    },
+    "prompts": {
+      "kind": "versioned",
+      "modules": {
+        "nvim-tree.lib": "lua/nvim-tree/lib.lua"
+      }
+    },
+    "renderer_hidden": {
+      "kind": "versioned",
+      "modules": {
+        "nvim-tree.renderer.builder": "lua/nvim-tree/renderer/builder.lua",
+        "nvim-tree.utils": "lua/nvim-tree/utils.lua"
+      }
+    },
+    "window_picker": {
+      "kind": "versioned",
+      "modules": {
+        "nvim-tree.actions.node.open-file": "lua/nvim-tree/actions/node/open-file.lua"
+      }
+    }
+  },
+  "targets": {
+    "baseline": {
+      "commit": "dbc9d96a3633c2de85f409416ebd4a3aacf4220a",
+      "dependencies": [
+        "lazy.nvim",
+        "nvim-cmp"
+      ],
+      "neovim": "0.12.6",
+      "sources": {
+        ".github/ISSUE_TEMPLATE/nvt-min.lua": "09ca3497d4f05f336b16511dbb87e44e89c63bce3a8c73ecbff2ffc5c3188382",
+        "doc/nvim-tree-lua.txt": "15974f9a9786486a359d57942df82eb17dd78afa0c60a916a0c232f515658444",
+        "lua/nvim-tree.lua": "e4b7c864eb1dfb645b8dfd6cc5025825d503ec8f352f11300d0ec36321d4fafd",
+        "lua/nvim-tree/_meta/api/appearance.lua": "8ddf10ac09f3d2d258eb0b226a880703dd4d0730f98d0707384f5902d6b37170",
+        "lua/nvim-tree/_meta/api/commands.lua": "8df95f9de4a441cb9f2eb00783cc2ac9adfa99562e34a290fe51330346635575",
+        "lua/nvim-tree/_meta/api/config.lua": "cf39178b861ac121bed26d846acd27b48490d44db01a0c20e7e46bcea3ec46b9",
+        "lua/nvim-tree/_meta/api/decorator.lua": "68354bcca49777d7bf072a49b138791c3af0cc277c7de83095b94b928babef8c",
+        "lua/nvim-tree/_meta/api/decorator_example.lua": "b1ed11f56709b22769eb7ed360915e138f7659a3d0d697d7602bee2421411be3",
+        "lua/nvim-tree/_meta/api/deprecated.lua": "5875b4873705d0c411b63ccc0825e6b4447b38f0e31d30635b82e875316ab0ba",
+        "lua/nvim-tree/_meta/api/events.lua": "c0e12314ab10eeed0a3de71f860892749242c77a2cd1c62f0ed5fefe8cbfe92f",
+        "lua/nvim-tree/_meta/api/filter.lua": "b801f70cfff9ec0aa92076b4b043e870b515be1559c00b0636f2a9adcde08ff9",
+        "lua/nvim-tree/_meta/api/fs.lua": "2678635c2aac70d06f2f78853ed285fa324e554e6ec54ef2c1d7fb4d5d5117a2",
+        "lua/nvim-tree/_meta/api/git.lua": "8caf54a8dea7528bf8fbec9506b98f21bf1efdc03f1550bc0b1d786ff166de99",
+        "lua/nvim-tree/_meta/api/map.lua": "64298463d824c42aa84ccd9a8660ae92c82ec5005d1ef748c7650a543e18f360",
+        "lua/nvim-tree/_meta/api/marks.lua": "adfa44f8c90b24c8ab3024bec13f5739d3b6647716077e431e8360a829af8e6d",
+        "lua/nvim-tree/_meta/api/node.lua": "c25896eb4e95d5e5fb0b5ad1b47aab481da3776f299744081ceb35f2596ae874",
+        "lua/nvim-tree/_meta/api/tree.lua": "256ffc02e6f56d3fefac1c570ddb6e464a9517ecd1a051a47bcce68a94bb8ec7",
+        "lua/nvim-tree/_meta/classes.lua": "b38b5002287048044bca1c9037a31122bb69d7b3dda257c0f5f115623c83b1de",
+        "lua/nvim-tree/_meta/config.lua": "284af2b6526b4aa5a8884ff2264fefe46c635a48a0a67e01c4c9ffa30c7305ec",
+        "lua/nvim-tree/_meta/config/actions.lua": "b1544ac3a76e9c2660484839414a4fcdbf4959a7193625603b044d3e95f9960d",
+        "lua/nvim-tree/_meta/config/bookmarks.lua": "60a03c038c18060083d52f3b87425e063d78af95d9b47f6ccc89799435f6cf53",
+        "lua/nvim-tree/_meta/config/default.lua": "bf096a8ba1a3a1afe79a5021c4c896d2687700901dd2f6eac48c0449ccbd9b43",
+        "lua/nvim-tree/_meta/config/diagnostics.lua": "06666b989e0e7cfe82e076a0407274acc763cd9a2ced79e9e01479349ed9a2b9",
+        "lua/nvim-tree/_meta/config/experimental.lua": "1f7d7bc71a39feaac69ba905d5577f098c1486c4bba4d8cab2d454bdc01e13fc",
+        "lua/nvim-tree/_meta/config/filesystem_watchers.lua": "b7eff1c79dfcec88f4f6ad0fbec2ae53e6e74d53b38064f19a3a485e9b6c896f",
+        "lua/nvim-tree/_meta/config/filters.lua": "dec8c992d10691cea4150fb0d41c76cd0e03e56b486c47c25100b69c7ebe8317",
+        "lua/nvim-tree/_meta/config/git.lua": "392ef421676e62ed2818eb52637e558003e6c81484abf37a1acb34ea43098d6c",
+        "lua/nvim-tree/_meta/config/help.lua": "d90f34c3ea86e2b0f0c67e52cc563f91d242f324630b3d7718b12423f07e6608",
+        "lua/nvim-tree/_meta/config/hijack_directories.lua": "9a4fbb4479ae1579961e45726b84c06f0d39b37624b68499aabaad08e4fe81c2",
+        "lua/nvim-tree/_meta/config/live_filter.lua": "0658e1d05a9ab828e76e973459653f2056333656ed4ab1ecec24895d8a2142b8",
+        "lua/nvim-tree/_meta/config/log.lua": "2052569906eadff8ebf931f023ef3aed7dcb5246b7f9abbc950cc35cfa467d47",
+        "lua/nvim-tree/_meta/config/modified.lua": "961b173eafda9884bce0b3965315e95b2e37280679853d9dd818a8bf6df1377f",
+        "lua/nvim-tree/_meta/config/notify.lua": "4120e8ac6d306cac4b03958dbeb4c4623977e0a60d1595f5fe5a4fc79f97f179",
+        "lua/nvim-tree/_meta/config/renderer.lua": "6e4ce7100ae799a6f2cadfced9f2d4b0cdd37c446d279bf42d15abec5b85478e",
+        "lua/nvim-tree/_meta/config/sort.lua": "1df824739afea4678cc53545b8cab7f3b7681eee051497b4f3dd6f00c4e8ad18",
+        "lua/nvim-tree/_meta/config/tab.lua": "0ca854c36c5bd54db91197f17b1c7fc2ff57ebce6cab75415e2951602af0a7a4",
+        "lua/nvim-tree/_meta/config/trash.lua": "dccf958b3cbbde54602aa0aa2a13e6cf836ff9efda4bedc831dc77954892c501",
+        "lua/nvim-tree/_meta/config/ui.lua": "5921dcaa88d1b71f2cb337c192b13dab001e6069cf986484494106a2a5e2c9a2",
+        "lua/nvim-tree/_meta/config/update_focused_file.lua": "a51e7d8c0f121b70561ea8cf8558df88a2fe59b8f42858737772b2157534dfae",
+        "lua/nvim-tree/_meta/config/view.lua": "a159fe2f8220081d4f7bf5c4d44ffca299864a25b4059b7c5b586c3e42fe7cd5",
+        "lua/nvim-tree/actions/finders/find-file.lua": "6c3fcea67800969578485cdfba5248d6c6cfbd18204e36ed7b85782e594f238b",
+        "lua/nvim-tree/actions/finders/search-node.lua": "980a9e04774fc37a8727713b00d93d4d06bc7412ba11e00ded8cbc6c3160204d",
+        "lua/nvim-tree/actions/fs/clipboard.lua": "26175fd06ff8fff8c02a8144a50626ae46542fa531c212cf92b9769243166d2a",
+        "lua/nvim-tree/actions/fs/create-file.lua": "df39d4ca4015e2d32381f72e8c4af052c63b9e943bc7fb58ebb4f752c5ff5899",
+        "lua/nvim-tree/actions/fs/remove-file.lua": "cd15c3ae94b349eb941a3c7e0c57e4e61b3420f647588756099eb222d10342c9",
+        "lua/nvim-tree/actions/fs/rename-file.lua": "08081b7c0e641a2ceb471162250083a577b786083fe784488472bbd20bde5b38",
+        "lua/nvim-tree/actions/fs/trash.lua": "78dcc06523ce505f2e189564cc90a76f794e77b20be8df2eb138cf7d62e45e6d",
+        "lua/nvim-tree/actions/moves/item.lua": "5aa64f73d2a065e9e2917a89f9927d5b943587420c919c6def52bcb6c0363dd7",
+        "lua/nvim-tree/actions/moves/parent.lua": "926897a352ce427b3136e8f754f8abcd8f9dd4885ae556b92625115b2734ec5c",
+        "lua/nvim-tree/actions/moves/sibling.lua": "facd0c4252e661af0dc16b534866f86680c7e64677334e8fe2f9109abd62efb0",
+        "lua/nvim-tree/actions/node/buffer.lua": "658eb70d9b3788ae41b2db75d2a7c07ea02253b2c6a71328d175d6cccbabaf64",
+        "lua/nvim-tree/actions/node/file-popup.lua": "8e950c8495a21b5f8731121e8e6920357d20465a84423098a54b389c527b8f63",
+        "lua/nvim-tree/actions/node/open-file.lua": "69b768a078697a31cb215e2da7fb5bf2c218e4359997c84db1a8e6bedb4931ad",
+        "lua/nvim-tree/actions/node/run-command.lua": "a7f12bbeb3e749da53ae3664d691a1d60461210115fd88b1e5079551738aa267",
+        "lua/nvim-tree/actions/node/system-open.lua": "1b2512f76bdcbe74f7c7a7ab762301274952b5c964207f1ac94a61ee6fe1da5e",
+        "lua/nvim-tree/actions/tree/change-dir.lua": "9c97c583868e70b0151ed9ff42abb241823d7b9e1a7b61fbb4d926d2ea2c2e6a",
+        "lua/nvim-tree/actions/tree/change-root.lua": "d63b104bd6428fd99b4a53029420e5302dfd200ca7fe3e4639f7110eee73b998",
+        "lua/nvim-tree/actions/tree/collapse.lua": "b3407cec6678f2921ca2c0f4326d141a932a9659fc0d01958579b9864f5456c3",
+        "lua/nvim-tree/actions/tree/find-file.lua": "f3207a0ff7b4cdc4e1c1eaf16f7431f5e4f009e6ca4e81aa65182cad4312f697",
+        "lua/nvim-tree/actions/tree/open.lua": "6b6717ce34ffebbb653612ac6685fdee834be6dffd85aa395be725e96ee7c9fd",
+        "lua/nvim-tree/actions/tree/resize.lua": "25f2b1c152f164164b6268c9ff4cf041494e2923776ad50307b1ba59d944023f",
+        "lua/nvim-tree/actions/tree/toggle.lua": "2e5f1dbb2c486778bdebe13ba5e45a59c725e81c340de6e40cc0ac8ab10efd97",
+        "lua/nvim-tree/api.lua": "20ba87196046e95ebb11210d7a929350f48ebaa4c04d328d373a117c8f25e72e",
+        "lua/nvim-tree/api/impl.lua": "286c8188b8692517e1cf6e6333c8c4aa6a3f015e9a3db1974801dce33c38930f",
+        "lua/nvim-tree/appearance/hi-test.lua": "b7c8e9db295aa3e47a37ce287299257bff479e8cf18b742a6b5377b20231e043",
+        "lua/nvim-tree/appearance/init.lua": "ce281ef47e0c69c8eb425b5b3a894336cf5731f9a54e89f0f6ac08a05d6f81cd",
+        "lua/nvim-tree/autocmd.lua": "b86d202295af4f57a859789852ae0b25bbf21c2c61d21d2fc24044516c20d140",
+        "lua/nvim-tree/buffers.lua": "a2dbb9cb62b93500430e0d82263ac62af4d62de6f33e0ab14275db39b7d12ff1",
+        "lua/nvim-tree/classic.lua": "ba2eacafc7ab7f8368ff13316a0b79875ffa281ab3b508775b83d2e84af0ef1b",
+        "lua/nvim-tree/commands.lua": "a203c1e85a61067a76ad9aa74df11b1daadac44002cde22501a8e618cb23b438",
+        "lua/nvim-tree/config.lua": "63fe5fcb0d9909cf162babe2e0491db99e71ae15e5ab27d1ebe742ab54ef31e2",
+        "lua/nvim-tree/core.lua": "883b04120dea403c06a5a78a42f3c47fe9f9500e65f181ce0ee4844cca0c29e3",
+        "lua/nvim-tree/diagnostics.lua": "2a15a8ce48c182f39de08b7d308f3e2d1a7dbfa429fe7a63b6104d19118a7c04",
+        "lua/nvim-tree/enum.lua": "6e221b6414c3682c242226a3c7bcec49541ba6a62f2c0524939f6237113bea87",
+        "lua/nvim-tree/events.lua": "0ff1fe8a6876a9c98400eca8f299eca87830c72c0b7349f2ebc398e373ee49eb",
+        "lua/nvim-tree/explorer/filters.lua": "f01bfabd6754284c875210fed12e92495bbbbe7402bd2a6080f2a34f7260c9e7",
+        "lua/nvim-tree/explorer/init.lua": "2f2beb11233bf1bcbbd13789efe334981496bc25d9eb18e3a6b05db8c1c55c7e",
+        "lua/nvim-tree/explorer/live-filter.lua": "6d9184114513e9b215975137f4c9fdff42b352bc7e7729d7b084f841d81d86b3",
+        "lua/nvim-tree/explorer/sorter.lua": "467704a99a145eab8c2592ebe1e98bcfb40f1a85415831c1378d78b50a51d169",
+        "lua/nvim-tree/explorer/watch.lua": "ccd930eca16d0bfbf5606cbddf8660fbddfdf471600e4f163b5fe8f3f0a334af",
+        "lua/nvim-tree/git/init.lua": "537790851a1f18ef3adfa915d53a625b1d490855d05c8016edba0ef233e73a80",
+        "lua/nvim-tree/git/runner.lua": "19e8e0ea5bb46ae3d2de0f41c29722263cae16981e37ce9694baa535f88d4573",
+        "lua/nvim-tree/git/utils.lua": "25b80b878ab1ceef6e7d7ffea2467546733dc62352b3c2b91b9177574ef52937",
+        "lua/nvim-tree/help.lua": "92892f8d160c8cfe1d1cbbb1aeb40f86482d440427e5a697888b6c7cbac02b68",
+        "lua/nvim-tree/iterators/node-iterator.lua": "bc8335364e1cae910c2970617ebbf1f463e72e4b56d0d680260323c2ecb9c7b3",
+        "lua/nvim-tree/keymap.lua": "af946146d813d266a75c4e714b7f17f509c907f0af11c15d0b17903f18a6a918",
+        "lua/nvim-tree/legacy.lua": "71925d4d7fda0e14adf05b80550fb1c805e4031608c94a5ec0ecd16833e1c7a5",
+        "lua/nvim-tree/lib.lua": "a3a7d5cbafa6723760f62e983caddae222327a6ea848ab2dc6b1ca8c62f56994",
+        "lua/nvim-tree/log.lua": "380743653f1c17eb85391fd3538a8d2264debf34f259e3efe99a13c1baf9e999",
+        "lua/nvim-tree/marks/init.lua": "414c5cebc9c637b43d4a28e6b343e1749b35cab1ed9ed51b11949946174febbf",
+        "lua/nvim-tree/node/directory-link.lua": "dde6ca875430553d194bc7b7199b4d8f9b90eafd1bb9512c9ca40ab5239848d6",
+        "lua/nvim-tree/node/directory.lua": "338e95863c3b47f9746d276c12044264abb83aa16870fa35136067b7a67d2aa1",
+        "lua/nvim-tree/node/factory.lua": "9a31068d023c18abc12128bf6f361efcbd4409b3881cccf2ccccaf75d18d868e",
+        "lua/nvim-tree/node/file-link.lua": "2dd859e8f68866355441b6aab4fdfa4ef41df507ce6a880a33eb3e08dfdda179",
+        "lua/nvim-tree/node/file.lua": "04a17a239d6e99346241d73773475da08ed95e67e23d51fd21806ad745658441",
+        "lua/nvim-tree/node/init.lua": "a9bc381f9ec0011df02408d6f3dd13ea419426198ef866031777c4c9835ef2c8",
+        "lua/nvim-tree/node/link.lua": "afb267e930c20a4830e6fa3ad4f2c2a5c3d35ab0310f5698fe5b3205d9d8b4f8",
+        "lua/nvim-tree/node/root.lua": "71a3b8c7a2cb416bfdb733420f378ad5bb085e6b5894eb67ec029757a3dbb972",
+        "lua/nvim-tree/notify.lua": "7bee7c5dba37aa49ad271ac77a6c218b561e63e055447bb856f9d06ff97f3755",
+        "lua/nvim-tree/renderer/builder.lua": "7fbf11fc2055848bf7226946135259733ec204a89d65d7d1ff7e0ef7fa54a697",
+        "lua/nvim-tree/renderer/components/devicons.lua": "0f8d180e81cb9772f7c697cd054d849122aadd8d09ee2b92c1cb80062647652c",
+        "lua/nvim-tree/renderer/components/full-name.lua": "03e969e24f388c4e9b6bf01bb246933847417a183934cbb94030055f0bc3c741",
+        "lua/nvim-tree/renderer/components/padding.lua": "b67cc5915db1cdd883234474d75f320bb0f0b0cf68cd78ca59477295c9b773c8",
+        "lua/nvim-tree/renderer/decorator/bookmarks.lua": "2561db452ea3490f3a5fede7a2ca463b9f9c78a7a53f66ee3892ea0a1ca8e670",
+        "lua/nvim-tree/renderer/decorator/builtin.lua": "eaa2023eb576d7a5299911dfd77a379a76c58c86be5c63cd2e3c23425ec54b2d",
+        "lua/nvim-tree/renderer/decorator/copied.lua": "06c13971931bb9f28468c09deae1ff52ed8ee4cf3c65ec5f222333a27c72f4ef",
+        "lua/nvim-tree/renderer/decorator/cut.lua": "f86a4a30c70579a9ac6608864118d83d20769efc98ddf804891aeb0f176d5f34",
+        "lua/nvim-tree/renderer/decorator/diagnostics.lua": "242a69bed915036cef55f2ace3c68ba1f1d6524b146b02dd7de2d0d5767eca92",
+        "lua/nvim-tree/renderer/decorator/git.lua": "850c1d4617bc3a02d52a5112bde270388fa7db5ea7569fcbf22a65a8b95e3cc6",
+        "lua/nvim-tree/renderer/decorator/hidden.lua": "fe27070169085cdf97cbb40e160e667b5d98db3ceab14ce3e369c764b083da1d",
+        "lua/nvim-tree/renderer/decorator/init.lua": "7c850bf1636a7a797f7953758a2a9720927d991c132b93078a455492b1376204",
+        "lua/nvim-tree/renderer/decorator/modified.lua": "89f8842515bcfc43b5db551e0e7d05722f5ca6f66360592c56934d66194847c2",
+        "lua/nvim-tree/renderer/decorator/opened.lua": "5936ded135c2022469192e4f696add32188d65875cc7d1844aeb57af04a3ad93",
+        "lua/nvim-tree/renderer/init.lua": "e2d795159e19d578fb6926fd49727e44a0868d8dd22bb42825736e20ef0f55a3",
+        "lua/nvim-tree/session.lua": "c41642200862df95d3b0ff0ffbba146b9a1eaecbb5d6e701475a3fd6468dc770",
+        "lua/nvim-tree/utils.lua": "47290053c6908e3250138140dc2c5bb15c1fa8bff003e32af47af9e3081bd09f",
+        "lua/nvim-tree/view-state.lua": "6e552e17957e4f3f05490bd095b16447596f7feda5cce1ea4504f68934e3c148",
+        "lua/nvim-tree/view.lua": "020ab59a7669290af6a90c2d5ac50ffdb9df726037162f487915f86712d48301",
+        "lua/nvim-tree/watcher.lua": "911ca909bab766bc81d59cc2d6d81d5da92a7d8b91ef6d09e774b647e8689281",
+        "plugin/nvim-tree.lua": "e6d257f92b3bdd343ea6059d0c767f3a6d085d7a2e3e7cf34db4242dd365720d",
+        "scripts/vimdoc_config.lua": "0890ff43cf2283bc678ff7a8cfe54f62751b8a4177f5f01fb8ede8df1fc70252"
+      }
+    }
+  },
+  "upstream": {
+    "follow": {
+      "kind": "default_branch"
+    },
+    "repository": "https://github.com/nvim-tree/nvim-tree.lua"
+  }
+}

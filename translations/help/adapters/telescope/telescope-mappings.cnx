@@ -1,0 +1,109 @@
+*telescope-mappings.cnx*      telescope.nvim: Mappings
+
+                                Telescope 映射
+
+映射                                                  *telescope.mappings*
+
+|telescope.mappings| 用于配置 telescope picker 内部的键绑定。这些键绑定只在
+picker 的 window 内有效，退出 picker 后就会被清除。
+
+我们提供了多个配置选项，方便你调整 telescope 的默认键绑定并创建自己的
+键绑定。
+
+要查看可作该 table 取值的内置 action，见 |telescope.actions|
+
+格式为： >lua
+    {
+      mode = { ..keys }
+    }
+<
+其中 {mode} 是表示模式的一个字符（'i' 表示 insert，
+'n' 表示 normal）。
+
+例如： >lua
+    mappings = {
+      i = {
+        ["<esc>"] = require('telescope.actions').close,
+      },
+    }
+<
+要禁用某个键映射，写 `[map] = false`
+例如： >lua
+    {
+      ...,
+      ["<C-n>"] = false,
+      ...,
+    }
+<
+要覆盖某个键的行为，只需把它的值设为一个函数（require 一个 action
+或自己写一个函数都可以） >lua
+    {
+      ...,
+      ["<C-i>"] = require('telescope.actions').select_default,
+      ...,
+    }
+<
+如果你想要的函数属于 `telescope.actions`，可以直接把函数名以字符串
+给出。例如，上一个选项等价于： >lua
+    {
+      ...,
+      ["<C-i>"] = "select_default",
+      ...,
+    }
+<
+你也可以用带 `type = "command"` 的 table 添加其他映射。例如： >lua
+    {
+      ...,
+      ["jj"] = { "<esc>", type = "command" },
+      ["kk"] = { "<cmd>echo \"Hello, World!\"<cr>", type = "command" },
+      ...,
+    }
+<
+对于任何类型（"action" 与 "command"）的映射，你还可以添加额外选项。
+例如： >lua
+    {
+      ...,
+      ["<C-j>"] = {
+        actions.move_selection_next, type = "action",
+        opts = { nowait = true, silent = true }
+      },
+      ...,
+    }
+<
+你可以在三个主要位置配置 |telescope.mappings|。它们按优先级从低到高排列。
+1. |telescope.defaults.mappings|
+
+2. 在 |telescope.setup()| 的 table 中，按 picker 名称找到对应项，
+   使用 `mappings` 键 >lua
+   require("telescope").setup {
+     pickers = {
+       find_files = {
+         mappings = {
+           n = {
+             ["kj"] = "close",
+           },
+         },
+       },
+     },
+   }
+<
+
+3. 某个 picker 的 `attach_mappings` 函数。 >lua
+   require("telescope.builtin").find_files {
+     attach_mappings = function(_, map)
+       map("i", "asdf", function(_prompt_bufnr)
+         print "You typed asdf"
+       end)
+
+       map({"i", "n"}, "<C-r>", function(_prompt_bufnr)
+         print "You typed <C-r>"
+       end, { desc = "desc for which key"})
+
+       -- needs to return true if you want to map default_mappings and
+       -- false if not
+       return true
+     end,
+   }
+<
+
+ vim:tw=78:ts=8:sw=4:sts=4:et:ft=help:norl:

@@ -29,6 +29,8 @@
 
 ### Removed
 
+- 移除 `modules.help.vimcdoc` 和固定值 `terminology`。升级时从 Lua 与热配置删除这两个字段。
+
 - 删除 `info()`、`show_info()`、`show_missing()`、`reload()` 及 `:NvimZhInfo`、`:NvimZhMissing`、`:NvimZhReload`；使用 `status()`、`missing()` 和 `refresh()`。
 - `check()` / `refresh()` 改为直接接收可选 callback，不再保留无实际作用的 opts 参数；`open()` 同样不再接收空选项。
 - 删除无生产调用方的 `nvim-zh` 内置 domain，以及 `Ready`、`Echo ready` 等只为早期 fixture 服务的交付条目；测试使用自己的目录或真实 Neovim 文本。
@@ -36,6 +38,11 @@
 - 删除陈旧设计/实施进度叙述和未反映当次验证的通过宣传。历史兼容性声明不再替代当前验证。
 
 ### Fixed
+
+- 使用普通 `vim.pack` 加载时自动记录固定上游模块的源码摘要；包更新后继续依据实际加载的模块代次决定能否投影。
+- 隔离 which-key 与 Telescope 的健康报告翻译，修复同会话中互相覆盖。
+- 修复 nvim-tree 中文帮助浮窗的显示列对齐，补齐浮窗映射说明及隐藏统计原因。
+- 已格式化动态文本中的相邻占位符无法分离时安全回退，避免错配用户字段。
 
 - 显式关闭原生接线时恢复原消息语言；原 LOCPATH 不可用时尝试系统 locale，最终失败明确报告 `restore_failed` 并保留重试状态。
 - 原生启动或状态发布失败时补偿目录、Help、配置和资源状态，不再提交半套候选。

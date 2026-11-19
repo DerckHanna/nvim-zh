@@ -4,12 +4,18 @@ on:
   push:
   pull_request:
   workflow_dispatch:
+  schedule:
+    - cron: "19 3 * * 1"
 
 permissions:
   contents: read
 
+env:
+  PYTHONDONTWRITEBYTECODE: '1'
+
 jobs:
   offline:
+    if: github.event_name != 'schedule'
     strategy:
       fail-fast: false
       matrix:
@@ -46,7 +52,6 @@ jobs:
           tar -xzf /tmp/nvim-zh-ci/nvim.tar.gz -C /tmp/nvim-zh-ci
           echo "/tmp/nvim-zh-ci/${{ matrix.asset }}/bin" >> "$GITHUB_PATH"
       - name: Install gettext for native MO verification
-        if: matrix.version == 'v0.12.6'
         run: |
           if ! command -v msgfmt >/dev/null; then
             sudo apt-get update
@@ -74,35 +79,33 @@ jobs:
           printf '%s  %s\n' '474430d53e6264f6d6dd18db42d6dc9df3a1b56ca9e88a325bbf860e1a811d87' /tmp/nvim.tar.gz | sha256sum -c -
           tar -xzf /tmp/nvim.tar.gz -C /tmp
           echo /tmp/nvim-linux-x86_64/bin >> "$GITHUB_PATH"
+      - name: Install terminal and search dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libvterm-dev ripgrep
       - name: Fetch manifest-pinned upstream archives
         run: |
-          python3 - <<'PYFETCH'
-          import io, json, tarfile, urllib.request
-          from pathlib import Path
-          manifest = json.loads(Path('manifests/upstreams.json').read_text())
-          selected = {name: manifest['upstreams'][name] for name in ('which-key', 'telescope', 'lazy.nvim', 'nvim-tree', 'nvim-cmp', 'nvim-dap', 'nvim-dap-ui')}
-          selected.update(manifest['test_dependencies'])
-          for name, item in selected.items():
-              destination = Path('/tmp/nvim-zh-smoke') / ('lazy' if name == 'lazy.nvim' else name)
-              destination.mkdir(parents=True)
-              url = item['repository'] + '/archive/' + item['commit'] + '.tar.gz'
-              with urllib.request.urlopen(url, timeout=60) as response:
-                  archive = tarfile.open(fileobj=io.BytesIO(response.read()), mode='r:gz')
-              for member in archive.getmembers():
-                  parts = Path(member.name).parts[1:]
-                  if parts:
-                      member.name = str(Path(*parts))
-                      archive.extract(member, destination, filter='data')
-          PYFETCH
-      - name: Run fixed upstream contracts
+          python3 tools/adapter_tool.py lock all --json > /tmp/nvim-zh-adapter-lock.json
+          python3 tools/adapter_tool.py fetch --lock /tmp/nvim-zh-adapter-lock.json --source-root /tmp/nvim-zh-smoke
+      - name: Run fixed upstream contracts and full TUI matrix
         run: make test-upstream
         env:
-          NVIM_ZH_TEST_WHICH_KEY: /tmp/nvim-zh-smoke/which-key
-          NVIM_ZH_TEST_TELESCOPE: /tmp/nvim-zh-smoke/telescope
-          NVIM_ZH_TEST_PLENARY: /tmp/nvim-zh-smoke/plenary
-          NVIM_ZH_TEST_LAZY: /tmp/nvim-zh-smoke/lazy
-          NVIM_ZH_TEST_NVIM_TREE: /tmp/nvim-zh-smoke/nvim-tree
-          NVIM_ZH_TEST_NVIM_CMP: /tmp/nvim-zh-smoke/nvim-cmp
-          NVIM_ZH_TEST_NVIM_DAP: /tmp/nvim-zh-smoke/nvim-dap
-          NVIM_ZH_TEST_NVIM_DAP_UI: /tmp/nvim-zh-smoke/nvim-dap-ui
-          NVIM_ZH_TEST_NVIM_NIO: /tmp/nvim-zh-smoke/nvim-nio
+          NVIM_ZH_ADAPTER_SOURCE_ROOT: /tmp/nvim-zh-smoke
+          NVIM_ZH_ADAPTER_REPORT: /tmp/nvim-zh-upstream-report.json
+      - name: Upload adapter test evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: adapter-upstream-evidence
+          path: /tmp/nvim-zh-upstream-report.json
+      - name: Resolve, audit, and test upstream candidates
+        if: github.event_name == 'schedule'
+        run: |
+          python3 tools/adapter_tool.py watch --source-root /tmp/nvim-zh-smoke \
+            --report-dir /tmp/nvim-zh-candidates --test
+      - name: Upload candidate source and catalog audit
+        if: always() && github.event_name == 'schedule'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: adapter-upstream-candidates
+          path: /tmp/nvim-zh-candidates

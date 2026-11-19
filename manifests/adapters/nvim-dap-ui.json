@@ -1,0 +1,148 @@
+{
+  "contracts": [
+    "tests/upstream/nvim-dap-ui/nvim_dap_ui_upstream_spec.lua"
+  ],
+  "domain": "nvim-dap-ui",
+  "entry": "nvim-zh.adapters.nvim_dap_ui",
+  "help": {
+    "doc/nvim-dap-ui.txt": [
+      "dapui-api.cnx",
+      "dapui-config.cnx",
+      "nvim-dap-ui-setup.cnx"
+    ]
+  },
+  "id": "nvim-dap-ui",
+  "lazy_names": [
+    "nvim-dap-ui"
+  ],
+  "modules": [
+    "dapui"
+  ],
+  "notes": {
+    "domain": "nvim-dap-ui",
+    "excluded": "raw DAP data, user values, debugger output, internal Buffer names, dependency/layout error values and existing Buffer contents",
+    "limitations": "existing Buffers are not scanned; shared nio.ui.select requires completed dapui setup, exactly six built-in non-hover IDs and expected formatter labels",
+    "public_path": "fixed render/display projections and exact vim.notify title",
+    "seam": "Canvas.new/write(highlight-scoped); util.apply_mapping(desc); util.format_value/error; util.select_win(scoped exact print); windows.open_float(title); guarded nio.ui.select; setup lifecycle; exact vim.notify title",
+    "status": "implemented",
+    "version_related": "Canvas.write recomputes matches from projected text; select_win is synchronous and render.new_canvas snapshots Canvas.new at module load",
+    "writes": "fixed_display_strings_only"
+  },
+  "scenarios": {
+    "help": {
+      "surfaces": [
+        "help"
+      ],
+      "tui": "tests/upstream/nvim-dap-ui/tui.py"
+    },
+    "layout": {
+      "surfaces": [
+        "layouts"
+      ],
+      "tui": "tests/upstream/nvim-dap-ui/tui.py"
+    },
+    "mappings": {
+      "surfaces": [
+        "mappings"
+      ],
+      "tui": "tests/upstream/nvim-dap-ui/tui.py"
+    },
+    "notification": {
+      "surfaces": [
+        "notifications"
+      ],
+      "tui": "tests/upstream/nvim-dap-ui/tui.py"
+    },
+    "selection": {
+      "surfaces": [
+        "selectors",
+        "float_title"
+      ],
+      "tui": "tests/upstream/nvim-dap-ui/tui.py"
+    },
+    "value_display": {
+      "surfaces": [
+        "value_displays"
+      ],
+      "tui": "tests/upstream/nvim-dap-ui/tui.py"
+    },
+    "window_prompt": {
+      "surfaces": [
+        "window_prompt"
+      ],
+      "tui": "tests/upstream/nvim-dap-ui/tui.py"
+    }
+  },
+  "schema": 1,
+  "status": "implemented",
+  "surfaces": {
+    "float_title": {
+      "kind": "versioned",
+      "modules": {
+        "dapui.windows": "lua/dapui/windows/init.lua"
+      },
+      "status_key": "float"
+    },
+    "help": {
+      "kind": "help"
+    },
+    "layouts": {
+      "kind": "versioned",
+      "modules": {
+        "dapui.render.canvas": "lua/dapui/render/canvas.lua"
+      },
+      "status_key": "canvas"
+    },
+    "mappings": {
+      "kind": "api",
+      "status_key": "mapping"
+    },
+    "notifications": {
+      "kind": "api",
+      "source": "lua/dapui/util.lua",
+      "status_key": "notification"
+    },
+    "selectors": {
+      "kind": "api",
+      "status_key": "select"
+    },
+    "value_displays": {
+      "kind": "api",
+      "status_key": "format_value"
+    },
+    "window_prompt": {
+      "kind": "api",
+      "status_key": "select_window"
+    }
+  },
+  "targets": {
+    "baseline": {
+      "commit": "cc9dd33aade7f20bae414d0cba163bc60d4d4b43",
+      "dependencies": [
+        "nvim-dap",
+        "nvim-nio"
+      ],
+      "neovim": "0.12.6",
+      "sources": {
+        "doc/nvim-dap-ui.txt": "387fb554d399ab85f77753d2e1f76925dd2343a1ecf1c1a072cb7b80fca4f251",
+        "lua/dapui/client/lib.lua": "cb365540a8b25141b3ee1a654d1c77b8f39e9b71554aedeb48247daebccd5ff6",
+        "lua/dapui/components/breakpoints.lua": "051af06356998fb055b7453e6df18223b630fe6e84036f87460915f38f2ee194",
+        "lua/dapui/components/frames.lua": "cce40bee0346c1f58511217f4ae2c651de06b9233d06e2d5d075c165383e7671",
+        "lua/dapui/components/watches.lua": "4ea55296e48bb8c101a7b3cb7ed6b416334d2a5ee096b47b1afa4e9140f514ff",
+        "lua/dapui/config/init.lua": "29004c339bf7ff4e9522325dc89f2b701207fdea3bf2fbfa03afb7d1c75f329f",
+        "lua/dapui/init.lua": "4ef7ec849f05d6d8a1753169f54b62e2250818305de1b8c5724107f061a04c34",
+        "lua/dapui/render/canvas.lua": "84160c2a8525992a8d8838f5f4f9310b60339df10f8c293f8cd35b0bead5a8a2",
+        "lua/dapui/render/init.lua": "c969b3e06c7b53f5830c3453d61184c735e55c8909a19ed4ef992dfb1a852441",
+        "lua/dapui/util.lua": "55e4cbcd55acd6706fb7b8b8abc7fba671c3d649c2fc98faa8631104012b3575",
+        "lua/dapui/windows/float.lua": "b451e5e00d0ab7709c45a40a72b630b3b2b4e21757ddce8d1afc2626f1a3d46f",
+        "lua/dapui/windows/init.lua": "8d196e169b5b784da4f8b0a359a98942c98d45bc1e10510194a3fe897cace364"
+      }
+    }
+  },
+  "upstream": {
+    "follow": {
+      "kind": "default_branch"
+    },
+    "repository": "https://github.com/rcarriga/nvim-dap-ui"
+  }
+}

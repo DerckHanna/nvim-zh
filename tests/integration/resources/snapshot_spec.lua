@@ -2,7 +2,7 @@ local zh = require('nvim-zh')
 local paths = require('nvim-zh.paths')
 local fs = require('nvim-zh.fs')
 local resources = require('nvim-zh.resources')
-local uv = vim.uv or vim.loop
+local uv = vim.uv
 zh.setup({ modules = { core = { enabled = false } } })
 local original_root, previous = paths.root, resources.active()
 assert(previous, vim.inspect(zh.status().runtime))
@@ -74,11 +74,7 @@ assert(zh.translate({ domain = 'nvim-ui', msgid = 'No information available' }) 
 assert(zh.status().help.chinese_help:find(manifest.bundle.id, 1, true), 'Help did not use same resource generation')
 local fallback = { kind = 'update', path = tmp }
 fs.write(tmp .. '/resources/' .. name, bytes .. 'broken')
-if vim.fn.exists('##PackChanged') == 1 then
-  vim.api.nvim_exec_autocmds('PackChanged', { data = fallback })
-else
-  zh.refresh()
-end
+vim.api.nvim_exec_autocmds('PackChanged', { data = fallback })
 assert(vim.wait(5000, function() return zh.status().runtime.status == 'error' end, 20))
 assert(zh.translate({ domain = 'nvim-ui', msgid = 'No information available' }) == '新资源已生效', 'failed event lost last good translations')
 paths.root = original_root

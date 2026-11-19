@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "id": "lazy.nvim",
+  "status": "inventory_only",
+  "upstream": {
+    "repository": "https://github.com/folke/lazy.nvim",
+    "follow": {
+      "kind": "default_branch"
+    }
+  },
+  "targets": {
+    "baseline": {
+      "commit": "306a05526ada86a7b30af95c5cc81ffba93fef97",
+      "neovim": "0.12.6",
+      "dependencies": [],
+      "sources": {
+        "lua/lazy/core/loader.lua": "b8054b8e9ef8ddbeb744d2fb9731467e68375dfdd2ebcea296b4f2e69262badb",
+        "lua/lazy/core/util.lua": "c8c6c2dc395bf1e3d36c3228a4d418eb2dd3810d8f5842fefbace199f0578925"
+      }
+    }
+  },
+  "modules": [
+    "lazy"
+  ],
+  "lazy_names": [
+    "lazy.nvim"
+  ],
+  "notes": {
+    "seam": "User LazyLoad for supported plugins",
+    "excluded": "Lazy main view, installer/update progress, notifications and Help"
+  },
+  "surfaces": {},
+  "scenarios": {},
+  "contracts": []
+}

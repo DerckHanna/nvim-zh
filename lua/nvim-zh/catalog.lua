@@ -3,13 +3,11 @@ local M = {}
 local SEP = '\031'
 local BUILTIN_SOURCES = {
   ['nvim-ui'] = 'translations/po/zh_CN/nvim-ui.po',
-  ['which-key'] = 'translations/po/zh_CN/which-key.po',
-  telescope = 'translations/po/zh_CN/telescope.po',
-  ['nvim-tree'] = 'translations/po/zh_CN/nvim-tree.po',
-  ['nvim-dap'] = 'translations/po/zh_CN/nvim-dap.po',
-  ['nvim-dap-ui'] = 'translations/po/zh_CN/nvim-dap-ui.po',
   clangd = 'translations/po/zh_CN/clangd.po',
 }
+for _, spec in pairs(require('nvim-zh.adapters.index')) do
+  if spec.domain then BUILTIN_SOURCES[spec.domain] = 'translations/po/zh_CN/' .. spec.domain .. '.po' end
+end
 local registrations = {}
 local loaded = {}
 local overrides = {}
@@ -78,6 +76,20 @@ end
 
 function M.is_registered(domain)
   return registrations[domain] ~= nil
+end
+
+function M.is_builtin(domain)
+  return BUILTIN_SOURCES[domain] ~= nil
+end
+
+function M.register_owned(domain, loader, metadata)
+  M.register(domain, loader, metadata)
+  local record = registrations[domain]
+  return function()
+    if registrations[domain] == record then
+      registrations[domain], loaded[domain] = nil, nil
+    end
+  end
 end
 
 -- Internal registrations own these require caches; user loaders retain control

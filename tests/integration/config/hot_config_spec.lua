@@ -1,6 +1,6 @@
 local zh = require('nvim-zh')
 local paths = require('nvim-zh.paths')
-local uv = vim.uv or vim.loop
+local uv = vim.uv
 local function wait_for(fn, message)
   assert(vim.wait(5000, fn, 20), message .. ': ' .. vim.inspect(zh.status().runtime))
 end

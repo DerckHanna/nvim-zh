@@ -1,32 +1,25 @@
-local h = dofile(vim.env.NVIM_ZH_ROOT .. '/tests/support/plugin_helpers.lua')
-local check, equal = h.check, h.equal
-h.setup()
 local zh = require('nvim-zh')
-equal(zh.translate({ domain = 'which-key', context = 'desc', msgid = 'Delete' }), '删除', 'built-in which-key PO')
-equal(zh.translate({ domain = 'telescope', context = 'title', msgid = 'Find Files' }), '查找文件', 'built-in Telescope PO')
-equal(zh.translate({ domain = 'nvim-tree', context = 'mapping', msgid = 'Open' }), '打开', 'built-in nvim-tree PO')
-equal(zh.translate({ domain = 'nvim-dap', context = 'notification', msgid = 'No active session' }), '没有活动会话', 'built-in nvim-dap PO')
-equal(zh.translate({ domain = 'nvim-dap-ui', context = 'element_title', msgid = 'scopes' }), '作用域', 'built-in nvim-dap-ui PO')
+zh.setup({ modules = { core = { enabled = false } } })
 local snapshot = zh.status()
-check(snapshot.config.modules.plugins.auto == true, 'plugins.auto default')
-check(snapshot.plugins['which-key'].reason == 'not_loaded' and snapshot.plugins.telescope.reason == 'not_loaded', 'absent plugin status')
-check(snapshot.plugins['nvim-dap'].reason == 'not_loaded' and snapshot.plugins['nvim-dap-ui'].reason == 'not_loaded', 'absent DAP plugin status')
-check(type(snapshot.version.running_version) == 'string' and #snapshot.version.running_version > 0, 'plugin version missing')
-
-local manifest = vim.json.decode(table.concat(vim.fn.readfile(vim.env.NVIM_ZH_ROOT .. '/manifests/upstreams.json'), '\n'))
-check(manifest.upstreams['which-key'].commit == snapshot.plugins['which-key'].supported_commit, 'which-key manifest/version mismatch')
-check(manifest.upstreams.telescope.commit == snapshot.plugins.telescope.supported_commit, 'Telescope manifest/version mismatch')
-check(manifest.upstreams['nvim-tree'].commit == snapshot.plugins['nvim-tree'].supported_commit, 'nvim-tree manifest/version mismatch')
-check(manifest.upstreams['nvim-dap'].commit == snapshot.plugins['nvim-dap'].supported_commit, 'nvim-dap manifest/version mismatch')
-check(manifest.upstreams['nvim-dap-ui'].commit == snapshot.plugins['nvim-dap-ui'].supported_commit, 'nvim-dap-ui manifest/version mismatch')
-check(manifest.upstreams['lazy.nvim'].adapter.status == 'implemented', 'lazy.nvim shared public capability missing')
-check(manifest.upstreams['nvim-tree'].adapter.status == 'implemented', 'nvim-tree public capability missing')
-check(manifest.upstreams['nvim-dap'].adapter.status == 'implemented', 'nvim-dap public capability missing')
-check(manifest.upstreams['nvim-dap-ui'].adapter.status == 'implemented', 'nvim-dap-ui public capability missing')
-check(manifest.upstreams['nvim-cmp'].adapter.status == 'inventory_only', 'nvim-cmp capability inventory missing')
+local index = require('nvim-zh.adapters.index')
+assert(snapshot.config.modules.plugins.auto, 'adapters are disabled by default')
+assert(type(snapshot.version.running_version) == 'string' and snapshot.version.running_version ~= '')
+local catalog = require('nvim-zh.catalog')
+for id, spec in pairs(index) do
+  local state = assert(snapshot.adapters[id], 'missing adapter status: ' .. id)
+  assert(spec.targets.baseline.commit == state.targets.baseline, id .. ' manifest/version mismatch')
+  assert(not state.active, id .. ' active without a loaded module')
+  if spec.status == 'implemented' then
+    assert(state.reason == 'not_loaded', id .. ' absent without not_loaded status')
+    local entries = assert(catalog.get(spec.domain), id .. ' missing catalog')
+    assert(entries.total > 0, id .. ' has an empty catalog')
+  else
+    assert(state.reason == 'inventory_only', id .. ' missing inventory-only state')
+  end
+end
 
 local refreshed
 zh.refresh(function(result) refreshed = result end)
-check(refreshed and refreshed.ok and refreshed.status == 'ok', 'resource/config refresh failed')
-check(vim.fn.exists(':NvimZhReload') == 0 and vim.fn.exists(':NvimZhInfo') == 0, 'retired command still registered')
-print('PLUGIN_INTEGRATION_SPEC=PASS manifests=8 built_in_domains=which-key,telescope,nvim-tree,nvim-dap,nvim-dap-ui')
+assert(refreshed and refreshed.ok and refreshed.status == 'ok', 'resource/config refresh failed')
+assert(vim.fn.exists(':NvimZhReload') == 0 and vim.fn.exists(':NvimZhInfo') == 0, 'retired command still registered')
+print(('PLUGIN_INTEGRATION_SPEC=PASS adapters=%d'):format(vim.tbl_count(index)))

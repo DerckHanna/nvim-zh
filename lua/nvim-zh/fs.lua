@@ -1,5 +1,5 @@
 local M = {}
-local uv = vim.uv or vim.loop
+local uv = vim.uv
 local serial = 0
 
 function M.safe(path)

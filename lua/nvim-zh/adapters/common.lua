@@ -28,7 +28,7 @@ end
 function M.wrap(state, key, get, set, factory)
   local record = state[key]
   local current = get()
-  if record then
+  if record and record.wrapper then
     if current == record.wrapper then
       record.active, record.reason = true, nil
     else
@@ -66,11 +66,12 @@ end
 
 function M.active(state, key)
   local record = state[key]
-  return record ~= nil and record.active == true
+  return record ~= nil and record.active == true and record.get() == record.wrapper
 end
 
 function M.reason(state, key)
   local record = state[key]
+  if record and record.wrapper and record.get() ~= record.wrapper then return 'external_override' end
   return record and record.reason or 'not_initialized'
 end
 

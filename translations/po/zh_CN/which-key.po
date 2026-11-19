@@ -988,3 +988,134 @@ msgstr "向后跳转 [count] 个 shell 提示符"
 msgctxt "desc"
 msgid "Jump [count] shell prompts forward"
 msgstr "向前跳转 [count] 个 shell 提示符"
+
+# 弹窗底部私有 footer 的固定操作提示（view.lua:442/445/448）。它们经
+# Text:render 显示投影翻译，按键本身（<esc>/<bs>/<c-d>/<c-u>）原样保留。
+#: lua/which-key/view.lua:442
+msgctxt "footer"
+msgid "close"
+msgstr "关闭"
+
+#: lua/which-key/view.lua:445
+msgctxt "footer"
+msgid "back"
+msgstr "返回"
+
+#: lua/which-key/view.lua:448
+msgctxt "footer"
+msgid "scroll"
+msgstr "滚动"
+
+# marks 插件的文件标记描述前缀（marks.lua:54）。路径载荷原样保留。
+#: lua/which-key/plugins/marks.lua:54
+msgctxt "mark_file"
+msgid "file: %s"
+msgstr "文件：%s"
+
+# registers 插件在 OSC 52 剪贴板下的固定说明（registers.lua:50）。
+# Register 内容本身是用户数据，不翻译。
+#: lua/which-key/plugins/registers.lua:50
+msgctxt "register_notice"
+msgid "OSC 52 detected, register not checked to maintain compatibility"
+msgstr "检测到 OSC 52，为保持兼容未检查该 Register"
+
+# 健康报告固定文本（health.lua）。动态部分（provider 名、模式、按键、
+# spec 内容）以 %s 模板保留；|DON'T| 等帮助链接与代码片段原样保留。
+#: lua/which-key/health.lua:24
+msgctxt "health"
+msgid ""
+"Most of these checks are for informational purposes only.\n"
+"WARNINGS should be treated as a warning, and don't necessarily indicate a problem with your config.\n"
+"Please |DON'T| report these warnings as an issue."
+msgstr ""
+"这些检查大多仅供参考。\n"
+"WARNINGS 应视为警告，不一定表示你的配置有问题。\n"
+"请|DON'T|将这些警告作为 issue 上报。"
+
+#: lua/which-key/health.lua:29
+msgctxt "health"
+msgid "Checking your config"
+msgstr "检查你的配置"
+
+#: lua/which-key/health.lua:33
+msgctxt "health"
+msgid "There are issues with your config:"
+msgstr "你的配置存在问题："
+
+#: lua/which-key/health.lua:41
+msgctxt "health"
+msgid "Please refer to the docs for more info."
+msgstr "更多信息请参阅文档。"
+
+#: lua/which-key/health.lua:51
+msgctxt "health"
+msgid "|%s| is installed"
+msgstr "|%s| 已安装"
+
+#: lua/which-key/health.lua:54
+msgctxt "health"
+msgid "|%s| is not installed"
+msgstr "|%s| 未安装"
+
+#: lua/which-key/health.lua:58
+msgctxt "health"
+msgid "Keymap icon support will be limited."
+msgstr "键映射图标支持将受限。"
+
+#: lua/which-key/health.lua:61
+msgctxt "health"
+msgid "Checking for issues with your mappings"
+msgstr "检查映射中的问题"
+
+#: lua/which-key/health.lua:63
+msgctxt "health"
+msgid "No issues reported"
+msgstr "未报告问题"
+
+#: lua/which-key/health.lua:77
+msgctxt "health"
+msgid "checking for overlapping keymaps"
+msgstr "检查重叠的键映射"
+
+#: lua/which-key/health.lua:121
+msgctxt "health"
+msgid "In mode `%s`, <%s> overlaps with %s:\n%s"
+msgstr "在模式 `%s` 中，<%s> 与 %s 重叠：\n%s"
+
+#: lua/which-key/health.lua:140
+msgctxt "health"
+msgid ""
+"Overlapping keymaps are only reported for informational purposes.\n"
+"This doesn't necessarily mean there is a problem with your config."
+msgstr ""
+"重叠的键映射仅供参考。\n"
+"这不一定表示你的配置有问题。"
+
+#: lua/which-key/health.lua:144
+msgctxt "health"
+msgid "No overlapping keymaps found"
+msgstr "未发现重叠的键映射"
+
+#: lua/which-key/health.lua:147
+msgctxt "health"
+msgid "Checking for duplicate mappings"
+msgstr "检查重复映射"
+
+#: lua/which-key/health.lua:150
+msgctxt "health"
+msgid "No duplicate mappings found"
+msgstr "未发现重复映射"
+
+#: lua/which-key/health.lua:157
+msgctxt "health"
+msgid "Duplicates for <%s> in mode `%s`:\n%s"
+msgstr "在模式 `%s` 中，<%s> 的重复项：\n%s"
+
+#: lua/which-key/health.lua:177
+msgctxt "health"
+msgid ""
+"Duplicate mappings are only reported for informational purposes.\n"
+"This doesn't necessarily mean there is a problem with your config."
+msgstr ""
+"重复映射仅供参考。\n"
+"这不一定表示你的配置有问题。"

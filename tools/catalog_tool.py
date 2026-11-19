@@ -231,7 +231,8 @@ def load_glossary(path: Path | None) -> list[dict]:
 
 
 def builtin_sources(root: Path) -> dict[str, Path]:
-    """Read the data-only BUILTIN_SOURCES table; do not duplicate its domains."""
+    """Read the core catalog table and the single-plugin manifests."""
+    from adapter_manifest import po_sources
     source = (root / 'lua/nvim-zh/catalog.lua').read_text(encoding='utf-8')
     table = re.search(r'local BUILTIN_SOURCES = \{(.*?)\n\}', source, re.S)
     if not table:
@@ -245,6 +246,7 @@ def builtin_sources(root: Path) -> dict[str, Path]:
         if relative != f'translations/po/zh_CN/{domain}.po' or domain in result:
             raise CatalogError(f'invalid builtin source: {domain}')
         result[domain] = root / relative
+    result.update(po_sources(root))
     actual = set((root / 'translations/po/zh_CN').glob('*.po'))
     if actual != set(result.values()):
         raise CatalogError('production PO files differ from BUILTIN_SOURCES')
@@ -526,7 +528,8 @@ def main(argv: list[str] | None = None) -> int:
             files = sum(1 for path in args.package_dir.rglob('*') if path.is_file())
             print(f'RELEASE_CHECK=PASS files={files} package={args.package_dir}')
         else:
-            manifest = json.loads(args.manifest.read_text(encoding='utf-8'))
+            from adapter_manifest import upstreams
+            manifest = upstreams(args.manifest)
             before = manifest_snapshot(manifest)
             if args.fixture:
                 fixture = json.loads(args.fixture.read_text(encoding='utf-8'))

@@ -1,6 +1,7 @@
 local zh = require('nvim-zh')
 local allowed = { setup=true, status=true, translate=true, register_catalog=true, stats=true,
-  missing=true, open=true, check=true, refresh=true, teardown=true }
+  missing=true, open=true, check=true, refresh=true, teardown=true,
+  register_adapter_source=true, register_adapter=true }
 for name, fn in pairs(zh) do
   assert(allowed[name] and type(fn) == 'function', 'unexpected public API: ' .. name)
   allowed[name] = nil

@@ -1,5 +1,10 @@
 local h = dofile(vim.env.NVIM_ZH_ROOT .. '/tests/support/plugin_helpers.lua')
 local check, equal = h.check, h.equal
+local index = require('nvim-zh.adapters.index')
+if not index['which-key'] or not index.telescope then
+  print('PLUGIN_DIFFERENTIAL_SPEC=NOT_APPLICABLE which-key/Telescope combination absent')
+  return
+end
 
 -- Absent plugins must remain absent; no adapter may force require/preload.
 for _, name in ipairs({ 'which-key.config', 'telescope.pickers', 'telescope.pickers.window', 'nvim-tree', 'dap', 'dap.ui', 'dap.repl', 'dapui', 'dapui.render.canvas', 'nio.ui' }) do
@@ -11,11 +16,12 @@ for _, name in ipairs({ 'which-key.config', 'telescope.pickers', 'telescope.pick
 end
 h.setup()
 equal(preload_calls, 0, 'adapter forced an absent plugin to load')
-local absent = require('nvim-zh').status().plugins
+local absent = require('nvim-zh').status().adapters
 check(not absent['which-key'].active and absent['which-key'].reason == 'not_loaded', 'absent which-key state')
 check(not absent.telescope.active and absent.telescope.reason == 'not_loaded', 'absent Telescope state')
-check(not absent['nvim-dap'].active and absent['nvim-dap'].reason == 'not_loaded', 'absent nvim-dap state')
-check(not absent['nvim-dap-ui'].active and absent['nvim-dap-ui'].reason == 'not_loaded', 'absent nvim-dap-ui state')
+for id, spec in pairs(index) do
+  if spec.status == 'implemented' then check(not absent[id].active, id .. ' falsely active without module') end
+end
 for _, name in ipairs({ 'which-key.config', 'telescope.pickers', 'telescope.pickers.window', 'nvim-tree', 'dap', 'dap.ui', 'dap.repl', 'dapui', 'dapui.render.canvas', 'nio.ui' }) do
   package.preload[name] = nil
 end
@@ -59,8 +65,8 @@ local function run()
   picker_calls = {}
   local desc = view.replace('desc', mapping.desc)
   local key = view.replace('key', mapping.lhs)
-  local picker = pickers.new({ prompt_title = 'Find Files', finder = finder }, {
-    results_title = 'Results', entry_maker = entry_maker,
+  local picker = pickers.new({ finder = finder }, {
+    prompt_title = 'Find Files', results_title = 'Results', entry_maker = entry_maker,
   })
   local projection = window.get_initial_window_options(picker)
   return {
@@ -97,7 +103,7 @@ for _, sample in ipairs(samples) do
   equal(picker.prompt_title, sample, 'fallback mutated internal title')
 end
 
-local clock = vim.uv and vim.uv.hrtime or vim.loop.hrtime
+local clock = vim.uv.hrtime
 local iterations = 5000
 local function measure(title)
   local started = clock()

@@ -1,12 +1,8 @@
 local common = require('nvim-zh.adapters.common')
 
-local M = {
-  name = 'nvim-dap-ui',
-  lazy_name = 'nvim-dap-ui',
-}
+local M = {}
 
 local DOMAIN = 'nvim-dap-ui'
-local COMMIT = 'cc9dd33aade7f20bae414d0cba163bc60d4d4b43'
 local unpack = table.unpack or unpack
 
 local state = {
@@ -26,9 +22,9 @@ local slots = {
   format_value = { module = 'dapui.util', method = 'format_value', records = {} },
   format_error = { module = 'dapui.util', method = 'format_error', records = {} },
   select_window = { module = 'dapui.util', method = 'select_win', records = {} },
-  canvas = { module = 'dapui.render.canvas', method = 'new', records = {} },
-  render = { module = 'dapui.render', method = 'new_canvas', records = {} },
-  float = { module = 'dapui.windows', method = 'open_float', records = {} },
+  canvas = { module = 'dapui.render.canvas', method = 'new', surface = 'layouts', records = {} },
+  render = { module = 'dapui.render', method = 'new_canvas', surface = 'layouts', records = {} },
+  float = { module = 'dapui.windows', method = 'open_float', surface = 'float_title', records = {} },
   select = { module = 'nio.ui', method = 'select', records = {} },
 }
 
@@ -60,6 +56,8 @@ end
 
 local function active(slot, generation)
   return state.attached and state.ctx ~= nil and state.ctx.enabled()
+    and (not slot.surface or state.ctx.verify(slot.surface) ~= nil)
+    and rawequal(package.loaded[slot.module], generation)
     and slot.generation == generation and common.active(slot.records, slot.method)
 end
 
@@ -78,12 +76,23 @@ end
 local restore_canvases
 local sync_all
 
-local function project_settings(name, settings)
+local function project_settings(name, settings, element)
   if type(settings) ~= 'table' or settings.title ~= name then return settings end
   local translated = translate('element_title', settings.title)
   if translated == settings.title then return settings end
   local copy = common.copy(settings)
   copy.title = translated
+  if copy.width == nil and type(element) == 'table' and type(element.buffer) == 'function' then
+    local buffer = element.buffer()
+    if type(buffer) == 'number' and vim.api.nvim_buf_is_valid(buffer) then
+      local columns, points = vim.fn.strdisplaywidth(translated), 0
+      for _, line in ipairs(vim.api.nvim_buf_get_lines(buffer, 0, -1, false)) do
+        columns = math.max(columns, vim.fn.strdisplaywidth(line))
+        points = math.max(points, vim.str_utfindex(line))
+      end
+      if columns > points then copy.width = columns end
+    end
+  end
   return copy
 end
 
@@ -116,8 +125,7 @@ local function project_canvas(canvas)
   local wrapper
   wrapper = function(self, text, opts, ...)
     if not record.active or not state.attached or not state.ctx or not state.ctx.enabled()
-      or slots.canvas.generation ~= record.generation
-      or not common.active(slots.canvas.records, 'new')
+      or not active(slots.canvas, record.generation)
       or self.write ~= wrapper then
       return original(self, text, opts, ...)
     end
@@ -159,7 +167,7 @@ function factories.setup(original, generation)
       state.setup_ready = true
       state.setup_generation = generation
       local ok, err = pcall(sync_all)
-      state.sync_error = ok and nil or tostring(err)
+      state.sync_error = not ok and tostring(err) or nil
     end
     return unpack(results, 1, results.n)
   end
@@ -274,10 +282,10 @@ function factories.float(original, generation)
         local settings_original = settings
         settings = function()
           -- The original resolves function settings at this same point.
-          return project_settings(name, settings_original())
+          return project_settings(name, settings_original(), element)
         end
       else
-        settings = project_settings(name, settings)
+        settings = project_settings(name, settings, element)
       end
     end
     -- name remains the float_windows key and close-command identity.
@@ -341,6 +349,16 @@ local function sync(slot)
     end
   end
   if type(current) ~= 'table' then return end
+  if slot.surface then
+    local verified, reason = state.ctx.verify(slot.surface)
+    if not verified then
+      if slot == slots.canvas then restore_canvases() end
+      common.unwrap(slot.records, slot.method)
+      slot.unavailable = reason
+      return
+    end
+    slot.unavailable = nil
+  end
   common.wrap(slot.records, slot.method,
     function() return current[slot.method] end,
     function(value) current[slot.method] = value end,
@@ -405,6 +423,7 @@ local function seam_info(slot)
   local current = package.loaded[slot.module]
   if current == nil or current == false then return { active = false, reason = 'not_loaded' } end
   if current ~= slot.generation then return { active = false, reason = 'stale_generation' } end
+  if slot.unavailable then return { active = false, reason = slot.unavailable } end
   return {
     active = state.attached and common.active(slot.records, slot.method) or false,
     reason = common.reason(slot.records, slot.method),
@@ -448,7 +467,6 @@ function M.info(ctx)
     reason = reason,
     seam = 'Canvas.new/write(highlight-scoped); util.apply_mapping(desc); util.format_value/error; util.select_win(scoped exact print); windows.open_float(title); nio.ui.select; setup lifecycle; exact vim.notify title',
     domain = DOMAIN,
-    supported_commit = COMMIT,
     notification = {
       active = state.release_source ~= nil,
       error = state.source_error,

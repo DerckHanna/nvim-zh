@@ -1,4 +1,19 @@
 local M = {}
+
+local telescope_source = vim.env.NVIM_ZH_TEST_TELESCOPE
+if telescope_source then
+  require('nvim-zh').register_adapter_source('telescope', telescope_source)
+else
+  -- Adapter fixtures supply in-memory modules. Real source and generation
+  -- proof is exercised separately by the upstream and TUI suites.
+  local evidence = require('nvim-zh.adapters.evidence')
+  local verify = evidence.verify
+  evidence.verify = function(id, ...)
+    if id == 'telescope' then return { kind = 'fixture' } end
+    return verify(id, ...)
+  end
+end
+
 function M.check(value, message) if not value then error(message, 2) end end
 function M.equal(actual, expected, message)
   if actual ~= expected then

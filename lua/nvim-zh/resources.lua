@@ -2,7 +2,7 @@ local M = {}
 local fs = require('nvim-zh.fs')
 local paths = require('nvim-zh.paths')
 local catalog = require('nvim-zh.catalog')
-local uv = vim.uv or vim.loop
+local uv = vim.uv
 local active, installed, code_root
 local initial_ok, running = pcall(fs.json, paths.root .. '/resources/manifest.json', 256 * 1024)
 if not initial_ok or type(running) ~= 'table' or type(running.version) ~= 'string'
@@ -62,6 +62,10 @@ end
 local function prepare(root)
   local meta = manifest(root)
   local data = fs.verify(root, meta.bundle.files)
+  local contract_data = assert(data['adapter-contract.json'], '缺少适配器资源契约')
+  local contract = vim.json.decode(contract_data)
+  assert(contract.id == meta.adapter_contract, '适配器资源契约不匹配')
+  if contract.id ~= running.adapter_contract then return nil, 'adapter_restart' end
   local sources = {}
   local required = catalog.builtin_domains()
   for _, domain in ipairs(required) do

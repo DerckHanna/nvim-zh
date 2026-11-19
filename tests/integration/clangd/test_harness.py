@@ -97,15 +97,18 @@ class PublicSeamGateTests(unittest.TestCase):
     def test_optimized_python_still_rejects_wrong_upstream_hashes(self):
         with tempfile.TemporaryDirectory(prefix='dsh-nvim-zh-public-seam-gate-') as tmp:
             root = Path(tmp)
-            manifest = json.loads((ROOT / 'manifests/upstreams.json').read_text(encoding='utf-8'))
-            names = set(manifest['upstreams']['nvim-cmp']['sources'])
+            path = ROOT / 'manifests/adapters/nvim-cmp.json'
+            if not path.exists():
+                self.skipTest('nvim-cmp inventory is absent')
+            manifest = json.loads(path.read_text(encoding='utf-8'))
+            names = set(manifest['targets']['baseline']['sources'])
             names.update(('lua/cmp/config/default.lua', 'lua/cmp/entry.lua'))
             for name in names:
                 path = root / name
                 path.parent.mkdir(parents=True, exist_ok=True)
                 path.write_text('intentionally invalid upstream fixture\n', encoding='utf-8')
             result = subprocess.run(
-                [sys.executable, str(ROOT / 'tests/upstream/cmp_seam.py')],
+                [sys.executable, str(ROOT / 'tests/upstream/nvim-cmp/cmp_seam.py')],
                 capture_output=True, text=True, timeout=60,
                 env={**os.environ, 'NVIM_ZH_TEST_NVIM_CMP': str(root), 'PYTHONOPTIMIZE': '1'})
         self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)

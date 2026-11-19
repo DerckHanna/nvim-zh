@@ -40,7 +40,7 @@ local function install(method, make_wrapper, enabled)
   if type(vim.lsp.handlers[method]) ~= 'function' then return end
   if state then
     state.active = vim.lsp.handlers[method] == state.wrapper
-    state.reason = state.active and nil or 'external_override'
+    state.reason = not state.active and 'external_override' or nil
     return
   end
   local original = vim.lsp.handlers[method]

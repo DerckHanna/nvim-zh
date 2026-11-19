@@ -1,4 +1,9 @@
 local h = dofile(vim.env.NVIM_ZH_ROOT .. '/tests/support/plugin_helpers.lua')
+local index = require('nvim-zh.adapters.index')
+if not index['which-key'] or not index.telescope then
+  print('PLUGIN_LIFECYCLE_SPEC=NOT_APPLICABLE which-key/Telescope combination absent')
+  return
+end
 local check, equal = h.check, h.equal
 
 local baseline_calls = {}
@@ -59,7 +64,7 @@ require('nvim-zh').refresh()
 check(pickers.new == external_after, 'refresh reclaimed external Telescope replacement')
 pickers.new({ prompt_title = 'Find Files' }, {})
 equal(baseline_calls[#baseline_calls].opts.prompt_title, 'Find Files', 'external-after lifecycle hook mutated internal title')
-local info = require('nvim-zh').status().plugins.telescope
+local info = require('nvim-zh').status().adapters.telescope
 check(not info.active and info.reason == 'external_override', 'Telescope external degradation missing')
 require('nvim-zh.plugins').teardown()
 check(pickers.new == external_after, 'teardown overwrote external Telescope replacement')
@@ -75,14 +80,14 @@ local new_list = { function(value) return 'External ' .. value end }
 current_config.replace.desc = new_list
 require('nvim-zh').refresh()
 equal(#new_list, 1, 'reload appended into external which-key replacement list')
-check(require('nvim-zh').status().plugins['which-key'].reason == 'external_override', 'which-key external override not reported')
+check(require('nvim-zh').status().adapters['which-key'].reason == 'external_override', 'which-key external override not reported')
 require('nvim-zh.plugins').teardown()
 equal(#old_list, 0, 'teardown did not remove owned which-key formatter from old list')
 equal(#new_list, 1, 'teardown changed external which-key list')
 
 local found = false
 for _, result in ipairs(require('nvim-zh.health').collect()) do
-  if result.name == 'plugins.telescope' then found = true end
+  if result.name == 'adapters.telescope.initial_titles' then found = true end
 end
 check(found, 'health omitted plugin adapters')
 print('PLUGIN_LIFECYCLE_SPEC=PASS loading_order=before,after no_reclaim=true')

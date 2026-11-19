@@ -18,6 +18,110 @@ return {
   },
   entries = {
     {
+      context = "help_buffer",
+      msgid = "description",
+      msgstr = "描述",
+      references = {
+        "lua/nvim-tree/help.lua:92",
+      },
+    },
+    {
+      context = "help_buffer",
+      msgid = "exit: q",
+      msgstr = "退出：q",
+      references = {
+        "lua/nvim-tree/help.lua:91",
+      },
+    },
+    {
+      context = "help_buffer",
+      msgid = "keymap",
+      msgstr = "按键",
+      references = {
+        "lua/nvim-tree/help.lua:92",
+      },
+    },
+    {
+      context = "help_buffer",
+      msgid = "nvim-tree mappings",
+      msgstr = "nvim-tree 映射",
+      references = {
+        "lua/nvim-tree/help.lua:90",
+      },
+    },
+    {
+      context = "help_buffer",
+      msgid = "nvim-tree: exit help",
+      msgstr = "nvim-tree: 退出帮助",
+      references = {
+        "lua/nvim-tree/help.lua:240",
+      },
+    },
+    {
+      context = "help_buffer",
+      msgid = "nvim-tree: toggle sorting method",
+      msgstr = "nvim-tree: 切换排序方式",
+      references = {
+        "lua/nvim-tree/help.lua:242",
+      },
+    },
+    {
+      context = "help_buffer",
+      msgid = "sort by %s: s",
+      msgstr = "按%s排序：s",
+      references = {
+        "lua/nvim-tree/help.lua:92",
+      },
+    },
+    {
+      context = "hidden_reason",
+      msgid = "bookmark",
+      msgstr = "书签",
+      references = {
+        "lua/nvim-tree/_meta/config/renderer.lua:380",
+      },
+    },
+    {
+      context = "hidden_reason",
+      msgid = "buf",
+      msgstr = "Buffer",
+      references = {
+        "lua/nvim-tree/_meta/config/renderer.lua:381",
+      },
+    },
+    {
+      context = "hidden_reason",
+      msgid = "custom",
+      msgstr = "自定义",
+      references = {
+        "lua/nvim-tree/_meta/config/renderer.lua:382",
+      },
+    },
+    {
+      context = "hidden_reason",
+      msgid = "dotfile",
+      msgstr = "点文件",
+      references = {
+        "lua/nvim-tree/_meta/config/renderer.lua:383",
+      },
+    },
+    {
+      context = "hidden_reason",
+      msgid = "git",
+      msgstr = "Git",
+      references = {
+        "lua/nvim-tree/_meta/config/renderer.lua:384",
+      },
+    },
+    {
+      context = "hidden_reason",
+      msgid = "live filter",
+      msgstr = "实时过滤",
+      references = {
+        "lua/nvim-tree/_meta/config/renderer.lua:385",
+      },
+    },
+    {
       context = "mapping",
       msgid = "CD",
       msgstr = "切换目录",
@@ -467,10 +571,26 @@ return {
     },
     {
       context = "notification",
+      msgid = " * ",
+      msgstr = " * ",
+      references = {
+        "lua/nvim-tree/actions/fs/clipboard.lua:467",
+      },
+    },
+    {
+      context = "notification",
       msgid = "%d git jobs have timed out after git.timeout %dms, disabling git integration.",
       msgstr = "%d 个 Git 任务在 git.timeout %dms 后超时，正在禁用 Git 集成。",
       references = {
         "lua/nvim-tree/git/runner.lua",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "%d nodes %s to clipboard.",
+      msgstr = "已将 %d 个节点 %s 到剪贴板。",
+      references = {
+        "lua/nvim-tree/actions/fs/clipboard.lua:180",
       },
     },
     {
@@ -487,6 +607,30 @@ return {
       msgstr = "已从剪贴板移除 %d 个节点。",
       references = {
         "lua/nvim-tree/actions/fs/clipboard.lua",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "%s\n\nsee :help nvim-tree-config for available configuration options",
+      msgstr = "%s\n\n可用配置选项见 :help nvim-tree-config",
+      references = {
+        "lua/nvim-tree/config.lua:489",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "%s %s copied to register",
+      msgstr = "%s %s 已复制到 Register",
+      references = {
+        "lua/nvim-tree/actions/fs/clipboard.lua:561",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "%s %s to clipboard.",
+      msgstr = "已将 %s %s 到剪贴板。",
+      references = {
+        "lua/nvim-tree/actions/fs/clipboard.lua:148",
       },
     },
     {
@@ -547,10 +691,34 @@ return {
     },
     {
       context = "notification",
+      msgid = "Cannot rename %s -> %s: %s",
+      msgstr = "无法把 %s 重命名为 %s：%s",
+      references = {
+        "lua/nvim-tree/actions/fs/rename-file.lua:33",
+      },
+    },
+    {
+      context = "notification",
       msgid = "Clipboard has been emptied.",
       msgstr = "剪贴板已清空。",
       references = {
         "lua/nvim-tree/actions/fs/clipboard.lua",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "Copied %s to %s clipboard!",
+      msgstr = "已将 %s 复制到 %s 剪贴板！",
+      references = {
+        "lua/nvim-tree/actions/fs/clipboard.lua:488",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "Could not %s %s - %s",
+      msgstr = "无法%s %s - %s",
+      references = {
+        "lua/nvim-tree/actions/fs/clipboard.lua:128",
       },
     },
     {
@@ -604,10 +772,26 @@ return {
     },
     {
       context = "notification",
+      msgid = "Diagnostics update from coc.nvim failed. %s",
+      msgstr = "来自 coc.nvim 的诊断更新失败。%s",
+      references = {
+        "lua/nvim-tree/diagnostics.lua:66",
+      },
+    },
+    {
+      context = "notification",
       msgid = "Disabling watchers: %s",
       msgstr = "正在禁用监视器：%s",
       references = {
         "lua/nvim-tree/watcher.lua",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "Failed to close window: %s",
+      msgstr = "关闭 Window 失败：%s",
+      references = {
+        "lua/nvim-tree/view.lua:174",
       },
     },
     {
@@ -652,10 +836,26 @@ return {
     },
     {
       context = "notification",
+      msgid = "Handler for event %s errored. %s",
+      msgstr = "事件 %s 的处理程序出错。%s",
+      references = {
+        "lua/nvim-tree/events.lua:27",
+      },
+    },
+    {
+      context = "notification",
       msgid = "Invalid bookmarks.persist, disabling persistence: %s",
       msgstr = "bookmarks.persist 无效，禁用持久化：%s",
       references = {
         "lua/nvim-tree/marks/init.lua",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "Invalid option: %s%s. Expected %s, got %s",
+      msgstr = "选项无效：%s%s。应为 %s，实际为 %s",
+      references = {
+        "lua/nvim-tree/config.lua:464",
       },
     },
     {
@@ -672,6 +872,22 @@ return {
       msgstr = "会话文件无效（%s）：%s",
       references = {
         "lua/nvim-tree/session.lua",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "Invalid value for field %s%s: '%s'",
+      msgstr = "字段 %s%s 的值无效：'%s'",
+      references = {
+        "lua/nvim-tree/config.lua:468",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "Invalid value for field %s%s: Expected one of enum '%s', got '%s'",
+      msgstr = "字段 %s%s 的值无效：应为枚举 '%s' 之一，实际为 '%s'",
+      references = {
+        "lua/nvim-tree/config.lua:444",
       },
     },
     {
@@ -740,10 +956,50 @@ return {
     },
     {
       context = "notification",
+      msgid = "Unknown option: %s%s",
+      msgstr = "未知选项：%s%s",
+      references = {
+        "lua/nvim-tree/config.lua:450",
+      },
+    },
+    {
+      context = "notification",
       msgid = "Unrecognized git state '%s'",
       msgstr = "无法识别的 Git 状态 '%s'",
       references = {
         "lua/nvim-tree/renderer/decorator/git.lua",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "absolute paths",
+      msgstr = "绝对路径",
+      references = {
+        "lua/nvim-tree/actions/fs/clipboard.lua:561",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "auto close feature has been removed: https://github.com/nvim-tree/nvim-tree.lua/wiki/Auto-Close",
+      msgstr = "自动关闭功能已移除：https://github.com/nvim-tree/nvim-tree.lua/wiki/Auto-Close",
+      references = {
+        "lua/nvim-tree/legacy.lua:131",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "copied",
+      msgstr = "已复制",
+      references = {
+        "lua/nvim-tree/actions/fs/clipboard.lua:22",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "create_in_closed_folder has been removed and is now the default behaviour. You may use api.fs.create to add a file under your desired node.",
+      msgstr = "create_in_closed_folder 已移除，现为默认行为。可以用 api.fs.create 在目标节点下新建文件。",
+      references = {
+        "lua/nvim-tree/legacy.lua:145",
       },
     },
     {
@@ -756,10 +1012,42 @@ return {
     },
     {
       context = "notification",
+      msgid = "cut",
+      msgstr = "已剪切",
+      references = {
+        "lua/nvim-tree/actions/fs/clipboard.lua:23",
+      },
+    },
+    {
+      context = "notification",
       msgid = "expansion iteration was halted after %d discovered folders",
       msgstr = "展开迭代在发现 %d 个目录后中止",
       references = {
         "lua/nvim-tree/node/directory.lua",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "file already exists",
+      msgstr = "文件已存在",
+      references = {
+        "lua/nvim-tree/actions/fs/rename-file.lua:55",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "focus_empty_on_setup has been removed: https://github.com/nvim-tree/nvim-tree.lua/wiki/Open-At-Startup",
+      msgstr = "focus_empty_on_setup 已移除：https://github.com/nvim-tree/nvim-tree.lua/wiki/Open-At-Startup",
+      references = {
+        "lua/nvim-tree/legacy.lua:138",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "fs.inotify.max_user_watches exceeded, see https://github.com/nvim-tree/nvim-tree.lua/wiki/Troubleshooting",
+      msgstr = "已超出 fs.inotify.max_user_watches，请参阅 https://github.com/nvim-tree/nvim-tree.lua/wiki/Troubleshooting",
+      references = {
+        "lua/nvim-tree/watcher.lua:8",
       },
     },
     {
@@ -772,10 +1060,34 @@ return {
     },
     {
       context = "notification",
+      msgid = "nvim-tree setup not called",
+      msgstr = "尚未调用 nvim-tree setup",
+      references = {
+        "lua/nvim-tree/api/impl.lua:14",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "nvim-tree.lua logging to %s",
+      msgstr = "nvim-tree.lua 日志写入 %s",
+      references = {
+        "lua/nvim-tree/log.lua:124",
+      },
+    },
+    {
+      context = "notification",
       msgid = "nvim-tree.lua requires Nvim >= 0.10. You may use a compat-nvim-0.X tag for earlier Nvim versions, however they will receive no updates or support.",
       msgstr = "nvim-tree.lua 需要 Nvim >= 0.10。较早的 Nvim 版本可使用 compat-nvim-0.X 标签，但这些版本不会获得更新或支持。",
       references = {
         "lua/nvim-tree.lua",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "system_open has been removed, now uses the system default handler: vim.ui.open()",
+      msgstr = "system_open 已移除，现使用系统默认处理程序：vim.ui.open()",
+      references = {
+        "lua/nvim-tree/legacy.lua:152",
       },
     },
     {
@@ -792,6 +1104,294 @@ return {
       msgstr = "trash.cmd '%s' 不是可执行程序。",
       references = {
         "lua/nvim-tree/actions/fs/trash.lua",
+      },
+    },
+    {
+      context = "notification",
+      msgid = "view.hide_root_folder is deprecated, please set renderer.root_folder_label = false",
+      msgstr = "view.hide_root_folder 已弃用，请改为设置 renderer.root_folder_label = false",
+      references = {
+        "lua/nvim-tree/legacy.lua:122",
+      },
+    },
+    {
+      context = "popup",
+      msgid = "  Can't retrieve file information",
+      msgstr = "  无法获取文件信息",
+      references = {
+        "lua/nvim-tree/actions/node/file-popup.lua:13",
+      },
+    },
+    {
+      context = "popup",
+      msgid = " accessed: ",
+      msgstr = " 访问时间：",
+      references = {
+        "lua/nvim-tree/actions/node/file-popup.lua:21",
+      },
+    },
+    {
+      context = "popup",
+      msgid = " created:  ",
+      msgstr = " 创建时间：",
+      references = {
+        "lua/nvim-tree/actions/node/file-popup.lua:19",
+      },
+    },
+    {
+      context = "popup",
+      msgid = " fullpath: ",
+      msgstr = " 完整路径：",
+      references = {
+        "lua/nvim-tree/actions/node/file-popup.lua:18",
+      },
+    },
+    {
+      context = "popup",
+      msgid = " modified: ",
+      msgstr = " 修改时间：",
+      references = {
+        "lua/nvim-tree/actions/node/file-popup.lua:20",
+      },
+    },
+    {
+      context = "popup",
+      msgid = " size:     ",
+      msgstr = " 大小：    ",
+      references = {
+        "lua/nvim-tree/actions/node/file-popup.lua:22",
+      },
+    },
+    {
+      context = "prompt",
+      msgid = "Overwrite %s ?",
+      msgstr = "覆盖 %s？",
+      references = {
+        "lua/nvim-tree/actions/fs/clipboard.lua:263",
+      },
+    },
+    {
+      context = "prompt",
+      msgid = "Overwrite %s ? R(ename)/y/n: ",
+      msgstr = "覆盖 %s？R(ename)/y/n: ",
+      references = {
+        "lua/nvim-tree/actions/fs/clipboard.lua:264",
+      },
+    },
+    {
+      context = "prompt",
+      msgid = "Remove %s?",
+      msgstr = "删除 %s？",
+      references = {
+        "lua/nvim-tree/actions/fs/remove-file.lua:150",
+      },
+    },
+    {
+      context = "prompt",
+      msgid = "Remove %s? Y/n: ",
+      msgstr = "删除 %s？Y/n: ",
+      references = {
+        "lua/nvim-tree/actions/fs/remove-file.lua:150",
+      },
+    },
+    {
+      context = "prompt",
+      msgid = "Remove %s? y/N: ",
+      msgstr = "删除 %s？y/N: ",
+      references = {
+        "lua/nvim-tree/actions/fs/remove-file.lua:150",
+      },
+    },
+    {
+      context = "prompt",
+      msgid = "Remove bookmarked ?",
+      msgstr = "删除书签节点？",
+      references = {
+        "lua/nvim-tree/marks/init.lua:202",
+      },
+    },
+    {
+      context = "prompt",
+      msgid = "Remove bookmarked ? y/N: ",
+      msgstr = "删除书签节点？y/N: ",
+      references = {
+        "lua/nvim-tree/marks/init.lua:203",
+      },
+    },
+    {
+      context = "prompt",
+      msgid = "Trash %s?",
+      msgstr = "将 %s 移到回收站？",
+      references = {
+        "lua/nvim-tree/actions/fs/trash.lua:101",
+      },
+    },
+    {
+      context = "prompt",
+      msgid = "Trash %s? Y/n: ",
+      msgstr = "将 %s 移到回收站？Y/n: ",
+      references = {
+        "lua/nvim-tree/actions/fs/trash.lua:101",
+      },
+    },
+    {
+      context = "prompt",
+      msgid = "Trash %s? y/N: ",
+      msgstr = "将 %s 移到回收站？y/N: ",
+      references = {
+        "lua/nvim-tree/actions/fs/trash.lua:101",
+      },
+    },
+    {
+      context = "prompt",
+      msgid = "Trash bookmarked ?",
+      msgstr = "将书签节点移到回收站？",
+      references = {
+        "lua/nvim-tree/marks/init.lua:231",
+      },
+    },
+    {
+      context = "prompt",
+      msgid = "Trash bookmarked ? y/N: ",
+      msgstr = "将书签节点移到回收站？y/N: ",
+      references = {
+        "lua/nvim-tree/marks/init.lua:232",
+      },
+    },
+    {
+      context = "prompt_count",
+      msgid = "%d file(s) already exist",
+      msgstr = "%d 个文件已存在",
+      references = {
+        "lua/nvim-tree/actions/fs/clipboard.lua:282",
+      },
+    },
+    {
+      context = "prompt_count",
+      msgid = "%d file(s) already exist. R(ename suffix)/y/n: ",
+      msgstr = "%d 个文件已存在。R(ename suffix)/y/n: ",
+      references = {
+        "lua/nvim-tree/actions/fs/clipboard.lua:283",
+      },
+    },
+    {
+      context = "prompt_count",
+      msgid = "Remove %d selected?",
+      msgstr = "删除选中的 %d 个节点？",
+      references = {
+        "lua/nvim-tree/actions/fs/remove-file.lua:190",
+      },
+    },
+    {
+      context = "prompt_count",
+      msgid = "Remove %d selected? Y/n: ",
+      msgstr = "删除选中的 %d 个节点？Y/n: ",
+      references = {
+        "lua/nvim-tree/actions/fs/remove-file.lua:190",
+      },
+    },
+    {
+      context = "prompt_count",
+      msgid = "Remove %d selected? y/N: ",
+      msgstr = "删除选中的 %d 个节点？y/N: ",
+      references = {
+        "lua/nvim-tree/actions/fs/remove-file.lua:190",
+      },
+    },
+    {
+      context = "prompt_count",
+      msgid = "Trash %d selected?",
+      msgstr = "将选中的 %d 个节点移到回收站？",
+      references = {
+        "lua/nvim-tree/actions/fs/trash.lua:133",
+      },
+    },
+    {
+      context = "prompt_count",
+      msgid = "Trash %d selected? Y/n: ",
+      msgstr = "将选中的 %d 个节点移到回收站？Y/n: ",
+      references = {
+        "lua/nvim-tree/actions/fs/trash.lua:133",
+      },
+    },
+    {
+      context = "prompt_count",
+      msgid = "Trash %d selected? y/N: ",
+      msgstr = "将选中的 %d 个节点移到回收站？y/N: ",
+      references = {
+        "lua/nvim-tree/actions/fs/trash.lua:133",
+      },
+    },
+    {
+      context = "select_item",
+      msgid = "No",
+      msgstr = "否",
+      references = {
+        "lua/nvim-tree/utils.lua:505",
+      },
+    },
+    {
+      context = "select_item",
+      msgid = "Overwrite all",
+      msgstr = "全部覆盖",
+      references = {
+        "lua/nvim-tree/actions/fs/clipboard.lua:287",
+      },
+    },
+    {
+      context = "select_item",
+      msgid = "Rename",
+      msgstr = "重命名",
+      references = {
+        "lua/nvim-tree/actions/fs/clipboard.lua:265",
+      },
+    },
+    {
+      context = "select_item",
+      msgid = "Rename (suffix)",
+      msgstr = "重命名（加后缀）",
+      references = {
+        "lua/nvim-tree/actions/fs/clipboard.lua:287",
+      },
+    },
+    {
+      context = "select_item",
+      msgid = "Skip all",
+      msgstr = "全部跳过",
+      references = {
+        "lua/nvim-tree/actions/fs/clipboard.lua:287",
+      },
+    },
+    {
+      context = "select_item",
+      msgid = "Yes",
+      msgstr = "是",
+      references = {
+        "lua/nvim-tree/utils.lua:505",
+      },
+    },
+    {
+      context = "tree_window",
+      msgid = "(%d hidden)",
+      msgstr = "（隐藏 %d 个）",
+      references = {
+        "lua/nvim-tree/utils.lua:141",
+      },
+    },
+    {
+      context = "tree_window",
+      msgid = "(%d total %s)",
+      msgstr = "（隐藏 %d：%s）",
+      references = {
+        "lua/nvim-tree/utils.lua:141",
+      },
+    },
+    {
+      context = "window_picker",
+      msgid = "Pick window: ",
+      msgstr = "选择 Window：",
+      references = {
+        "lua/nvim-tree/actions/node/open-file.lua:139",
       },
     },
   },

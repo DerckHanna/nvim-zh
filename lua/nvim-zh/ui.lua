@@ -22,6 +22,10 @@ end
 local function translate_notification(msg, opts)
   if type(msg) ~= 'string' or msg == '' then return msg end
   local route = type(opts) == 'table' and type(opts.title) == 'string' and sources[opts.title] or nil
+  if route and route.matches then
+    local ok, matched = pcall(route.matches, opts)
+    if not ok or not matched then return msg end
+  end
   local domain, context = DOMAIN, ''
   local prefix
   if route then domain, context, prefix = route.domain, route.context, route.prefix end
@@ -185,8 +189,10 @@ function M.register_source(spec)
   assert(spec.context == nil or type(spec.context) == 'string', 'notification source context must be string')
   assert(spec.prefix == nil or (type(spec.prefix) == 'string' and spec.prefix ~= ''),
     'notification source prefix must be a non-empty string')
+  assert(spec.matches == nil or type(spec.matches) == 'function', 'invalid notification source matcher')
   assert(sources[spec.title] == nil, 'notification source already registered: ' .. spec.title)
-  local record = { title = spec.title, domain = spec.domain, context = spec.context or '', prefix = spec.prefix }
+  local record = { title = spec.title, domain = spec.domain, context = spec.context or '',
+    prefix = spec.prefix, matches = spec.matches }
   sources[spec.title] = record
   local released = false
   return function()

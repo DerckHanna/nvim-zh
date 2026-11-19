@@ -1,0 +1,49 @@
+*which-key-triggers.cnx*      which-key.nvim: Triggers
+
+                               which-key 触发器
+
+触发                                       *which-key.nvim-which-key-triggers*
+
+**which-key** 有两种触发方式：
+
+- 通过触发键映射
+- 通过 visual 与 operator pending 模式的 `ModeChanged` 事件
+
+两者都可以用 `opts.triggers` 与 `opts.defer` 配置。
+
+默认情况下 `opts.triggers` 包含 `{ "<auto>", mode = "nixsotc" }`，它会自动
+为每个模式设置键映射触发器，并在 `ModeChanged` 期间触发。
+
+
+  [!NOTE] 已存在的键映射永远不会被自动触发器接管。这包括 Neovim 所有有效
+  的单键内置映射。如果你想在内置键映射上触发，必须手动添加它。
+  >lua
+       triggers = {
+         { "<auto>", mode = "nixsotc" },
+         { "a", mode = { "n", "v" } },
+       }
+  <
+
+  [!TIP] To manually setup triggers, you can set `opts.triggers` to:
+  >lua
+       triggers = {
+         { "<leader>", mode = { "n", "v" } },
+       }
+  <
+对于 `ModeChanged` 触发器，你可以配置 `opts.defer` 选项。当它返回 `true`
+时，弹窗只会在再按下一个键之后显示。因此 `yaf` 会在按下 `ya` 之后显示
+which-key，而不会在按下 `y` 之后就显示。
+
+
+  [!TIP] 延迟某些 operator：
+  >lua
+      ---@param ctx { mode: string, operator: string }
+      defer = function(ctx)
+        if vim.list_contains({ "d", "y" }, ctx.operator) then
+          return true
+        end
+        return vim.list_contains({ "<C-V>", "V" }, ctx.mode)
+      end,
+  <
+
+vim:tw=78:ts=8:noet:ft=help:norl:

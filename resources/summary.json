@@ -2,12 +2,12 @@
   "baseline": "0.12.6",
   "domains": {
     "clangd": 4,
-    "nvim-dap": 147,
+    "nvim-dap": 161,
     "nvim-dap-ui": 41,
-    "nvim-tree": 97,
+    "nvim-tree": 172,
     "nvim-ui": 18,
-    "telescope": 96,
-    "which-key": 195
+    "telescope": 164,
+    "which-key": 217
   },
   "help": {
     "complete": 133,

@@ -31,7 +31,7 @@ local snapshot = require('nvim-zh').status()
 | `native` | gettext 绑定、消息语言、MO 路径、平台降级原因 |
 | `help` | 中文 Help 路径、索引与 `'helplang'` 状态 |
 | `ui` | notify、input/select、select_items、echo 的启用/活动/原因 |
-| `plugins` | 各第三方适配器的 `enabled/active/reason/seam` |
+| `adapters` | 第三方适配器的固定验证组合、安装观察和各显示面的状态与证据 |
 | `diagnostics` | 各诊断显示接缝与本进程实际观察 |
 | `lsp` | clangd 消息和进度 handler 状态 |
 | `nvim_version` / `v_lang` / `helplang` | 当前 Neovim 与语言状态 |
@@ -81,6 +81,16 @@ end, { source = 'my-plugin/l10n' })
 注册懒加载目录，成功返回 `true`。domain 必须合法且不能重复注册，loader 必须是函数，metadata 必须是 Table。loader 返回的目录会经过 schema、domain、locale、空译文和重复键校验；用户覆盖在内置条目之后合并。
 
 `refresh()` 会使已注册目录在下次使用时重新加载。外部 loader 自己的依赖缓存仍由调用方管理，插件不会清空整个 `package.loaded`。
+
+## `register_adapter_source(id, directory)`
+
+使用镜像或其他管理器时，在目标插件加载前登记源码根目录。标准 `vim.pack` 安装按清单仓库地址自动识别。仅加载清单指定的模块时记录实际执行的源码摘要和模块代次。版本相关接缝按匹配结果激活。插件管理器的加载回调用法见[第三方插件适配](adapters.md#启用版本相关接缝)。
+
+## `register_adapter(definition)`
+
+从可信 Lua 配置显式注册外置包提供的适配器。定义使用 `api = 1`，并提供唯一的 `id`、`domain`、已验证的 `catalog` 及 `surfaces`。每个显示面声明 `module`、只读的 `probe(module)` 和 `mount(scope, target)`。`probe` 返回可挂载的目标，或者等待原因。`mount` 可以使用 `scope.translate(context, text)`、`scope.wrap(object, key, factory)`、`scope.autocmd(event, options)` 与 `scope.defer(release)`。可将 `scope.wrap` 返回的所有权查询函数作为 `mount` 的返回值。插件接管同一函数时，适配器保留外部替换。
+
+注册返回幂等的释放函数，移除当前适配器和其目录。`modules.plugins.disabled` 可按 ID 禁用外置适配。示例见[外置适配配置](adapter-system-design.md#第三方-help-与外置适配包)。
 
 ## `stats()`
 

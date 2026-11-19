@@ -115,40 +115,72 @@ local function capture_pattern(token)
   return '([%-%+]?%d+%.?%d*[eE]?[%-%+]?%d*)'
 end
 
+local function printf_runs(template)
+  local runs = {}
+  for _, token in ipairs(template.tokens) do
+    local previous = runs[#runs]
+    if token.literal then
+      runs[#runs + 1] = token
+    elseif previous and previous.size then
+      previous.size = previous.size + 1
+    else
+      runs[#runs + 1] = { size = 1, token = token }
+    end
+  end
+  return runs
+end
+
 local function match_template(entry, text)
   local source = parse_template(entry.msgid)
   local target = parse_template(entry.msgstr)
   if not compatible(source, target) then return nil end
-  local pattern = { '^' }
-  local previous_placeholder = false
-  for _, token in ipairs(source.tokens) do
-    if token.literal then
-      table.insert(pattern, escape_literal(token.literal))
-      previous_placeholder = false
+
+  if source.kind == 'named' then
+    local pattern = { '^' }
+    for index, token in ipairs(source.tokens) do
+      if token.literal then
+        table.insert(pattern, escape_literal(token.literal))
+      else
+        -- Two names without a delimiter cannot be recovered from rendered text.
+        if index > 1 and not source.tokens[index - 1].literal then return nil end
+        table.insert(pattern, capture_pattern(token))
+      end
+    end
+    table.insert(pattern, '$')
+    local captures = { text:match(table.concat(pattern)) }
+    if #captures ~= #source.placeholders then return nil end
+    local values = {}
+    for index, name in ipairs(source.placeholders) do
+      if values[name] ~= nil and values[name] ~= captures[index] then return nil end
+      values[name] = captures[index]
+    end
+    return render_named(target, values)
+  end
+
+  local source_runs, target_runs = printf_runs(source), printf_runs(target)
+  local pattern, sizes = { '^' }, {}
+  for _, run in ipairs(source_runs) do
+    if run.literal then
+      pattern[#pattern + 1] = escape_literal(run.literal)
     else
-      if previous_placeholder then return nil end
-      table.insert(pattern, capture_pattern(token))
-      previous_placeholder = true
+      sizes[#sizes + 1] = run.size
+      -- A run has no internal delimiter. Capture the entire byte sequence.
+      pattern[#pattern + 1] = run.size == 1 and capture_pattern(run.token) or '(.-)'
     end
   end
-  table.insert(pattern, '$')
+  pattern[#pattern + 1] = '$'
   local captures = { text:match(table.concat(pattern)) }
-  if #captures ~= #source.placeholders then return nil end
-  local values = {}
-  for index, name in ipairs(source.placeholders) do
-    local key = source.kind == 'named' and name or index
-    if values[key] ~= nil and values[key] ~= captures[index] then return nil end
-    values[key] = captures[index]
-  end
-  if source.kind == 'named' then return render_named(target, values) end
-  local output = {}
-  local capture_index = 0
-  for _, token in ipairs(target.tokens) do
-    if token.literal then
-      table.insert(output, token.literal)
+  if #captures ~= #sizes then return nil end
+
+  local output, capture = {}, 0
+  for _, run in ipairs(target_runs) do
+    if run.literal then
+      output[#output + 1] = run.literal
     else
-      capture_index = capture_index + 1
-      table.insert(output, captures[capture_index])
+      capture = capture + 1
+      -- A translation cannot split or join runs unless given the original args.
+      if sizes[capture] ~= run.size then return nil end
+      output[#output + 1] = captures[capture]
     end
   end
   return table.concat(output)

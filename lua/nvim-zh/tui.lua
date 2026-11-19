@@ -56,10 +56,10 @@ local function lines()
       add('统计仅限已接入的翻译入口，跨资源更新累计，非全 Neovim 覆盖率。')
       if not stats.missing.enabled then add('运行时观察已关闭。') end
       if stats.runtime.truncated then add('去重记录达到容量上限，部分记录已淘汰。') end
-      local plugins = vim.tbl_keys(info.plugins)
+      local plugins = vim.tbl_keys(info.adapters)
       table.sort(plugins)
       for _, name in ipairs(plugins) do
-        local adapter = info.plugins[name]
+        local adapter = info.adapters[name]
         add(('插件 %s：%s（%s）'):format(name, adapter.active and '已适配' or '未适配', adapter.reason or '正常'))
       end
     else
@@ -129,7 +129,7 @@ local function sync_timer()
   if not panel then return end
   if panel.page ~= 2 and panel.page ~= 3 then stop_timer(panel); return end
   if panel.timer then return end
-  panel.timer = (vim.uv or vim.loop).new_timer()
+  panel.timer = vim.uv.new_timer()
   panel.timer:start(500, 500, vim.schedule_wrap(function()
     if panel and (panel.page == 2 or panel.page == 3) then M.render() end
   end))

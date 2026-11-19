@@ -4,6 +4,7 @@
     "clangd": 4,
     "nvim-dap": 161,
     "nvim-dap-ui": 41,
+    "nvim-dap-view": 152,
     "nvim-tree": 172,
     "nvim-ui": 18,
     "telescope": 164,

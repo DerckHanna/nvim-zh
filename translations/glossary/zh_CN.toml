@@ -13,3 +13,5 @@ forbidden = ["窗口"]
 source = "Register"
 policy = "preserve"
 forbidden = ["寄存器"]
+# CodeLLDB exposes CPU registers, a different object from a Neovim Register.
+exclude = [{ domain = "nvim-dap-view", contexts = ["codelldb_scope", "codelldb_register"] }]

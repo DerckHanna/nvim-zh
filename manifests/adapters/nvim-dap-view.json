@@ -1,0 +1,302 @@
+{
+  "contracts": [
+    "tests/upstream/nvim-dap-view/nvim_dap_view_upstream_spec.lua"
+  ],
+  "domain": "nvim-dap-view",
+  "entry": "nvim-zh.adapters.nvim_dap_view",
+  "help": {
+    "doc/dap-view.txt": [
+      "dap-view.cnx"
+    ]
+  },
+  "id": "nvim-dap-view",
+  "lazy_names": [
+    "nvim-dap-view"
+  ],
+  "modules": [
+    "dap-view"
+  ],
+  "notes": {
+    "excluded": "custom labels, user expressions, DAP data (except identified CodeLLDB labels), internal identifiers and debugger output",
+    "limitations": "requires load-time source evidence; fixed CodeLLDB labels require an executable named codelldb",
+    "seam": "source-verified display expressions evaluated in the upstream call and callback"
+  },
+  "scenarios": {
+    "codelldb": {
+      "surfaces": [
+        "codelldb_scopes",
+        "codelldb_exceptions"
+      ],
+      "tui": "tests/upstream/nvim-dap-view/tui.py"
+    },
+    "diagnostics": {
+      "surfaces": [
+        "notifications",
+        "errors"
+      ],
+      "tui": "tests/upstream/nvim-dap-view/tui.py"
+    },
+    "help": {
+      "surfaces": [
+        "help"
+      ],
+      "tui": "tests/upstream/nvim-dap-view/tui.py"
+    },
+    "interaction": {
+      "surfaces": [
+        "input",
+        "selectors",
+        "key_help"
+      ],
+      "tui": "tests/upstream/nvim-dap-view/tui.py"
+    },
+    "lifecycle": {
+      "surfaces": [
+        "titles",
+        "panel_messages"
+      ],
+      "tui": "tests/upstream/nvim-dap-view/tui.py"
+    },
+    "panel": {
+      "surfaces": [
+        "titles",
+        "panel_messages",
+        "mappings"
+      ],
+      "tui": "tests/upstream/nvim-dap-view/tui.py"
+    }
+  },
+  "schema": 1,
+  "source_projection": true,
+  "status": "implemented",
+  "surfaces": {
+    "codelldb_exceptions": {
+      "independent": true,
+      "kind": "versioned",
+      "modules": {
+        "dap-view.exceptions.view": "lua/dap-view/exceptions/view.lua"
+      }
+    },
+    "codelldb_scopes": {
+      "independent": true,
+      "kind": "versioned",
+      "modules": {
+        "dap-view.scopes.view": "lua/dap-view/scopes/view.lua"
+      }
+    },
+    "errors": {
+      "independent": true,
+      "kind": "versioned",
+      "modules": {
+        "dap-view.actions": "lua/dap-view/actions.lua",
+        "dap-view.breakpoints.view": "lua/dap-view/breakpoints/view.lua",
+        "dap-view.console.view": "lua/dap-view/console/view.lua",
+        "dap-view.hover.eval": "lua/dap-view/hover/eval.lua",
+        "dap-view.hover.view": "lua/dap-view/hover/view.lua",
+        "dap-view.setup.validate": "lua/dap-view/setup/validate/init.lua",
+        "dap-view.setup.validate.util": "lua/dap-view/setup/validate/util.lua",
+        "dap-view.setup.validate.winbar": "lua/dap-view/setup/validate/winbar.lua",
+        "dap-view.threads.actions": "lua/dap-view/threads/actions.lua",
+        "dap-view.threads.view": "lua/dap-view/threads/view.lua",
+        "dap-view.views": "lua/dap-view/views/init.lua",
+        "dap-view.views.set": "lua/dap-view/views/set.lua",
+        "dap-view.virtual-text": "lua/dap-view/virtual-text.lua",
+        "dap-view.watches.eval": "lua/dap-view/watches/eval.lua"
+      }
+    },
+    "help": {
+      "kind": "help"
+    },
+    "input": {
+      "independent": true,
+      "kind": "versioned",
+      "modules": {
+        "dap-view.exceptions.actions": "lua/dap-view/exceptions/actions.lua",
+        "dap-view.hover.actions": "lua/dap-view/hover/actions.lua",
+        "dap-view.scopes.actions": "lua/dap-view/scopes/actions.lua",
+        "dap-view.threads.keymaps": "lua/dap-view/threads/keymaps.lua",
+        "dap-view.watches.actions": "lua/dap-view/watches/actions.lua",
+        "dap-view.watches.keymaps": "lua/dap-view/watches/keymaps.lua"
+      }
+    },
+    "key_help": {
+      "independent": true,
+      "kind": "versioned",
+      "modules": {
+        "dap-view.views.keymaps.help": "lua/dap-view/views/keymaps/help.lua"
+      }
+    },
+    "mappings": {
+      "independent": true,
+      "kind": "versioned",
+      "modules": {
+        "dap-view.base.keymaps": "lua/dap-view/base/keymaps.lua",
+        "dap-view.breakpoints.keymaps": "lua/dap-view/breakpoints/keymaps.lua",
+        "dap-view.console.keymaps": "lua/dap-view/console/keymaps.lua",
+        "dap-view.exceptions.keymaps": "lua/dap-view/exceptions/keymaps.lua",
+        "dap-view.hover": "lua/dap-view/hover/init.lua",
+        "dap-view.scopes.keymaps": "lua/dap-view/scopes/keymaps.lua",
+        "dap-view.sessions.keymaps": "lua/dap-view/sessions/keymaps.lua",
+        "dap-view.threads.keymaps": "lua/dap-view/threads/keymaps.lua",
+        "dap-view.views.keymaps": "lua/dap-view/views/keymaps/init.lua",
+        "dap-view.views.keymaps.help": "lua/dap-view/views/keymaps/help.lua",
+        "dap-view.views.util": "lua/dap-view/views/util.lua",
+        "dap-view.watches.keymaps": "lua/dap-view/watches/keymaps.lua"
+      }
+    },
+    "notifications": {
+      "independent": true,
+      "kind": "versioned",
+      "modules": {
+        "dap-view.actions": "lua/dap-view/actions.lua",
+        "dap-view.complete": "lua/dap-view/complete.lua",
+        "dap-view.exceptions.actions": "lua/dap-view/exceptions/actions.lua",
+        "dap-view.guard": "lua/dap-view/guard.lua",
+        "dap-view.hover.actions": "lua/dap-view/hover/actions.lua",
+        "dap-view.options.winbar": "lua/dap-view/options/winbar/init.lua",
+        "dap-view.scopes.actions": "lua/dap-view/scopes/actions.lua",
+        "dap-view.sessions.actions": "lua/dap-view/sessions/actions.lua",
+        "dap-view.threads.actions": "lua/dap-view/threads/actions.lua",
+        "dap-view.views.set": "lua/dap-view/views/set.lua",
+        "dap-view.views.util": "lua/dap-view/views/util.lua",
+        "dap-view.watches.actions": "lua/dap-view/watches/actions.lua",
+        "dap-view.watches.eval": "lua/dap-view/watches/eval.lua"
+      }
+    },
+    "panel_messages": {
+      "independent": true,
+      "kind": "versioned",
+      "modules": {
+        "dap-view.actions": "lua/dap-view/actions.lua",
+        "dap-view.breakpoints.view": "lua/dap-view/breakpoints/view.lua",
+        "dap-view.console.view": "lua/dap-view/console/view.lua",
+        "dap-view.exceptions.view": "lua/dap-view/exceptions/view.lua",
+        "dap-view.scopes.view": "lua/dap-view/scopes/view.lua",
+        "dap-view.sessions.view": "lua/dap-view/sessions/view.lua",
+        "dap-view.threads.view": "lua/dap-view/threads/view.lua",
+        "dap-view.watches.view": "lua/dap-view/watches/view.lua"
+      }
+    },
+    "selectors": {
+      "kind": "versioned",
+      "modules": {
+        "dap-view.views.windows": "lua/dap-view/views/windows/init.lua",
+        "dap-view.views.windows.switchbuf": "lua/dap-view/views/windows/switchbuf.lua"
+      }
+    },
+    "titles": {
+      "kind": "versioned",
+      "modules": {
+        "dap-view.config": "lua/dap-view/config.lua",
+        "dap-view.options.winbar": "lua/dap-view/options/winbar/init.lua",
+        "dap-view.setup": "lua/dap-view/setup/init.lua"
+      }
+    }
+  },
+  "targets": {
+    "baseline": {
+      "commit": "1c3b9cc295303fc173f24d442739a8557e23e987",
+      "dependencies": [
+        "nvim-dap"
+      ],
+      "neovim": "0.12.6",
+      "sources": {
+        "doc/dap-view.txt": "a1e905c41f5d1c0dc9c624f61356911dc4873d6abe42fe7f1843e6ee63077b19",
+        "lua/dap-view.lua": "5a9676bd9e364304703b676c3a8df8ebb9fa5f814b7af0d4e99c864f709b99fc",
+        "lua/dap-view/actions.lua": "ded4de92ef818bd3f492b4ac45fbabbef1c9dce0994c2be709f65a0736bfed41",
+        "lua/dap-view/autocmds.lua": "6b199b81e9f8db9aefe4b48474c71b8ae7cc29b0b20023f3c28a5dce8ab87935",
+        "lua/dap-view/base/keymaps.lua": "6b549be3716faed938ceadf54226502fc2b1c9d63af796ec4a00d0f6f06b4831",
+        "lua/dap-view/breakpoints/actions.lua": "cf6b75cee0ef4a1eddf595fd8495190402f2ee68d7d564d97cc1b9003e5d4794",
+        "lua/dap-view/breakpoints/keymaps.lua": "187e0f39333f21b6d878aedf9658ff02282f9ca86ca952416e33b9a1b1cb1ae0",
+        "lua/dap-view/breakpoints/util/extmarks.lua": "1734ec4d7000309103cf9a6623316d238bfcc32ed7a4561389d2d5e12f31b75b",
+        "lua/dap-view/breakpoints/util/treesitter.lua": "707e4e07ca48761ec86a39b9be10bab63aacb13a1eae08213f847a210a03419a",
+        "lua/dap-view/breakpoints/vendor/init.lua": "b8cf9f0797db0fc427a73d693c9283f6afdfc78c3841c12d24343d354bcfedfc",
+        "lua/dap-view/breakpoints/view.lua": "f65c4adb1a88748a0b7e8296a8a4cd89be8196cf3bee95e470a0a476859b1e00",
+        "lua/dap-view/complete.lua": "e7eb4188c42bbbffb848154e8fd495852cbc8219853a022cc0a8eb3b1f67141c",
+        "lua/dap-view/config.lua": "8f558fa0bd1e3d96242cbd929e462ef44607571cc8ada25a93eb7d0398ba9799",
+        "lua/dap-view/console/keymaps.lua": "3c4a259d8bcc855124dd15b6b55b477eda06fc882c2296c619df9991db864beb",
+        "lua/dap-view/console/options.lua": "03753235c8edb79c015251383731b14b1c1b87b698e6fec55d4f699d219f0bc2",
+        "lua/dap-view/console/scroll.lua": "4abc2b0f9bb3351093eae53b9e5065d8477ab0fca60dc66ba94aa591bd92a797",
+        "lua/dap-view/console/view.lua": "fd8f4ee7e3eff9f3a871609c5b97ee4ec3eeefcf63c2c7359af6cec8c58be53d",
+        "lua/dap-view/dap-defaults.lua": "9815d56ddf016177cf8349c9cbaf53329aae7c517016da934f33e012a546f89e",
+        "lua/dap-view/exceptions/actions.lua": "ec1915d92a2725820e5e738d7aa584ee39c551e6dba94a249fa267840ce60413",
+        "lua/dap-view/exceptions/init.lua": "8728b9d6890bf9883842857e2cca3841e8a73987f1a4908dd5beee8601fde7a8",
+        "lua/dap-view/exceptions/keymaps.lua": "f24a5e5dc528d39eff5a85550a7a757439e82b16f9a19f1eff1da295ae462316",
+        "lua/dap-view/exceptions/view.lua": "3abaa2925cefa7602aa882d5776c72320d1e43c75a148291bd1eb743c93388b8",
+        "lua/dap-view/globals.lua": "22e03b5b44fe789298303f86d4cdc7242c28bd02d653031a2573519eff271e4a",
+        "lua/dap-view/guard.lua": "550586aea798a423c0f3ec92724061220a8be60c3b7dcbd10d626120ec44a26b",
+        "lua/dap-view/highlight.lua": "9384bc2087509a575f9c09370d783c6f3ca19142cc5d48c9ebca67532ac7e670",
+        "lua/dap-view/hover/actions.lua": "94e12a449336d465c69dd41e18c715cb226118e26492a6d28b858896fd1c55af",
+        "lua/dap-view/hover/eval.lua": "ca648c9f7bda86ad1034ca1724aece63e6b06faa3e5cab492b2460b73911f16a",
+        "lua/dap-view/hover/init.lua": "b9af021647c6c0e4577f38494f807f6900d5a49c91c12560d152a26b666d06f7",
+        "lua/dap-view/hover/view.lua": "56d26b9fe3e0745dff692214bf750c9a141be42b9470fa51364b2c84fb104ca8",
+        "lua/dap-view/listeners.lua": "cd4d3b3b1d421134e22923e6da80169c02b547831555a95f442c4986d9e19d7a",
+        "lua/dap-view/options/autocmd.lua": "94641ce94518dd3b38e3de71a901e8f73dca845cf4797897d3fad21aa566631a",
+        "lua/dap-view/options/controls/base.lua": "16120b7b4e070d7ef3875ad811ef7deb4121999835eeba529b87ff6f74d01356",
+        "lua/dap-view/options/controls/init.lua": "c411a9d7ce28b7bb412416146dcb36d0fbe13969861dd2aa1d9e4b3c9294bc39",
+        "lua/dap-view/options/winbar/init.lua": "3630b63b116970def9824dc1dd1fcd350b9c1719a587c984ae00dc4da7d15f1a",
+        "lua/dap-view/refresher.lua": "4e68db1c2a4da09b4f86eddc58ec0e378a61fecd45eb79f2af8ef8fd91080670",
+        "lua/dap-view/repl/init.lua": "00a98814cc1914b0823131b1f869c80c06497bd2c7a50d7708bf1c1317ce5205",
+        "lua/dap-view/scopes/actions.lua": "07acab2db53bd85c3e5430d634fe6212444fb09a10d25f659d60dcdffc8d3fc3",
+        "lua/dap-view/scopes/keymaps.lua": "3edbd2119c529b9033d0cccdad37de3a57f8ac7b3b225ea906c89fffb9069a85",
+        "lua/dap-view/scopes/view.lua": "71f6de1007216eed372e536735efa3a178b65c09557c1baf5e0c0d70b31a2afb",
+        "lua/dap-view/sessions/actions.lua": "090ea683b9ffa40c3bbaf6a4eebca2449e08fa29575d1aad20ae4db32b03fe0e",
+        "lua/dap-view/sessions/keymaps.lua": "1df2541b9cda1e76e0d213ebc3cb103a0b2781f70406a7d5ae7d95d1ecd76260",
+        "lua/dap-view/sessions/view.lua": "e4ca6863f3ebf43a51eefa4e8f2e250f7803f6686f61e8266946cda615f9591d",
+        "lua/dap-view/setup/init.lua": "c8f817c4e7f581fa3936f6d8f39422e126dc2c90805504eb6cd1d2db747a7ead",
+        "lua/dap-view/setup/validate/help.lua": "d4723b85b622cdf0a0e2296fae002f4a7ebc6e93203140e175511290d731f77b",
+        "lua/dap-view/setup/validate/hover.lua": "48c6bd5ca28e5f58a6a20cb5fdd73ce0df2a68a6ac77fbf735f6573c18e2e0d8",
+        "lua/dap-view/setup/validate/icons.lua": "1ce6385cf24e42bc911d71ba6c3d90c170ad59e2b87402bddb3bb8698636e2ba",
+        "lua/dap-view/setup/validate/init.lua": "c05c98bf7877e3a8d937684ee8c9b31b1833b713f5cf51596d276b3f7ce8f861",
+        "lua/dap-view/setup/validate/keymaps.lua": "206daa5bc41dc5dd88c16dd0dd502ab2dbf10099a0f7a791b2c33324439584a3",
+        "lua/dap-view/setup/validate/render.lua": "aa5134c5630d597ef5a2ba329c3c7f49b3ea78d3b6bc371bf4a4e8c4a3003b35",
+        "lua/dap-view/setup/validate/util.lua": "f9d28b9f2a7408031bc20120c57cc1e4734afa181cdda7b117b4ba64185077a1",
+        "lua/dap-view/setup/validate/virtual-text.lua": "f28cfe7c8bde7e1211cb3c51316691c88c4ac14663680de01398dfb570f35610",
+        "lua/dap-view/setup/validate/winbar.lua": "b0b2810907418f17a18d6ca3ab18b6520f1844f874ebc95827f5df9abf5bee52",
+        "lua/dap-view/setup/validate/windows.lua": "90d32b9f4368e9fddb44ce8c477c09f821bfbc6993e9e59d09a10c9dc5ffe685",
+        "lua/dap-view/state.lua": "6f7e1cf5289d1755d9e7604ad783f00534a2b6f126d9df66ba77923101d352b8",
+        "lua/dap-view/threads/actions.lua": "1b4293020832b26dd8ac515a3c51afc74b1d249858cfbb14dacfc4764f57aeba",
+        "lua/dap-view/threads/init.lua": "ed9260fc21b6238de123b499babc6bb6ac0cb6295ef3211e92728761e36926f5",
+        "lua/dap-view/threads/keymaps.lua": "15052069faabde17fd92a18d068ce5131d01f641990220c26a01386acea62db8",
+        "lua/dap-view/threads/view.lua": "1fafdfe2a06582cfe47339d90e39bf78b035aec6964b42c3a98ffe1deba243e4",
+        "lua/dap-view/tree/traversal.lua": "651147c0ab38adfd1eb9227540c7df155b87629a6eb2463a7233318c8a5f640e",
+        "lua/dap-view/types.lua": "cfa16e15f53ddecd2c7fa05215adc1ac3c63864ef053cc11547f6d2e91c8ad73",
+        "lua/dap-view/util/adapter.lua": "4c45e550b5c5482d28b0043f5a398f935ffeebba1f5da7ed24e32a49cb5c0b39",
+        "lua/dap-view/util/align.lua": "8ce7142df4f2656f1c076e2bc60abeb401d890cdca1ba4bf0711fc8fdf6dd5c4",
+        "lua/dap-view/util/exprs.lua": "ede1adb2e6c0365cbeac6fc60c6001c55915fe4818ff875560d5883f56c99eae",
+        "lua/dap-view/util/float.lua": "67ddeb79db734236267bd4039c97e498d8ba7ac3736b51bebef31d92fa93c96b",
+        "lua/dap-view/util/fmt.lua": "4ba7ec637b2facc3198faa9f499ed3c728d580ccf5ae9817e370ea01db1cd41e",
+        "lua/dap-view/util/hl.lua": "06a322044555b7774e8ad7435f4f957777a5e00d2163ff526a46096a7a984076",
+        "lua/dap-view/util/init.lua": "220e72a5eafae3edcf2bf580c332c494c7d31c4eaa7fb15e1207a6950f497829",
+        "lua/dap-view/util/size.lua": "1c83cb1fc43c7f45cd14b3f827c694c58c1df247430aa9d37076867fe0dd0abe",
+        "lua/dap-view/util/source.lua": "28e3749f4de7f84fcaadcfb8bb7619e26439e24717e853fbbe2d34b5f6bd7a17",
+        "lua/dap-view/util/statusline.lua": "e7cad18dcfec4cdfe57f185b5a0adb5f9bdebef3f8ad002f64c22b4d140c1b90",
+        "lua/dap-view/util/tables.lua": "9911e50c77a53aaffd857019a3f469fe519138904c93f06452439f6a448c78af",
+        "lua/dap-view/util/trigger.lua": "f8ed92b3fc4f0275c712c524831918247b7cdd9988f29f558d143243951a2d7a",
+        "lua/dap-view/util/window.lua": "32f17636f71eec85f7fba09fba51806549f482ed76b8ee6874cd4c44841d402e",
+        "lua/dap-view/views/init.lua": "86fdf0a8393197da42f153f06043bc8588304f549159a9adf150121a2ebe6102",
+        "lua/dap-view/views/keymaps/help.lua": "710ca9da3daeb37fb68d722fe61c66519f61f8e4970df841932406fdbf48c567",
+        "lua/dap-view/views/keymaps/init.lua": "0bc001329e398ddec81b5a7fe72a0d2d045b7866b492bac973c4b58f5a485e9e",
+        "lua/dap-view/views/keymaps/util.lua": "782ad89b5ed54923f8c0a4395ce7a3c4524b94d857a7a5512d29043557f992f6",
+        "lua/dap-view/views/options.lua": "8d9aec403650f6b946d228e06f29c847c1bf6d536581ef357e8f3206890792e1",
+        "lua/dap-view/views/set.lua": "f57b21c261ccd25b789ad6e33d4f10429aa890051a21d2cc00aaba6f172142c7",
+        "lua/dap-view/views/util.lua": "6d6df9471b7cb5484167fc2e4b8bd6cd3e9c4ecc1f78eeb759286b18eeeb3a87",
+        "lua/dap-view/views/windows/init.lua": "0672804dc0ab369dd86c6aabfc4b7a7c0da5d80a6c031a0cc13491a540824d3d",
+        "lua/dap-view/views/windows/switchbuf.lua": "f1f452fe1fb01cc1c6702293a70c72f31709d1afe1d2a34c54b70bd108b95522",
+        "lua/dap-view/vim-sessions.lua": "7df611ca3b2bf7aa1bb279c9b417d325746286deddf5c44ba8b93ac0e8590605",
+        "lua/dap-view/virtual-text.lua": "e78a9cf591b8c0b859b23125f61874d1d87b0f8ea6b56ed64fae9fbf1b021fd6",
+        "lua/dap-view/watches/actions.lua": "a8a83b57ad4df25ffc12498776f63634eee048d49354784fafe1256556f765e3",
+        "lua/dap-view/watches/eval.lua": "dca95d06c00f1a53a7f7ab3a75dc1a3d9312ee95d16e789184c2d2e39c1b9b69",
+        "lua/dap-view/watches/keymaps.lua": "f05730d443b9a0f42373ab38585c1936d9b8930aa54a060e7877e4060bb669b7",
+        "lua/dap-view/watches/view.lua": "3598732a90b395ba3fc490163e8d5e8e315303db66f8b65496553a787925d305",
+        "plugin/dap-view.lua": "4907c56a84898bc482afca308e5633159e4ac0a8285025dcfa39cfbd90b2916c"
+      }
+    }
+  },
+  "upstream": {
+    "follow": {
+      "kind": "default_branch"
+    },
+    "repository": "https://github.com/igorlfs/nvim-dap-view"
+  }
+}

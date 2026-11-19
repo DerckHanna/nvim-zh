@@ -204,7 +204,11 @@ nvim-dap-ui translates fixed render text, mappings, float titles, element and
 Window selectors, and notifications. Variables, expressions, frames, paths,
 protocol objects and debugger output retain their source values.
 
-The five adapters include Chinese excerpts from frequently used help topics.
+nvim-dap-view translates default tabs and keymap descriptions, empty views,
+g?, input prompts and jump choices, notifications, configuration errors,
+and recognized CodeLLDB labels. Enable nvim-zh or register the source before
+loading dap-view. See |dap-view.txt| for the full Chinese help.
+
 lazy.nvim supplies the User LazyLoad lifecycle event. nvim-cmp completion data
 comes from completion sources or user formatters. See manifests/adapters/ and
 docs/adapters.md for fixed revisions, source digests and supported features.

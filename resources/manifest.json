@@ -1,9 +1,9 @@
 {
-  "adapter_contract": "5ed8079264685de151ff2210ad2ba09f75cd24ee95f9a9e1312610bfbe5dca75",
+  "adapter_contract": "a9c4443c809079402701afcd353c96aa39f60eaa77bef1b43c6a46106fab1f87",
   "bundle": {
     "files": {
       "adapter-contract.json": {
-        "sha256": "3cb20917d368af3f7394621655bfa2d2be04bd9799c24364248a70bdc3edb5b9",
+        "sha256": "2cbd81d715a3e27acef0799093e36d8e1a76344e118040e69cbc05b98174f4ba",
         "size": 79
       },
       "catalogs/clangd.json": {
@@ -13,6 +13,10 @@
       "catalogs/nvim-dap-ui.json": {
         "sha256": "decd2b44877ce046d71bbaed3f2754823b4cf32309342b51d0489098822ca145",
         "size": 5138
+      },
+      "catalogs/nvim-dap-view.json": {
+        "sha256": "646bd6f23fc662474eda1136f7da21d5810932c4226d8a343fb0abad577389dd",
+        "size": 20119
       },
       "catalogs/nvim-dap.json": {
         "sha256": "0533fb0027dbf47dcff43d54e4e177d0aa2a8f3d2d52ba2dc320833933e6e0f4",
@@ -49,6 +53,14 @@
       "help/adapters/nvim-dap-ui/nvim-dap-ui.txt/doc/tags-cn": {
         "sha256": "1c17024563a5accc58679a6222fd1f8bddf85de0f6b2393d643f0e8dd85d1bad",
         "size": 1444
+      },
+      "help/adapters/nvim-dap-view/dap-view.txt/doc/dap-view.cnx": {
+        "sha256": "87d2b80a3af20c4d1a3372565884d67c0d7a76790d531c4ded9566c2778bc5a6",
+        "size": 36341
+      },
+      "help/adapters/nvim-dap-view/dap-view.txt/doc/tags-cn": {
+        "sha256": "f6131156d8ea7d481ec367ede8a7ba8ac65b75dc1bacd353040a52bf1dc6fe30",
+        "size": 898
       },
       "help/adapters/nvim-dap/dap.txt/doc/dap-configuration.cnx": {
         "sha256": "317366974b13f56ae0e0399250a2e2f43c0df2f7d7e41213c9a04bcb0b85c8cc",
@@ -359,12 +371,12 @@
         "size": 25427
       },
       "help/doc/nvim-zh.cnx": {
-        "sha256": "fcef2f397d7d5d8cd1b8891d9a1af56d585635fa10d7fa46c4720b8df20e9175",
-        "size": 10628
+        "sha256": "3020ef287f42e5cf1fb69bf8a52846fe962fd72e73490632abb2c43ba6af1cc5",
+        "size": 10880
       },
       "help/doc/nvim-zh.txt": {
-        "sha256": "6a8e688b404135be5216efc943ec32365328f39f91a6a76014313ce902bcfbf5",
-        "size": 11848
+        "sha256": "27d8ee9ad508e826de28863a0e71c34bede98443303b3e28f231b4b0a2dc18c3",
+        "size": 12062
       },
       "help/doc/nvim.cnx": {
         "sha256": "0c2832c7f7592a7d8f25aef17287c1ec042a0a66b41e2c470848b2376119efe5",
@@ -675,11 +687,11 @@
         "size": 213466
       },
       "summary.json": {
-        "sha256": "0b6080997a6fc5f0907c18c04e360c722707dda0ed95c59e353a437e69fa4187",
-        "size": 724
+        "sha256": "8e806f2f6e92ef796cf08200748b22e52a205f28f2f6f709418773c88b598371",
+        "size": 750
       }
     },
-    "id": "4d4b4fe74ceffdd4ea3eebfba3ae7899eea51b8947e8c9bd1d4e3c6b7296fafb"
+    "id": "fb6abc67a46fa5ff77f784399a8b27f26baa029f5d4ea66bd8d61af4faed338c"
   },
   "implementation": {
     "files": {
@@ -688,12 +700,12 @@
         "size": 2260
       },
       "lua/nvim-zh/adapters/evidence.lua": {
-        "sha256": "868304efcd29b86d40a9dbad1e992e7b10664553b9a1efb678393fb2dd9ef388",
-        "size": 7733
+        "sha256": "67b5dacc8d68002eea522b98a50868c1e36f654fba06bbd6a85edeaf4b3eab3d",
+        "size": 9361
       },
       "lua/nvim-zh/adapters/index.lua": {
-        "sha256": "08c351f8d4138944ce2747c92cc2e0bcdae877234e9e315a643984a0172ccc84",
-        "size": 38119
+        "sha256": "819819eb7d7afd03082f5e6773d3245c1ff6917fbdbeff0f55718ff55442014e",
+        "size": 52031
       },
       "lua/nvim-zh/adapters/nvim_dap.lua": {
         "sha256": "70478d3392a9650ccfe2d05b5cf45fec93df8cc221b23991d615097fa2cea240",
@@ -702,6 +714,10 @@
       "lua/nvim-zh/adapters/nvim_dap_ui.lua": {
         "sha256": "7acd27a967fef61feb184fbf66173fe54171cc1805bdb3ef914d89ee638d2a66",
         "size": 18405
+      },
+      "lua/nvim-zh/adapters/nvim_dap_view.lua": {
+        "sha256": "7ad70df6422eecb01dd66ee120014b51d6b83a0557db568294a82ef2cd0676ad",
+        "size": 25429
       },
       "lua/nvim-zh/adapters/nvim_tree.lua": {
         "sha256": "92a74705cadbaef439474dff9fe376befa20aa4cb040ad16ee8d131dda79319e",
@@ -812,7 +828,7 @@
         "size": 448
       }
     },
-    "id": "f81a8842acf3a7411a49e614d9ee7bc20df9c261c88d60ade20eddc50fe15a64"
+    "id": "1811fd67a29a6ba9bdb5a5d0b22fcc4bfec9dbe4d71a4ebe4a47499ea10614ab"
   },
   "runtime_api": 1,
   "schema": 1,

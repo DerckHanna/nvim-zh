@@ -11,7 +11,7 @@
 | `make test-tools` | `tests/tools` | PO/native/资源构建、原子写、安全发布、Help relay 与 inventory |
 | `make test-integration` | `tests/integration` | 配置保存/回滚、真实 Neovim Help/诊断、资源状态、并发、native 与可选 clangd |
 | `make test-e2e` | `tests/e2e` | 真实 PTY、只读 TUI、临时本地 Git 与 vim.pack、可选中文欢迎页 |
-| `make test-upstream` | `tests/upstream` | 固定 which-key、Telescope、lazy、nvim-tree、cmp、nvim-dap、nvim-dap-ui 的公开或固定显示接缝与源码摘要 |
+| `make test-upstream` | `tests/upstream` | 固定 which-key、Telescope、lazy、nvim-tree、cmp、nvim-dap、nvim-dap-ui、nvim-dap-view 的显示接缝与源码摘要 |
 
 默认 `make test` 顺序执行前五类，不访问网络、不要求第三方源码。真实终端和本地 Git/vim.pack 都是离线测试。`tests/fixtures` 保存输入与历史服务器观察；`tests/support` 保存共享断言及进程环境，不向产品发布 fixture 目录条目。
 
@@ -48,6 +48,8 @@ NVIM_ZH_ADAPTER_SOURCE_ROOT="$up" make test-upstream
 ```
 
 `fetch` 是显式联网入口。测试读取本地检出并校验源码摘要。需要保留机读证据时，将 `NVIM_ZH_ADAPTER_REPORT` 指向要保存的 JSON 文件。单适配器的 `test <id> --upstream --target baseline --source-root "$up"` 运行该组合的全部真实终端场景。缺失源码、摘要不符、PTY 环境不可用或屏幕断言失败均返回非零退出码。离线契约使用 `test <id> --offline` 单独运行。覆盖与候选审计详见[适配系统设计](adapter-system-design.md)。
+
+nvim-dap-view 的固定上游测试还需要 `g++`、PATH 中的 `codelldb` 和跟踪子进程的权限。它在临时目录编译练习程序，并在真实调试会话和定向夹具中各执行中文启停对照。设置 `NVIM_ZH_DAP_VIEW_EVIDENCE` 可保存捕获的终端画面。可用 `NVIM_ZH_DAP_VIEW_MAIN` 指定练习程序源文件的副本。
 
 可选 GDB 终端探针要求 C 编译器、支持 DAP 的 GDB 和跟踪其子进程的权限。用与清单一致的三个固定源码目录运行。
 

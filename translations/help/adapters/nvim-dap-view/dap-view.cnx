@@ -1,0 +1,986 @@
+*dap-view.txt*
+
+nvim-dap-view 是 nvim-dap 的调试界面。
+
+警告：如果所用插件会覆盖 |winbar| 选项，请务必对 nvim-dap-view 的 buffer
+禁用该选项（见 |dap-view-filetypes|）。
+
+==============================================================================
+功能特性                                                   *dap-view-features*
+
+本插件提供 8 个“视图”（又称“分区”），它们（大体上）共用同一个 window
+（因此会显得拥挤）。
+
+它还会用 inline 虚拟文本预览变量。
+
+监视视图 ~
+
+显示用户自定义表达式的列表，这些表达式由调试适配器求值
+
+- 表达式的基本 CRUD 操作
+- 展开、折叠、复制或设置表达式与变量的值
+
+线程视图 ~
+
+列出所有线程及其调用栈
+
+- 跳转到调用栈中的某个函数，并把上下文切换到该次调用
+- 用 Lua 模式过滤栈帧
+- 切换“subtle”（隐藏）栈帧的显示
+
+断点视图 ~
+
+列出所有断点，并带完整的语法高亮，包括 treesitter 与（来自 LSP 的）语义
+token
+
+- 跳转到断点所在位置
+- 删除断点
+
+异常视图 ~
+
+在常规断点之外控制调试器何时应当停下（例如每当抛出异常时）
+
+作用域视图 ~
+
+查看作用域内的所有变量
+
+- 展开、折叠与设置变量的值
+
+会话视图 ~
+
+列出所有调试会话（默认禁用）
+
+- 切换到某个会话
+
+REPL 视图 ~
+
+使用 nvim-dap 提供的 REPL
+
+终端视图 ~
+
+你也可以与 console（terminal）交互，它同样由 nvim-dap 提供。默认情况下，
+console 有自己独立的 window，但也可以配置为与其他视图一起显示
+（参见 |dap-view-configuration|）。
+
+自定义视图 ~
+
+你也可以编写自己的视图（见 |dap-view-custom-views|）。
+
+控制栏 ~
+
+nvim-dap-view 还提供一个“非视图”组件：控制栏，它暴露若干可点击的按钮来
+控制你的会话。该组件默认禁用。
+
+虚拟文本 ~
+
+nvim-dap-view 自带一个 nvim-dap-virtual-text 的最小重实现：它用 “inline”
+虚拟文本显示变量的值。默认禁用。需要 0.12+。
+
+警告：nvim-dap-view 不会自动启动，你必须使用命令或 API。要改变这一行为，
+请启用 `auto_toggle` 选项。
+
+==============================================================================
+配置                                                  *dap-view-configuration*
+
+
+默认配置在插件加载时应用。你可以调用 `require"dap-view".setup(opts)` 调整
+选项。你的选项会与默认值深度合并，因此只需覆盖你真正想改的部分。
+
+你不必原样复制粘贴这些选项，把它们当作参考即可。
+    >lua
+    return {
+        winbar = {
+            show = true,
+            -- You can add a "console" section to merge the terminal with the other views
+            sections = { "watches", "scopes", "exceptions", "breakpoints", "threads", "repl" },
+            -- Must be one of the sections declared above
+            default_section = "watches",
+            -- Append hints with keymaps within the labels
+            show_keymap_hints = true,
+            -- List of up to 2 strings, defining left and right separators
+            separators = nil,
+            -- Configure each section individually
+            base_sections = {
+                -- Labels can be set dynamically with functions
+                -- Each function receives the window's width and the current section as arguments
+                breakpoints = { label = "Breakpoints", keymap = "B" },
+                scopes = { label = "Scopes", keymap = "S" },
+                exceptions = { label = "Exceptions", keymap = "E" },
+                watches = { label = "Watches", keymap = "W" },
+                threads = { label = "Threads", keymap = "T" },
+                repl = { label = "REPL", keymap = "R" },
+                sessions = { label = "Sessions", keymap = "K" },
+                console = { label = "Console", keymap = "C" },
+            },
+            -- Add your own sections
+            custom_sections = {},
+            controls = {
+                enabled = false,
+                position = "right",
+                buttons = {
+                    "play",
+                    "step_into",
+                    "step_over",
+                    "step_out",
+                    "step_back",
+                    "run_last",
+                    "terminate",
+                    "disconnect",
+                },
+                custom_buttons = {},
+            },
+        },
+        windows = {
+            size = 0.25,
+            position = "below",
+            terminal = {
+                size = 0.5,
+                position = "left",
+                -- List of debug adapters for which the terminal should be ALWAYS hidden
+                -- Can also be set to "true" to never show the terminal
+                hide = {},
+            },
+        },
+        -- Bindings can be disabled by assigning to an empty table
+        keymaps = {
+            scopes = {
+                toggle = { "<CR>", "<2-LeftMouse>" },
+                jump_to_parent = "[[",
+                set_value = "s",
+            },
+            watches = {
+                toggle = { "<CR>", "<2-LeftMouse>" },
+                jump_to_parent = "[[",
+                set_value = "s",
+                copy_value = "c",
+                delete_expression = "d",
+                append_expression = "a",
+                insert_expression = "i",
+                edit_expression = "e",
+            },
+            hover = {
+                quit = "q",
+                toggle = { "<CR>", "<2-LeftMouse>" },
+                jump_to_parent = "[[",
+                set_value = "s",
+            },
+            help = {
+                quit = "q",
+            },
+            console = {
+                next_session = "]s",
+                prev_session = "[s",
+            },
+            threads = {
+                toggle_subtle_frames = "t",
+                filter = "f",
+                invert_filter = "o",
+                jump_to_frame = { "<CR>", "<2-LeftMouse>" },
+                force_jump = "<C-w><CR>",
+            },
+            exceptions = {
+                toggle_filter = { "<CR>", "<2-LeftMouse>" },
+                set_condition = { "s" },
+                clear_condition = { "x" },
+            },
+            sessions = {
+                switch_session = { "<CR>", "<2-LeftMouse>" },
+            },
+            breakpoints = {
+                delete_breakpoint = "d",
+                jump_to_breakpoint = { "<CR>", "<2-LeftMouse>" },
+                force_jump = "<C-w><CR>",
+            },
+            base = {
+                next_view = "]v",
+                prev_view = "[v",
+                jump_to_first = "[V",
+                jump_to_last = "]V",
+                help = "g?",
+            },
+        },
+        icons = {
+            collapsed = "󰅂 ",
+            disabled = "",
+            disconnect = "",
+            enabled = "",
+            expanded = "󰅀 ",
+            filter = "󰈲",
+            negate = " ",
+            pause = "",
+            play = "",
+            run_last = "",
+            step_back = "",
+            step_into = "",
+            step_out = "",
+            step_over = "",
+            terminate = "",
+        },
+        help = {
+            border = nil,
+        },
+        hover = {
+            border = nil,
+        },
+        render = {
+            -- Optionally a function that takes two `dap.Variable`'s as arguments
+            -- and is forwarded to a `table.sort` when rendering variables in the scopes view
+            sort_variables = nil,
+            -- Full control of how frames are rendered, see the "Custom Formatting" section
+            threads = {
+                -- Choose which items to display and how
+                format = function(name, lnum, path)
+                    return {
+                        { text = name, separator = " " },
+                        { text = path, hl = "FileName", separator = ":" },
+                        { text = lnum, hl = "LineNumber" },
+                    }
+                end,
+                -- Align columns
+                align = false,
+            },
+            -- Full control of how breakpoints are rendered, see the "Custom Formatting" section
+            breakpoints = {
+                -- Choose which items to display and how
+                format = function(line, lnum, path)
+                    return {
+                        { text = path, hl = "FileName" },
+                        { text = lnum, hl = "LineNumber" },
+                        { text = line, hl = true },
+                    }
+                end,
+                -- Align columns
+                align = false,
+            },
+        },
+        -- Requires neovim 0.12+
+        virtual_text = {
+            -- Control with `DapViewVirtualTextToggle`
+            enabled = false,
+            -- Supported options include "inline", "eol", and "eol_right_align"
+            position = "inline",
+            format = function(variable)
+                return " " .. variable.value
+            end,
+            -- Prepend the variable name (when using eol positioning)
+            prefix = function(position, node, bufnr)
+                if position == "eol" or position == "eol_right_align" then
+                    local name = vim.treesitter.get_node_text(node, bufnr)
+
+                    return name .. " ="
+                end
+            end,
+            -- Add commas between variables (when using eol positioning)
+            suffix = function(position, _, _, var_index, num_var_line)
+                if position == "eol" or position == "eol_right_align" then
+                    return var_index == num_var_line and "" or ","
+                end
+            end,
+        },
+        -- Controls how to jump when selecting a breakpoint or navigating the stack
+        -- Comma separated list, like the built-in 'switchbuf'. See :help 'switchbuf'
+        -- Only a subset of the options is available: newtab, useopen, usetab and uselast
+        -- Can also be a function that takes the current winnr and the destination bufnr
+        -- If a function, should return the winnr of the destination window
+        switchbuf = "usetab,uselast",
+        -- Auto open when a session is started and auto close when all sessions finish
+        -- Alternatively, can be a string:
+        -- - "keep_terminal": as above, but keeps the terminal when the session finishes
+        -- - "open_term": open the terminal when starting a new session, nothing else
+        -- - "open": self explanatory
+        auto_toggle = false,
+        -- Reopen dapview when switching to a different tab
+        -- Can also be a function to dynamically choose when to follow, by returning a boolean
+        -- If a function, receives the name of the adapter for the current session as an argument
+        follow_tab = false,
+    }
+==============================================================================
+映射                                                        *dap-view-keymaps*
+
+除了用于切换视图的映射之外，每个视图还有自己的映射。任何时候（在
+nvim-dap-view 的主 window 内）都可以用 `g?` 打开一个“帮助”window，其中
+列出所有这些映射。
+
+nvim-dap-view 不在自己的 buffer 之外定义任何按键绑定：你需要自己创建绑定，
+用来调用 `open`、`close` 或 `toggle` 以及其它 API 函数或命令。
+
+==============================================================================
+命令                                                       *dap-view-commands*
+
+命令提供与 API 相同的功能。
+
+DapViewOpen ~
+
+打开两个 dap-view window：视图与 console。
+
+DapViewClose ~
+
+关闭视图 window。接受 bang（即 `:DapViewClose!`），此时还会隐藏 terminal
+window。
+
+DapViewToggle ~
+
+如果没有视图 window，则行为同 `DapViewOpen`；否则行为同 `DapViewClose`
+（也接受 bang，此时行为同 `DapViewClose!`）。
+
+DapViewWatch ~
+
+在普通模式下，把光标下的表达式加入监视列表；在可视模式下，把选中内容加入
+监视列表。也接受直接给出表达式（即 `:DapViewWatch foo + bar`），此形式优先。
+
+DapViewJump [view] ~
+
+显示给定视图并跳转到它的 window。例如要跳到 REPL，可以使用
+`:DapViewJump repl`。
+
+DapViewShow [view] ~
+
+显示给定视图。如果指定的视图已是当前视图，则跳转到它的 window。
+
+DapViewNavigate [number] ~
+
+以当前视图（在 winbar 中）的序号为起点加上计数，从当前视图切换到另一个
+视图。可以选择性地给出 bang 以允许回绕。它带有一些默认映射。
+
+DapViewHover ~
+
+在普通模式下，用光标下的变量打开悬停 window；在可视模式下，用选中内容打开
+悬停 window。也接受直接发送表达式（即 `:DapViewHover foo[1].bar`），此形式
+优先。接受 bang（即 `DapViewHover!`）以把焦点移入该 window。如果该 window
+已存在但未获得焦点，调用 `DapViewHover` 总会聚焦它。
+
+虚拟文本 ~
+
+对虚拟文本的显示做细粒度控制：
+- `DapViewVirtualTextEnable`
+- `DapViewVirtualTextDisable`
+- `DapViewVirtualTextToggle`
+
+==============================================================================
+API                                                             *dap-view-api*
+
+API 提供与命令相同的功能。
+
+打开 ~
+    >lua
+    require("dap-view").open()
+
+打开两个 nvim-dap-view window：视图与 console。
+
+关闭 ~
+    >lua
+    ---@param hide_terminal? boolean
+    require("dap-view").close()
+
+关闭视图 window。如指定参数，还可隐藏 terminal window。
+
+切换 ~
+    >lua
+    ---@param hide_terminal? boolean
+    require("dap-view").toggle()
+
+如果没有视图 window，则调用 `require("dap-view").open()`；否则行为同
+`require("dap-view").close()`。
+
+添加表达式 ~
+    >lua
+    ---@param expr? string
+    ---@param default_expanded? boolean
+    require("dap-view").add_expr(expr, default_expanded)
+
+在普通模式下，把光标下的表达式加入监视列表；在可视模式下，把选中内容加入
+监视列表。如果给出了 expr，则直接添加该表达式，覆盖前述情形。表达式会被
+展开（非递归）：把 `default_expanded` 设为 false 可以覆盖此行为。
+
+跳转到视图 ~
+    >lua
+    ---@param view dapview.Section
+    require("dap-view").jump_to_view(view)
+
+显示给定视图并跳转到它的 window。
+
+显示视图 ~
+    >lua
+    ---@param view dapview.Section
+    require("dap-view").show_view(view)
+
+显示给定视图。如果指定的视图已是当前视图，则跳转到它的 window。
+
+导航 ~
+    >lua
+    ---@param opts {count: number, wrap: boolean, type?: 'views' | 'sessions'}
+    require("dap-view").navigate(opts)
+
+以当前视图（在 winbar 中）的序号为起点加上计数，从当前视图切换到另一个
+视图。如指定，也可用于在会话之间导航。它带有一些默认映射。
+
+悬停 ~
+    >lua
+    ---@param expr? string
+    ---@param enter? boolean
+    ---@param opts? {context: "watch" | "repl" | "hover" | "clipboard" | "variables" | string}
+    require("dap-view").hover(expr, enter, opts)
+
+在普通模式下，用光标下的变量打开悬停 window；在可视模式下，用选中内容打开
+悬停 window。如果 `expr` 不是 `nil`，则直接对其求值，跳过前述情形。`enter`
+会把焦点移入该 window；但如果该 window 已存在且未获得焦点，则无论此参数
+如何，该 window 都会被聚焦。
+
+可以用 `opts` 进一步定制悬停显示。特别是把 `opts.context` 设为 “repl”，
+对某些适配器可能有用。
+
+补全 ~
+    >lua
+    ---@param arg_lead string
+    ---@param cmdline string
+    ---@param cursor_pos number
+    require("dap-view").complete(arg_lead, cmdline, cursor_pos)
+
+为给定输入发出补全候选（见 |vim.ui.input|、|:command-completion|）。
+nvim-dap-view 内部会用到它，但你也可以用它接入自己的补全（例如用于条件
+断点）。见 |dap-view-completion|。
+
+虚拟文本 ~
+
+对虚拟文本的显示做细粒度控制：
+    >lua
+    require("dap-view").virtual_text_enable()
+    require("dap-view").virtual_text_disable()
+    require("dap-view").virtual_text_toggle()
+
+==============================================================================
+文件类型                                                  *dap-view-filetypes*
+
+nvim-dap-view 会设置以下 filetype：`dap-view`、`dap-view-term`、
+`dap-view-hover` 与 `dap-view-help`。
+
+它们可用来覆盖 buffer 与 window 选项。
+
+如果启用了 REPL，则还会使用 nvim-dap 设置的 `dap-repl` filetype。
+
+自定义视图也可以设置自己的 filetype。
+
+==============================================================================
+补全                                                     *dap-view-completion*
+
+你可以借助 nvim-dap-view 的补全能力为 nvim-dap 的内置功能提供支持。
+
+以下示例使用这个辅助函数：
+    >lua
+    ---@param line integer?
+    ---@return dap.bp?
+    local function get_breakpoint_by_line(line)
+        local line_ = line or api.nvim_win_get_cursor(0)[1]
+        local buf = api.nvim_get_current_buf()
+        local breakpoints = require("dap.breakpoints").get(buf)
+        local breakpoint = vim.iter(breakpoints[buf] or {}):find(function(bp)
+            return bp.line == line_
+        end)
+
+        return breakpoint
+    end
+
+条件断点 ~
+    >lua
+    vim.keymap.set("n", "<F21>", function()
+        local default = get_breakpoint_by_line()
+
+        vim.ui.input({
+            prompt = "Breakpoint condition: ",
+            -- Note that the function is not called directly
+            completion = "customlist,v:lua.require'dap-view'.complete",
+            default = default and default.condition,
+        }, function(input)
+            if input then
+                require("dap").set_breakpoint(input)
+            end
+        end)
+    end)
+
+日志点 ~
+
+注意，日志点与常规断点的工作方式不同。`{}` 内的表达式会被插值，其它地方的
+文本按字面解释。
+    >lua
+    vim.keymap.set("n", "<F8>", function()
+        local default = get_breakpoint_by_line()
+
+        vim.ui.input({
+            prompt = "Log point message: ",
+            completion = "customlist,v:lua.require'dap-view'.complete",
+            default = default and default.logMessage,
+        }, function(input)
+            if input then
+                require("dap").set_breakpoint(nil, nil, input)
+            end
+        end)
+    end)
+
+==============================================================================
+常见问题                                                        *dap-view-faq*
+
+切换 tab 时 nvim-dap-view 为什么会消失？ ~
+
+nvim-dap-view 的默认值力求不打扰用户：不被显式调用时它不会启动。也就是说，
+默认情况下它在切换 tab 时不会重新打开。如果你更希望 nvim-dap-view 的
+window“跟随”当前 tab，可以打开 `follow_tab` 选项：
+    >lua
+    -- Your nvim-dap-view config
+    return {
+        -- Can also be a function to dynamically choose when to follow, by returning a boolean
+        follow_tab = true,
+    }
+
+为什么 `DapViewWatch` 没有把整个变量加进去？ ~
+
+在普通模式下，`:DapViewWatch` 会展开光标下的 <cexpr>。默认情况下，该设置
+对类 C 语言工作得很好，但对其它语言可能很麻烦。为应对这种情况，你可以调整
+'iskeyword' 选项的值。例如对 PHP，你可以用：
+    >vim
+    set iskeyword+=$
+
+如何控制跳转到哪个 window？ ~
+
+nvim-dap-view 自带自己的 |switchbuf|，它支持 Neovim 内置选项的一个子集：
+newtab、useopen、usetab 与 uselast。你可以这样定制：
+    >lua
+    -- Your nvim-dap-view config
+    return {
+        switchbuf = "useopen",
+    }
+
+可以用逗号定义回退行为（例如 `useopen,newtab` 在找不到 buffer 时新建一个
+tab）。如果连回退行为也匹配不到，则会打开顶层分屏。如果默认选项满足不了
+需求，见 |dap-view-switchbuf|。
+
+程序停下时 nvim-dap 为什么会覆盖其中一个 window？ ~
+
+当 `windows.terminal.position` 设为 right 时，主 window 可能被用来显示当前
+栈帧，因为 nvim-dap 有自己的内部 |switchbuf| 设置，其默认值取全局值。常见
+的解决办法是把 nvim-dap 的 switchbuf 设为另一个值。例如：
+    >lua
+    -- Don't change focus if the window is visible,
+    -- otherwise jump to the first window (from any tab) containing the buffer
+    --
+    -- If no window contains the buffer, create a new tab
+    --
+    -- See :help dap-defaults to learn more
+    require("dap").defaults.fallback.switchbuf = "usevisible,usetab,newtab"
+==============================================================================
+高亮组                                             *dap-view-highlight-groups*
+
+nvim-dap-view 定义了 34 个（nvim 0.12+ 上为 42 个）高亮组，链接到（大体）
+合理的默认值。
+
+高亮组                                默认链接
+
+`NvimDapViewBoolean`                  Boolean
+`NvimDapViewConstant`                 Constant
+`NvimDapViewControlDisconnect`        DapBreakpoint
+`NvimDapViewControlNC`                Comment
+`NvimDapViewControlPause`             Boolean
+`NvimDapViewControlPlay`              Keyword
+`NvimDapViewControlRunLast`           Keyword
+`NvimDapViewControlStepBack`          Function
+`NvimDapViewControlStepInto`          Function
+`NvimDapViewControlStepOut`           Function
+`NvimDapViewControlStepOver`          Function
+`NvimDapViewControlTerminate`         DapBreakpoint
+`NvimDapViewExceptionFilterDisabled`  DiagnosticError
+`NvimDapViewExceptionFilterEnabled`   DiagnosticOk
+`NvimDapViewFileName`                 qfFileName
+`NvimDapViewFloat`                    Float
+`NvimDapViewFrameCurrent`             DiagnosticVirtualTextWarn
+`NvimDapViewFunction`                 Function
+`NvimDapViewLineNumber`               qfLineNr
+`NvimDapViewMissingData`              DapBreakpoint
+`NvimDapViewNumber`                   Number
+`NvimDapViewSeparator`                Comment
+`NvimDapViewString`                   String
+`NvimDapViewTabFill`                  TabLineFill
+`NvimDapViewTabSelectedSeparator`     NvimDapViewTabSelected
+`NvimDapViewTabSelected`              TabLineSel
+`NvimDapViewTabSeparator`             NvimDapViewTab
+`NvimDapViewTab`                      TabLine
+`NvimDapViewThreadError`              DiagnosticError
+`NvimDapViewThreadStopped`            Conditional
+`NvimDapViewThread`                   Tag
+`NvimDapViewWatchError`               DiagnosticError
+`NvimDapViewWatchPending`             DiagnosticHint
+`NvimDapViewWatchExpr`                Identifier
+`NvimDapViewWatchUpdated`             DiagnosticVirtualTextWarn
+
+从 neovim 0.12+ 起，`Boolean`、`Constant`、`Float`、`Function`、`Number` 与
+`String` 都有 `Dim` 变体，用于虚拟文本。此外还有 `NvimDapViewVirtualText`
+（“回退”项，链接到 `NonText`）与 `NvimDapViewVirtualTextUpdated`（链接到
+`NvimDapViewWatchUpdated`，但同时做了调暗处理）。
+
+==============================================================================
+控制栏                                                  *dap-view-control-bar*
+
+控制栏可用于通过可点击的“按钮”控制会话。
+
+它默认禁用，可以将 `winbar.controls.enabled` 设为 `true` 来启用。
+
+参见 |dap-view-configuration| 了解它的全部配置选项。
+
+自定义按钮 ~
+
+nvim-dap-view 为控制栏提供了一些默认按钮，但你也可以添加自己的按钮。做法是
+用 `winbar.controls.custom_buttons` table 声明新按钮，然后在
+`winbar.controls.buttons` 列表中的所需位置加入它。
+
+自定义按钮有 2 个方法：
+
+1. `render`，返回用于显示按钮的字符串（通常是包在高亮组中的 emoji 或
+   NerdFont 字形）。它接收获得焦点的会话作为参数。
+2. `action`，按钮被点击时执行的函数。该函数接收 3 个参数：
+    - `clicks`，点击次数
+    - `button`，被点击的按钮（l、r、m）
+    - `modifiers`，按下的修饰键列表（c 表示 control、s 表示 shift、
+    a 表示 alt、m 表示 meta）
+
+点击处理器的完整规范见 |statusline| 中的 `@ N` 一节。
+
+示例 ~
+
+下面是一个添加 2 个按钮的示例：
+
+- `fun`：最基础的按钮，点击时仅打印 “🎊”
+- `term_restart`：一个混合按钮，充当停止或重启按钮。如果按钮的触发方式不是
+单次左键点击（中键点击、右键点击、双击或带修饰键的点击），它将断开会话而
+不是停止。
+
+    >lua
+    return {
+        winbar = {
+            controls = {
+                enabled = true,
+                buttons = { "play", "step_into", "step_over", "step_out", "term_restart", "fun" },
+                custom_buttons = {
+                    fun = {
+                        render = function()
+                            return "🎉"
+                        end,
+                        action = function()
+                            vim.print("🎊")
+                        end,
+                    },
+                    -- Stop | Restart
+                    -- Double click, middle click or click with a modifier disconnect instead of stopping
+                    term_restart = {
+                        render = function(session)
+                            local group = session and "ControlTerminate" or "ControlRunLast"
+                            local icon = session and "" or ""
+                            return "%#NvimDapView" .. group .. "#" .. icon .. "%*"
+                        end,
+                        action = function(clicks, button, modifiers)
+                            local dap = require("dap")
+                            local alt = clicks > 1 or button ~= "l" or modifiers:gsub(" ", "") ~= ""
+                            if not dap.session() then
+                                dap.run_last()
+                            elseif alt then
+                                dap.disconnect()
+                            else
+                                dap.terminate()
+                            end
+                        end,
+                    },
+                },
+            },
+        },
+    }
+
+==============================================================================
+自定义格式化                                      *dap-view-custom-formatting*
+
+你可以用特殊的格式化函数控制某些视图的文本显示方式。每个可定制的视图都有
+自己的参数，但期望的返回类型相同：一个
+`{text: string, hl?: string, separator?: string}` 数组。
+`text` 是“内容”本身，`hl` 是 nvim-dap-view 的某个高亮组（不含
+`NvimDapView` 前缀），separator 可用来定制当前部分与下一部分之间的分隔符。
+
+分隔符必须是单个字符。未指定时使用竖线。
+
+此外，线程与断点都支持一个用于对齐列的标志。
+
+线程 ~
+
+你可以操作栈帧名（通常是函数名）、它的行号与路径。
+
+示例：
+
+- 只显示文件名，而不是相对路径
+
+    >lua
+    return {
+        render = {
+            threads = {
+                format = function(name, lnum, path)
+                    return {
+                        { text = name, separator = " " },
+                        -- See :h filename-modifiers
+                        { text = vim.fn.fnamemodify(buf_name, ":t"), hl = "FileName", separator = ":" },
+                        { text = lnum, hl = "LineNumber" },
+                    }
+                end,
+            },
+        },
+    }
+
+- 恢复 v1.0.0 之前的行为
+
+    >lua
+    return {
+        render = {
+            threads = {
+                format = function(name, lnum, path)
+                    return {
+                        { text = path, hl = "FileName" },
+                        { text = lnum, hl = "LineNumber" },
+                        { text = name },
+                    }
+                end,
+            },
+        },
+    }
+
+断点 ~
+
+除了断点的路径（与行号）之外，还可以操作该行自身的内容。把 `hl` 设为 true
+即可用 treesitter 对其高亮。
+
+示例：
+    >lua
+    return {
+        render = {
+            breakpoints = {
+                -- The line number HATER
+                format = function(line, _, path)
+                    return {
+                        { text = path, hl = "FileName" },
+                        { text = line, hl = true },
+                    }
+                end,
+                -- Alignment enjoyer
+                align = true,
+            },
+        },
+    }
+
+==============================================================================
+自定义视图                                             *dap-view-custom-views*
+
+你可以编写自己的视图。
+
+编写自定义视图与编写自定义按钮类似。一个视图由 ID 与 4 个字段组成：
+
+1. `label`，将显示在用户 winbar 中的字符串
+2. 用于渲染该组件的 `action` 函数
+3. `keymap`，用于触发该 action
+4. `buffer` 函数，用于创建新 buffer 并返回其 `bufnr`
+
+action 触发之后的逻辑不由 nvim-dap-view 处理。
+
+示例：
+
+- 一个最简陋的视图可以是这样：
+
+    >lua
+    return {
+        winbar = {
+            custom_sections = {
+                my_new_view = { -- the ID
+                    label = "My new view",
+                    action = function()
+                        vim.print("Hi from view")
+                    end,
+                    keymap = "M",
+                    buffer = function()
+                        return vim.api.nvim_create_buf(true, false)
+                    end,
+                },
+            },
+        },
+    }
+
+要把自定义视图加入配置，只需把它当作常规视图加入 sections table：
+    >lua
+    return {
+        winbar = {
+            sections = {
+                "my_new_view",
+                -- ...
+            },
+        },
+    }
+
+注册视图 ~
+
+如果你是插件作者，可以用 `register_view` 函数确保你的视图被加载。这样做之后，
+用户就不必“手动”创建该自定义视图了。
+
+==============================================================================
+高级 switchbuf                                            *dap-view-switchbuf*
+
+你可以用 nvim-dap-view 自己的 |switchbuf| 配置选项来调整 nvim-dap-view 的
+跳转到断点与栈帧功能的行为。与内置选项类似，你可以用逗号分隔的列表组合不同
+行为。可用选项包括：
+
+- `newtab`：总是新建一个 tab
+- `useopen`：只在当前 tab 中查找要跳转到的 buffer
+- `usetab`：类似 useopen，但会搜索所有 tab（默认）
+- `uselast`：如符合条件，跳转到上次使用的 window
+
+例如使用 `useopen,newtab` 时，如果当前 tab 中找不到该 buffer，就会新建一个
+tab。
+
+对于更高级的用法，你可以编写自己的 switchbuf 函数。它接收 2 个参数：当前
+window 号与要跳转到的 buffer 号。它应当（可选地）返回跳转目标 window 的
+window 号。
+
+如果某种选项组合得不到有效的目标 window 号（例如用 `useopen` 但 buffer 是
+隐藏的），则会回退为创建一个顶层分屏。
+
+强制行为 ~
+
+有时仅有自定义 switchbuf 还不够。在这些场景下，你可以用 <C-w><CR> 调出
+包含所有可用选项的列表来覆盖自己的设置，且只影响当前这次跳转。
+
+==============================================================================
+动态布局                                             *dap-view-dynamic-layout*
+
+你可以用函数为 nvim-dap-view 的 window 指定不同的位置与尺寸。这带来了很高
+的灵活性，参见下面的示例。
+
+在垂直与水平布局之间自动切换 ~
+
+当当前 tab 中只有一个 window 时，使用垂直布局以充分利用可用空间；其它场景
+下回退为常规的水平布局：
+    >lua
+    return {
+        windows = {
+            -- `prev` is the last used position, might be nil
+            position = function(prev)
+                local wins = vim.api.nvim_tabpage_list_wins(0)
+
+                -- Restores previous position if terminal is visible
+                if
+                    vim.iter(wins):find(function(win)
+                        return vim.w[win].dapview_win_term
+                    end)
+                then
+                    return prev
+                end
+
+                return vim.tbl_count(vim.iter(wins)
+                    :filter(function(win)
+                        local buf = vim.api.nvim_win_get_buf(win)
+                        local valid_buftype =
+                            vim.tbl_contains({ "", "help", "prompt", "quickfix", "terminal" }, vim.bo[buf].buftype)
+                        local dapview_win = vim.w[win].dapview_win or vim.w[win].dapview_win_term
+                        return valid_buftype and not dapview_win
+                    end)
+                    :totable()) > 1 and "below" or "right"
+            end,
+            size = function(pos)
+                return pos == "below" and 0.25 or 0.5
+            end,
+            terminal = {
+                -- `pos` is the position for the regular window
+                position = function(pos)
+                    return pos == "below" and "right" or "below"
+                end,
+                size = 0.5,
+            },
+        },
+    }
+
+在垂直与水平布局之间手动切换 ~
+
+如果你更希望明确指定每种布局在何时使用，可以用多个按键绑定：
+
+    >lua
+    -- Assign one keymap to
+    local horizontal_layout = function()
+        if not vim.g._dv_below then
+            require("dap-view").close(true)
+        end
+        vim.g._dv_below = true
+        require("dap-view").toggle()
+    end
+
+    -- And the other one to
+    local vertical_layout = function()
+        if vim.g._dv_below then
+            require("dap-view").close(true)
+        end
+        vim.g._dv_below = nil
+        require("dap-view").toggle()
+    end
+
+    -- your nvim-dap-view config
+    return {
+        windows = {
+            position = function()
+                return vim.g._dv_below and "below" or "right"
+            end,
+        }
+    }
+
+保留手动调整的尺寸 ~
+
+nvim-dap-view 总是尝试遵循预定义的尺寸。如果你更希望它跟随手动调整，
+可以使用下面的做法：
+
+    >lua
+    local api = vim.api
+
+    api.nvim_create_autocmd("WinResized", {
+        callback = function()
+            local win = require("dap-view.state").winnr
+
+            if not win then
+                return
+            end
+
+            local cfg = require("dap-view.setup").config
+
+            local pos_ = cfg.windows.position
+            local pos = type(pos_) == "function" and pos_() or pos_
+
+            vim.g._dv_size = pos == "below" and api.nvim_win_get_height(win) or api.nvim_win_get_width(win)
+        end,
+    })
+
+    return {
+        -- your nvim-dap-view config
+        windows = {
+            size = function()
+                return vim.g._dv_size or 0.4 -- a reasonable default
+            end,
+        },
+    }
+
+==============================================================================
+恢复会话                                         *dap-view-restoring-sessions*
+
+Vim 提供了一种强大的恢复编辑器状态的方式：会话（见 |Session|）。
+nvim-dap-view 挂接到这套会话系统中来恢复自己的内部状态。目前会恢复以下数据：
+
+- 选中的“视图”（分区）
+- 被监视表达式的完整状态，包括变量的展开情况
+
+设置 ~
+
+注意：如果你使用了“会话管理器”插件，请检查它是否以 vim 会话为骨架
+（即不依赖自己的实现）。自定义的会话实现可能无法工作，或需要额外配置。
+
+要让 nvim-dap-view 恢复其状态，请确保满足以下条件：
+
+- 'sessionoptions' 包含 `global`
+- nvim-dap-view 没有被懒加载
+
+本插件会自己懒加载。手动懒加载可能会阻止“会话恢复”钩子被触发。
+
+vim:ft=help

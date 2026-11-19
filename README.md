@@ -1,6 +1,6 @@
 # nvim-zh
 
-Neovim 简体中文本地化插件，覆盖核心消息、中文帮助、常见 UI、五个第三方插件的部分界面，以及 clangd 的部分诊断和 LSP 提示。命令、快捷键、用户输入和协议数据沿用原值。
+Neovim 简体中文本地化插件，覆盖核心消息、中文帮助、常见 UI、六个第三方插件的部分界面，以及 clangd 的部分诊断和 LSP 提示。命令、快捷键、用户输入和协议数据沿用原值。
 
 ## 要求
 
@@ -61,7 +61,7 @@ require('nvim-zh').setup({
 | 核心消息 | 继续使用 Neovim gettext，绑定用户数据目录中的已验证合并 MO，不替换系统 MO |
 | 中文 Help | 通过 `.cnx` 与预生成 `tags-cn` 选择中文，缺失主题回退英文 |
 | Neovim UI | 支持 notify、input/select；select item 格式化与 echo 为可选功能 |
-| 第三方插件 | 围绕固定上游的公开或已验证显示接缝适配 which-key、Telescope、nvim-tree、nvim-dap、nvim-dap-ui；其他私有 UI 不做猜测性接管 |
+| 第三方插件 | 围绕固定上游的公开或已验证显示接缝适配 which-key、Telescope、nvim-tree、nvim-dap、nvim-dap-ui、nvim-dap-view |
 | 诊断与 LSP | 只翻译明确拥有的 clang/clangd 显示字段，原始数据、动作和取消语义不变 |
 | 状态与排错 | 面板、健康检查、结构化状态、实际观察与脱敏缺失记录 |
 

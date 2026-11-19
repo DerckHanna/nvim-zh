@@ -195,6 +195,9 @@ def check_entry(entry: dict, path: Path, terms: list[dict]) -> None:
         source = term['source']
         if term.get('domain') not in (None, path.stem) or term.get('context') not in (None, context):
             continue
+        if any(rule['domain'] == path.stem and context in rule['contexts']
+               for rule in term.get('exclude', [])):
+            continue
         present = re.search(rf'(?<![A-Za-z0-9_]){re.escape(source)}(?![A-Za-z0-9_])', msgid)
         # Preserve the exact technical spelling for singular capitalized terms.
         # Also reject forbidden translations for lowercase/plural source forms;
@@ -227,6 +230,11 @@ def load_glossary(path: Path | None) -> list[dict]:
     for term in terms:
         if not isinstance(term.get('source'), str) or term.get('policy') not in ('preserve', 'translate'):
             raise CatalogError(f'{path}: each term needs source and preserve/translate policy')
+        for rule in term.get('exclude', []):
+            if not isinstance(rule.get('domain'), str) or not isinstance(rule.get('contexts'), list) or not all(
+                isinstance(context, str) and context for context in rule['contexts']
+            ):
+                raise CatalogError(f'{path}: each exclusion needs a domain and contexts')
     return terms
 
 

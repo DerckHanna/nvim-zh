@@ -133,6 +133,7 @@ def validate(root=ROOT):
         require(re.fullmatch(r'nvim-zh\.adapters\.[a-z][a-z_0-9]*', entry)
                 and entry.split('.')[-1] not in ('common', 'index', 'evidence', 'scope'), 'invalid Lua entry')
         entry_path = owned(root, 'lua/' + entry.replace('.', '/') + '.lua', 'lua/nvim-zh/adapters/')
+        require(type(spec.get('source_projection', False)) is bool, 'invalid source projection')
         require(entry_path not in owned_files, 'Lua entry already owned')
         owned_files.add(entry_path)
         owned(root, f'translations/po/zh_CN/{domain}.po', 'translations/po/zh_CN/')
@@ -161,6 +162,7 @@ def validate(root=ROOT):
                     require(all(origin in target['sources'] for target in spec['targets'].values()),
                             f'{name} has an unpinned source')
             if surface['kind'] == 'versioned':
+                require(type(surface.get('independent', False)) is bool, 'invalid independent source group')
                 sources = surface['modules']
                 require(sources and all(ID.fullmatch(module) for module in sources), f'{name} has no runtime sources')
                 require(all(set(sources.values()) <= target['sources'].keys()
@@ -181,7 +183,8 @@ def index_text(adapters):
     for id, spec in adapters.items():
         if spec['status'] == 'draft':
             continue
-        entry = {k: spec[k] for k in ('status', 'modules', 'lazy_names', 'surfaces', 'notes', 'help') if k in spec}
+        entry = {k: spec[k] for k in ('status', 'modules', 'lazy_names', 'surfaces', 'notes', 'help',
+                                     'source_projection') if k in spec}
         entry.update({k: spec[k] for k in ('entry', 'domain') if k in spec})
         entry['repository'] = spec['upstream']['repository']
         entry['targets'] = {

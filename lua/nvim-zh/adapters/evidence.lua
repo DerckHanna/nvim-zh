@@ -66,6 +66,25 @@ local function load_health(chunk, source, digest, current)
   end
 end
 
+-- Some display expressions live inside private callbacks or share a renderer
+-- with protocol data. Project those expressions from the verified input bytes,
+-- before anything can capture an unprojected alias. Keep the original chunk as
+-- a fallback and give the projection a generation guard for delayed callbacks.
+local function project(chunk, source, module, bytes, digest, actual, current)
+  if not source.spec.source_projection then return chunk end
+  for _, target in pairs(source.spec.targets) do
+    if target.neovim == nvim_version and target.sources[source.path] == digest then
+      local ok, projected = pcall(function()
+        local adapter = require(source.spec.entry)
+        return adapter.project_source(module, bytes, actual, current)
+      end)
+      if ok and type(projected) == 'function' then return projected end
+      break
+    end
+  end
+  return chunk
+end
+
 local function loader(module)
   local source = sources[module]
   if not source then return end
@@ -83,15 +102,20 @@ local function loader(module)
   local epoch = installation.epoch
   local digest = vim.fn.sha256(bytes)
   local observation
-  load_health(chunk, source, digest, function()
-    return observation and observations[id] and observations[id][module] == observation
-  end)
+  local function current()
+    return observation ~= nil and observations[id] and observations[id][module] == observation
+      and installed[id] == installation and installation.epoch == epoch
+      and rawequal(package.loaded[module], observation.object)
+  end
+  load_health(chunk, source, digest, current)
+  local original = chunk
+  chunk = project(chunk, source, module, bytes, digest, actual, current)
   return function(...)
     local object = chunk(...)
     observations[id] = observations[id] or {}
     observation = {
       object = object or package.loaded[module],
-      sha256 = digest, installation = installation, epoch = epoch,
+      sha256 = digest, installation = installation, epoch = epoch, projected = chunk ~= original,
     }
     observations[id][module] = observation
     installation.sequence = installation.sequence + 1
@@ -137,7 +161,15 @@ function M.verify(id, spec, surface)
   local found = observations[id] or {}
   local installation = installed[id]
   local plugin_modules = false
-  for name in pairs(surface.modules) do
+  local considered = surface.modules
+  if surface.independent then
+    considered = {}
+    for name, path in pairs(surface.modules) do
+      if package.loaded[name] then considered[name] = path end
+    end
+    if not next(considered) then return nil, 'not_loaded' end
+  end
+  for name in pairs(considered) do
     if not vim.startswith(name, 'vim.') then
       plugin_modules = true
       local value = found[name]
@@ -146,12 +178,15 @@ function M.verify(id, spec, surface)
           or not rawequal(value.object, package.loaded[name]) then
         return nil, 'stale_generation'
       end
+      if spec.source_projection and not value.projected then
+        return nil, 'unsupported_revision'
+      end
     end
   end
   -- A surface made only of runtime-owned modules still needs the adapter's
   -- loading evidence to exist before it can claim a fixed combination.
   if not plugin_modules and not installation then return nil, 'unknown_version' end
-  local cache = verified[surface]
+  local cache = not surface.independent and verified[surface]
   local sequence = installation and installation.sequence or 0
   if cache and cache.installation == installation and cache.sequence == sequence then
     return cache.result, cache.reason
@@ -160,7 +195,7 @@ function M.verify(id, spec, surface)
   for _, target in ipairs(vim.fn.sort(vim.tbl_keys(spec.targets))) do
     local candidate = spec.targets[target]
     local mismatch = candidate.neovim ~= nvim_version
-    for name, path in pairs(surface.modules) do
+    for name, path in pairs(considered) do
       local digest
       if vim.startswith(name, 'vim.') then
         -- Runtime-owned module: hash the raw bytes of the loaded runtime file
@@ -182,7 +217,9 @@ function M.verify(id, spec, surface)
   end
   local result = #matches > 0 and { kind = 'fixed_sources', matches = matches } or nil
   local reason = not result and 'unsupported_revision' or nil
-  verified[surface] = { installation = installation, sequence = sequence, result = result, reason = reason }
+  if not surface.independent then
+    verified[surface] = { installation = installation, sequence = sequence, result = result, reason = reason }
+  end
   return result, reason
 end
 

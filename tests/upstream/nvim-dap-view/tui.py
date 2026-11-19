@@ -744,8 +744,15 @@ def codelldb(ui, enabled):
     ui.send(']s')
     probe(ui, 'vim.bo.filetype == "dap-view-term" and require("dap").session().term_buf == vim.api.nvim_get_current_buf()')
 
-    open_view(ui, 'scopes')
-    ui.send('gg\r')
+    # Focus the already rendered scope row without starting another async
+    # scopes refresh, which would restore its cursor while the keys arrive.
+    click(ui, local)
+    probe(ui, '''(function()
+      local s=require("dap-view.state")
+      return vim.api.nvim_get_current_win()==s.winnr and vim.fn.line(".")==1
+        and vim.wait(3000,function() return s.line_to_scope_name[1]=="Local" end)
+    end)()'''.replace('\n', ' '))
+    ui.send('\r')
     capture(ui, 'scope-collapse', scope_title, local, registers, reject=('vec_int = size=0',))
     probe(ui, 'vim.tbl_contains(require("dap-view.state").collapsed_scopes, "Local")')
     ui.send('gg\r')

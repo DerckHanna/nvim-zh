@@ -209,36 +209,43 @@ local function move(rev)
   local p=vim.system({'git','-C',f.remote,'reset','--hard',rev}):wait()
   assert(p.code==0,p.stderr)
 end
-local function update(accept)
+local function update(accept, ready)
   local gen=zh.status().runtime.generation
   vim.pack.update({'renamed-zh'})
   assert(vim.bo.filetype=='nvim-pack','missing standard confirmation buffer')
   if accept then vim.cmd.write() else vim.cmd.quit() end
   if accept then
-    assert(vim.wait(20000,function() return zh.status().runtime.generation>gen and zh.status().runtime.status~='syncing' end,20),vim.inspect(zh.status().runtime))
+    -- A refresh triggered while entering or leaving the confirmation tab can
+    -- finish before the refresh that observes the confirmed package revision.
+    assert(vim.wait(20000,function()
+      local status=zh.status()
+      return status.runtime.generation>gen and status.runtime.status~='syncing' and ready(status)
+    end,20),vim.inspect(zh.status()))
   else vim.wait(300,function() return false end,20) end
 end
 move(f.translated)
 update(false)
 assert(zh.status().version.active_bundle==old_bundle,'cancel activated resources')
 assert(zh.translate({domain='nvim-ui',msgid='No information available'})=='没有可用的信息')
-update(true)
+update(true,function(s) return s.version.active_bundle~=old_bundle end)
 assert(zh.translate({domain='nvim-ui',msgid='No information available'})=='来自包管理器的新译文')
 assert(zh.status().version.active_bundle~=old_bundle)
 vim.cmd('help nvim-zh')
 assert(table.concat(vim.api.nvim_buf_get_lines(0,0,-1,false),'\n'):find('PACK_RESOURCE_MARKER',1,true),'Help did not update')
 if native_enabled then assert(vim.fn.gettext(probe)=='来自包管理器的欢迎译文','MO did not update') end
 local new_bundle=zh.status().version.active_bundle
-move(f.implementation); update(true)
+move(f.implementation); update(true,function(s) return s.runtime.restart_required end)
 assert(zh.status().runtime.restart_required,'implementation update not reported')
 assert(zh.status().version.running_implementation==running,'running implementation changed')
 assert(zh.status().version.installed_implementation~=running)
 restart_probe(false)
-move(f.broken); update(true)
+move(f.broken); update(true,function(s) return s.runtime.status=='error' end)
 assert(zh.status().runtime.status=='error','corrupt release marked success')
 assert(zh.status().version.active_bundle==new_bundle,'corrupt release replaced good resources')
 restart_probe(true)
-move(f.initial); update(true)
+move(f.initial); update(true,function(s)
+  return s.version.active_bundle==old_bundle and not s.runtime.restart_required
+end)
 assert(zh.status().version.active_bundle==old_bundle,'package rollback did not restore complete resource set')
 assert(zh.translate({domain='nvim-ui',msgid='No information available'})=='没有可用的信息')
 if native_enabled then assert(vim.fn.gettext(probe)~='来自包管理器的欢迎译文','MO rollback failed') end

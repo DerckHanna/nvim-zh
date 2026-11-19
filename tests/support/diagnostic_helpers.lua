@@ -7,6 +7,7 @@ function M.pack(...) return { n = select('#', ...), ... } end
 function M.setup(diagnostics, lsp)
   require('nvim-zh').setup({
     modules = {
+      core = { enabled = false },
       ui = { notify = false, prompts = false, echo = false },
       plugins = { auto = false },
       diagnostics = diagnostics or { enabled = true, virtual_text = true, virtual_lines = true, float = true },

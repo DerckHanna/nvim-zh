@@ -50,6 +50,7 @@ local original_notify = utils.notify
 
 require('nvim-zh').setup({
   modules = {
+    core = { enabled = false },
     ui = { notify = true, prompts = false, echo = false },
     plugins = { auto = true, disabled = {} },
   },
@@ -175,7 +176,7 @@ package.loaded['telescope.pickers.window'] = nil
 window = require('telescope.pickers.window')
 local new_original = window.get_initial_window_options
 check(window ~= old_window and new_original ~= original_window, 'real module generation fixture failed')
-require('nvim-zh').refresh()
+dofile(vim.env.NVIM_ZH_ROOT .. '/tests/support/public.lua').refresh()
 require('nvim-zh.catalog').use_sources(h.empty_catalogs())
 equal(old_window.get_initial_window_options, original_window, 'real old module generation not restored')
 check(window.get_initial_window_options ~= new_original, 'real new module generation not attached')

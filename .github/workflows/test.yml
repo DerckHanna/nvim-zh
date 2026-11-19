@@ -33,10 +33,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      # Official refs/tags/v4 and v4.4.0 resolve to this commit.
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
-      # Official refs/tags/v5 and v5.6.0 resolve to this commit.
-      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: '3.12'
       - name: Install pinned Neovim
@@ -66,10 +64,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      # Official refs/tags/v4 and v4.4.0 resolve to this commit.
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
-      # Official refs/tags/v5 and v5.6.0 resolve to this commit.
-      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: '3.12'
       - name: Install Neovim 0.12.6
@@ -94,7 +90,7 @@ jobs:
           NVIM_ZH_ADAPTER_REPORT: /tmp/nvim-zh-upstream-report.json
       - name: Upload adapter test evidence
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: adapter-upstream-evidence
           path: /tmp/nvim-zh-upstream-report.json
@@ -105,7 +101,7 @@ jobs:
             --report-dir /tmp/nvim-zh-candidates --test
       - name: Upload candidate source and catalog audit
         if: always() && github.event_name == 'schedule'
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: adapter-upstream-candidates
           path: /tmp/nvim-zh-candidates

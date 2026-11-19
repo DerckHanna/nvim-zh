@@ -12,7 +12,7 @@ zh.register_catalog(domain, function()
     { context = '', msgid = 'Known {name}', msgstr = '已知 {name}' },
   } }
 end)
-zh.setup({ missing = { enabled = true, max_entries = 2 } })
+zh.setup({ modules = { core = { enabled = false } }, missing = { enabled = true, max_entries = 2 } })
 local missing = require('nvim-zh.missing')
 missing.reset()
 zh.translate({ domain = domain, msgid = 'Known' })
@@ -51,7 +51,7 @@ check(not vim.inspect(missing.list()):find(secret, 1, true), 'static path leaked
 missing.reset()
 zh.translate({ domain = domain, msgid = string.rep('x', 2048) })
 check(#missing.list()[1].msgid < 100, 'very long source text was retained in missing report')
-zh.setup({ missing = { enabled = false } })
+zh.setup({ modules = { core = { enabled = false } }, missing = { enabled = false } })
 local before_disabled = zh.stats().missing.occurrences
 zh.translate({ domain = domain, msgid = 'Not observed' })
 equal(zh.stats().missing.occurrences, before_disabled, 'disabled missing stats still observed')

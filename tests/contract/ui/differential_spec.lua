@@ -66,9 +66,9 @@ local function run()
   }
 end
 
-require('nvim-zh').setup({ modules = { ui = { notify = false, prompts = false, echo = false } }, overrides = h.ui_overrides() })
+require('nvim-zh').setup({ modules = { core = { enabled = false }, ui = { notify = false, prompts = false, echo = false } }, overrides = h.ui_overrides() })
 local baseline = run()
-require('nvim-zh').setup({ modules = { ui = { notify = true, prompts = true, echo = true } }, overrides = h.ui_overrides() })
+require('nvim-zh').setup({ modules = { core = { enabled = false }, ui = { notify = true, prompts = true, echo = true } }, overrides = h.ui_overrides() })
 local translated = run()
 
 local function normalize(result)

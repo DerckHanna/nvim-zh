@@ -19,6 +19,7 @@ zh.register_catalog(domain, function()
   }
 end)
 zh.setup({
+  modules = { core = { enabled = false } },
   overrides = {
     [domain] = {
       [''] = { Save = '存盘' },
@@ -30,7 +31,7 @@ equal(zh.translate({ domain = domain, msgid = 'Save' }), '存盘', 'override did
 equal(zh.translate({ domain = domain, context = 'menu', msgid = 'Open' }), '展开', 'context override failed')
 equal(zh.translate({ domain = domain, context = 'menu', msgid = 'File x', formatted = true }), '菜单文件 x', 'template override failed')
 equal(zh.translate({ domain = domain, context = 'other', msgid = 'Open' }), 'Open', 'override leaked context')
-zh.setup({ overrides = {} })
+zh.setup({ modules = { core = { enabled = false } }, overrides = {} })
 equal(zh.translate({ domain = domain, msgid = 'Save' }), '保存', 'clearing overrides did not restore built-in')
 
 local invalid = {

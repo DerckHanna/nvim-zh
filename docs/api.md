@@ -12,6 +12,8 @@ local zh = require('nvim-zh').setup()
 
 校验并应用配置，返回主模块。重复调用会更新基础配置，再与本地 JSON 合并；不会叠加 wrapper、autocmd 或后台任务。配置项见[配置文档](configuration.md)。
 
+原生模块准备私有 locale 时会异步完成。同步仍在进行时，新的配置会进入同一队列。需要等待队列完成时，可使用 `refresh(callback)` 的完成回调。
+
 实现代码更新不会通过 setup 强制热执行；需要重启时，`status().runtime.restart_required` 为 `true`。
 
 ## `status()`

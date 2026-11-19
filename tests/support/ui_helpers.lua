@@ -39,7 +39,7 @@ end
 
 function M.setup(ui, overrides)
   require('nvim-zh').setup({
-    modules = { ui = ui or { notify = false, prompts = false, echo = false } },
+    modules = { core = { enabled = false }, ui = ui or { notify = false, prompts = false, echo = false } },
     overrides = overrides or M.ui_overrides(),
     missing = { enabled = true, max_entries = 64 },
   })

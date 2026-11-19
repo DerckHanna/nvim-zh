@@ -9,6 +9,7 @@ function M.setup(preserve_display)
   end
   require('nvim-zh').setup({
     modules = {
+      core = { enabled = false },
       ui = { notify = false, prompts = false, echo = false },
       plugins = { auto = false },
       diagnostics = { enabled = true, virtual_text = true, virtual_lines = true, float = true },

@@ -1,4 +1,5 @@
 local h = dofile(vim.env.NVIM_ZH_ROOT .. '/tests/support/plugin_helpers.lua')
+local refresh = dofile(vim.env.NVIM_ZH_ROOT .. '/tests/support/public.lua').refresh
 local check, equal = h.check, h.equal
 local lazy_root = vim.env.NVIM_ZH_TEST_LAZY
 local tree_root = vim.env.NVIM_ZH_TEST_NVIM_TREE
@@ -102,6 +103,7 @@ zh.register_catalog('nvim-tree', function()
 end, { locale = 'zh_CN', source = 'pinned-test-catalog' })
 zh.setup({
   modules = {
+    core = { enabled = false },
     ui = { notify = true, prompts = false, echo = false },
     plugins = { auto = true, lazy_load = true, disabled = {} },
   },
@@ -268,7 +270,7 @@ local wrapped_setup = tree.setup
 tree.setup(custom_opts)
 check(config.u.on_attach == custom_on_attach and config.g.on_attach == custom_on_attach,
   'real custom on_attach was chained or replaced')
-zh.refresh()
+refresh()
 check(tree.setup == wrapped_setup, 'public refresh stacked real tree setup wrapper')
 local custom_buf = vim.api.nvim_create_buf(false, true)
 keymap.on_attach(custom_buf)
@@ -292,7 +294,7 @@ package.loaded['nvim-tree'] = nil
 local next_tree = require('nvim-tree')
 local next_original_setup = next_tree.setup
 check(next_keymap ~= keymap and next_tree ~= tree, 'real module generation did not replace tables')
-zh.refresh()
+refresh()
 check(keymap.on_attach_default ~= old_default_wrapper, 'old real keymap wrapper remains installed after generation')
 check(tree.setup ~= old_setup_wrapper, 'old real tree wrapper remains installed after generation')
 equal(keymap.on_attach_default, original_default, 'old real keymap generation not restored')

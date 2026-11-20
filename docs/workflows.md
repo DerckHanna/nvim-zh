@@ -31,6 +31,8 @@
 
 C 文件可将 `makeprg` 设为 `clang -std=c11 -fsyntax-only`。需要位置列表时用 `:lmake!`、`:lopen` 和 `:ll`。GNU Make 等间接构建保留现有解析和显示，无法从混合输出确认诊断来源。直接链接时可查阅已匹配的编译器驱动消息，链接器输出保留原文。
 
+头文件报错时，包含栈前导可以显示中文。用 `:NvimZhRaw` 读取前导或诊断的完整原文。Clang 的位置可能被 `#line` 改写，列表仍按 Neovim 原始解析结果跳转。无法用编译器输出的源码片段核对位置时，诊断保留原文，可在状态中看到 `unverified_location`。
+
 ~~~vim
 :compiler nvim-zh-clang-tidy
 :setlocal makeprg=clang-tidy
@@ -39,6 +41,8 @@ C 文件可将 `makeprg` 设为 `clang -std=c11 -fsyntax-only`。需要位置列
 ~~~
 
 可先用 `--export-fixes=修复.yaml` 检查替换内容，随后在已保存的工作树中用 `--fix` 应用，最后去掉 `--fix` 复查。启用 clangd 检查时，按项目配置选择检查名，并安装对应的 `clang-tidy` 汉化包读取服务器转发的结果。LSP `user_data.lsp` 保留检查名、原文、位置和附加说明。
+
+独立运行 `clang-tidy 文件.cpp --checks=-*,clang-analyzer-core.NullDereference -- -std=c++20` 可检查空指针解引用，并在列表里阅读匹配的路径说明。固定版本的 clangd 使用检查模块，静态分析器检查通过独立命令运行。
 
 主包开发版支持本地候选附件。用 `tools/pack_assets.py` 生成的附件可通过 `:NvimZhPacks import <附件路径>` 安装。官方目录和当前覆盖状态见[覆盖清单](toolchain-coverage.md)。
 

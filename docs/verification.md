@@ -1,6 +1,23 @@
 # 验证记录
 
-## Clang 工具链固定组合（2026-11-20）
+## Clang 工具链完整覆盖验收（2026-11-20）
+
+固定组合为官方 Neovim 0.12.6 Linux x86_64、LuaJIT 2.1.1774638290、glibc 2.44 和 WSL2，配合 Arch Linux `clang 23.1.5-1`。LLVM 源码固定到 `llvmorg-23.1.5`（commit `392dfff97d29b59d77e5cac6d4b6ef2585fe7117`）。完整运行证据位于 `/home/hanna/desktop/clang-toolchain-research/nvim-zh-run/complete-20261120-204356`。
+
+| 命令或场景 | 本轮结果 | 证据 |
+| --- | --- | --- |
+| 词库同步与术语/校验 `tools/toolchain_catalog.py sync`、`tools/catalog_tool.py check` | PASS。10 个域共 70,587 条目零错误：Clang `33,543` 条、clangd `33,016` 条、clang-tidy `3,103` 条。展开 `1,599` 条多分支 TableGen 摘要、`20` 条 `%sub` 宏并核对 `131` 个已启用分析器检查（`116` 个输出诊断共 `1,715` 条源码核对消息、`15` 个纯建模检查）。 | [analyzer_audit.json](../translations/toolchain/analyzer_audit.json)、[zh_CN.json](../translations/toolchain/zh_CN.json) |
+| 三个候选附件重复构建与 SHA-256 验证（`tools/pack_assets.py`） | PASS。`clang`（0.1.0，`ccaeb17c...`）、`clang-tidy`（0.1.0，`91eb1d39...`）、`clangd`（0.1.2，`0dd6344f...`）及 `catalog.json`（`3ac8a8ad...`）两次构建逐字节一致。 | `candidates/`、`candidates.sha256`、`candidates-2.sha256` |
+| `python3 -B tools/toolchain_observe.py --output "$evidence/compiler.json"` | PASS。两个驱动运行 C/C++ 共 48 次（含成功、失败、含错与回退），`clang-tidy` 列出 602 个检查与清单一致（`registration_gaps=0`）；CLI 命中 172 条 + 20 条 clang-tidy，保留 14 条项目原文、8 条修复编辑、2 条子工具输出。 | `compiler.json` |
+| `NVIM_ZH_TEST_CLANGD=/usr/bin/clangd NVIM_ZH_CLANGD_RECORD="$evidence/clangd.json" make test-contract test-integration` | PASS。15 样例 21 条 push 诊断主/说明命中 30 条 + 1 条 `#error` 原文；`clangd` 对 `textDocument/diagnostic`、`workspace/diagnostic`、`completionItem/resolve` 均返回 `-32601`，独立契约验证三项成功响应；真实编辑器及 LSP 处理器测试通过。 | `clangd.json`、`contracts.log` |
+| `python3 -B tests/workflows/clang_toolchain.py --assets "$evidence/candidates" --evidence "$evidence/tui"` | PASS。同一中文路径 C/C++ 项目在官方 Neovim 0.12.6 真实 PTY 中导入候选附件对照：17 次命令、输出、解析项、退出状态、最终文件、附件摘要与 10 种协议消息一致；`tui_push` 命中 14 + 10 条、保留 2 条碰撞原文。 | `tui.log`、`tui/comparison.json`、两组 `wire.json`、屏幕文本及 `terminal.pty` |
+| `python3 -B tools/toolchain_coverage.py … --require-complete` | PASS（退出码 `0`，`TOOLCHAIN_COMPLETE=PASS`）。Clang 合成命中 `44,693`（`matched_source_ids=7,261`，`31` 预期原文）、clangd 合成命中 `43,541`（`matched_source_ids=6,652`，`12` 预期原文）、clang-tidy 合成命中 `3,104`（`matched_source_ids=587`）。`0` 缺译、`0` 歧义、`evidence_gaps=[]`、`enabled_analyzer_audit_gaps=0`。 | `coverage.json`、`coverage.log` |
+| `tests/workflows/clang_pack_official.lua` 与本地候选生命周期 | PASS。官方源 `clangd` 在线安装 0.1.0、升级 0.1.1、暂停/恢复、断网回滚、损坏恢复全部通过；`clang`（0.1.0→0.1.1）、`clang-tidy`（0.1.0→0.1.1）、`clangd`（0.1.1→0.1.2）离线导入、更新、损坏包拒绝、暂停/恢复和离线回滚全部通过。 | `official/`、`local-lifecycle/probe.log` |
+| `NVIM_ZH_ADAPTER_SOURCE_ROOT=… make test-upstream` 及全量离线与发布门禁 | PASS。固定上游全矩阵（`nvim-cmp`、`nvim-dap`、`nvim-dap-ui`、`nvim-dap-view`、`nvim-tree`、`telescope`、`which-key`、`lazy.nvim`）及全套语法、资源包、单元测试、发布包检查通过。 | `upstream.json`、`upstream.log`、`gates.log` |
+
+候选附件当前保存于本地证据目录，待明确发布授权后再行打 tag、发布 Release、更新官方目录与公开下载校验。其余 LLVM 版本、macOS、Windows、Neovim nightly 尚未纳入本轮实测。
+
+## 上轮 Clang 工具链固定组合（2026-11-20）
 
 使用官方 Neovim 0.12.6 Linux x86_64、glibc 2.44、LuaJIT 2.1.1774638290，配合 Arch Linux `clang 23.1.5-1`，在 WSL2 运行。证据目录为 `/home/hanna/desktop/clang-toolchain-research/nvim-zh-run`。完整二进制摘要与 LLVM 版本见[工具链清单](../manifests/toolchain.json)，复跑命令见[覆盖清单](toolchain-coverage.md)。
 

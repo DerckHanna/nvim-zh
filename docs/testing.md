@@ -90,7 +90,7 @@ C++ 终端验证需要 PATH 中的 CodeLLDB 1.12.3、GNU Make、GCC 和子进程
 
 ## Clang 工具链
 
-[覆盖清单](toolchain-coverage.md)记录源码和匹配报告的重建命令。`tests/workflows/clang_toolchain.py` 采用真实 PTY 和 libvterm，先导入三个本地候选附件，再用相同 C/C++ 项目运行启停对照。证据目录需在仓库外，且每次使用新路径。覆盖报告的 `--require-complete` 退出非零时检查逐项未命中记录。
+[覆盖清单](toolchain-coverage.md)记录源码和匹配报告的重建命令。`tests/workflows/clang_toolchain.py` 采用真实 PTY 和 libvterm，先导入三个本地候选附件，再用相同 C/C++ 项目运行启停对照。用 `--assets` 指定正式打包脚本生成的候选，屏幕与协议证据写到仓库外的新目录。完整门禁需要两组启停对照和独立 LSP 契约日志，退出非零时查看未命中记录与 `evidence_gaps`。
 
 `tests/workflows/clang_pack_official.lua` 为显式网络探针。设置 `NVIM_ZH_ROOT`、独立 `XDG_DATA_HOME`、`NVIM_ZH_OFFICIAL_DIGEST`，以 `NVIM_ZH_OFFICIAL_MODE=online` 用官方源安装和升级历史 clangd 附件。在禁用网络的会话中用 `offline` 验证回滚。复制升级后的数据目录并损坏副本中的选定附件，随后用 `damaged` 验证回退快照。
 

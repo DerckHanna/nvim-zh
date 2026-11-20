@@ -82,6 +82,8 @@ require('nvim-zh').setup({
 
 Clang 与 clang-tidy 按命令、工具版本、二进制 SHA-256 和显示接口选择独立汉化包。间接构建、无法确认的来源和自定义诊断格式回退原文。已验证的命令和选项见[工作流指南](workflows.md)。
 
+编译器状态的 `last.results` 按列表条目记录结果。`unverified_location` 表示 Clang 输出的源码片段无法与解析得到的文件和行对应。`project_text` 表示保留了项目生成的诊断正文。`:NvimZhRaw` 可读取当前条目的原文、识别出的工具及代码。
+
 ### `modules.lsp`
 
 - `messages`：适配 clangd 的 `window/showMessage` 和 `window/showMessageRequest` 显示字段。

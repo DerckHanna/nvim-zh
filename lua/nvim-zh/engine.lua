@@ -258,7 +258,7 @@ local function translate(spec)
     return original, 'fallback', nil
   end
   local context = spec.context or ''
-  local clangd = spec.domain == 'clangd'
+  local clangd = spec.domain == 'clangd' or spec.domain == 'clang' or spec.domain == 'clang-tidy'
   local current = catalog.get(spec.domain)
   if not current then
     observe(spec, false)
@@ -314,7 +314,7 @@ local function translate(spec)
     end
     if ambiguous then
       observe(spec, false)
-      return original, 'fallback', nil
+      return original, spec.report_ambiguity and 'ambiguous' or 'fallback', nil
     end
     if matched then
       observe(spec, true)

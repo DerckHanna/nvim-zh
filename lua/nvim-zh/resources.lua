@@ -44,7 +44,8 @@ function M.freeze()
   assert(meta.implementation.id == running.implementation.id, '初始化期间实现已更新，请重启 Neovim')
   for name in pairs(meta.implementation.files) do
     assert(name == 'VERSION' or name:match('^lua/[%w_./%-]+%.lua$')
-      or name:match('^plugin/[%w_./%-]+%.lua$'), '非法实现文件路径')
+      or name:match('^plugin/[%w_./%-]+%.lua$')
+      or name:match('^compiler/[%w_./%-]+%.vim$'), '非法实现文件路径')
   end
   local bytes = fs.verify(paths.root, meta.implementation.files)
   local candidate = publish(paths.data() .. '/implementations', meta.implementation.id, bytes)

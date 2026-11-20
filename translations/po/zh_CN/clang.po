@@ -1,0 +1,1821 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: nvim-zh clang\n"
+"PO-Revision-Date: 2026-11-20 16:00+0800\n"
+"Last-Translator: nvim-zh maintainers\n"
+"Language-Team: Simplified Chinese\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: zh_CN\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgctxt "clangd_legacy"
+msgid "No matching function for call to {name}"
+msgstr "找不到与调用匹配的函数 {name}"
+
+msgctxt "clangd_legacy"
+msgid "Variable has incomplete type {type}"
+msgstr "变量的类型 {type} 是不完整类型"
+
+#: clang/include/clang/Basic/DiagnosticLexKinds.td:618
+msgctxt "diagnostic"
+msgid "#elif without #if"
+msgstr "#elif 缺少对应的 #if"
+
+#: clang/include/clang/Basic/DiagnosticLexKinds.td:617
+msgctxt "diagnostic"
+msgid "#else without #if"
+msgstr "#else 缺少对应的 #if"
+
+#: clang/include/clang/Basic/DiagnosticLexKinds.td:620
+msgctxt "diagnostic"
+msgid "#endif without #if"
+msgstr "#endif 缺少对应的 #if"
+
+#: clang/include/clang/Basic/DiagnosticLexKinds.td:595
+msgctxt "diagnostic"
+msgid "#include nested too deeply"
+msgstr "#include 嵌套过深"
+
+msgctxt "diagnostic"
+msgid "#include {0}"
+msgstr "#include {0}"
+
+#: clang/include/clang/Basic/DiagnosticLexKinds.td:421
+msgctxt "diagnostic"
+msgid "%0 is not defined, evaluates to 0"
+msgstr "未定义的 %0，按 0 处理"
+
+#: clang/include/clang/Basic/DiagnosticLexKinds.td:513
+msgctxt "diagnostic"
+msgid "%0 macro redefined"
+msgstr "宏 %0 被重新定义"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:2070
+msgctxt "diagnostic"
+msgid "%1 is a private member of %3"
+msgstr "%1 是 %3 的私有成员"
+
+msgctxt "diagnostic"
+msgid "'#endif' without '#if'"
+msgstr "'#endif' 缺少对应的 '#if'"
+
+#: clang/include/clang/Basic/DiagnosticLexKinds.td:564
+msgctxt "diagnostic"
+msgid "'%0' file not found"
+msgstr "找不到文件 '%0'"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:11275
+msgctxt "diagnostic"
+msgid "'break' statement not in loop or switch statement"
+msgstr "'break' 语句在循环和 switch 语句之外"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:11291
+msgctxt "diagnostic"
+msgid "'case' statement not in switch statement"
+msgstr "'case' 语句在 switch 语句之外"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:11273
+msgctxt "diagnostic"
+msgid "'continue' statement not in loop statement"
+msgstr "'continue' 语句在循环之外"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:11289
+msgctxt "diagnostic"
+msgid "'default' statement not in switch statement"
+msgstr "'default' 语句在 switch 语句之外"
+
+msgctxt "diagnostic"
+msgid "'{file}' file not found"
+msgstr "找不到文件 '{file}'"
+
+msgctxt "diagnostic"
+msgid "'{file}' file not found, did you mean '{suggestion}'?"
+msgstr "找不到文件 '{file}'，是否想使用 '{suggestion}'？"
+
+msgctxt "diagnostic"
+msgid "'{name}' macro redefined"
+msgstr "宏 '{name}' 被重复定义"
+
+msgctxt "diagnostic"
+msgid "A non-const lvalue reference to type {type} cannot bind to a temporary of type {from}"
+msgstr "指向 {type} 的非 const 左值引用不能绑定到 {from} 类型的临时对象"
+
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:330
+msgctxt "diagnostic"
+msgid "AVX vector argument of type %1 without '%2' enabled changes the ABI"
+msgstr "未启用 '%2' 时传递 %1 类型的 AVX 向量实参会改变 ABI"
+
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:330
+msgctxt "diagnostic"
+msgid "AVX vector argument of type {type} without '{target}' enabled changes the ABI"
+msgstr "未启用 '{target}' 时传递 {type} 类型的 AVX 向量实参会改变 ABI"
+
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:330
+msgctxt "diagnostic"
+msgid "AVX vector return of type %1 without '%2' enabled changes the ABI"
+msgstr "未启用 '%2' 时返回 %1 类型的 AVX 向量会改变 ABI"
+
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:330
+msgctxt "diagnostic"
+msgid "AVX vector return of type {type} without '{target}' enabled changes the ABI"
+msgstr "未启用 '{target}' 时返回 {type} 类型的 AVX 向量会改变 ABI"
+
+msgctxt "diagnostic"
+msgid "Address of stack memory associated with local variable {name} returned"
+msgstr "返回了局部变量 {name} 所在栈内存的地址"
+
+msgctxt "diagnostic"
+msgid "Array has incomplete element type {type}"
+msgstr "数组元素的类型 {type} 是不完整类型"
+
+msgctxt "diagnostic"
+msgid "Array index {index} is past the end of the array (that has type {type})"
+msgstr "下标 {index} 超出了 {type} 类型数组的末尾"
+
+msgctxt "diagnostic"
+msgid "Array size is negative"
+msgstr "数组大小为负数"
+
+msgctxt "diagnostic"
+msgid "Array subscript is not an integer"
+msgstr "数组下标不是整数"
+
+msgctxt "diagnostic"
+msgid "Array type {type} is not assignable"
+msgstr "数组类型 {type} 不可赋值"
+
+msgctxt "diagnostic"
+msgid "Attempt to use a deleted function"
+msgstr "尝试使用已删除的函数"
+
+msgctxt "diagnostic"
+msgid "Call to deleted function {name}"
+msgstr "调用了已删除的函数 {name}"
+
+msgctxt "diagnostic"
+msgid "Call to implicitly-deleted copy constructor of {type}"
+msgstr "调用了 {type} 已隐式删除的复制构造函数"
+
+msgctxt "diagnostic"
+msgid "Call to implicitly-deleted default constructor of {type}"
+msgstr "调用了 {type} 已隐式删除的默认构造函数"
+
+msgctxt "diagnostic"
+msgid "Call to implicitly-deleted move constructor of {type}"
+msgstr "调用了 {type} 已隐式删除的移动构造函数"
+
+msgctxt "diagnostic"
+msgid "Called object type {type} is not a function or function pointer"
+msgstr "被调用对象的类型 {type} 不是函数或函数指针"
+
+msgctxt "diagnostic"
+msgid "Candidate constructor (the implicit copy constructor) not viable: requires 1 argument, but {provided} were provided"
+msgstr "候选隐式拷贝构造函数不可用：需要 1 个实参，但提供了 {provided} 个"
+
+msgctxt "diagnostic"
+msgid "Candidate constructor (the implicit move constructor) not viable: requires 1 argument, but {provided} were provided"
+msgstr "候选隐式移动构造函数不可用：需要 1 个实参，但提供了 {provided} 个"
+
+msgctxt "diagnostic"
+msgid "Candidate constructor not viable: requires 1 argument, but {provided} were provided"
+msgstr "候选构造函数不可用：需要 1 个实参，但提供了 {provided} 个"
+
+msgctxt "diagnostic"
+msgid "Candidate function has been explicitly deleted"
+msgstr "候选函数已被显式删除"
+
+msgctxt "diagnostic"
+msgid "Candidate function not viable: no known conversion from {from} to {to} for {argument} argument"
+msgstr "候选函数不可用：第 {argument} 个实参无法从 {from} 转换为 {to}"
+
+msgctxt "diagnostic"
+msgid "Candidate function not viable: requires %d arguments, but %d was provided"
+msgstr "候选函数不可用：需要 %d 个实参，但提供了 %d 个"
+
+msgctxt "diagnostic"
+msgid "Candidate function not viable: requires %d arguments, but %d were provided"
+msgstr "候选函数不可用：需要 %d 个实参，但提供了 %d 个"
+
+msgctxt "diagnostic"
+msgid "Candidate function not viable: requires %d arguments, but no arguments were provided"
+msgstr "候选函数不可用：需要 %d 个实参，但未提供实参"
+
+msgctxt "diagnostic"
+msgid "Candidate function not viable: requires single argument %s, but %d arguments were provided"
+msgstr "候选函数不可用：需要一个实参 %s，但提供了 %d 个"
+
+msgctxt "diagnostic"
+msgid "Candidate function not viable: requires single argument {argument}, but no arguments were provided"
+msgstr "候选函数不可用：需要一个实参 {argument}，但未提供实参"
+
+msgctxt "diagnostic"
+msgid "Candidate template ignored: constraints not satisfied [with {args}]"
+msgstr "已忽略候选模板：不满足约束 [with {args}]"
+
+msgctxt "diagnostic"
+msgid "Candidate template ignored: could not match {expected} against {actual}"
+msgstr "已忽略候选模板：{expected} 无法与 {actual} 匹配"
+
+msgctxt "diagnostic"
+msgid "Cannot assign to non-static data member within const member function {name}"
+msgstr "不能在 const 成员函数 {name} 内给非静态数据成员赋值"
+
+msgctxt "diagnostic"
+msgid "Cannot assign to variable {name} with const-qualified type {type}"
+msgstr "不能对 const 限定类型 {type} 的变量 {name} 赋值"
+
+msgctxt "diagnostic"
+msgid "Cannot deduce return type from initializer list"
+msgstr "无法从初始化列表推导返回类型"
+
+msgctxt "diagnostic"
+msgid "Cannot initialize a parameter of type {type} with an lvalue of type {from}"
+msgstr "不能用 {from} 类型的左值初始化 {type} 类型的形参"
+
+msgctxt "diagnostic"
+msgid "Cannot initialize a parameter of type {type} with an rvalue of type {from}"
+msgstr "不能用 {from} 类型的右值初始化 {type} 类型的形参"
+
+msgctxt "diagnostic"
+msgid "Cannot initialize a variable of type {type} with an lvalue of type {from}"
+msgstr "不能用 {from} 类型的左值初始化 {type} 类型的变量"
+
+msgctxt "diagnostic"
+msgid "Cannot initialize a variable of type {type} with an rvalue of type {from}"
+msgstr "不能用 {from} 类型的右值初始化 {type} 类型的变量"
+
+msgctxt "diagnostic"
+msgid "Cannot initialize return object of type {type} with an lvalue of type {from}"
+msgstr "不能用 {from} 类型的左值初始化 {type} 类型的返回对象"
+
+msgctxt "diagnostic"
+msgid "Cannot initialize return object of type {type} with an rvalue of type {from}"
+msgstr "不能用 {from} 类型的右值初始化 {type} 类型的返回对象"
+
+msgctxt "diagnostic"
+msgid "Cannot jump from switch statement to this case label"
+msgstr "无法从 switch 语句跳转到这个 case 标签"
+
+msgctxt "diagnostic"
+msgid "Cannot jump from this goto statement to its label"
+msgstr "这个 goto 语句无法跳转到其目标标签"
+
+msgctxt "diagnostic"
+msgid "Cannot take the address of an rvalue of type {type}"
+msgstr "不能获取 {type} 类型右值的地址"
+
+msgctxt "diagnostic"
+msgid "Comparison of distinct pointer types ({left} and {right})"
+msgstr "比较了不同的指针类型（{left} 和 {right}）"
+
+msgctxt "diagnostic"
+msgid "Comparison of integers of different signs: {left} and {right}"
+msgstr "比较了符号属性不同的整型值：{left} 和 {right}"
+
+msgctxt "diagnostic"
+msgid "Conflicting types for {name}"
+msgstr "{name} 的类型与先前声明冲突"
+
+msgctxt "diagnostic"
+msgid "Constraints not satisfied for {target}"
+msgstr "{target} 不满足约束"
+
+msgctxt "diagnostic"
+msgid "Declaration of variable {name} with deduced type {type} requires an initializer"
+msgstr "变量 {name} 的类型 {type} 需要推导，因此声明中必须提供初始化器"
+
+msgctxt "diagnostic"
+msgid "Declaration shadows a field of {type}"
+msgstr "此声明遮蔽了 {type} 的一个字段"
+
+msgctxt "diagnostic"
+msgid "Declaration shadows a local variable"
+msgstr "此声明遮蔽了一个局部变量"
+
+msgctxt "diagnostic"
+msgid "Declaration shadows a variable in the global namespace"
+msgstr "此声明遮蔽了全局命名空间中的变量"
+
+msgctxt "diagnostic"
+msgid "Declared here"
+msgstr "在这里声明"
+
+msgctxt "diagnostic"
+msgid "Division by zero is undefined"
+msgstr "除以零会导致未定义行为"
+
+msgctxt "diagnostic"
+msgid "Do not use 'else' after 'break'"
+msgstr "请勿在 'break' 后使用 'else'"
+
+msgctxt "diagnostic"
+msgid "Do not use 'else' after 'continue'"
+msgstr "请勿在 'continue' 后使用 'else'"
+
+msgctxt "diagnostic"
+msgid "Do not use 'else' after 'return'"
+msgstr "请勿在 'return' 后使用 'else'"
+
+msgctxt "diagnostic"
+msgid "Do not use pointer arithmetic"
+msgstr "请避免指针算术"
+
+msgctxt "diagnostic"
+msgid "Duplicate #else"
+msgstr "重复的 #else"
+
+msgctxt "diagnostic"
+msgid "Duplicate case value '{value}'"
+msgstr "case 值 '{value}' 重复"
+
+msgctxt "diagnostic"
+msgid "Empty catch statements hide errors"
+msgstr "空的 catch 语句会掩盖错误"
+
+msgctxt "diagnostic"
+msgid "Error occurred here"
+msgstr "错误发生在这里"
+
+msgctxt "diagnostic"
+msgid "Error opening file '{file}': {error}"
+msgstr "打开文件 '{file}' 时出错：{error}"
+
+msgctxt "diagnostic"
+msgid "Expanded from here"
+msgstr "从这里展开"
+
+msgctxt "diagnostic"
+msgid "Expanded from macro '{name}'"
+msgstr "由宏 '{name}' 展开"
+
+msgctxt "diagnostic"
+msgid "Expected '('"
+msgstr "此处缺少 '('"
+
+msgctxt "diagnostic"
+msgid "Expected '(' after '{where}'"
+msgstr "'{where}' 后需要 '('"
+
+msgctxt "diagnostic"
+msgid "Expected '(' for function-style cast or type construction"
+msgstr "函数式类型转换或类型构造缺少 '('"
+
+msgctxt "diagnostic"
+msgid "Expected ')'"
+msgstr "此处缺少 ')'"
+
+msgctxt "diagnostic"
+msgid "Expected ')' after '{where}'"
+msgstr "'{where}' 后需要 ')'"
+
+msgctxt "diagnostic"
+msgid "Expected ')' or ',' after '{token}'"
+msgstr "'{token}' 后需要 ')' 或 ','"
+
+msgctxt "diagnostic"
+msgid "Expected ','"
+msgstr "此处缺少 ','"
+
+msgctxt "diagnostic"
+msgid "Expected ',' or '>' in template-parameter-list"
+msgstr "模板形参列表中需要 ',' 或 '>'"
+
+msgctxt "diagnostic"
+msgid "Expected ',' or ']' in lambda capture list"
+msgstr "lambda 捕获列表中需要 ',' 或 ']'"
+
+msgctxt "diagnostic"
+msgid "Expected ':'"
+msgstr "此处缺少 ':'"
+
+msgctxt "diagnostic"
+msgid "Expected ';'"
+msgstr "此处缺少 ';'"
+
+msgctxt "diagnostic"
+msgid "Expected ';' after attribute list"
+msgstr "属性列表后缺少 ';'"
+
+msgctxt "diagnostic"
+msgid "Expected ';' after namespace name"
+msgstr "命名空间名称后缺少 ';'"
+
+msgctxt "diagnostic"
+msgid "Expected ';' after {statement} statement"
+msgstr "{statement} 语句后缺少 ';'"
+
+msgctxt "diagnostic"
+msgid "Expected ';' at end of requirement"
+msgstr "约束要求末尾缺少 ';'"
+
+msgctxt "diagnostic"
+msgid "Expected ';' in 'for' statement specifier"
+msgstr "'for' 语句头部缺少 ';'"
+
+msgctxt "diagnostic"
+msgid "Expected '<' after '{where}'"
+msgstr "'{where}' 后需要 '<'"
+
+msgctxt "diagnostic"
+msgid "Expected '>'"
+msgstr "此处缺少 '>'"
+
+msgctxt "diagnostic"
+msgid "Expected '['"
+msgstr "此处缺少 '['"
+
+msgctxt "diagnostic"
+msgid "Expected ']'"
+msgstr "此处缺少 ']'"
+
+msgctxt "diagnostic"
+msgid "Expected 'case' keyword before expression"
+msgstr "表达式前缺少关键字 'case'"
+
+msgctxt "diagnostic"
+msgid "Expected 'while' in do/while loop"
+msgstr "do/while 循环中缺少 'while'"
+
+msgctxt "diagnostic"
+msgid "Expected '{'"
+msgstr "此处缺少 '{'"
+
+msgctxt "diagnostic"
+msgid "Expected '}'"
+msgstr "此处缺少 '}'"
+
+msgctxt "diagnostic"
+msgid "Expected a qualified name after 'typename'"
+msgstr "'typename' 后需要限定名称"
+
+msgctxt "diagnostic"
+msgid "Expected a type"
+msgstr "此处需要类型"
+
+msgctxt "diagnostic"
+msgid "Expected an identifier or template-id after '::'"
+msgstr "'::' 后需要标识符或模板标识符"
+
+msgctxt "diagnostic"
+msgid "Expected body of lambda expression"
+msgstr "lambda 表达式缺少函数体"
+
+msgctxt "diagnostic"
+msgid "Expected catch"
+msgstr "此处需要 catch"
+
+msgctxt "diagnostic"
+msgid "Expected class member or base class name"
+msgstr "此处需要类成员或基类的名称"
+
+msgctxt "diagnostic"
+msgid "Expected class name"
+msgstr "此处需要类名"
+
+msgctxt "diagnostic"
+msgid "Expected comma in macro parameter list"
+msgstr "宏形参列表中缺少逗号"
+
+msgctxt "diagnostic"
+msgid "Expected external declaration"
+msgstr "此处需要外部声明"
+
+msgctxt "diagnostic"
+msgid "Expected function body after function declarator"
+msgstr "函数声明符后缺少函数体"
+
+msgctxt "diagnostic"
+msgid "Expected identifier in macro parameter list"
+msgstr "宏形参列表中需要标识符"
+
+msgctxt "diagnostic"
+msgid "Expected member name or ';' after declaration specifiers"
+msgstr "声明说明符后需要成员名称或 ';'"
+
+msgctxt "diagnostic"
+msgid "Expected statement"
+msgstr "此处需要语句"
+
+msgctxt "diagnostic"
+msgid "Expected template"
+msgstr "此处需要模板"
+
+msgctxt "diagnostic"
+msgid "Expected template parameter"
+msgstr "此处需要模板参数"
+
+msgctxt "diagnostic"
+msgid "Expected the name of a parameter pack"
+msgstr "此处需要形参包的名称"
+
+msgctxt "diagnostic"
+msgid "Expected variable name or 'this' in lambda capture list"
+msgstr "lambda 捕获列表中需要变量名或 'this'"
+
+msgctxt "diagnostic"
+msgid "Explicit specialization of undeclared template {name}"
+msgstr "显式特化了未声明的模板 {name}"
+
+msgctxt "diagnostic"
+msgid "Expression is not assignable"
+msgstr "表达式不可赋值"
+
+msgctxt "diagnostic"
+msgid "Expression result unused"
+msgstr "表达式的结果未使用"
+
+msgctxt "diagnostic"
+msgid "Forward declaration of {type}"
+msgstr "{type} 的前置声明"
+
+msgctxt "diagnostic"
+msgid "Function {name} exceeds recommended size/complexity thresholds"
+msgstr "函数 {name} 超过建议的长度或复杂度上限"
+
+msgctxt "diagnostic"
+msgid "Function {name} with deduced return type cannot be used before it is defined"
+msgstr "返回类型需要推导的函数 {name} 必须先定义才能使用"
+
+msgctxt "diagnostic"
+msgid "Header {header} is not used directly"
+msgstr "头文件 {header} 未被直接使用"
+
+msgctxt "diagnostic"
+msgid "Ignoring return value of function declared with {attribute} attribute"
+msgstr "忽略了带有 {attribute} 属性的函数的返回值"
+
+msgctxt "diagnostic"
+msgid "Ignoring return value of function declared with {attribute} attribute: {message}"
+msgstr "忽略了带有 {attribute} 属性的函数的返回值：{message}"
+
+msgctxt "diagnostic"
+msgid "Implicit conversion changes signedness: {from} to {to}"
+msgstr "从 {from} 到 {to} 的隐式转换改变了有无符号属性"
+
+msgctxt "diagnostic"
+msgid "Implicit conversion from {from} to {to} changes value from {before} to {after}"
+msgstr "从 {from} 到 {to} 的隐式转换将值从 {before} 改为 {after}"
+
+msgctxt "diagnostic"
+msgid "Implicit conversion from {from} to {to} is not allowed in C++11"
+msgstr "从 {from} 到 {to} 的隐式转换在 C++11 中不允许"
+
+msgctxt "diagnostic"
+msgid "Implicit conversion loses integer precision: {from} to {to}"
+msgstr "从 {from} 到 {to} 的隐式转换会损失整数精度"
+
+msgctxt "diagnostic"
+msgid "Implicit instantiation of undefined template {name}"
+msgstr "隐式实例化了未定义的模板 {name}"
+
+msgctxt "diagnostic"
+msgid "In instantiation of function template specialization {name} requested here"
+msgstr "这里请求实例化函数模板特化 {name}"
+
+msgctxt "diagnostic"
+msgid "In instantiation of member function {name} requested here"
+msgstr "这里请求实例化成员函数 {name}"
+
+msgctxt "diagnostic"
+msgid "In instantiation of template class {name} requested here"
+msgstr "这里请求实例化类模板 {name}"
+
+msgctxt "diagnostic"
+msgid "In instantiation of template type alias {name} requested here"
+msgstr "这里请求实例化模板类型别名 {name}"
+
+msgctxt "diagnostic"
+msgid "Incompatible operand types ({left} and {right})"
+msgstr "操作数类型不兼容（{left} 和 {right}）"
+
+msgctxt "diagnostic"
+msgid "Incomplete definition of type {type}"
+msgstr "类型 {type} 的定义不完整"
+
+msgctxt "diagnostic"
+msgid "Indirection requires pointer operand ({type} invalid)"
+msgstr "间接访问需要指针操作数（{type} 无效）"
+
+msgctxt "diagnostic"
+msgid "Initialization of incomplete type {type}"
+msgstr "初始化了不完整类型 {type}"
+
+msgctxt "diagnostic"
+msgid "Initializer element is not a compile-time constant"
+msgstr "初始化器的元素不是编译期常量"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:6864
+msgctxt "diagnostic"
+msgid "Insert an explicit cast to silence this issue"
+msgstr "插入显式类型转换以消除这条诊断"
+
+msgctxt "diagnostic"
+msgid "Invalid application of 'sizeof' to an incomplete type {type}"
+msgstr "无法对不完整类型 {type} 使用 'sizeof'"
+
+msgctxt "diagnostic"
+msgid "Invalid argument type {type} to unary expression"
+msgstr "一元表达式的操作数类型 {type} 无效"
+
+msgctxt "diagnostic"
+msgid "Invalid operands to binary expression ({left} and {right})"
+msgstr "二元表达式的操作数类型无效（{left} 和 {right}）"
+
+msgctxt "diagnostic"
+msgid "Invalid preprocessing directive, did you mean '{name}'?"
+msgstr "无效的预处理指令，是否想使用 '{name}'？"
+
+msgctxt "diagnostic"
+msgid "Jump bypasses variable initialization"
+msgstr "跳转绕过了变量的初始化"
+
+msgctxt "diagnostic"
+msgid "Jump bypasses variable with a non-trivial destructor"
+msgstr "跳转绕过了具有非平凡析构函数的变量"
+
+msgctxt "diagnostic"
+msgid "Left operand of comma operator has no effect"
+msgstr "逗号运算符的左操作数没有效果"
+
+msgctxt "diagnostic"
+msgid "Macro name missing"
+msgstr "缺少宏名称"
+
+msgctxt "diagnostic"
+msgid "Macro name must be an identifier"
+msgstr "宏名称必须是标识符"
+
+msgctxt "diagnostic"
+msgid "Macro redefined"
+msgstr "宏被重复定义"
+
+msgctxt "diagnostic"
+msgid "Member reference base type {type} is not a structure or union"
+msgstr "成员访问所用的基类型 {type} 不是结构体或联合体"
+
+msgctxt "diagnostic"
+msgid "Member reference type {type} is a pointer; did you mean to use '->'?"
+msgstr "成员访问所用的类型 {type} 是指针，是否应使用 '->'？"
+
+msgctxt "diagnostic"
+msgid "Member reference type {type} is not a pointer"
+msgstr "成员访问所用的类型 {type} 不是指针"
+
+msgctxt "diagnostic"
+msgid "Member reference type {type} is not a pointer; did you mean to use '.'?"
+msgstr "成员访问所用的类型 {type} 不是指针，是否应使用 '.'？"
+
+msgctxt "diagnostic"
+msgid "Missing ')' in macro parameter list"
+msgstr "宏形参列表中缺少 ')'"
+
+msgctxt "diagnostic"
+msgid "Multiple default labels in one switch"
+msgstr "同一个 switch 中有多个 default 标签"
+
+msgctxt "diagnostic"
+msgid "No header providing \"{0}\" is directly included"
+msgstr "没有直接包含提供 \"{0}\" 的头文件"
+
+msgctxt "diagnostic"
+msgid "No matching constructor for initialization of {type}"
+msgstr "找不到可用于初始化 {type} 的构造函数"
+
+msgctxt "diagnostic"
+msgid "No matching conversion for {cast} from {from} to {to}"
+msgstr "{cast} 找不到从 {from} 到 {to} 的适用转换"
+
+msgctxt "diagnostic"
+msgid "No matching member function for call to {name}"
+msgstr "找不到与调用匹配的成员函数 {name}"
+
+msgctxt "diagnostic"
+msgid "No member named {name} in {scope}"
+msgstr "{scope} 中没有名为 {name} 的成员"
+
+msgctxt "diagnostic"
+msgid "No template named {name} in {scope}"
+msgstr "{scope} 中没有名为 {name} 的模板"
+
+msgctxt "diagnostic"
+msgid "No type named {name} in {scope}"
+msgstr "{scope} 中没有名为 {name} 的类型"
+
+msgctxt "diagnostic"
+msgid "No viable conversion from {from} to {to}"
+msgstr "无法从 {from} 转换为 {to}"
+
+msgctxt "diagnostic"
+msgid "No viable overloaded '{op}'"
+msgstr "没有可用的重载运算符 '{op}'"
+
+msgctxt "diagnostic"
+msgid "No viable overloaded operator[] for type {type}"
+msgstr "类型 {type} 没有可用的重载 operator[]"
+
+msgctxt "diagnostic"
+msgid "Non-type template argument is not a constant expression"
+msgstr "非类型模板实参不是常量表达式"
+
+msgctxt "diagnostic"
+msgid "Non-void function does not return a value in all control paths"
+msgstr "非 void 函数存在未返回值的执行路径"
+
+msgctxt "diagnostic"
+msgid "Non-void function {name} should return a value"
+msgstr "非 void 函数 {name} 必须返回值"
+
+msgctxt "diagnostic"
+msgid "Out-of-line definition of {name} does not match any declaration in {scope}"
+msgstr "{name} 的类外定义与 {scope} 中的任何声明均不匹配"
+
+msgctxt "diagnostic"
+msgid "Parameter {name} set but not used"
+msgstr "形参 {name} 已赋值但未使用"
+
+msgctxt "diagnostic"
+msgid "Passing argument to parameter {name} here"
+msgstr "此处将实参传给形参 {name}"
+
+msgctxt "diagnostic"
+msgid "Previous case defined here"
+msgstr "此前的 case 定义在这里"
+
+msgctxt "diagnostic"
+msgid "Previous declaration is here"
+msgstr "此前的声明在这里"
+
+msgctxt "diagnostic"
+msgid "Previous default label is here"
+msgstr "此前的 default 标签在这里"
+
+msgctxt "diagnostic"
+msgid "Previous definition is here, with type {type}"
+msgstr "此前的定义在这里，类型为 {type}"
+
+msgctxt "diagnostic"
+msgid "Previous implicit declaration is here"
+msgstr "此前的隐式声明在这里"
+
+msgctxt "diagnostic"
+msgid "Previous statement is here"
+msgstr "此前的语句在这里"
+
+msgctxt "diagnostic"
+msgid "Previous use is here"
+msgstr "此前在这里使用"
+
+msgctxt "diagnostic"
+msgid "Private field {name} is not used"
+msgstr "私有字段 {name} 未使用"
+
+msgctxt "diagnostic"
+msgid "Read-only variable is not assignable"
+msgstr "只读变量不可赋值"
+
+msgctxt "diagnostic"
+msgid "Redefinition of {name} as different kind of symbol"
+msgstr "将 {name} 重复定义为另一类符号"
+
+msgctxt "diagnostic"
+msgid "Redundant access specifier has the same accessibility as the previous access specifier"
+msgstr "访问说明符多余，它与前一个访问说明符的访问权限相同"
+
+msgctxt "diagnostic"
+msgid "Reference to stack memory associated with local variable {name} returned"
+msgstr "返回了对局部变量 {name} 所在栈内存的引用"
+
+msgctxt "diagnostic"
+msgid "Remainder by zero is undefined"
+msgstr "除数为零时取余会导致未定义行为"
+
+msgctxt "diagnostic"
+msgid "Shift count >= width of type"
+msgstr "移位位数大于或等于类型的位宽"
+
+msgctxt "diagnostic"
+msgid "Shift count is negative"
+msgstr "移位位数为负"
+
+msgctxt "diagnostic"
+msgid "Static assertion expression is not an integral constant expression"
+msgstr "静态断言表达式不是整型常量表达式"
+
+msgctxt "diagnostic"
+msgid "Static assertion failed"
+msgstr "静态断言失败"
+
+msgctxt "diagnostic"
+msgid "Static assertion failed due to requirement '{condition}'"
+msgstr "静态断言失败，条件 '{condition}' 不成立"
+
+msgctxt "diagnostic"
+msgid "Static assertion failed due to requirement '{condition}': {message}"
+msgstr "静态断言失败，条件 '{condition}' 不成立：{message}"
+
+msgctxt "diagnostic"
+msgid "Static assertion failed: {message}"
+msgstr "静态断言失败：{message}"
+
+msgctxt "diagnostic"
+msgid "Subscripted value is not an array, pointer, or vector"
+msgstr "使用下标的值不是数组、指针或向量"
+
+msgctxt "diagnostic"
+msgid "Taking the address of a temporary object of type {type}"
+msgstr "正在获取 {type} 类型临时对象的地址"
+
+msgctxt "diagnostic"
+msgid "Template argument for template type parameter must be a type"
+msgstr "类型模板形参对应的实参必须是类型"
+
+msgctxt "diagnostic"
+msgid "To match this '{token}'"
+msgstr "与这里的 '{token}' 匹配"
+
+msgctxt "diagnostic"
+msgid "Too few arguments provided to function-like macro invocation"
+msgstr "函数式宏调用的实参过少"
+
+msgctxt "diagnostic"
+msgid "Too few arguments to function call, expected %d, have %d"
+msgstr "函数调用的实参太少，需要 %d 个，提供了 %d 个"
+
+msgctxt "diagnostic"
+msgid "Too few arguments to function call, expected at least %d, have %d"
+msgstr "函数调用的实参太少，至少需要 %d 个，提供了 %d 个"
+
+msgctxt "diagnostic"
+msgid "Too few arguments to function call, single argument {argument} was not specified"
+msgstr "函数调用缺少唯一所需的实参 {argument}"
+
+msgctxt "diagnostic"
+msgid "Too few template arguments for {target}"
+msgstr "提供给 {target} 的模板实参太少"
+
+msgctxt "diagnostic"
+msgid "Too many arguments provided to function-like macro invocation"
+msgstr "函数式宏调用的实参过多"
+
+msgctxt "diagnostic"
+msgid "Too many arguments to function call, expected %d, have %d"
+msgstr "函数调用的实参太多，需要 %d 个，提供了 %d 个"
+
+msgctxt "diagnostic"
+msgid "Too many arguments to function call, expected at most %d, have %d"
+msgstr "函数调用的实参太多，最多接受 %d 个，提供了 %d 个"
+
+msgctxt "diagnostic"
+msgid "Too many arguments to function call, expected single argument {argument}, have {actual} arguments"
+msgstr "函数调用仅需实参 {argument}，却提供了 {actual} 个"
+
+msgctxt "diagnostic"
+msgid "Too many errors emitted, stopping now"
+msgstr "错误过多，已停止报告"
+
+msgctxt "diagnostic"
+msgid "Too many template arguments for {target}"
+msgstr "提供给 {target} 的模板实参太多"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:6836
+msgctxt "diagnostic"
+msgid "Type {from} cannot be narrowed to {to} in initializer list"
+msgstr "初始化列表中不能将 {from} 类型窄化为 {to}"
+
+msgctxt "diagnostic"
+msgid "Unknown type name '{name}'; did you mean {suggestion}?"
+msgstr "未知类型名 '{name}'，是否想使用 {suggestion}？"
+
+msgctxt "diagnostic"
+msgid "Unterminated function-like macro invocation"
+msgstr "函数式宏调用未结束"
+
+msgctxt "diagnostic"
+msgid "Unused exception parameter {name}"
+msgstr "异常处理形参 {name} 未使用"
+
+msgctxt "diagnostic"
+msgid "Unused function {name}"
+msgstr "函数 {name} 未使用"
+
+msgctxt "diagnostic"
+msgid "Unused label {name}"
+msgstr "标签 {name} 未使用"
+
+msgctxt "diagnostic"
+msgid "Unused member function {name}"
+msgstr "成员函数 {name} 未使用"
+
+msgctxt "diagnostic"
+msgid "Unused parameter {name}"
+msgstr "形参 {name} 未使用"
+
+msgctxt "diagnostic"
+msgid "Unused type alias {name}"
+msgstr "类型别名 {name} 未使用"
+
+msgctxt "diagnostic"
+msgid "Unused typedef {name}"
+msgstr "typedef 名称 {name} 未使用"
+
+msgctxt "diagnostic"
+msgid "Unused variable {name}"
+msgstr "变量 {name} 未使用"
+
+msgctxt "diagnostic"
+msgid "Use auto when initializing with a cast to avoid duplicating the type name"
+msgstr "用类型转换初始化时，请使用 auto，避免重复书写类型名"
+
+msgctxt "diagnostic"
+msgid "Use nullptr"
+msgstr "请使用 nullptr"
+
+msgctxt "diagnostic"
+msgid "Use of a signed integer operand with a binary bitwise operator"
+msgstr "对有符号整数操作数使用了二元位运算符"
+
+msgctxt "diagnostic"
+msgid "Use of alias template '{name}' requires template arguments"
+msgstr "使用别名模板 '{name}' 时必须提供模板实参"
+
+msgctxt "diagnostic"
+msgid "Use of class template '{name}' requires template arguments"
+msgstr "使用类模板 '{name}' 时必须提供模板实参"
+
+msgctxt "diagnostic"
+msgid "Use of undeclared identifier '{name}'; did you mean {suggestion}?"
+msgstr "使用了未声明的标识符 '{name}'，是否想使用 {suggestion}？"
+
+msgctxt "diagnostic"
+msgid "Use range-based for loop instead"
+msgstr "请使用基于范围的 for 循环"
+
+msgctxt "diagnostic"
+msgid "Variable {name} is not initialized"
+msgstr "变量 {name} 未初始化"
+
+msgctxt "diagnostic"
+msgid "Variable {name} is uninitialized when used here"
+msgstr "在此处使用的变量 {name} 尚未初始化"
+
+msgctxt "diagnostic"
+msgid "Variable {name} is uninitialized when used within its own initialization"
+msgstr "变量 {name} 在自身初始化过程中被使用，此时它尚未初始化"
+
+msgctxt "diagnostic"
+msgid "Variable {name} set but not used"
+msgstr "变量 {name} 已赋值但未使用"
+
+msgctxt "diagnostic"
+msgid "Void function {name} should not return a value"
+msgstr "void 函数 {name} 不应返回值"
+
+#: clang/include/clang/Basic/DiagnosticParseKinds.td:909
+msgctxt "diagnostic"
+msgid "a static_assert declaration cannot be a template"
+msgstr "static_assert 声明不能是模板"
+
+msgctxt "diagnostic"
+msgid "add all missing includes"
+msgstr "添加所有缺少的包含指令"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:10720
+msgctxt "diagnostic"
+msgid "array index %0 is past the end of the array (that has type %1)"
+msgstr "数组下标 %0 越过了数组末尾（数组类型为 %1）"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:6723
+msgctxt "diagnostic"
+msgid "array size is negative"
+msgstr "数组大小为负数"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:7737
+msgctxt "diagnostic"
+msgid "array subscript is not an integer"
+msgstr "数组下标不是整数"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:9767
+msgctxt "diagnostic"
+msgid "attempt to use a deleted function"
+msgstr "尝试使用已删除的函数"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:557
+msgctxt "diagnostic"
+msgid "call to undeclared function %0; ISO C99 and later do not support implicit function declarations"
+msgstr "调用了未声明的函数 %0；ISO C99 及之后的标准不支持隐式函数声明"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:2861
+msgctxt "diagnostic"
+msgid "cannot deduce return type from initializer list"
+msgstr "无法从初始化列表推导返回类型"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:2456
+msgctxt "diagnostic"
+msgid "cannot initialize a variable of type %1 with an rvalue of type %3"
+msgstr "无法用 %3 类型的右值初始化 %1 类型的变量"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:6960
+msgctxt "diagnostic"
+msgid "cannot jump from switch statement to this case label"
+msgstr "无法从 switch 语句跳转到这个 case 标签"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:6949
+msgctxt "diagnostic"
+msgid "cannot jump from this goto statement to its label"
+msgstr "这个 goto 语句无法跳转到其目标标签"
+
+#: clang/include/clang/Basic/DiagnosticCommonKinds.td:395
+msgctxt "diagnostic"
+msgid "cannot open file '%0': %1"
+msgstr "无法打开文件 '%0'：%1"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:7965
+msgctxt "diagnostic"
+msgid "cannot take the address of an rvalue of type %0"
+msgstr "无法取得 %0 类型右值的地址"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:588
+msgctxt "diagnostic"
+msgid "declaration shadows a local variable"
+msgstr "此声明遮蔽了一个局部变量"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:7583
+msgctxt "diagnostic"
+msgid "division by zero is undefined"
+msgstr "除以零会导致未定义行为"
+
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:14
+msgctxt "diagnostic"
+msgid "error reading '%0': %1"
+msgstr "读取 '%0' 时出错：%1"
+
+#: clang/include/clang/Basic/DiagnosticCommonKinds.td:83
+msgctxt "diagnostic"
+msgid "expected %0"
+msgstr "此处需要 %0"
+
+#: clang/include/clang/Basic/DiagnosticParseKinds.td:634
+msgctxt "diagnostic"
+msgid "expected '(' for function-style cast or type construction"
+msgstr "函数式类型转换或类型构造缺少 '('"
+
+#: clang/include/clang/Basic/DiagnosticParseKinds.td:873
+msgctxt "diagnostic"
+msgid "expected ',' or '>' in template-parameter-list"
+msgstr "模板形参列表中需要 ',' 或 '>'"
+
+#: clang/include/clang/Basic/DiagnosticParseKinds.td:1115
+msgctxt "diagnostic"
+msgid "expected ',' or ']' in lambda capture list"
+msgstr "lambda 捕获列表中需要 ',' 或 ']'"
+
+#: clang/include/clang/Basic/DiagnosticParseKinds.td:282
+msgctxt "diagnostic"
+msgid "expected ';' after %0 statement"
+msgstr "%0 语句后缺少 ';'"
+
+#: clang/include/clang/Basic/DiagnosticParseKinds.td:315
+msgctxt "diagnostic"
+msgid "expected ';' after attribute list"
+msgstr "属性列表后缺少 ';'"
+
+#: clang/include/clang/Basic/DiagnosticCommonKinds.td:85
+msgctxt "diagnostic"
+msgid "expected ';' after class"
+msgstr "class 后缺少 ';'"
+
+#: clang/include/clang/Basic/DiagnosticCommonKinds.td:85
+msgctxt "diagnostic"
+msgid "expected ';' after enum"
+msgstr "enum 后缺少 ';'"
+
+#: clang/include/clang/Basic/DiagnosticParseKinds.td:283
+msgctxt "diagnostic"
+msgid "expected ';' after expression"
+msgstr "表达式后缺少 ';'"
+
+#: clang/include/clang/Basic/DiagnosticParseKinds.td:291
+msgctxt "diagnostic"
+msgid "expected ';' after namespace name"
+msgstr "命名空间名称后缺少 ';'"
+
+#: clang/include/clang/Basic/DiagnosticCommonKinds.td:85
+msgctxt "diagnostic"
+msgid "expected ';' after struct"
+msgstr "struct 后缺少 ';'"
+
+#: clang/include/clang/Basic/DiagnosticCommonKinds.td:85
+msgctxt "diagnostic"
+msgid "expected ';' after union"
+msgstr "union 后缺少 ';'"
+
+#: clang/include/clang/Basic/DiagnosticParseKinds.td:229
+msgctxt "diagnostic"
+msgid "expected ';' at end of declaration"
+msgstr "声明末尾缺少 ';'"
+
+#: clang/include/clang/Basic/DiagnosticParseKinds.td:231
+msgctxt "diagnostic"
+msgid "expected ';' at end of declaration list"
+msgstr "声明列表末尾缺少 ';'"
+
+#: clang/include/clang/Basic/DiagnosticParseKinds.td:934
+msgctxt "diagnostic"
+msgid "expected ';' at end of requirement"
+msgstr "约束要求末尾缺少 ';'"
+
+#: clang/include/clang/Basic/DiagnosticParseKinds.td:319
+msgctxt "diagnostic"
+msgid "expected ';' in 'for' statement specifier"
+msgstr "'for' 语句头部缺少 ';'"
+
+#: clang/include/clang/Basic/DiagnosticParseKinds.td:467
+msgctxt "diagnostic"
+msgid "expected 'case' keyword before expression"
+msgstr "表达式前缺少关键字 'case'"
+
+#: clang/include/clang/Basic/DiagnosticParseKinds.td:280
+msgctxt "diagnostic"
+msgid "expected 'while' in do/while loop"
+msgstr "do/while 循环中缺少 'while'"
+
+#: clang/include/clang/Basic/DiagnosticLexKinds.td:882
+msgctxt "diagnostic"
+msgid "expected '}'"
+msgstr "此处缺少 '}'"
+
+#: clang/include/clang/Basic/DiagnosticParseKinds.td:974
+msgctxt "diagnostic"
+msgid "expected a qualified name after 'typename'"
+msgstr "'typename' 后需要限定名称"
+
+#: clang/include/clang/Basic/DiagnosticParseKinds.td:226
+msgctxt "diagnostic"
+msgid "expected a type"
+msgstr "此处需要类型"
+
+#: clang/include/clang/Basic/DiagnosticParseKinds.td:981
+msgctxt "diagnostic"
+msgid "expected an identifier or template-id after '::'"
+msgstr "'::' 后需要标识符或模板标识符"
+
+#: clang/include/clang/Basic/DiagnosticParseKinds.td:1121
+msgctxt "diagnostic"
+msgid "expected body of lambda expression"
+msgstr "lambda 表达式缺少函数体"
+
+#: clang/include/clang/Basic/DiagnosticParseKinds.td:676
+msgctxt "diagnostic"
+msgid "expected catch"
+msgstr "此处需要 catch"
+
+#: clang/include/clang/Basic/DiagnosticParseKinds.td:651
+msgctxt "diagnostic"
+msgid "expected class member or base class name"
+msgstr "此处需要类成员或基类的名称"
+
+#: clang/include/clang/Basic/DiagnosticParseKinds.td:445
+msgctxt "diagnostic"
+msgid "expected class name"
+msgstr "此处需要类名"
+
+#: clang/include/clang/Basic/DiagnosticLexKinds.td:605
+msgctxt "diagnostic"
+msgid "expected comma in macro parameter list"
+msgstr "宏形参列表中缺少逗号"
+
+#: clang/include/clang/Basic/DiagnosticParseKinds.td:225
+msgctxt "diagnostic"
+msgid "expected expression"
+msgstr "缺少表达式"
+
+#: clang/include/clang/Basic/DiagnosticParseKinds.td:227
+msgctxt "diagnostic"
+msgid "expected external declaration"
+msgstr "此处需要外部声明"
+
+#: clang/include/clang/Basic/DiagnosticParseKinds.td:249
+msgctxt "diagnostic"
+msgid "expected function body after function declarator"
+msgstr "函数声明符后缺少函数体"
+
+#: clang/include/clang/Basic/DiagnosticParseKinds.td:624
+msgctxt "diagnostic"
+msgid "expected identifier"
+msgstr "缺少标识符"
+
+#: clang/include/clang/Basic/DiagnosticLexKinds.td:603
+msgctxt "diagnostic"
+msgid "expected identifier in macro parameter list"
+msgstr "宏形参列表中需要标识符"
+
+#: clang/include/clang/Basic/DiagnosticParseKinds.td:235
+msgctxt "diagnostic"
+msgid "expected member name or ';' after declaration specifiers"
+msgstr "声明说明符后需要成员名称或 ';'"
+
+#: clang/include/clang/Basic/DiagnosticParseKinds.td:273
+msgctxt "diagnostic"
+msgid "expected statement"
+msgstr "此处需要语句"
+
+#: clang/include/clang/Basic/DiagnosticParseKinds.td:870
+msgctxt "diagnostic"
+msgid "expected template"
+msgstr "此处需要模板"
+
+#: clang/include/clang/Basic/DiagnosticParseKinds.td:927
+msgctxt "diagnostic"
+msgid "expected template parameter"
+msgstr "此处需要模板参数"
+
+#: clang/include/clang/Basic/DiagnosticParseKinds.td:1107
+msgctxt "diagnostic"
+msgid "expected the name of a parameter pack"
+msgstr "此处需要形参包的名称"
+
+#: clang/include/clang/Basic/DiagnosticParseKinds.td:624
+msgctxt "diagnostic"
+msgid "expected unqualified-id"
+msgstr "缺少非限定标识符"
+
+#: clang/include/clang/Basic/DiagnosticParseKinds.td:1119
+msgctxt "diagnostic"
+msgid "expected variable name or 'this' in lambda capture list"
+msgstr "lambda 捕获列表中需要变量名或 'this'"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:8384
+msgctxt "diagnostic"
+msgid "expression is not assignable"
+msgstr "表达式不可赋值"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:10001
+msgctxt "diagnostic"
+msgid "expression result unused"
+msgstr "表达式的结果未使用"
+
+#: clang/include/clang/Basic/DiagnosticParseKinds.td:228
+msgctxt "diagnostic"
+msgid "extraneous closing brace ('}')"
+msgstr "多余的右花括号 ('}')"
+
+msgctxt "diagnostic"
+msgid "fix all includes"
+msgstr "修复所有包含指令"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:10762
+msgctxt "diagnostic"
+msgid "format specifies type %0 but the argument has type %1"
+msgstr "格式说明符要求 %0 类型，但实参是 %1 类型"
+
+#: clang/include/clang/Basic/DiagnosticParseKinds.td:518
+msgctxt "diagnostic"
+msgid "function definition is not allowed here"
+msgstr "此处不允许定义函数"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:4575
+msgctxt "diagnostic"
+msgid "implicit conversion loses integer precision: %0 to %1"
+msgstr "隐式转换丢失整数精度：%0 到 %1"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:554
+msgctxt "diagnostic"
+msgid "implicit declaration of function %0"
+msgstr "函数 %0 的隐式声明"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:9245
+msgctxt "diagnostic"
+msgid "incompatible integer to pointer conversion initializing %0 with an expression of type %1"
+msgstr "用 %1 类型的表达式初始化 %0 时发生整数到指针的不兼容转换"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:9225
+msgctxt "diagnostic"
+msgid "incompatible pointer to integer conversion passing %0 to parameter of type %1"
+msgstr "将 %0 传给 %1 类型的参数时发生指针到整数的不兼容转换"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:9326
+msgctxt "diagnostic"
+msgid "incompatible pointer types assigning to %0 from %1"
+msgstr "将 %1 赋给 %0 时指针类型不兼容"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:9326
+msgctxt "diagnostic"
+msgid "incompatible pointer types passing %0 to parameter of type %1"
+msgstr "将 %0 传给 %1 类型的参数时指针类型不兼容"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:6744
+msgctxt "diagnostic"
+msgid "initializer element is not a compile-time constant"
+msgstr "初始化器的元素不是编译期常量"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:8004
+msgctxt "diagnostic"
+msgid "invalid operands to binary expression (%0 and %1)"
+msgstr "二元表达式（%0 和 %1）的操作数无效"
+
+#: clang/include/clang/Basic/DiagnosticLexKinds.td:556
+msgctxt "diagnostic"
+msgid "invalid preprocessing directive"
+msgstr "无效的预处理指令"
+
+#: clang/include/clang/Basic/DiagnosticLexKinds.td:556
+msgctxt "diagnostic"
+msgid "invalid preprocessing directive, did you mean '#%1'?"
+msgstr "无效的预处理指令；是否想用 '#%1'？"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:10003
+msgctxt "diagnostic"
+msgid "left operand of comma operator has no effect"
+msgstr "逗号运算符的左操作数没有效果"
+
+#: clang/include/clang/Basic/DiagnosticLexKinds.td:598
+msgctxt "diagnostic"
+msgid "macro name missing"
+msgstr "缺少宏名称"
+
+#: clang/include/clang/Basic/DiagnosticLexKinds.td:597
+msgctxt "diagnostic"
+msgid "macro name must be an identifier"
+msgstr "宏名称必须是标识符"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:7750
+msgctxt "diagnostic"
+msgid "member reference base type %0 is not a structure or union"
+msgstr "成员访问的基类型 %0 不是结构体或联合体"
+
+#: clang/include/clang/Basic/DiagnosticLexKinds.td:599
+msgctxt "diagnostic"
+msgid "missing ')' in macro parameter list"
+msgstr "宏形参列表中缺少 ')'"
+
+#: clang/include/clang/Basic/DiagnosticLexKinds.td:82
+msgctxt "diagnostic"
+msgid "missing terminating ' character"
+msgstr "缺少结尾的 ' 字符"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:11354
+msgctxt "diagnostic"
+msgid "multiple default labels in one switch"
+msgstr "同一个 switch 中有多个 default 标签"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:5443
+msgctxt "diagnostic"
+msgid "no matching constructor for initialization of %0"
+msgstr "初始化 %0 时找不到匹配的构造函数"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:5214
+msgctxt "diagnostic"
+msgid "no matching function for call to %0"
+msgstr "找不到与 %0 匹配的函数调用"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:5216
+msgctxt "diagnostic"
+msgid "no matching member function for call to %0"
+msgstr "找不到与 %0 匹配的成员函数调用"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:7776
+msgctxt "diagnostic"
+msgid "no member named %0 in %1"
+msgstr "%1 中没有名为 %0 的成员"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:9073
+msgctxt "diagnostic"
+msgid "no viable conversion from %1 to %2"
+msgstr "无法从 %1 转换为 %2"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:147
+msgctxt "diagnostic"
+msgid "non-type template argument is not a constant expression"
+msgstr "非类型模板实参不是常量表达式"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:791
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:796
+msgctxt "diagnostic"
+msgid "non-void function does not return a value"
+msgstr "非 void 函数没有返回值"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:796
+msgctxt "diagnostic"
+msgid "non-void function does not return a value in all control paths"
+msgstr "非 void 函数存在未返回值的执行路径"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:8126
+msgctxt "diagnostic"
+msgid "read-only variable is not assignable"
+msgstr "只读变量不可赋值"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:6452
+msgctxt "diagnostic"
+msgid "redefinition of %0"
+msgstr "%0 的重复定义"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:7583
+msgctxt "diagnostic"
+msgid "remainder by zero is undefined"
+msgstr "除数为零时取余会导致未定义行为"
+
+msgctxt "diagnostic"
+msgid "remove #include directive"
+msgstr "移除 #include 指令"
+
+msgctxt "diagnostic"
+msgid "remove all unused includes"
+msgstr "移除所有未使用的包含指令"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:7590
+msgctxt "diagnostic"
+msgid "shift count >= width of type"
+msgstr "移位位数大于或等于类型的位宽"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:7588
+msgctxt "diagnostic"
+msgid "shift count is negative"
+msgstr "移位位数为负"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:1771
+msgctxt "diagnostic"
+msgid "static assertion expression is not an integral constant expression"
+msgstr "静态断言表达式必须是整数常量表达式"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:1775
+msgctxt "diagnostic"
+msgid "static assertion failed"
+msgstr "静态断言失败"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:1776
+msgctxt "diagnostic"
+msgid "static assertion failed due to requirement '%0'"
+msgstr "静态断言因条件 '%0' 不满足而失败"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:1776
+msgctxt "diagnostic"
+msgid "static assertion failed due to requirement '%0': %2"
+msgstr "静态断言因条件 '%0' 不满足而失败：%2"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:1775
+msgctxt "diagnostic"
+msgid "static assertion failed: %1"
+msgstr "静态断言失败：%1"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:7735
+msgctxt "diagnostic"
+msgid "subscripted value is not an array, pointer, or vector"
+msgstr "使用下标的值不是数组、指针或向量"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:5675
+msgctxt "diagnostic"
+msgid "template argument for template type parameter must be a type"
+msgstr "类型模板形参对应的实参必须是类型"
+
+#: clang/include/clang/Basic/DiagnosticLexKinds.td:799
+msgctxt "diagnostic"
+msgid "too few arguments provided to function-like macro invocation"
+msgstr "函数式宏调用的实参过少"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:9570
+msgctxt "diagnostic"
+msgid "too few arguments to function call, expected %1, have %2"
+msgstr "函数调用实参太少：应为 %1 个，实际 %2 个"
+
+#: clang/include/clang/Basic/DiagnosticLexKinds.td:792
+msgctxt "diagnostic"
+msgid "too many arguments provided to function-like macro invocation"
+msgstr "函数式宏调用的实参过多"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:9600
+msgctxt "diagnostic"
+msgid "too many arguments to function call, expected %1, have %2"
+msgstr "函数调用实参太多：应为 %1 个，实际 %2 个"
+
+#: clang/include/clang/Basic/DiagnosticCommonKinds.td:22
+msgctxt "diagnostic"
+msgid "too many errors emitted, stopping now"
+msgstr "错误过多，已停止编译"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:11741
+msgctxt "diagnostic"
+msgid "unknown type name %0"
+msgstr "未知类型名 %0"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:11745
+msgctxt "diagnostic"
+msgid "unknown type name %0; did you mean %1?"
+msgstr "未知类型名 %0；是否想用 %1？"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:11743
+msgctxt "diagnostic"
+msgid "unknown type name %0; did you mean %2?"
+msgstr "未知类型名 %0；是否想用 %2？"
+
+#: clang/include/clang/Basic/DiagnosticLexKinds.td:612
+msgctxt "diagnostic"
+msgid "unterminated conditional directive"
+msgstr "条件指令未结束"
+
+#: clang/include/clang/Basic/DiagnosticLexKinds.td:790
+msgctxt "diagnostic"
+msgid "unterminated function-like macro invocation"
+msgstr "函数式宏调用未结束"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:495
+msgctxt "diagnostic"
+msgid "unused function %0"
+msgstr "未使用的函数 %0"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:441
+msgctxt "diagnostic"
+msgid "unused parameter %0"
+msgstr "未使用的形参 %0"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:445
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:459
+msgctxt "diagnostic"
+msgid "unused variable %0"
+msgstr "未使用的变量 %0"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:6345
+msgctxt "diagnostic"
+msgid "use of undeclared identifier %0"
+msgstr "使用了未声明的标识符 %0"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:11752
+msgctxt "diagnostic"
+msgid "use of undeclared identifier %0; did you mean %1?"
+msgstr "使用了未声明的标识符 %0；是否想用 %1？"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:7871
+msgctxt "diagnostic"
+msgid "variable has incomplete type %0"
+msgstr "变量具有不完整类型 %0"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:224
+msgctxt "diagnostic"
+msgid "variable length array used"
+msgstr "使用了变长数组"
+
+msgctxt "diagnostic"
+msgid "{symbol} declared here"
+msgstr "{symbol} 在这里声明"
+
+msgctxt "diagnostic"
+msgid "{symbol} has been explicitly marked deprecated here"
+msgstr "{symbol} 已在这里被明确标记为弃用"
+
+msgctxt "diagnostic"
+msgid "{symbol} is deprecated"
+msgstr "{symbol} 已弃用"
+
+msgctxt "diagnostic"
+msgid "{symbol} is deprecated: {message}"
+msgstr "{symbol} 已弃用：{message}"
+
+#: clang/include/clang/Basic/DiagnosticDriverKinds.td:274
+msgctxt "driver"
+msgid "%0 command failed with exit code %1 (use -v to see invocation)"
+msgstr "%0 命令失败，退出状态为 %1（使用 -v 查看调用命令）"
+
+#: clang/include/clang/Basic/DiagnosticDriverKinds.td:494
+msgctxt "driver"
+msgid "argument unused during compilation: '%0'"
+msgstr "编译期间未使用参数：'%0'"
+
+#: clang/include/clang/Basic/DiagnosticDriverKinds.td:525
+msgctxt "driver"
+msgid "float ABI '%0' is not supported by current library"
+msgstr "当前库不支持浮点 ABI '%0'"
+
+#: clang/include/clang/Basic/DiagnosticDriverKinds.td:358
+msgctxt "driver"
+msgid "invalid value '%1' in '%0'"
+msgstr "'%0' 中的值 '%1' 无效"
+
+#: clang/include/clang/Basic/DiagnosticDriverKinds.td:362
+msgctxt "driver"
+msgid "invalid value '%1' in '%0', expected one of: %2"
+msgstr "'%0' 中的值 '%1' 无效；可选值为 %2"
+
+#: clang/include/clang/Basic/DiagnosticDriverKinds.td:211
+msgctxt "driver"
+msgid "no input files"
+msgstr "没有输入文件"
+
+#: clang/include/clang/Basic/DiagnosticDriverKinds.td:11
+msgctxt "driver"
+msgid "no such file or directory: '%0'"
+msgstr "没有该文件或目录：'%0'"
+
+#: clang/include/clang/Basic/DiagnosticDriverKinds.td:12
+msgctxt "driver"
+msgid "no such file or directory: '%0'; did you mean '%1'?"
+msgstr "没有该文件或目录：'%0'；是否想用 '%1'？"
+
+#: clang/include/clang/Basic/DiagnosticDriverKinds.td:467
+msgctxt "driver"
+msgid "optimization flag '%0' is not supported for target '%1'"
+msgstr "目标 '%1' 不支持优化标志 '%0'"
+
+#: clang/include/clang/Basic/DiagnosticDriverKinds.td:726
+msgctxt "driver"
+msgid "position-independent code requires '-mabicalls'"
+msgstr "位置无关代码需要 '-mabicalls'"
+
+#: clang/include/clang/Basic/DiagnosticDriverKinds.td:542
+msgctxt "driver"
+msgid "treating '%0' input as '%1' when in C++ mode, this behavior is deprecated"
+msgstr "在 C++ 模式下将 '%0' 输入视为 '%1'，此行为已弃用"
+
+#: clang/include/clang/Basic/DiagnosticDriverKinds.td:336
+msgctxt "driver"
+msgid "unknown argument '%0'; did you mean '%1'?"
+msgstr "未知参数 '%0'；是否想用 '%1'？"
+
+#: clang/include/clang/Basic/DiagnosticDriverKinds.td:335
+msgctxt "driver"
+msgid "unknown argument: '%0'"
+msgstr "未知参数：'%0'"
+
+#: clang/include/clang/Basic/DiagnosticDriverKinds.td:344
+msgctxt "driver"
+msgid "unknown target triple '%0'"
+msgstr "未知目标三元组 '%0'"
+
+#: clang/include/clang/Basic/DiagnosticDriverKinds.td:21
+msgctxt "driver"
+msgid "unsupported argument '%1' to option '%0'"
+msgstr "选项 '%0' 不支持实参 '%1'"
+
+#: clang/include/clang/Basic/DiagnosticDriverKinds.td:23
+msgctxt "driver"
+msgid "unsupported argument '%1' to option '%0' for target '%2'"
+msgstr "目标 '%2' 的选项 '%0' 不支持实参 '%1'"
+
+#: clang/include/clang/Basic/DiagnosticDriverKinds.td:14
+msgctxt "driver"
+msgid "unsupported option '%0'"
+msgstr "不支持的选项 '%0'"
+
+#: clang/include/clang/Basic/DiagnosticDriverKinds.td:17
+msgctxt "driver"
+msgid "unsupported option '%0' for target '%1'"
+msgstr "目标 '%1' 不支持选项 '%0'"
+
+#: clang/include/clang/Basic/DiagnosticDriverKinds.td:195
+msgctxt "driver"
+msgid "unsupported runtime library '%0' for platform '%1'"
+msgstr "平台 '%1' 不支持运行库 '%0'"
+
+#: clang/include/clang/Basic/DiagnosticDriverKinds.td:199
+msgctxt "driver"
+msgid "unsupported unwind library '%0' for platform '%1'"
+msgstr "平台 '%1' 不支持栈展开库 '%0'"
+
+#: clang/include/clang/Basic/DiagnosticCommonKinds.td:85
+msgctxt "err_expected_after"
+msgid "expected %1 after %0"
+msgstr "%0 之后应为 %1"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:3225
+msgctxt "note"
+msgid "and %1 does not satisfy %2:"
+msgstr "并且 %1 不满足 %2："
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:3217
+msgctxt "note"
+msgid "and %1 may throw an exception"
+msgstr "并且 %1 可能抛出异常"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:3215
+msgctxt "note"
+msgid "and '%1' would be invalid"
+msgstr "并且 '%1' 会无效"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:3213
+msgctxt "note"
+msgid "and '%1' would be invalid: %2"
+msgstr "并且 '%1' 会无效：%2"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:3213
+msgctxt "note"
+msgid "and '{expression}' would be invalid: {diagnostic}"
+msgstr "并且 '{expression}' 会无效：{diagnostic}"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:3223
+msgctxt "note"
+msgid "and type constraint %1 was not satisfied:"
+msgstr "并且类型约束 %1 未得到满足："
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:3196
+msgctxt "note"
+msgid "because %1 does not satisfy %2"
+msgstr "因为 %1 不满足 %2"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:3225
+msgctxt "note"
+msgid "because %1 does not satisfy %2:"
+msgstr "因为 %1 不满足 %2："
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:3217
+msgctxt "note"
+msgid "because %1 may throw an exception"
+msgstr "因为 %1 可能抛出异常"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:3215
+msgctxt "note"
+msgid "because '%1' would be invalid"
+msgstr "因为 '%1' 会无效"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:3213
+msgctxt "note"
+msgid "because '%1' would be invalid: %2"
+msgstr "因为 '%1' 会无效：%2"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:3213
+msgctxt "note"
+msgid "because '{expression}' would be invalid: {diagnostic}"
+msgstr "因为 '{expression}' 会无效：{diagnostic}"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:3223
+msgctxt "note"
+msgid "because type constraint %1 was not satisfied:"
+msgstr "因为类型约束 %1 未得到满足："
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:5342
+msgctxt "note"
+msgid "candidate function has been explicitly deleted"
+msgstr "候选函数已被显式删除"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:5279
+msgctxt "note"
+msgid "candidate template ignored: constraints not satisfied%0"
+msgstr "候选模板被忽略：约束不满足%0"
+
+#: clang/include/clang/Basic/DiagnosticCommonKinds.td:30
+msgctxt "note"
+msgid "declared here"
+msgstr "在这里声明"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:5860
+msgctxt "note"
+msgid "explicit instantiation first required here"
+msgstr "此处首次需要显式实例化"
+
+#: clang/include/clang/Basic/DiagnosticCommonKinds.td:37
+msgctxt "note"
+msgid "forward declaration of %0"
+msgstr "%0 的前向声明"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:5860
+msgctxt "note"
+msgid "implicit instantiation first required here"
+msgstr "此处首次需要隐式实例化"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:6863
+msgctxt "note"
+msgid "insert an explicit cast to silence this issue"
+msgstr "插入显式类型转换以消除这条诊断"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:6981
+msgctxt "note"
+msgid "jump bypasses variable initialization"
+msgstr "跳转绕过了变量的初始化"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:6983
+msgctxt "note"
+msgid "jump bypasses variable with a non-trivial destructor"
+msgstr "跳转绕过了具有非平凡析构函数的变量"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:8486
+msgctxt "note"
+msgid "passing argument to parameter here"
+msgstr "实参传到此形参"
+
+#: clang/include/clang/Basic/DiagnosticCommonKinds.td:36
+msgctxt "note"
+msgid "previous case defined here"
+msgstr "此前的 case 定义在这里"
+
+#: clang/include/clang/Basic/DiagnosticCommonKinds.td:32
+msgctxt "note"
+msgid "previous declaration is here"
+msgstr "此前的声明在这里"
+
+#: clang/include/clang/Basic/DiagnosticCommonKinds.td:31
+msgctxt "note"
+msgid "previous definition is here"
+msgstr "此前的定义在这里"
+
+#: clang/include/clang/Basic/DiagnosticCommonKinds.td:33
+msgctxt "note"
+msgid "previous implicit declaration is here"
+msgstr "此前的隐式声明在这里"
+
+#: clang/include/clang/Basic/DiagnosticParseKinds.td:68
+msgctxt "note"
+msgid "previous statement is here"
+msgstr "此前的语句在这里"
+
+#: clang/include/clang/Basic/DiagnosticCommonKinds.td:35
+msgctxt "note"
+msgid "previous use is here"
+msgstr "此前在这里使用"

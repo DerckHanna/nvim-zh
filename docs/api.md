@@ -36,6 +36,7 @@ local snapshot = require('nvim-zh').status()
 | `adapters` | 第三方适配器的固定验证组合、安装观察和各显示面的状态与证据 |
 | `packs` | 已登记汉化包的启用状态、选定与活动版本、待重启、任务阶段和最近错误 |
 | `diagnostics` | 各诊断显示接缝与本进程实际观察 |
+| `compiler` | 编译器列表显示开关、近期工具身份、匹配和回退原因 |
 | `lsp` | clangd 消息、进度与提示适配状态 |
 | `nvim_version` / `v_lang` / `helplang` | 当前 Neovim 与语言状态 |
 
@@ -94,6 +95,10 @@ end, { source = 'my-plugin/l10n' })
 从可信 Lua 配置显式注册外置包提供的适配器。定义使用 `api = 1`，并提供唯一的 `id`、`domain`、已验证的 `catalog` 及 `surfaces`。每个显示面声明 `module`、只读的 `probe(module)` 和 `mount(scope, target)`。`probe` 返回可挂载的目标，或者等待原因。`mount` 可以使用 `scope.translate(context, text)`、`scope.wrap(object, key, factory)`、`scope.autocmd(event, options)` 与 `scope.defer(release)`。可将 `scope.wrap` 返回的所有权查询函数作为 `mount` 的返回值。插件接管同一函数时，适配器保留外部替换。
 
 注册返回幂等的释放函数，移除当前适配器和其目录。`modules.plugins.disabled` 可按 ID 禁用外置适配。示例见[外置适配配置](adapter-system-design.md#第三方-help-与外置适配包)。
+
+## `raw()` 和 `raw_text()`
+
+`raw()` 返回当前 quickfix 或 location list 条目的副本。可取得时包含原文本 `raw_text`、工具代码 `code`、来源 `tool` 与匹配原因 `reason`，以及原条目 `item`。无条目时返回 `nil`。`raw_text()` 返回供 `:NvimZhRaw` 使用的文本。当前光标所在行的 LSP 原文可用 `:NvimZhDiagnosticRaw` 或 `vim.diagnostic.get()` 查看。
 
 ## `stats()`
 

@@ -3,6 +3,8 @@ local engine = require('nvim-zh.engine')
 local packs = require('nvim-zh.packs')
 local config = {}
 local states = {}
+local file_status = {}
+local file_status_method = 'textDocument/clangd.fileStatus'
 local unpack = table.unpack or unpack
 local function pack(...) return { n = select('#', ...), ... } end
 
@@ -108,49 +110,25 @@ end
 
 local function file_status_wrapper(original)
   return function(err, params, ctx, ...)
-    if not config.progress or not clangd(ctx, 'textDocument/clangd.fileStatus') or type(params) ~= 'table' or type(params.state) ~= 'string' then
+    if not config.progress or not clangd(ctx, file_status_method) or type(params) ~= 'table' or type(params.state) ~= 'string' then
       return original(err, params, ctx, ...)
     end
     local copy = vim.tbl_extend('force', {}, params)
     local parts = vim.split(params.state, ', ', { plain = true })
     for i, part in ipairs(parts) do parts[i] = translate('file_status', part) end
     copy.state = table.concat(parts, ', ')
+    file_status[ctx.client_id] = { uri = params.uri, state = copy.state, raw_state = params.state }
     return original(err, copy, ctx, ...)
   end
 end
 
 local function hover_text(text, markdown)
-  if type(text) ~= 'string' or #text > 32768 then return text end
-  local lines = vim.split(text, '\n', { plain = true })
-  local fence
-  for i, line in ipairs(lines) do
-    local marker = markdown and line:match('^%s*(```+)')
-    if marker then
-      if not fence then
-        fence = #marker
-      elseif #marker >= fence and line:match('^%s*`+%s*$') then
-        fence = nil
-      end
-    elseif not fence then
-      local heading, body = line:match('^(### )(.*)$')
-      if i == 1 and heading then
-        local kind, name = body:match('^([^`]-) (`.*`)$')
-        if kind then
-          line = heading .. translate('hover_kind', kind) .. ' ' .. name
-        else
-          line = heading .. translate('hover_kind', body)
-        end
-      elseif heading then
-        line = heading .. translate('hover', body)
-      elseif line == 'Parameters:' or line:match('^Type: `') or line:match('^Value = `')
-        or line:match('^provided by `') or line:match('^provides `')
-        or line:match('^Offset: %d') or line:match('^Size: %d') then
-        line = translate('hover', line)
-      end
-      lines[i] = line
-    end
-  end
-  return table.concat(lines, '\n')
+  if not markdown or type(text) ~= 'string' or #text > 32768 then return text end
+  -- clangd writes this heading before emitting any comment or definition.
+  -- The remaining markdown has no boundary between generated fields and docs.
+  local kind, name, rest = text:match('^### ([^`\n]-) (`[^\n]*`)(\n.*)$')
+  if not kind then return text end
+  return '### ' .. translate('hover_kind', kind) .. ' ' .. name .. rest
 end
 
 local function hover_result(result)
@@ -220,6 +198,8 @@ local function completion_wrapper(original)
   return function(result, prefix, client_id, ...)
     local items = original(result, prefix, client_id, ...)
     if not config.hints or not clangd({ client_id = client_id }, 'textDocument/completion') or type(items) ~= 'table' then return items end
+    local client = vim.lsp.get_client_by_id(client_id)
+    local reviewed = packs.tool_reason('clangd', client, 'textDocument/completion') == 'verified'
     local copy
     for i, item in ipairs(items) do
       local raw = type(item) == 'table' and vim.tbl_get(item, 'user_data', 'nvim', 'lsp', 'completion_item')
@@ -231,7 +211,12 @@ local function completion_wrapper(original)
         local doc = type(raw.documentation) == 'table' and raw.documentation.value or raw.documentation
         if info == doc and type(info) == 'string' then
           local first, rest = info:match('^([^\n]*)(.*)$')
-          if first:match('^From `+.+`+$') or first:match('^From <.+>$') or first:match('^From ".+"$') then
+          local header = first:match('^From `+(.-)`+$') or first:match('^From (<.+>)$') or first:match('^From (".+")$')
+          -- clangd places both documentation and include information in the
+          -- same string. A corresponding insertion establishes header origin.
+          if header and (not reviewed or vim.iter(raw.additionalTextEdits or {}):any(function(edit)
+            return type(edit.newText) == 'string' and edit.newText:find('#include ' .. header, 1, true)
+          end)) then
             info = translate('completion', first) .. rest
           end
         end
@@ -265,7 +250,14 @@ function M.setup(next_config)
   install('window/showMessage', message_wrapper, config.messages)
   install('window/showMessageRequest', request_wrapper, config.messages)
   install('$/progress', progress_wrapper, config.progress)
-  install('textDocument/clangd.fileStatus', file_status_wrapper, config.progress)
+  if config.progress and not vim.lsp.handlers[file_status_method] and not states[file_status_method] then
+    local wrapper = file_status_wrapper(function() end)
+    states[file_status_method] = { target = vim.lsp.handlers, wrapper = wrapper, active = true }
+    vim.lsp.handlers[file_status_method] = wrapper
+  else
+    install(file_status_method, file_status_wrapper, config.progress)
+  end
+  if not config.progress then file_status = {} end
   install('textDocument/hover', hover_wrapper, config.hints)
   install('buf_request_all', request_all_wrapper, config.hints, vim.lsp)
   install('open_floating_preview', signature_title_wrapper, config.hints, vim.lsp.util)
@@ -275,6 +267,7 @@ end
 
 function M.teardown()
   config = {}
+  file_status = {}
   for method in pairs(states) do restore(method) end
 end
 function M.info()
@@ -285,6 +278,7 @@ function M.info()
       id = client.id,
       version = client.server_info and client.server_info.version,
       reason = packs.tool_reason('clangd', client, 'textDocument/publishDiagnostics'),
+      file_status = vim.deepcopy(file_status[client.id]),
     }
   end
   for method, state in pairs(states) do result[method] = { active = state.active == true, reason = state.reason or (state.active and 'active') or 'external_override' } end

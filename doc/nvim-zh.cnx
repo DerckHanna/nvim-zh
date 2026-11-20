@@ -201,30 +201,47 @@ nvim-cmp 的补全内容来自补全源或用户 formatter。固定 commit、源
 
 诊断与 LSP                                                *nvim-zh-diagnostics*
 
-安装 clangd 汉化包后，常见 clangd、Clang 和 clang-tidy 诊断在行尾、虚拟行、
-浮窗和 Neovim 诊断列表中使用中文。diagnostics.lists 控制 quickfix 和
-location list 汉化。诊断原文和位置可从 vim.diagnostic.get() 和
-user_data.lsp 查询。
+安装 clangd 汉化包后，已有译文的诊断在行尾、虚拟行、浮窗和诊断列表中
+显示中文。诊断原文和位置保存在 vim.diagnostic.get() 与 user_data.lsp。
+在源文件内执行 |:NvimZhDiagnosticRaw|，查看当前行的原文和诊断代码。
 
 lsp.messages 和 lsp.progress 控制通知与进度。lsp.hints 控制代码操作标题、
-悬浮说明、签名标题和原生补全说明。代码操作菜单需要 ui.prompts。修复编辑、
-补全文本、项目代码和 LSP 协议记录保留原值。未知诊断和提示显示英文原文。
+悬浮标题、签名标题和重载补全提示。代码操作菜单需要 ui.prompts。
+修复编辑、补全文本、项目代码和原始 LSP 对象保留原值。
 
 C/C++ 工作流                                                       *nvim-zh-cpp*
 
-在 :NvimZhPacks 安装 clangd 汉化包，用 :NvimZh 查看版本和失败原因。通过
-|:vimgrep| 检索文件，|:copen| 查看列表，|:cc| 跳转。打开诊断浮窗后，阅读
-错误码或用以下命令查看当前行的 LSP 原文和范围。 >vim
+在 :NvimZhPacks 管理 clangd 汉化包，在 :NvimZh 查看识别出的版本和回退原因。
+使用 |vim.lsp.buf.code_action()| 应用修复，核对结果后保存。
 
-    :lua vim.print(vim.diagnostic.get(0, { lnum = vim.fn.line('.') - 1 }))
+Clang 编译器支持 :make 和 :lmake 的列表显示。选择已有 errorformat 或使用
+下列可选设置。用 clang 编译 C、用 clang++ 编译 C++。 >vim
+
+    :compiler nvim-zh-clang
+    :setlocal makeprg=clang++\ -std=c++20\ -fsyntax-only
+    :make! %
+    :copen
+    :NvimZhRaw
+    :cc
+    :echo v:shell_error
 <
-使用 |vim.lsp.buf.code_action()| 应用修复，然后保存。GCC 项目可执行
-:compiler gcc 和 :make!，用 :echo v:shell_error 查看退出状态。配置好
-nvim-dap 和 CodeLLDB 后，用 :DapToggleBreakpoint 设置断点，
-:DapViewJump scopes 查看变量，:DapContinue 继续。
+查看列表原文和代码                                            *:NvimZhRaw*
 
-包管理页可更新或离线回滚。服务器版本或接口未验证时，保留原来的显示文字。
-docs/workflows.md 包含构建、pytest、Ruff 和 Git 冲突的操作指南。
+在 quickfix 或 location list 中执行 :NvimZhRaw。此命令从选中条目读取原文，
+并显示能够识别的工具代码和版本。跳转使用原有的 |:cc|、|:cnext| 或 |:ll|。
+GNU Make 等间接构建、未验证的接口以及未知来源继续使用原有显示。
+
+查看源文件里的诊断原文                                 *:NvimZhDiagnosticRaw*
+
+在有 LSP 诊断的源文件中执行 :NvimZhDiagnosticRaw。原始位置、相关注释和
+修复参数可通过 |vim.diagnostic.get()| 的 user_data.lsp 查询。
+
+独立检查可用 :compiler nvim-zh-clang-tidy 和 makeprg=clang-tidy。先检查，
+确认后使用 --fix，再去掉该参数复查。modules.compiler 控制这两种工具的列表
+显示。clangd 转发的检查诊断也可使用 clang-tidy 汉化包的对应词条。
+
+工具链候选附件可本地导入。docs/workflows.md 记录使用方式，
+docs/toolchain-coverage.md 记录固定组合、证据和仍缺的译文。
 
 Help 文档                                                      *nvim-zh-help*
 

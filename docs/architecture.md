@@ -67,7 +67,7 @@ nvim-zh 由五类输入组成：
 
 | 输入 | 位置 | 是否随包更新 | 运行时如何使用 |
 |---|---|---|---|
-| 插件实现 | `plugin/`、`lua/nvim-zh/` 中非生成 Lua | 是，由 vim.pack 管理 | 当前进程冻结同一份实现；实现变化提示重启 |
+| 插件实现 | `plugin/`、`lua/nvim-zh/` 中非生成 Lua 和 `compiler/` 的可选解析设置 | 是，由 vim.pack 管理 | 当前进程冻结同一份实现；实现变化提示重启 |
 | 翻译编辑源 | `translations/` | 由维护者修改 | 构建为只读目录和 MO，不在安装端执行构建 |
 | 中文 Help | `doc/*.cnx`、项目自有 `nvim-zh.txt/.cnx` | 是 | 与预生成索引进同一资源快照 |
 | 发布资源 | `resources/` | 是 | 全量校验后发布为不可变快照 |
@@ -102,6 +102,7 @@ translate / register_catalog ──► catalog / engine / missing
 - **`native_backend.lua`**：管理 gettext 绑定、消息语言和私有 locale 能力，只恢复仍由本插件拥有的进程状态。
 - **`catalog.lua` / `engine.lua`**：精确目录、受控模板、用户覆盖和原文回退；不知道第三方插件生命周期。
 - **`ui.lua` / `diagnostics.lua` / `lsp.lua`**：Neovim 自身公开显示接缝，保留原对象、回调和外部函数所有权。
+- **`compiler.lua`**：在 `QuickFixCmdPost` 读取已解析列表与实际命令标题，按工具版本和摘要验证来源。每张列表仅拥有显示回调，条目、`user_data` 和 list context 由 Neovim 保管。
 - **`plugins.lua` / `adapters/`**：适配注册、加载证据和通用显示接缝。插件专用适配器随可选包交付。
 - **`packs.lua` / `pack_store.lua`**：协调下载、选版、启停与回退，校验并发布不可变包快照，按代次更新包登记。
 - **`status.lua`**：组合只读快照。查询不会隐式 setup、安装、更新、生成 locale 或写缓存。

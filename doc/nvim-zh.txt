@@ -249,18 +249,34 @@ Diagnostics and hints missing from the catalog retain their original text.
 
 C/C++ WORKFLOW                                                     *nvim-zh-cpp*
 
-Install the clangd localization pack with :NvimZhPacks and check the version
-and fallback state with :NvimZh. Search with |:vimgrep|, list the matches
-with |:copen|, and jump with |:cc|. Inspect the original diagnostic and
-its range on the current line with: >vim
+Install the clangd localization pack with :NvimZhPacks. Use |:NvimZh| to inspect
+the version and fallback state. Apply a fix with |vim.lsp.buf.code_action()|,
+review the resulting edit, and save the file.
 
-    :lua vim.print(vim.diagnostic.get(0, { lnum = vim.fn.line('.') - 1 }))
+Clang compiler display uses the results that Neovim parsed for :make or
+:lmake. Use the existing errorformat or select the optional parser: >vim
+
+    :compiler nvim-zh-clang
+    :setlocal makeprg=clang++\ -std=c++20\ -fsyntax-only
+    :make! %
+    :copen
+    :NvimZhRaw
+    :cc
+    :echo v:shell_error
 <
-Apply a fix with |vim.lsp.buf.code_action()| and save the file. For GCC, try
-:compiler gcc and :make!, and use :echo v:shell_error to check the exit code.
-With nvim-dap and CodeLLDB configured, set a breakpoint with
-:DapToggleBreakpoint, view variables with :DapViewJump scopes, and continue
-with :DapContinue. See docs/workflows.md for the full guide.
+                                                              *:NvimZhRaw*
+Inspect the selected quickfix/location entry, including its source text,
+tool code and tool version when available.
+
+                                                       *:NvimZhDiagnosticRaw*
+Read the source diagnostics and codes on the current source line.
+|vim.diagnostic.get()| also returns the LSP object in user_data.lsp.
+
+For standalone checks, use :compiler nvim-zh-clang-tidy and makeprg=clang-tidy.
+Inspect the finding, run clang-tidy with --fix when ready, and check again
+without --fix. The compiler module controls list display. clangd diagnostics
+forwarded from clang-tidy can use the corresponding clang-tidy catalog.
+See docs/toolchain-coverage.md for the pinned combination and current gaps.
 
 HELP DOCUMENTS                                                  *nvim-zh-help*
 

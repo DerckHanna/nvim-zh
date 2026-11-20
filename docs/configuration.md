@@ -24,6 +24,7 @@ require('nvim-zh').setup({
       float = true,
       lists = true,
     },
+    compiler = { enabled = true, quickfix = true, loclist = true },
     lsp = { messages = true, progress = true, hints = true },
   },
   pack_sources = {},
@@ -74,6 +75,12 @@ require('nvim-zh').setup({
 `enabled` 是总开关。`virtual_text`、`virtual_lines` 和 `float` 分别控制行尾、虚拟行和浮窗。Neovim 已启用的诊断显示会使用中文译文。浮窗也会翻译已收录的相关位置说明。
 
 `lists` 控制 `vim.diagnostic.setqflist()` 和 `vim.diagnostic.setloclist()` 生成的诊断列表。插件先调用用户 formatter，再翻译显示文字。用户 formatter 返回 `nil` 时仍隐藏对应诊断，其异常继续传播。`vim.diagnostic.get()` 仍返回完整原文，可用诊断代码和 `user_data.lsp` 查找上游说明。
+
+### `modules.compiler`
+
+`enabled` 控制编译器和独立检查工具的列表显示，`quickfix` 对应 `:make`，`loclist` 对应 `:lmake`。匹配使用 Neovim 已解析的条目。应用优先保留用户的 `quickfixtextfunc`。`:NvimZhRaw` 显示选中项的原文和可取得的工具代码。
+
+Clang 与 clang-tidy 按命令、工具版本、二进制 SHA-256 和显示接口选择独立汉化包。间接构建、无法确认的来源和自定义诊断格式回退原文。已验证的命令和选项见[工作流指南](workflows.md)。
 
 ### `modules.lsp`
 

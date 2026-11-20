@@ -1619,7 +1619,9 @@ $quote	vimeval.cnx	/*$quote*
 :NoMatchParen	pi_paren.cnx	/*:NoMatchParen*
 :NvimZh	nvim-zh.cnx	/*:NvimZh*
 :NvimZhCheck	nvim-zh.cnx	/*:NvimZhCheck*
+:NvimZhDiagnosticRaw	nvim-zh.cnx	/*:NvimZhDiagnosticRaw*
 :NvimZhPacks	nvim-zh.cnx	/*:NvimZhPacks*
+:NvimZhRaw	nvim-zh.cnx	/*:NvimZhRaw*
 :Open	lua.cnx	/*:Open*
 :Over	terminal.cnx	/*:Over*
 :Program	terminal.cnx	/*:Program*

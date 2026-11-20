@@ -13,6 +13,8 @@ local raw_codes = {
   pp_hash_error = true, pp_hash_warning = true, pragma_message = true, warn_pragma_message = true,
   apinotes_message = true, note_apinotes_message = true, warn_apinotes_message = true,
   diagnose_if_succeeded = true, warn_diagnose_if_succeeded = true, inline_ms_asm_parsing = true,
+  ['-Wuser-defined-warnings'] = true, ['-Wapinotes'] = true, ['-W#warnings'] = true,
+  ['-W#pragma-messages'] = true, ['-Winline-asm'] = true, ['-Wsource-mgr'] = true,
 }
 
 local function is_clangd(diagnostic)
@@ -77,7 +79,7 @@ end
 -- Used by the source inventory to exercise the same message matcher.
 M.match_message = translate_sentence
 
-local function translate_diagnostic(diagnostic, text, code)
+local function translate_diagnostic(diagnostic, text, code, note)
   if type(text) ~= 'string' or text == '' or type(diagnostic) ~= 'table' or not is_clangd(diagnostic) then return text end
   if raw_codes[code] then
     runtime.observed = runtime.observed + 1
@@ -92,6 +94,20 @@ local function translate_diagnostic(diagnostic, text, code)
   runtime.observed = runtime.observed + 1
   local result, context
   local source = diagnostic.source
+  if source == 'clang-tidy' and client and packs.tool_reason('clangd', client, method) == 'verified' then
+    if packs.tool_reason('clang-tidy', client, 'forwarded_diagnostics') ~= 'verified' then return text end
+    local body, fixes = text:match('^(.*) %((fixe?s? available)%)$')
+    body = body or text
+    local cli_body = body:sub(1, 1):lower() .. body:sub(2)
+    local match = require('nvim-zh.compiler').match_message
+    local translated, reason = match('clang-tidy', cli_body, code, note and 'note' or nil)
+    if reason == 'missing_translation' and cli_body ~= body then
+      translated, reason = match('clang-tidy', body, code, note and 'note' or nil)
+    end
+    if reason ~= 'translated' then return text end
+    runtime.translated = runtime.translated + 1
+    return translated .. (fixes and (lookup('diagnostic_suffix', ' (' .. fixes .. ')') or (' (' .. fixes .. ')')) or '')
+  end
   local first, notes = text:match('^(.-)(\n\n.*)$')
   if first and notes:match('^\n\n[^\n]*:%d+:%d+[%s:]+') then
     result, context = translate_sentence(first, code, source)
@@ -149,7 +165,9 @@ local function float_suffix(suffix)
       local related = vim.tbl_get(diagnostic, 'user_data', 'lsp', 'relatedInformation')
       if type(related) == 'table' then
         for _, item in ipairs(related) do
-          if type(item) == 'table' then item.message = translate_diagnostic(diagnostic, item.message) end
+          if type(item) == 'table' then
+            item.message = translate_diagnostic(diagnostic, item.message, diagnostic.code, true)
+          end
         end
       end
     end

@@ -45,10 +45,8 @@ TBLGEN_TARGET = "clang/include/clang/Basic/Diagnostic.td"
 TBLGEN_INCLUDE = "clang/include/clang/Basic"
 
 SCHEMA = 1
-# Canonical templates per diagnostic are capped so a pathological modifier
-# product cannot explode the manifest; capped records keep their first variants
-# and are reported so maintainers see the limitation.
-VARIANT_CAP = 64
+# The fixed LLVM version's largest expansion fits within this cap.
+VARIANT_CAP = 16384
 SEVERITY = {
     "CLASS_ERROR": "error",
     "CLASS_WARNING": "warning",
@@ -154,7 +152,8 @@ STRUCTURAL_RE = re.compile(r"%(select|plural|diff|sub)\{")
 ENUM_SELECT_RE = re.compile(r"%enum_select<([A-Za-z_][A-Za-z0-9_]*)>\{")
 # Modifiers that only change how one argument renders; the engine captures the
 # rendered span, so normalization keeps a bare %N placeholder.
-SIMPLE_MODIFIER_RE = re.compile(r"%(ordinal|human|quoted|objcclass|objcinstance|q|s)(\d+)")
+SIMPLE_MODIFIER_RE = re.compile(r"%%|%(ordinal|human|quoted|objcclass|objcinstance|q)(\d+)")
+ARGUMENT_RE = re.compile(r"%%|%([a-z]*)(\d+)")
 
 
 def _take_arg_index(tail: str) -> tuple[int, int]:
@@ -188,8 +187,16 @@ def normalize_template(template: str, substitutions: dict[str, str],
     def map_index(index: int) -> int:
         return mapping[index] if index < len(mapping) else index
 
-    def renumber(placeholder: re.Match) -> str:
-        return f"%{map_index(int(placeholder.group(1)))}"
+    def literal(text: str) -> str:
+        def renumber(placeholder: re.Match) -> str:
+            if placeholder.group(0) == "%%":
+                return "%%"
+            return f"%{placeholder.group(1)}{map_index(int(placeholder.group(2)))}"
+        return ARGUMENT_RE.sub(renumber, text)
+
+    def join(head: str, branches: list[str], tail: str) -> list[str]:
+        suffixes = normalize_template(tail, substitutions, mapping)
+        return [head + branch + suffix for branch in branches for suffix in suffixes]
 
     match = STRUCTURAL_RE.search(template)
     enum_match = ENUM_SELECT_RE.search(template)
@@ -200,22 +207,22 @@ def normalize_template(template: str, substitutions: dict[str, str],
         after = template[close_brace + 1 :]
         index, consumed = _take_arg_index(after)
         tail = after[consumed:]
-        head = template[: enum_match.start()]
+        head = literal(template[: enum_match.start()])
         results = []
         for tag in split_top_level(inner, "|"):
             open_tag = tag.find("{")
             body = tag[open_tag + 1 : -1] if open_tag >= 0 and tag.endswith("}") else (tag[open_tag + 1 :] if open_tag >= 0 else "")
-            results.extend(normalize_template(head + body + tail, substitutions, mapping))
-        return results
+            results.extend(normalize_template(body, substitutions, mapping))
+        return join(head, results, tail)
     if not match:
-        return [re.sub(r"%(\d+)(?!\d)", renumber, template)]
+        return [literal(template)]
 
     kind = match.group(1)
     open_brace = match.end() - 1
     close_brace = find_matching_brace(template, open_brace)
     inner = template[open_brace + 1 : close_brace]
     after = template[close_brace + 1 :]
-    head = template[: match.start()]
+    head = literal(template[: match.start()])
     if kind == "sub":
         index, consumed = _take_arg_index(after)
         indexes = [index]
@@ -229,24 +236,21 @@ def normalize_template(template: str, substitutions: dict[str, str],
             return [template]
         inner_mapping = [map_index(i) for i in indexes]
         tail = after[consumed:]
-        results = []
-        for body_variant in normalize_template(body, substitutions, inner_mapping):
-            results.extend(normalize_template(head + body_variant + tail, substitutions, mapping))
-        return results
+        return join(head, normalize_template(body, substitutions, inner_mapping), tail)
     if kind == "select":
         index, consumed = _take_arg_index(after)
         tail = after[consumed:]
         results = []
         for alternative in split_top_level(inner, "|"):
-            results.extend(normalize_template(head + alternative + tail, substitutions, mapping))
-        return results
+            results.extend(normalize_template(alternative, substitutions, mapping))
+        return join(head, results, tail)
     if kind == "plural":
         index, consumed = _take_arg_index(after)
         tail = after[consumed:]
         results = []
         for clause in split_top_level(inner, "|"):
-            results.extend(normalize_template(head + clause.partition(":")[2] + tail, substitutions, mapping))
-        return results
+            results.extend(normalize_template(clause.partition(":")[2], substitutions, mapping))
+        return join(head, results, tail)
     # diff: %diff{paired|fallback}N,M — the paired shape renders the first
     # argument at the first $ and the second at the second $; the fallback
     # shape omits both arguments.
@@ -257,20 +261,19 @@ def normalize_template(template: str, substitutions: dict[str, str],
     tail = after[consumed + 1 + width :]
     paired, fallback = split_top_level(inner, "|")
     results = []
-    for shape, prepared in ((paired, _substitute_diff_dollars(paired, map_index(first), map_index(second))),
-                            (fallback, fallback)):
-        results.extend(normalize_template(head + prepared + tail, substitutions, mapping))
-    return results
+    for prepared in (_substitute_diff_dollars(paired, first, second), fallback):
+        results.extend(normalize_template(prepared, substitutions, mapping))
+    return join(head, results, tail)
 
 
 def strip_simple_modifiers(text: str) -> str:
     """Rewrite rendering-only modifiers to bare placeholders (%ordinal0 -> %0)."""
-    return SIMPLE_MODIFIER_RE.sub(r"%\2", text)
+    return SIMPLE_MODIFIER_RE.sub(lambda m: f"%{m[2]}" if m[2] else "%%", text)
 
 
 def expand_plural_suffixes(text: str) -> list[str]:
     """Expand %sN (integer + optional plural s) into both rendered shapes."""
-    match = re.search(r"%s(\d)(?!\d)", text)
+    match = next((m for m in re.finditer(r"%%|%s(\d)(?!\d)", text) if m[1]), None)
     if not match:
         return [text]
     # The suffix attaches to the preceding word; emit both spellings.
@@ -351,7 +354,7 @@ def diagnostic_records(defs: dict) -> list[dict]:
         group_defs = record.get("Group")
         options = groups.get(group_defs.get("def", ""), []) if isinstance(group_defs, dict) else []
         locs = record.get("!locs") or []
-        source_file = f"clang/include/clang/Basic/{locs[0].split('/')[-1]}" if locs else TBLGEN_TARGET
+        source_file = f"clang/include/clang/Basic/{Path(locs[0].rsplit(':', 1)[0]).name}" if locs else TBLGEN_TARGET
         records.append({
             "id": name,
             "source": source_file,

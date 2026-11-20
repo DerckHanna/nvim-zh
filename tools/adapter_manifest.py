@@ -126,7 +126,7 @@ def validate(root=ROOT):
                     'inactive adapter defines runtime surfaces')
             continue
         domain = spec['domain']
-        require(ID.fullmatch(domain) and domain not in seen and domain not in ('nvim-ui', 'clangd', 'nvim-zh'),
+        require(ID.fullmatch(domain) and domain not in seen and domain not in ('nvim-ui', 'clangd', 'clang', 'clang-tidy', 'nvim-zh'),
                 'invalid or duplicate domain')
         seen.add(domain)
         entry = spec['entry']

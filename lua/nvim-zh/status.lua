@@ -12,6 +12,7 @@ function M.get()
     adapters = require('nvim-zh.plugins').info(),
     packs = require('nvim-zh.packs').info(),
     diagnostics = require('nvim-zh.diagnostics').info(),
+    compiler = require('nvim-zh.compiler').info(),
     lsp = require('nvim-zh.lsp').info(),
     v_lang = vim.v.lang,
     helplang = vim.o.helplang,

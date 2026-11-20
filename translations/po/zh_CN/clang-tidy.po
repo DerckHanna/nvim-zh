@@ -1,0 +1,80 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: nvim-zh clang-tidy\n"
+"PO-Revision-Date: 2026-11-20 16:00+0800\n"
+"Last-Translator: nvim-zh maintainers\n"
+"Language-Team: Simplified Chinese\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: zh_CN\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: clang-tools-extra/clang-tidy/bugprone/EasilySwappableParametersCheck.cpp:2285
+msgctxt "bugprone-easily-swappable-parameters"
+msgid "%0 adjacent parameters of %1 of convertible types are easily swapped by mistake"
+msgstr "%1 的 %0 个相邻形参类型可以转换，调用时容易误换顺序"
+
+#: clang-tools-extra/clang-tidy/bugprone/EasilySwappableParametersCheck.cpp:2285
+msgctxt "bugprone-easily-swappable-parameters"
+msgid "%0 adjacent parameters of %1 of similar type ('%2') are easily swapped by mistake"
+msgstr "%1 的 %0 个相邻形参具有相似的类型 ('%2')，调用时容易误换顺序"
+
+#: clang-tools-extra/clang-tidy/bugprone/EasilySwappableParametersCheck.cpp:2285
+msgctxt "bugprone-easily-swappable-parameters"
+msgid "%0 adjacent parameters of %1 of similar type are easily swapped by mistake"
+msgstr "%1 的 %0 个相邻形参类型相似，调用时容易误换顺序"
+
+#: clang-tools-extra/clang-tidy/bugprone/EasilySwappableParametersCheck.cpp:2285
+msgctxt "bugprone-easily-swappable-parameters/note"
+msgid "'%0' and '%1' may be implicitly converted"
+msgstr "'%0' 和 '%1' 可能发生隐式转换"
+
+#: clang-tools-extra/clang-tidy/bugprone/EasilySwappableParametersCheck.cpp:2285
+msgctxt "bugprone-easily-swappable-parameters/note"
+msgid "'%0' and '%1' may be implicitly converted: %2, %3"
+msgstr "'%0' 和 '%1' 可能发生隐式转换：%2, %3"
+
+#: clang-tools-extra/clang-tidy/bugprone/EasilySwappableParametersCheck.cpp:2233
+msgctxt "bugprone-easily-swappable-parameters/note"
+msgid "the first parameter in the range is '%0'"
+msgstr "此范围内的首个形参是 '%0'"
+
+#: clang-tools-extra/clang-tidy/bugprone/EasilySwappableParametersCheck.cpp:2238
+msgctxt "bugprone-easily-swappable-parameters/note"
+msgid "the last parameter in the range is '%0'"
+msgstr "此范围内的最后一个形参是 '%0'"
+
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:212
+msgctxt "fix_note"
+msgid "FIX-IT applied suggested code changes"
+msgstr "已应用建议的代码修复"
+
+#: clang-tools-extra/clang-tidy/misc/UnusedParametersCheck.cpp:0
+#: clang-tools-extra/clang-tidy/misc/UnusedParametersCheck.cpp:149
+msgctxt "misc-unused-parameters"
+msgid "parameter %0 is unused"
+msgstr "形参 %0 未被使用"
+
+#: clang-tools-extra/clang-tidy/modernize/UseNullptrCheck.cpp:0
+#: clang-tools-extra/clang-tidy/modernize/UseNullptrCheck.cpp:103
+msgctxt "modernize-use-nullptr"
+msgid "use nullptr"
+msgstr "改用 nullptr"
+
+#: clang-tools-extra/clang-tidy/readability/ElseAfterReturnCheck.cpp:0
+#: clang-tools-extra/clang-tidy/readability/ElseAfterReturnCheck.cpp:250
+msgctxt "readability-else-after-return"
+msgid "do not use 'else' after %0"
+msgstr "不要在 %0 之后使用 'else'"
+
+#: clang-tools-extra/clang-tidy/readability/RedundantControlFlowCheck.cpp:0
+#: clang-tools-extra/clang-tidy/readability/RedundantControlFlowCheck.cpp:59
+msgctxt "readability-redundant-control-flow"
+msgid "redundant continue statement at the end of loop statement"
+msgstr "循环语句末尾的 continue 语句是多余的"
+
+#: clang-tools-extra/clang-tidy/readability/RedundantControlFlowCheck.cpp:0
+#: clang-tools-extra/clang-tidy/readability/RedundantControlFlowCheck.cpp:59
+msgctxt "readability-redundant-control-flow"
+msgid "redundant return statement at the end of a function with a void return type"
+msgstr "void 返回类型函数末尾的 return 语句是多余的"

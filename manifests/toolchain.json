@@ -1,0 +1,129 @@
+{
+ "schema": 1,
+ "llvm": {
+  "repository": "https://github.com/llvm/llvm-project",
+  "version": "llvmorg-23.1.5",
+  "commit": "392dfff97d29b59d77e5cac6d4b6ef2585fe7117",
+  "cache_hint": "research checkout outside the repository; pass --source-root"
+ },
+ "tools": {
+  "clang": {
+   "protocol": "cli",
+   "executable": "clang",
+   "name": "Clang 编译器诊断",
+   "versions": {
+    "23.1.5": [
+     "compile",
+     "quickfix"
+    ]
+   },
+   "interfaces": {
+    "compile": "command-line diagnostics printed by clang/clang++",
+    "quickfix": ":make/:lmake text parsed by compiler/nvim-zh-clang.vim"
+   },
+   "binaries": {
+    "clang": [
+     "ff89ab5fa1c49c203cd4eb4fd61acab7672fd34cd8d33762542c1e1218b4f298"
+    ],
+    "clang++": [
+     "ff89ab5fa1c49c203cd4eb4fd61acab7672fd34cd8d33762542c1e1218b4f298"
+    ]
+   }
+  },
+  "clang-tidy": {
+   "protocol": "cli",
+   "executable": "clang-tidy",
+   "name": "clang-tidy 检查",
+   "versions": {
+    "23.1.5": [
+     "checks",
+     "quickfix"
+    ]
+   },
+   "interfaces": {
+    "checks": "standalone clang-tidy diagnostics",
+    "quickfix": ":make/:lmake text parsed by compiler/nvim-zh-clang-tidy.vim"
+   },
+   "binaries": {
+    "clang-tidy": [
+     "61929b0d85e67b01a50c04015a66144d098636f9419ccfd9a7e1b4b5f407eeaa"
+    ]
+   },
+   "forwarded": {
+    "clangd version 23.1.5 linux x86_64-pc-linux-gnu": [
+     "forwarded_diagnostics"
+    ]
+   }
+  }
+ },
+ "binaries": {
+  "clang": {
+   "path": "/usr/bin/clang",
+   "realpath": "/usr/bin/clang-23",
+   "version": "clang version 23.1.5",
+   "platform": "Linux x86_64-pc-linux-gnu",
+   "package": "Arch Linux extra/clang 23.1.5-1",
+   "sha256": "ff89ab5fa1c49c203cd4eb4fd61acab7672fd34cd8d33762542c1e1218b4f298"
+  },
+  "clang++": {
+   "path": "/usr/bin/clang++",
+   "realpath": "/usr/bin/clang-23",
+   "version": "clang version 23.1.5",
+   "platform": "Linux x86_64-pc-linux-gnu",
+   "package": "Arch Linux extra/clang 23.1.5-1",
+   "sha256": "ff89ab5fa1c49c203cd4eb4fd61acab7672fd34cd8d33762542c1e1218b4f298"
+  },
+  "clangd": {
+   "path": "/usr/bin/clangd",
+   "realpath": "/usr/bin/clangd",
+   "version": "clangd version 23.1.5",
+   "server_info": "clangd version 23.1.5 linux x86_64-pc-linux-gnu",
+   "platform": "Linux x86_64-pc-linux-gnu",
+   "package": "Arch Linux extra/clang 23.1.5-1",
+   "sha256": "40b41eed884d7bcab758c571ea2828fec9bb02f30c66e3e79489af04978972b9"
+  },
+  "clang-tidy": {
+   "path": "/usr/bin/clang-tidy",
+   "realpath": "/usr/bin/clang-tidy",
+   "version": "LLVM version 23.1.5",
+   "platform": "Linux x86_64-pc-linux-gnu",
+   "package": "Arch Linux extra/clang 23.1.5-1",
+   "sha256": "61929b0d85e67b01a50c04015a66144d098636f9419ccfd9a7e1b4b5f407eeaa"
+  }
+ },
+ "baseline": {
+  "neovim": "0.12.6",
+  "package": "Official neovim/neovim v0.12.6 linux-x86_64 tar.gz",
+  "lua": "LuaJIT 2.1.1774638290",
+  "platform": "Linux x86_64, glibc 2.44 (WSL2)",
+  "commit": "779c36969e31080503be2dfccbcc3f999e289606",
+  "archive_sha256": "474430d53e6264f6d6dd18db42d6dc9df3a1b56ca9e88a325bbf860e1a811d87",
+  "sha256": "2e150e924a93930295deff9ca3c02c8828590ce3d04ce7b3ef49c8804adde973"
+ },
+ "packages": {
+  "clang": {
+   "filename": "clang-23.1.5-1-x86_64.pkg.tar.zst",
+   "sha256": "8edbba1b9661bf57e38a8e947c684f4599a7f9e53d6f911d66bd30e2b22a0813",
+   "source": "https://archive.archlinux.org/packages/c/clang/clang-23.1.5-1-x86_64.pkg.tar.zst"
+  },
+  "llvm": {
+   "filename": "llvm-23.1.5-1-x86_64.pkg.tar.zst",
+   "sha256": "0fd7df891e40b2c09f82e9bbce742ba984580da70ec5a4aa467e3349f1c4feea",
+   "source": "https://archive.archlinux.org/packages/l/llvm/llvm-23.1.5-1-x86_64.pkg.tar.zst"
+  },
+  "llvm-libs": {
+   "filename": "llvm-libs-23.1.5-1-x86_64.pkg.tar.zst",
+   "sha256": "5c9613f1d807d4f5b0d9ae9d70163026732ce12934b9d891d28922036ccebdcb",
+   "source": "https://archive.archlinux.org/packages/l/llvm-libs/llvm-libs-23.1.5-1-x86_64.pkg.tar.zst"
+  }
+ },
+ "subtools": {
+  "ld": {
+   "path": "/usr/bin/ld",
+   "version": "GNU ld (GNU Binutils) 2.47",
+   "platform": "Linux x86_64",
+   "package": "Arch Linux binutils 2.47-4",
+   "sha256": "4d83828f709f0eade25bcae2f4a2508c47db2f01b58daaca5c1c4cefce897847"
+  }
+ }
+}

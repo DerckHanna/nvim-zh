@@ -13,6 +13,7 @@ check-syntax:
 
 check-translations:
 	PYTHONDONTWRITEBYTECODE=1 $(PYTHON) tools/catalog_tool.py check
+	PYTHONDONTWRITEBYTECODE=1 $(PYTHON) tools/toolchain_catalog.py check
 
 check-native:
 	PYTHONDONTWRITEBYTECODE=1 $(PYTHON) tools/native_catalog.py check

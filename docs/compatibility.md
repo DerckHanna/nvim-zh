@@ -59,6 +59,8 @@
 
 声明工具目标的 clangd 汉化包使用 LSP `serverInfo` 和协议方法选择词库显示面。已验证目标为 `clangd version 23.1.5 linux x86_64-pc-linux-gnu`。其他版本、缺失身份和未验证方法使用服务器原文。历史 0.1.0 clangd 附件仍按当时的词库规则工作，可用面板查看区别和回退原因。
 
+Clang 与 clang-tidy 的命令行显示在 Neovim 0.12.6 的 `:make`、`:lmake` 和列表回调上验证。固定二进制为 Arch Linux `clang 23.1.5-1` 软件包的 Linux x86_64 构建。编译器和独立 clang-tidy 同时校验版本与二进制摘要。clangd 按连接的服务器 `serverInfo` 和已验证方法选择显示规则。Windows、macOS、其余 LLVM 版本和 Neovim nightly 的编译器显示未验证。相同自报版本的其他 CLI 二进制也需要摘要验证。逐工具范围与缺口见[覆盖清单](toolchain-coverage.md)。
+
 ## 验证与 SKIP 规则
 
 - 默认 `make test` 是离线套件，包含真实本地 PTY 和临时 Git 仓库的 vim.pack 集成，不要求第三方源码或网络。

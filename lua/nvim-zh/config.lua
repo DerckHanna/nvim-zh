@@ -7,6 +7,7 @@ local defaults = {
     ui = { notify = true, prompts = true, select_items = false, echo = false },
     plugins = { auto = true, lazy_load = true, disabled = {} },
     diagnostics = { enabled = true, virtual_text = true, virtual_lines = true, float = true, lists = true },
+    compiler = { enabled = true, quickfix = true, loclist = true },
     lsp = { messages = true, progress = true, hints = true },
   },
   overrides = {},
@@ -36,6 +37,10 @@ function M.resolve(opts)
   expect(config.modules.diagnostics, 'table', 'modules.diagnostics')
   for _, name in ipairs({ 'enabled', 'virtual_text', 'virtual_lines', 'float', 'lists' }) do
     expect(config.modules.diagnostics[name], 'boolean', 'modules.diagnostics.' .. name)
+  end
+  expect(config.modules.compiler, 'table', 'modules.compiler')
+  for _, name in ipairs({ 'enabled', 'quickfix', 'loclist' }) do
+    expect(config.modules.compiler[name], 'boolean', 'modules.compiler.' .. name)
   end
   expect(config.modules.lsp, 'table', 'modules.lsp')
   expect(config.modules.lsp.messages, 'boolean', 'modules.lsp.messages')

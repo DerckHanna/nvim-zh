@@ -16,9 +16,12 @@ def assets(root, version, repository, only=None):
     specs = adapter_manifest.validate(root)
     index = adapter_manifest.runtime_specs(specs)
     domains = catalog_tool.builtin_sources(root, optional=True)
-    tool = json.loads((root / 'manifests/upstreams.json').read_text(encoding='utf-8'))['upstreams']['clangd']['tool']
+    toolchain = json.loads((root / 'manifests/toolchain.json').read_text(encoding='utf-8'))
+    upstreams = json.loads((root / 'manifests/upstreams.json').read_text(encoding='utf-8'))
+    tools = {'clangd': upstreams['upstreams']['clangd']['tool']}
+    tools.update(toolchain['tools'])
     catalog_tool.check(root / 'translations/po/zh_CN', root / 'translations/glossary/zh_CN.toml')
-    ids = {id for id, spec in specs.items() if spec['status'] == 'implemented'} | {'clangd'}
+    ids = {id for id, spec in specs.items() if spec['status'] == 'implemented'} | set(tools)
     if only:
         if only not in ids:
             raise ValueError(f'unknown pack: {only}')
@@ -37,8 +40,8 @@ def assets(root, version, repository, only=None):
         if spec:
             manifest['adapter'] = spec
         else:
-            manifest['executable'] = 'clangd'
-            manifest['tool'] = tool
+            manifest['executable'] = id
+            manifest['tool'] = tools[id]
         content = bundle.encoded({'manifest': manifest, 'files': {
             name: value.decode('utf-8') for name, value in files.items()}})
         filename = f'{id}-zh_CN.json'
@@ -49,8 +52,8 @@ def assets(root, version, repository, only=None):
             record.update(repository=spec['repository'], modules=spec['modules'],
                           targets=sorted({target['commit'] for target in spec['targets'].values()}))
         else:
-            record['executable'] = 'clangd'
-            record['tool'] = tool
+            record['executable'] = id
+            record['tool'] = tools[id]
         yield filename, content, record
 
 

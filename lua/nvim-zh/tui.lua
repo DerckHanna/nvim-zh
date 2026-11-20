@@ -7,8 +7,11 @@ local labels = { ok = '已生效', idle = '未准备', unread = '尚未读取', 
 local tool_reasons = {
   verified = '诊断接口已验证', unsupported_version = '版本未经验证，显示原文',
   unverified_interface = '接口未经验证，显示原文', unsupported_interface = '服务器不支持此接口',
-  pack_missing = '未安装 clangd 汉化包', paused = 'clangd 汉化包已暂停',
+  pack_missing = '未安装汉化包', paused = '汉化包已暂停',
   legacy_pack = '词库已启用，包未声明服务器版本', client_missing = '等待 clangd 客户端',
+  tool_missing = '无法确认工具版本', unverified_binary = '二进制摘要未经验证，显示原文',
+  unknown_source = '无法确认诊断来源，显示原文', driver_only = '仅识别编译器驱动的消息',
+  external_override = '沿用现有列表格式', projection_failed = '无法设置列表显示',
 }
 
 local function clean(value)
@@ -58,8 +61,18 @@ local function lines()
       local reason = tool_reasons[client.reason] or client.reason
       if not info.diagnostics.enabled then reason = '诊断显示已关闭' end
       add(('C/C++ · %s · %s'):format(client.version or 'clangd', reason))
+      if client.file_status and client.file_status.state then
+        add('clangd · ' .. client.file_status.state)
+      end
     end
-    add('构建与测试 · :make / quickfix 保留命令输出和位置')
+    local compiler = info.compiler.last
+    if compiler then
+      local reason = tool_reasons[compiler.reason] or compiler.reason
+      if compiler.results and compiler.results.ambiguous then
+        reason = reason .. (' · %d 条匹配歧义，显示原文'):format(compiler.results.ambiguous)
+      end
+      add((':make · %s · %s'):format(compiler.tool or '工具来源未知', reason))
+    end
   elseif panel.page == PAGES.translations or panel.page == PAGES.missing then
     local stats = require('nvim-zh.engine').stats()
     if panel.page == PAGES.translations then

@@ -76,8 +76,15 @@ def contents(root=ROOT):
         native={'supplement': native['supplement']['entries'],
                 'probe': {'msgid': probe_msgid, 'msgstr': probe_msgstr}}))
     implementation = {}
-    for folder in ('lua', 'plugin'):
-        for source in sorted((root / folder).rglob('*.lua')):
+    for folder in ('lua', 'plugin', 'compiler'):
+        folder_dir = root / folder
+        if not folder_dir.exists():
+            continue
+        for source in sorted(folder_dir.rglob('*')):
+            if not source.is_file():
+                continue
+            if not (source.name.endswith('.lua') or source.name.endswith('.vim')):
+                continue
             if source.parent == root / 'lua/nvim-zh/catalogs/generated':
                 continue  # PO-derived data is hot-swapped through JSON, not Lua code.
             if source.is_symlink():

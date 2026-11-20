@@ -972,7 +972,7 @@
     },
     "clangd": {
       "repository": "https://github.com/llvm/llvm-project",
-      "version": "llvmorg-23.1.4",
+      "version": "llvmorg-23.1.5",
       "tool": {
         "protocol": "lsp",
         "server": "clangd",
@@ -983,11 +983,12 @@
             "textDocument/hover",
             "textDocument/completion",
             "textDocument/signatureHelp",
-            "$/progress"
+            "$/progress",
+            "textDocument/clangd.fileStatus"
           ]
         }
       },
-      "commit": "7a941dfb2877a0b8cf30323fefa85ad019e0b0f5",
+      "commit": "392dfff97d29b59d77e5cac6d4b6ef2585fe7117",
       "adapter": {
         "status": "implemented",
         "seam": "vim.diagnostic display formatters and Neovim LSP display",

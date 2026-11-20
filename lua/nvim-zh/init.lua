@@ -27,6 +27,14 @@ function M.register_adapter(definition)
   return require('nvim-zh.plugins').register_adapter(definition)
 end
 
+function M.raw()
+  return require('nvim-zh.compiler').raw()
+end
+
+function M.raw_text()
+  return require('nvim-zh.compiler').raw_text()
+end
+
 function M.stats()
   return require('nvim-zh.engine').stats()
 end

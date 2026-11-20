@@ -1,0 +1,488 @@
+{
+ "clang": {
+  "diagnostic": {
+   "use of undeclared identifier %0": {
+    "msgstr": "使用了未声明的标识符 %0",
+    "diagnostic": "err_undeclared_var_use"
+   },
+   "use of undeclared identifier %0; did you mean %1?": {
+    "msgstr": "使用了未声明的标识符 %0；是否想用 %1？",
+    "diagnostic": "err_undeclared_var_use_suggest"
+   },
+   "unknown type name %0": {
+    "msgstr": "未知类型名 %0",
+    "diagnostic": "err_unknown_typename"
+   },
+   "unknown type name %0; did you mean %1?": {
+    "msgstr": "未知类型名 %0；是否想用 %1？",
+    "diagnostic": "err_unknown_typename_suggest"
+   },
+   "unknown type name %0; did you mean %2?": {
+    "msgstr": "未知类型名 %0；是否想用 %2？",
+    "diagnostic": "err_unknown_type_or_class_name_suggest"
+   },
+   "expected expression": {
+    "msgstr": "缺少表达式",
+    "diagnostic": "err_expected_expression"
+   },
+   "expected identifier": {
+    "msgstr": "缺少标识符",
+    "diagnostic": "err_expected_unqualified_id"
+   },
+   "expected unqualified-id": {
+    "msgstr": "缺少非限定标识符",
+    "diagnostic": "err_expected_unqualified_id"
+   },
+   "expected ';' at end of declaration": {
+    "msgstr": "声明末尾缺少 ';'",
+    "diagnostic": "err_expected_semi_declaration"
+   },
+   "expected ';' at end of declaration list": {
+    "msgstr": "声明列表末尾缺少 ';'",
+    "diagnostic": "err_expected_semi_decl_list"
+   },
+   "expected ';' after expression": {
+    "msgstr": "表达式后缺少 ';'",
+    "diagnostic": "err_expected_semi_after_expr"
+   },
+   "expected ';' after %0 statement": {
+    "msgstr": "%0 语句后缺少 ';'",
+    "diagnostic": "err_expected_semi_after_stmt"
+   },
+   "expected %1 after %0": {
+    "msgstr": "%0 之后应为 %1",
+    "diagnostic": "err_expected_after",
+    "context": "err_expected_after"
+   },
+   "extraneous closing brace ('}')": {
+    "msgstr": "多余的右花括号 ('}')",
+    "diagnostic": "err_extraneous_closing_brace"
+   },
+   "redefinition of %0": {
+    "msgstr": "%0 的重复定义",
+    "diagnostic": "err_redefinition"
+   },
+   "no member named %0 in %1": {
+    "msgstr": "%1 中没有名为 %0 的成员",
+    "diagnostic": "err_no_member"
+   },
+   "no matching function for call to %0": {
+    "msgstr": "找不到与 %0 匹配的函数调用",
+    "diagnostic": "err_ovl_no_viable_function_in_call"
+   },
+   "no matching member function for call to %0": {
+    "msgstr": "找不到与 %0 匹配的成员函数调用",
+    "diagnostic": "err_ovl_no_viable_member_function_in_call"
+   },
+   "no matching constructor for initialization of %0": {
+    "msgstr": "初始化 %0 时找不到匹配的构造函数",
+    "diagnostic": "err_ovl_no_viable_function_in_init"
+   },
+   "invalid operands to binary expression (%0 and %1)": {
+    "msgstr": "二元表达式（%0 和 %1）的操作数无效",
+    "diagnostic": "err_typecheck_invalid_operands"
+   },
+   "too few arguments to function call, expected %1, have %2": {
+    "msgstr": "函数调用实参太少：应为 %1 个，实际 %2 个",
+    "diagnostic": "err_typecheck_call_too_few_args"
+   },
+   "too many arguments to function call, expected %1, have %2": {
+    "msgstr": "函数调用实参太多：应为 %1 个，实际 %2 个",
+    "diagnostic": "err_typecheck_call_too_many_args"
+   },
+   "member reference base type %0 is not a structure or union": {
+    "msgstr": "成员访问的基类型 %0 不是结构体或联合体",
+    "diagnostic": "err_typecheck_member_reference_struct_union"
+   },
+   "cannot initialize a variable of type %1 with an rvalue of type %3": {
+    "msgstr": "无法用 %3 类型的右值初始化 %1 类型的变量",
+    "diagnostic": "err_init_conversion_failed"
+   },
+   "incompatible pointer types passing %0 to parameter of type %1": {
+    "msgstr": "将 %0 传给 %1 类型的参数时指针类型不兼容",
+    "diagnostic": "err_typecheck_convert_incompatible_pointer"
+   },
+   "incompatible pointer types assigning to %0 from %1": {
+    "msgstr": "将 %1 赋给 %0 时指针类型不兼容",
+    "diagnostic": "err_typecheck_convert_incompatible_pointer"
+   },
+   "format specifies type %0 but the argument has type %1": {
+    "msgstr": "格式说明符要求 %0 类型，但实参是 %1 类型",
+    "diagnostic": "err_format_conversion_argument_type_mismatch"
+   },
+   "'%0' file not found": {
+    "msgstr": "找不到文件 '%0'",
+    "diagnostic": "err_pp_file_not_found"
+   },
+   "invalid preprocessing directive": {
+    "msgstr": "无效的预处理指令",
+    "diagnostic": "err_pp_invalid_directive"
+   },
+   "invalid preprocessing directive, did you mean '#%1'?": {
+    "msgstr": "无效的预处理指令；是否想用 '#%1'？",
+    "diagnostic": "err_pp_invalid_directive"
+   },
+   "unterminated conditional directive": {
+    "msgstr": "条件指令未结束",
+    "diagnostic": "err_pp_unterminated_conditional"
+   },
+   "missing terminating ' character": {
+    "msgstr": "缺少结尾的 ' 字符",
+    "diagnostic": "ext_unterminated_char_or_string"
+   },
+   "%0 macro redefined": {
+    "msgstr": "宏 %0 被重新定义",
+    "diagnostic": "ext_pp_macro_redef"
+   },
+   "previous definition is here": {
+    "msgstr": "此前的定义在这里",
+    "diagnostic": "note_previous_definition"
+   },
+   "unused variable %0": {
+    "msgstr": "未使用的变量 %0",
+    "diagnostic": "warn_unused_variable"
+   },
+   "unused parameter %0": {
+    "msgstr": "未使用的形参 %0",
+    "diagnostic": "warn_unused_parameter"
+   },
+   "unused function %0": {
+    "msgstr": "未使用的函数 %0",
+    "diagnostic": "warn_unused_function"
+   },
+   "implicit declaration of function %0": {
+    "msgstr": "函数 %0 的隐式声明",
+    "diagnostic": "warn_implicit_function_decl"
+   },
+   "call to undeclared function %0; ISO C99 and later do not support implicit function declarations": {
+    "msgstr": "调用了未声明的函数 %0；ISO C99 及之后的标准不支持隐式函数声明",
+    "diagnostic": "ext_implicit_function_decl_c99"
+   },
+   "static assertion failed: %1": {
+    "msgstr": "静态断言失败：%1",
+    "diagnostic": "err_static_assert_failed"
+   },
+   "static assertion failed due to requirement '%0': %2": {
+    "msgstr": "静态断言因条件 '%0' 不满足而失败：%2",
+    "diagnostic": "err_static_assert_requirement_failed"
+   },
+   "non-void function does not return a value": {
+    "msgstr": "非 void 函数没有返回值",
+    "diagnostic": "warn_falloff_nonvoid"
+   },
+   "no viable conversion from %1 to %2": {
+    "msgstr": "无法从 %1 转换为 %2",
+    "diagnostic": "err_typecheck_nonviable_condition"
+   },
+   "variable length array used": {
+    "msgstr": "使用了变长数组",
+    "diagnostic": "warn_vla_used"
+   },
+   "array index %0 is past the end of the array (that has type %1)": {
+    "msgstr": "数组下标 %0 越过了数组末尾（数组类型为 %1）",
+    "diagnostic": "warn_array_index_exceeds_bounds"
+   },
+   "AVX vector return of type %1 without '%2' enabled changes the ABI": {
+    "msgstr": "未启用 '%2' 时返回 %1 类型的 AVX 向量会改变 ABI",
+    "diagnostic": "err_avx_calling_convention",
+    "runtime": {
+     "msgid": "AVX vector return of type {type} without '{target}' enabled changes the ABI",
+     "msgstr": "未启用 '{target}' 时返回 {type} 类型的 AVX 向量会改变 ABI"
+    }
+   },
+   "AVX vector argument of type %1 without '%2' enabled changes the ABI": {
+    "msgstr": "未启用 '%2' 时传递 %1 类型的 AVX 向量实参会改变 ABI",
+    "diagnostic": "err_avx_calling_convention",
+    "runtime": {
+     "msgid": "AVX vector argument of type {type} without '{target}' enabled changes the ABI",
+     "msgstr": "未启用 '{target}' 时传递 {type} 类型的 AVX 向量实参会改变 ABI"
+    }
+   },
+   "incompatible integer to pointer conversion initializing %0 with an expression of type %1": {
+    "msgstr": "用 %1 类型的表达式初始化 %0 时发生整数到指针的不兼容转换",
+    "diagnostic": "err_typecheck_convert_int_pointer"
+   },
+   "incompatible pointer to integer conversion passing %0 to parameter of type %1": {
+    "msgstr": "将 %0 传给 %1 类型的参数时发生指针到整数的不兼容转换",
+    "diagnostic": "err_typecheck_convert_pointer_int"
+   },
+   "variable has incomplete type %0": {
+    "msgstr": "变量具有不完整类型 %0",
+    "diagnostic": "err_typecheck_decl_incomplete_type"
+   },
+   "forward declaration of %0": {
+    "msgstr": "%0 的前向声明",
+    "diagnostic": "note_forward_declaration"
+   },
+   "passing argument to parameter here": {
+    "msgstr": "实参传到此形参",
+    "diagnostic": "note_parameter_here"
+   },
+   "candidate template ignored: constraints not satisfied%0": {
+    "msgstr": "候选模板被忽略：约束不满足%0",
+    "diagnostic": "note_ovl_candidate_unsatisfied_constraints"
+   },
+   "because %1 does not satisfy %2": {
+    "msgstr": "因为 %1 不满足 %2",
+    "diagnostic": "note_single_arg_concept_specialization_constraint_evaluated_to_false"
+   },
+   "because '%1' would be invalid: %2": {
+    "msgstr": "因为 '%1' 会无效：%2",
+    "diagnostic": "note_expr_requirement_expr_substitution_error",
+    "runtime": {
+     "msgid": "because '{expression}' would be invalid: {diagnostic}",
+     "msgstr": "因为 '{expression}' 会无效：{diagnostic}"
+    }
+   },
+   "no input files": {
+    "msgstr": "没有输入文件",
+    "diagnostic": "err_drv_no_input_files"
+   },
+   "unknown argument: '%0'": {
+    "msgstr": "未知参数：'%0'",
+    "diagnostic": "err_drv_unknown_argument"
+   },
+   "no such file or directory: '%0'": {
+    "msgstr": "没有该文件或目录：'%0'",
+    "diagnostic": "err_drv_no_such_file"
+   },
+   "unsupported option '%0'": {
+    "msgstr": "不支持的选项 '%0'",
+    "diagnostic": "err_drv_unsupported_opt"
+   },
+   "argument unused during compilation: '%0'": {
+    "msgstr": "编译期间未使用参数：'%0'",
+    "diagnostic": "warn_drv_unused_argument"
+   },
+   "error reading '%0': %1": {
+    "msgstr": "读取 '%0' 时出错：%1",
+    "diagnostic": "err_fe_error_reading"
+   },
+   "cannot open file '%0': %1": {
+    "msgstr": "无法打开文件 '%0'：%1",
+    "diagnostic": "err_cannot_open_file"
+   },
+   "function definition is not allowed here": {
+    "msgstr": "此处不允许定义函数",
+    "diagnostic": "err_function_definition_not_allowed"
+   },
+   "%1 is a private member of %3": {
+    "msgstr": "%1 是 %3 的私有成员",
+    "diagnostic": "err_access"
+   },
+   "%0 is not defined, evaluates to 0": {
+    "msgstr": "未定义的 %0，按 0 处理",
+    "diagnostic": "warn_pp_undef_identifier"
+   },
+   "unknown target triple '%0'": {
+    "msgstr": "未知目标三元组 '%0'",
+    "diagnostic": "err_drv_unknown_target_triple"
+   },
+   "no such file or directory: '%0'; did you mean '%1'?": {
+    "msgstr": "没有该文件或目录：'%0'；是否想用 '%1'？",
+    "diagnostic": "err_drv_no_such_file_with_suggestion"
+   },
+   "unknown argument '%0'; did you mean '%1'?": {
+    "msgstr": "未知参数 '%0'；是否想用 '%1'？",
+    "diagnostic": "err_drv_unknown_argument_with_suggestion"
+   },
+   "invalid value '%1' in '%0'": {
+    "msgstr": "'%0' 中的值 '%1' 无效",
+    "diagnostic": "err_drv_invalid_value"
+   },
+   "invalid value '%1' in '%0', expected one of: %2": {
+    "msgstr": "'%0' 中的值 '%1' 无效；可选值为 %2",
+    "diagnostic": "err_drv_invalid_value_with_suggestion"
+   },
+   "unsupported option '%0' for target '%1'": {
+    "msgstr": "目标 '%1' 不支持选项 '%0'",
+    "diagnostic": "err_drv_unsupported_opt_for_target"
+   },
+   "unsupported argument '%1' to option '%0'": {
+    "msgstr": "选项 '%0' 不支持实参 '%1'",
+    "diagnostic": "err_drv_unsupported_option_argument"
+   },
+   "unsupported argument '%1' to option '%0' for target '%2'": {
+    "msgstr": "目标 '%2' 的选项 '%0' 不支持实参 '%1'",
+    "diagnostic": "err_drv_unsupported_option_argument_for_target"
+   },
+   "unsupported runtime library '%0' for platform '%1'": {
+    "msgstr": "平台 '%1' 不支持运行库 '%0'",
+    "diagnostic": "err_drv_unsupported_rtlib_for_platform"
+   },
+   "unsupported unwind library '%0' for platform '%1'": {
+    "msgstr": "平台 '%1' 不支持栈展开库 '%0'",
+    "diagnostic": "err_drv_unsupported_unwind_for_platform"
+   },
+   "%0 command failed with exit code %1 (use -v to see invocation)": {
+    "msgstr": "%0 命令失败，退出状态为 %1（使用 -v 查看调用命令）",
+    "diagnostic": "err_drv_command_failed"
+   },
+   "optimization flag '%0' is not supported for target '%1'": {
+    "msgstr": "目标 '%1' 不支持优化标志 '%0'",
+    "diagnostic": "warn_drv_unsupported_opt_for_target"
+   },
+   "float ABI '%0' is not supported by current library": {
+    "msgstr": "当前库不支持浮点 ABI '%0'",
+    "diagnostic": "warn_drv_unsupported_float_abi_by_lib"
+   },
+   "position-independent code requires '-mabicalls'": {
+    "msgstr": "位置无关代码需要 '-mabicalls'",
+    "diagnostic": "err_drv_unsupported_noabicalls_pic"
+   },
+   "implicit instantiation first required here": {
+    "msgstr": "此处首次需要隐式实例化",
+    "diagnostic": "note_instantiation_required_here"
+   },
+   "explicit instantiation first required here": {
+    "msgstr": "此处首次需要显式实例化",
+    "diagnostic": "note_instantiation_required_here"
+   },
+   "and type constraint %1 was not satisfied:": {
+    "msgstr": "并且类型约束 %1 未得到满足：",
+    "diagnostic": "note_expr_requirement_constraints_not_satisfied"
+   },
+   "because type constraint %1 was not satisfied:": {
+    "msgstr": "因为类型约束 %1 未得到满足：",
+    "diagnostic": "note_expr_requirement_constraints_not_satisfied"
+   },
+   "and %1 does not satisfy %2:": {
+    "msgstr": "并且 %1 不满足 %2：",
+    "diagnostic": "note_expr_requirement_constraints_not_satisfied_simple"
+   },
+   "because %1 does not satisfy %2:": {
+    "msgstr": "因为 %1 不满足 %2：",
+    "diagnostic": "note_expr_requirement_constraints_not_satisfied_simple"
+   },
+   "and '%1' would be invalid: %2": {
+    "msgstr": "并且 '%1' 会无效：%2",
+    "diagnostic": "note_expr_requirement_expr_substitution_error",
+    "runtime": {
+     "msgid": "and '{expression}' would be invalid: {diagnostic}",
+     "msgstr": "并且 '{expression}' 会无效：{diagnostic}"
+    }
+   },
+   "because '%1' would be invalid": {
+    "msgstr": "因为 '%1' 会无效",
+    "diagnostic": "note_expr_requirement_expr_unknown_substitution_error"
+   },
+   "and '%1' would be invalid": {
+    "msgstr": "并且 '%1' 会无效",
+    "diagnostic": "note_expr_requirement_expr_unknown_substitution_error"
+   },
+   "because %1 may throw an exception": {
+    "msgstr": "因为 %1 可能抛出异常",
+    "diagnostic": "note_expr_requirement_noexcept_not_met"
+   },
+   "and %1 may throw an exception": {
+    "msgstr": "并且 %1 可能抛出异常",
+    "diagnostic": "note_expr_requirement_noexcept_not_met"
+   },
+   "static assertion expression is not an integral constant expression": {
+    "msgstr": "静态断言表达式必须是整数常量表达式",
+    "diagnostic": "err_static_assert_expression_is_not_constant"
+   },
+   "static assertion failed": {
+    "msgstr": "静态断言失败",
+    "diagnostic": "err_static_assert_failed"
+   },
+   "static assertion failed due to requirement '%0'": {
+    "msgstr": "静态断言因条件 '%0' 不满足而失败",
+    "diagnostic": "err_static_assert_requirement_failed"
+   },
+   "a static_assert declaration cannot be a template": {
+    "msgstr": "static_assert 声明不能是模板",
+    "diagnostic": "err_templated_invalid_declaration"
+   },
+   "cannot take the address of an rvalue of type %0": {
+    "msgstr": "无法取得 %0 类型右值的地址",
+    "diagnostic": "err_typecheck_invalid_lvalue_addrof"
+   },
+   "too many errors emitted, stopping now": {
+    "msgstr": "错误过多，已停止编译",
+    "diagnostic": "fatal_too_many_errors"
+   },
+   "expected ';' after struct": {
+    "msgstr": "struct 后缺少 ';'",
+    "diagnostic": "err_expected_after",
+    "source_variant": "expected %1 after %0"
+   },
+   "expected ';' after union": {
+    "msgstr": "union 后缺少 ';'",
+    "diagnostic": "err_expected_after",
+    "source_variant": "expected %1 after %0"
+   },
+   "expected ';' after enum": {
+    "msgstr": "enum 后缺少 ';'",
+    "diagnostic": "err_expected_after",
+    "source_variant": "expected %1 after %0"
+   },
+   "expected ';' after class": {
+    "msgstr": "class 后缺少 ';'",
+    "diagnostic": "err_expected_after",
+    "source_variant": "expected %1 after %0"
+   },
+   "treating '%0' input as '%1' when in C++ mode, this behavior is deprecated": {
+    "msgstr": "在 C++ 模式下将 '%0' 输入视为 '%1'，此行为已弃用",
+    "diagnostic": "warn_drv_treating_input_as_cxx"
+   }
+  }
+ },
+ "clang-tidy": {
+  "modernize-use-nullptr": {
+   "use nullptr": {
+    "msgstr": "改用 nullptr"
+   }
+  },
+  "readability-redundant-control-flow": {
+   "redundant return statement at the end of a function with a void return type": {
+    "msgstr": "void 返回类型函数末尾的 return 语句是多余的"
+   },
+   "redundant continue statement at the end of loop statement": {
+    "msgstr": "循环语句末尾的 continue 语句是多余的"
+   }
+  },
+  "misc-unused-parameters": {
+   "parameter %0 is unused": {
+    "msgstr": "形参 %0 未被使用"
+   }
+  },
+  "readability-else-after-return": {
+   "do not use 'else' after %0": {
+    "msgstr": "不要在 %0 之后使用 'else'"
+   }
+  },
+  "bugprone-easily-swappable-parameters": {
+   "%0 adjacent parameters of %1 of similar type ('%2') are easily swapped by mistake": {
+    "msgstr": "%1 的 %0 个相邻形参具有相似的类型 ('%2')，调用时容易误换顺序"
+   },
+   "%0 adjacent parameters of %1 of similar type are easily swapped by mistake": {
+    "msgstr": "%1 的 %0 个相邻形参类型相似，调用时容易误换顺序"
+   },
+   "%0 adjacent parameters of %1 of convertible types are easily swapped by mistake": {
+    "msgstr": "%1 的 %0 个相邻形参类型可以转换，调用时容易误换顺序"
+   },
+   "the first parameter in the range is '%0'": {
+    "msgstr": "此范围内的首个形参是 '%0'",
+    "note": true
+   },
+   "the last parameter in the range is '%0'": {
+    "msgstr": "此范围内的最后一个形参是 '%0'",
+    "note": true
+   },
+   "'%0' and '%1' may be implicitly converted": {
+    "msgstr": "'%0' 和 '%1' 可能发生隐式转换",
+    "note": true
+   },
+   "'%0' and '%1' may be implicitly converted: %2, %3": {
+    "msgstr": "'%0' 和 '%1' 可能发生隐式转换：%2, %3",
+    "note": true
+   }
+  },
+  "fix_note": {
+   "FIX-IT applied suggested code changes": {
+    "msgstr": "已应用建议的代码修复"
+   }
+  }
+ }
+}

@@ -161,7 +161,7 @@ msgstr "切换 Window 和 Register"
         self.assertEqual(set(catalog_tool.builtin_sources(source)), {'nvim-ui'})
         actual = catalog_tool.builtin_sources(source, optional=True)
         from adapter_manifest import po_sources
-        self.assertEqual(set(actual), {'nvim-ui', 'clangd'} | po_sources(source).keys())
+        self.assertEqual(set(actual), {'nvim-ui', 'clangd', 'clang', 'clang-tidy'} | po_sources(source).keys())
         extra = source / 'translations/po/zh_CN/unregistered.po'
         extra.write_text(VALID_PO)
         with self.assertRaisesRegex(catalog_tool.CatalogError, 'differ'):

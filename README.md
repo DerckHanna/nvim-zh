@@ -1,6 +1,6 @@
 # nvim-zh
 
-Neovim 简体中文本地化插件，基础安装覆盖核心消息、中文帮助和常见 UI。第三方插件和 clangd 可通过独立汉化包按需启用。命令、快捷键、用户输入和协议数据沿用原值。
+Neovim 简体中文本地化插件，基础安装覆盖核心消息、中文帮助和常见 UI。第三方插件和 Clang 工具链的显示译文可通过独立汉化包按需启用。命令、快捷键、用户输入和协议数据沿用原值。
 
 ## 要求
 
@@ -24,11 +24,13 @@ require('nvim-zh').setup()
 - 用 `:NvimZhCheck` 或 `:checkhealth nvim-zh` 查看检查结果。
 - 用 `:help nvim-zh` 打开帮助，或用 `:help nvim-zh@en` 选择英文版本。
 
-### C++ 与 clangd
+### C/C++ 与 Clang 工具链
 
 已有 clangd 配置时，在 `:NvimZhPacks` 中安装 `clangd` 汉化包。安装后，`require('nvim-zh').setup()` 默认启用相应的显示适配。常见 C++ 报错、警告、clang-tidy 检查和诊断注释会在编辑器中显示中文。代码操作菜单、悬浮说明、索引进度和原生补全里的部分说明也使用中文。
 
 如果希望在代码行尾显示诊断，可在调用 `setup()` 前设置 `vim.diagnostic.config({ virtual_text = true })`。未知诊断保留英文，可通过配置补充译文。[clangd 配置与译文覆盖](docs/configuration.md#modulesdiagnostics)
+
+编译器与独立 clang-tidy 词库可从开发版附件导入。打开 quickfix 后用 `:NvimZhRaw` 查看原文和工具代码。版本范围、真实验证和当前缺口见[覆盖清单](docs/toolchain-coverage.md)。
 
 从编辑、修复和构建到断点调试，见[中文工作流指南](docs/workflows.md)或 `:help nvim-zh-cpp`。
 

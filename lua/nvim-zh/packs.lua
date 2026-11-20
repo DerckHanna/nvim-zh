@@ -214,6 +214,7 @@ local function target_state(row, installed)
   if row.executable then
     local target = vim.fn.executable(row.executable) == 1
     if not row.tool then return target end
+    if row.tool.protocol == 'cli' then return target end
     local seen = false
     for _, client in ipairs(vim.lsp.get_clients({ name = row.tool.server })) do
       local info = client.server_info
@@ -482,7 +483,7 @@ function M.rows()
       local meta = active[id] and active[id].candidate.manifest
       local spec = meta and meta.adapter or {}
       local target = target_state({ repository = spec.repository, modules = spec.modules,
-        executable = meta and meta.executable }, installed)
+        executable = meta and meta.executable, tool = meta and meta.tool }, installed)
       rows[#rows + 1] = { id = id, source = selected.source, name = id, installed = true,
         enabled = record.enabled ~= false, selected = selected.version, previous = record.previous and record.previous.version,
         update = update, options = options, state = states[id], job = job_info(id), generation = record.generation,
@@ -535,21 +536,42 @@ local requested_capabilities = {
   ['textDocument/signatureHelp'] = true,
 }
 
-function M.tool_reason(id, client, method)
+-- Tool identity comes from two verified sources: an LSP client's declared
+-- serverInfo, or a command-line tool's own --version output. A target without
+-- identity never authorizes a reviewed catalog.
+function M.tool_reason(id, target, method)
   local pack = active[id]
   if not pack then return states[id] and states[id].enabled == false and 'paused' or 'pack_missing' end
   local tool = pack.candidate.manifest.tool
   if not tool then return 'legacy_pack' end
-  if not client then return 'client_missing' end
-  local info = client.server_info
+  if type(target) ~= 'table' then return tool.protocol == 'cli' and 'tool_missing' or 'client_missing' end
+  if tool.protocol == 'cli' then
+    if target.server_info then
+      local info = target.server_info
+      if info.name ~= 'clangd' or not tool.forwarded or not tool.forwarded[info.version] then
+        return 'unsupported_version'
+      end
+      return vim.tbl_contains(tool.forwarded[info.version], method) and 'verified' or 'unverified_interface'
+    end
+    if not target.version or not target.executable or not tool.versions[target.version] then
+      return 'unsupported_version'
+    end
+    local hashes = tool.binaries and tool.binaries[target.executable]
+    if not hashes or not target.sha256 or not vim.tbl_contains(hashes, target.sha256) then
+      return 'unverified_binary'
+    end
+    if method and not vim.tbl_contains(tool.versions[target.version], method) then return 'unverified_interface' end
+    return 'verified'
+  end
+  local info = target.server_info
   if not info or info.name ~= tool.server or not tool.versions[info.version] then return 'unsupported_version' end
   if method and not vim.tbl_contains(tool.versions[info.version], method) then return 'unverified_interface' end
-  if requested_capabilities[method] and not client:supports_method(method) then return 'unsupported_interface' end
+  if requested_capabilities[method] and not target:supports_method(method) then return 'unsupported_interface' end
   return 'verified'
 end
 
-function M.tool_allows(id, client, method)
-  local reason = M.tool_reason(id, client, method)
+function M.tool_allows(id, target, method)
+  local reason = M.tool_reason(id, target, method)
   return reason == 'verified' or reason == 'legacy_pack' or reason == 'pack_missing' or reason == 'paused'
 end
 

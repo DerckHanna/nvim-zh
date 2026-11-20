@@ -24,6 +24,7 @@ NAMED = re.compile(r'\{([A-Za-z_][A-Za-z0-9_]*)\}')
 # Clang diagnostic argument placeholders: %0-%9, never multi-digit (the runtime
 # FormatDiagnostic reads exactly one digit after the modifier).
 INDEX_RE = re.compile(r'%([0-9])(?!\d)')
+CLANG_DOMAINS = ('clangd', 'clang', 'clang-tidy')
 PROTECTED_PATTERNS = (
     re.compile(r'`[^`\n]+`'),
     re.compile(r'<[A-Z][A-Za-z0-9-]*(?:-[A-Za-z0-9]+)*>'),
@@ -186,8 +187,8 @@ def check_entry(entry: dict, path: Path, terms: list[dict]) -> None:
         raise CatalogError(f'{location}: empty translation')
     if 'fuzzy' in entry.get('flags', []):
         raise CatalogError(f'{location}: fuzzy translation must be reviewed')
-    source_kind, source_tokens = placeholders(msgid, location, clangd=path.stem == 'clangd')
-    target_kind, target_tokens = placeholders(msgstr, location, clangd=path.stem == 'clangd')
+    source_kind, source_tokens = placeholders(msgid, location, clangd=path.stem in CLANG_DOMAINS)
+    target_kind, target_tokens = placeholders(msgstr, location, clangd=path.stem in CLANG_DOMAINS)
     if source_kind != target_kind:
         raise CatalogError(f'{location}: placeholder kind mismatch')
     if source_kind == 'printf' and source_tokens != target_tokens:
@@ -268,7 +269,8 @@ def builtin_sources(root: Path, *, optional=False) -> dict[str, Path]:
         result[domain] = root / relative
     if optional:
         result.update(po_sources(root))
-        result['clangd'] = root / 'translations/po/zh_CN/clangd.po'
+        for domain in ('clangd', 'clang', 'clang-tidy'):
+            result[domain] = root / f'translations/po/zh_CN/{domain}.po'
     actual = set((root / 'translations/po/zh_CN').glob('*.po'))
     if optional and actual != set(result.values()):
         raise CatalogError('production PO files differ from BUILTIN_SOURCES')

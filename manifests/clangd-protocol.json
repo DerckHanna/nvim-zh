@@ -1,0 +1,133 @@
+{
+ "schema": 1,
+ "llvm": "llvmorg-23.1.5",
+ "source_root": "clang-tools-extra/clangd",
+ "methods": [
+  {
+   "method": "textDocument/publishDiagnostics",
+   "source": "ClangdLSPServer.cpp / Diagnostics.cpp",
+   "capability": "client textDocument.publishDiagnostics.relatedInformation",
+   "input": "练习.cpp, 说明.cpp, 检查.cpp",
+   "display": "diagnostics formatters and float relatedInformation"
+  },
+  {
+   "method": "textDocument/diagnostic",
+   "source": "ClangdLSPServer.cpp, no method binding",
+   "capability": "server diagnosticProvider absent",
+   "input": "T.pull()",
+   "display": "-32601 on pinned server; success contract clangd_observation_spec.lua"
+  },
+  {
+   "method": "workspace/diagnostic",
+   "source": "ClangdLSPServer.cpp, no method binding",
+   "capability": "server diagnosticProvider absent",
+   "input": "T.pull()",
+   "display": "unsupported, original RPC error"
+  },
+  {
+   "method": "textDocument/codeAction",
+   "source": "ClangdLSPServer.cpp onCodeAction / Diagnostics.cpp",
+   "capability": "server codeActionProvider",
+   "input": "semicolon quickfix at 练习.cpp:5",
+   "display": "action title; original edit"
+  },
+  {
+   "method": "textDocument/hover",
+   "source": "Hover.cpp HoverInfo::presentDefault",
+   "capability": "server hoverProvider",
+   "input": "sum definition and project documentation",
+   "display": "generated heading; raw markdown body for source ambiguity"
+  },
+  {
+   "method": "textDocument/completion",
+   "source": "CodeComplete.cpp CodeCompletion::render",
+   "capability": "server completionProvider",
+   "input": "补全.cpp, su prefix",
+   "display": "overload count; original insertion, types and docs"
+  },
+  {
+   "method": "completionItem/resolve",
+   "source": "ClangdLSPServer.cpp, no method binding",
+   "capability": "completionProvider.resolveProvider absent",
+   "input": "T.pull() with a minimal completion item",
+   "display": "unsupported, original RPC error"
+  },
+  {
+   "method": "textDocument/signatureHelp",
+   "source": "ClangdLSPServer.cpp onSignatureHelp",
+   "capability": "server signatureHelpProvider",
+   "input": "sum invocation",
+   "display": "Neovim title; raw signature and documentation"
+  },
+  {
+   "method": "window/workDoneProgress/create",
+   "source": "ClangdLSPServer.cpp onBackgroundIndexProgress",
+   "capability": "client window.workDoneProgress",
+   "input": "index compile_commands.json",
+   "display": "no display text in creation request"
+  },
+  {
+   "method": "$/progress",
+   "source": "ClangdLSPServer.cpp onBackgroundIndexProgress",
+   "capability": "client window.workDoneProgress",
+   "input": "index compile_commands.json",
+   "display": "title; numbers and token retained"
+  },
+  {
+   "method": "textDocument/clangd.fileStatus",
+   "source": "ClangdLSPServer.cpp onFileUpdated / TUScheduler.cpp",
+   "capability": "initializationOptions.clangdFileStatus",
+   "input": "open project source",
+   "display": "nvim-zh status and existing handler; file URI retained"
+  },
+  {
+   "method": "window/showMessage",
+   "source": "ClangdLSPServer.cpp onCommandApplyTweak",
+   "capability": "server notification; no provider field",
+   "input": "T.notify_tweak() asks real server to dump a FunctionDecl",
+   "display": "project-derived AST and code retain source"
+  },
+  {
+   "method": "window/showMessageRequest",
+   "source": "ClangdLSPServer.cpp, no outgoing binding",
+   "capability": "no outgoing interface found",
+   "input": "lsp_handlers_spec.lua",
+   "display": "synthetic success contract; no verified production translation"
+  },
+  {
+   "method": "window/logMessage",
+   "source": "clangd tool logging and transport",
+   "capability": "no display interface selected",
+   "input": null,
+   "display": "log text retained"
+  },
+  {
+   "method": "workspace/symbol",
+   "source": "ClangdLSPServer.cpp onWorkspaceSymbol",
+   "capability": "server workspaceSymbolProvider",
+   "input": null,
+   "display": "project symbol names retained"
+  },
+  {
+   "method": "workspace/executeCommand",
+   "source": "ClangdLSPServer.cpp onCommandApplyTweak",
+   "capability": "server executeCommandProvider",
+   "input": "T.notify_tweak()",
+   "display": "raw result; action notification shown separately"
+  },
+  {
+   "method": "textDocument/semanticTokens/full",
+   "source": "ClangdLSPServer.cpp onSemanticTokens",
+   "capability": "server semanticTokensProvider",
+   "input": "visit project files",
+   "display": "numeric tokens, original highlights"
+  },
+  {
+   "method": "workspace/semanticTokens/refresh",
+   "source": "ClangdLSPServer.cpp onSemanticsMaybeChanged",
+   "capability": "client workspace.semanticTokens.refreshSupport",
+   "input": "edit and save",
+   "display": "refresh request has no translatable text"
+  }
+ ]
+}

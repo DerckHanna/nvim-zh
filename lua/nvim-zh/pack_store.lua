@@ -24,17 +24,35 @@ end
 
 function M.validate_tool(tool, executable)
   if tool == nil then return end
-  assert(type(tool) == 'table' and tool.protocol == 'lsp' and M.id(executable)
-    and tool.server == executable and type(tool.versions) == 'table'
-    and next(tool.versions), '无效的工具兼容性清单')
+  assert(type(tool) == 'table' and M.id(executable) and type(tool.versions) == 'table'
+    and next(tool.versions) and ((tool.protocol == 'lsp' and tool.server == executable)
+      or (tool.protocol == 'cli' and tool.executable == executable)),
+    '无效的工具兼容性清单')
   for version, methods in pairs(tool.versions) do
     assert(type(version) == 'string' and #version <= 200 and version ~= '' and not version:find('%c')
       and vim.islist(methods) and #methods > 0 and #methods <= 32, '无效的工具兼容版本')
     local seen = {}
     for _, method in ipairs(methods) do
-      assert(type(method) == 'string' and #method <= 100 and method:match('^[%w$_.-]+/[%w_.-]+$')
+      assert(type(method) == 'string' and #method <= 100
+        and method:match(tool.protocol == 'cli' and '^[%w$_.-]+$' or '^[%w$_.-]+/[%w_.-]+$')
         and not seen[method], '无效或重复的工具协议方法')
       seen[method] = true
+    end
+  end
+  if tool.binaries then
+    assert(tool.protocol == 'cli' and type(tool.binaries) == 'table', '无效的工具摘要清单')
+    for binary, hashes in pairs(tool.binaries) do
+      assert((binary == executable or (executable == 'clang' and binary == 'clang++'))
+        and vim.islist(hashes) and #hashes > 0, '无效的工具摘要清单')
+      for _, hash in ipairs(hashes) do assert(M.digest(hash), '无效的工具摘要') end
+    end
+  end
+  if tool.forwarded then
+    assert(executable == 'clang-tidy' and tool.protocol == 'cli' and type(tool.forwarded) == 'table',
+      '无效的 clangd 转发清单')
+    for version, methods in pairs(tool.forwarded) do
+      assert(type(version) == 'string' and #version <= 200 and vim.deep_equal(methods, { 'forwarded_diagnostics' }),
+        '无效的 clangd 转发接口')
     end
   end
 end

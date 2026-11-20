@@ -12,6 +12,31 @@
       "version": "0.1.0"
     },
     {
+      "executable": "clangd",
+      "id": "clangd",
+      "locale": "zh_CN",
+      "name": "clangd",
+      "sdk": 1,
+      "sha256": "a353e9f31e9975230f473106ca93043d1bf753e19bbcba9c78f5b604fc518dcb",
+      "size": 71106,
+      "tool": {
+        "protocol": "lsp",
+        "server": "clangd",
+        "versions": {
+          "clangd version 23.1.5 linux x86_64-pc-linux-gnu": [
+            "textDocument/publishDiagnostics",
+            "textDocument/codeAction",
+            "textDocument/hover",
+            "textDocument/completion",
+            "textDocument/signatureHelp",
+            "$/progress"
+          ]
+        }
+      },
+      "url": "https://github.com/DerckHanna/nvim-zh/releases/download/packs-clangd-v0.1.1/clangd-zh_CN.json",
+      "version": "0.1.1"
+    },
+    {
       "id": "nvim-dap",
       "locale": "zh_CN",
       "modules": [

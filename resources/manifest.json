@@ -463,8 +463,8 @@
         "size": 8263
       },
       "help/doc/usr_24.cnx": {
-        "sha256": "d34d3eea4fd41bba1e22d06e8eccdf7e292a05ba4ff2c937ee4638c944951f52",
-        "size": 18922
+        "sha256": "722cb7f1cb2480ec7189086576b513e9f77e4e315fc7b77d1b4613205ae077cb",
+        "size": 18949
       },
       "help/doc/usr_25.cnx": {
         "sha256": "798104e17a746874f9ef0e2999f565a36b70e26620c0e016ad40e9cbc9543369",
@@ -567,7 +567,7 @@
         "size": 597
       }
     },
-    "id": "fc66ee805d1b3c8fbff0ab136b588f888bfa2ce8b5f2163d23e644dc535cb02c"
+    "id": "90b9342da9fbf00769e2a2b3c89425bbd193811380021478bad2e04de59520b5"
   },
   "implementation": {
     "files": {

@@ -7,10 +7,13 @@ local function notify(message) seen = message end
 vim.notify = notify
 local zh = require('nvim-zh')
 zh.setup()
-assert(vim.wait(15000, function()
+if not vim.wait(15000, function()
   local native = zh.status().native
   return native.status == expected_native
-end, 50), vim.inspect(zh.status().native))
+end, 50) then
+  local status = zh.status()
+  error(vim.inspect({ native = status.native, runtime = status.runtime }))
+end
 local native = zh.status().native
 
 local ok, message = pcall(vim.fn.writefile, { 'probe' }, vim.fn.tempname() .. '/missing/file')

@@ -1,0 +1,136 @@
+{
+  "packages": [
+    {
+      "executable": "clangd",
+      "id": "clangd",
+      "locale": "zh_CN",
+      "name": "clangd",
+      "sdk": 1,
+      "sha256": "cfd5cc74f9d3f6c5dd43a6b786abd9cb19c0ee02264f742523aa299ff9c3e385",
+      "size": 69445,
+      "url": "https://github.com/DerckHanna/nvim-zh/releases/download/packs-clangd-v0.1.0/clangd-zh_CN.json",
+      "version": "0.1.0"
+    },
+    {
+      "id": "nvim-dap",
+      "locale": "zh_CN",
+      "modules": [
+        "dap"
+      ],
+      "name": "nvim-dap",
+      "repository": "https://github.com/mfussenegger/nvim-dap",
+      "sdk": 1,
+      "sha256": "69bd2c094dd28a5c56411d00e3f849c01ec388c780faa276afedf27bc76e7dab",
+      "size": 84439,
+      "targets": [
+        "cfa2d58f4537aca6ca83e2de1a0d9f1491121264"
+      ],
+      "url": "https://github.com/DerckHanna/nvim-zh/releases/download/packs-nvim-dap-v0.1.0/nvim-dap-zh_CN.json",
+      "version": "0.1.0"
+    },
+    {
+      "id": "nvim-dap-ui",
+      "locale": "zh_CN",
+      "modules": [
+        "dapui"
+      ],
+      "name": "nvim-dap-ui",
+      "repository": "https://github.com/rcarriga/nvim-dap-ui",
+      "sdk": 1,
+      "sha256": "2097890125b2abcdd34a33c92845141869e282b326983a680e2468e5e4d15685",
+      "size": 40353,
+      "targets": [
+        "cc9dd33aade7f20bae414d0cba163bc60d4d4b43"
+      ],
+      "url": "https://github.com/DerckHanna/nvim-zh/releases/download/packs-nvim-dap-ui-v0.1.0/nvim-dap-ui-zh_CN.json",
+      "version": "0.1.0"
+    },
+    {
+      "id": "nvim-dap-view",
+      "locale": "zh_CN",
+      "modules": [
+        "dap-view"
+      ],
+      "name": "nvim-dap-view",
+      "repository": "https://github.com/igorlfs/nvim-dap-view",
+      "sdk": 1,
+      "sha256": "af452f51ea7e26e57a1a21c1a464ed9386992fe1d2f530d020581d3b9aac1b00",
+      "size": 106028,
+      "targets": [
+        "1c3b9cc295303fc173f24d442739a8557e23e987"
+      ],
+      "url": "https://github.com/DerckHanna/nvim-zh/releases/download/packs-nvim-dap-view-v0.1.0/nvim-dap-view-zh_CN.json",
+      "version": "0.1.0"
+    },
+    {
+      "id": "nvim-tree",
+      "locale": "zh_CN",
+      "modules": [
+        "nvim-tree",
+        "nvim-tree.actions.node.file-popup",
+        "nvim-tree.actions.node.open-file",
+        "nvim-tree.help",
+        "nvim-tree.keymap",
+        "nvim-tree.lib",
+        "nvim-tree.renderer.builder"
+      ],
+      "name": "nvim-tree",
+      "repository": "https://github.com/nvim-tree/nvim-tree.lua",
+      "sdk": 1,
+      "sha256": "2c04b3d0a7c439eb99a17fdfc1d53617d93eec87ae2eb3d5941bf4c6b465d13f",
+      "size": 92029,
+      "targets": [
+        "dbc9d96a3633c2de85f409416ebd4a3aacf4220a"
+      ],
+      "url": "https://github.com/DerckHanna/nvim-zh/releases/download/packs-nvim-tree-v0.1.0/nvim-tree-zh_CN.json",
+      "version": "0.1.0"
+    },
+    {
+      "id": "telescope",
+      "locale": "zh_CN",
+      "modules": [
+        "telescope",
+        "telescope.pickers",
+        "telescope.pickers.window",
+        "telescope.previewers.previewer",
+        "telescope.actions",
+        "telescope.actions.generate",
+        "telescope.actions.mt",
+        "telescope.health"
+      ],
+      "name": "telescope",
+      "repository": "https://github.com/nvim-telescope/telescope.nvim",
+      "sdk": 1,
+      "sha256": "6eba28e8676466c94431fcc6a20f58f1eb1a95987fe3ed789aad5173adfc5891",
+      "size": 84755,
+      "targets": [
+        "1e1bab730218eaf97fce743be3f56e51075928ac"
+      ],
+      "url": "https://github.com/DerckHanna/nvim-zh/releases/download/packs-telescope-v0.1.0/telescope-zh_CN.json",
+      "version": "0.1.0"
+    },
+    {
+      "id": "which-key",
+      "locale": "zh_CN",
+      "modules": [
+        "which-key",
+        "which-key.config",
+        "which-key.text",
+        "which-key.health",
+        "which-key.plugins.marks",
+        "which-key.plugins.registers"
+      ],
+      "name": "which-key",
+      "repository": "https://github.com/folke/which-key.nvim",
+      "sdk": 1,
+      "sha256": "62ccb351054b2c8f9d1e1adf57c820c858075245b3f34f1e9f51d9799a2eb768",
+      "size": 59834,
+      "targets": [
+        "3aab2147e74890957785941f0c1ad87d0a44c15a"
+      ],
+      "url": "https://github.com/DerckHanna/nvim-zh/releases/download/packs-which-key-v0.1.0/which-key-zh_CN.json",
+      "version": "0.1.0"
+    }
+  ],
+  "schema": 1
+}

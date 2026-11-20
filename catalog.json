@@ -1,6 +1,76 @@
 {
   "packages": [
     {
+      "executable": "clang",
+      "id": "clang",
+      "locale": "zh_CN",
+      "name": "clang",
+      "sdk": 1,
+      "sha256": "ccaeb17cc1aeda4de077667efd85b0787f8016914be8446f21424a06d096aa59",
+      "size": 9007775,
+      "tool": {
+        "binaries": {
+          "clang": [
+            "ff89ab5fa1c49c203cd4eb4fd61acab7672fd34cd8d33762542c1e1218b4f298"
+          ],
+          "clang++": [
+            "ff89ab5fa1c49c203cd4eb4fd61acab7672fd34cd8d33762542c1e1218b4f298"
+          ]
+        },
+        "executable": "clang",
+        "interfaces": {
+          "compile": "command-line diagnostics printed by clang/clang++",
+          "quickfix": ":make/:lmake text parsed by compiler/nvim-zh-clang.vim"
+        },
+        "name": "Clang 编译器诊断",
+        "protocol": "cli",
+        "versions": {
+          "23.1.5": [
+            "compile",
+            "quickfix"
+          ]
+        }
+      },
+      "url": "https://github.com/DerckHanna/nvim-zh/releases/download/packs-clang-v0.1.0/clang-zh_CN.json",
+      "version": "0.1.0"
+    },
+    {
+      "executable": "clang-tidy",
+      "id": "clang-tidy",
+      "locale": "zh_CN",
+      "name": "clang-tidy",
+      "sdk": 1,
+      "sha256": "91eb1d397675ef805542884ed7e8be50100c5b8201daa4d8bb0541cca29e54f5",
+      "size": 846533,
+      "tool": {
+        "binaries": {
+          "clang-tidy": [
+            "61929b0d85e67b01a50c04015a66144d098636f9419ccfd9a7e1b4b5f407eeaa"
+          ]
+        },
+        "executable": "clang-tidy",
+        "forwarded": {
+          "clangd version 23.1.5 linux x86_64-pc-linux-gnu": [
+            "forwarded_diagnostics"
+          ]
+        },
+        "interfaces": {
+          "checks": "standalone clang-tidy diagnostics",
+          "quickfix": ":make/:lmake text parsed by compiler/nvim-zh-clang-tidy.vim"
+        },
+        "name": "clang-tidy 检查",
+        "protocol": "cli",
+        "versions": {
+          "23.1.5": [
+            "checks",
+            "quickfix"
+          ]
+        }
+      },
+      "url": "https://github.com/DerckHanna/nvim-zh/releases/download/packs-clang-tidy-v0.1.0/clang-tidy-zh_CN.json",
+      "version": "0.1.0"
+    },
+    {
       "executable": "clangd",
       "id": "clangd",
       "locale": "zh_CN",
@@ -35,6 +105,32 @@
       },
       "url": "https://github.com/DerckHanna/nvim-zh/releases/download/packs-clangd-v0.1.1/clangd-zh_CN.json",
       "version": "0.1.1"
+    },
+    {
+      "executable": "clangd",
+      "id": "clangd",
+      "locale": "zh_CN",
+      "name": "clangd",
+      "sdk": 1,
+      "sha256": "0dd6344f8921bcd37fb8daef01e0b7388206cc345f8585c349f8767eb75ae3ba",
+      "size": 9043685,
+      "tool": {
+        "protocol": "lsp",
+        "server": "clangd",
+        "versions": {
+          "clangd version 23.1.5 linux x86_64-pc-linux-gnu": [
+            "textDocument/publishDiagnostics",
+            "textDocument/codeAction",
+            "textDocument/hover",
+            "textDocument/completion",
+            "textDocument/signatureHelp",
+            "$/progress",
+            "textDocument/clangd.fileStatus"
+          ]
+        }
+      },
+      "url": "https://github.com/DerckHanna/nvim-zh/releases/download/packs-clangd-v0.1.2/clangd-zh_CN.json",
+      "version": "0.1.2"
     },
     {
       "id": "nvim-dap",

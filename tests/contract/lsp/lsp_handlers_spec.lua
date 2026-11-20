@@ -16,6 +16,7 @@ original['$/progress'] = function(err, params, ctx) table.insert(calls, { 'progr
 original['textDocument/clangd.fileStatus'] = function(_, params) return params end
 for method, fn in pairs(original) do vim.lsp.handlers[method] = fn end
 local old_preview = vim.lsp.util.open_floating_preview
+local upstream_complete = vim.lsp.completion._lsp_to_complete_items
 vim.lsp.util.open_floating_preview = function(lines, _, opts) return lines, opts end
 local overrides = { clangd = {
   show_message = { ['Indexing completed'] = '索引已完成' },
@@ -26,8 +27,14 @@ local overrides = { clangd = {
 } }
 require('nvim-zh').setup({ modules = { ui = { notify = false, prompts = false }, plugins = { auto = false }, diagnostics = { enabled = false }, lsp = { messages = true, progress = true } }, overrides = overrides })
 local old_get = vim.lsp.get_client_by_id
+local capabilities = vim.lsp.protocol.make_client_capabilities()
 vim.lsp.get_client_by_id = function(id)
-  return { id = id, name = id == 1 and 'clangd' or 'other', server_capabilities = { completionProvider = {} } }
+  return {
+    id = id, name = id == 1 and 'clangd' or 'other',
+    capabilities = capabilities,
+    server_capabilities = { completionProvider = {} },
+    _get_registrations = function() return {} end,
+  }
 end
 local err, ctx = { code = 0 }, { client_id = 1 }
 local show = { type = 2, message = 'Indexing completed' }
@@ -81,12 +88,20 @@ if vim.lsp.completion._lsp_to_complete_items then
   }
   local complete = vim.lsp.completion._lsp_to_complete_items
   local item = complete({ raw }, '', 1)[1]
-  equal(item.menu, '[2 个重载]', 'completion overload count was not translated')
-  equal(item.info, '来自 `<math.h>`\n\nProject docs', 'completion documentation display was not translated')
+  local original_item = upstream_complete({ raw }, '', 1)[1]
+  if vim.version().minor == 12 then
+    equal(original_item.menu, raw.detail, 'pinned completion menu shape changed')
+    equal(original_item.info, raw.documentation.value, 'pinned completion documentation shape changed')
+  end
+  local expected_menu = original_item.menu == raw.detail and '[2 个重载]' or original_item.menu
+  local expected_info = original_item.info == raw.documentation.value
+    and '来自 `<math.h>`\n\nProject docs' or original_item.info
+  equal(item.menu, expected_menu, 'completion menu projection or fallback changed')
+  equal(item.info, expected_info, 'completion documentation projection or fallback changed')
   equal(item.word, 'sum', 'completion insertion text changed')
   equal(item.user_data.nvim.lsp.completion_item, raw, 'completion protocol item identity changed')
   equal(raw.detail, '[2 overloads]', 'completion protocol item mutated')
-  equal(complete({ raw }, '', 2)[1].menu, raw.detail, 'other server completion translated')
+  equal(complete({ raw }, '', 2)[1].menu, original_item.menu, 'other server completion translated')
 end
 local boom_ok, boom_err = pcall(vim.lsp.handlers['window/showMessage'], err, { type = 2, message = 'boom' }, ctx)
 check(not boom_ok and tostring(boom_err):find('lsp-original-error', 1, true), 'LSP original exception swallowed')

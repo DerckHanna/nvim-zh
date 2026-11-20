@@ -32,10 +32,12 @@
 | C/C++ 终端 | `python3 -B tests/workflows/cpp_tui.py`。官方 Neovim 0.12.6、clangd 23.1.5、GCC 16.2.1、GNU Make 4.4.1、官方 CodeLLDB 1.12.3 和固定 DAP 插件。两组在中文路径项目中查阅 Help、搜索编辑、查看诊断原文和错误码、应用修复、构建、quickfix 跳转和调试。失败构建退出码 2，修复后为 0。两组跳到第 3 行第 32 列，LSP 原始对象字段一致。第 3 行断点的 `counter = 7`，继续至退出码 0。中文组用本地词库验证热更新和回滚，注入未知版本并检查状态理由。 |
 | pytest、Ruff 与 Git 冲突 | `python3 -B tests/workflows/python_git_tui.py`。选用 Neovim 0.12.6 自带编译器支持的 pytest 9.0.2 与 Ruff 0.15.0，两者都有可固定的本地环境、明确的退出码和位置。两组分别从测试第 2 行断言和 Ruff 第 1 行 `F401` 的失败退出码 1 到修复后的 0。Git 2.56.1 的临时分支合并返回 1，定位冲突第 1 行，确认解决后的暂存内容和空冲突索引。位置、原文和退出状态通过差分。 |
 | 核心 gettext | `make audit-native` 核对原 15 个未确认键。`NVIM_ZH_TEST_NATIVE_RUNTIME=1 make test-integration` 和独立英文/中文探针覆盖 12 个修复后的键，包括 E513、E1136、E5100/E5101、E5114、Lua 回调、`--server` 和 E575。3 个 ShaDa 旧键仅有源码移除或重构证据，见 `manifests/native.json`。 |
-| 核心 Help | 固定 0.12.6 的 133 篇全量结构契约通过。按清单的 10 个主题逐批抽查对齐段落，机器核对了 164 个可配对的字面默认值。修订 `starting` 的日志路径、`usr_24` 的删除位置和 `usr_25` 的实际插入换行。语义审阅覆盖样本与所修主题，其他段落仍需全文审校。 |
+| 核心 Help | 固定 0.12.6 的 133 篇全量结构契约通过。逐篇使用 `:help <文件名>@cn` 和 `:help <文件名>@en` 打开，中文和英文各 133 篇。按清单的 10 个主题逐批抽查对齐段落，机器核对了 164 个可配对的字面默认值。修订 `starting` 的日志路径、`usr_24` 的删除位置和 `usr_25` 的实际插入换行。语义审阅覆盖样本与所修主题，其他段落仍需全文审校。 |
 | 平台 | 在隔离环境执行 `nvim --headless -u NONE -i NONE -n -l tests/platform/localization.lua`。Windows 11 x86_64 和 macOS 15.8.2 arm64 使用官方 0.12.6，Alpine edge x86_64 使用 Neovim 0.12.2-r1 与 musl 1.2.6。三组通过中文 Help、英文 Help 回退、Lua UI 和原文通知回退。三组的原生后端均报告 `unsupported`，E482 保留英文。macOS 首次因系统目录别名拒绝了快照路径，修复后从系统别名路径复跑通过。[macOS CI](https://github.com/DerckHanna/nvim-zh/actions/runs/44676795841) |
 
 工作流说明和复跑环境见[中文操作指南](workflows.md)与[测试文档](testing.md)。
+
+主包开发分支的 `4031052` 通过固定版离线与上游 CI。clangd 0.1.1 附件从公开地址下载并校验了 71 106 字节和 SHA-256。官方目录 `620b4a2` 保留原七条记录与附件。新用户目录从 0.1.0 更新到 0.1.1，连接真实 clangd 后显示中文诊断。注入未知服务器版本时显示原文，LSP 对象一致。断网重启后从 0.1.1 回滚到 0.1.0。[固定版 CI](https://github.com/DerckHanna/nvim-zh/actions/runs/44676795889) [clangd 0.1.1](https://github.com/DerckHanna/nvim-zh/releases/tag/packs-clangd-v0.1.1) [更新后的目录](https://github.com/DerckHanna/nvim-zh/blob/620b4a2bd2d091f98038f5548dfc1ac6989b2eb9/catalog.json)
 
 ## 历史全量复审（2026-11-19）
 

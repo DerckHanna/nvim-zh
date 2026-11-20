@@ -6,7 +6,7 @@ import re
 import subprocess
 import tempfile
 
-from adapter_tui import Terminal, lua_literal
+from adapter_tui import Terminal, assert_lua, lua_literal
 from pack_assets import assets
 from pack_fixture import seed
 
@@ -117,8 +117,7 @@ def run(base, code, enabled):
         ui.command('copen')
         ui.expect('练习.cpp')
         ui.command('cc')
-        lua(ui, "assert(vim.fn.line('.') == 3); print('JUMP_3')")
-        ui.expect('JUMP_3')
+        assert_lua(ui, "vim.fn.line('.') == 3", 'JUMP_3')
         lua(ui, "vim.lsp.buf.code_action({context={diagnostics={Cpp.raw},only={'quickfix'}}})")
         frame = ui.expect("插入 ';'" if enabled else "insert ';'")
         number = re.search(r"(\d+): .*';'", frame)
@@ -129,17 +128,15 @@ def run(base, code, enabled):
         ui.command('make!')
         ui.expect('Press ENTER', timeout=15)
         dismiss(ui)
-        lua(ui, "assert(vim.v.shell_error == 0 and vim.uv.fs_stat('app')); print('BUILD_EXIT_0')")
-        ui.expect('BUILD_EXIT_0')
+        assert_lua(ui, "vim.v.shell_error == 0 and vim.uv.fs_stat('app')", 'BUILD_EXIT_0')
         ui.command('3')
         ui.command('DapToggleBreakpoint')
         ui.command('DapContinue')
-        ui.expect('counter = 7', '变量' if enabled else 'Scopes', timeout=18)
-        lua(ui, "assert(require('dap').session().current_frame.line == 3); print('BREAKPOINT_3')")
-        ui.expect('BREAKPOINT_3')
+        ui.expect('│        counter = 7', '变量' if enabled else 'Scopes', timeout=18)
+        assert_lua(ui, "require('dap').session().current_frame.line == 3", 'BREAKPOINT_3')
         ui.command('DapContinue')
-        lua(ui, "assert(vim.wait(8000,function() return Cpp.exit == 0 end)); print('DAP_EXIT_0')")
-        ui.expect('DAP_EXIT_0', timeout=10)
+        assert_lua(ui, "vim.wait(10000, function() return Cpp.exit == 0 and not require('dap').session() end)",
+              'DAP_EXIT_0', timeout=12)
         ui.command('DapViewClose')
         ui.command('edit 练习.cpp')
         if enabled:
@@ -150,11 +147,9 @@ def run(base, code, enabled):
             ui.send('q')
             lua(ui, "vim.lsp.get_client_by_id(Cpp.id).server_info.version=Cpp.version")
             ui.command('NvimZhPacks import ' + str(code))
-            lua(ui, "assert(require('nvim-zh').status().packs.clangd.active=='1.1.0'); print('PACK_UPDATED')")
-            ui.expect('PACK_UPDATED')
+            assert_lua(ui, "require('nvim-zh').status().packs.clangd.active=='1.1.0'", 'PACK_UPDATED')
             ui.command('NvimZhPacks rollback clangd')
-            lua(ui, "assert(require('nvim-zh').status().packs.clangd.active=='1.0.0'); print('PACK_ROLLED_BACK')")
-            ui.expect('PACK_ROLLED_BACK')
+            assert_lua(ui, "require('nvim-zh').status().packs.clangd.active=='1.0.0'", 'PACK_ROLLED_BACK')
         evidence = json.loads(report.read_text())
         assert (ui.cwd / '练习.cpp').read_text() == SOURCE.replace(': 1\n', ': 1;\n')
         evidence['build_exit'] = 0

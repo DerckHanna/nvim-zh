@@ -15,7 +15,7 @@
 |---|---|---|---|
 | Linux x86_64，glibc 2.44，WSL2 | 官方 0.12.6 | 中文 E482/E576/E136/E5005、欢迎页及 12 项运行时键修复通过 | 中文 Help、Lua UI 和英文回退通过 |
 | Windows 11 x86_64，NT 10.0.26300 | 官方 0.12.6 | 原生接线报告 `unsupported`，E482 保留英文 | 中文 `options`、英文 `credits`、中文通知、未知文案和 teardown 通过 |
-| macOS 15.8.2 arm64，GitHub Actions | 官方 0.12.6 | 原生接线报告 `unsupported`，E482 保留英文 | 中文 `options`、英文 `credits`、中文通知、未知文案和 teardown 通过。[CI](https://github.com/DerckHanna/nvim-zh/actions/runs/44675088047) |
+| macOS 15.8.2 arm64，GitHub Actions | 官方 0.12.6 | 原生接线报告 `unsupported`，E482 保留英文 | 通过系统路径别名启动后，中文 `options`、英文 `credits`、中文通知、未知文案和 teardown 均通过。[CI](https://github.com/DerckHanna/nvim-zh/actions/runs/44676795841) |
 | Alpine Linux edge x86_64，musl 1.2.6 | Alpine 0.12.2-r1 | 缺少 glibc 符号，原生接线报告 `unsupported`，E482 保留英文 | 中文 `options`、英文 `credits`、中文通知、未知文案和 teardown 通过 |
 
 项目不再维护 0.10/0.11 的独立基础入口，也不保留旧命令、旧 Lua API 或旧测试目录的兼容层。旧版本的历史测试记录不能作为当前版本通过证据。

@@ -186,6 +186,13 @@ def lua_literal(value):
     return json.dumps(value, ensure_ascii=False)
 
 
+def assert_lua(ui, expression, marker, *, timeout=7):
+    # The marker must appear only after the Ex command executes.
+    midpoint = len(marker) // 2
+    ui.command(f"lua assert({expression}); print('{marker[:midpoint]}' .. '{marker[midpoint:]}')")
+    ui.expect(marker, timeout=timeout)
+
+
 def init_for(id, enabled, extra, dependencies, *, verify=False):
     imports = '\n'.join(f'vim.opt.rtp:prepend(assert(vim.env.{name}))' for name in dependencies)
     register = (f"zh.register_adapter_source({lua_literal(id)}, assert(vim.env.{dependencies[-1]}))"

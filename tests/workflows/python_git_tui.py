@@ -5,7 +5,7 @@ from pathlib import Path
 import subprocess
 import tempfile
 
-from adapter_tui import Terminal, lua_literal
+from adapter_tui import Terminal, assert_lua, lua_literal
 
 INIT = """
 vim.opt.runtimepath:prepend(vim.env.NVIM_ZH_ROOT)
@@ -85,15 +85,13 @@ def run(base, enabled):
         ui.expect('test_算术.py', 'assert (1 + 1) == 3')
         test_row = next(row for row in test['rows'] if row['line'] == 2 and row['file'] == 'test_算术.py')
         ui.command(f"cc {test_row['index']}")
-        ui.command("lua assert(vim.fn.line('.')==2); print('TEST_LINE_2')")
-        ui.expect('TEST_LINE_2')
+        assert_lua(ui, "vim.fn.line('.')==2", 'TEST_LINE_2')
         ui.command('s/== 3/== 2/')
         ui.command('write')
         ui.command('make! test_算术.py')
         ui.expect('1 passed', 'Press ENTER', timeout=15)
         ui.send('\r')
-        ui.command("lua assert(vim.v.shell_error==0); print('TEST_FIXED')")
-        ui.expect('TEST_FIXED')
+        assert_lua(ui, "vim.v.shell_error==0", 'TEST_FIXED')
 
         ui.command('edit 检查.py')
         ui.command('compiler ruff')
@@ -105,15 +103,13 @@ def run(base, enabled):
         ui.command('copen')
         ui.expect('检查.py', 'F401')
         ui.command(f"cc {lint['rows'][0]['index']}")
-        ui.command("lua assert(vim.fn.line('.')==1); print('LINT_LINE_1')")
-        ui.expect('LINT_LINE_1')
+        assert_lua(ui, "vim.fn.line('.')==1", 'LINT_LINE_1')
         ui.command('1delete')
         ui.command('write')
         ui.command('make! 检查.py')
         ui.expect('Press ENTER', timeout=15)
         ui.send('\r')
-        ui.command("lua assert(vim.v.shell_error==0); print('LINT_FIXED')")
-        ui.expect('LINT_FIXED')
+        assert_lua(ui, "vim.v.shell_error==0", 'LINT_FIXED')
 
         ui.command('edit 说明.txt')
         ui.expect('<<<<<<< HEAD', '主分支', '主题分支')
@@ -121,14 +117,12 @@ def run(base, enabled):
         conflict = evidence(ui, base / 'merge.json')['rows']
         assert conflict[0]['line'] == 1 and conflict[0]['file'] == '说明.txt', conflict
         ui.command('cc')
-        ui.command("lua assert(vim.fn.line('.')==1); print('CONFLICT_LINE_1')")
-        ui.expect('CONFLICT_LINE_1')
+        assert_lua(ui, "vim.fn.line('.')==1", 'CONFLICT_LINE_1')
         ui.command('silent %delete _')
         ui.send('i合并后的说明\x1b')
         ui.command('write')
         ui.command('silent !git add -- 说明.txt')
-        ui.command("lua assert(vim.v.shell_error==0); print('CONFLICT_STAGED')")
-        ui.expect('CONFLICT_STAGED')
+        assert_lua(ui, "vim.v.shell_error==0", 'CONFLICT_STAGED')
         assert not git(root, 'ls-files', '-u')
         assert git(root, 'show', ':说明.txt') == '合并后的说明'
         print(f'PYTHON_GIT_TUI=PASS zh={enabled} pytest_exit_1_0 ruff_F401_exit_1_0 git_conflict_exit_1_staged', flush=True)

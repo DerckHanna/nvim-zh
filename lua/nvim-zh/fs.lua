@@ -17,7 +17,7 @@ end
 function M.read(path, limit)
   M.safe(path)
   local stat = assert(uv.fs_stat(path), '无法读取：' .. path)
-  assert(stat.type == 'file' and stat.size <= (limit or 8 * 1024 * 1024), '文件类型或大小不符合要求：' .. path)
+  assert(stat.type == 'file' and stat.size <= (limit or 16 * 1024 * 1024), '文件类型或大小不符合要求：' .. path)
   local fd = assert(uv.fs_open(path, 'r', 0))
   local ok, data = pcall(uv.fs_read, fd, stat.size, 0)
   uv.fs_close(fd)
@@ -113,7 +113,7 @@ function M.index_id(files)
     local item = files[key]
     assert(type(item) == 'table' and type(item.sha256) == 'string' and #item.sha256 == 64
       and item.sha256:match('^[a-f0-9]+$') and type(item.size) == 'number'
-      and item.size > 0 and item.size <= 8 * 1024 * 1024 and item.size % 1 == 0, '非法资源清单项')
+      and item.size > 0 and item.size <= 16 * 1024 * 1024 and item.size % 1 == 0, '非法资源清单项')
     parts[#parts + 1] = key .. '\0' .. item.sha256 .. '\0' .. tostring(item.size) .. '\n'
   end
   assert(#keys > 0 and #keys <= 500, '资源清单数量不符合要求')
@@ -125,7 +125,7 @@ function M.verify(root, files)
   M.index_id(files)
   for name, item in pairs(files) do
     total = total + item.size
-    assert(total <= 32 * 1024 * 1024, '资源集过大')
+    assert(total <= 64 * 1024 * 1024, '资源集过大')
     local bytes = M.read(root .. '/' .. name)
     assert(#bytes == item.size and vim.fn.sha256(bytes) == item.sha256, '资源校验失败：' .. name)
     data[name] = bytes

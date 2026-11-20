@@ -125,6 +125,8 @@ def main() -> int:
         return 0
     executable = str(Path(executable).resolve())
     version_text = subprocess.check_output([executable, '--version'], text=True).strip()
+    with Path(executable).open('rb') as stream:
+        executable_hash = hashlib.file_digest(stream, 'sha256').hexdigest()
     corpus_files = sorted(CORPUS.glob('*.cpp'))
     if len(corpus_files) < 4:
         raise AssertionError('fixed clangd corpus must contain the C++ samples')
@@ -225,6 +227,7 @@ def main() -> int:
             'recorded_at': datetime.datetime.now(datetime.timezone.utc).isoformat(),
             'clangd': {
                 'version_text': version_text,
+                'sha256': executable_hash,
                 # Only fields measured from this process belong in a new record.
                 # Distribution, source commit and package hashes need external,
                 # independently verifiable evidence; never invent fixed values.

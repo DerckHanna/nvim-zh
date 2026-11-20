@@ -31,53 +31,91 @@ local function is_clangd(diagnostic)
   return false
 end
 
-local function lookup(context, text)
-  local ok, result, status = pcall(engine.translate, {
-    domain = 'clangd', context = context, msgid = text, formatted = true, observe = false,
+local function lookup(context, text, args)
+  local ok, result, status, id = pcall(engine.translate, {
+    domain = 'clangd', context = context, msgid = text, args = args, formatted = true,
+    observe = false, report_ambiguity = true,
   })
-  if ok and status == 'translated' and type(result) == 'string' then return result, context end
+  if ok and status == 'translated' and type(result) == 'string' then return result, context, id, status end
+  if ok and status == 'ambiguous' then return nil, context, nil, status end
 end
 
-local function translate_body(text, code, source)
-  local result, context
+local function translate_body(text, code, source, note)
+  local contexts = {}
+  if note then contexts[#contexts + 1] = 'related_diagnostic' end
   if type(code) == 'string' then
-    result, context = lookup(code, text)
-    if result then return result, context end
+    contexts[#contexts + 1] = code
   end
   -- Configuration diagnostics arrive with substituted values, so only the
   -- fixed prefix can be matched; the clangd_config context holds those.
   if source == 'clangd-config' then
-    result, context = lookup('clangd_config', text)
-    if result then return result, context end
+    contexts[#contexts + 1] = 'clangd_config'
   end
-  for _, legacy in ipairs(CONTEXTS) do
-    result, context = lookup(legacy, text)
-    if result then return result, context end
+  vim.list_extend(contexts, CONTEXTS)
+  contexts[#contexts + 1] = 'diagnostic'
+  for _, context in ipairs(contexts) do
+    local result, _, id, status = lookup(context, text)
+    if status then return result, context, id, status end
   end
-  return lookup('diagnostic', text)
 end
 
-local function translate_sentence(text, code, source)
-  if raw_codes[code] then return end
+local function translate_sentence(text, code, source, note)
+  if raw_codes[code] then return nil, nil, nil, 'project_text' end
   local origin, inner = text:match('^(In [^:]+): (.+)$')
-  local translated_origin = origin and lookup('diagnostic_origin', origin)
+  local translated_origin, _, origin_id, origin_status
+  if origin then translated_origin, _, origin_id, origin_status = lookup('diagnostic_origin', origin) end
+  if origin_status == 'ambiguous' then return nil, 'diagnostic_origin', nil, origin_status end
   if translated_origin then
-    local translated, context = translate_sentence(inner:sub(1, 1):upper() .. inner:sub(2), code, source)
-    return translated_origin .. '：' .. (translated or inner), context or 'diagnostic_origin'
+    local translated, context, id, status, nested_id =
+      translate_sentence(inner:sub(1, 1):upper() .. inner:sub(2), code, source, note)
+    if status == 'ambiguous' then return nil, context, nil, status end
+    return translated_origin .. '：' .. (translated or inner), context or 'diagnostic_origin',
+      id or origin_id, status or 'partial_translation', nested_id
+  end
+  if note then
+    local conjunction, expression, diagnostic = text:match("^([A-Za-z]+) '([^']+)' would be invalid: (.+)$")
+    conjunction = conjunction and conjunction:lower()
+    if conjunction == 'because' or conjunction == 'and' then
+      local nested, context, nested_id, status = lookup('substitution_diagnostic', diagnostic)
+      if status == 'ambiguous' then return nil, context, nil, status end
+      if nested then
+        local key = conjunction:sub(1, 1):upper() .. conjunction:sub(2) .. " '%1' would be invalid: %2"
+        local result, scope, id, reason = lookup('related_diagnostic', key, { ['1'] = expression, ['2'] = nested })
+        if reason then return result, scope, id, reason, nested_id end
+      end
+    end
   end
   local body, fixes = text:match('^(.*) %((fixe?s? available)%)$')
   body = body or text
-  local result, context = translate_body(body, code, source)
+  local result, context, id, status = translate_body(body, code, source, note)
+  if status == 'ambiguous' then return nil, context, nil, status end
   if result and fixes then
-    result = result .. (lookup('diagnostic_suffix', ' (' .. fixes .. ')') or (' (' .. fixes .. ')'))
+    local suffix = lookup('diagnostic_suffix', ' (' .. fixes .. ')')
+    result = result .. (suffix or (' (' .. fixes .. ')'))
+    if not suffix then status = 'partial_translation' end
   elseif fixes then
-    return translate_body(text, code, source)
+    return translate_body(text, code, source, note)
   end
-  return result, context
+  return result, context, id, status
 end
 
 -- Used by the source inventory to exercise the same message matcher.
 M.match_message = translate_sentence
+
+function M.match_forwarded(text, code, note)
+  local body, fixes = text:match('^(.*) %((fixe?s? available)%)$')
+  body = body or text
+  local cli_body = body:sub(1, 1):lower() .. body:sub(2)
+  local match = require('nvim-zh.compiler').match_message
+  local level = note and 'note' or nil
+  local translated, reason, context, id = match('clang-tidy', cli_body, code, level)
+  if reason == 'missing_translation' and cli_body ~= body then
+    translated, reason, context, id = match('clang-tidy', body, code, level)
+  end
+  if reason ~= 'translated' then return text, reason end
+  local suffix = fixes and (lookup('diagnostic_suffix', ' (' .. fixes .. ')') or (' (' .. fixes .. ')')) or ''
+  return translated .. suffix, reason, context, id
+end
 
 local function translate_diagnostic(diagnostic, text, code, note)
   if type(text) ~= 'string' or text == '' or type(diagnostic) ~= 'table' or not is_clangd(diagnostic) then return text end
@@ -96,29 +134,21 @@ local function translate_diagnostic(diagnostic, text, code, note)
   local source = diagnostic.source
   if source == 'clang-tidy' and client and packs.tool_reason('clangd', client, method) == 'verified' then
     if packs.tool_reason('clang-tidy', client, 'forwarded_diagnostics') ~= 'verified' then return text end
-    local body, fixes = text:match('^(.*) %((fixe?s? available)%)$')
-    body = body or text
-    local cli_body = body:sub(1, 1):lower() .. body:sub(2)
-    local match = require('nvim-zh.compiler').match_message
-    local translated, reason = match('clang-tidy', cli_body, code, note and 'note' or nil)
-    if reason == 'missing_translation' and cli_body ~= body then
-      translated, reason = match('clang-tidy', body, code, note and 'note' or nil)
-    end
-    if reason ~= 'translated' then return text end
-    runtime.translated = runtime.translated + 1
-    return translated .. (fixes and (lookup('diagnostic_suffix', ' (' .. fixes .. ')') or (' (' .. fixes .. ')')) or '')
+    local translated, reason = M.match_forwarded(text, code, note)
+    if reason == 'translated' then runtime.translated = runtime.translated + 1 end
+    return translated
   end
   local first, notes = text:match('^(.-)(\n\n.*)$')
   if first and notes:match('^\n\n[^\n]*:%d+:%d+[%s:]+') then
     result, context = translate_sentence(first, code, source)
     notes = notes:gsub('(\n\n[^\n]-:%d+:%d+[%s:]+)([a-z ]+): ([^\n]+)', function(location, level, note)
-      local translated = translate_sentence(note:sub(1, 1):upper() .. note:sub(2), code, source)
+      local translated = translate_sentence(note:sub(1, 1):upper() .. note:sub(2), code, source, true)
       return location .. (lookup('diagnostic_level', level) or level) .. ': ' .. (translated or note)
     end)
     result = (result or first) .. notes
     if result == text then result = nil end
   else
-    result, context = translate_sentence(text, code, source)
+    result, context = translate_sentence(text, code, source, note)
   end
   if result then runtime.translated = runtime.translated + 1 end
   missing.observe({ domain = 'clangd', context = context or '', msgid = text, dynamic = true, translated = result ~= nil })

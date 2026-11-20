@@ -276,7 +276,7 @@ For standalone checks, use :compiler nvim-zh-clang-tidy and makeprg=clang-tidy.
 Inspect the finding, run clang-tidy with --fix when ready, and check again
 without --fix. The compiler module controls list display. clangd diagnostics
 forwarded from clang-tidy can use the corresponding clang-tidy catalog.
-See docs/toolchain-coverage.md for the pinned combination and current gaps.
+See docs/toolchain-coverage.md for the pinned combination, evidence, and scope.
 
 HELP DOCUMENTS                                                  *nvim-zh-help*
 

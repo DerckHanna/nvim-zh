@@ -15,14 +15,20 @@
    "source": "ClangdLSPServer.cpp, no method binding",
    "capability": "server diagnosticProvider absent",
    "input": "T.pull()",
-   "display": "-32601 on pinned server; success contract clangd_observation_spec.lua"
+   "rpc_error": -32601,
+   "display": "-32601 on pinned server",
+   "independent_success": "tests/integration/diagnostics/push_pull_spec.lua document full report and user_data.lsp",
+   "success_marker": "PUSH_PULL_SPEC=PASS"
   },
   {
    "method": "workspace/diagnostic",
    "source": "ClangdLSPServer.cpp, no method binding",
    "capability": "server diagnosticProvider absent",
    "input": "T.pull()",
-   "display": "unsupported, original RPC error"
+   "rpc_error": -32601,
+   "display": "unsupported, original RPC error",
+   "independent_success": "tests/integration/diagnostics/push_pull_spec.lua workspace full report and user_data.lsp",
+   "success_marker": "WORKSPACE_PULL_SPEC=PASS"
   },
   {
    "method": "textDocument/codeAction",
@@ -50,7 +56,10 @@
    "source": "ClangdLSPServer.cpp, no method binding",
    "capability": "completionProvider.resolveProvider absent",
    "input": "T.pull() with a minimal completion item",
-   "display": "unsupported, original RPC error"
+   "rpc_error": -32601,
+   "display": "unsupported, original RPC error",
+   "independent_success": "tests/integration/diagnostics/push_pull_spec.lua resolved documentation and textEdit",
+   "success_marker": "COMPLETION_RESOLVE_SPEC=PASS"
   },
   {
    "method": "textDocument/signatureHelp",
@@ -89,23 +98,26 @@
   },
   {
    "method": "window/showMessageRequest",
-   "source": "ClangdLSPServer.cpp, no outgoing binding",
-   "capability": "no outgoing interface found",
-   "input": "lsp_handlers_spec.lua",
-   "display": "synthetic success contract; no verified production translation"
+   "source": "ClangdLSPServer.cpp:1737-1748, outgoing request and notification bindings",
+   "capability": "the server binds window/showMessage as a notification and has no window/showMessageRequest sender",
+   "input": "tests/contract/lsp/lsp_handlers_spec.lua (independent client contract)",
+   "display": "no production request in this fixed server",
+   "success_marker": "LSP_HANDLER_SPEC=PASS",
+   "evidence": "source_absent"
   },
   {
    "method": "window/logMessage",
-   "source": "clangd tool logging and transport",
-   "capability": "no display interface selected",
+   "source": "ClangdLSPServer.cpp:1737-1748, outgoing request and notification bindings",
+   "capability": "no outgoing binding; logging goes through the clangd logger",
    "input": null,
-   "display": "log text retained"
+   "display": "clangd process log text retained",
+   "evidence": "source_absent"
   },
   {
    "method": "workspace/symbol",
    "source": "ClangdLSPServer.cpp onWorkspaceSymbol",
    "capability": "server workspaceSymbolProvider",
-   "input": null,
+   "input": "T.symbol() queries the project-owned indexing name",
    "display": "project symbol names retained"
   },
   {
@@ -116,11 +128,26 @@
    "display": "raw result; action notification shown separately"
   },
   {
+   "method": "workspace/applyEdit",
+   "source": "ClangdLSPServer.cpp:794-805 / ClangdLSPServer.cpp:854-870",
+   "capability": "server issues request for clangd.applyFix",
+   "input": "T.apply_edit() exercises a real clang-tidy quickfix at 请求修复.cpp",
+   "display": "server edit and client response remain raw"
+  },
+  {
    "method": "textDocument/semanticTokens/full",
    "source": "ClangdLSPServer.cpp onSemanticTokens",
    "capability": "server semanticTokensProvider",
    "input": "visit project files",
    "display": "numeric tokens, original highlights"
+  },
+  {
+   "method": "textDocument/semanticTokens/full/delta",
+   "source": "ClangdLSPServer.cpp onSemanticTokensDelta",
+   "capability": "server semanticTokensProvider.full.delta",
+   "input": "edit a C++ buffer after enabling semantic highlighting",
+   "display": "numeric token edits retain their original values",
+   "evidence": "asynchronous"
   },
   {
    "method": "workspace/semanticTokens/refresh",

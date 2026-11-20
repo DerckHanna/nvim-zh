@@ -80,16 +80,43 @@ local function classify(body, level)
 end
 
 function M.match_message(domain, body, code, level, interface)
+  if domain == 'clang' and level == 'note' and interface == 'quickfix' then
+    local conjunction, expression, diagnostic = body:match("^([a-z]+) '([^']+)' would be invalid: (.+)$")
+    if conjunction == 'because' or conjunction == 'and' then
+      local nested, status, nested_id = engine.translate({
+        domain = domain, context = 'substitution_diagnostic', msgid = diagnostic,
+        formatted = true, observe = false, report_ambiguity = true,
+      })
+      if status == 'ambiguous' then return body, status end
+      if status == 'translated' then
+        local text, reason, id = engine.translate({
+          domain = domain, context = 'note', msgid = conjunction .. " '%1' would be invalid: %2",
+          args = { ['1'] = expression, ['2'] = nested }, observe = false,
+        })
+        if reason == 'translated' then return text, reason, 'note', id, nested_id end
+      end
+    end
+  end
   local contexts = {}
-  if domain == 'clang-tidy' then
+  if interface == 'include_stack' then
+    contexts[1] = 'include_stack'
+  elseif domain == 'clang-tidy' then
     if code then contexts[1] = level == 'note' and code .. '/note' or code end
     if level == 'note' then contexts[#contexts + 1] = 'fix_note' end
   else
     local warning = code and (code:match(',(%-W[^,]+)$') or code)
     if warning then contexts[#contexts + 1] = warning end
-    if interface == 'driver' then contexts[#contexts + 1] = 'driver'
-    elseif level == 'note' then contexts[#contexts + 1] = 'note'
-    else contexts[#contexts + 1] = 'diagnostic' end
+    if interface == 'driver' then
+      contexts[#contexts + 1] = 'driver'
+      contexts[#contexts + 1] = 'unlocated'
+    elseif level == 'note' then
+      contexts[#contexts + 1] = 'note'
+    else
+      if body:match('^too few template arguments for ') or body:match('^too many template arguments for ') then
+        contexts[#contexts + 1] = 'template_arity'
+      end
+      contexts[#contexts + 1] = 'diagnostic'
+    end
   end
   for _, context in ipairs(contexts) do
     local result, status, id = engine.translate({
@@ -101,8 +128,26 @@ function M.match_message(domain, body, code, level, interface)
   return body, 'missing_translation'
 end
 
-local function source_guard(item, files)
-  if item.bufnr == 0 or item.lnum == 0 then return false end
+local function loose_item(item)
+  return item.bufnr == 0 and item.lnum == 0 and item.type == ''
+end
+
+local function source_line(items, index, line)
+  for i = index + 1, #items do
+    local row = items[i]
+    if not loose_item(row) then break end
+    local number, snippet = row.text:match('^%s+(%d+) | (.*)$')
+    if not number then break end
+    if tonumber(number) == line then return snippet end
+  end
+end
+
+local function continuation(line)
+  return line:match('^(.-)\\%s*$') or line:match('^(.-)%?%?/%s*$')
+end
+
+local function source_guard(item, files, snippet, tabstop)
+  if item.bufnr == 0 or item.lnum == 0 then return 'unverified_location' end
   local file = files[item.bufnr]
   if file == nil then
     local path = vim.api.nvim_buf_get_name(item.bufnr)
@@ -114,19 +159,37 @@ local function source_guard(item, files)
     file = ok and lines or false
     files[item.bufnr] = file
   end
-  if not file or not file[item.lnum] then return false end
-  for i = item.lnum, 1, -1 do
-    -- Clang flattens backslash-newline before processing directives.
-    local line = file[i]:gsub('/%*.-%*/', ' '):gsub('^%s*%%:', '#'):gsub('^%s*%?%?=', '#')
-    if line:match('^%s*#%s*error%f[%W]') or line:match('^%s*#%s*warning%f[%W]')
-      or line:match('^%s*#%s*pragma%s+message%f[%W]') then return false end
-    if i == 1 or not file[i - 1]:match('\\%s*$') then break end
+  local line = file and file[item.lnum]
+  if not line then return 'unverified_location' end
+  -- A presumed location from #line can name a different existing source file.
+  -- Verify it against the source excerpt already printed by Clang.
+  if tabstop and snippet ~= line then
+    local expanded = line:gsub('([^\t]*)\t', function(before)
+      return before .. (' '):rep(tabstop - #before % tabstop)
+    end)
+    if snippet ~= expanded then return 'unverified_location' end
   end
-  return true
+
+  local first = item.lnum
+  while first > 1 and continuation(file[first - 1]) do first = first - 1 end
+  local parts = {}
+  for i = first, #file do
+    local fragment = continuation(file[i])
+    parts[#parts + 1] = fragment or file[i]
+    if not fragment then break end
+  end
+  local logical = table.concat(parts):gsub('^\239\187\191', ''):gsub('/%*.-%*/', ' ')
+    :gsub('^%s*%%:', '#'):gsub('^%s*%?%?=', '#')
+  local directive = logical:match('^%s*#%s*([%a_]+)')
+  -- A block comment can start on the preceding physical line and close
+  -- immediately before a diagnostic directive's name.
+  if directive == 'error' or directive == 'warning' or directive == 'pragma'
+    or line:sub(1, item.col):find('*/', 1, true) then return 'project_text' end
 end
 
 local function inspect_items(items, evidence)
   local result, files, previous, parent = {}, {}, nil, nil
+  local include_stack = {}
   for index, item in ipairs(items) do
     local text = item.text
     local body, code = split(vim.trim(text), evidence.domain)
@@ -142,7 +205,11 @@ local function inspect_items(items, evidence)
     local record = { raw_text = text, code = code, level = level, text = text,
       tool = evidence.domain, version = evidence.identity.version, reason = 'unclassified_output' }
     result[index] = record
-    if interface == 'driver' and not level then
+    if evidence.domain == 'clang' and evidence.source_locations and loose_item(item)
+      and (text:match('^In file included from .+:[1-9]%d*:$') or text == 'In included file:') then
+      include_stack[#include_stack + 1] = record
+    elseif interface == 'driver' and not level then
+      include_stack = {}
       local origin = (item.bufnr ~= 0 and vim.fs.basename(vim.api.nvim_buf_get_name(item.bufnr)))
         or body:match('^([^:]+):')
       origin = origin and vim.fs.basename(origin)
@@ -152,7 +219,8 @@ local function inspect_items(items, evidence)
     elseif item.valid == 1 or interface == 'driver' then
       local driver = interface == 'driver' and evidence.domain == 'clang'
         and (prefix:find(evidence.identity.executable .. ': ', 1, true) == 1
-          or (item.bufnr ~= 0 and vim.fs.basename(vim.api.nvim_buf_get_name(item.bufnr)) == evidence.identity.executable))
+          or (item.bufnr ~= 0 and vim.fs.basename(vim.api.nvim_buf_get_name(item.bufnr)) == evidence.identity.executable)
+          or (evidence.frontend_only and loose_item(item) and prefix ~= ''))
       if level ~= 'note' then previous, parent = code, record end
       if evidence.domain == 'clang-tidy' and level == 'note' and not code then
         code = previous
@@ -162,15 +230,29 @@ local function inspect_items(items, evidence)
         parent.reason, parent.text = 'project_text', parent.raw_text
       end
       local warning = code and (code:match(',(%-W[^,]+)$') or code)
-      if (warning and free_codes[warning]) or (interface ~= 'driver' and not source_guard(item, files)) then
+      local location_reason
+      if interface ~= 'driver' then
+        location_reason = source_guard(item, files, source_line(items, index, item.lnum), evidence.tabstop)
+      end
+      if warning and free_codes[warning] then
         record.reason = 'project_text'
+      elseif location_reason then
+        record.reason = location_reason
       elseif driver or (interface ~= 'driver' and evidence.source_locations) then
-        local translated, reason, context, id = M.match_message(evidence.domain, message, code, level, interface)
-        record.reason, record.context, record.entry_id = reason, context, id
+        local translated, reason, context, id, nested =
+          M.match_message(evidence.domain, message, code, level, interface)
+        record.reason, record.context, record.entry_id, record.nested_entry_id = reason, context, id, nested
         if reason == 'translated' then
           record.text = prefix .. translated .. (record.code and body ~= vim.trim(text) and (' [' .. record.code .. ']') or '')
         end
       end
+      if interface ~= 'driver' and not location_reason and evidence.source_locations then
+        for _, preamble in ipairs(include_stack) do
+          preamble.text, preamble.reason, preamble.context, preamble.entry_id =
+            M.match_message('clang', preamble.raw_text, nil, nil, 'include_stack')
+        end
+      end
+      include_stack = {}
     end
   end
   return result
@@ -208,18 +290,28 @@ local function act(event)
   end
   -- These options can change diagnostic ownership, location or output schema.
   -- Keep the display unmodified for those invocations.
-  local source_locations = domain == 'clang-tidy'
+  local source_locations, frontend_only = domain == 'clang-tidy', false
+  local tabstop = domain == 'clang' and 8 or nil
+  if domain == 'clang' and vim.env.CCC_OVERRIDE_OPTIONS then
+    last.reason = 'unverified_interface'
+    return
+  end
   for _, arg in ipairs(args) do
     if arg:match('^[@]') or arg:match('^%-X') or arg:match('^%-fplugin')
       or arg:match('^%-%-config') or arg:match('^%-fdiagnostics%-format')
       or arg:match('^%-fno%-diagnostics%-show%-option') or arg:match('^%-%-load')
-      or arg:match('^%-%-experimental%-custom%-checks') or arg:match('^%-%-extra%-arg') then
+      or arg:match('^%-%-experimental%-custom%-checks') or arg:match('^%-%-extra%-arg')
+      or arg == '-fno-caret-diagnostics' or arg == '-fno-integrated-as' or arg:match('^%-B') then
       last.reason = 'unverified_interface'
       return
     end
-    source_locations = source_locations or arg == '-fsyntax-only' or arg == '-c' or arg == '-E' or arg == '-S'
+    frontend_only = frontend_only or arg == '-fsyntax-only' or arg == '-E'
+    source_locations = source_locations or frontend_only or arg == '-c' or arg == '-S'
+    local requested_tabstop = tabstop and tonumber(arg:match('^%-ftabstop=(%d+)$'))
+    if requested_tabstop and requested_tabstop >= 1 and requested_tabstop <= 100 then tabstop = requested_tabstop end
   end
-  local evidence = { domain = domain, identity = identity, source_locations = source_locations }
+  local evidence = { domain = domain, identity = identity, source_locations = source_locations,
+    frontend_only = frontend_only, tabstop = tabstop }
   if not evidence.source_locations then last.reason = 'driver_only' end
   local state = { id = list.id, evidence = evidence, win = win }
   local formatter = function(info)

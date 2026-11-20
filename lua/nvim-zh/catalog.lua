@@ -168,6 +168,14 @@ local function build(source, domain)
     copy.context = context
     copy.id = domain .. ':' .. context .. ':' .. entry.msgid
     catalog.exact[key] = copy
+    if (domain == 'clang' or domain == 'clangd' or domain == 'clang-tidy') and entry.msgid:find('%%', 1, true)
+      and not entry.msgid:gsub('%%%%', ''):find('%', 1, true) and not entry.msgid:find('{', 1, true) then
+      local unesc = vim.deepcopy(copy)
+      unesc.msgid = entry.msgid:gsub('%%%%', '%%')
+      unesc.msgstr = entry.msgstr:gsub('%%%%', '%%')
+      local unesc_key = context .. SEP .. unesc.msgid
+      catalog.exact[unesc_key] = catalog.exact[unesc_key] or unesc
+    end
     catalog.total = catalog.total + 1
     catalog.translated[context .. SEP .. entry.msgstr] = copy.id
     if entry.msgid:find('{', 1, true) or entry.msgid:find('%', 1, true) then

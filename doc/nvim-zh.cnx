@@ -230,6 +230,9 @@ Clang 编译器支持 :make 和 :lmake 的列表显示。选择已有 errorforma
 在 quickfix 或 location list 中执行 :NvimZhRaw。此命令从选中条目读取原文，
 并显示能够识别的工具代码和版本。跳转使用原有的 |:cc|、|:cnext| 或 |:ll|。
 GNU Make 等间接构建、未验证的接口以及未知来源继续使用原有显示。
+默认 Clang 文本格式中的包含栈前导可显示中文，文件名和行号保留原值。
+对于 #line 重映射等情况，列表会在无法核对诊断位置时保留原文。
+如果关闭源码片段显示，例如指定 -fno-caret-diagnostics，则沿用原有列表显示。
 
 查看源文件里的诊断原文                                 *:NvimZhDiagnosticRaw*
 
@@ -239,9 +242,11 @@ GNU Make 等间接构建、未验证的接口以及未知来源继续使用原�
 独立检查可用 :compiler nvim-zh-clang-tidy 和 makeprg=clang-tidy。先检查，
 确认后使用 --fix，再去掉该参数复查。modules.compiler 控制这两种工具的列表
 显示。clangd 转发的检查诊断也可使用 clang-tidy 汉化包的对应词条。
+例如，独立运行 clang-tidy 的 clang-analyzer-core.NullDereference 可查看
+空指针诊断和分析路径。固定版本的 clangd 不运行这个静态分析器检查。
 
 工具链候选附件可本地导入。docs/workflows.md 记录使用方式，
-docs/toolchain-coverage.md 记录固定组合、证据和仍缺的译文。
+docs/toolchain-coverage.md 记录固定组合的覆盖范围、实测证据与已知边界。
 
 Help 文档                                                      *nvim-zh-help*
 

@@ -118,6 +118,13 @@
   }
  },
  "subtools": {
+  "as": {
+   "path": "/usr/bin/as",
+   "version": "GNU assembler (GNU Binutils) 2.47",
+   "platform": "Linux x86_64",
+   "package": "Arch Linux binutils 2.47-4",
+   "sha256": "3dfdf6007545ea36176c350eef201d1ece55c347a182697bb5f9bac815a1f34b"
+  },
   "ld": {
    "path": "/usr/bin/ld",
    "version": "GNU ld (GNU Binutils) 2.47",

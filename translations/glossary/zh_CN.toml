@@ -13,5 +13,20 @@ forbidden = ["窗口"]
 source = "Register"
 policy = "preserve"
 forbidden = ["寄存器"]
-# CodeLLDB exposes CPU registers, a different object from a Neovim Register.
-exclude = [{ domain = "nvim-dap-view", contexts = ["codelldb_scope", "codelldb_register"] }]
+# CodeLLDB exposes CPU registers, and clangd capitalizes C/CPU/HLSL register diagnostics.
+exclude = [
+  { domain = "nvim-dap-view", contexts = ["codelldb_scope", "codelldb_register"] },
+  { domain = "clangd", contexts = ["diagnostic", "related_diagnostic"] },
+]
+
+[[term]]
+source = "target triple"
+domain = "clang"
+policy = "translate"
+forbidden = ["目标三元数组"]
+
+[[term]]
+source = "null pointer"
+domain = "clang-tidy"
+policy = "translate"
+forbidden = ["零指针"]

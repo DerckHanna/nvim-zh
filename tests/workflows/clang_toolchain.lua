@@ -36,8 +36,9 @@ zh.setup({
 assert(zh.status().runtime.status == 'ok', vim.inspect(zh.status().runtime))
 for _, tool in ipairs({ 'clang', 'clangd', 'clang-tidy' }) do
   local path = vim.env.NVIM_ZH_TEST_TOOLCHAIN_ASSETS .. '/' .. tool .. '-zh_CN.json'
+  local asset = vim.json.decode(table.concat(vim.fn.readfile(path), '\n'))
   vim.cmd.NvimZhPacks({ args = { 'import', path }, mods = { silent = true } })
-  assert(zh.status().packs[tool].active == '1.0.0')
+  assert(zh.status().packs[tool].active == asset.manifest.version)
 end
 vim.api.nvim_create_autocmd('QuickFixCmdPost', { pattern = { 'make', 'lmake' }, callback = function(ev)
   local query = { items = 1, title = 1, idx = 0, context = 1 }
@@ -53,8 +54,11 @@ function T.start()
     cmd = function(dispatchers)
       local server_request = dispatchers.server_request
       dispatchers.server_request = function(method, params)
-        T.wire[#T.wire + 1] = { method = method, server_request = vim.deepcopy(params) }
-        return server_request(method, params)
+        local raw_params = vim.deepcopy(params)
+        local result, err = server_request(method, params)
+        T.wire[#T.wire + 1] = { method = method, server_request = raw_params,
+          result = vim.deepcopy(result), error = vim.deepcopy(err) }
+        return result, err
       end
       local notification = dispatchers.notification
       dispatchers.notification = function(method, params)
@@ -82,9 +86,9 @@ function T.start()
   vim.lsp.completion.enable(true, client_id, 0, { autotrigger = false })
 end
 
-function T.diagnostic(code, key)
+function T.diagnostic(code, key, line)
   return vim.wait(10000, function()
-    for _, row in ipairs(vim.diagnostic.get(0)) do
+    for _, row in ipairs(vim.diagnostic.get(0, { lnum = line })) do
       if row.code == code then
         T.raw[key] = vim.deepcopy(row.user_data.lsp)
         return true
@@ -119,9 +123,46 @@ function T.notify_tweak()
   assert(not command.err, vim.inspect(command))
 end
 
+function T.apply_edit()
+  local diagnostic = T.raw.apply_edit
+  local params = { textDocument = { uri = vim.uri_from_bufnr(0) }, range = diagnostic.range,
+    context = { diagnostics = { diagnostic }, only = { 'quickfix' } } }
+  local reply = assert(T.client:request_sync('textDocument/codeAction', params, 5000, 0))
+  local action = vim.iter(reply.result or {}):find(function(item) return item.edit ~= nil end)
+  assert(action and action.edit, vim.inspect(reply))
+  local response = assert(T.client:request_sync('workspace/executeCommand', {
+    command = 'clangd.applyFix', arguments = { action.edit },
+  }, 5000, 0))
+  assert(response.result == 'Fix applied.', vim.inspect(response))
+  T.raw.apply_edit_result = response.result
+end
+
+function T.symbol()
+  local reply = assert(T.client:request_sync('workspace/symbol', { query = 'indexing' }, 5000, 0))
+  assert(not reply.err, vim.inspect(reply))
+  local symbol = vim.iter(reply.result or {}):find(function(item) return item.name == 'indexing' end)
+  if symbol then T.raw.symbol = vim.deepcopy(symbol) end
+  return symbol ~= nil
+end
+
+function T.analyzer_push()
+  local filename = vim.api.nvim_buf_get_name(0)
+  return vim.wait(10000, function()
+    for _, row in ipairs(T.wire) do
+      if row.method == 'textDocument/publishDiagnostics' and vim.uri_to_fname(row.params.uri) == filename then
+        assert(#row.params.diagnostics == 1 and row.params.diagnostics[1].code == 'modernize-use-nullptr',
+          vim.inspect(row.params))
+        T.raw.analyzer_push = vim.deepcopy(row.params)
+        return true
+      end
+    end
+  end, 25)
+end
+
 function T.snapshot()
   local output = { raw = T.raw, wire = T.wire, displayed = T.displayed, builds = T.builds,
-    compiler = zh.status().compiler, lsp = zh.status().lsp, capabilities = T.client.server_capabilities }
+    compiler = zh.status().compiler, lsp = zh.status().lsp, capabilities = T.client.server_capabilities,
+    language = vim.env.NVIM_ZH_LANGUAGE }
   vim.fn.writefile({ vim.json.encode(output) }, vim.env.NVIM_ZH_TOOLCHAIN_RESULT)
 end
 

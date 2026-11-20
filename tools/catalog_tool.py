@@ -201,8 +201,25 @@ def check_entry(entry: dict, path: Path, terms: list[dict]) -> None:
         # may appear.
         if Counter(source_tokens) != Counter(target_tokens):
             raise CatalogError(f'{location}: index placeholder multiset mismatch')
+    snake_pat = PROTECTED_PATTERNS[6]
+    leading_snake = None
+    if path.stem == 'clangd':
+        head = snake_pat.match(msgid)
+        if head and head.group(0)[0].isupper():
+            leading_snake = head.group(0)
     for pattern in PROTECTED_PATTERNS:
-        if Counter(pattern.findall(msgid)) != Counter(pattern.findall(msgstr)):
+        source_tokens = Counter(pattern.findall(msgid))
+        target_tokens = Counter(pattern.findall(msgstr))
+        if source_tokens != target_tokens and pattern is snake_pat and leading_snake:
+            lowered = leading_snake[0].lower() + leading_snake[1:]
+            alt = Counter(source_tokens)
+            alt[leading_snake] -= 1
+            if alt[leading_snake] == 0:
+                del alt[leading_snake]
+            alt[lowered] += 1
+            if alt == target_tokens:
+                continue
+        if source_tokens != target_tokens:
             raise CatalogError(f'{location}: protected command, path, option, or code span changed')
     for term in terms:
         source = term['source']

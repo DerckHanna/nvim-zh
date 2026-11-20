@@ -6,6 +6,9 @@ local SEP = catalog._key_separator()
 local MAX_TEMPLATE_INPUT = 8192
 local unpack = table.unpack or unpack
 local matchers = setmetatable({}, { __mode = 'k' })
+local probes = setmetatable({}, { __mode = 'k' })
+local groups = setmetatable({}, { __mode = 'k' })
+local specificities = setmetatable({}, { __mode = 'k' })
 
 local function flush_literal(tokens, buffer)
   if #buffer > 0 then
@@ -47,7 +50,13 @@ local function parse_template(text, clangd)
           table.insert(placeholders, digit)
           index = index + 2
         else
-          local flags, width, precision, conversion = text:match('^%%([-+ #0]*)(%d*)(%.?%d*)([diufeEgGxXoscq])', index)
+          local flags, width, precision, conversion
+          if clangd then
+            flags, width, precision = '', '', ''
+            conversion = text:match('^%%([ds])', index)
+          else
+            flags, width, precision, conversion = text:match('^%%([-+ #0]*)(%d*)(%.?%d*)([diufeEgGxXoscq])', index)
+          end
           if not conversion then
             table.insert(buffer, char)
             index = index + 1
@@ -145,13 +154,15 @@ local function printf_runs(template)
   return runs
 end
 
-local function compile_matcher(entry, clangd)
+local function compile_matcher(entry, clangd, domain)
   local source = parse_template(entry.msgid, clangd)
   local target = parse_template(entry.msgstr, clangd)
   if not compatible(source, target) then return nil end
 
   if source.kind ~= 'printf' then
-    local pattern, literal_bytes = { '^' }, 0
+    local pattern, literal_bytes, raw_quoted = { '^' }, 0, false
+    local overload_conversion = clangd and source.kind == 'index'
+      and entry.msgid:lower():match('^candidate .+ not viable: no known conversion ')
     for index, token in ipairs(source.tokens) do
       if token.literal then
         literal_bytes = literal_bytes + #token.literal
@@ -165,24 +176,76 @@ local function compile_matcher(entry, clangd)
         end
       else
         local previous, following = source.tokens[index - 1], source.tokens[index + 1]
-        if previous and not previous.literal then return nil end
-        local quoted = clangd and previous and following and following.literal
+        if previous and not previous.literal and source.kind ~= 'index' then return nil end
+        local quoted = clangd and previous and previous.literal and following and following.literal
           and previous.literal:sub(-1) == "'" and following.literal:sub(1, 1) == "'"
-        pattern[#pattern + 1] = quoted and "([^']*)" or '(.-)'
+        -- This driver message quotes the complete path, including any
+        -- apostrophes in its name. Suggestions use a separate form ending '?'.
+        raw_quoted = quoted and domain == 'clang' and entry.context == 'driver' and #source.placeholders == 1
+          and entry.msgid == "no such file or directory: '%0'"
+        if previous and not previous.literal then
+          pattern[#pattern + 1] = '()'
+        else
+          pattern[#pattern + 1] = quoted and not raw_quoted and "([^']*)" or '(.-)'
+        end
       end
     end
     -- Bare Clang arguments can contain entire user messages, such as #error.
-    if source.kind == 'index' and literal_bytes < 8 then return nil end
+    if source.kind == 'index' and domain ~= 'clang-tidy' and literal_bytes < 8 then return nil end
     pattern[#pattern + 1] = '$'
+    local probe = ''
+    for index, token in ipairs(source.tokens) do
+      if token.literal then
+        local lit = (clangd and index == 1 and token.literal:sub(1, 1):match('^[A-Za-z]$'))
+          and token.literal:sub(2) or token.literal
+        if #lit > #probe then probe = lit end
+      end
+    end
+    probes[entry] = probe
+    specificities[entry] = literal_bytes
+    local adj_next = {}
+    local p_idx = 0
+    for ti, tok in ipairs(source.tokens) do
+      if not tok.literal then
+        p_idx = p_idx + 1
+        if source.tokens[ti + 1] and not source.tokens[ti + 1].literal then
+          adj_next[p_idx] = true
+        end
+      end
+    end
     local anchor = table.concat(pattern)
     return function(text)
+      if probe ~= '' and not text:find(probe, 1, true) then return nil end
       local captures = { text:match(anchor) }
       if #captures ~= #source.placeholders then return nil end
       local values = {}
       for index, name in ipairs(source.placeholders) do
         local value = captures[index]
+        if adj_next[index] then
+          local next_name = source.placeholders[index + 1]
+          if values[name] ~= nil then
+            if value:sub(1, #values[name]) ~= values[name] then return nil end
+            captures[index + 1] = value:sub(#values[name] + 1)
+            value = values[name]
+          elseif next_name and values[next_name] ~= nil then
+            local suffix = values[next_name]
+            if #value < #suffix or value:sub(-#suffix) ~= suffix then return nil end
+            captures[index + 1] = suffix
+            value = value:sub(1, #value - #suffix)
+          else
+            captures[index + 1] = ''
+          end
+        end
+        if overload_conversion then
+          if (name == '3' or name == '4') and value:sub(1, 1) ~= "'" then return nil end
+          if name == '6' then
+            local suffix = value:match('^%d+(%a%a)$')
+            if suffix ~= 'st' and suffix ~= 'nd' and suffix ~= 'rd' and suffix ~= 'th' then return nil end
+          end
+        end
         -- A single argument must not consume another quoted diagnostic clause.
-        if source.kind == 'index' and value:find("'", 1, true) and not value:match("^'[^']*'$") then
+        if source.kind == 'index' and not raw_quoted and value:find("'", 1, true) and not value:match("^'[^']*'$")
+          and not value:match("^'[^']*' %(aka '[^']*'%)$") then
           return nil
         end
         if values[name] ~= nil and values[name] ~= value then return nil end
@@ -193,9 +256,11 @@ local function compile_matcher(entry, clangd)
   end
 
   local source_runs, target_runs = printf_runs(source), printf_runs(target)
-  local pattern, sizes = { '^' }, {}
+  local pattern, sizes, literal_bytes, probe = { '^' }, {}, 0, ''
   for _, run in ipairs(source_runs) do
     if run.literal then
+      literal_bytes = literal_bytes + #run.literal
+      if #run.literal > #probe then probe = run.literal end
       pattern[#pattern + 1] = escape_literal(run.literal)
     else
       sizes[#sizes + 1] = run.size
@@ -212,6 +277,8 @@ local function compile_matcher(entry, clangd)
       if sizes[capture] ~= run.size then return nil end
     end
   end
+  probes[entry] = probe
+  specificities[entry] = literal_bytes
   local anchor = table.concat(pattern)
   return function(text)
     local captures = { text:match(anchor) }
@@ -229,10 +296,10 @@ local function compile_matcher(entry, clangd)
   end
 end
 
-local function match_template(entry, text, clangd)
+local function match_template(entry, text, clangd, domain)
   local matcher = matchers[entry]
   if matcher == nil then
-    matcher = compile_matcher(entry, clangd) or false
+    matcher = compile_matcher(entry, clangd, domain) or false
     matchers[entry] = matcher
   end
   if matcher then return matcher(text) end
@@ -285,16 +352,61 @@ local function translate(spec)
 
   if spec.formatted == true and #original <= MAX_TEMPLATE_INPUT then
     local function scan(candidates)
-      local matched, matched_entry
-      for _, candidate in ipairs(candidates) do
-        local result = match_template(candidate, original, clangd)
-        if result then
-          -- Distinct entries rendering to the same Chinese text are the same
-          -- surface form, not an ambiguity; the first entry id wins.
-          if matched and matched ~= result then return nil, nil, true end
-          matched, matched_entry = result, candidate
+      local list = candidates
+      if #candidates > 64 then
+        local g = groups[candidates]
+        if not g then
+          g = { prefixes = {}, short = {} }
+          for _, cand in ipairs(candidates) do
+            match_template(cand, '', clangd, spec.domain)
+            local pr = probes[cand] or ''
+            if #pr >= 12 then
+              local k1 = pr:sub(1, 12)
+              local sub = g.prefixes[k1]
+              if not sub then sub = { by_len = {} }; g.prefixes[k1] = sub end
+              local by_pr = sub.by_len[#pr]
+              if not by_pr then by_pr = {}; sub.by_len[#pr] = by_pr end
+              local arr = by_pr[pr]
+              if not arr then arr = {}; by_pr[pr] = arr end
+              arr[#arr + 1] = cand
+            else
+              g.short[#g.short + 1] = cand
+            end
+          end
+          groups[candidates] = g
+        end
+        list = {}
+        for _, cand in ipairs(g.short) do list[#list + 1] = cand end
+        for k1, sub in pairs(g.prefixes) do
+          local pos = 1
+          while true do
+            local found = original:find(k1, pos, true)
+            if not found then break end
+            for len, by_pr in pairs(sub.by_len) do
+              local arr = by_pr[original:sub(found, found + len - 1)]
+              if arr then
+                for _, cand in ipairs(arr) do list[#list + 1] = cand end
+              end
+            end
+            pos = found + 1
+          end
         end
       end
+      local matched, matched_entry, best_spec, ambiguous = nil, nil, -1, false
+      for _, candidate in ipairs(list) do
+        local result = match_template(candidate, original, clangd, spec.domain)
+        if result then
+          local sp = specificities[candidate] or 0
+          if sp > best_spec then
+            matched, matched_entry, best_spec, ambiguous = result, candidate, sp, false
+          elseif sp == best_spec and matched and matched ~= result then
+            -- Distinct entries of equal specificity rendering to different
+            -- Chinese text are ambiguous; identical surface forms are not.
+            ambiguous = true
+          end
+        end
+      end
+      if ambiguous then return nil, nil, true end
       return matched, matched_entry, false
     end
     local first_byte = catalog._template_key(original)

@@ -1,4 +1,5 @@
 #include <cstdlib>
+#include <fcntl.h>
 #include <utility>
 struct 配置 {
   int *指针 = 0;
@@ -32,3 +33,9 @@ int 相邻(int 左, int 右) {
     return 1;
   return 右 * 100;
 }
+struct LongerType {};
+void 自动推导() {
+  LongerType *对象 = new LongerType;
+  delete 对象;
+}
+int 打开() { return open("路径.txt", O_RDONLY); }

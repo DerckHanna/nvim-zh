@@ -161086,5 +161086,25 @@
    "free_text": false,
    "untranslated_multi_digit": false
   }
+ ],
+ "frontend_messages": [
+  {
+   "id": "include_location",
+   "source": "clang/lib/Frontend/TextDiagnostic.cpp",
+   "line": 959,
+   "interface": "include_stack",
+   "variants": [
+    "In file included from {location}:"
+   ]
+  },
+  {
+   "id": "include_without_location",
+   "source": "clang/lib/Frontend/TextDiagnostic.cpp",
+   "line": 963,
+   "interface": "include_stack",
+   "variants": [
+    "In included file:"
+   ]
+  }
  ]
 }

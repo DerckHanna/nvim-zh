@@ -47,7 +47,7 @@ local translations = {
   ["Expected ')'"] = "此处缺少 ')'",
   ["Expected function body after function declarator"] = "函数声明符后缺少函数体",
   ["No viable conversion from returned value of type 'Holder<int>' to function return type 'int'"] =
-    "无法从 returned value of type 'Holder<int>' 转换为 function return type 'int'",
+    "没有可行的转换（从类型为 'Holder<int>' 的返回值到函数返回类型 'int'）",
   ["Invalid operands to binary expression ('Holder<int>' and 'Holder<int>')"] =
     "二元表达式的操作数类型无效（'Holder<int>' 和 'Holder<int>'）",
   ["Cannot initialize a variable of type 'const char *' with an rvalue of type 'int'"] =

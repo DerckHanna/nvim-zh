@@ -82,7 +82,6 @@ equal(require('nvim-zh').status().adapters['which-key'].reason, 'external_overri
 
 -- teardown clears the startup timers and detaches; no residual owned formatter.
 require('nvim-zh').teardown()
-equal(require('nvim-zh').status().adapters['which-key'].active, false,
-  'teardown left which-key adapter active')
+check(require('nvim-zh').status().adapters['which-key'] == nil, 'teardown retained the package adapter')
 
 print('STARTUP_LATE_ATTACH_SPEC=PASS late_auto_setup=no_focus_boundary idempotent external_override=safe teardown=clean')

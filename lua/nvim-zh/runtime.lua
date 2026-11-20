@@ -228,6 +228,14 @@ function M.setup(opts, injected_session)
         changed('adapters')
       end
     end })
+    vim.api.nvim_create_autocmd('FocusGained', { group = group, callback = function()
+      if not busy then
+        local packs = require('nvim-zh.packs')
+        local before = packs.info()
+        packs.sync()
+        if not vim.deep_equal(before, packs.info()) then changed('packs') end
+      end
+    end })
     vim.api.nvim_create_autocmd('PackChanged', { group = group, callback = function(event)
       local data = event.data or {}
       local path = data.path and (vim.uv.fs_realpath(data.path) or data.path)
@@ -248,6 +256,8 @@ end
 
 function M.stop()
   stopped = true
+  local packs = package.loaded['nvim-zh.packs']
+  if packs then packs.stop() end
   operation = operation + 1
   busy, queued = false, false
   local pending = callbacks

@@ -1619,6 +1619,7 @@ $quote	vimeval.cnx	/*$quote*
 :NoMatchParen	pi_paren.cnx	/*:NoMatchParen*
 :NvimZh	nvim-zh.cnx	/*:NvimZh*
 :NvimZhCheck	nvim-zh.cnx	/*:NvimZhCheck*
+:NvimZhPacks	nvim-zh.cnx	/*:NvimZhPacks*
 :Open	lua.cnx	/*:Open*
 :Over	terminal.cnx	/*:Over*
 :Program	terminal.cnx	/*:Program*
@@ -8033,6 +8034,7 @@ nvim-zh-diagnostics	nvim-zh.cnx	/*nvim-zh-diagnostics*
 nvim-zh-help	nvim-zh.cnx	/*nvim-zh-help*
 nvim-zh-install	nvim-zh.cnx	/*nvim-zh-install*
 nvim-zh-maintenance	nvim-zh.cnx	/*nvim-zh-maintenance*
+nvim-zh-packs	nvim-zh.cnx	/*nvim-zh-packs*
 nvim-zh-panel	nvim-zh.cnx	/*nvim-zh-panel*
 nvim-zh-plugins	nvim-zh.cnx	/*nvim-zh-plugins*
 nvim-zh-resources	nvim-zh.cnx	/*nvim-zh-resources*

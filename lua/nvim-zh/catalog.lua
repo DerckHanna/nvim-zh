@@ -3,11 +3,7 @@ local M = {}
 local SEP = '\031'
 local BUILTIN_SOURCES = {
   ['nvim-ui'] = 'translations/po/zh_CN/nvim-ui.po',
-  clangd = 'translations/po/zh_CN/clangd.po',
 }
-for _, spec in pairs(require('nvim-zh.adapters.index')) do
-  if spec.domain then BUILTIN_SOURCES[spec.domain] = 'translations/po/zh_CN/' .. spec.domain .. '.po' end
-end
 local registrations = {}
 local loaded = {}
 local overrides = {}
@@ -89,6 +85,8 @@ function M.register_owned(domain, loader, metadata)
     if registrations[domain] == record then
       registrations[domain], loaded[domain] = nil, nil
     end
+  end, function()
+    if registrations[domain] == record then loaded[domain] = nil end
   end
 end
 
@@ -126,6 +124,27 @@ local function validate_entry(entry, domain)
     and (entry.domain == nil or entry.domain == domain)
 end
 
+-- Templates with no leading literal are considered after anchored templates.
+function M._template_key(text)
+  return text:sub(1, 1):lower()
+end
+
+local function add_template(catalog, entry)
+  local first = entry.msgid:sub(1, 1)
+  local key = (first == '%' or first == '{') and '' or M._template_key(entry.msgid)
+  local buckets = catalog.template_buckets[entry.context]
+  if not buckets then
+    buckets = {}
+    catalog.template_buckets[entry.context] = buckets
+  end
+  local bucket = buckets[key]
+  if not bucket then
+    bucket = {}
+    buckets[key] = bucket
+  end
+  bucket[#bucket + 1] = entry
+end
+
 local function build(source, domain)
   if type(source) ~= 'table' or source.schema ~= 1 or source.domain ~= domain
     or type(source.locale) ~= 'string' or type(source.entries) ~= 'table' then
@@ -136,7 +155,7 @@ local function build(source, domain)
     locale = source.locale,
     metadata = source.metadata or {},
     exact = {},
-    templates = {},
+    template_buckets = {},
     translated = {},
     total = 0,
   }
@@ -151,14 +170,10 @@ local function build(source, domain)
     catalog.exact[key] = copy
     catalog.total = catalog.total + 1
     catalog.translated[context .. SEP .. entry.msgstr] = copy.id
-    if entry.msgid:find('{', 1, true) or entry.msgid:find('%%') then
-      table.insert(catalog.templates, copy)
+    if entry.msgid:find('{', 1, true) or entry.msgid:find('%', 1, true) then
+      add_template(catalog, copy)
     end
   end
-  table.sort(catalog.templates, function(a, b)
-    if #a.msgid ~= #b.msgid then return #a.msgid > #b.msgid end
-    return a.id < b.id
-  end)
   return catalog
 end
 
@@ -180,15 +195,11 @@ local function apply_overrides(catalog)
         }
         catalog.exact[key] = entry
         catalog.total = catalog.total + 1
-        if msgid:find('{', 1, true) or msgid:find('%%') then table.insert(catalog.templates, entry) end
+        if msgid:find('{', 1, true) or msgid:find('%', 1, true) then add_template(catalog, entry) end
       end
       catalog.translated[context .. SEP .. msgstr] = entry.id
     end
   end
-  table.sort(catalog.templates, function(a, b)
-    if #a.msgid ~= #b.msgid then return #a.msgid > #b.msgid end
-    return a.id < b.id
-  end)
 end
 
 function M.get(domain)

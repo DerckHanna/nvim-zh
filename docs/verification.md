@@ -1,6 +1,22 @@
 # 验证记录
 
-## 全量复审（2026-11-19）
+## 0.1.0 验收（2026-11-20）
+
+本地环境为 Arch Linux x86_64 / glibc 2.44（WSL2），使用通过 SHA-256 校验的 Neovim 官方 0.12.6 压缩包与 CodeLLDB 官方 1.12.3 VSIX。固定插件及依赖由 `tools/adapter_tool.py lock all --json` 和 `fetch --lock … --source-root …` 获取。命令从独立用户目录启动 Neovim。
+
+| 检查 | 实际结果 |
+| --- | --- |
+| `make check-syntax check-translations check-native` | PASS。47 个 Python、10 个 Shell、110 个 Lua 文件通过语法检查。8 个词库共 1 335 条，核心 gettext 输入通过校验。 |
+| `make build-resources check-resources check-reproducible sync release-check` | PASS。主包资源 142 个文件，Lua、MO 和完整资源逐字节复现，离线同步无变动。移出的研究资料保留在仓库外。 |
+| `NVIM_ZH_TEST_NATIVE_RUNTIME=1 NVIM_ZH_TEST_CLANGD=/usr/sbin/clangd make test` | PASS。62 个 Lua 规格、117 个 Python 用例，验证用户配置、更新取消与回退、失败候选与并发、真实中文消息及欢迎页。检查 133 篇核心 Help 的结构及固定上游摘要。系统 MO 探针在官方压缩包中缺少其预期文件，报告 SKIP。使用项目 MO 的独立原生消息和欢迎页测试通过。 |
+| 同一次 `make test` 的 clangd 探针 | clangd 23.1.5 对 14 个样例发布 17 条 push 诊断，显示契约命中 16 条，保留原始协议。真实编辑器打开中文错误、警告、悬浮和 quickfix，并应用修复。pull 返回 `-32601`，成功 pull 走独立契约。 |
+| 汉化包离线与失败恢复 | 真实终端使用本地发布附件和模拟索引，验证初次打开离线、按需下载、热更新、关闭面板后继续下载、暂停与恢复、离线回滚、取消与确认卸载。Lua 规格验证入口执行失败恢复包登记、拒绝未授权 Lua 与摘要错误，以及随后可重新导入。 |
+| `NVIM_ZH_ADAPTER_SOURCE_ROOT=… NVIM_ZH_ADAPTER_REPORT=… make test-upstream` | PASS。67 个记录，包含 59 个终端场景和 116 个汉化启停或单组终端执行。首次使用旧本地检出时缺少固定 nvim-tree 修订，退出非零。使用新锁定源码目录后完整矩阵通过。 |
+| `bash benchmarks/run.sh` | PASS。202 个 UI 事件保留 history 和 cmdheight。200 次基线 0.252 ms，观察开启 0.179 ms。 |
+
+`nvim-dap-view` 的 `codelldb` 和 `interaction` 均在汉化启用和关闭时通过。真实调试命中第 8 行，展开变量与寄存器，单步并继续至退出码 0。此前环境在启动阶段报告 `failed to send the handshake ack`。本轮同版本 VSIX 完成了实际子进程调试，保留了所有终端和协议断言。两组 `interaction` 使用同一个经源文件摘要验证的装载接缝，英文组的接缝仅保留虚拟行参数等兼容处理。直接调用 Neovim API 仍可复现 0.12.6 拒绝 `virt_lines_overflow = "wrap"`。
+
+## 历史全量复审（2026-11-19）
 
 本轮使用 Linux x86_64 / glibc、Neovim 0.12.6 和 `manifests/adapters/` 中的固定版本。在独立 Neovim 进程中验证启动、动态加载、配置回滚、翻译查找、英文回退、Help 和资源更新。固定上游矩阵有 60 个记录，其中 53 个终端场景共运行 104 次。表中的条目是目录规模，Help 数是已发布的主题摘译数。
 

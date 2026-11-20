@@ -1,12 +1,8 @@
 local zh = require('nvim-zh')
 zh.setup({ modules = { core = { enabled = false } } })
 local domains = require('nvim-zh.catalog').builtin_domains()
-local expected = { 'clangd', 'nvim-ui' }
-for _, spec in pairs(require('nvim-zh.adapters.index')) do
-  if spec.domain then expected[#expected + 1] = spec.domain end
-end
-table.sort(expected)
-assert(vim.deep_equal(domains, expected))
+assert(vim.deep_equal(domains, { 'nvim-ui' }))
+assert(not next(zh.status().adapters) and not next(zh.status().packs), 'clean setup installed optional packs')
 local text, status = zh.translate({ domain = 'nvim-ui', msgid = 'No information available' })
 assert(text == '没有可用的信息' and status == 'translated', 'production catalog unavailable')
 local found = false

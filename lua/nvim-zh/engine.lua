@@ -5,6 +5,7 @@ local missing = require('nvim-zh.missing')
 local SEP = catalog._key_separator()
 local MAX_TEMPLATE_INPUT = 8192
 local unpack = table.unpack or unpack
+local matchers = setmetatable({}, { __mode = 'k' })
 
 local function flush_literal(tokens, buffer)
   if #buffer > 0 then
@@ -13,7 +14,7 @@ local function flush_literal(tokens, buffer)
   end
 end
 
-local function parse_template(text)
+local function parse_template(text, clangd)
   local tokens, buffer, placeholders = {}, {}, {}
   local kind
   local index = 1
@@ -22,7 +23,7 @@ local function parse_template(text)
     local name = text:match('^{([%a_][%w_]*)}', index)
     if name then
       flush_literal(tokens, buffer)
-      if kind == 'printf' then return nil end
+      if kind and kind ~= 'named' then return nil end
       kind = 'named'
       local raw = '{' .. name .. '}'
       table.insert(tokens, { kind = 'named', name = name, raw = raw })
@@ -33,18 +34,32 @@ local function parse_template(text)
         table.insert(buffer, '%')
         index = index + 2
       else
-        local flags, width, precision, conversion = text:match('^%%([-+ #0]*)(%d*)(%.?%d*)([diufeEgGxXoscq])', index)
-        if not conversion then
-          table.insert(buffer, char)
-          index = index + 1
-        else
+        -- Clang diagnostic argument: exactly one digit (%0-%9). The runtime
+        -- FormatDiagnostic reads a single digit, so well-formed catalog
+        -- templates never contain multi-digit argument placeholders.
+        local digit = text:sub(index + 1, index + 1)
+        if clangd and digit:match('^%d$') and not text:sub(index + 2, index + 2):match('%d') then
           flush_literal(tokens, buffer)
-          if kind == 'named' then return nil end
-          kind = 'printf'
-          local raw = '%' .. flags .. width .. precision .. conversion
-          table.insert(tokens, { kind = 'printf', conversion = conversion, raw = raw })
-          table.insert(placeholders, conversion)
-          index = index + #raw
+          if kind and kind ~= 'index' then return nil end
+          kind = 'index'
+          local raw = '%' .. digit
+          table.insert(tokens, { kind = 'named', name = digit, raw = raw })
+          table.insert(placeholders, digit)
+          index = index + 2
+        else
+          local flags, width, precision, conversion = text:match('^%%([-+ #0]*)(%d*)(%.?%d*)([diufeEgGxXoscq])', index)
+          if not conversion then
+            table.insert(buffer, char)
+            index = index + 1
+          else
+            flush_literal(tokens, buffer)
+            if kind and kind ~= 'printf' then return nil end
+            kind = 'printf'
+            local raw = '%' .. flags .. width .. precision .. conversion
+            table.insert(tokens, { kind = 'printf', conversion = conversion, raw = raw })
+            table.insert(placeholders, conversion)
+            index = index + #raw
+          end
         end
       end
     else
@@ -90,12 +105,12 @@ local function render_named(template, values)
   return table.concat(output)
 end
 
-local function format_entry(entry, args)
-  local source = parse_template(entry.msgid)
+local function format_entry(entry, args, clangd)
+  local source = parse_template(entry.msgid, clangd)
   if not source then return entry.msgstr end
-  local target = parse_template(entry.msgstr)
+  local target = parse_template(entry.msgstr, clangd)
   if not compatible(source, target) or type(args) ~= 'table' then return nil end
-  if source.kind == 'named' then return render_named(target, args) end
+  if source.kind ~= 'printf' then return render_named(target, args) end
   if #args ~= #source.placeholders then return nil end
   for index = 1, #args do
     if args[index] == nil then return nil end
@@ -109,7 +124,7 @@ local function escape_literal(text)
 end
 
 local function capture_pattern(token)
-  if token.kind == 'named' or token.conversion == 's' or token.conversion == 'q' then return '(.-)' end
+  if token.conversion == 's' or token.conversion == 'q' then return '(.-)' end
   if token.conversion == 'c' then return '(.)' end
   if token.conversion:match('[diuxXo]') then return '([%-%+]?%d+)' end
   return '([%-%+]?%d+%.?%d*[eE]?[%-%+]?%d*)'
@@ -130,31 +145,51 @@ local function printf_runs(template)
   return runs
 end
 
-local function match_template(entry, text)
-  local source = parse_template(entry.msgid)
-  local target = parse_template(entry.msgstr)
+local function compile_matcher(entry, clangd)
+  local source = parse_template(entry.msgid, clangd)
+  local target = parse_template(entry.msgstr, clangd)
   if not compatible(source, target) then return nil end
 
-  if source.kind == 'named' then
-    local pattern = { '^' }
+  if source.kind ~= 'printf' then
+    local pattern, literal_bytes = { '^' }, 0
     for index, token in ipairs(source.tokens) do
       if token.literal then
-        table.insert(pattern, escape_literal(token.literal))
+        literal_bytes = literal_bytes + #token.literal
+        local first = token.literal:sub(1, 1)
+        if clangd and index == 1 and first:match('^[A-Za-z]$') then
+          -- clangd capitalizes the first byte of a composed diagnostic.
+          pattern[#pattern + 1] = '[' .. first:lower() .. first:upper() .. ']'
+          pattern[#pattern + 1] = escape_literal(token.literal:sub(2))
+        else
+          pattern[#pattern + 1] = escape_literal(token.literal)
+        end
       else
-        -- Two names without a delimiter cannot be recovered from rendered text.
-        if index > 1 and not source.tokens[index - 1].literal then return nil end
-        table.insert(pattern, capture_pattern(token))
+        local previous, following = source.tokens[index - 1], source.tokens[index + 1]
+        if previous and not previous.literal then return nil end
+        local quoted = clangd and previous and following and following.literal
+          and previous.literal:sub(-1) == "'" and following.literal:sub(1, 1) == "'"
+        pattern[#pattern + 1] = quoted and "([^']*)" or '(.-)'
       end
     end
-    table.insert(pattern, '$')
-    local captures = { text:match(table.concat(pattern)) }
-    if #captures ~= #source.placeholders then return nil end
-    local values = {}
-    for index, name in ipairs(source.placeholders) do
-      if values[name] ~= nil and values[name] ~= captures[index] then return nil end
-      values[name] = captures[index]
+    -- Bare Clang arguments can contain entire user messages, such as #error.
+    if source.kind == 'index' and literal_bytes < 8 then return nil end
+    pattern[#pattern + 1] = '$'
+    local anchor = table.concat(pattern)
+    return function(text)
+      local captures = { text:match(anchor) }
+      if #captures ~= #source.placeholders then return nil end
+      local values = {}
+      for index, name in ipairs(source.placeholders) do
+        local value = captures[index]
+        -- A single argument must not consume another quoted diagnostic clause.
+        if source.kind == 'index' and value:find("'", 1, true) and not value:match("^'[^']*'$") then
+          return nil
+        end
+        if values[name] ~= nil and values[name] ~= value then return nil end
+        values[name] = value
+      end
+      return render_named(target, values)
     end
-    return render_named(target, values)
   end
 
   local source_runs, target_runs = printf_runs(source), printf_runs(target)
@@ -169,21 +204,38 @@ local function match_template(entry, text)
     end
   end
   pattern[#pattern + 1] = '$'
-  local captures = { text:match(table.concat(pattern)) }
-  if #captures ~= #sizes then return nil end
-
-  local output, capture = {}, 0
+  local capture = 0
   for _, run in ipairs(target_runs) do
-    if run.literal then
-      output[#output + 1] = run.literal
-    else
+    if not run.literal then
       capture = capture + 1
       -- A translation cannot split or join runs unless given the original args.
       if sizes[capture] ~= run.size then return nil end
-      output[#output + 1] = captures[capture]
     end
   end
-  return table.concat(output)
+  local anchor = table.concat(pattern)
+  return function(text)
+    local captures = { text:match(anchor) }
+    if #captures ~= #sizes then return nil end
+    local output, index = {}, 0
+    for _, run in ipairs(target_runs) do
+      if run.literal then
+        output[#output + 1] = run.literal
+      else
+        index = index + 1
+        output[#output + 1] = captures[index]
+      end
+    end
+    return table.concat(output)
+  end
+end
+
+local function match_template(entry, text, clangd)
+  local matcher = matchers[entry]
+  if matcher == nil then
+    matcher = compile_matcher(entry, clangd) or false
+    matchers[entry] = matcher
+  end
+  if matcher then return matcher(text) end
 end
 
 local function observe(spec, translated)
@@ -206,6 +258,7 @@ local function translate(spec)
     return original, 'fallback', nil
   end
   local context = spec.context or ''
+  local clangd = spec.domain == 'clangd'
   local current = catalog.get(spec.domain)
   if not current then
     observe(spec, false)
@@ -216,7 +269,7 @@ local function translate(spec)
 
   local entry = current.exact[context .. SEP .. original] or current.exact['' .. SEP .. original]
   if entry then
-    local result = format_entry(entry, spec.args)
+    local result = format_entry(entry, spec.args, clangd)
     if result then
       observe(spec, true)
       return result, 'translated', entry.id
@@ -231,18 +284,29 @@ local function translate(spec)
   end
 
   if spec.formatted == true and #original <= MAX_TEMPLATE_INPUT then
-    local function match_context(template_context)
+    local function scan(candidates)
       local matched, matched_entry
-      for _, candidate in ipairs(current.templates) do
-        if candidate.context == template_context then
-          local result = match_template(candidate, original)
-          if result then
-            if matched then return nil, nil, true end
-            matched, matched_entry = result, candidate
-          end
+      for _, candidate in ipairs(candidates) do
+        local result = match_template(candidate, original, clangd)
+        if result then
+          -- Distinct entries rendering to the same Chinese text are the same
+          -- surface form, not an ambiguity; the first entry id wins.
+          if matched and matched ~= result then return nil, nil, true end
+          matched, matched_entry = result, candidate
         end
       end
       return matched, matched_entry, false
+    end
+    local first_byte = catalog._template_key(original)
+    local function match_context(template_context)
+      local buckets = current.template_buckets[template_context]
+      if not buckets then return nil, nil, false end
+      local matched, matched_entry, ambiguous = scan(buckets[first_byte] or {})
+      if matched or ambiguous then return matched, matched_entry, ambiguous end
+      -- A rendered argument can start with the template's leading literal, so
+      -- templates whose msgid begins with a placeholder share the '' bucket and
+      -- are only consulted when no literal-anchored template matched.
+      return scan(buckets[''] or {})
     end
     local matched, matched_entry, ambiguous = match_context(context)
     if not matched and not ambiguous and context ~= '' then

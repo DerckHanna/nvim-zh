@@ -7,7 +7,7 @@ import re
 from pathlib import Path, PurePosixPath
 
 ROOT = Path(__file__).resolve().parents[1]
-INDEX = Path('lua/nvim-zh/adapters/index.lua')
+INDEX = Path('manifests/adapter-index.lua')
 ID = re.compile(r'[a-z0-9][a-z0-9_.-]*\Z')
 SHA = re.compile(r'[a-f0-9]{40}\Z')
 DIGEST = re.compile(r'[a-f0-9]{64}\Z')
@@ -132,7 +132,7 @@ def validate(root=ROOT):
         entry = spec['entry']
         require(re.fullmatch(r'nvim-zh\.adapters\.[a-z][a-z_0-9]*', entry)
                 and entry.split('.')[-1] not in ('common', 'index', 'evidence', 'scope'), 'invalid Lua entry')
-        entry_path = owned(root, 'lua/' + entry.replace('.', '/') + '.lua', 'lua/nvim-zh/adapters/')
+        entry_path = owned(root, 'translations/adapters/' + entry.split('.')[-1] + '.lua', 'translations/adapters/')
         require(type(spec.get('source_projection', False)) is bool, 'invalid source projection')
         require(entry_path not in owned_files, 'Lua entry already owned')
         owned_files.add(entry_path)
@@ -178,7 +178,7 @@ def validate(root=ROOT):
     return adapters
 
 
-def index_text(adapters):
+def runtime_specs(adapters):
     entries = {}
     for id, spec in adapters.items():
         if spec['status'] == 'draft':
@@ -192,7 +192,11 @@ def index_text(adapters):
             for name, combo in spec['targets'].items()
         }
         entries[id] = entry
-    payload = json.dumps(entries, ensure_ascii=True, separators=(',', ':'), sort_keys=True)
+    return entries
+
+
+def index_text(adapters):
+    payload = json.dumps(runtime_specs(adapters), ensure_ascii=True, separators=(',', ':'), sort_keys=True)
     delimiter = '='
     while f']{delimiter}]' in payload:
         delimiter += '='

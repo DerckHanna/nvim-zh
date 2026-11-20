@@ -49,11 +49,11 @@ jobs:
           fi
           tar -xzf /tmp/nvim-zh-ci/nvim.tar.gz -C /tmp/nvim-zh-ci
           echo "/tmp/nvim-zh-ci/${{ matrix.asset }}/bin" >> "$GITHUB_PATH"
-      - name: Install gettext for native MO verification
+      - name: Install gettext and terminal test dependencies
         run: |
-          if ! command -v msgfmt >/dev/null; then
+          if ! command -v msgfmt >/dev/null || ! pkg-config --exists vterm; then
             sudo apt-get update
-            sudo apt-get install -y gettext
+            sudo apt-get install -y gettext libvterm-dev pkg-config
           fi
       - name: Syntax, catalogs, resources, offline suites and release gates
         run: make check-syntax check-translations check-native check-resources check-reproducible test release-check

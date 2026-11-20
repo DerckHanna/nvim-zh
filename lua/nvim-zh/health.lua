@@ -49,6 +49,17 @@ local function collect()
     })
   end
   local plugins = snapshot.adapters
+  for _, id in ipairs(vim.fn.sort(vim.tbl_keys(snapshot.packs))) do
+    local pack = snapshot.packs[id]
+    local reason = pack.reason or (pack.job and pack.job.phase == '失败' and pack.job.message)
+    table.insert(results, {
+      name = 'packs.' .. id,
+      status = (pack.error or (pack.job and pack.job.phase == '失败')) and 'warn'
+        or pack.active and 'ok' or 'info',
+      message = reason or (pack.active and ('活动版本 ' .. pack.active))
+        or (pack.job and pack.job.phase) or '已登记',
+    })
+  end
   local plugin_names = vim.tbl_keys(plugins)
   table.sort(plugin_names)
   for _, name in ipairs(plugin_names) do
@@ -71,7 +82,7 @@ local function collect()
     end
   end
   local diagnostics = snapshot.diagnostics
-  for _, name in ipairs({ 'virtual_text', 'virtual_lines', 'float' }) do
+  for _, name in ipairs({ 'virtual_text', 'virtual_lines', 'float', 'setqflist', 'setloclist' }) do
     local adapter = diagnostics[name]
     local status = adapter.active and 'ok' or adapter.enabled and 'warn' or 'info'
     table.insert(results, {
@@ -88,6 +99,7 @@ local function collect()
     table.insert(expected, 'window/showMessageRequest')
   end
   if lsp.progress then table.insert(expected, '$/progress') end
+  if lsp.hints then table.insert(expected, 'buf_request_all') end
   local degraded = {}
   for _, method in ipairs(expected) do
     local adapter = lsp[method]
@@ -100,8 +112,8 @@ local function collect()
   table.insert(results, {
     name = 'lsp.clangd',
     status = status,
-    message = ('messages=%s progress=%s window/logMessage=原文%s'):format(
-      tostring(lsp.messages), tostring(lsp.progress), detail),
+    message = ('messages=%s progress=%s hints=%s window/logMessage=原文%s'):format(
+      tostring(lsp.messages), tostring(lsp.progress), tostring(lsp.hints), detail),
   })
   return results
 end

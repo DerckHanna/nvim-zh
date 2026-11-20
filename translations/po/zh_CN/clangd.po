@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: nvim-zh clangd diagnostics\n"
+"Project-Id-Version: nvim-zh clangd\n"
 "PO-Revision-Date: 2026-11-17 20:38+0800\n"
 "Last-Translator: nvim-zh maintainers\n"
 "Language-Team: Simplified Chinese\n"
@@ -28,3 +28,1646 @@ msgstr "使用了未声明的标识符 '{name}'"
 msgctxt "unknown_type_name"
 msgid "Unknown type name '{name}'"
 msgstr "未知类型名 '{name}'"
+
+msgctxt "diagnostic"
+msgid "Expected '(' for function-style cast or type construction"
+msgstr "函数式类型转换或类型构造缺少 '('"
+
+msgctxt "diagnostic"
+msgid "Expected ';' at end of declaration"
+msgstr "声明末尾缺少 ';'"
+
+msgctxt "diagnostic"
+msgid "Expected ';' at end of declaration list"
+msgstr "声明列表末尾缺少 ';'"
+
+msgctxt "diagnostic"
+msgid "Expected ';' at end of requirement"
+msgstr "约束要求末尾缺少 ';'"
+
+msgctxt "diagnostic"
+msgid "Expected ';' after expression"
+msgstr "表达式后缺少 ';'"
+
+msgctxt "diagnostic"
+msgid "Expected ';' after {statement} statement"
+msgstr "{statement} 语句后缺少 ';'"
+
+msgctxt "diagnostic"
+msgid "Expected ';' after attribute list"
+msgstr "属性列表后缺少 ';'"
+
+msgctxt "diagnostic"
+msgid "Expected ';' after namespace name"
+msgstr "命名空间名称后缺少 ';'"
+
+msgctxt "diagnostic"
+msgid "Expected ';' in 'for' statement specifier"
+msgstr "'for' 语句头部缺少 ';'"
+
+msgctxt "diagnostic"
+msgid "Expected expression"
+msgstr "此处需要表达式"
+
+msgctxt "diagnostic"
+msgid "Expected statement"
+msgstr "此处需要语句"
+
+msgctxt "diagnostic"
+msgid "Expected a type"
+msgstr "此处需要类型"
+
+msgctxt "diagnostic"
+msgid "Expected identifier"
+msgstr "此处需要标识符"
+
+msgctxt "diagnostic"
+msgid "Expected unqualified-id"
+msgstr "此处需要非限定标识符"
+
+msgctxt "diagnostic"
+msgid "Expected class name"
+msgstr "此处需要类名"
+
+msgctxt "diagnostic"
+msgid "Expected template parameter"
+msgstr "此处需要模板参数"
+
+msgctxt "diagnostic"
+msgid "Expected template"
+msgstr "此处需要模板"
+
+msgctxt "diagnostic"
+msgid "Expected an identifier or template-id after '::'"
+msgstr "'::' 后需要标识符或模板标识符"
+
+msgctxt "diagnostic"
+msgid "Expected a qualified name after 'typename'"
+msgstr "'typename' 后需要限定名称"
+
+msgctxt "diagnostic"
+msgid "Expected the name of a parameter pack"
+msgstr "此处需要形参包的名称"
+
+msgctxt "diagnostic"
+msgid "Expected external declaration"
+msgstr "此处需要外部声明"
+
+msgctxt "diagnostic"
+msgid "Expected function body after function declarator"
+msgstr "函数声明符后缺少函数体"
+
+msgctxt "diagnostic"
+msgid "Expected body of lambda expression"
+msgstr "lambda 表达式缺少函数体"
+
+msgctxt "diagnostic"
+msgid "Expected variable name or 'this' in lambda capture list"
+msgstr "lambda 捕获列表中需要变量名或 'this'"
+
+msgctxt "diagnostic"
+msgid "Expected ',' or ']' in lambda capture list"
+msgstr "lambda 捕获列表中需要 ',' 或 ']'"
+
+msgctxt "diagnostic"
+msgid "Expected ',' or '>' in template-parameter-list"
+msgstr "模板形参列表中需要 ',' 或 '>'"
+
+msgctxt "diagnostic"
+msgid "Expected member name or ';' after declaration specifiers"
+msgstr "声明说明符后需要成员名称或 ';'"
+
+msgctxt "diagnostic"
+msgid "Expected class member or base class name"
+msgstr "此处需要类成员或基类的名称"
+
+msgctxt "diagnostic"
+msgid "Expected 'while' in do/while loop"
+msgstr "do/while 循环中缺少 'while'"
+
+msgctxt "diagnostic"
+msgid "Expected catch"
+msgstr "此处需要 catch"
+
+msgctxt "diagnostic"
+msgid "Expected 'case' keyword before expression"
+msgstr "表达式前缺少关键字 'case'"
+
+msgctxt "diagnostic"
+msgid "Expected ')' or ',' after '{token}'"
+msgstr "'{token}' 后需要 ')' 或 ','"
+
+msgctxt "diagnostic"
+msgid "Expected '(' after '{where}'"
+msgstr "'{where}' 后需要 '('"
+
+msgctxt "diagnostic"
+msgid "Expected ')' after '{where}'"
+msgstr "'{where}' 后需要 ')'"
+
+msgctxt "diagnostic"
+msgid "Expected '<' after '{where}'"
+msgstr "'{where}' 后需要 '<'"
+
+msgctxt "diagnostic"
+msgid "Expected '{'"
+msgstr "此处缺少 '{'"
+
+msgctxt "diagnostic"
+msgid "Expected '}'"
+msgstr "此处缺少 '}'"
+
+msgctxt "diagnostic"
+msgid "Expected '('"
+msgstr "此处缺少 '('"
+
+msgctxt "diagnostic"
+msgid "Expected ')'"
+msgstr "此处缺少 ')'"
+
+msgctxt "diagnostic"
+msgid "Expected '['"
+msgstr "此处缺少 '['"
+
+msgctxt "diagnostic"
+msgid "Expected ']'"
+msgstr "此处缺少 ']'"
+
+msgctxt "diagnostic"
+msgid "Expected '>'"
+msgstr "此处缺少 '>'"
+
+msgctxt "diagnostic"
+msgid "Expected ':'"
+msgstr "此处缺少 ':'"
+
+msgctxt "diagnostic"
+msgid "Expected ','"
+msgstr "此处缺少 ','"
+
+msgctxt "diagnostic"
+msgid "Expected ';'"
+msgstr "此处缺少 ';'"
+
+msgctxt "diagnostic"
+msgid "Extraneous closing brace ('}')"
+msgstr "多余的右花括号 ('}')"
+
+msgctxt "diagnostic"
+msgid "Unterminated conditional directive"
+msgstr "条件预处理指令未结束"
+
+msgctxt "diagnostic"
+msgid "Unterminated function-like macro invocation"
+msgstr "函数式宏调用未结束"
+
+msgctxt "diagnostic"
+msgid "Invalid preprocessing directive"
+msgstr "无效的预处理指令"
+
+msgctxt "diagnostic"
+msgid "Invalid preprocessing directive, did you mean '{name}'?"
+msgstr "无效的预处理指令，是否想使用 '{name}'？"
+
+msgctxt "diagnostic"
+msgid "'#endif' without '#if'"
+msgstr "'#endif' 缺少对应的 '#if'"
+
+msgctxt "diagnostic"
+msgid "#endif without #if"
+msgstr "#endif 缺少对应的 #if"
+
+msgctxt "diagnostic"
+msgid "#elif without #if"
+msgstr "#elif 缺少对应的 #if"
+
+msgctxt "diagnostic"
+msgid "#else without #if"
+msgstr "#else 缺少对应的 #if"
+
+msgctxt "diagnostic"
+msgid "Duplicate #else"
+msgstr "重复的 #else"
+
+msgctxt "diagnostic"
+msgid "#include nested too deeply"
+msgstr "#include 嵌套过深"
+
+msgctxt "diagnostic"
+msgid "Macro name must be an identifier"
+msgstr "宏名称必须是标识符"
+
+msgctxt "diagnostic"
+msgid "Macro name missing"
+msgstr "缺少宏名称"
+
+msgctxt "diagnostic"
+msgid "Missing ')' in macro parameter list"
+msgstr "宏形参列表中缺少 ')'"
+
+msgctxt "diagnostic"
+msgid "Expected identifier in macro parameter list"
+msgstr "宏形参列表中需要标识符"
+
+msgctxt "diagnostic"
+msgid "Expected comma in macro parameter list"
+msgstr "宏形参列表中缺少逗号"
+
+msgctxt "diagnostic"
+msgid "Too many arguments provided to function-like macro invocation"
+msgstr "函数式宏调用的实参过多"
+
+msgctxt "diagnostic"
+msgid "Too few arguments provided to function-like macro invocation"
+msgstr "函数式宏调用的实参过少"
+
+msgctxt "diagnostic"
+msgid "'{file}' file not found"
+msgstr "找不到文件 '{file}'"
+
+msgctxt "diagnostic"
+msgid "'{file}' file not found, did you mean '{suggestion}'?"
+msgstr "找不到文件 '{file}'，是否想使用 '{suggestion}'？"
+
+msgctxt "diagnostic"
+msgid "Error opening file '{file}': {error}"
+msgstr "打开文件 '{file}' 时出错：{error}"
+
+msgctxt "no_template"
+msgid "No template named {name}"
+msgstr "找不到名为 {name} 的模板"
+
+msgctxt "diagnostic"
+msgid "No template named {name} in {scope}"
+msgstr "{scope} 中没有名为 {name} 的模板"
+
+msgctxt "diagnostic"
+msgid "No type named {name} in {scope}"
+msgstr "{scope} 中没有名为 {name} 的类型"
+
+msgctxt "diagnostic"
+msgid "No member named {name} in {scope}"
+msgstr "{scope} 中没有名为 {name} 的成员"
+
+msgctxt "diagnostic"
+msgid "No matching function for call to {name}"
+msgstr "找不到与调用匹配的函数 {name}"
+
+msgctxt "diagnostic"
+msgid "No matching member function for call to {name}"
+msgstr "找不到与调用匹配的成员函数 {name}"
+
+msgctxt "diagnostic"
+msgid "No matching constructor for initialization of {type}"
+msgstr "找不到可用于初始化 {type} 的构造函数"
+
+msgctxt "diagnostic"
+msgid "No viable overloaded '{op}'"
+msgstr "没有可用的重载运算符 '{op}'"
+
+msgctxt "diagnostic"
+msgid "No viable overloaded operator[] for type {type}"
+msgstr "类型 {type} 没有可用的重载 operator[]"
+
+msgctxt "diagnostic"
+msgid "No matching conversion for {cast} from {from} to {to}"
+msgstr "{cast} 找不到从 {from} 到 {to} 的适用转换"
+
+msgctxt "diagnostic"
+msgid "No viable conversion from {from} to {to}"
+msgstr "无法从 {from} 转换为 {to}"
+
+msgctxt "diagnostic"
+msgid "Use of undeclared identifier '{name}'; did you mean {suggestion}?"
+msgstr "使用了未声明的标识符 '{name}'，是否想使用 {suggestion}？"
+
+msgctxt "diagnostic"
+msgid "Use of class template '{name}' requires template arguments"
+msgstr "使用类模板 '{name}' 时必须提供模板实参"
+
+msgctxt "diagnostic"
+msgid "Use of alias template '{name}' requires template arguments"
+msgstr "使用别名模板 '{name}' 时必须提供模板实参"
+
+msgctxt "diagnostic"
+msgid "Too few template arguments for {target}"
+msgstr "提供给 {target} 的模板实参太少"
+
+msgctxt "diagnostic"
+msgid "Too many template arguments for {target}"
+msgstr "提供给 {target} 的模板实参太多"
+
+msgctxt "diagnostic"
+msgid "Template argument for template type parameter must be a type"
+msgstr "类型模板形参对应的实参必须是类型"
+
+msgctxt "diagnostic"
+msgid "Non-type template argument is not a constant expression"
+msgstr "非类型模板实参不是常量表达式"
+
+msgctxt "diagnostic"
+msgid "Implicit instantiation of undefined template {name}"
+msgstr "隐式实例化了未定义的模板 {name}"
+
+msgctxt "diagnostic"
+msgid "Explicit specialization of undeclared template {name}"
+msgstr "显式特化了未声明的模板 {name}"
+
+msgctxt "diagnostic"
+msgid "Constraints not satisfied for {target}"
+msgstr "{target} 不满足约束"
+
+msgctxt "diagnostic"
+msgid "Invalid operands to binary expression ({left} and {right})"
+msgstr "二元表达式的操作数类型无效（{left} 和 {right}）"
+
+msgctxt "diagnostic"
+msgid "Invalid argument type {type} to unary expression"
+msgstr "一元表达式的操作数类型 {type} 无效"
+
+msgctxt "diagnostic"
+msgid "Incompatible operand types ({left} and {right})"
+msgstr "操作数类型不兼容（{left} 和 {right}）"
+
+msgctxt "diagnostic"
+msgid "Called object type {type} is not a function or function pointer"
+msgstr "被调用对象的类型 {type} 不是函数或函数指针"
+
+msgctxt "diagnostic"
+msgid "Too few arguments to function call, expected %d, have %d"
+msgstr "函数调用的实参太少，需要 %d 个，提供了 %d 个"
+
+msgctxt "diagnostic"
+msgid "Too many arguments to function call, expected %d, have %d"
+msgstr "函数调用的实参太多，需要 %d 个，提供了 %d 个"
+
+msgctxt "diagnostic"
+msgid "Too few arguments to function call, expected at least %d, have %d"
+msgstr "函数调用的实参太少，至少需要 %d 个，提供了 %d 个"
+
+msgctxt "diagnostic"
+msgid "Too many arguments to function call, expected at most %d, have %d"
+msgstr "函数调用的实参太多，最多接受 %d 个，提供了 %d 个"
+
+msgctxt "diagnostic"
+msgid "Too many arguments to function call, expected single argument {argument}, have {actual} arguments"
+msgstr "函数调用仅需实参 {argument}，却提供了 {actual} 个"
+
+msgctxt "diagnostic"
+msgid "Too few arguments to function call, single argument {argument} was not specified"
+msgstr "函数调用缺少唯一所需的实参 {argument}"
+
+msgctxt "diagnostic"
+msgid "Array subscript is not an integer"
+msgstr "数组下标不是整数"
+
+msgctxt "diagnostic"
+msgid "Array size is negative"
+msgstr "数组大小为负数"
+
+msgctxt "diagnostic"
+msgid "Array has incomplete element type {type}"
+msgstr "数组元素的类型 {type} 是不完整类型"
+
+msgctxt "diagnostic"
+msgid "Subscripted value is not an array, pointer, or vector"
+msgstr "使用下标的值不是数组、指针或向量"
+
+msgctxt "diagnostic"
+msgid "Expression is not assignable"
+msgstr "表达式不可赋值"
+
+msgctxt "diagnostic"
+msgid "Read-only variable is not assignable"
+msgstr "只读变量不可赋值"
+
+msgctxt "diagnostic"
+msgid "Cannot assign to variable {name} with const-qualified type {type}"
+msgstr "不能对 const 限定类型 {type} 的变量 {name} 赋值"
+
+msgctxt "diagnostic"
+msgid "Cannot assign to non-static data member within const member function {name}"
+msgstr "不能在 const 成员函数 {name} 内给非静态数据成员赋值"
+
+msgctxt "diagnostic"
+msgid "Array type {type} is not assignable"
+msgstr "数组类型 {type} 不可赋值"
+
+msgctxt "diagnostic"
+msgid "Member reference base type {type} is not a structure or union"
+msgstr "成员访问所用的基类型 {type} 不是结构体或联合体"
+
+msgctxt "diagnostic"
+msgid "Member reference type {type} is not a pointer"
+msgstr "成员访问所用的类型 {type} 不是指针"
+
+msgctxt "diagnostic"
+msgid "Member reference type {type} is a pointer; did you mean to use '->'?"
+msgstr "成员访问所用的类型 {type} 是指针，是否应使用 '->'？"
+
+msgctxt "diagnostic"
+msgid "Member reference type {type} is not a pointer; did you mean to use '.'?"
+msgstr "成员访问所用的类型 {type} 不是指针，是否应使用 '.'？"
+
+msgctxt "diagnostic"
+msgid "Indirection requires pointer operand ({type} invalid)"
+msgstr "间接访问需要指针操作数（{type} 无效）"
+
+msgctxt "diagnostic"
+msgid "Cannot take the address of an rvalue of type {type}"
+msgstr "不能获取 {type} 类型右值的地址"
+
+msgctxt "diagnostic"
+msgid "Taking the address of a temporary object of type {type}"
+msgstr "正在获取 {type} 类型临时对象的地址"
+
+msgctxt "diagnostic"
+msgid "Incomplete definition of type {type}"
+msgstr "类型 {type} 的定义不完整"
+
+msgctxt "diagnostic"
+msgid "Initialization of incomplete type {type}"
+msgstr "初始化了不完整类型 {type}"
+
+msgctxt "diagnostic"
+msgid "Invalid application of 'sizeof' to an incomplete type {type}"
+msgstr "无法对不完整类型 {type} 使用 'sizeof'"
+
+msgctxt "diagnostic"
+msgid "Variable has incomplete type {type}"
+msgstr "变量的类型 {type} 是不完整类型"
+
+msgctxt "diagnostic"
+msgid "Cannot initialize a variable of type {type} with an lvalue of type {from}"
+msgstr "不能用 {from} 类型的左值初始化 {type} 类型的变量"
+
+msgctxt "diagnostic"
+msgid "Cannot initialize a variable of type {type} with an rvalue of type {from}"
+msgstr "不能用 {from} 类型的右值初始化 {type} 类型的变量"
+
+msgctxt "diagnostic"
+msgid "Cannot initialize a parameter of type {type} with an lvalue of type {from}"
+msgstr "不能用 {from} 类型的左值初始化 {type} 类型的形参"
+
+msgctxt "diagnostic"
+msgid "Cannot initialize a parameter of type {type} with an rvalue of type {from}"
+msgstr "不能用 {from} 类型的右值初始化 {type} 类型的形参"
+
+msgctxt "diagnostic"
+msgid "Cannot initialize return object of type {type} with an lvalue of type {from}"
+msgstr "不能用 {from} 类型的左值初始化 {type} 类型的返回对象"
+
+msgctxt "diagnostic"
+msgid "Cannot initialize return object of type {type} with an rvalue of type {from}"
+msgstr "不能用 {from} 类型的右值初始化 {type} 类型的返回对象"
+
+msgctxt "diagnostic"
+msgid "A non-const lvalue reference to type {type} cannot bind to a temporary of type {from}"
+msgstr "指向 {type} 的非 const 左值引用不能绑定到 {from} 类型的临时对象"
+
+msgctxt "diagnostic"
+msgid "Declaration of variable {name} with deduced type {type} requires an initializer"
+msgstr "变量 {name} 的类型 {type} 需要推导，因此声明中必须提供初始化器"
+
+msgctxt "diagnostic"
+msgid "Cannot deduce return type from initializer list"
+msgstr "无法从初始化列表推导返回类型"
+
+msgctxt "diagnostic"
+msgid "Function {name} with deduced return type cannot be used before it is defined"
+msgstr "返回类型需要推导的函数 {name} 必须先定义才能使用"
+
+msgctxt "diagnostic"
+msgid "Initializer element is not a compile-time constant"
+msgstr "初始化器的元素不是编译期常量"
+
+msgctxt "diagnostic"
+msgid "Static assertion expression is not an integral constant expression"
+msgstr "静态断言表达式不是整型常量表达式"
+
+msgctxt "diagnostic"
+msgid "Static assertion failed"
+msgstr "静态断言失败"
+
+msgctxt "diagnostic"
+msgid "Static assertion failed: {message}"
+msgstr "静态断言失败：{message}"
+
+msgctxt "diagnostic"
+msgid "Static assertion failed due to requirement '{condition}'"
+msgstr "静态断言失败，条件 '{condition}' 不成立"
+
+msgctxt "diagnostic"
+msgid "Static assertion failed due to requirement '{condition}': {message}"
+msgstr "静态断言失败，条件 '{condition}' 不成立：{message}"
+
+msgctxt "diagnostic"
+msgid "Call to deleted function {name}"
+msgstr "调用了已删除的函数 {name}"
+
+msgctxt "diagnostic"
+msgid "Attempt to use a deleted function"
+msgstr "尝试使用已删除的函数"
+
+msgctxt "diagnostic"
+msgid "Call to implicitly-deleted default constructor of {type}"
+msgstr "调用了 {type} 已隐式删除的默认构造函数"
+
+msgctxt "diagnostic"
+msgid "Call to implicitly-deleted copy constructor of {type}"
+msgstr "调用了 {type} 已隐式删除的复制构造函数"
+
+msgctxt "diagnostic"
+msgid "Call to implicitly-deleted move constructor of {type}"
+msgstr "调用了 {type} 已隐式删除的移动构造函数"
+
+msgctxt "diagnostic"
+msgid "Redefinition of {name} as different kind of symbol"
+msgstr "将 {name} 重复定义为另一类符号"
+
+msgctxt "redefinition_different_type"
+msgid "Redefinition of {name} with a different type: {current} vs {previous}"
+msgstr "以不同类型重复定义 {name}：{current} 与 {previous}"
+
+msgctxt "diagnostic"
+msgid "Conflicting types for {name}"
+msgstr "{name} 的类型与先前声明冲突"
+
+msgctxt "diagnostic"
+msgid "Out-of-line definition of {name} does not match any declaration in {scope}"
+msgstr "{name} 的类外定义与 {scope} 中的任何声明均不匹配"
+
+msgctxt "diagnostic"
+msgid "Non-void function does not return a value"
+msgstr "非 void 函数没有返回值"
+
+msgctxt "diagnostic"
+msgid "Non-void function does not return a value in all control paths"
+msgstr "非 void 函数存在未返回值的执行路径"
+
+msgctxt "diagnostic"
+msgid "Void function {name} should not return a value"
+msgstr "void 函数 {name} 不应返回值"
+
+msgctxt "diagnostic"
+msgid "Non-void function {name} should return a value"
+msgstr "非 void 函数 {name} 必须返回值"
+
+msgctxt "diagnostic"
+msgid "Cannot jump from this goto statement to its label"
+msgstr "这个 goto 语句无法跳转到其目标标签"
+
+msgctxt "diagnostic"
+msgid "Cannot jump from switch statement to this case label"
+msgstr "无法从 switch 语句跳转到这个 case 标签"
+
+msgctxt "diagnostic"
+msgid "'break' statement not in loop or switch statement"
+msgstr "'break' 语句在循环和 switch 语句之外"
+
+msgctxt "diagnostic"
+msgid "'continue' statement not in loop statement"
+msgstr "'continue' 语句在循环之外"
+
+msgctxt "diagnostic"
+msgid "'case' statement not in switch statement"
+msgstr "'case' 语句在 switch 语句之外"
+
+msgctxt "diagnostic"
+msgid "'default' statement not in switch statement"
+msgstr "'default' 语句在 switch 语句之外"
+
+msgctxt "diagnostic"
+msgid "Duplicate case value '{value}'"
+msgstr "case 值 '{value}' 重复"
+
+msgctxt "diagnostic"
+msgid "Multiple default labels in one switch"
+msgstr "同一个 switch 中有多个 default 标签"
+
+msgctxt "diagnostic"
+msgid "Unused variable {name}"
+msgstr "变量 {name} 未使用"
+
+msgctxt "diagnostic"
+msgid "Unused parameter {name}"
+msgstr "形参 {name} 未使用"
+
+msgctxt "diagnostic"
+msgid "Unused exception parameter {name}"
+msgstr "异常处理形参 {name} 未使用"
+
+msgctxt "diagnostic"
+msgid "Unused function {name}"
+msgstr "函数 {name} 未使用"
+
+msgctxt "diagnostic"
+msgid "Unused member function {name}"
+msgstr "成员函数 {name} 未使用"
+
+msgctxt "diagnostic"
+msgid "Unused label {name}"
+msgstr "标签 {name} 未使用"
+
+msgctxt "diagnostic"
+msgid "Unused typedef {name}"
+msgstr "typedef 名称 {name} 未使用"
+
+msgctxt "diagnostic"
+msgid "Unused type alias {name}"
+msgstr "类型别名 {name} 未使用"
+
+msgctxt "diagnostic"
+msgid "Private field {name} is not used"
+msgstr "私有字段 {name} 未使用"
+
+msgctxt "diagnostic"
+msgid "Variable {name} set but not used"
+msgstr "变量 {name} 已赋值但未使用"
+
+msgctxt "diagnostic"
+msgid "Parameter {name} set but not used"
+msgstr "形参 {name} 已赋值但未使用"
+
+msgctxt "diagnostic"
+msgid "Variable {name} is uninitialized when used here"
+msgstr "在此处使用的变量 {name} 尚未初始化"
+
+msgctxt "diagnostic"
+msgid "Variable {name} is uninitialized when used within its own initialization"
+msgstr "变量 {name} 在自身初始化过程中被使用，此时它尚未初始化"
+
+msgctxt "diagnostic"
+msgid "Expression result unused"
+msgstr "表达式的结果未使用"
+
+msgctxt "diagnostic"
+msgid "Left operand of comma operator has no effect"
+msgstr "逗号运算符的左操作数没有效果"
+
+msgctxt "diagnostic"
+msgid "Ignoring return value of function declared with {attribute} attribute"
+msgstr "忽略了带有 {attribute} 属性的函数的返回值"
+
+msgctxt "diagnostic"
+msgid "Ignoring return value of function declared with {attribute} attribute: {message}"
+msgstr "忽略了带有 {attribute} 属性的函数的返回值：{message}"
+
+msgctxt "diagnostic"
+msgid "Declaration shadows a local variable"
+msgstr "此声明遮蔽了一个局部变量"
+
+msgctxt "diagnostic"
+msgid "Declaration shadows a field of {type}"
+msgstr "此声明遮蔽了 {type} 的一个字段"
+
+msgctxt "diagnostic"
+msgid "Declaration shadows a variable in the global namespace"
+msgstr "此声明遮蔽了全局命名空间中的变量"
+
+msgctxt "diagnostic"
+msgid "Implicit conversion loses integer precision: {from} to {to}"
+msgstr "从 {from} 到 {to} 的隐式转换会损失整数精度"
+
+msgctxt "diagnostic"
+msgid "Implicit conversion changes signedness: {from} to {to}"
+msgstr "从 {from} 到 {to} 的隐式转换改变了有无符号属性"
+
+msgctxt "diagnostic"
+msgid "Implicit conversion from {from} to {to} changes value from {before} to {after}"
+msgstr "从 {from} 到 {to} 的隐式转换将值从 {before} 改为 {after}"
+
+msgctxt "diagnostic"
+msgid "Implicit conversion from {from} to {to} is not allowed in C++11"
+msgstr "从 {from} 到 {to} 的隐式转换在 C++11 中不允许"
+
+msgctxt "diagnostic"
+msgid "Comparison of integers of different signs: {left} and {right}"
+msgstr "比较了符号属性不同的整型值：{left} 和 {right}"
+
+msgctxt "diagnostic"
+msgid "Comparison of distinct pointer types ({left} and {right})"
+msgstr "比较了不同的指针类型（{left} 和 {right}）"
+
+msgctxt "diagnostic"
+msgid "Division by zero is undefined"
+msgstr "除以零会导致未定义行为"
+
+msgctxt "diagnostic"
+msgid "Remainder by zero is undefined"
+msgstr "除数为零时取余会导致未定义行为"
+
+msgctxt "diagnostic"
+msgid "Shift count is negative"
+msgstr "移位位数为负"
+
+msgctxt "diagnostic"
+msgid "Shift count >= width of type"
+msgstr "移位位数大于或等于类型的位宽"
+
+msgctxt "diagnostic"
+msgid "Array index {index} is past the end of the array (that has type {type})"
+msgstr "下标 {index} 超出了 {type} 类型数组的末尾"
+
+msgctxt "diagnostic"
+msgid "Address of stack memory associated with local variable {name} returned"
+msgstr "返回了局部变量 {name} 所在栈内存的地址"
+
+msgctxt "diagnostic"
+msgid "Reference to stack memory associated with local variable {name} returned"
+msgstr "返回了对局部变量 {name} 所在栈内存的引用"
+
+msgctxt "diagnostic"
+msgid "{symbol} is deprecated"
+msgstr "{symbol} 已弃用"
+
+msgctxt "diagnostic"
+msgid "{symbol} is deprecated: {message}"
+msgstr "{symbol} 已弃用：{message}"
+
+msgctxt "diagnostic"
+msgid "Macro redefined"
+msgstr "宏被重复定义"
+
+msgctxt "diagnostic"
+msgid "'{name}' macro redefined"
+msgstr "宏 '{name}' 被重复定义"
+
+msgctxt "diagnostic"
+msgid "Too many errors emitted, stopping now"
+msgstr "错误过多，已停止报告"
+
+msgctxt "diagnostic"
+msgid "Header {header} is not used directly"
+msgstr "头文件 {header} 未被直接使用"
+
+
+msgctxt "diagnostic"
+msgid "Use nullptr"
+msgstr "请使用 nullptr"
+
+msgctxt "diagnostic"
+msgid "Use of a signed integer operand with a binary bitwise operator"
+msgstr "对有符号整数操作数使用了二元位运算符"
+
+msgctxt "diagnostic"
+msgid "Do not use pointer arithmetic"
+msgstr "请避免指针算术"
+
+msgctxt "diagnostic"
+msgid "Use range-based for loop instead"
+msgstr "请使用基于范围的 for 循环"
+
+msgctxt "diagnostic"
+msgid "Use auto when initializing with a cast to avoid duplicating the type name"
+msgstr "用类型转换初始化时，请使用 auto，避免重复书写类型名"
+
+msgctxt "diagnostic"
+msgid "Function {name} exceeds recommended size/complexity thresholds"
+msgstr "函数 {name} 超过建议的长度或复杂度上限"
+
+msgctxt "diagnostic"
+msgid "Variable {name} is not initialized"
+msgstr "变量 {name} 未初始化"
+
+msgctxt "diagnostic"
+msgid "Empty catch statements hide errors"
+msgstr "空的 catch 语句会掩盖错误"
+
+msgctxt "diagnostic"
+msgid "Do not use 'else' after 'return'"
+msgstr "请勿在 'return' 后使用 'else'"
+
+msgctxt "diagnostic"
+msgid "Do not use 'else' after 'break'"
+msgstr "请勿在 'break' 后使用 'else'"
+
+msgctxt "diagnostic"
+msgid "Do not use 'else' after 'continue'"
+msgstr "请勿在 'continue' 后使用 'else'"
+
+msgctxt "diagnostic"
+msgid "Redundant access specifier has the same accessibility as the previous access specifier"
+msgstr "访问说明符多余，它与前一个访问说明符的访问权限相同"
+
+msgctxt "diagnostic"
+msgid "Error occurred here"
+msgstr "错误发生在这里"
+
+msgctxt "diagnostic"
+msgid "Previous declaration is here"
+msgstr "此前的声明在这里"
+
+msgctxt "diagnostic"
+msgid "Previous statement is here"
+msgstr "此前的语句在这里"
+
+msgctxt "diagnostic"
+msgid "Previous implicit declaration is here"
+msgstr "此前的隐式声明在这里"
+
+msgctxt "diagnostic"
+msgid "Previous use is here"
+msgstr "此前在这里使用"
+
+msgctxt "diagnostic"
+msgid "Previous case defined here"
+msgstr "此前的 case 定义在这里"
+
+msgctxt "diagnostic"
+msgid "Previous default label is here"
+msgstr "此前的 default 标签在这里"
+
+msgctxt "diagnostic"
+msgid "Previous definition is here, with type {type}"
+msgstr "此前的定义在这里，类型为 {type}"
+
+msgctxt "diagnostic"
+msgid "Forward declaration of {type}"
+msgstr "{type} 的前置声明"
+
+msgctxt "diagnostic"
+msgid "Passing argument to parameter {name} here"
+msgstr "此处将实参传给形参 {name}"
+
+msgctxt "diagnostic"
+msgid "Declared here"
+msgstr "在这里声明"
+
+msgctxt "diagnostic"
+msgid "{symbol} declared here"
+msgstr "{symbol} 在这里声明"
+
+msgctxt "diagnostic"
+msgid "{symbol} has been explicitly marked deprecated here"
+msgstr "{symbol} 已在这里被明确标记为弃用"
+
+msgctxt "diagnostic"
+msgid "Expanded from macro '{name}'"
+msgstr "由宏 '{name}' 展开"
+
+msgctxt "diagnostic"
+msgid "Expanded from here"
+msgstr "从这里展开"
+
+msgctxt "diagnostic"
+msgid "To match this '{token}'"
+msgstr "与这里的 '{token}' 匹配"
+
+msgctxt "diagnostic"
+msgid "Jump bypasses variable initialization"
+msgstr "跳转绕过了变量的初始化"
+
+msgctxt "diagnostic"
+msgid "Jump bypasses variable with a non-trivial destructor"
+msgstr "跳转绕过了具有非平凡析构函数的变量"
+
+msgctxt "diagnostic"
+msgid "In instantiation of function template specialization {name} requested here"
+msgstr "这里请求实例化函数模板特化 {name}"
+
+msgctxt "diagnostic"
+msgid "In instantiation of member function {name} requested here"
+msgstr "这里请求实例化成员函数 {name}"
+
+msgctxt "diagnostic"
+msgid "In instantiation of template class {name} requested here"
+msgstr "这里请求实例化类模板 {name}"
+
+msgctxt "diagnostic"
+msgid "In instantiation of template type alias {name} requested here"
+msgstr "这里请求实例化模板类型别名 {name}"
+
+msgctxt "diagnostic"
+msgid "Candidate function has been explicitly deleted"
+msgstr "候选函数已被显式删除"
+
+msgctxt "diagnostic"
+msgid "Candidate function not viable: requires %d arguments, but %d were provided"
+msgstr "候选函数不可用：需要 %d 个实参，但提供了 %d 个"
+
+msgctxt "diagnostic"
+msgid "Candidate function not viable: requires %d arguments, but %d was provided"
+msgstr "候选函数不可用：需要 %d 个实参，但提供了 %d 个"
+
+msgctxt "diagnostic"
+msgid "Candidate function not viable: requires %d arguments, but no arguments were provided"
+msgstr "候选函数不可用：需要 %d 个实参，但未提供实参"
+
+msgctxt "diagnostic"
+msgid "Candidate function not viable: requires single argument {argument}, but no arguments were provided"
+msgstr "候选函数不可用：需要一个实参 {argument}，但未提供实参"
+
+msgctxt "diagnostic"
+msgid "Candidate function not viable: requires single argument %s, but %d arguments were provided"
+msgstr "候选函数不可用：需要一个实参 %s，但提供了 %d 个"
+
+msgctxt "diagnostic"
+msgid "Candidate function not viable: no known conversion from {from} to {to} for {argument} argument"
+msgstr "候选函数不可用：第 {argument} 个实参无法从 {from} 转换为 {to}"
+
+msgctxt "diagnostic"
+msgid "Candidate template ignored: could not match {expected} against {actual}"
+msgstr "已忽略候选模板：{expected} 无法与 {actual} 匹配"
+
+msgctxt "diagnostic"
+msgid "Candidate template ignored: constraints not satisfied [with {args}]"
+msgstr "已忽略候选模板：不满足约束 [with {args}]"
+
+msgctxt "ovl_no_viable_function_in_call"
+msgid "No matching function for call to {name}"
+msgstr "找不到与调用匹配的函数 {name}"
+
+msgctxt "ovl_no_viable_object_call"
+msgid "No matching function for call to object of type {type}"
+msgstr "找不到可调用 {type} 类型对象的匹配函数"
+
+msgctxt "no_member"
+msgid "No member named {name} in {scope}"
+msgstr "{scope} 中没有名为 {name} 的成员"
+
+msgctxt "no_member_suggest"
+msgid "No member named {name} in {scope}; did you mean {suggestion}?"
+msgstr "{scope} 中没有名为 {name} 的成员，是否想使用 {suggestion}？"
+
+msgctxt "no_member_overloaded_arrow"
+msgid "No member named {name} in {scope}; did you mean to use '->' instead of '.'?"
+msgstr "{scope} 中没有名为 {name} 的成员，是否应使用 '->' 来代替 '.'？"
+
+msgctxt "diagnostic_suffix"
+msgid " (fix available)"
+msgstr "（有可用修复）"
+
+msgctxt "diagnostic_suffix"
+msgid " (fixes available)"
+msgstr "（有多项可用修复）"
+
+msgctxt "diagnostic_level"
+msgid "ignored"
+msgstr "已忽略"
+
+msgctxt "diagnostic_level"
+msgid "note"
+msgstr "注释"
+
+msgctxt "diagnostic_level"
+msgid "remark"
+msgstr "备注"
+
+msgctxt "diagnostic_level"
+msgid "warning"
+msgstr "警告"
+
+msgctxt "diagnostic_level"
+msgid "error"
+msgstr "错误"
+
+msgctxt "diagnostic_level"
+msgid "fatal error"
+msgstr "致命错误"
+
+msgctxt "diagnostic_origin"
+msgid "In included file"
+msgstr "在包含的文件中"
+
+msgctxt "diagnostic_origin"
+msgid "In template"
+msgstr "在模板中"
+
+msgctxt "show_message"
+msgid "Indexing completed"
+msgstr "索引已完成"
+
+msgctxt "show_message"
+msgid "No definition found"
+msgstr "找不到定义"
+
+msgctxt "show_message"
+msgid "No declaration found"
+msgstr "找不到声明"
+
+msgctxt "request_message"
+msgid "Restart clangd?"
+msgstr "重启 clangd？"
+
+msgctxt "action"
+msgid "Restart"
+msgstr "重启"
+
+msgctxt "action"
+msgid "Not now"
+msgstr "暂不"
+
+msgctxt "action"
+msgid "OK"
+msgstr "确定"
+
+msgctxt "action"
+msgid "Cancel"
+msgstr "取消"
+
+msgctxt "progress_title"
+msgid "indexing"
+msgstr "正在建立索引"
+
+msgctxt "progress_title"
+msgid "Indexing"
+msgstr "正在建立索引"
+
+msgctxt "progress_message"
+msgid "Parsing files"
+msgstr "正在解析文件"
+
+msgctxt "file_status"
+msgid "idle"
+msgstr "空闲"
+
+msgctxt "file_status"
+msgid "parsing includes"
+msgstr "正在解析包含的文件"
+
+msgctxt "file_status"
+msgid "includes are queued"
+msgstr "包含的文件等待解析"
+
+msgctxt "file_status"
+msgid "file is queued"
+msgstr "文件等待解析"
+
+msgctxt "file_status"
+msgid "parsing main file"
+msgstr "正在解析主文件"
+
+msgctxt "file_status"
+msgid "running {task}"
+msgstr "正在执行 {task}"
+
+msgctxt "hover_kind"
+msgid "function"
+msgstr "函数"
+
+msgctxt "hover_kind"
+msgid "variable"
+msgstr "变量"
+
+msgctxt "hover_kind"
+msgid "parameter"
+msgstr "形参"
+
+msgctxt "hover_kind"
+msgid "field"
+msgstr "字段"
+
+msgctxt "hover_kind"
+msgid "method"
+msgstr "方法"
+
+msgctxt "hover_kind"
+msgid "instance-method"
+msgstr "实例方法"
+
+msgctxt "hover_kind"
+msgid "class-method"
+msgstr "类方法"
+
+msgctxt "hover_kind"
+msgid "static-method"
+msgstr "静态方法"
+
+msgctxt "hover_kind"
+msgid "constructor"
+msgstr "构造函数"
+
+msgctxt "hover_kind"
+msgid "destructor"
+msgstr "析构函数"
+
+msgctxt "hover_kind"
+msgid "conversion-function"
+msgstr "转换函数"
+
+msgctxt "hover_kind"
+msgid "class"
+msgstr "类"
+
+msgctxt "hover_kind"
+msgid "struct"
+msgstr "结构体"
+
+msgctxt "hover_kind"
+msgid "union"
+msgstr "联合体"
+
+msgctxt "hover_kind"
+msgid "enum"
+msgstr "枚举"
+
+msgctxt "hover_kind"
+msgid "enumerator"
+msgstr "枚举常量"
+
+msgctxt "hover_kind"
+msgid "namespace"
+msgstr "命名空间"
+
+msgctxt "hover_kind"
+msgid "namespace-alias"
+msgstr "命名空间别名"
+
+msgctxt "hover_kind"
+msgid "type-alias"
+msgstr "类型别名"
+
+msgctxt "hover_kind"
+msgid "concept"
+msgstr "概念"
+
+msgctxt "hover_kind"
+msgid "macro"
+msgstr "宏"
+
+msgctxt "hover_kind"
+msgid "type-template-parm"
+msgstr "类型模板形参"
+
+msgctxt "hover_kind"
+msgid "non-type-template-parm"
+msgstr "非类型模板形参"
+
+msgctxt "hover_kind"
+msgid "template-template-parm"
+msgstr "模板模板形参"
+
+msgctxt "hover"
+msgid "Brief"
+msgstr "摘要"
+
+msgctxt "hover"
+msgid "Details"
+msgstr "详细说明"
+
+msgctxt "hover"
+msgid "Template Parameters"
+msgstr "模板形参"
+
+msgctxt "hover"
+msgid "Parameters"
+msgstr "形参"
+
+msgctxt "hover"
+msgid "Returns"
+msgstr "返回值"
+
+msgctxt "hover"
+msgid "Parameters:"
+msgstr "形参："
+
+msgctxt "hover"
+msgid "Type: {type}"
+msgstr "类型：{type}"
+
+msgctxt "hover"
+msgid "Value = {value}"
+msgstr "值 = {value}"
+
+msgctxt "hover"
+msgid "Size: {size}"
+msgstr "大小：{size}"
+
+msgctxt "hover"
+msgid "Offset: {offset}"
+msgstr "偏移：{offset}"
+
+msgctxt "hover"
+msgid "provided by {header}"
+msgstr "由 {header} 提供"
+
+msgctxt "hover"
+msgid "provides {symbols}"
+msgstr "提供 {symbols}"
+
+msgctxt "code_action"
+msgid "remove {text}"
+msgstr "移除 {text}"
+
+msgctxt "code_action"
+msgid "insert {text}"
+msgstr "插入 {text}"
+
+msgctxt "code_action"
+msgid "replace '{old}' with '{new}'"
+msgstr "将 '{old}' 替换为 '{new}'"
+
+msgctxt "code_action"
+msgid "Replace '{old}' with '{new}'"
+msgstr "将 '{old}' 替换为 '{new}'"
+
+msgctxt "code_action"
+msgid "Change '{old}' to '{new}'"
+msgstr "将 '{old}' 改为 '{new}'"
+
+msgctxt "code_action"
+msgid "change '{old}' to '{new}'"
+msgstr "将 '{old}' 改为 '{new}'"
+
+msgctxt "code_action"
+msgid "Add {header} for {symbol}"
+msgstr "添加 {header} 以使用 {symbol}"
+
+msgctxt "code_action"
+msgid "Add include {header}"
+msgstr "添加包含指令 {header}"
+
+msgctxt "code_action"
+msgid "Remove unused include"
+msgstr "移除未使用的包含指令"
+
+msgctxt "code_action"
+msgid "Remove unused include {header}"
+msgstr "移除未使用的包含指令 {header}"
+
+msgctxt "code_action"
+msgid "Remove all unused includes"
+msgstr "移除所有未使用的包含指令"
+
+msgctxt "code_action"
+msgid "Add all missing includes"
+msgstr "添加所有缺少的包含指令"
+
+msgctxt "code_action"
+msgid "Add using-declaration"
+msgstr "添加 using 声明"
+
+msgctxt "code_action"
+msgid "Convert to raw string"
+msgstr "转换为原始字符串"
+
+msgctxt "code_action"
+msgid "Convert to scoped enum"
+msgstr "转换为有作用域的枚举"
+
+msgctxt "code_action"
+msgid "Extract variable"
+msgstr "提取变量"
+
+msgctxt "code_action"
+msgid "Extract function"
+msgstr "提取函数"
+
+msgctxt "code_action"
+msgid "Expand macro"
+msgstr "展开宏"
+
+msgctxt "code_action"
+msgid "Expand auto type"
+msgstr "展开 auto 类型"
+
+msgctxt "code_action"
+msgid "Expand deduced type"
+msgstr "展开推导出的类型"
+
+msgctxt "code_action"
+msgid "Invert if condition"
+msgstr "反转 if 条件"
+
+msgctxt "code_action"
+msgid "Swap if branches"
+msgstr "交换 if 分支"
+
+msgctxt "code_action"
+msgid "Swap if/else branches"
+msgstr "交换 if/else 分支"
+
+msgctxt "code_action"
+msgid "Move function body to declaration"
+msgstr "将函数体移动到声明处"
+
+msgctxt "code_action"
+msgid "Move function definition out of line"
+msgstr "将函数定义移到类外"
+
+msgctxt "code_action"
+msgid "Split declaration and assignment"
+msgstr "拆分声明与赋值"
+
+msgctxt "code_action"
+msgid "Populate switch"
+msgstr "补全 switch 分支"
+
+msgctxt "no_template_suggest"
+msgid "No template named {name}; did you mean {suggestion}?"
+msgstr "找不到名为 {name} 的模板，是否想使用 {suggestion}？"
+
+msgctxt "no_member_template_suggest"
+msgid "No template named {name} in {scope}; did you mean {suggestion}?"
+msgstr "{scope} 中没有名为 {name} 的模板，是否想使用 {suggestion}？"
+
+msgctxt "diagnostic"
+msgid "Unknown type name '{name}'; did you mean {suggestion}?"
+msgstr "未知类型名 '{name}'，是否想使用 {suggestion}？"
+
+msgctxt "code_action"
+msgid "#include {header}"
+msgstr "添加 #include {header}"
+
+msgctxt "code_action"
+msgid "remove #include directive"
+msgstr "移除 #include 指令"
+
+msgctxt "code_action"
+msgid "remove all unused includes"
+msgstr "移除所有未使用的包含指令"
+
+msgctxt "code_action"
+msgid "add all missing includes"
+msgstr "添加所有缺少的包含指令"
+
+msgctxt "code_action"
+msgid "fix all includes"
+msgstr "修复所有包含指令"
+
+msgctxt "code_action"
+msgid "Remove using namespace, re-qualify names instead"
+msgstr "移除 using namespace 并为名称添加限定符"
+
+msgctxt "code_action"
+msgid "Extract subexpression to variable"
+msgstr "将子表达式提取为变量"
+
+msgctxt "signature_help"
+msgid "Signature Help: clangd {position}"
+msgstr "函数签名：clangd {position}"
+
+msgctxt "signature_help"
+msgid " (<C-s> to cycle)"
+msgstr "（按 <C-s> 切换）"
+
+msgctxt "completion"
+msgid "[{count} overloads]"
+msgstr "[{count} 个重载]"
+
+msgctxt "completion"
+msgid "From {header}"
+msgstr "来自 {header}"
+
+msgctxt "code_action"
+msgid "Extract to function"
+msgstr "提取为函数"
+
+msgctxt "code_action"
+msgid "Move function body to out-of-line"
+msgstr "将函数体移到声明之外"
+
+msgctxt "code_action"
+msgid "Create function body out-of-line"
+msgstr "在声明之外创建函数体"
+
+msgctxt "code_action"
+msgid "Annotate highlighting tokens"
+msgstr "标注高亮记号"
+
+msgctxt "code_action"
+msgid "Show selection tree"
+msgstr "显示选区语法树"
+
+msgctxt "code_action"
+msgid "Dump symbol under the cursor"
+msgstr "输出光标下的符号信息"
+
+# seed batch for pipeline validation
+msgctxt "diagnostic"
+msgid "no member named %0 in %1"
+msgstr "%1 中没有名为 %0 的成员"
+
+msgctxt "diagnostic"
+msgid "use of undeclared identifier %0"
+msgstr "使用了未声明的标识符 %0"
+
+msgctxt "diagnostic"
+msgid "expected %0"
+msgstr "此处需要 %0"
+
+msgctxt "diagnostic"
+msgid "unused variable %0"
+msgstr "变量 %0 未使用"
+
+msgctxt "diagnostic"
+msgid "unknown type name %0"
+msgstr "未知类型名 %0"
+
+msgctxt "diagnostic"
+msgid "redefinition of %0"
+msgstr "%0 重复定义"
+
+msgctxt "diagnostic"
+msgid "implicit conversion loses integer precision: %0 to %1"
+msgstr "隐式转换丢失整数精度：%0 到 %1"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+msgctxt "code_action"
+msgid "Add using-declaration for {0} and remove qualifier"
+msgstr "为 {0} 添加 using 声明并移除限定符"
+
+msgctxt "code_action"
+msgid "Declare implicit {0} members"
+msgstr "声明隐式 {0} 成员"
+
+msgctxt "code_action"
+msgid "Declare memberwise initializer"
+msgstr "声明逐成员初始化器"
+
+msgctxt "code_action"
+msgid "Define constructor"
+msgstr "定义构造函数"
+
+msgctxt "code_action"
+msgid "Dump {0} AST"
+msgstr "导出 {0} 的 AST"
+
+msgctxt "code_action"
+msgid "Expand macro '{0}'"
+msgstr "展开宏 '{0}'"
+
+msgctxt "code_action"
+msgid "Generate memberwise initializer"
+msgstr "生成逐成员初始化器"
+
+msgctxt "code_action"
+msgid "Override pure virtual methods"
+msgstr "重写纯虚函数"
+
+msgctxt "code_action"
+msgid "Replace with deduced type"
+msgstr "替换为推导出的类型"
+
+msgctxt "code_action"
+msgid "Swap operands to {0}"
+msgstr "交换操作数为 {0}"
+
+msgctxt "code_action"
+msgid "Wrap in NSLocalizedString"
+msgstr "用 NSLocalizedString 包裹"
+
+msgctxt "completion"
+msgid "[{0} overloads]"
+msgstr "[{0} 个重载]"
+
+msgctxt "diagnostic"
+msgid "#include {0}"
+msgstr "#include {0}"
+
+msgctxt "diagnostic"
+msgid "No header providing \"{0}\" is directly included"
+msgstr "没有直接包含提供 \"{0}\" 的头文件"
+
+msgctxt "diagnostic"
+msgid "add all missing includes"
+msgstr "添加所有缺少的包含指令"
+
+msgctxt "diagnostic"
+msgid "fix all includes"
+msgstr "修复所有包含指令"
+
+msgctxt "diagnostic"
+msgid "remove #include directive"
+msgstr "移除 #include 指令"
+
+msgctxt "diagnostic"
+msgid "remove all unused includes"
+msgstr "移除所有未使用的包含指令"
+
+msgctxt "file_status"
+msgid "running "
+msgstr "正在运行 "
+
+msgctxt "hover"
+msgid "Offset: "
+msgstr "偏移量："
+
+msgctxt "hover"
+msgid "Size: "
+msgstr "大小："
+
+msgctxt "hover"
+msgid "Type: "
+msgstr "类型："
+
+msgctxt "hover"
+msgid "Value = "
+msgstr "值 = "
+
+msgctxt "hover"
+msgid "provided by"
+msgstr "由以下提供"
+
+msgctxt "hover"
+msgid "provides "
+msgstr "提供 "
+
+msgctxt "message"
+msgid "Tweak applied."
+msgstr "重构已应用"
+
+msgctxt "progress_message"
+msgid "file is queued"
+msgstr "文件解析已排队"
+
+msgctxt "progress_message"
+msgid "idle"
+msgstr "空闲"
+
+msgctxt "progress_message"
+msgid "includes are queued"
+msgstr "头文件解析已排队"
+
+msgctxt "progress_message"
+msgid "parsing includes"
+msgstr "正在解析包含的头文件"
+
+msgctxt "progress_message"
+msgid "parsing main file"
+msgstr "正在解析主文件"
+
+msgctxt "clangd_config"
+msgid "A mountpoint is required."
+msgstr "必须指定挂载点"
+
+msgctxt "clangd_config"
+msgid "Clangd isn't compiled with remote index support, ignoring Server: {server}"
+msgstr "clangd 未编译远程索引支持，已忽略 Server：{server}"
+
+msgctxt "clangd_config"
+msgid "Duplicate key {key} is ignored"
+msgstr "重复的键 {key} 已被忽略"
+
+msgctxt "clangd_config"
+msgid "Exactly one of File, Server or None must be set."
+msgstr "File、Server、None 三者必须且只能设置其一"
+
+msgctxt "clangd_config"
+msgid "Experiment is deprecated for UnusedIncludes, use Strict instead."
+msgstr "UnusedIncludes 的 Experiment 已废弃，请改用 Strict"
+
+msgctxt "clangd_config"
+msgid "Invalid clang-tidy check name"
+msgstr "无效的 clang-tidy 检查名"
+
+msgctxt "clangd_config"
+msgid "Invalid regex {pattern}: {reason}"
+msgstr "无效的正则表达式 {pattern}：{reason}"
+
+msgctxt "clangd_config"
+msgid "Invalid regular expression '{pattern}': {reason}"
+msgstr "无效的正则表达式 '{pattern}'：{reason}"
+
+msgctxt "clangd_config"
+msgid "Latency of clang-tidy check '{check}' is not known. It will only run if ClangTidy.FastCheckFilter is Loose or None"
+msgstr "未知 clang-tidy 检查 '{check}' 的延迟。仅当 ClangTidy.FastCheckFilter 为 Loose 或 None 时才会运行"
+
+msgctxt "clangd_config"
+msgid "Remote index may not be specified by untrusted configuration. Copy this into user config to use it."
+msgstr "不受信任的配置不能指定远程索引。请复制到用户配置中以启用"
+
+msgctxt "clangd_config"
+msgid "Unknown {kind} key '{key}' ignored"
+msgstr "已忽略未知的 {kind} 键 '{key}'"
+
+msgctxt "clangd_config"
+msgid "clang-tidy check '{check}' is slow. It will only run if ClangTidy.FastCheckFilter is None"
+msgstr "clang-tidy 检查 '{check}' 运行较慢。仅当 ClangTidy.FastCheckFilter 为 None 时才会运行"
+
+msgctxt "clangd_config"
+msgid "clang-tidy check '{check}' was not found"
+msgstr "未找到 clang-tidy 检查 '{check}'"
+
+msgctxt "clangd_config"
+msgid "{key} should be a boolean"
+msgstr "{key} 应为布尔值"
+
+msgctxt "clangd_config"
+msgid "{key} should be scalar"
+msgstr "{key} 应为标量值"
+
+msgctxt "clangd_config"
+msgid "{key} should be scalar or list of scalars"
+msgstr "{key} 应为标量值或标量列表"
+
+msgctxt "clangd_config"
+msgid "{path} must be an absolute path, because this fragment is not associated with any directory."
+msgstr "{path} 必须是绝对路径，因为该配置片段没有关联任何目录"

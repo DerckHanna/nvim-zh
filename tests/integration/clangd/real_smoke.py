@@ -13,6 +13,8 @@ import sys
 import tempfile
 import time
 
+from pack_fixture import seed
+
 ROOT = Path(os.environ['NVIM_ZH_ROOT']).resolve()
 CORPUS = ROOT / 'tests/fixtures/clangd/corpus'
 
@@ -124,8 +126,8 @@ def main() -> int:
     executable = str(Path(executable).resolve())
     version_text = subprocess.check_output([executable, '--version'], text=True).strip()
     corpus_files = sorted(CORPUS.glob('*.cpp'))
-    if len(corpus_files) != 4:
-        raise AssertionError('fixed clangd corpus must contain four C++ files')
+    if len(corpus_files) < 4:
+        raise AssertionError('fixed clangd corpus must contain the C++ samples')
 
     with tempfile.TemporaryDirectory(prefix='dsh-nvim-zh-clangd-smoke-') as tmp:
         work = Path(tmp)
@@ -157,6 +159,7 @@ def main() -> int:
                 client.send('textDocument/didOpen', {'textDocument': {
                     'uri': uri, 'languageId': 'cpp', 'version': 1, 'text': text,
                 }})
+                client.send('workspace/didChangeConfiguration', {'settings': {}})
                 pull_id = client.send('textDocument/diagnostic', {'textDocument': {'uri': uri}}, True)
                 got_push = False
                 got_pull = False
@@ -176,12 +179,42 @@ def main() -> int:
             for response in pull:
                 require(response.get('error', {}).get('code') == -32601, response)
         diagnostics = [d for item in push for d in item['params']['diagnostics']]
-        require(len(diagnostics) == 6, diagnostics)
-        require(len({d['message'] for d in diagnostics}) == 6, sorted({d['message'] for d in diagnostics}))
+        # The corpus covers syntax errors, type conversion, overloads,
+        # template instantiation, preprocessor errors, missing headers and
+        # cross-file notes; every scenario must produce a diagnostic.
+        require(len(diagnostics) >= 6, diagnostics)
+        messages = {d['message'] for d in diagnostics}
         require(any(d['message'] == "Use of undeclared identifier '路径变量'" for d in diagnostics),
                 'Chinese undeclared identifier missing')
         require(any(d.get('relatedInformation', [{}])[0].get('message') == 'Previous definition is here'
                     for d in diagnostics if d.get('relatedInformation')),
+                'relatedInformation control missing')
+        # Upstream wording is preserved for the reference sample; the Chinese
+        # rendering is produced by the display layer, not by clangd.
+        require(any('undeclared identifier' in message for message in messages),
+                'undeclared identifier diagnostic missing')
+        # The corpus covers the required C++ scenarios: syntax error, type
+        # conversion, overload resolution, template instantiation note,
+        # preprocessor error, missing header, clang-tidy warning and a
+        # cross-file/redefinition note.
+        scenarios = {
+            'syntax error': lambda m: m.startswith('Expected'),
+            'type conversion': lambda m: 'Cannot initialize' in m or 'incompatible' in m,
+            'overload': lambda m: 'No matching function' in m,
+            'template instantiation': lambda m: "Holder<int>" in m or 'in instantiation of' in m,
+            'preprocessor': lambda m: 'Custom build failure message' in m,
+            'missing header': lambda m: 'file not found' in m,
+            'member lookup': lambda m: 'No member named' in m,
+            'cross-file or redefinition note': lambda m: m == "Redefinition of 'repeated'",
+        }
+        for name, predicate in scenarios.items():
+            require(any(predicate(message) for message in messages),
+                    f'{name} diagnostic missing in {sorted(messages)}')
+        if os.environ.get('NVIM_ZH_CLANGD_DEBUG'):
+            print('CLANGD_DIAGNOSTIC_MESSAGES=' + json.dumps(sorted(messages), ensure_ascii=False))
+        # The redefinition sample reports the previous definition through
+        # relatedInformation rather than as a separate diagnostic message.
+        require(any(d.get('relatedInformation') for d in diagnostics),
                 'relatedInformation control missing')
         for diagnostic in diagnostics:
             for field in ('message', 'code', 'source', 'range', 'relatedInformation'):
@@ -206,7 +239,6 @@ def main() -> int:
             'push': push,
             'pull': pull,
             'pull_status': pull_status,
-            'fixture_observation': {'runtime_observed': 18, 'runtime_translated': 12},
         }
         record = os.environ.get('NVIM_ZH_CLANGD_RECORD')
         observation_path = Path(record) if record else work / 'observed.json'
@@ -218,14 +250,21 @@ def main() -> int:
         env = os.environ.copy()
         env['NVIM_ZH_ROOT'] = str(ROOT)
         env['NVIM_ZH_TEST_CLANGD_OBSERVATION'] = str(observation_path)
+        seed(ROOT, Path(env['XDG_DATA_HOME']), 'clangd')
         command = [os.environ.get('NVIM_BIN', 'nvim'), '--headless', '-u', 'NONE',
                    '--cmd', f'set runtimepath^={ROOT}', '--cmd', 'runtime! plugin/nvim-zh.lua',
                    '-l', str(ROOT / 'tests' / 'contract' / 'diagnostics' / 'clangd_observation_spec.lua')]
         subprocess.run(command, env=env, check=True)
         require(observation_path.read_bytes() == raw_bytes,
                 f'raw observation file changed during contract test: {observation_path}')
+        editor = ROOT / 'tests' / 'integration' / 'clangd' / 'real_editor.lua'
+        env['NVIM_ZH_TEST_CLANGD_WORK'] = str(work)
+        env['NVIM_ZH_TEST_CLANGD'] = executable
+        subprocess.run(command[:-1] + [str(editor)], env=env, check=True)
         print(f'REAL_CLANGD_VERSION={version_text.splitlines()[0]}')
-        print(f'REAL_CLANGD_SMOKE=PASS push=6/6 pull={pull_status} corpus=5/7 runtime=12/18 raw=unchanged')
+        print(f'REAL_CLANGD_SMOKE=PASS push={len(push)}/{len(corpus_files)} '
+              f'pull={pull_status} corpus={len(corpus_files)} '
+              f'diagnostics={len(diagnostics)} raw=unchanged')
     return 0
 
 

@@ -8,8 +8,9 @@ import resource_bundle as bundle
 root = Path(__file__).resolve().parents[1]
 with tempfile.TemporaryDirectory(prefix='nvim-zh-repro-') as tmp:
     out = Path(tmp)
-    ct.builtin_sources(root)
-    ct.build(root / 'translations/po/zh_CN', out / 'lua', root / 'translations/glossary/zh_CN.toml')
+    ct.builtin_sources(root, optional=True)
+    ct.build(root / 'translations/po/zh_CN', out / 'lua', root / 'translations/glossary/zh_CN.toml',
+             ct.builtin_sources(root).values())
     def payload(folder):
         return {p.relative_to(folder).as_posix(): p.read_bytes() for p in folder.rglob('*') if p.is_file()}
     if payload(out / 'lua') != payload(root / 'lua/nvim-zh/catalogs/generated'):

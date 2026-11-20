@@ -26,7 +26,16 @@ case_env() {
 run_lua() {
   case_env
   printf 'LUA_SPEC=%s\n' "${1#"$ROOT/"}"
-  "$NVIM_BIN" --headless -u NONE -i NONE -n --cmd "set runtimepath^=$ROOT" --cmd 'runtime plugin/nvim-zh.lua' -l "$1"
+  case "$1" in
+    */tests/contract/plugins/*)
+      "$PYTHON" "$ROOT/tests/support/pack_fixture.py" "$ROOT" "$XDG_DATA_HOME"
+      ;;
+    */tests/*/diagnostics/*|*/tests/contract/lsp/*)
+      "$PYTHON" "$ROOT/tests/support/pack_fixture.py" "$ROOT" "$XDG_DATA_HOME" clangd
+      ;;
+  esac
+  "$NVIM_BIN" --headless -u NONE -i NONE -n --cmd "set runtimepath^=$ROOT" --cmd 'runtime plugin/nvim-zh.lua' \
+    --cmd 'lua dofile(vim.env.NVIM_ZH_ROOT .. "/tests/support/load_adapters.lua")' -l "$1"
 }
 run_python() {
   case_env

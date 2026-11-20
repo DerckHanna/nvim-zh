@@ -16,6 +16,7 @@ ROOT = Path(os.environ['NVIM_ZH_ROOT']).resolve()
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import real_smoke as clangd_smoke  # noqa: E402
+from pack_fixture import seed  # noqa: E402
 
 
 class ClangdReadTimeoutTests(unittest.TestCase):
@@ -84,9 +85,11 @@ class ObservationIntegrityTests(unittest.TestCase):
                 observation['pull_status'] = 'passed'
                 path = Path(tmp) / 'observed.json'
                 path.write_text(json.dumps(observation))
+                data = Path(tmp) / 'data'
+                seed(ROOT, data, 'clangd')
                 result = subprocess.run([os.environ.get('NVIM_BIN', 'nvim'), '--headless', '-u', 'NONE', '-i', 'NONE', '-n',
                     '--cmd', f'set runtimepath^={ROOT}', '-l', str(ROOT / 'tests/contract/diagnostics/clangd_observation_spec.lua')],
-                    env={**os.environ, 'NVIM_ZH_TEST_CLANGD_OBSERVATION': str(path)},
+                    env={**os.environ, 'NVIM_ZH_TEST_CLANGD_OBSERVATION': str(path), 'XDG_DATA_HOME': str(data)},
                     capture_output=True, text=True, timeout=60)
                 self.assertEqual(result.returncode == 0, succeeds, result.stdout + result.stderr)
                 if not succeeds:

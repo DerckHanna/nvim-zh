@@ -13,7 +13,10 @@ original['window/showMessageRequest'] = function(err, params, ctx)
 end
 original['window/logMessage'] = function(err, params, ctx) table.insert(calls, { 'log', err, params, ctx }); return params end
 original['$/progress'] = function(err, params, ctx) table.insert(calls, { 'progress', err, params, ctx }); return 'progress-return' end
+original['textDocument/clangd.fileStatus'] = function(_, params) return params end
 for method, fn in pairs(original) do vim.lsp.handlers[method] = fn end
+local old_preview = vim.lsp.util.open_floating_preview
+vim.lsp.util.open_floating_preview = function(lines, _, opts) return lines, opts end
 local overrides = { clangd = {
   show_message = { ['Indexing completed'] = '索引已完成' },
   request_message = { ['Restart clangd?'] = '重启 clangd？' },
@@ -23,7 +26,7 @@ local overrides = { clangd = {
 } }
 require('nvim-zh').setup({ modules = { ui = { notify = false, prompts = false }, plugins = { auto = false }, diagnostics = { enabled = false }, lsp = { messages = true, progress = true } }, overrides = overrides })
 local old_get = vim.lsp.get_client_by_id
-vim.lsp.get_client_by_id = function(id) return { id = id, name = 'clangd' } end
+vim.lsp.get_client_by_id = function(id) return { id = id, name = id == 1 and 'clangd' or 'other' } end
 local err, ctx = { code = 0 }, { client_id = 1 }
 local show = { type = 2, message = 'Indexing completed' }
 local show_result = h.pack(vim.lsp.handlers['window/showMessage'](err, show, ctx))
@@ -52,6 +55,37 @@ equal(shown_progress.token, 'fixed-token', 'progress token changed')
 equal(shown_progress.value.percentage, 10, 'progress percentage changed')
 equal(shown_progress.value.cancellable, true, 'progress cancellable changed')
 equal(progress.value.title, 'Indexing', 'progress params mutated')
+local index_progress = { token = 'backgroundIndexProgress', value = { kind = 'begin', title = 'indexing' } }
+vim.lsp.handlers['$/progress'](nil, index_progress, ctx)
+equal(calls[#calls][3].value.title, '正在建立索引', 'built-in clangd progress translation missing')
+local status = { uri = 'file:///tmp/test.cpp', state = 'parsing includes, file is queued' }
+local display_status = vim.lsp.handlers['textDocument/clangd.fileStatus'](nil, status, ctx)
+equal(display_status.state, '正在解析包含的文件, 文件等待解析', 'clangd file status was not translated')
+equal(display_status.uri, status.uri, 'clangd file status changed URI')
+equal(status.state, 'parsing includes, file is queued', 'clangd file status mutated source')
+
+local opts = { focus_id = 'textDocument/signatureHelp', title = 'Signature Help: clangd (1/2) (<C-s> to cycle)' }
+local lines = { '# ' .. opts.title, 'int sum(int x, int y)' }
+local preview_lines, preview_opts = vim.lsp.util.open_floating_preview(lines, 'markdown', opts)
+equal(preview_opts.title, '函数签名：clangd (1/2)（按 <C-s> 切换）', 'signature title was not translated')
+equal(preview_lines[1], '# ' .. preview_opts.title, 'inline signature title was not translated')
+equal(preview_lines[2], lines[2], 'signature source changed')
+equal(lines[1], '# ' .. opts.title, 'signature preview mutated input')
+
+if vim.lsp.completion._lsp_to_complete_items then
+  local raw = {
+    label = 'sum', kind = 3, detail = '[2 overloads]', insertText = 'sum',
+    documentation = { kind = 'markdown', value = 'From `<math.h>`\n\nProject docs' },
+  }
+  local complete = vim.lsp.completion._lsp_to_complete_items
+  local item = complete({ raw }, '', 1)[1]
+  equal(item.menu, '[2 个重载]', 'completion overload count was not translated')
+  equal(item.info, '来自 `<math.h>`\n\nProject docs', 'completion documentation display was not translated')
+  equal(item.word, 'sum', 'completion insertion text changed')
+  equal(item.user_data.nvim.lsp.completion_item, raw, 'completion protocol item identity changed')
+  equal(raw.detail, '[2 overloads]', 'completion protocol item mutated')
+  equal(complete({ raw }, '', 2)[1].menu, raw.detail, 'other server completion translated')
+end
 local boom_ok, boom_err = pcall(vim.lsp.handlers['window/showMessage'], err, { type = 2, message = 'boom' }, ctx)
 check(not boom_ok and tostring(boom_err):find('lsp-original-error', 1, true), 'LSP original exception swallowed')
 local unknown = { type = 2, message = 'Unknown message' }
@@ -72,4 +106,5 @@ equal(vim.lsp.handlers['window/showMessage'], external, 'teardown/re-enable recl
 equal(require('nvim-zh.lsp').info()['window/showMessage'].reason, 'external_override', 'external handler ownership forgotten')
 require('nvim-zh.lsp').teardown()
 vim.lsp.get_client_by_id = old_get
+vim.lsp.util.open_floating_preview = old_preview
 print('LSP_HANDLER_SPEC=PASS original_action token cancellation log_source unknown_fallback')

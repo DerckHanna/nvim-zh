@@ -34,8 +34,9 @@ local snapshot = require('nvim-zh').status()
 | `help` | 中文 Help 路径、索引与 `'helplang'` 状态 |
 | `ui` | notify、input/select、select_items、echo 的启用/活动/原因 |
 | `adapters` | 第三方适配器的固定验证组合、安装观察和各显示面的状态与证据 |
+| `packs` | 已登记汉化包的启用状态、选定与活动版本、待重启、任务阶段和最近错误 |
 | `diagnostics` | 各诊断显示接缝与本进程实际观察 |
-| `lsp` | clangd 消息和进度 handler 状态 |
+| `lsp` | clangd 消息、进度与提示适配状态 |
 | `nvim_version` / `v_lang` / `helplang` | 当前 Neovim 与语言状态 |
 
 `version.running_implementation` 与 `version.installed_implementation` 不同，表示磁盘实现已变化；不能据此认为当前进程已经执行新代码。
@@ -122,7 +123,7 @@ local rows = require('nvim-zh').missing()
 local win, err = require('nvim-zh').open()
 ```
 
-打开或聚焦只读中文面板，成功返回 Window id。没有 UI 时返回 `nil, err`，不会创建不可见窗口，也不会触发资源同步。面板操作见 `:help nvim-zh`。
+打开或聚焦中文面板，成功返回 Window id。没有 UI 时返回 `nil, err`。打开面板读取本地状态，汉化包操作从「汉化包」页显式触发。面板操作见 `:help nvim-zh-packs`。
 
 ## `check(callback?)`
 

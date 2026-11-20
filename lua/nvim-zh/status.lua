@@ -10,6 +10,7 @@ function M.get()
     native = require('nvim-zh.native').info(),
     ui = require('nvim-zh.ui').info(),
     adapters = require('nvim-zh.plugins').info(),
+    packs = require('nvim-zh.packs').info(),
     diagnostics = require('nvim-zh.diagnostics').info(),
     lsp = require('nvim-zh.lsp').info(),
     v_lang = vim.v.lang,

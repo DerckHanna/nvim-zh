@@ -33,6 +33,7 @@ function M.resolve(base)
       assert(type(layer) == 'table' and layer.schema == 1, '本地配置需要 schema: 1')
       bounds(layer, 0, { n = 0 })
       layer.schema = nil
+      assert(layer.pack_sources == nil, '汉化包发布源通过 Lua setup 配置')
     end
     local effective = config.resolve(config.merge(base, layer))
     pending = layer

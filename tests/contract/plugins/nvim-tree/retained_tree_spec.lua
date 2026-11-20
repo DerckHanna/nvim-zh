@@ -1,10 +1,5 @@
 local h = dofile(vim.env.NVIM_ZH_ROOT .. '/tests/support/plugin_helpers.lua')
 local check = h.check
-require('nvim-zh').register_catalog('nvim-tree', function()
-  return { schema = 1, domain = 'nvim-tree', locale = 'zh_CN', entries = {
-    { context = 'mapping', msgid = 'Open', msgstr = '打开' },
-  } }
-end, { locale = 'zh_CN', source = 'pinned-test-catalog' })
 local original_keymap_set = vim.keymap.set
 local desc, original_calls = nil, 0
 local throw_default = false

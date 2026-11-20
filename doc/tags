@@ -1,5 +1,6 @@
 :NvimZh	nvim-zh.txt	/*:NvimZh*
 :NvimZhCheck	nvim-zh.txt	/*:NvimZhCheck*
+:NvimZhPacks	nvim-zh.txt	/*:NvimZhPacks*
 nvim-zh	nvim-zh.txt	/*nvim-zh*
 nvim-zh-api	nvim-zh.txt	/*nvim-zh-api*
 nvim-zh-commands	nvim-zh.txt	/*nvim-zh-commands*
@@ -8,6 +9,7 @@ nvim-zh-diagnostics	nvim-zh.txt	/*nvim-zh-diagnostics*
 nvim-zh-help	nvim-zh.txt	/*nvim-zh-help*
 nvim-zh-install	nvim-zh.txt	/*nvim-zh-install*
 nvim-zh-maintenance	nvim-zh.txt	/*nvim-zh-maintenance*
+nvim-zh-packs	nvim-zh.txt	/*nvim-zh-packs*
 nvim-zh-panel	nvim-zh.txt	/*nvim-zh-panel*
 nvim-zh-plugins	nvim-zh.txt	/*nvim-zh-plugins*
 nvim-zh-resources	nvim-zh.txt	/*nvim-zh-resources*

@@ -2,6 +2,7 @@ local h = dofile(vim.env.NVIM_ZH_ROOT .. '/tests/support/diagnostic_helpers.lua'
 local check, equal = h.check, h.equal
 local known = "Redefinition of 'x'"
 local original_open_float = vim.diagnostic.open_float
+local original_setqflist = vim.diagnostic.setqflist
 local user_calls = 0
 local user_format = function(diagnostic) user_calls = user_calls + 1; return diagnostic.message end
 vim.diagnostic.config({ virtual_text = { format = user_format }, virtual_lines = { format = user_format }, float = { format = user_format } })
@@ -45,12 +46,20 @@ equal(stored.message, known, 'stored diagnostic was translated')
 check(vim.deep_equal(stored.user_data, diagnostic.user_data), 'stored user_data changed')
 vim.diagnostic.setqflist({ open = false })
 local qf = vim.fn.getqflist({ items = 1 }).items
-check(vim.tbl_contains(vim.tbl_map(function(item) return item.text end, qf), known), 'quickfix diagnostic was translated')
+local list_text = vim.fn.has('nvim-0.12') == 1 and "'x' 重复定义" or known
+equal(qf[1].text, list_text, 'quickfix diagnostic display')
+vim.diagnostic.setloclist({ open = false })
+equal(vim.fn.getloclist(0)[1].text, list_text, 'location list diagnostic display')
 vim.api.nvim_win_set_cursor(0, { 1, 4 })
 local float_buf, float_win = vim.diagnostic.open_float({ namespace = ns, scope = 'line' })
 check(float_buf and float_win, 'diagnostic float did not open')
 local text = table.concat(vim.api.nvim_buf_get_lines(float_buf, 0, -1, false), '\n')
 check(text:find("'x' 重复定义", 1, true), 'float diagnostic not translated')
+if vim.fn.has('nvim-0.12') == 1 then
+  check(text:find('nvim-zh-fixture.cpp:1:5: 此前的定义在这里', 1, true), 'float related information not translated')
+  check(vim.deep_equal(vim.diagnostic.get(buf, { namespace = ns })[1].user_data, diagnostic.user_data),
+    'float mutated stored related information')
+end
 vim.api.nvim_win_close(float_win, true)
 
 local before = user_calls
@@ -70,5 +79,6 @@ local ok, err = pcall(throwing, diagnostic)
 check(not ok and tostring(err):find('user-format-error', 1, true), 'user formatter error changed')
 h.setup({ enabled = false })
 equal(vim.diagnostic.open_float, original_open_float, 'disabling diagnostics did not restore open_float')
+equal(vim.diagnostic.setqflist, original_setqflist, 'disabling diagnostics did not restore setqflist')
 require('nvim-zh.diagnostics').teardown()
-print('DIAGNOSTIC_DISPLAY_SPEC=PASS stored=source quickfix=source float=translated metadata=preserved')
+print('DIAGNOSTIC_DISPLAY_SPEC=PASS stored=source quickfix=version_dependent float=translated metadata=preserved')

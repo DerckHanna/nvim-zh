@@ -22,6 +22,28 @@ local function index(id, spec)
   end
 end
 
+function M.check_conflicts(specs, candidate)
+  local modules = {}
+  for _, surface in pairs(candidate.surfaces) do
+    for name in pairs(surface.modules or {}) do
+      if not vim.startswith(name, 'vim.') then modules[name] = true end
+    end
+  end
+  for id, spec in pairs(specs) do
+    for _, surface in pairs(spec.surfaces) do
+      for name in pairs(surface.modules or {}) do
+        assert(not modules[name], '适配模块已由 ' .. id .. ' 注册：' .. name)
+      end
+    end
+  end
+end
+
+function M.remove(id)
+  for module, source in pairs(sources) do
+    if source.id == id then sources[module] = nil end
+  end
+end
+
 local function set_root(id, root)
   local previous = installed[id]
   if previous and previous.root == root then return previous end
@@ -71,11 +93,11 @@ end
 -- before anything can capture an unprojected alias. Keep the original chunk as
 -- a fallback and give the projection a generation guard for delayed callbacks.
 local function project(chunk, source, module, bytes, digest, actual, current)
-  if not source.spec.source_projection then return chunk end
+  if not source.spec.source_projection or not source.spec.load then return chunk end
   for _, target in pairs(source.spec.targets) do
     if target.neovim == nvim_version and target.sources[source.path] == digest then
       local ok, projected = pcall(function()
-        local adapter = require(source.spec.entry)
+        local adapter = source.spec.load()
         return adapter.project_source(module, bytes, actual, current)
       end)
       if ok and type(projected) == 'function' then return projected end
@@ -103,7 +125,8 @@ local function loader(module)
   local digest = vim.fn.sha256(bytes)
   local observation
   local function current()
-    return observation ~= nil and observations[id] and observations[id][module] == observation
+    return sources[module] and sources[module].id == id
+      and observation ~= nil and observations[id] and observations[id][module] == observation
       and installed[id] == installation and installation.epoch == epoch
       and rawequal(package.loaded[module], observation.object)
   end

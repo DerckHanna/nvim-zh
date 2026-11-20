@@ -976,17 +976,29 @@
       "commit": "7a941dfb2877a0b8cf30323fefa85ad019e0b0f5",
       "adapter": {
         "status": "implemented",
-        "seam": "vim.diagnostic display formatters",
+        "seam": "vim.diagnostic display formatters and Neovim LSP display",
         "domain": "clangd",
         "writes": "display_strings_only",
-        "static_entries": 4,
-        "corpus_coverage": "5/7",
-        "real_smoke": "push passed; pull unsupported_method_not_found",
+        "static_entries": 356,
+        "corpus_coverage": "7/7",
+        "real_smoke": "clangd 23.1.5 push passed, pull unsupported_method_not_found; real editor error, warning, hover and quickfix passed",
         "distribution": "Arch Linux extra/clang 23.1.4-1"
       },
       "sources": {
         "clang-tools-extra/clangd/ClangdLSPServer.cpp": {
           "sha256": "166463c6638e6c9002784f9cd6aff3d6c7782a610f7b890f99917818ded1f0c0"
+        },
+        "clang-tools-extra/clangd/Diagnostics.cpp": {
+          "sha256": "bb245daa9438bb08487a5731cc9d29629f547682468ff1f298b22c9dfe1b3fbe"
+        },
+        "clang-tools-extra/clangd/Hover.cpp": {
+          "sha256": "2e06b52e9aa4651e6319d8f0e81a3d847b36f456b4722e844615e4c4242eaa34"
+        },
+        "clang-tools-extra/clangd/CodeComplete.cpp": {
+          "sha256": "b5a0a2e0c19524feba02c860401d353cf16da814ee402848fc21f2786ce6b9ea"
+        },
+        "clang-tools-extra/clangd/TUScheduler.cpp": {
+          "sha256": "03ec19ed024dba898ab70ada0a456c682dcc7372d144159d4a2faa3ccc15002a"
         }
       }
     }

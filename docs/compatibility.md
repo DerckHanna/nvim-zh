@@ -38,6 +38,7 @@
 | nvim-tree | `dbc9d96a3633c2de85f409416ebd4a3aacf4220a` | 默认映射、通知、文件操作、文件信息、Window 选择、帮助浮窗、隐藏统计和 4 篇中文帮助 |
 | nvim-dap | `cfa2d58f4537aca6ca83e2de1a0d9f1491121264` | 通知、选择器、REPL、输入、quickfix、健康检查、Widget、诊断前缀和 4 篇中文帮助 |
 | nvim-dap-ui | `cc9dd33aade7f20bae414d0cba163bc60d4d4b43` | 固定渲染文案、映射、浮窗、选择器、Window 提示、通知和 3 篇中文帮助 |
+| nvim-dap-view | `1c3b9cc295303fc173f24d442739a8557e23e987` | 监视、作用域、调试面板、键位、异常、Help 及 CodeLLDB 1.12.3 的固定显示标签 |
 | lazy.nvim | `306a05526ada86a7b30af95c5cc81ffba93fef97` | `User LazyLoad` 生命周期桥接 |
 | nvim-cmp | `2ffe79f1f021def8dd1fcd81deb16f1bb0d989f3` | inventory-only，实测公共 formatter 与输入数据契约 |
 
@@ -45,7 +46,7 @@
 
 ## 诊断、LSP 与外部工具
 
-诊断/LSP 适配仅处理明确识别的 clang/clangd 显示文本。固定 fixture 和真实服务器观察用于发现回归，不是整个 clangd 的覆盖率。原始诊断、quickfix、LSP 协议对象、日志和外部工具 stdout/stderr 不修改。
+诊断与 LSP 适配按诊断代码和显示文本匹配译文。诊断列表使用 Neovim 0.12 的 formatter，原生补全使用同版本提供的显示转换入口。固定样例和真实服务器测试只统计实际验证的文本。原始 LSP 诊断、日志和外部编译器的 stdout/stderr 继续使用上游文本。
 
 真实 clangd pull 的支持取决于服务器能力；不支持的方法要报告真实错误，不能把它写成成功。测试必须同时保留成功 pull 反例，避免用 `and/or` 之类表达式让已知消息断言失效。
 

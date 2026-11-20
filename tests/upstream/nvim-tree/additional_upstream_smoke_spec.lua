@@ -87,20 +87,10 @@ local notify_spy = function(msg, level, opts)
 end
 vim.notify = notify_spy
 local zh = require('nvim-zh')
-zh.register_catalog('nvim-tree', function()
-  local entries = {
-    { context = 'notification', msgid = 'No bookmarks to delete.', msgstr = '没有可删除的书签。' },
-    { context = 'notification', msgid = 'Cannot create: path already exists: %s', msgstr = '无法创建：路径已存在：%s' },
-  }
-  local seen = {}
-  for _, item in ipairs(expected) do
-    if not seen[item[2]] then
-      entries[#entries + 1] = { context = 'mapping', msgid = item[2], msgstr = item[3] }
-      seen[item[2]] = true
-    end
-  end
-  return { schema = 1, domain = 'nvim-tree', locale = 'zh_CN', entries = entries }
-end, { locale = 'zh_CN', source = 'pinned-test-catalog' })
+overrides['nvim-tree'].notification = {
+  ['No bookmarks to delete.'] = '没有可删除的书签。',
+  ['Cannot create: path already exists: %s'] = '无法创建：路径已存在：%s',
+}
 zh.setup({
   modules = {
     core = { enabled = false },
@@ -116,9 +106,7 @@ local lazy = require('lazy')
 local cmp = require('cmp')
 check(type(lazy.setup) == 'function', 'real lazy.setup missing')
 check(type(cmp.setup) == 'table', 'real nvim-cmp public setup missing')
-local cmp_info = zh.status().adapters['nvim-cmp']
-check(not cmp_info.active and cmp_info.reason == 'inventory_only',
-  'nvim-cmp inventory-only exclusion changed')
+check(zh.status().adapters['nvim-cmp'] == nil, 'nvim-cmp inventory was registered as a runtime adapter')
 
 local order = {}
 local setup_events, lazy_events = 0, 0
@@ -307,7 +295,6 @@ require('nvim-zh.plugins').teardown()
 equal(next_keymap.on_attach_default, next_original_default, 'real keymap teardown failed')
 equal(next_tree.setup, next_original_setup, 'real tree setup teardown failed')
 check(tree_notify.warn == original_notify_warn, 'teardown changed plugin-owned notify')
-cmp_info = zh.status().adapters['nvim-cmp']
-check(not cmp_info.active and cmp_info.reason == 'inventory_only',
+check(zh.status().adapters['nvim-cmp'] == nil,
   'nvim-cmp inventory assertion changed after teardown')
 print('ADDITIONAL_UPSTREAM_SMOKE_SPEC=PASS lazy=306a055 nvim-tree=69eb0c3 mappings=60 custom_desc=original notify=source_only generations=true nvim-cmp=inventory_only')

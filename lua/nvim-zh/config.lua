@@ -6,10 +6,11 @@ local defaults = {
     help = { enabled = true, lang = { 'cn', 'en' } },
     ui = { notify = true, prompts = true, select_items = false, echo = false },
     plugins = { auto = true, lazy_load = true, disabled = {} },
-    diagnostics = { enabled = true, virtual_text = true, virtual_lines = true, float = true },
-    lsp = { messages = true, progress = true },
+    diagnostics = { enabled = true, virtual_text = true, virtual_lines = true, float = true, lists = true },
+    lsp = { messages = true, progress = true, hints = true },
   },
   overrides = {},
+  pack_sources = {},
   missing = { enabled = true, max_entries = 2000 },
 }
 
@@ -33,12 +34,13 @@ function M.resolve(opts)
     expect(name, 'string', ('modules.plugins.disabled[%d]'):format(index))
   end
   expect(config.modules.diagnostics, 'table', 'modules.diagnostics')
-  for _, name in ipairs({ 'enabled', 'virtual_text', 'virtual_lines', 'float' }) do
+  for _, name in ipairs({ 'enabled', 'virtual_text', 'virtual_lines', 'float', 'lists' }) do
     expect(config.modules.diagnostics[name], 'boolean', 'modules.diagnostics.' .. name)
   end
   expect(config.modules.lsp, 'table', 'modules.lsp')
   expect(config.modules.lsp.messages, 'boolean', 'modules.lsp.messages')
   expect(config.modules.lsp.progress, 'boolean', 'modules.lsp.progress')
+  expect(config.modules.lsp.hints, 'boolean', 'modules.lsp.hints')
   expect(config.modules.ui, 'table', 'modules.ui')
   expect(config.modules.ui.notify, 'boolean', 'modules.ui.notify')
   expect(config.modules.ui.prompts, 'boolean', 'modules.ui.prompts')
@@ -56,6 +58,12 @@ function M.resolve(opts)
     error('nvim-zh: missing.max_entries must be a positive integer', 2)
   end
   expect(config.overrides, 'table', 'overrides')
+  local store = require('nvim-zh.pack_store')
+  for id, source in pairs(config.pack_sources) do
+    assert(store.id(id) and id ~= 'official' and id ~= 'local' and type(source) == 'table'
+      and store.https(source.url) and (source.allow_lua == nil or type(source.allow_lua) == 'boolean'), '无效的汉化包发布源')
+    for key in pairs(source) do assert(key == 'url' or key == 'allow_lua', '未知的汉化包发布源字段') end
+  end
   require('nvim-zh.catalog').validate_overrides(config.overrides)
   return config
 end
@@ -65,7 +73,10 @@ function M.merge(base, layer, prefix)
   for key, value in pairs(layer) do
     local name = (prefix and prefix .. '.' or '') .. tostring(key)
     assert(base[key] ~= nil, 'nvim-zh: unknown option ' .. name)
-    if name == 'overrides' then
+    if name == 'pack_sources' then
+      expect(value, 'table', name)
+      result[key] = vim.deepcopy(value)
+    elseif name == 'overrides' then
       expect(value, 'table', name)
       result[key] = vim.tbl_deep_extend('force', result[key], value)
     elseif name == 'modules.plugins.disabled' or name == 'modules.help.lang' then

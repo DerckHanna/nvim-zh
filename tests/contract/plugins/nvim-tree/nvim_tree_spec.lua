@@ -5,13 +5,6 @@ for _, forbidden in ipairs({ '窗口', '缓冲区', '寄存器' }) do
   check(not po:find(forbidden, 1, true), 'nvim-tree PO contains forbidden terminology: ' .. forbidden)
 end
 local zh = require('nvim-zh')
-zh.register_catalog('nvim-tree', function()
-  return { schema = 1, domain = 'nvim-tree', locale = 'zh_CN', entries = {
-    { context = 'mapping', msgid = 'Open', msgstr = '打开' },
-    { context = 'mapping', msgid = 'Help', msgstr = '帮助' },
-    { context = 'notification', msgid = 'No bookmarks to delete.', msgstr = '没有可删除的书签。' },
-  } }
-end, { locale = 'zh_CN', source = 'pinned-test-catalog' })
 local original_keymap_set = vim.keymap.set
 local maps = {}
 local keymap_spy = function(mode, lhs, rhs, opts)

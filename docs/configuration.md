@@ -22,9 +22,11 @@ require('nvim-zh').setup({
       virtual_text = true,
       virtual_lines = true,
       float = true,
+      lists = true,
     },
-    lsp = { messages = true, progress = true },
+    lsp = { messages = true, progress = true, hints = true },
   },
+  pack_sources = {},
   overrides = {},
   missing = { enabled = true, max_entries = 2000 },
 })
@@ -67,16 +69,51 @@ require('nvim-zh').setup({
 
 ### `modules.diagnostics`
 
-`enabled` 是总开关；`virtual_text`、`virtual_lines`、`float` 分别控制显示入口。适配器只包装公开 formatter，先调用用户 formatter，再翻译明确识别的 clang/clangd 显示文本。
+诊断译文由 clangd 汉化包提供，可通过 `:NvimZhPacks` 安装。
 
-原始 `vim.diagnostic.get()`、quickfix、LSP 诊断对象、范围、代码和 `user_data.lsp` 保持原样。用户 formatter 返回 `nil` 时仍隐藏对应诊断，用户 formatter 的异常继续传播。
+`enabled` 是总开关。`virtual_text`、`virtual_lines` 和 `float` 分别控制行尾、虚拟行和浮窗。Neovim 已启用的诊断显示会使用中文译文。浮窗也会翻译已收录的相关位置说明。
+
+`lists` 控制 `vim.diagnostic.setqflist()` 和 `vim.diagnostic.setloclist()` 生成的诊断列表。插件先调用用户 formatter，再翻译显示文字。用户 formatter 返回 `nil` 时仍隐藏对应诊断，其异常继续传播。`vim.diagnostic.get()` 仍返回完整原文，可用诊断代码和 `user_data.lsp` 查找上游说明。
 
 ### `modules.lsp`
 
 - `messages`：适配 clangd 的 `window/showMessage` 和 `window/showMessageRequest` 显示字段。
-- `progress`：适配 `$/progress` 的 `title` 和 `message`。
+- `progress` 启用工作进度译文，并适配通过 `vim.lsp.handlers` 注册的 `textDocument/clangd.fileStatus`。
+- `hints` 启用悬浮说明、重载签名标题、原生补全的头文件与重载说明，以及代码操作标题。代码操作菜单使用 `modules.ui.prompts` 的选择器适配。
 
-动作返回值、token、percentage、取消逻辑和原始请求对象不被替换。`window/logMessage`、其他服务器和未知文本保留原文。
+原生补全保留标识符、插入文本和编辑范围。语言服务器协议记录及 `window/logMessage` 仍使用英文。当前词库离线运行，遇到目录未收录的诊断和提示时显示原文。
+
+可按诊断代码添加或覆盖译文。通用诊断使用 `diagnostic` context。`{name}` 会保留诊断中的变量名，例如 `unused`。
+
+```lua
+require('nvim-zh').setup({
+  overrides = {
+    clangd = {
+      ['-Wunused-variable'] = {
+        ["Unused variable '{name}'"] = "未使用的变量 '{name}'",
+      },
+    },
+  },
+})
+```
+
+## 汉化包发布源
+
+在 `:NvimZh` 的「汉化包」页管理已安装的包。官方源随主包登记。可在 Lua
+`setup()` 中通过 `pack_sources` 添加自定义 HTTPS 索引。带 Lua 入口的自定义
+包需要该来源配置 `allow_lua = true`。
+
+```lua
+require('nvim-zh').setup({
+  pack_sources = {
+    community = { url = 'https://example.org/nvim-zh/catalog.json' },
+  },
+})
+```
+
+遇到重名包时，可用 `:NvimZhPacks install community:包ID` 指定来源。
+安装状态和暂停开关按用户数据目录保存。`modules.plugins` 继续控制插件显示
+接缝，`modules.diagnostics` 和 `modules.lsp` 控制对应工具界面。
 
 ## 翻译覆盖
 

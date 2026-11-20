@@ -1,0 +1,82 @@
+#!/usr/bin/env python3
+"""Build individual nvim-zh release assets and their catalog records."""
+import argparse
+import json
+import re
+from pathlib import Path
+
+import adapter_manifest
+import catalog_tool
+import resource_bundle as bundle
+
+
+def assets(root, version, repository, only=None):
+    if not re.fullmatch(r'\d+\.\d+\.\d+', version):
+        raise ValueError('pack version must be major.minor.patch')
+    specs = adapter_manifest.validate(root)
+    index = adapter_manifest.runtime_specs(specs)
+    domains = catalog_tool.builtin_sources(root, optional=True)
+    catalog_tool.check(root / 'translations/po/zh_CN', root / 'translations/glossary/zh_CN.toml')
+    ids = {id for id, spec in specs.items() if spec['status'] == 'implemented'} | {'clangd'}
+    if only:
+        if only not in ids:
+            raise ValueError(f'unknown pack: {only}')
+        ids = {only}
+    for id in sorted(ids):
+        spec = index.get(id)
+        domain = spec['domain'] if spec else id
+        files = {'catalogs/zh_CN.json': bundle.encoded(bundle.catalog(domains[domain]))}
+        if spec:
+            entry = spec['entry'].split('.')[-1]
+            spec.pop('entry')
+            files.update(bundle.adapter_help(root, {id: specs[id]}))
+            files['adapter/entry.lua'] = (root / 'translations/adapters' / f'{entry}.lua').read_bytes()
+        manifest = {'schema': 1, 'sdk': 1, 'id': id, 'locale': 'zh_CN', 'version': version,
+                    'domain': domain, 'name': id, 'files': bundle.descriptor(files)}
+        if spec:
+            manifest['adapter'] = spec
+        else:
+            manifest['executable'] = 'clangd'
+        content = bundle.encoded({'manifest': manifest, 'files': {
+            name: value.decode('utf-8') for name, value in files.items()}})
+        filename = f'{id}-zh_CN.json'
+        record = {'id': id, 'version': version, 'locale': 'zh_CN', 'sdk': 1, 'name': id,
+                  'url': f'{repository}/releases/download/packs-{id}-v{version}/{filename}',
+                  'sha256': bundle.digest(content), 'size': len(content)}
+        if spec:
+            record.update(repository=spec['repository'], modules=spec['modules'],
+                          targets=sorted({target['commit'] for target in spec['targets'].values()}))
+        else:
+            record['executable'] = 'clangd'
+        yield filename, content, record
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--root', type=Path, default=adapter_manifest.ROOT)
+    parser.add_argument('--version', required=True)
+    parser.add_argument('--repository', default='https://github.com/DerckHanna/nvim-zh')
+    parser.add_argument('--output', required=True, type=Path)
+    parser.add_argument('--id', help='build a single pack')
+    parser.add_argument('--index', type=Path, help='append to an existing published catalog')
+    args = parser.parse_args()
+    records = {}
+    if args.index:
+        index = json.loads(args.index.read_text(encoding='utf-8'))
+        if index['schema'] != 1:
+            parser.error('unsupported existing catalog schema')
+        for item in index['packages']:
+            records[item['id'], item['version'], item['locale']] = item
+    args.output.mkdir(parents=True, exist_ok=True)
+    for filename, content, record in assets(args.root, args.version, args.repository.rstrip('/'), args.id):
+        key = record['id'], record['version'], record['locale']
+        if key in records and records[key] != record:
+            parser.error(f'{key[0]} {key[1]} already has a different asset')
+        catalog_tool.atomic_write_bytes(args.output / filename, content)
+        records[key] = record
+    catalog_tool.atomic_write_bytes(args.output / 'catalog.json', bundle.encoded({
+        'schema': 1, 'packages': [records[key] for key in sorted(records)]}))
+
+
+if __name__ == '__main__':
+    main()

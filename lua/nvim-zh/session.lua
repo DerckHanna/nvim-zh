@@ -14,12 +14,17 @@ function M.apply(config)
   require('nvim-zh.plugins').setup(config.modules.plugins)
   require('nvim-zh.diagnostics').setup(config.modules.diagnostics)
   require('nvim-zh.lsp').setup(config.modules.lsp)
+  local packs = require('nvim-zh.packs')
+  packs.configure(config.pack_sources)
+  packs.sync(config.modules)
   state = { configured = true, config = config }
   return M
 end
 
 function M.restore(config, configured)
   if configured then return M.apply(config) end
+  local packs = package.loaded['nvim-zh.packs']
+  if packs then packs.stop() end
   for _, name in ipairs({ 'ui', 'plugins', 'diagnostics', 'lsp' }) do
     require('nvim-zh.' .. name).teardown()
   end

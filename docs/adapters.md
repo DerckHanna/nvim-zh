@@ -6,6 +6,7 @@
 
 ## 通用行为
 
+- 在 `:NvimZh` 的「汉化包」页安装所需汉化包。目标插件及其依赖由用户原有的插件管理器安装。
 - 默认只检查 `package.loaded` 中已经加载的模块，不为了汉化强制加载插件。
 - `modules.plugins.auto = false` 关闭全部第三方适配；`disabled` 按名称关闭单个适配器。
 - `lazy_load = true` 时使用 `User LazyLoad`，并在后续 Buffer/焦点边界补检已加载模块。
@@ -154,7 +155,7 @@ vim.pack.add({
 
 ## 新增适配器的要求
 
-1. 在 `lua/nvim-zh/adapters/` 新建一个模块，并在 `manifests/adapters/<id>.json` 声明入口。使用 `make build-resources` 更新生成索引与发布资源。
+1. 在 `translations/adapters/` 新建模块，并在 `manifests/adapters/<id>.json` 声明入口。用 `make build-adapters` 更新维护索引。
 2. 固定完整上游 commit，记录实际检查源码 hash 和公开/版本相关接缝依据。
 3. 编辑对应 domain 的 PO，使用稳定 context 和真实 source reference；不从 fixture 编造产品条目。
 4. 先写差分和负向契约，再实现。至少覆盖默认流程、重复 setup、晚加载、外部替换、模块换代、未知文本和 teardown。

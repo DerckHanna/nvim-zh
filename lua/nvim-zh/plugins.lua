@@ -1,16 +1,11 @@
 local M = {}
 
-local specs = require('nvim-zh.adapters.index')
+local specs = {}
 local evidence = require('nvim-zh.adapters.evidence')
 local common = require('nvim-zh.adapters.common')
 local uv = vim.uv
 local adapters, names, failures = {}, {}, {}
-local installed, external = {}, {}
-
-for id, spec in pairs(specs) do
-  names[#names + 1] = id
-end
-table.sort(names)
+local installed, external, managed, source_dirs = {}, {}, {}, {}
 
 local config = { auto = false, lazy_load = true, disabled = {} }
 local AUGROUP = 'NvimZhPluginLateLoad'
@@ -66,18 +61,19 @@ local function match_notification(paths, opts)
 end
 
 local function context(id)
+  local owner = specs[id]
   return {
-    enabled = function() return enabled(id) end,
+    enabled = function() return specs[id] == owner and enabled(id) end,
     translate = common.translate,
     verify = function(surface)
-      local spec = specs[id]
-      local rule = spec.surfaces[surface]
+      if specs[id] ~= owner then return nil, 'stale_generation' end
+      local rule = owner.surfaces[surface]
       if not rule then return nil, 'unsupported_api' end
       if rule.kind ~= 'versioned' then return { kind = 'api_contract' } end
-      return evidence.verify(id, spec, rule)
+      return evidence.verify(id, owner, rule)
     end,
     register_source = function(spec)
-      local rule = specs[id].surfaces.notifications
+      local rule = owner.surfaces.notifications
       if rule and rule.source then
         spec = vim.tbl_extend('force', spec, { matches = function(opts)
           return match_notification(rule.source, opts)
@@ -90,7 +86,7 @@ end
 
 local function attach_one(id)
   local spec = specs[id]
-  if not spec.entry and not external[id] then return end
+  if not spec or (not spec.load and not external[id]) then return end
   local adapter = adapters[id]
   if not enabled(id) then
     if adapter then adapter.detach() end
@@ -99,7 +95,7 @@ local function attach_one(id)
   end
   local ok, failure = pcall(function()
     if not adapter then
-      adapter = require(spec.entry)
+      adapter = spec.load()
       adapters[id] = adapter
     end
     adapter.attach(context(id))
@@ -342,9 +338,54 @@ function M.register_adapter(definition)
   return unregister
 end
 
+function M.check_managed(id, spec)
+  assert(not specs[id] or managed[id], '适配包 ID 已在使用：' .. id)
+  local others = vim.tbl_extend('force', {}, specs)
+  others[id] = nil
+  evidence.check_conflicts(others, spec)
+end
+
+function M.managed_entry(id) return managed[id] and adapters[id] end
+
+function M.register_managed(id, spec, adapter, help_root)
+  assert(not specs[id], '适配包 ID 已在使用：' .. id)
+  M.check_managed(id, spec)
+  local entry = adapter or { attach = function() end, detach = function() end, info = function() return {} end }
+  spec.help_root = help_root
+  spec.load = function() return entry end
+  if source_dirs[id] then evidence.register(id, spec, source_dirs[id]) end
+  specs[id], adapters[id], managed[id] = spec, entry, true
+  names[#names + 1] = id
+  table.sort(names)
+  local function release()
+    if specs[id] ~= spec then return end
+    pcall(entry.detach)
+    specs[id], adapters[id], failures[id], managed[id] = nil, nil, nil, nil
+    table.remove(names, vim.fn.index(names, id) + 1)
+    evidence.remove(id)
+    sync_help()
+  end
+  if config.auto then evidence.setup(specs, source_loaded, translate_health) end
+  attach_one(id)
+  local ok, err = pcall(sync_help)
+  local failure = failures[id] or (not ok and err)
+  if failure then release(); error(failure, 0) end
+  return release, sync_help
+end
+
 function M.register_source(id, directory)
-  local spec = assert(specs[id], 'unknown adapter ' .. tostring(id))
-  evidence.register(id, spec, directory)
+  assert(type(id) == 'string' and id:match('^[a-z0-9][a-z0-9_.%-]*$'), 'invalid adapter ID')
+  assert(type(directory) == 'string', 'adapter source directory must be a string')
+  local root = uv.fs_realpath(directory)
+  local stat = root and uv.fs_stat(root)
+  assert(stat and stat.type == 'directory', 'adapter source directory does not exist')
+  source_dirs[id] = root
+  if not specs[id] then
+    local pending_spec = require('nvim-zh.packs').spec_for_evidence(id)
+    if pending_spec then evidence.register(id, pending_spec, root) end
+    return
+  end
+  evidence.register(id, specs[id], root)
   if config.auto then attach_one(id); sync_help() end
 end
 

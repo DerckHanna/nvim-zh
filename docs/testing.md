@@ -24,7 +24,7 @@ make test
 make release-check
 ```
 
-`check-syntax` 使用 Neovim `loadfile`、Python AST 与 `bash -n`，仅做语法检查，不是完整类型分析，不要求 luacheck/stylua。`check-reproducible` 重建并逐字节核对 PO → Lua、固定上游 → MO，以及完整资源包。资源构建只在维护端发生。
+`check-syntax` 使用 Neovim `loadfile`、Python AST 与 `bash -n`，仅做语法检查，不是完整类型分析，不要求 luacheck/stylua。`check-reproducible` 重建并逐字节核对 PO → Lua、固定上游 → MO，以及完整资源包。资源构建只在维护端发生。汉化包面板端到端测试用 libvterm 开发头文件和 C 编译器解码 PTY 屏幕。
 
 `release-check` 从工作树复制临时候选，排除自身 `.git` 和工作环境创建的空 `.agents`、`.codex`、`.aws` 挂载目录。其余文件均接受严格检查，包括未跟踪文件。校验器自身拒绝 `.agents`、`.codex`、`.aws`、日志、零字节文件、符号链接、缓存、研究源码和备份，不用 Git 忽略规则掩盖残留。
 
@@ -73,7 +73,7 @@ bash benchmarks/run.sh
 
 native 真实消息探针使用复制到临时前缀的 Neovim、临时 locale 与临时 MO，检查 E482/E576/E136/E5005、原文豁免和欢迎页；不写系统 locale 或 MO。自动接线、opt-out、绑定/语言独立所有权、异步外部修改、两次恢复失败与重试也在 Lua 集成中检查。性能读数只描述当次环境，不形成稳定性能承诺。
 
-真实 clangd 重新观察固定 C++ corpus，通过同一显示断言验证 push、quickfix、`user_data.lsp` 与原始协议不变。服务器若返回 pull `-32601`，报告“不支持”，不声称成功；独立成功 pull 控制验证原始英文可以通过，已译文本和非字符串必须失败。`NVIM_ZH_CLANGD_RECORD` 可指定仓库外记录路径；默认只在临时目录记录。
+真实 clangd 重新观察固定 C++ 样例，检查 push 诊断和列表显示，以及原始协议和 `user_data.lsp` 的完整性。随后用真实 Neovim 会话检查中文语法错误、修复菜单、悬浮提示，以及修复后出现的未使用变量警告。服务器对 pull 返回 `-32601` 时记录该能力未提供，成功 pull 由独立用例验证。`NVIM_ZH_CLANGD_RECORD` 可指定仓库外记录路径，默认在临时目录记录。
 
 ## PASS / FAIL / SKIP / BLOCKED
 

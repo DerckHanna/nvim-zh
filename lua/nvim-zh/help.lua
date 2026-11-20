@@ -9,7 +9,7 @@ local owned_roots, adapter_states = {}, {}
 
 function M.sync_adapters(specs, enabled)
   local desired, states = {}, {}
-  if resource_root and adapter_enabled then
+  if adapter_enabled then
     for id, spec in pairs(specs) do
       if enabled(id) and spec.help then
         states[id] = 'unknown_version'
@@ -19,8 +19,8 @@ function M.sync_adapters(specs, enabled)
             local ok, bytes = pcall(require('nvim-zh.fs').read, file, 4 * 1024 * 1024)
             local hash = ok and vim.fn.sha256(bytes)
             for _, target in pairs(spec.targets) do
-              local root = resource_root .. '/adapters/' .. id .. '/' .. vim.fs.basename(source)
-              if hash and hash == target.sources[source] and vim.uv.fs_stat(root .. '/doc/tags-cn') then
+              local root = spec.help_root and spec.help_root .. '/' .. vim.fs.basename(source)
+              if root and hash and hash == target.sources[source] and vim.uv.fs_stat(root .. '/doc/tags-cn') then
                 desired[root] = true
                 states[id] = 'active'
                 break

@@ -8,7 +8,7 @@
 | 核心 gettext 消息 | `translations/native/*.po`、`manifests/native.json` | `build/native/`、资源中的 MO | `make check-native` |
 | 上游 Neovim Help 译文 | `doc/*.cnx`、`manifests/upstreams.json` | `doc/tags*`、`manifests/help_inventory.json`、资源 Help | Help contract/integration suites |
 | 项目自有 Help | `doc/nvim-zh.txt`、`doc/nvim-zh.cnx` | 项目 tag 与资源 Help | `:help nvim-zh` 与 Help suites |
-| 第三方适配与 Help | `manifests/adapters/`、适配 Lua、PO、`translations/help/adapters/` | `lua/nvim-zh/adapters/index.lua`、`resources/adapter-contract.json`、第三方 Help | `make check-adapters test-upstream` |
+| 第三方适配与 Help | `manifests/adapters/`、`translations/adapters/`、PO、`translations/help/adapters/` | `manifests/adapter-index.lua`、独立汉化包 JSON 附件 | `make check-adapters test-upstream` |
 | 运行时实现 | `plugin/`、`lua/nvim-zh/` 中非生成 Lua | 资源清单中的实现标识 | `make check-syntax test-contract test-integration` |
 | 完整交付资源 | 上述所有输入 | `resources/` | `make build-resources check-resources` |
 
@@ -40,7 +40,8 @@ make test               # 默认离线测试与真实本地 TUI/vim.pack；发�
 - `catalog` / `engine` / `missing`：精确翻译、模板和本地观察；
 - `ui` / `diagnostics` / `lsp`：Neovim 公共显示接缝；
 - `plugins` / `adapters`：薄管理器与每插件独立适配；
-- `status` / `health` / `tui`：只读快照、检查和展示。
+- `status` / `health`：只读快照和检查。
+- `packs` / `pack_store` / `tui`：包操作、快照与安装登记、状态展示和面板交互。
 
 查询不得隐式 setup、下载、更新或写资源；渲染层不承载同步流程。不要通过 `require('nvim-zh')` 从底层模块回到公共入口形成循环。完整说明见[架构文档](docs/architecture.md)。
 
@@ -55,6 +56,8 @@ make test               # 默认离线测试与真实本地 TUI/vim.pack；发�
 
 ## 修改 PO 与术语
 
+译文写法、词条选取和审校口径见[简体中文翻译规范](docs/translation-style.md)。
+
 ```bash
 make check-translations
 make build
@@ -63,7 +66,7 @@ make check-reproducible
 
 - 每个插件/服务器使用独立 domain，每个语义场景使用稳定 `msgctxt`。
 - 保留真实 `#:` source reference，不从测试 fixture 编造产品文本。
-- 动态文本使用审查过的 `{name}` 或 printf 占位符，保持参数顺序和类型。
+- 动态文本使用审查过的 `{name}` 或 printf 占位符。保留命名参数的名称和次数，以及 printf 参数的顺序和类型。
 - 命令、选项、代码、路径、URI、快捷键和反引号内容必须保留。
 - 空译文、fuzzy、占位符不匹配、重复键和受保护文本变化均应失败。
 - `translations/glossary/zh_CN.toml` 是术语检查真源；运行时不做最终文本全局替换。
@@ -125,6 +128,17 @@ make sync-native # 显式联网：Neovim 核心 PO
 第三方适配器使用 `tools/adapter_tool.py` 独立发现与校验候选。同步报告中的 `UPSTREAM_CHANGE`、`STALE_TRANSLATION`、`UNTRANSLATED` 需要逐条审查。
 
 ## 发布
+
+生成独立汉化包附件和目录索引时，请将输出放在主包工作树之外。
+
+```bash
+python3 -B tools/pack_assets.py --id telescope --version 1.0.0 --output /tmp/nvim-zh-packs
+```
+
+省略 `--id` 会为所有支持的目标分别生成附件。发布单包新版本时，用
+`--index /path/to/catalog.json` 合入现有目录，维护其他包和历史版本。先发布并核验
+`packs-<id>-v<版本>` 对应附件，再更新同仓库 `packs` 分支的 `catalog.json`。
+开发验证可用 `:NvimZhPacks! import` 在本地导入含 Lua 的附件。
 
 相关实现、PO、Help 或 native 输入变化后，重建并检查完整资源，运行默认测试和 `make release-check`。固定上游 smoke 使用 `make test-upstream`，所需固定源码目录必须真实存在。
 

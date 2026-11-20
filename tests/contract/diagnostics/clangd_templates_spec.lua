@@ -13,12 +13,23 @@ local cases = {
   { "Use of undeclared identifier 'foo\nbar'", "使用了未声明的标识符 'foo\nbar'" },
   { "Use of undeclared identifier '{name}'", "使用了未声明的标识符 '{name}'" },
   { "Unknown type name 'MissingType'", "未知类型名 'MissingType'" },
-  { "Expected ';' at end of declaration (fix available)", "Expected ';' at end of declaration (fix available)" },
+  { "Expected ';' at end of declaration (fix available)", "声明末尾缺少 ';'（有可用修复）" },
+  { "No matching function for call to 'sum'\n\nmain.cpp:3:5: note: candidate function not viable: requires 2 arguments, but 1 was provided",
+    "找不到与调用匹配的函数 'sum'\n\nmain.cpp:3:5: 注释: 候选函数不可用：需要 2 个实参，但提供了 1 个" },
+  { "In included file: unknown type name 'Widget'", "在包含的文件中：未知类型名 'Widget'" },
+  { "Use of undeclared identifier 'countt'; did you mean 'count'?", "使用了未声明的标识符 'countt'，是否想使用 'count'？" },
+  { 'Candidate function not viable: requires 2 arguments, but no arguments were provided',
+    '候选函数不可用：需要 2 个实参，但未提供实参' },
+  { "Candidate function not viable: requires single argument 'value', but no arguments were provided",
+    "候选函数不可用：需要一个实参 'value'，但未提供实参" },
+  { 'Too few arguments to function call, expected at least 2, have 1',
+    '函数调用的实参太少，至少需要 2 个，提供了 1 个' },
   { 'an unknown diagnostic', 'an unknown diagnostic' },
 }
 for _, case in ipairs(cases) do
   equal(formatter(diagnostic(case[1])), case[2], 'clangd template/fallback mismatch')
 end
+equal(formatter(diagnostic('Use nullptr', 'clang-tidy')), '请使用 nullptr', 'clang-tidy diagnostic not translated')
 equal(formatter(diagnostic("Use of undeclared identifier 'other'", 'other-server')), "Use of undeclared identifier 'other'", 'unknown server was translated')
 local engine = require('nvim-zh.engine')
 local original_translate = engine.translate

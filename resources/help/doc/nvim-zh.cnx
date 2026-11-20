@@ -3,7 +3,7 @@
 nvim-zh                                                         *nvim-zh*
 
 nvim-zh 是 Neovim 简体中文本地化插件，接入原生 gettext 消息、中文 Help、
-精确 Lua 目录、常见 UI、受支持第三方插件以及 clangd 诊断/LSP 显示文本。
+精确 Lua 目录和常见 UI。第三方插件及 clangd 诊断/LSP 显示通过汉化包启用。
 
 插件不改写编辑 Buffer、原始诊断/LSP 对象、第三方源文件、私有渲染 UI 或
 外部工具字节流。未知文本自然回退英文。
@@ -21,12 +21,13 @@ Linux/glibc + LuaJIT；其他环境会报告原生降级，中文 Help 和 Lua U
     vim.pack.add({ 'https://github.com/DerckHanna/nvim-zh' }, { load = true })
     require('nvim-zh').setup()
 <
-全部运行资源随包交付。setup 校验并启用资源，不在用户机器上编译 MO 或生成
-帮助索引。
+核心资源随主包交付。setup 离线校验并启用这些资源。安装或刷新可选汉化包时
+才访问发布源，也可离线导入已下载的附件。
 
 命令                                                         *nvim-zh-commands*
 
-*:NvimZh*        打开或聚焦只读中文状态面板。
+*:NvimZh*        打开或聚焦中文面板。
+*:NvimZhPacks*   打开汉化包页，也可用子命令管理，见 |nvim-zh-packs|。
 *:NvimZhCheck*   显示只读检查结果，也可执行 `:checkhealth nvim-zh`。
 
 没有独立的 Update、Rollback、Reload、Info 或 Missing 命令。结构化数据通过
@@ -34,19 +35,33 @@ Linux/glibc + LuaJIT；其他环境会报告原生降级，中文 Help 和 Lua U
 
 面板与更新                                                     *nvim-zh-panel*
 
-:NvimZh 提供概览、翻译、缺失和检查页面。Tab/Shift-Tab 切页，j/k 滚动，
-/ 搜索，? 打开本帮助，q/Esc 关闭。面板不提供更新、配置编辑、构建或回退动作。
+:NvimZh 提供概览、汉化包、翻译、缺失和检查页面。Tab/Shift-Tab 切页，j/k
+滚动或选择，/ 搜索，? 打开帮助，q/Esc 关闭。
 
-更新只使用 vim.pack： >lua
+主包通过 vim.pack 更新： >lua
 
     vim.pack.update()
 <
 在 vim.pack 标准确认 Buffer 中用 :write 接受；取消不会改变活动资源。确认后
-自动同步 MO、UI/诊断/LSP 目录、中文 Help 和预生成索引。
+自动同步核心 MO、UI 目录和中文 Help。
 
 纯资源变化用于后续查询，无需重启。实现变化会报告 restart_required，并在下次
 启动自动完成同步。无效候选保留上一份已验证资源。版本回退通过 vim.pack 和
 锁文件完成。
+
+汉化包                                                         *nvim-zh-packs*
+
+在「汉化包」页，首次按回车获取可用包目录，r 刷新目录，/ 筛选。j/k 选择，
+回车打开选中包的详情和操作。i 安装，u 更新单个包，U 预览批量更新，a 打开
+页面操作菜单并可导入本地包。暂停、恢复、回滚和卸载从包详情操作。
+
+安装会话里的下载和校验在后台进行。关闭面板后可重新打开查看进度。适配代码
+变化会显示待重启，词库可以在同一会话内切换。
+
+:NvimZhPacks list、search、install、update、enable、disable、rollback 和
+remove 也可从命令行调用。安装时可用 telescope@1.0.0 指定版本。用
+`:NvimZhPacks import 文件` 导入数据包，使用 `:NvimZhPacks! import 文件`
+明确授权执行本地包内的 Lua 入口。
 
 配置                                                          *nvim-zh-config*
 
@@ -63,8 +78,9 @@ Linux/glibc + LuaJIT；其他环境会报告原生降级，中文 Help 和 Lua U
           virtual_text = true,
           virtual_lines = true,
           float = true,
+          lists = true,
         },
-        lsp = { messages = true, progress = true },
+        lsp = { messages = true, progress = true, hints = true },
       },
       overrides = {},
       missing = { enabled = true, max_entries = 2000 },
@@ -185,13 +201,14 @@ nvim-cmp 的补全内容来自补全源或用户 formatter。固定 commit、源
 
 诊断与 LSP                                                *nvim-zh-diagnostics*
 
-只翻译明确识别的 clang/clangd 显示文本。virtual_text、virtual_lines 和
-open_float 使用公开 formatter 接缝。原始 vim.diagnostic 对象、quickfix、
-push/pull 数据、位置和 user_data.lsp 保持原文。
+安装 clangd 汉化包后，常见 clangd、Clang 和 clang-tidy 诊断在行尾、虚拟行、
+浮窗和 Neovim 诊断列表中使用中文。diagnostics.lists 控制 quickfix 和
+location list 汉化。诊断原文和位置可从 vim.diagnostic.get() 和
+user_data.lsp 查询。
 
-showMessage/showMessageRequest 翻译显示副本并返回原 action。$/progress 只改
-title/message 显示副本，不改 token、percentage 或取消逻辑。window/logMessage
-和外部工具输出保持不变。
+lsp.messages 和 lsp.progress 控制通知与进度。lsp.hints 控制代码操作标题、
+悬浮说明、签名标题和原生补全说明。代码操作菜单需要 ui.prompts。修复编辑、
+补全文本、项目代码和 LSP 协议记录保留原值。未知诊断和提示显示英文原文。
 
 Help 文档                                                      *nvim-zh-help*
 

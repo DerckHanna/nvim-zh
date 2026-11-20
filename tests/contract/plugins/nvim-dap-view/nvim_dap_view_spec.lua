@@ -1,7 +1,6 @@
 local zh = require('nvim-zh')
-local adapter = require('nvim-zh.adapters.nvim_dap_view')
-
 zh.setup({ modules = { core = { enabled = false } } })
+local adapter = require('nvim-zh.adapters.nvim_dap_view')
 assert(not package.loaded['dap-view'], 'the adapter loaded its target')
 
 local views = { cleanup_view = function(_, message) return message end }

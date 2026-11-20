@@ -67,14 +67,15 @@ local ok, err = xpcall(function()
   assert(not mapping('u') and not mapping('b') and not mapping('e'), 'mutating panel action')
   local tab = assert(mapping('<Tab>'))
   local pages = {}
-  for i=1,4 do
+  for i=1,5 do
     tui.render()
     pages[i] = table.concat(vim.api.nvim_buf_get_lines(buf, 0, -1, false), '\n')
     tab()
   end
   assert(pages[1]:find('插件运行版本',1,true))
-  assert(pages[2]:find('133',1,true))
-  assert(pages[3]:find('没有观察到缺失',1,true))
+  assert(pages[2]:find('获取可用包',1,true))
+  assert(pages[3]:find('133',1,true))
+  assert(pages[4]:find('没有观察到缺失',1,true))
   vim.o.columns, vim.o.lines = 28, 10
   vim.api.nvim_exec_autocmds('VimResized', {})
   for _, line in ipairs(vim.api.nvim_buf_get_lines(buf,0,-1,false)) do
@@ -90,7 +91,7 @@ local ok, err = xpcall(function()
   vim.api.nvim_win_close(win,true)
   vim.wait(600,function() return false end,20)
   assert(#vim.api.nvim_get_autocmds({group='NvimZhRuntime'}) > 0)
-  vim.fn.writefile({vim.json.encode({ok=true,pages=4})},vim.env.NVIM_ZH_UI_RESULT)
+  vim.fn.writefile({vim.json.encode({ok=true,pages=5})},vim.env.NVIM_ZH_UI_RESULT)
 end,debug.traceback)
 if not ok then vim.fn.writefile({vim.json.encode({ok=false,error=err})},vim.env.NVIM_ZH_UI_RESULT) end
 vim.defer_fn(function() vim.cmd('qa!') end,200)

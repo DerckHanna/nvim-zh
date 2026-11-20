@@ -154,10 +154,14 @@ def env_for(root, temp, source_dirs, binary):
 def run_case(root, binary, script, dirs, extra=()):
     with tempfile.TemporaryDirectory(prefix='nvim-zh-adapter-') as temp:
         env = env_for(root, Path(temp), dirs, binary)
+        subprocess.run([sys.executable, str(root / 'tests/support/pack_fixture.py'), str(root), env['XDG_DATA_HOME']],
+                       env=env, check=True, capture_output=True, text=True)
         if script.endswith('.lua'):
             command = [binary, '--headless', '-u', 'NONE', '-i', 'NONE', '-n',
                        '--cmd', "lua vim.opt.rtp:prepend(vim.env.NVIM_ZH_ROOT)",
-                       '--cmd', 'runtime plugin/nvim-zh.lua', '-l', str(root / script)]
+                       '--cmd', 'runtime plugin/nvim-zh.lua',
+                       '--cmd', 'lua dofile(vim.env.NVIM_ZH_ROOT .. "/tests/support/load_adapters.lua")',
+                       '-l', str(root / script)]
         else:
             command = [sys.executable, str(root / script), *extra]
         result = subprocess.run(command, env=env, capture_output=True, text=True, timeout=90)
@@ -342,10 +346,9 @@ def remove(root, adapters, id, plan):
                    for target in other['targets'].values()), f'{id} is still a dependency')
     files = {f'manifests/adapters/{id}.json'}
     if spec.get('entry'):
-        files.add('lua/' + spec['entry'].replace('.', '/') + '.lua')
+        files.add('translations/adapters/' + spec['entry'].split('.')[-1] + '.lua')
     if spec.get('domain'):
         files.add(f'translations/po/zh_CN/{spec["domain"]}.po')
-        files.add(f'lua/nvim-zh/catalogs/generated/{spec["domain"]}.lua')
     files.update(row['tui'] for row in spec['scenarios'].values())
     files.update(spec['contracts'])
     for folder in (f'tests/contract/plugins/{id}', f'translations/help/adapters/{id}'):

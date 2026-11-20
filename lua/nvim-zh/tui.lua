@@ -1,6 +1,7 @@
 local M = {}
 local panel
-local names = { '概览', '翻译', '缺失', '检查' }
+local names = { '概览', '汉化包', '翻译', '缺失', '检查' }
+local PAGES = { overview = 1, packs = 2, translations = 3, missing = 4, health = 5 }
 local labels = { ok = '已生效', idle = '未准备', unread = '尚未读取', disabled = '已关闭', degraded = '降级',
   unsupported = '不支持', preparing = '准备中', syncing = '同步中', error = '失败', restore_failed = '恢复失败' }
 
@@ -17,9 +18,11 @@ local function lines()
   local version, runtime = info.version, info.runtime
   local tabs = {}
   for index, name in ipairs(names) do tabs[#tabs + 1] = index == panel.page and ('[' .. name .. ']') or name end
-  local result = { ' nvim-zh  ' .. table.concat(tabs, '  '), '' }
+  local header = ' nvim-zh  ' .. table.concat(tabs, '  ')
+  if panel.page == PAGES.packs then return require('nvim-zh.packs_ui').lines(panel, header) end
+  local result = { header, '' }
   local function add(value) result[#result + 1] = ' ' .. clean(value) end
-  if panel.page == 1 then
+  if panel.page == PAGES.overview then
     add('插件运行版本：' .. version.running_version .. ' / ' .. short(version.running_implementation))
     add('磁盘安装版本：' .. (version.installed_version or '未检查') .. ' / ' .. short(version.installed_implementation))
     add('活动资源集：' .. short(version.active_bundle))
@@ -35,11 +38,17 @@ local function lines()
     if runtime.error then add('同步说明：' .. explanation(runtime.error)) end
     if runtime.config_file.error then add('配置说明：' .. explanation(runtime.config_file.error)) end
     add('')
-    add('更新统一由 vim.pack 管理；本面板仅展示状态。')
-    add('远端版本未检查。')
-  elseif panel.page == 2 or panel.page == 3 then
+    local installed, pending = 0, 0
+    for _, row in ipairs(require('nvim-zh.packs').rows()) do
+      if row.installed then installed = installed + 1 end
+      if (row.installed and row.update) or (row.state and row.state.restart) then pending = pending + 1 end
+    end
+    add(('汉化包 · %d 已安装 · %d 待处理 · Enter 管理'):format(installed, pending))
+    panel.pack_overview = #result
+    add('主包更新由 vim.pack 管理。')
+  elseif panel.page == PAGES.translations or panel.page == PAGES.missing then
     local stats = require('nvim-zh.engine').stats()
-    if panel.page == 2 then
+    if panel.page == PAGES.translations then
       local summary = version.summary
       if summary then
         add('翻译基准 Neovim：' .. summary.baseline)
@@ -100,6 +109,8 @@ end
 
 function M.render()
   if not panel or not vim.api.nvim_win_is_valid(panel.win) then return end
+  local pack_ui = panel.page == PAGES.packs and require('nvim-zh.packs_ui')
+  local selected = pack_ui and (pack_ui.selection(panel) or panel.pack_selection)
   local next_lines = lines()
   local width = vim.api.nvim_win_get_width(panel.win)
   for index, text in ipairs(next_lines) do
@@ -118,6 +129,7 @@ function M.render()
   vim.api.nvim_buf_set_lines(panel.buf, 0, -1, false, next_lines)
   vim.bo[panel.buf].modifiable = false
   vim.api.nvim_win_call(panel.win, function() vim.fn.winrestview(view) end)
+  if pack_ui then pack_ui.restore(panel, selected) end
   panel.lines = next_lines
 end
 
@@ -127,11 +139,11 @@ end
 
 local function sync_timer()
   if not panel then return end
-  if panel.page ~= 2 and panel.page ~= 3 then stop_timer(panel); return end
+  if panel.page ~= PAGES.translations and panel.page ~= PAGES.missing then stop_timer(panel); return end
   if panel.timer then return end
   panel.timer = vim.uv.new_timer()
   panel.timer:start(500, 500, vim.schedule_wrap(function()
-    if panel and (panel.page == 2 or panel.page == 3) then M.render() end
+    if panel and (panel.page == PAGES.translations or panel.page == PAGES.missing) then M.render() end
   end))
 end
 
@@ -145,9 +157,46 @@ function M.close()
   if vim.api.nvim_buf_is_valid(old.buf) then pcall(vim.api.nvim_buf_delete, old.buf, { force = true }) end
 end
 
-function M.open()
+local pack_keys = { '<CR>', '/', 'i', 'u', 'U', 'r', 'a', 'j', 'k', '<Down>', '<Up>' }
+
+local function use_page(index)
+  local buf = panel.buf
+  if panel.page == PAGES.overview then pcall(vim.keymap.del, 'n', '<CR>', { buffer = buf }) end
+  if panel.page == PAGES.packs then
+    panel.pack_selection = require('nvim-zh.packs_ui').selection(panel) or panel.pack_selection
+    for _, key in ipairs(pack_keys) do pcall(vim.keymap.del, 'n', key, { buffer = buf }) end
+    panel.pack_items = nil
+  end
+  panel.page, panel.lines = index, nil
+  vim.api.nvim_win_set_cursor(panel.win, { 1, 0 })
+  if index == PAGES.packs then
+    local ui = require('nvim-zh.packs_ui')
+    local instance = panel
+    for _, key in ipairs(pack_keys) do
+      vim.keymap.set('n', key, function()
+        if panel ~= instance then return end
+        if key == 'j' or key == '<Down>' then ui.move(panel, 1); M.render()
+        elseif key == 'k' or key == '<Up>' then ui.move(panel, -1); M.render()
+        else ui.key(panel, key, M.render) end
+      end, { buffer = buf, silent = true })
+    end
+  elseif index == PAGES.overview then
+    vim.keymap.set('n', '<CR>', function()
+      if panel and vim.api.nvim_win_get_cursor(panel.win)[1] == panel.pack_overview then use_page(PAGES.packs) end
+    end, { buffer = buf, silent = true })
+  end
+  sync_timer()
+  if index == PAGES.health then require('nvim-zh.health').run(M.render) end
+  M.render()
+end
+
+function M.open(requested)
   if #vim.api.nvim_list_uis() == 0 then return nil, '当前会话没有 UI；请使用 status()/stats()/check() 查询。' end
-  if panel and vim.api.nvim_win_is_valid(panel.win) then vim.api.nvim_set_current_win(panel.win); return panel.win end
+  if panel and vim.api.nvim_win_is_valid(panel.win) then
+    vim.api.nvim_set_current_win(panel.win)
+    if requested and PAGES[requested] ~= panel.page then use_page(assert(PAGES[requested])) end
+    return panel.win
+  end
   M.close()
   local buf = vim.api.nvim_create_buf(false, true)
   local win = vim.api.nvim_open_win(buf, true, size())
@@ -155,24 +204,17 @@ function M.open()
   vim.bo[buf].filetype = 'nvim-zh'
   vim.wo[win].wrap, vim.wo[win].number, vim.wo[win].relativenumber = false, false, false
   vim.wo[win].cursorline = true
-  panel = { buf = buf, win = win, page = 1, group = vim.api.nvim_create_augroup('NvimZhPanel', { clear = true }) }
+  panel = { buf = buf, win = win, group = vim.api.nvim_create_augroup('NvimZhPanel', { clear = true }) }
   local function page(delta)
     if not panel then return end
-    panel.page = (panel.page - 1 + delta) % #names + 1
-    panel.lines = nil
-    vim.api.nvim_win_set_cursor(win, { 1, 0 })
-    sync_timer()
-    if panel.page == 4 then
-      require('nvim-zh.health').run(function()
-        if panel and panel.page == 4 then M.render() end
-      end)
-    end
-    M.render()
+    use_page((panel.page - 1 + delta) % #names + 1)
   end
   for _, key in ipairs({ 'q', '<Esc>' }) do vim.keymap.set('n', key, M.close, { buffer = buf, silent = true }) end
   vim.keymap.set('n', '<Tab>', function() page(1) end, { buffer = buf, silent = true })
   vim.keymap.set('n', '<S-Tab>', function() page(-1) end, { buffer = buf, silent = true })
-  vim.keymap.set('n', '?', function() vim.cmd('help nvim-zh') end, { buffer = buf, silent = true })
+  vim.keymap.set('n', '?', function()
+    vim.cmd(panel and panel.page == PAGES.packs and 'help nvim-zh-packs' or 'help nvim-zh')
+  end, { buffer = buf, silent = true })
   vim.api.nvim_create_autocmd({ 'VimResized', 'ColorScheme' }, { group = panel.group, callback = function()
     if panel and vim.api.nvim_win_is_valid(win) then vim.api.nvim_win_set_config(win, size()); M.render() end
   end })
@@ -180,7 +222,7 @@ function M.open()
   vim.api.nvim_create_autocmd('WinClosed', { group = panel.group, pattern = tostring(win), callback = M.close })
   vim.api.nvim_create_autocmd('BufWipeout', { group = panel.group, buffer = buf, callback = M.close })
   vim.api.nvim_create_autocmd('VimLeavePre', { group = panel.group, callback = M.close })
-  M.render()
+  use_page(requested and assert(PAGES[requested]) or PAGES.overview)
   return win
 end
 return M

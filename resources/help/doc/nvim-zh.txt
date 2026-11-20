@@ -3,8 +3,8 @@
 nvim-zh                                                         *nvim-zh*
 
 nvim-zh is a Simplified Chinese localization plugin for Neovim. It integrates
-native gettext messages, Chinese Help, exact Lua catalogs, common UI, supported
-third-party plugins, and clangd diagnostic/LSP display text.
+native gettext messages, Chinese Help, exact Lua catalogs, and common UI.
+Localization packs add support for third-party plugins and clangd display text.
 
 It does not rewrite editing buffers, raw diagnostic/LSP objects, third-party
 source files, private rendered UI, or external tool byte streams. Unknown text
@@ -24,12 +24,15 @@ Install and enable with: >lua
     vim.pack.add({ 'https://github.com/DerckHanna/nvim-zh' }, { load = true })
     require('nvim-zh').setup()
 <
-All runtime resources ship with the package. setup validates and activates
-them without compiling MO files or generating help tags on the user's machine.
+Core resources ship with the main package. setup validates and activates them
+offline. Catalog refresh and pack download contact the release source.
+Previously downloaded packs can be imported offline.
 
 COMMANDS                                                     *nvim-zh-commands*
 
-*:NvimZh*        Open or focus the read-only Chinese status panel.
+*:NvimZh*        Open or focus the Chinese panel.
+*:NvimZhPacks*   Open package management or run a subcommand. See
+                  |nvim-zh-packs|.
 *:NvimZhCheck*   Show read-only health results. Also available through
                   `:checkhealth nvim-zh`.
 
@@ -39,23 +42,39 @@ scraping.
 
 PANEL AND UPDATES                                              *nvim-zh-panel*
 
-:NvimZh opens overview, translation, missing-entry, and health pages.
-Tab/Shift-Tab switch pages, j/k scroll, / searches, ? opens this help, and
-q/Esc closes the panel. It has no update, configuration-editing, build, or
-rollback actions.
+:NvimZh opens overview, package management, translation, missing-entry, and
+health pages. Tab/Shift-Tab switch pages, j/k scroll or select, / searches,
+? opens help, and q/Esc closes the panel.
 
-Update only through vim.pack: >lua
+Update the core plugin through vim.pack: >lua
 
     vim.pack.update()
 <
 Use :write in the standard vim.pack confirmation buffer. Cancelling leaves the
 active resources unchanged. Confirmed changes automatically synchronize MO,
-UI/diagnostic/LSP catalogs, Chinese Help, and prebuilt indexes.
+the core UI catalog and Chinese Help.
 
 Pure resource changes affect subsequent queries without a restart. An
 implementation change is reported as restart_required and completes
 automatically on the next startup. Invalid candidates preserve the previous
 verified resource set. Version rollback uses vim.pack and its lock file.
+
+LOCALIZATION PACKS                                            *nvim-zh-packs*
+
+On the packs page, press Enter to fetch the initial catalog, r to refresh,
+/ to filter, and j/k to select a pack. Enter opens details and available
+actions. i installs, u updates one pack, U previews updates for installed
+packs, and a opens page actions including local import. Use pack details to
+pause, resume, roll back, or uninstall a pack.
+
+Downloads continue when the panel closes. Open it again to see progress.
+Catalog-only updates can apply immediately. Adapter changes may require a
+restart.
+
+:NvimZhPacks also accepts list, search, install, update, enable, disable,
+rollback, and remove. Use telescope@1.0.0 to select a specific version.
+Use `:NvimZhPacks import FILE` for local data packs, or
+`:NvimZhPacks! import FILE` to explicitly permit a local Lua entry point.
 
 CONFIGURATION                                                 *nvim-zh-config*
 
@@ -72,8 +91,9 @@ The default configuration is: >lua
           virtual_text = true,
           virtual_lines = true,
           float = true,
+          lists = true,
         },
-        lsp = { messages = true, progress = true },
+        lsp = { messages = true, progress = true, hints = true },
       },
       overrides = {},
       missing = { enabled = true, max_entries = 2000 },
@@ -215,15 +235,17 @@ docs/adapters.md for fixed revisions, source digests and supported features.
 
 DIAGNOSTICS AND LSP                                         *nvim-zh-diagnostics*
 
-Only recognized clang/clangd display text is translated. virtual_text,
-virtual_lines, and open_float use public formatter seams. Raw vim.diagnostic
-objects, quickfix, push/pull payloads, locations, and user_data.lsp stay in the
-source language.
+With the clangd pack installed, common clangd, Clang, and clang-tidy diagnostics
+appear in Chinese in virtual text, virtual lines, floats, and Neovim diagnostic
+lists. diagnostics.lists
+controls quickfix and location list translation. vim.diagnostic.get() and
+user_data.lsp retain the original messages and locations.
 
-showMessage/showMessageRequest translate display copies and return original
-actions. $/progress changes only title/message display copies, never token,
-percentage, or cancellation. window/logMessage and external tool output remain
-unchanged.
+lsp.messages and lsp.progress control notifications and work progress.
+lsp.hints covers code action titles, hover labels, signature titles, and native
+completion descriptions. Code action menus use ui.prompts. Edits, completion
+insertions, code, and LSP protocol records retain their original values.
+Diagnostics and hints missing from the catalog retain their original text.
 
 HELP DOCUMENTS                                                  *nvim-zh-help*
 

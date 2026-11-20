@@ -30,29 +30,37 @@ def descriptor(files):
     return {name: {'sha256': digest(data), 'size': len(data)} for name, data in sorted(files.items())}
 
 
+def catalog(po):
+    entries, headers = ct.parse_po(po)
+    entries = [dict(context=e.get('msgctxt', ''), msgid=e['msgid'], msgstr=e['msgstr'])
+               for e in sorted(entries, key=lambda e: (e.get('msgctxt', ''), e['msgid']))]
+    return dict(schema=1, domain=po.stem, locale='zh_CN',
+                metadata={'source': po.name, 'headers': headers}, entries=entries)
+
+
+def adapter_help(root, specs):
+    files, help_tags = {}, {}
+    for _, source, path, tags in adapters.help_inputs(root, specs):
+        prefix = f'help/{Path(source).name}/doc/'
+        files[prefix + path.name] = path.read_bytes()
+        help_tags.setdefault(prefix, []).extend(f'{tag}\t{path.name}\t/*{tag}*\n' for tag in tags)
+    for prefix, tags in help_tags.items():
+        files[prefix + 'tags-cn'] = ''.join(sorted(tags)).encode()
+    return files
+
+
 def contents(root=ROOT):
     ct.check(root / 'translations/po/zh_CN', root / 'translations/glossary/zh_CN.toml')
-    files = {}
-    domains = {}
+    files, domains = {}, {}
     for domain, po in sorted(ct.builtin_sources(root).items()):
-        entries, headers = ct.parse_po(po)
-        entries = [dict(context=e.get('msgctxt', ''), msgid=e['msgid'], msgstr=e['msgstr'])
-                   for e in sorted(entries, key=lambda e: (e.get('msgctxt', ''), e['msgid']))]
-        files[f'catalogs/{po.stem}.json'] = encoded(dict(schema=1, domain=po.stem,
-            locale='zh_CN', metadata={'source': po.name, 'headers': headers}, entries=entries))
-        domains[po.stem] = len(entries)
+        source = catalog(po)
+        files[f'catalogs/{domain}.json'] = encoded(source)
+        domains[domain] = len(source['entries'])
     for source in sorted((root / 'doc').iterdir()):
         if source.suffix in {'.cnx', '.txt'} or source.name in {'tags', 'tags-cn'}:
             if source.is_symlink():
                 raise ValueError(f'symlink resource: {source}')
             files['help/doc/' + source.name] = source.read_bytes()
-    help_tags = {}
-    for id, source, path, tags in adapters.help_inputs(root, adapters.load(root)):
-        prefix = f'help/adapters/{id}/{Path(source).name}/doc/'
-        files[prefix + path.name] = path.read_bytes()
-        help_tags.setdefault(prefix, []).extend(f'{tag}\t{path.name}\t/*{tag}*\n' for tag in tags)
-    for prefix, tags in help_tags.items():
-        files[prefix + 'tags-cn'] = ''.join(sorted(tags)).encode()
     mo = root / 'build/native/zh_CN.UTF-8/LC_MESSAGES/nvim.mo'
     files['native/zh_CN.UTF-8/LC_MESSAGES/nvim.mo'] = mo.read_bytes()
     inventory = json.loads((root / 'manifests/help_inventory.json').read_text())

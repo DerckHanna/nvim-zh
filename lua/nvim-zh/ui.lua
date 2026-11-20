@@ -133,11 +133,18 @@ local function install_prompts()
     return function(items, opts, on_choice)
       if not config.prompts then return original(items, opts, on_choice) end
       local copy = display_opts(opts, 'select')
-      if config.select_items and type(copy) == 'table'
+      local code_actions = type(copy) == 'table' and copy.kind == 'codeaction'
+        and type(copy.format_item) == 'function' and require('nvim-zh.lsp').hints_enabled()
+      if (config.select_items or code_actions) and type(copy) == 'table'
         and (copy.format_item == nil or type(copy.format_item) == 'function') then
         local format_item = copy.format_item or tostring
         copy.format_item = function(item)
-          local text = format_item(item)
+          local text
+          if config.prompts and code_actions then
+            text = require('nvim-zh.lsp').format_action(item, format_item)
+          else
+            text = format_item(item)
+          end
           if not config.prompts or not config.select_items then return text end
           return translate(text, 'select_item')
         end

@@ -28,6 +28,7 @@ int pair(int left, int right) {
 }
 """
 FILES = {'练习.cpp': MAIN, '说明.cpp': NOTES, '检查.cpp': TIDY,
+         '转发.cpp': 'int wrap(int *p, int v) { return p == 0 ? v : *p; }\n',
          '补全.cpp': 'int sum(int x, int y);\nint sum(double x, double y);\nvoid test() { su; }\n',
          '项目.c': 'int value(void) { return 1; }\n',
          '碰撞.c': "#error expected ';' after return statement\n",
@@ -47,6 +48,13 @@ def frame(ui, evidence, name, *needles, **kwargs):
     text = ui.expect(*needles, **kwargs)
     (evidence / (name + '.txt')).write_text(text + '\n')
     return text
+
+
+def choose_fix(ui, evidence, name, title):
+    screen = frame(ui, evidence, name, title)
+    match = re.search(r'^\s*(\d+): .*' + re.escape(title), screen, re.M)
+    assert match, screen
+    ui.send(match.group(1) + '\r')
 
 
 def run(base, enabled):
@@ -108,11 +116,7 @@ def run(base, enabled):
             frame(ui, evidence, 'signature', '函数签名：clangd' if enabled else 'Signature Help: clangd')
             ui.send(b'\x1b')
             lua(ui, "vim.api.nvim_win_set_cursor(0,{5,18}); vim.lsp.buf.code_action({context={diagnostics={T.raw.syntax},only={'quickfix'}}})")
-            title = "插入 ';'" if enabled else "insert ';'"
-            action = frame(ui, evidence, 'action', title)
-            match = re.search(r"(\d+): .*';'", action)
-            assert match, action
-            ui.send(match.group(1) + '\r')
+            choose_fix(ui, evidence, 'action', "插入 ';'" if enabled else "insert ';'")
             assert_lua(ui, "vim.api.nvim_buf_get_lines(0,4,5,false)[1]:sub(-1) == ';'", 'CLANGD_FIXED')
             ui.command('write')
             ui.command('silent make!')
@@ -160,6 +164,15 @@ def run(base, enabled):
             ui.command('setlocal makeprg=clang-tidy\\ 检查.cpp\\ --checks=-*,modernize-use-nullptr\\ --\\ -std=c++20')
             ui.command('silent make!')
             assert_lua(ui, 'vim.v.shell_error == 0 and #vim.fn.getqflist() == 0', 'TIDY_RECHECK')
+            ui.command('edit 转发.cpp')
+            lua(ui, 'assert(vim.lsp.buf_attach_client(0,T.client.id))')
+            assert_lua(ui, "T.diagnostic('modernize-use-nullptr','forwarded_fix')", 'FORWARDED_FIX_READY')
+            lua(ui, "vim.api.nvim_win_set_cursor(0,{1,T.raw.forwarded_fix.range.start.character}); "
+                    "vim.lsp.buf.code_action({context={diagnostics={T.raw.forwarded_fix},only={'quickfix'}}})")
+            choose_fix(ui, evidence, 'forwarded-action', "将 '0' 改为 'nullptr'" if enabled else "change '0' to 'nullptr'")
+            assert_lua(ui, "vim.api.nvim_get_current_line():find('p == nullptr',1,true)", 'FORWARDED_FIXED')
+            ui.command('write')
+            assert_lua(ui, 'vim.wait(10000,function() return #vim.diagnostic.get(0)==0 end,25)', 'FORWARDED_RECHECK')
             ui.command('edit 碰撞.c')
             ui.command('compiler nvim-zh-clang')
             ui.command('setlocal makeprg=clang\\ -fsyntax-only\\ 碰撞.c')
@@ -192,7 +205,7 @@ def run(base, enabled):
         finally:
             (evidence / 'terminal.pty').write_bytes(ui.raw)
     data = json.loads(report.read_text())
-    data['files'] = {name: (work / name).read_text() for name in ('练习.cpp', '检查.cpp', '碰撞.c')}
+    data['files'] = {name: (work / name).read_text() for name in ('练习.cpp', '检查.cpp', '转发.cpp', '碰撞.c')}
     return data
 
 

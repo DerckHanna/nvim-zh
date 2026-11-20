@@ -1,0 +1,42 @@
+name: platform localization
+
+on:
+  push:
+    paths:
+      - '.github/workflows/platform.yml'
+      - 'tests/platform/**'
+      - 'lua/**'
+      - 'resources/**'
+  pull_request:
+    paths:
+      - '.github/workflows/platform.yml'
+      - 'tests/platform/**'
+      - 'lua/**'
+      - 'resources/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  macos:
+    runs-on: macos-15
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Probe native fallback, Help and Lua UI on Neovim 0.12.6
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(uname -m)" = arm64
+          sw_vers
+          workspace=$(mktemp -d)
+          curl -fsSL --retry 3 https://github.com/neovim/neovim/releases/download/v0.12.6/nvim-macos-arm64.tar.gz -o "$workspace/nvim.tar.gz"
+          printf '%s  %s\n' 1dbd148222b051ba6c307c4d17a318ed083df018a4f6a5a0ce46955ffc9ab87b "$workspace/nvim.tar.gz" | shasum -a 256 -c -
+          tar -xzf "$workspace/nvim.tar.gz" -C "$workspace"
+          export NVIM_ZH_ROOT="$PWD" NVIM_ZH_PLATFORM_NATIVE=unsupported
+          export XDG_CONFIG_HOME="$workspace/config" XDG_DATA_HOME="$workspace/data"
+          export XDG_STATE_HOME="$workspace/state" XDG_CACHE_HOME="$workspace/cache"
+          export XDG_RUNTIME_DIR="$workspace/run" NVIM_LOG_FILE="$workspace/nvim.log"
+          mkdir -m 700 "$XDG_RUNTIME_DIR"
+          "$workspace/nvim-macos-arm64/bin/nvim" --headless -u NONE -i NONE -n -l tests/platform/localization.lua

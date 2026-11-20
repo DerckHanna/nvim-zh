@@ -16,6 +16,10 @@
 
 `nvim-dap-view` 的 `codelldb` 和 `interaction` 均在汉化启用和关闭时通过。真实调试命中第 8 行，展开变量与寄存器，单步并继续至退出码 0。此前环境在启动阶段报告 `failed to send the handshake ack`。本轮同版本 VSIX 完成了实际子进程调试，保留了所有终端和协议断言。两组 `interaction` 使用同一个经源文件摘要验证的装载接缝，英文组的接缝仅保留虚拟行参数等兼容处理。直接调用 Neovim API 仍可复现 0.12.6 拒绝 `virt_lines_overflow = "wrap"`。
 
+发布提交 `631a516` 的固定版离线和上游 CI 均通过。实验性 nightly 在补全契约的模拟客户端处失败，运行时新增了对 `server_capabilities` 的读取。[CI 运行](https://github.com/DerckHanna/nvim-zh/actions/runs/44673762104)
+
+七个 0.1.0 汉化包均从正式 Release 下载地址校验了大小和 SHA-256。官方目录 `86f1cf9` 上线后，新用户目录通过 `vim.pack.add` 安装主包，显式刷新默认官方索引，仅下载 Telescope，然后暂停和恢复。断网重启保留所选资源。另一全新用户目录在关闭网络后打开中文包管理 Help，并导入下载好的 clangd 附件。主包正式 tag 的公开源码归档通过发布检查，共 541 个文件。[官方目录](https://github.com/DerckHanna/nvim-zh/blob/86f1cf9f00a39c1f6e7ba07a234ed454ef623e6b/catalog.json) [主包 Release](https://github.com/DerckHanna/nvim-zh/releases/tag/v0.1.0)
+
 ## 历史全量复审（2026-11-19）
 
 本轮使用 Linux x86_64 / glibc、Neovim 0.12.6 和 `manifests/adapters/` 中的固定版本。在独立 Neovim 进程中验证启动、动态加载、配置回滚、翻译查找、英文回退、Help 和资源更新。固定上游矩阵有 60 个记录，其中 53 个终端场景共运行 104 次。表中的条目是目录规模，Help 数是已发布的主题摘译数。

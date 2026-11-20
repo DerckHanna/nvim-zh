@@ -5,6 +5,7 @@ nvim-zh	nvim-zh.txt	/*nvim-zh*
 nvim-zh-api	nvim-zh.txt	/*nvim-zh-api*
 nvim-zh-commands	nvim-zh.txt	/*nvim-zh-commands*
 nvim-zh-config	nvim-zh.txt	/*nvim-zh-config*
+nvim-zh-cpp	nvim-zh.txt	/*nvim-zh-cpp*
 nvim-zh-diagnostics	nvim-zh.txt	/*nvim-zh-diagnostics*
 nvim-zh-help	nvim-zh.txt	/*nvim-zh-help*
 nvim-zh-install	nvim-zh.txt	/*nvim-zh-install*

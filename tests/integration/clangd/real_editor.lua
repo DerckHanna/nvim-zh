@@ -9,7 +9,20 @@ vim.fn.writefile({
   '  int unused = 0;',
   '  return sum(1, 2)',
   '}',
+  'double sum(double x, double y) { return x + y; }',
+  'int signature_example() { return sum(1, 2); }',
+  'auto completion_example() { su; }',
 }, path)
+vim.fn.writefile({vim.json.encode({{
+  directory = root, file = path, arguments = { 'clang++', '-Wall', '-Wextra', '-c', path },
+}})}, root .. '/compile_commands.json')
+
+local progress, raw_progress = {}, {}
+local handle_progress = vim.lsp.handlers['$/progress']
+vim.lsp.handlers['$/progress'] = function(err, params, ctx)
+  progress[#progress + 1] = vim.deepcopy(params)
+  return handle_progress(err, params, ctx)
+end
 
 local selected_title, selection_error
 local select = vim.ui.select
@@ -33,9 +46,16 @@ local bufnr = vim.api.nvim_get_current_buf()
 vim.bo.filetype = 'cpp'
 local client_id = assert(vim.lsp.start({
   name = 'clangd',
-  cmd = { executable, '--background-index=false', '--enable-config=false', '--log=error' },
+  cmd = { executable, '--background-index', '--completion-style=bundled', '--enable-config=false', '--log=error' },
   root_dir = root,
+  capabilities = { textDocument = { publishDiagnostics = { relatedInformation = true } } },
   init_options = { fallbackFlags = { '-Wall', '-Wextra' } },
+  handlers = {
+    ['$/progress'] = function(err, params, ctx)
+      raw_progress[#raw_progress + 1] = vim.deepcopy(params)
+      return vim.lsp.handlers['$/progress'](err, params, ctx)
+    end,
+  },
 }))
 local client = assert(vim.lsp.get_client_by_id(client_id))
 local semicolon
@@ -91,5 +111,81 @@ check(float_buf and float_win, 'warning float did not open')
 diagnostic_text = table.concat(vim.api.nvim_buf_get_lines(float_buf, 0, -1, false), '\n')
 check(diagnostic_text:find("变量 'unused' 未使用", 1, true), 'unused-variable warning not shown in Chinese')
 vim.api.nvim_win_close(float_win, true)
+
+local function request(method)
+  local reply = assert(client:request_sync(method, vim.lsp.util.make_position_params(0, client.offset_encoding), 5000, bufnr))
+  assert(not reply.err and reply.result, vim.inspect(reply))
+  return reply.result
+end
+
+local signature_line = vim.api.nvim_buf_get_lines(bufnr, 6, 7, false)[1]
+vim.api.nvim_win_set_cursor(0, { 7, assert(signature_line:find('sum(', 1, true)) + 4 })
+local signatures = request('textDocument/signatureHelp').signatures
+check(#signatures >= 2, vim.inspect(signatures))
+vim.lsp.buf.signature_help()
+local function preview(label)
+  for _, win in ipairs(vim.api.nvim_list_wins()) do
+    if vim.api.nvim_win_get_config(win).relative ~= '' then
+      local text = table.concat(vim.api.nvim_buf_get_lines(vim.api.nvim_win_get_buf(win), 0, -1, false), '\n')
+      if text:find(label, 1, true) then return win, text end
+    end
+  end
+end
+check(vim.wait(5000, function() return preview('函数签名：clangd') ~= nil end, 25), 'signature title did not appear')
+local signature_win, signature_text = preview('函数签名：clangd')
+check(signature_text:find('sum', 1, true), signature_text)
+vim.api.nvim_win_close(signature_win, true)
+
+local completion_line = vim.api.nvim_buf_get_lines(bufnr, 7, 8, false)[1]
+vim.api.nvim_win_set_cursor(0, { 8, assert(completion_line:find('su;', 1, true)) + 1 })
+local result = request('textDocument/completion')
+local completion_items = vim.lsp.completion._lsp_to_complete_items(result.items or result, 'su', client_id)
+local completion
+for _, item in ipairs(completion_items) do
+  if item.word == 'sum' then completion = item; break end
+end
+check(completion ~= nil, vim.inspect(completion_items))
+local raw_item = completion.user_data.nvim.lsp.completion_item
+check(raw_item.label:find('sum', 1, true), vim.inspect(raw_item))
+equal(completion.word, 'sum', 'completion insert text changed')
+equal(raw_item.detail, '[2 overloads]', 'clangd did not bundle the expected overloads')
+equal(completion.menu, '[2 个重载]', 'completion menu was not translated')
+
+check(vim.wait(10000, function()
+  return vim.iter(progress):any(function(item) return item.value.title == '正在建立索引' end)
+end, 25), 'clangd did not display translated index progress: ' .. vim.inspect(progress))
+check(vim.iter(raw_progress):any(function(item) return item.value.title == 'indexing' end), vim.inspect(raw_progress))
+
+local tool = require('nvim-zh.packs')
+local server_info = client.server_info
+client.server_info = vim.tbl_extend('force', server_info, { version = 'unknown test version' })
+equal(tool.tool_reason('clangd', client, 'textDocument/hover'), 'unsupported_version', 'unknown version accepted')
+float_buf, float_win = vim.diagnostic.open_float({ scope = 'buffer' })
+diagnostic_text = table.concat(vim.api.nvim_buf_get_lines(float_buf, 0, -1, false), '\n')
+check(diagnostic_text:find("Unused variable 'unused'", 1, true), diagnostic_text)
+vim.api.nvim_win_close(float_win, true)
+client.server_info = server_info
+equal(tool.tool_reason('clangd', client, 'textDocument/diagnostic'), 'unverified_interface', 'unverified pull accepted')
+
+vim.cmd.edit(vim.fn.fnameescape(root .. '/redefinition.cpp'))
+vim.bo.filetype = 'cpp'
+assert(vim.lsp.buf_attach_client(0, client_id))
+local note
+check(vim.wait(10000, function()
+  for _, diagnostic in ipairs(vim.diagnostic.get(0)) do
+    local related = diagnostic.user_data.lsp.relatedInformation
+    if related and related[1] and related[1].message == 'Previous definition is here' then
+      note = related[1]
+      return true
+    end
+  end
+end, 25), 'no related definition from clangd')
+float_buf, float_win = vim.diagnostic.open_float({ scope = 'buffer' })
+diagnostic_text = table.concat(vim.api.nvim_buf_get_lines(float_buf, 0, -1, false), '\n')
+check(diagnostic_text:find('此前的定义在这里', 1, true), diagnostic_text)
+equal(note.message, 'Previous definition is here', 'raw related information was changed')
+vim.api.nvim_win_close(float_win, true)
+
 client:stop()
-print('REAL_CLANGD_EDITOR=PASS error warning hover quickfix')
+print('REAL_CLANGD_EDITOR=PASS error warning related_information hover quickfix completion signature progress unknown_version')
+print('REAL_CLANGD_COMPLETION=' .. vim.json.encode({ menu = completion.menu, detail = raw_item.detail, info = completion.info }))

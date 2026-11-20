@@ -1233,8 +1233,9 @@ $NVIM_APPNAME 的一个用途是 "隔离" Nvim 应用。另一种方式，在 Li
 除了 'debug' 和 'verbose' 之外，Nvim 还保留一个通用日志文件，供内部调试、插件和 RPC
 客户端使用。 >
         :echo $NVIM_LOG_FILE
-默认位置是 stdpath("log")/log（$XDG_STATE_HOME/nvim/nvim.log），除非该路径不可
-访问， 或者在 |startup| 之前设置了 $NVIM_LOG_FILE。
+日志默认写入 stdpath("log") 下的 nvim.log（在 Unix 上是
+$XDG_STATE_HOME/nvim/nvim.log）。默认路径不可访问，或在 |startup| 前设置了
+$NVIM_LOG_FILE 时，会使用其他位置。
 
 
  vim:et:tw=78:ts=8:sw=4:ft=help:norl:

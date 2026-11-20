@@ -22,6 +22,23 @@ function M.https(value)
   return type(value) == 'string' and #value <= 2048 and value:match('^https://[%w.%-]+[:/%w_.~?&=+%%#%-]*$')
 end
 
+function M.validate_tool(tool, executable)
+  if tool == nil then return end
+  assert(type(tool) == 'table' and tool.protocol == 'lsp' and M.id(executable)
+    and tool.server == executable and type(tool.versions) == 'table'
+    and next(tool.versions), '无效的工具兼容性清单')
+  for version, methods in pairs(tool.versions) do
+    assert(type(version) == 'string' and #version <= 200 and version ~= '' and not version:find('%c')
+      and vim.islist(methods) and #methods > 0 and #methods <= 32, '无效的工具兼容版本')
+    local seen = {}
+    for _, method in ipairs(methods) do
+      assert(type(method) == 'string' and #method <= 100 and method:match('^[%w$_.-]+/[%w_.-]+$')
+        and not seen[method], '无效或重复的工具协议方法')
+      seen[method] = true
+    end
+  end
+end
+
 local function record_path(id)
   assert(M.id(id), '无效的汉化包 ID')
   return root() .. '/state/' .. id
@@ -136,6 +153,7 @@ local function prepare(manifest, files, allow_lua)
     and M.id(manifest.domain), '汉化包的格式、版本或语言不受支持')
   assert(type(files) == 'table' and type(manifest.files) == 'table', '无效的文件清单')
   assert(not manifest.executable or (M.id(manifest.executable) and not manifest.adapter), '无效的工具包标识')
+  M.validate_tool(manifest.tool, manifest.executable)
   fs.index_id(manifest.files)
   for name, info in pairs(manifest.files) do
     local bytes = files[name]
@@ -182,6 +200,7 @@ function M.stage(bytes, expected, allow_lua)
   local candidate = prepare(manifest, files, allow_lua)
   if expected then
     assert(manifest.id == expected.id and manifest.version == expected.version, '发布索引与包信息不匹配')
+    assert(vim.deep_equal(manifest.tool, expected.tool), '发布索引与工具兼容性不匹配')
   end
   local base = root() .. '/snapshots'
   fs.mkdir(base)

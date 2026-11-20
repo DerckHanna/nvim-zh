@@ -247,6 +247,21 @@ completion descriptions. Code action menus use ui.prompts. Edits, completion
 insertions, code, and LSP protocol records retain their original values.
 Diagnostics and hints missing from the catalog retain their original text.
 
+C/C++ WORKFLOW                                                     *nvim-zh-cpp*
+
+Install the clangd localization pack with :NvimZhPacks and check the version
+and fallback state with :NvimZh. Search with |:vimgrep|, list the matches
+with |:copen|, and jump with |:cc|. Inspect the original diagnostic and
+its range on the current line with: >vim
+
+    :lua vim.print(vim.diagnostic.get(0, { lnum = vim.fn.line('.') - 1 }))
+<
+Apply a fix with |vim.lsp.buf.code_action()| and save the file. For GCC, try
+:compiler gcc and :make!, and use :echo v:shell_error to check the exit code.
+With nvim-dap and CodeLLDB configured, set a breakpoint with
+:DapToggleBreakpoint, view variables with :DapViewJump scopes, and continue
+with :DapContinue. See docs/workflows.md for the full guide.
+
 HELP DOCUMENTS                                                  *nvim-zh-help*
 
 Chinese translations ship as .cnx files with prebuilt tags-cn. The default

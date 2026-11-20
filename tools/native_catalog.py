@@ -327,6 +327,10 @@ def check(root: Path) -> dict:
         raise NativeError('repairs: quote-drift upstream msgid missing from repairs.upstream_msgids')
     if {item['runtime_msgid'] for item in quote_drift} - translated_repairs:
         raise NativeError('repairs: quote-drift runtime msgid has no translation entry')
+    for item in manifest['repairs'].get('gap_drift', []):
+        if (item['upstream_msgid'] not in supplement_ids or item['upstream_msgid'] not in repair_upstream
+                or item['runtime_msgid'] not in translated_repairs or not item.get('evidence')):
+            raise NativeError(f"gap drift repair {item['upstream_msgid']!r}: missing source, translation or evidence")
     intro = []
     if 'intro' in manifest:
         info = manifest['intro']

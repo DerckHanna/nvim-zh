@@ -973,16 +973,36 @@
     "clangd": {
       "repository": "https://github.com/llvm/llvm-project",
       "version": "llvmorg-23.1.4",
+      "tool": {
+        "protocol": "lsp",
+        "server": "clangd",
+        "versions": {
+          "clangd version 23.1.5 linux x86_64-pc-linux-gnu": [
+            "textDocument/publishDiagnostics",
+            "textDocument/codeAction",
+            "textDocument/hover",
+            "textDocument/completion",
+            "textDocument/signatureHelp",
+            "$/progress"
+          ]
+        }
+      },
       "commit": "7a941dfb2877a0b8cf30323fefa85ad019e0b0f5",
       "adapter": {
         "status": "implemented",
         "seam": "vim.diagnostic display formatters and Neovim LSP display",
         "domain": "clangd",
         "writes": "display_strings_only",
-        "static_entries": 356,
-        "corpus_coverage": "7/7",
-        "real_smoke": "clangd 23.1.5 push passed, pull unsupported_method_not_found; real editor error, warning, hover and quickfix passed",
-        "distribution": "Arch Linux extra/clang 23.1.4-1"
+        "catalog_entries": 415,
+        "source_inventory": "LLVM source baseline; separate from the tested executable",
+        "runtime_observation": {
+          "distribution": "Arch Linux extra/clang 23.1.5-1",
+          "executable_sha256": "40b41eed884d7bcab758c571ea2828fec9bb02f30c66e3e79489af04978972b9",
+          "corpus_files": 15,
+          "push_messages": 21,
+          "translated_bodies": 20,
+          "pull_error": -32601
+        }
       },
       "sources": {
         "clang-tools-extra/clangd/ClangdLSPServer.cpp": {

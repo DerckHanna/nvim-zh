@@ -258,6 +258,7 @@ def main() -> int:
         require(observation_path.read_bytes() == raw_bytes,
                 f'raw observation file changed during contract test: {observation_path}')
         editor = ROOT / 'tests' / 'integration' / 'clangd' / 'real_editor.lua'
+        seed(ROOT, Path(env['XDG_DATA_HOME']), 'clangd', verified_tools=True)
         env['NVIM_ZH_TEST_CLANGD_WORK'] = str(work)
         env['NVIM_ZH_TEST_CLANGD'] = executable
         subprocess.run(command[:-1] + [str(editor)], env=env, check=True)

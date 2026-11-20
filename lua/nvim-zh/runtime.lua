@@ -217,7 +217,9 @@ function M.setup(opts, injected_session)
   if not group then
     group = vim.api.nvim_create_augroup('NvimZhRuntime', { clear = true })
     vim.api.nvim_create_autocmd('BufWritePost', { group = group, callback = function(event)
-      if vim.fs.normalize(vim.fn.fnamemodify(event.file, ':p')) == vim.fs.normalize(paths.config()) then M.request('config') end
+      local path = vim.fn.fnamemodify(event.file, ':p')
+      path = vim.uv.fs_realpath(path) or path
+      if vim.fs.normalize(path) == vim.fs.normalize(paths.config()) then M.request('config') end
     end })
     vim.api.nvim_create_autocmd({ 'FocusGained', 'BufEnter' }, { group = group, callback = function()
       if config_file.fingerprint() ~= fingerprints[1] or resources.fingerprint() ~= fingerprints[2] then M.request('external') end

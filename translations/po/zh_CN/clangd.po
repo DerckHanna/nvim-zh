@@ -1671,3 +1671,25 @@ msgstr "{key} 应为标量值或标量列表"
 msgctxt "clangd_config"
 msgid "{path} must be an absolute path, because this fragment is not associated with any directory."
 msgstr "{path} 必须是绝对路径，因为该配置片段没有关联任何目录"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:6836
+msgctxt "-Wc++11-narrowing"
+msgid "Type {from} cannot be narrowed to {to} in initializer list"
+msgstr "初始化列表中不能将 {from} 类型窄化为 {to}"
+
+#: clang/include/clang/Basic/DiagnosticSemaKinds.td:6864
+msgctxt "diagnostic"
+msgid "Insert an explicit cast to silence this issue"
+msgstr "插入显式类型转换以消除这条诊断"
+
+msgctxt "diagnostic"
+msgid "Candidate constructor not viable: requires 1 argument, but {provided} were provided"
+msgstr "候选构造函数不可用：需要 1 个实参，但提供了 {provided} 个"
+
+msgctxt "diagnostic"
+msgid "Candidate constructor (the implicit copy constructor) not viable: requires 1 argument, but {provided} were provided"
+msgstr "候选隐式拷贝构造函数不可用：需要 1 个实参，但提供了 {provided} 个"
+
+msgctxt "diagnostic"
+msgid "Candidate constructor (the implicit move constructor) not viable: requires 1 argument, but {provided} were provided"
+msgstr "候选隐式移动构造函数不可用：需要 1 个实参，但提供了 {provided} 个"

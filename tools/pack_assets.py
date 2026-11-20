@@ -16,6 +16,7 @@ def assets(root, version, repository, only=None):
     specs = adapter_manifest.validate(root)
     index = adapter_manifest.runtime_specs(specs)
     domains = catalog_tool.builtin_sources(root, optional=True)
+    tool = json.loads((root / 'manifests/upstreams.json').read_text(encoding='utf-8'))['upstreams']['clangd']['tool']
     catalog_tool.check(root / 'translations/po/zh_CN', root / 'translations/glossary/zh_CN.toml')
     ids = {id for id, spec in specs.items() if spec['status'] == 'implemented'} | {'clangd'}
     if only:
@@ -37,6 +38,7 @@ def assets(root, version, repository, only=None):
             manifest['adapter'] = spec
         else:
             manifest['executable'] = 'clangd'
+            manifest['tool'] = tool
         content = bundle.encoded({'manifest': manifest, 'files': {
             name: value.decode('utf-8') for name, value in files.items()}})
         filename = f'{id}-zh_CN.json'
@@ -48,6 +50,7 @@ def assets(root, version, repository, only=None):
                           targets=sorted({target['commit'] for target in spec['targets'].values()}))
         else:
             record['executable'] = 'clangd'
+            record['tool'] = tool
         yield filename, content, record
 
 

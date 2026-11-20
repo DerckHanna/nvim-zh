@@ -75,6 +75,19 @@ native 真实消息探针使用复制到临时前缀的 Neovim、临时 locale �
 
 真实 clangd 重新观察固定 C++ 样例，检查 push 诊断和列表显示，以及原始协议和 `user_data.lsp` 的完整性。随后用真实 Neovim 会话检查中文语法错误、修复菜单、悬浮提示，以及修复后出现的未使用变量警告。服务器对 pull 返回 `-32601` 时记录该能力未提供，成功 pull 由独立用例验证。`NVIM_ZH_CLANGD_RECORD` 可指定仓库外记录路径，默认在临时目录记录。
 
+~~~bash
+source tests/run/lib/env.sh
+export NVIM_ZH_TEST_CLANGD=/usr/bin/clangd
+export NVIM_ZH_TEST_NVIM_DAP=/absolute/path/to/fixed/nvim-dap
+export NVIM_ZH_TEST_NVIM_DAP_VIEW=/absolute/path/to/fixed/nvim-dap-view
+python3 -B tests/workflows/cpp_tui.py
+python3 -B tests/workflows/python_git_tui.py
+~~~
+
+C++ 终端验证需要 PATH 中的 CodeLLDB 1.12.3、GNU Make、GCC 和子进程调试权限。第二个终端脚本需要 Bash、Git、pytest 9.0.2 和 Ruff 0.15.0。两者均运行中文启停对照。可按 `manifests/adapters/` 的哈希核对固定插件，测试会为每组生成临时项目。
+
+平台消息与 Help 探针使用独立 Neovim 用户目录，设置 `NVIM_ZH_ROOT` 指向仓库，`NVIM_ZH_PLATFORM_NATIVE` 取 `unsupported` 或 `ok`。入口为 `nvim --headless -u NONE -i NONE -n -l tests/platform/localization.lua`。
+
 ## PASS / FAIL / SKIP / BLOCKED
 
 - PASS：实际执行且退出成功。

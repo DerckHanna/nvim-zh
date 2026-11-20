@@ -26,7 +26,9 @@ local overrides = { clangd = {
 } }
 require('nvim-zh').setup({ modules = { ui = { notify = false, prompts = false }, plugins = { auto = false }, diagnostics = { enabled = false }, lsp = { messages = true, progress = true } }, overrides = overrides })
 local old_get = vim.lsp.get_client_by_id
-vim.lsp.get_client_by_id = function(id) return { id = id, name = id == 1 and 'clangd' or 'other' } end
+vim.lsp.get_client_by_id = function(id)
+  return { id = id, name = id == 1 and 'clangd' or 'other', server_capabilities = { completionProvider = {} } }
+end
 local err, ctx = { code = 0 }, { client_id = 1 }
 local show = { type = 2, message = 'Indexing completed' }
 local show_result = h.pack(vim.lsp.handlers['window/showMessage'](err, show, ctx))

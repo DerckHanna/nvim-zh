@@ -16,9 +16,26 @@
 
 `nvim-dap-view` 的 `codelldb` 和 `interaction` 均在汉化启用和关闭时通过。真实调试命中第 8 行，展开变量与寄存器，单步并继续至退出码 0。此前环境在启动阶段报告 `failed to send the handshake ack`。本轮同版本 VSIX 完成了实际子进程调试，保留了所有终端和协议断言。两组 `interaction` 使用同一个经源文件摘要验证的装载接缝，英文组的接缝仅保留虚拟行参数等兼容处理。直接调用 Neovim API 仍可复现 0.12.6 拒绝 `virt_lines_overflow = "wrap"`。
 
+固定 CodeLLDB 附件的 `liblldb.so` 含该错误字符串。LLVM 源码中对应 `GDBRemoteCommunicationClient::HandshakeWithServer` 发送初始 ACK 失败，发生在开始读取子调试器响应之前。历史运行没有保留足以确定连接提前关闭原因的进程或系统调用记录。[LLVM 源码](https://github.com/llvm/llvm-project/blob/7a941dfb2877a0b8cf30323fefa85ad019e0b0f5/lldb/source/Plugins/Process/gdb-remote/GDBRemoteCommunicationClient.cpp#L88-L125)
+
 发布提交 `631a516` 的固定版离线和上游 CI 均通过。实验性 nightly 在补全契约的模拟客户端处失败，运行时新增了对 `server_capabilities` 的读取。[CI 运行](https://github.com/DerckHanna/nvim-zh/actions/runs/44673762104)
 
 七个 0.1.0 汉化包均从正式 Release 下载地址校验了大小和 SHA-256。官方目录 `86f1cf9` 上线后，新用户目录通过 `vim.pack.add` 安装主包，显式刷新默认官方索引，仅下载 Telescope，然后暂停和恢复。断网重启保留所选资源。另一全新用户目录在关闭网络后打开中文包管理 Help，并导入下载好的 clangd 附件。主包正式 tag 的公开源码归档通过发布检查，共 541 个文件。[官方目录](https://github.com/DerckHanna/nvim-zh/blob/86f1cf9f00a39c1f6e7ba07a234ed454ef623e6b/catalog.json) [主包 Release](https://github.com/DerckHanna/nvim-zh/releases/tag/v0.1.0)
+
+## 工作流与维护验收（2026-11-20）
+
+| 任务 | 命令、环境与实际结果 |
+| --- | --- |
+| clangd 源码盘点 | `python3 -B tools/diagnostic_inventory.py coverage --source-root <LLVM 检出>` 以 `llvmorg-23.1.4` / `7a941dfb` 生成 6 663 个诊断和 15 736 个变体。41 个诊断的展开达到上限。 |
+| clangd 翻译匹配 | `python3 -B tools/diagnostic_coverage.py --observations <运行记录> --report <输出>` 调用实际 Lua 查找。盘点包括 252 条通用诊断词条、11 条与源码诊断码匹配的词条、历史 context 和 LSP UI 词条。合成参数命中 406 个诊断的 669 个变体，其中 656 个命中通用模板，13 个命中专用 context。11 个自由文本变体预期保留原文，其中包括用户写的 `#error` 内容。 |
+| 真实 clangd | `NVIM_ZH_TEST_CLANGD=/usr/bin/clangd NVIM_ZH_CLANGD_RECORD=<输出> make test-integration`。Arch 软件包 `clang 23.1.5-1` 的服务器标识为 `clangd version 23.1.5 linux x86_64-pc-linux-gnu`，二进制 SHA-256 为 `40b41eed884d7bcab758c571ea2828fec9bb02f30c66e3e79489af04978972b9`。15 个样例收到 21 条 push 诊断，20 条正文命中。补齐初始化窄化、显式转换和构造函数候选说明。实际编辑器通过诊断、相关位置、修复、悬浮、重载补全、签名、索引进度和模拟未知版本回退。pull 返回 `-32601`，独立契约覆盖成功路径。 |
+| C/C++ 终端 | `python3 -B tests/workflows/cpp_tui.py`。官方 Neovim 0.12.6、clangd 23.1.5、GCC 16.2.1、GNU Make 4.4.1、官方 CodeLLDB 1.12.3 和固定 DAP 插件。两组在中文路径项目中查阅 Help、搜索编辑、查看诊断原文和错误码、应用修复、构建、quickfix 跳转和调试。失败构建退出码 2，修复后为 0。两组跳到第 3 行第 32 列，LSP 原始对象字段一致。第 3 行断点的 `counter = 7`，继续至退出码 0。中文组用本地词库验证热更新和回滚，注入未知版本并检查状态理由。 |
+| pytest、Ruff 与 Git 冲突 | `python3 -B tests/workflows/python_git_tui.py`。选用 Neovim 0.12.6 自带编译器支持的 pytest 9.0.2 与 Ruff 0.15.0，两者都有可固定的本地环境、明确的退出码和位置。两组分别从测试第 2 行断言和 Ruff 第 1 行 `F401` 的失败退出码 1 到修复后的 0。Git 2.56.1 的临时分支合并返回 1，定位冲突第 1 行，确认解决后的暂存内容和空冲突索引。位置、原文和退出状态通过差分。 |
+| 核心 gettext | `make audit-native` 核对原 15 个未确认键。`NVIM_ZH_TEST_NATIVE_RUNTIME=1 make test-integration` 和独立英文/中文探针覆盖 12 个修复后的键，包括 E513、E1136、E5100/E5101、E5114、Lua 回调、`--server` 和 E575。3 个 ShaDa 旧键仅有源码移除或重构证据，见 `manifests/native.json`。 |
+| 核心 Help | 固定 0.12.6 的 133 篇全量结构契约通过。按清单的 10 个主题逐批抽查对齐段落，机器核对了 164 个可配对的字面默认值。修订 `starting` 的日志路径、`usr_24` 的删除位置和 `usr_25` 的实际插入换行。语义审阅覆盖样本与所修主题，其他段落仍需全文审校。 |
+| 平台 | 在隔离环境执行 `nvim --headless -u NONE -i NONE -n -l tests/platform/localization.lua`。Windows 11 x86_64 和 macOS 15.8.2 arm64 使用官方 0.12.6，Alpine edge x86_64 使用 Neovim 0.12.2-r1 与 musl 1.2.6。三组通过中文 Help、英文 Help 回退、Lua UI 和原文通知回退。三组的原生后端均报告 `unsupported`，E482 保留英文。macOS 首次运行使用系统目录别名，独立探针改用真实目录后通过。[macOS CI](https://github.com/DerckHanna/nvim-zh/actions/runs/44675088047) |
+
+工作流说明和复跑环境见[中文操作指南](workflows.md)与[测试文档](testing.md)。
 
 ## 历史全量复审（2026-11-19）
 

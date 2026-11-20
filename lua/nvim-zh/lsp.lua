@@ -1,14 +1,15 @@
 local M = {}
 local engine = require('nvim-zh.engine')
+local packs = require('nvim-zh.packs')
 local config = {}
 local states = {}
 local unpack = table.unpack or unpack
 local function pack(...) return { n = select('#', ...), ... } end
 
-local function clangd(ctx)
+local function clangd(ctx, method)
   if type(ctx) ~= 'table' or type(ctx.client_id) ~= 'number' then return false end
   local ok, client = pcall(vim.lsp.get_client_by_id, ctx.client_id)
-  return ok and type(client) == 'table' and client.name == 'clangd'
+  return ok and type(client) == 'table' and client.name == 'clangd' and packs.tool_allows('clangd', client, method)
 end
 
 local function translate(context, text)
@@ -52,7 +53,7 @@ end
 
 local function message_wrapper(original)
   return function(err, params, ctx, ...)
-    if not config.messages or not clangd(ctx) or type(params) ~= 'table' then return original(err, params, ctx, ...) end
+    if not config.messages or not clangd(ctx, 'window/showMessage') or type(params) ~= 'table' then return original(err, params, ctx, ...) end
     local copy = {}
     for key, value in pairs(params) do copy[key] = value end
     copy.message = translate('show_message', params.message)
@@ -62,7 +63,7 @@ end
 
 local function request_wrapper(original)
   return function(err, params, ctx, ...)
-    if not config.messages or not clangd(ctx) or type(params) ~= 'table' then return original(err, params, ctx, ...) end
+    if not config.messages or not clangd(ctx, 'window/showMessageRequest') or type(params) ~= 'table' then return original(err, params, ctx, ...) end
     local copy = {}
     for key, value in pairs(params) do copy[key] = value end
     copy.message = translate('request_message', params.message)
@@ -89,7 +90,7 @@ end
 
 local function progress_wrapper(original)
   return function(err, params, ctx, ...)
-    if not config.progress or not clangd(ctx) or type(params) ~= 'table' or type(params.value) ~= 'table' then
+    if not config.progress or not clangd(ctx, '$/progress') or type(params) ~= 'table' or type(params.value) ~= 'table' then
       return original(err, params, ctx, ...)
     end
     if params.value.kind ~= 'begin' and params.value.kind ~= 'report' and params.value.kind ~= 'end' then
@@ -107,7 +108,7 @@ end
 
 local function file_status_wrapper(original)
   return function(err, params, ctx, ...)
-    if not config.progress or not clangd(ctx) or type(params) ~= 'table' or type(params.state) ~= 'string' then
+    if not config.progress or not clangd(ctx, 'textDocument/clangd.fileStatus') or type(params) ~= 'table' or type(params.state) ~= 'string' then
       return original(err, params, ctx, ...)
     end
     local copy = vim.tbl_extend('force', {}, params)
@@ -165,7 +166,7 @@ end
 
 local function hover_wrapper(original)
   return function(err, result, ctx, ...)
-    if config.hints and not err and clangd(ctx) then result = hover_result(result) end
+    if config.hints and not err and clangd(ctx, 'textDocument/hover') then result = hover_result(result) end
     return original(err, result, ctx, ...)
   end
 end
@@ -179,7 +180,7 @@ local function request_all_wrapper(original)
       if not config.hints or type(results) ~= 'table' then return handler(results, ...) end
       local copy
       for id, response in pairs(results) do
-        if type(response) == 'table' and not (response.err or response.error) and clangd({ client_id = id }) then
+        if type(response) == 'table' and not (response.err or response.error) and clangd({ client_id = id }, method) then
           local translated = hover_result(response.result)
           if translated ~= response.result then
             copy = copy or vim.tbl_extend('force', {}, results)
@@ -196,6 +197,10 @@ local function signature_title_wrapper(original)
   return function(lines, syntax, opts, ...)
     if config.hints and type(opts) == 'table' and opts.focus_id == 'textDocument/signatureHelp'
       and type(opts.title) == 'string' and opts.title:match('^Signature Help: clangd[ (]') then
+      local clients = vim.lsp.get_clients({ bufnr = 0, name = 'clangd' })
+      if #clients > 1 or not packs.tool_allows('clangd', clients[1], 'textDocument/signatureHelp') then
+        return original(lines, syntax, opts, ...)
+      end
       local title, cycle = opts.title:match('^(.-)( %(<C%-s> to cycle%))$')
       title = translate('signature_help', title or opts.title)
       if cycle then title = title .. translate('signature_help', cycle) end
@@ -214,7 +219,7 @@ end
 local function completion_wrapper(original)
   return function(result, prefix, client_id, ...)
     local items = original(result, prefix, client_id, ...)
-    if not config.hints or not clangd({ client_id = client_id }) or type(items) ~= 'table' then return items end
+    if not config.hints or not clangd({ client_id = client_id }, 'textDocument/completion') or type(items) ~= 'table' then return items end
     local copy
     for i, item in ipairs(items) do
       local raw = type(item) == 'table' and vim.tbl_get(item, 'user_data', 'nvim', 'lsp', 'completion_item')
@@ -243,7 +248,7 @@ end
 function M.hints_enabled() return config.hints == true end
 
 function M.format_action(item, format_item)
-  if config.hints and type(item) == 'table' and clangd(item.ctx) and type(item.action) == 'table'
+  if config.hints and type(item) == 'table' and clangd(item.ctx, 'textDocument/codeAction') and type(item.action) == 'table'
     and type(item.action.title) == 'string' then
     local title = translate('code_action', item.action.title)
     if title ~= item.action.title then
@@ -274,7 +279,14 @@ function M.teardown()
 end
 function M.info()
   local result = { messages = config.messages == true, progress = config.progress == true,
-    hints = config.hints == true, logMessage = 'source', domain = 'clangd' }
+    hints = config.hints == true, logMessage = 'source', domain = 'clangd', clangd_clients = {} }
+  for _, client in ipairs(vim.lsp.get_clients({ name = 'clangd' })) do
+    result.clangd_clients[#result.clangd_clients + 1] = {
+      id = client.id,
+      version = client.server_info and client.server_info.version,
+      reason = packs.tool_reason('clangd', client, 'textDocument/publishDiagnostics'),
+    }
+  end
   for method, state in pairs(states) do result[method] = { active = state.active == true, reason = state.reason or (state.active and 'active') or 'external_override' } end
   return result
 end

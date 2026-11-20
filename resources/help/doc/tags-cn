@@ -8030,6 +8030,7 @@ nvim-zh	nvim-zh.cnx	/*nvim-zh*
 nvim-zh-api	nvim-zh.cnx	/*nvim-zh-api*
 nvim-zh-commands	nvim-zh.cnx	/*nvim-zh-commands*
 nvim-zh-config	nvim-zh.cnx	/*nvim-zh-config*
+nvim-zh-cpp	nvim-zh.cnx	/*nvim-zh-cpp*
 nvim-zh-diagnostics	nvim-zh.cnx	/*nvim-zh-diagnostics*
 nvim-zh-help	nvim-zh.cnx	/*nvim-zh-help*
 nvim-zh-install	nvim-zh.cnx	/*nvim-zh-install*

@@ -103,7 +103,7 @@ class CheckContractTest(unittest.TestCase):
         self.assertEqual(result['gaps'], 130)
         self.assertEqual(result['supplement'], 118)
         self.assertEqual(result['exemptions'], 12)
-        self.assertEqual(result['repairs'], 8)
+        self.assertEqual(result['repairs'], 20)
         self.assertEqual(result['prefix_repairs'], 25)
 
     def test_placeholder_change_is_rejected(self) -> None:

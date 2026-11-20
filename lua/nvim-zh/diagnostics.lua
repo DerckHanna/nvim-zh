@@ -1,6 +1,7 @@
 local M = {}
 local engine = require('nvim-zh.engine')
 local missing = require('nvim-zh.missing')
+local packs = require('nvim-zh.packs')
 local config = { enabled = false }
 local states = { virtual_text = {}, virtual_lines = {} }
 local float_state = {}
@@ -8,6 +9,11 @@ local lists = {}
 local unpack = table.unpack or unpack
 local CONTEXTS = { 'redefinition', 'previous_definition', 'undeclared_identifier', 'unknown_type_name' }
 local runtime = { observed = 0, translated = 0 }
+local raw_codes = {
+  pp_hash_error = true, pp_hash_warning = true, pragma_message = true, warn_pragma_message = true,
+  apinotes_message = true, note_apinotes_message = true, warn_apinotes_message = true,
+  diagnose_if_succeeded = true, warn_diagnose_if_succeeded = true, inline_ms_asm_parsing = true,
+}
 
 local function is_clangd(diagnostic)
   local source = diagnostic.source
@@ -50,6 +56,7 @@ local function translate_body(text, code, source)
 end
 
 local function translate_sentence(text, code, source)
+  if raw_codes[code] then return end
   local origin, inner = text:match('^(In [^:]+): (.+)$')
   local translated_origin = origin and lookup('diagnostic_origin', origin)
   if translated_origin then
@@ -67,8 +74,21 @@ local function translate_sentence(text, code, source)
   return result, context
 end
 
+-- Used by the source inventory to exercise the same message matcher.
+M.match_message = translate_sentence
+
 local function translate_diagnostic(diagnostic, text, code)
   if type(text) ~= 'string' or text == '' or type(diagnostic) ~= 'table' or not is_clangd(diagnostic) then return text end
+  if raw_codes[code] then
+    runtime.observed = runtime.observed + 1
+    return text
+  end
+  local ns = diagnostic.namespace and vim.diagnostic.get_namespace(diagnostic.namespace)
+  local id, remainder
+  if ns then id, remainder = ns.name:match('^nvim%.lsp%.clangd%.(%d+)(.*)$') end
+  local client = id and vim.lsp.get_client_by_id(tonumber(id))
+  local method = remainder and remainder ~= '' and 'textDocument/diagnostic' or 'textDocument/publishDiagnostics'
+  if not packs.tool_allows('clangd', client, method) then return text end
   runtime.observed = runtime.observed + 1
   local result, context
   local source = diagnostic.source

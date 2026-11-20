@@ -65,3 +65,71 @@ msgstr "E1115: \"assert_fails()\" 的第四个参数必须是数字"
 #: ../testing.c
 msgid "E1116: \"assert_fails()\" fifth argument must be a string"
 msgstr "E1116: \"assert_fails()\" 的第五个参数必须是字符串"
+
+#. upstream gap: "E513: write error, conversion failed in line %"
+#: ../bufwrite.c:61
+#, c-format
+msgid "E513: Write error, conversion failed in line %<PRId32> (make 'fenc' empty to override)"
+msgstr "E513: 写入错误，第 %<PRId32> 行转换失败（清空 'fenc' 可强制写入）"
+
+#. upstream gap: "E5521: <Cmd> mapping must end with <CR> before second <Cmd>"
+#: ../getchar.c:170
+msgid "E1136: <Cmd> mapping must end with <CR> before second <Cmd>"
+msgstr "E1136: <Cmd> 映射在第二个 <Cmd> 前必须以 <CR> 结束"
+
+#. upstream gap: "E5100: Cannot convert given lua table: table should either have a sequence of positive integer keys or contain only string keys"
+#: ../lua/converter.c:360
+msgid "E5100: Cannot convert given Lua table: table should contain either only integer keys or only string keys"
+msgstr "E5100: 无法转换给定的 Lua 表：键必须全部为整数或全部为字符串"
+
+#. upstream gap: "E5101: Cannot convert given lua type"
+#: ../lua/converter.c:388
+msgid "E5101: Cannot convert given Lua type"
+msgstr "E5101: 无法转换给定的 Lua 类型"
+
+#. upstream gap: "Error executing vim.schedule lua callback: %.*s"
+#: ../lua/executor.c:392
+#, c-format
+msgid "vim.schedule callback: %.*s"
+msgstr "vim.schedule 回调：%.*s"
+
+#. upstream gap: "E5114: Error while converting print argument #%i: %.*s"
+#: ../lua/executor.c:1078
+#, c-format
+msgid "E5114: Converting print argument #%i: %.*s"
+msgstr "E5114: 转换 print 的第 %i 个参数时出错：%.*s"
+
+#. upstream gap: "Error executing lua callback: %.*s"
+#: ../lua/executor.c:1566
+#, c-format
+msgid "Lua callback: %.*s"
+msgstr "Lua 回调：%.*s"
+
+#. upstream gap: "Error executing vim._expand_pat: %.*s"
+#: ../lua/executor.c:1985
+#, c-format
+msgid "vim._expand_pat: %.*s"
+msgstr "vim._expand_pat：%.*s"
+
+#. upstream gap: "Error executing  vim.on_key Lua callback: %.*s"
+#: ../lua/executor.c:2133
+#, c-format
+msgid "vim.on_key() callbacks: %.*s"
+msgstr "vim.on_key() 回调：%.*s"
+
+#. upstream gap: "Error executing Lua callback: %.*s"
+#: ../lua/executor.c:2377
+#, c-format
+msgid "Lua :command callback: %.*s"
+msgstr "Lua :command 回调：%.*s"
+
+#. upstream gap: "  --server <address>    Specify RPC server to send commands to\n"
+#: ../main.c:2344
+msgid "  --server <address>    Connect to this Nvim server\n"
+msgstr "  --server <address>    连接到此 Nvim 服务器\n"
+
+#. upstream gap: "Error while reading ShaDa file: buffer list at position %<PRIu64> contains entry that is not a dictionary"
+#: ../shada.c:3458
+#, c-format
+msgid "E575: Error while reading ShaDa file: buffer list at position %<PRIu64> contains entry that %s"
+msgstr "E575: 读取 ShaDa 文件时出错：位置 %<PRIu64> 处的 buffer 列表包含无效条目（%s）"

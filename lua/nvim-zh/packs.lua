@@ -180,6 +180,7 @@ local function parse_catalog(bytes, source)
     assert(row.description == nil or (type(row.description) == 'string' and #row.description <= 1000), '无效的包描述')
     assert(row.repository == nil or store.https(row.repository), '无效的目标仓库')
     assert(row.executable == nil or store.id(row.executable), '无效的目标工具')
+    store.validate_tool(row.tool, row.executable)
     assert(source ~= 'official' or vim.startswith(row.url, release_root), '官方附件地址超出发布仓库')
     local key = row.id .. '@' .. row.version .. '/' .. tostring(row.locale)
     assert(not keys[key], '发布索引版本重复：' .. key)
@@ -210,7 +211,18 @@ local function newer(a, b)
 end
 
 local function target_state(row, installed)
-  if type(row.executable) == 'string' and vim.fn.executable(row.executable) == 1 then return true end
+  if row.executable then
+    local target = vim.fn.executable(row.executable) == 1
+    if not row.tool then return target end
+    local seen = false
+    for _, client in ipairs(vim.lsp.get_clients({ name = row.tool.server })) do
+      local info = client.server_info
+      if info and info.name == row.tool.server and row.tool.versions[info.version] then return true, true end
+      seen = seen or client.initialized
+    end
+    if seen then return true, false end
+    return target
+  end
   if row.repository and installed[row.repository] then
     local rev = installed[row.repository].rev
     return true, type(rev) ~= 'string' or not vim.islist(row.targets) or vim.tbl_contains(row.targets, rev)
@@ -513,6 +525,32 @@ function M.info()
     end
   end
   return result
+end
+
+local requested_capabilities = {
+  ['textDocument/codeAction'] = true,
+  ['textDocument/completion'] = true,
+  ['textDocument/diagnostic'] = true,
+  ['textDocument/hover'] = true,
+  ['textDocument/signatureHelp'] = true,
+}
+
+function M.tool_reason(id, client, method)
+  local pack = active[id]
+  if not pack then return states[id] and states[id].enabled == false and 'paused' or 'pack_missing' end
+  local tool = pack.candidate.manifest.tool
+  if not tool then return 'legacy_pack' end
+  if not client then return 'client_missing' end
+  local info = client.server_info
+  if not info or info.name ~= tool.server or not tool.versions[info.version] then return 'unsupported_version' end
+  if method and not vim.tbl_contains(tool.versions[info.version], method) then return 'unverified_interface' end
+  if requested_capabilities[method] and not client:supports_method(method) then return 'unsupported_interface' end
+  return 'verified'
+end
+
+function M.tool_allows(id, client, method)
+  local reason = M.tool_reason(id, client, method)
+  return reason == 'verified' or reason == 'legacy_pack' or reason == 'pack_missing' or reason == 'paused'
 end
 
 return M

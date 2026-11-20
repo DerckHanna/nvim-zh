@@ -113,6 +113,11 @@ class RuntimeProbeTest(unittest.TestCase):
             other = _run_probe(binary, env, ['-l', str(script)])
             self.assertIn('E5005: 无法 dump msgpackdump() 参数', other, other)
             self.assertIn("键 'self'", other, other)
+            drift = _run_probe(binary, env, ['-i', 'NONE', '-l', str(Path(__file__).with_name('drift.lua'))])
+            self.assertIn('NATIVE_DRIFT_RUNTIME=PASS', drift, drift)
+            self.assertIn('Lua 回调：', drift, drift)
+            self.assertIn('autocmd marker', drift, drift)
+            self.assertIn('--server <address>    连接到此 Nvim 服务器', _run_probe(binary, env, ['--help']))
 
 
 if __name__ == '__main__':

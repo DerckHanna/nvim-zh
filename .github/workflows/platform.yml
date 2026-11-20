@@ -31,7 +31,6 @@ jobs:
           test "$(uname -m)" = arm64
           sw_vers
           workspace=$(mktemp -d)
-          workspace=$(cd "$workspace" && pwd -P)
           curl -fsSL --retry 3 https://github.com/neovim/neovim/releases/download/v0.12.6/nvim-macos-arm64.tar.gz -o "$workspace/nvim.tar.gz"
           printf '%s  %s\n' 1dbd148222b051ba6c307c4d17a318ed083df018a4f6a5a0ce46955ffc9ab87b "$workspace/nvim.tar.gz" | shasum -a 256 -c -
           tar -xzf "$workspace/nvim.tar.gz" -C "$workspace"

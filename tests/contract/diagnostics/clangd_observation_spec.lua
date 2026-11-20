@@ -53,6 +53,12 @@ local translations = {
   ["Cannot initialize a variable of type 'const char *' with an rvalue of type 'int'"] =
     "不能用 'int' 类型的右值初始化 'const char *' 类型的变量",
   ["No member named 'absent' in 'Holder'"] = "'Holder' 中没有名为 'absent' 的成员",
+  ["No matching constructor for initialization of 'Widget'"] = "找不到可用于初始化 'Widget' 的构造函数",
+  ["Type 'double' cannot be narrowed to 'int' in initializer list (fix available)"] =
+    "初始化列表中不能将 'double' 类型窄化为 'int'（有可用修复）",
+  ["Implicit conversion from 'double' to 'int' changes value from 3.5 to 3"] =
+    "从 'double' 到 'int' 的隐式转换将值从 3.5 改为 3",
+  ["Read-only variable is not assignable"] = "只读变量不可赋值",
 }
 local function convert(raw)
   return {

@@ -4,6 +4,12 @@ local names = { '概览', '汉化包', '翻译', '缺失', '检查' }
 local PAGES = { overview = 1, packs = 2, translations = 3, missing = 4, health = 5 }
 local labels = { ok = '已生效', idle = '未准备', unread = '尚未读取', disabled = '已关闭', degraded = '降级',
   unsupported = '不支持', preparing = '准备中', syncing = '同步中', error = '失败', restore_failed = '恢复失败' }
+local tool_reasons = {
+  verified = '诊断接口已验证', unsupported_version = '版本未经验证，显示原文',
+  unverified_interface = '接口未经验证，显示原文', unsupported_interface = '服务器不支持此接口',
+  pack_missing = '未安装 clangd 汉化包', paused = 'clangd 汉化包已暂停',
+  legacy_pack = '词库已启用，包未声明服务器版本', client_missing = '等待 clangd 客户端',
+}
 
 local function clean(value)
   return tostring(value == nil and '未知' or value):gsub('[%z\1-\31\127]', ' ')
@@ -46,6 +52,14 @@ local function lines()
     add(('汉化包 · %d 已安装 · %d 待处理 · Enter 管理'):format(installed, pending))
     panel.pack_overview = #result
     add('主包更新由 vim.pack 管理。')
+    local cpp = info.lsp.clangd_clients
+    if #cpp == 0 then add('C/C++ · 等待 clangd · :help nvim-zh-cpp') end
+    for _, client in ipairs(cpp) do
+      local reason = tool_reasons[client.reason] or client.reason
+      if not info.diagnostics.enabled then reason = '诊断显示已关闭' end
+      add(('C/C++ · %s · %s'):format(client.version or 'clangd', reason))
+    end
+    add('构建与测试 · :make / quickfix 保留命令输出和位置')
   elseif panel.page == PAGES.translations or panel.page == PAGES.missing then
     local stats = require('nvim-zh.engine').stats()
     if panel.page == PAGES.translations then

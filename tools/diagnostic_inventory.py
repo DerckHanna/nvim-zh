@@ -374,47 +374,6 @@ def diagnostic_records(defs: dict) -> list[dict]:
 # Coverage assembly and commands
 # ---------------------------------------------------------------------------
 
-def parse_po_entries(po_path: Path) -> dict[tuple[str, str], str]:
-    """Minimal PO reader: (context, msgid) -> msgstr for coverage accounting."""
-    entries: dict[tuple[str, str], str] = {}
-    context = msgid = msgstr = None
-    active = None
-
-    def finish():
-        nonlocal context, msgid, msgstr
-        if msgid is not None and msgstr is not None:
-            entries[(context or "", msgid)] = msgstr
-        context = msgid = msgstr = None
-
-    for raw in po_path.read_text(encoding="utf-8").splitlines():
-        line = raw.strip()
-        if not line or line.startswith("#"):
-            continue
-        match = re.match(r"^(msgctxt|msgid|msgstr)\s+\"(.*)\"$", line)
-        if match:
-            keyword, value = match.group(1), match.group(2)
-            if keyword in ("msgctxt", "msgid") and msgid is not None:
-                finish()
-            if keyword == "msgctxt":
-                context = value
-            elif keyword == "msgid":
-                msgid = value
-            else:
-                msgstr = value
-            active = keyword
-            continue
-        if line.startswith('"') and active:
-            extra = line[1:-1]
-            if active == "msgctxt":
-                context += extra
-            elif active == "msgid":
-                msgid += extra
-            else:
-                msgstr += extra
-    finish()
-    return entries
-
-
 def build_coverage(upstream: dict, defs: dict) -> dict:
     records = diagnostic_records(defs)
     substitutions = collect_substitutions(defs)
@@ -482,36 +441,19 @@ def cmd_coverage(upstream: dict, defs: dict) -> int:
     return 0
 
 
-def cmd_stats(upstream: dict, defs: dict) -> int:
-    coverage = build_coverage(upstream, defs)
-    counts = coverage["counts"]
-    po = parse_po_entries(ROOT / "translations/po/zh_CN/clangd.po")
-    supportable = [record for record in coverage["diagnostics"] if not record["untranslated_multi_digit"]]
-    covered = sum(1 for record in supportable if any(("diagnostic", v) in po for v in record["variants"]))
-    total = len(supportable)
-    print(f"UPSTREAM_VERSION={upstream['version']} commit={upstream['commit']}")
-    print(f"DIAGNOSTICS={counts['diagnostics']} variants={counts['variants']} "
-          f"multi_digit={counts['diagnostics_outside_digit_arguments']} capped={counts['diagnostics_with_capped_variants']}")
-    print(f"TRANSLATABLE={total} covered={covered} percent={100.0 * covered / max(total, 1):.1f}%")
-    print(f"PO_ENTRIES={len(po)}")
-    missing = [record["id"] for record in supportable if not any(("diagnostic", v) in po for v in record["variants"])]
-    print(f"MISSING={len(missing)}")
-    for name in missing[:12]:
-        print(f"MISSING_ID={name}")
-    return 0
-
-
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("command", choices=("coverage", "stats"))
+    parser.add_argument("--source-root", type=Path, help="pinned llvm-project checkout")
     args = parser.parse_args(argv)
+    if args.command == "stats":
+        import diagnostic_coverage
+        return diagnostic_coverage.main([])
     try:
         upstream = load_upstream()
-        verify_checkout(upstream["cache"], upstream["commit"])
-        defs = tblgen_records(upstream["cache"])
-        if args.command == "coverage":
-            return cmd_coverage(upstream, defs)
-        return cmd_stats(upstream, defs)
+        source_root = args.source_root or upstream["cache"]
+        verify_checkout(source_root, upstream["commit"])
+        return cmd_coverage(upstream, tblgen_records(source_root))
     except InventoryError as exc:
         print(f"INVENTORY_ERROR={exc}", file=sys.stderr)
         return 1

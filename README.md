@@ -30,6 +30,8 @@ require('nvim-zh').setup()
 
 如果希望在代码行尾显示诊断，可在调用 `setup()` 前设置 `vim.diagnostic.config({ virtual_text = true })`。未知诊断保留英文，可通过配置补充译文。[clangd 配置与译文覆盖](docs/configuration.md#modulesdiagnostics)
 
+从编辑、修复和构建到断点调试，见[中文工作流指南](docs/workflows.md)或 `:help nvim-zh-cpp`。
+
 ### 更新
 
 ```lua

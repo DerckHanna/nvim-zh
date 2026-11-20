@@ -23,7 +23,7 @@
   },
   "repairs": {
     "po": "translations/native/runtime_repairs.po",
-    "entries": 8,
+    "entries": 20,
     "upstream_msgids": [
       "E5403: Chunk %i start %",
       "E5405: Chunk %i start %",
@@ -32,7 +32,19 @@
       "E15: Invalid expression: %s",
       "E856: assert_fails() second argument must be a string or a list with one or two strings",
       "E1115: assert_fails() fourth argument must be a number",
-      "E1116: assert_fails() fifth argument must be a string"
+      "E1116: assert_fails() fifth argument must be a string",
+      "E513: write error, conversion failed in line %",
+      "E5521: <Cmd> mapping must end with <CR> before second <Cmd>",
+      "E5100: Cannot convert given lua table: table should either have a sequence of positive integer keys or contain only string keys",
+      "E5101: Cannot convert given lua type",
+      "Error executing vim.schedule lua callback: %.*s",
+      "E5114: Error while converting print argument #%i: %.*s",
+      "Error executing lua callback: %.*s",
+      "Error executing vim._expand_pat: %.*s",
+      "Error executing  vim.on_key Lua callback: %.*s",
+      "Error executing Lua callback: %.*s",
+      "  --server <address>    Specify RPC server to send commands to\n",
+      "Error while reading ShaDa file: buffer list at position %<PRIu64> contains entry that is not a dictionary"
     ],
     "runtime_msgids": [
       "E5403: Chunk %i start %<PRIdVARNUMBER> not in range [%<PRIdVARNUMBER>, %i)",
@@ -42,7 +54,19 @@
       "E15: Invalid expression: \"%s\"",
       "E856: \"assert_fails()\" second argument must be a string or a list with one or two strings",
       "E1115: \"assert_fails()\" fourth argument must be a number",
-      "E1116: \"assert_fails()\" fifth argument must be a string"
+      "E1116: \"assert_fails()\" fifth argument must be a string",
+      "E513: Write error, conversion failed in line %<PRId32> (make 'fenc' empty to override)",
+      "E1136: <Cmd> mapping must end with <CR> before second <Cmd>",
+      "E5100: Cannot convert given Lua table: table should contain either only integer keys or only string keys",
+      "E5101: Cannot convert given Lua type",
+      "vim.schedule callback: %.*s",
+      "E5114: Converting print argument #%i: %.*s",
+      "Lua callback: %.*s",
+      "vim._expand_pat: %.*s",
+      "vim.on_key() callbacks: %.*s",
+      "Lua :command callback: %.*s",
+      "  --server <address>    Connect to this Nvim server\n",
+      "E575: Error while reading ShaDa file: buffer list at position %<PRIu64> contains entry that %s"
     ],
     "quote_drift": [
       {
@@ -64,6 +88,68 @@
         "upstream_msgid": "E1116: assert_fails() fifth argument must be a string",
         "runtime_msgid": "E1116: \"assert_fails()\" fifth argument must be a string",
         "evidence": "pinned src/nvim/testing.c e_assert_fails_fifth_argument = N_(\"E1116: \\\"assert_fails()\\\" fifth argument must be a string\"); upstream PO extraction dropped the quotes."
+      }
+    ],
+    "gap_drift": [
+      {
+        "upstream_msgid": "E513: write error, conversion failed in line %",
+        "runtime_msgid": "E513: Write error, conversion failed in line %<PRId32> (make 'fenc' empty to override)",
+        "evidence": "src/nvim/bufwrite.c:61 and Neovim 0.12.6 runtime probe"
+      },
+      {
+        "upstream_msgid": "E5521: <Cmd> mapping must end with <CR> before second <Cmd>",
+        "runtime_msgid": "E1136: <Cmd> mapping must end with <CR> before second <Cmd>",
+        "evidence": "src/nvim/getchar.c:170 and Neovim 0.12.6 runtime probe"
+      },
+      {
+        "upstream_msgid": "E5100: Cannot convert given lua table: table should either have a sequence of positive integer keys or contain only string keys",
+        "runtime_msgid": "E5100: Cannot convert given Lua table: table should contain either only integer keys or only string keys",
+        "evidence": "src/nvim/lua/converter.c:360 and Neovim 0.12.6 runtime probe"
+      },
+      {
+        "upstream_msgid": "E5101: Cannot convert given lua type",
+        "runtime_msgid": "E5101: Cannot convert given Lua type",
+        "evidence": "src/nvim/lua/converter.c:388 and Neovim 0.12.6 runtime probe"
+      },
+      {
+        "upstream_msgid": "Error executing vim.schedule lua callback: %.*s",
+        "runtime_msgid": "vim.schedule callback: %.*s",
+        "evidence": "src/nvim/lua/executor.c:392 and Neovim 0.12.6 runtime probe"
+      },
+      {
+        "upstream_msgid": "E5114: Error while converting print argument #%i: %.*s",
+        "runtime_msgid": "E5114: Converting print argument #%i: %.*s",
+        "evidence": "src/nvim/lua/executor.c:1078 and Neovim 0.12.6 runtime probe"
+      },
+      {
+        "upstream_msgid": "Error executing lua callback: %.*s",
+        "runtime_msgid": "Lua callback: %.*s",
+        "evidence": "src/nvim/lua/executor.c:1566 and Neovim 0.12.6 runtime probe"
+      },
+      {
+        "upstream_msgid": "Error executing vim._expand_pat: %.*s",
+        "runtime_msgid": "vim._expand_pat: %.*s",
+        "evidence": "src/nvim/lua/executor.c:1985 and Neovim 0.12.6 runtime probe"
+      },
+      {
+        "upstream_msgid": "Error executing  vim.on_key Lua callback: %.*s",
+        "runtime_msgid": "vim.on_key() callbacks: %.*s",
+        "evidence": "src/nvim/lua/executor.c:2133 and Neovim 0.12.6 runtime probe"
+      },
+      {
+        "upstream_msgid": "Error executing Lua callback: %.*s",
+        "runtime_msgid": "Lua :command callback: %.*s",
+        "evidence": "src/nvim/lua/executor.c:2377 and Neovim 0.12.6 runtime probe"
+      },
+      {
+        "upstream_msgid": "  --server <address>    Specify RPC server to send commands to\n",
+        "runtime_msgid": "  --server <address>    Connect to this Nvim server\n",
+        "evidence": "src/nvim/main.c:2344 and Neovim 0.12.6 runtime probe"
+      },
+      {
+        "upstream_msgid": "Error while reading ShaDa file: buffer list at position %<PRIu64> contains entry that is not a dictionary",
+        "runtime_msgid": "E575: Error while reading ShaDa file: buffer list at position %<PRIu64> contains entry that %s",
+        "evidence": "src/nvim/shada.c:3458 and Neovim 0.12.6 runtime probe"
       }
     ]
   },
@@ -1172,32 +1258,24 @@
       "additional data of ShaDa ",
       "Error while reading ShaDa file: buffer list at position %<PRIu64> contains entry that is not a dictionary"
     ],
-    "stale_upstream_msgids": [
-      {
-        "upstream_msgid": "E5100: Cannot convert given lua table: table should either have a sequence of positive integer keys or contain only string keys",
-        "runtime_literal": "E5100: Cannot convert given Lua table: table should contain either only integer keys or only string keys",
-        "note": "上游 po 的 msgid 与固定二进制中的运行时字面量措辞/大小写不一致，按上游键查询不会命中；需要上游更新 po，或在下游增加运行时键条目。"
-      },
-      {
-        "upstream_msgid": "E5101: Cannot convert given lua type",
-        "runtime_literal": "E5101: Cannot convert given Lua type",
-        "note": "上游 po 的 msgid 与固定二进制中的运行时字面量措辞/大小写不一致，按上游键查询不会命中；需要上游更新 po，或在下游增加运行时键条目。"
-      },
-      {
-        "upstream_msgid": "E5114: Error while converting print argument #%i: %.*s",
-        "runtime_literal": "E5114: Converting print argument #%i: %.*s",
-        "note": "上游 po 的 msgid 与固定二进制中的运行时字面量措辞/大小写不一致，按上游键查询不会命中；需要上游更新 po，或在下游增加运行时键条目。"
-      },
-      {
-        "upstream_msgid": "  --server <address>    Specify RPC server to send commands to\n",
-        "runtime_literal": "--server <address>    Connect to this Nvim server\n",
-        "note": "上游 po 的 msgid 与固定二进制中的运行时字面量措辞/大小写不一致，按上游键查询不会命中；需要上游更新 po，或在下游增加运行时键条目。"
-      }
-    ],
     "notes": [
       "Audit is host/version specific: it records which literals of one compiled Neovim 0.12.6 (plus its runtime tree) contain each supplement msgid.",
       "bare_and_prefixed entries get an extra runtime key in prefix_repairs; unverified entries are not claimed to be live.",
-      "stale_upstream_msgids list upstream po keys whose runtime wording changed, so the upstream catalog itself needs an update."
+      "repairs.gap_drift records new exact runtime keys for twelve of the old unmatched catalog keys."
+    ],
+    "unconfirmed_after_gap_drift": [
+      {
+        "upstream_msgid": "System error while writing ShaDa file: %s",
+        "evidence": "src/nvim/shada.c::shada_write_file and shada_write_single_entry now handle writes through the file and packer paths; no matching gettext key in v0.12.6 source or official binary."
+      },
+      {
+        "upstream_msgid": "additional elements of ShaDa ",
+        "evidence": "src/nvim/shada.c::dump_additional_data and src/nvim/msgpack_rpc/unpacker.c::push_additional_data use packed data directly; no matching gettext key in v0.12.6 source or official binary."
+      },
+      {
+        "upstream_msgid": "additional data of ShaDa ",
+        "evidence": "src/nvim/shada.c::dump_additional_data and src/nvim/msgpack_rpc/unpacker.c::unpack_keydict handle extra fields; no matching gettext key in v0.12.6 source or official binary."
+      }
     ]
   }
 }

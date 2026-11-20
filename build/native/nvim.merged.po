@@ -282,6 +282,11 @@ msgstr "  --noplugin            不加载 plugin 脚本\n"
 msgid "  --remote[-subcommand] Execute commands remotely on a server\n"
 msgstr "  --remote[-subcommand] 在服务器上远程执行命令\n"
 
+#. upstream gap: "  --server <address>    Specify RPC server to send commands to\n"
+#: ../main.c:2344
+msgid "  --server <address>    Connect to this Nvim server\n"
+msgstr "  --server <address>    连接到此 Nvim 服务器\n"
+
 #: ../main.c:2132
 msgid "  --server <address>    Specify RPC server to send commands to\n"
 msgstr "  --server <address>    指定用于发送命令的 RPC 服务器\n"
@@ -1674,6 +1679,11 @@ msgstr "E112: 缺少选项名称：%.*s"
 #, c-format
 msgid "E112: Option name missing: %s"
 msgstr "E112: 缺少选项名称：%s"
+
+#. upstream gap: "E5521: <Cmd> mapping must end with <CR> before second <Cmd>"
+#: ../getchar.c:170
+msgid "E1136: <Cmd> mapping must end with <CR> before second <Cmd>"
+msgstr "E1136: <Cmd> 映射在第二个 <Cmd> 前必须以 <CR> 结束"
 
 #: ../eval.c:3751
 #, c-format
@@ -3971,9 +3981,19 @@ msgstr "E5071: 字符数不能大于 INT_MAX (%i)"
 msgid "E509: Cannot create backup file (add ! to override)"
 msgstr "E509: 无法创建备份文件 (请加 ! 强制执行)"
 
+#. upstream gap: "E5100: Cannot convert given lua table: table should either have a sequence of positive integer keys or contain only string keys"
+#: ../lua/converter.c:360
+msgid "E5100: Cannot convert given Lua table: table should contain either only integer keys or only string keys"
+msgstr "E5100: 无法转换给定的 Lua 表：键必须全部为整数或全部为字符串"
+
 #: ../lua/converter.c:380
 msgid "E5100: Cannot convert given lua table: table should either have a sequence of positive integer keys or contain only string keys"
 msgstr "E5100: 无法转换给定的 lua table：table 要么包含正整数键序列，要么只包含字符串键"
+
+#. upstream gap: "E5101: Cannot convert given lua type"
+#: ../lua/converter.c:388
+msgid "E5101: Cannot convert given Lua type"
+msgstr "E5101: 无法转换给定的 Lua 类型"
 
 #: ../lua/converter.c:409
 #: ../lua/converter.c:415
@@ -4032,6 +4052,12 @@ msgstr "E5112: 创建 Lua chunk 时出错：%.*s"
 msgid "E5113: Error while calling lua chunk: %.*s"
 msgstr "E5113: 调用 Lua chunk 时出错：%.*s"
 
+#. upstream gap: "E5114: Error while converting print argument #%i: %.*s"
+#: ../lua/executor.c:1078
+#, c-format
+msgid "E5114: Converting print argument #%i: %.*s"
+msgstr "E5114: 转换 print 的第 %i 个参数时出错：%.*s"
+
 #: ../lua/executor.c:972
 #, c-format
 msgid "E5114: Error while converting print argument #%i: %.*s"
@@ -4051,6 +4077,12 @@ msgstr "E5116: 调用调试字符串时出错：%.*s"
 #, c-format
 msgid "E512: Close failed: %s"
 msgstr "E512: 关闭失败：%s"
+
+#. upstream gap: "E513: write error, conversion failed in line %"
+#: ../bufwrite.c:61
+#, c-format
+msgid "E513: Write error, conversion failed in line %<PRId32> (make 'fenc' empty to override)"
+msgstr "E513: 写入错误，第 %<PRId32> 行转换失败（清空 'fenc' 可强制写入）"
 
 #: ../fileio.c:3363
 msgid "E513: write error, conversion failed (make 'fenc' empty to override)"
@@ -4373,6 +4405,12 @@ msgstr "E5700: 'spellsuggest' 的表达式必须返回恰好包含两个值的�
 #, c-format
 msgid "E574: Failed to write variable %s"
 msgstr "E574: 写入变量 %s 失败"
+
+#. upstream gap: "Error while reading ShaDa file: buffer list at position %<PRIu64> contains entry that is not a dictionary"
+#: ../shada.c:3458
+#, c-format
+msgid "E575: Error while reading ShaDa file: buffer list at position %<PRIu64> contains entry that %s"
+msgstr "E575: 读取 ShaDa 文件时出错：位置 %<PRIu64> 处的 buffer 列表包含无效条目（%s）"
 
 #. runtime-prefixed key: 编译产物中同时存在带前缀的字面量 E575: …（audit binary_sha256=d308f10e416aec90…）；上游 po 只记录无前缀 msgid，调用点在运行时按带前缀的键查询，故需补一条同前缀条目才能生效。
 #: ../shada.c:3955
@@ -6273,6 +6311,18 @@ msgstr "拉丁文补充"
 #: ../runtime.c:2222
 msgid "Lua"
 msgstr "Lua"
+
+#. upstream gap: "Error executing Lua callback: %.*s"
+#: ../lua/executor.c:2377
+#, c-format
+msgid "Lua :command callback: %.*s"
+msgstr "Lua :command 回调：%.*s"
+
+#. upstream gap: "Error executing lua callback: %.*s"
+#: ../lua/executor.c:1566
+#, c-format
+msgid "Lua callback: %.*s"
+msgstr "Lua 回调：%.*s"
 
 #: ../digraph.c:1807
 msgid "Mathematical operators"
@@ -8946,6 +8996,24 @@ msgstr "开始编辑文件时，'foldlevel' 的值"
 #: ../../../runtime/optwin.vim:1209
 msgid "various"
 msgstr "杂项"
+
+#. upstream gap: "Error executing vim._expand_pat: %.*s"
+#: ../lua/executor.c:1985
+#, c-format
+msgid "vim._expand_pat: %.*s"
+msgstr "vim._expand_pat：%.*s"
+
+#. upstream gap: "Error executing  vim.on_key Lua callback: %.*s"
+#: ../lua/executor.c:2133
+#, c-format
+msgid "vim.on_key() callbacks: %.*s"
+msgstr "vim.on_key() 回调：%.*s"
+
+#. upstream gap: "Error executing vim.schedule lua callback: %.*s"
+#: ../lua/executor.c:392
+#, c-format
+msgid "vim.schedule callback: %.*s"
+msgstr "vim.schedule 回调：%.*s"
 
 #: ../../../runtime/optwin.vim:1075
 msgid "warn when using a shell command and a buffer has changes"

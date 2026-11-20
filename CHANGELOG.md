@@ -2,6 +2,12 @@
 
 本项目遵循语义化版本。
 
+## Unreleased
+
+- clangd 词库增加 LSP 服务器身份、版本和所用方法的兼容声明。C/C++ 状态显示回退原因。
+- 增加中文 C/C++、pytest、Ruff 和 Git 冲突操作指南与实际终端对照。
+- 修复 12 个 Neovim 0.12.6 核心 gettext 键，补记 Windows、macOS 和 Linux/musl 回退验证。
+
 ## [0.1.0] - 2026-11-20
 
 ### Added

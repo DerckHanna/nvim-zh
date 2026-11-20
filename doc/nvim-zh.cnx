@@ -210,6 +210,22 @@ lsp.messages 和 lsp.progress 控制通知与进度。lsp.hints 控制代码操�
 悬浮说明、签名标题和原生补全说明。代码操作菜单需要 ui.prompts。修复编辑、
 补全文本、项目代码和 LSP 协议记录保留原值。未知诊断和提示显示英文原文。
 
+C/C++ 工作流                                                       *nvim-zh-cpp*
+
+在 :NvimZhPacks 安装 clangd 汉化包，用 :NvimZh 查看版本和失败原因。通过
+|:vimgrep| 检索文件，|:copen| 查看列表，|:cc| 跳转。打开诊断浮窗后，阅读
+错误码或用以下命令查看当前行的 LSP 原文和范围。 >vim
+
+    :lua vim.print(vim.diagnostic.get(0, { lnum = vim.fn.line('.') - 1 }))
+<
+使用 |vim.lsp.buf.code_action()| 应用修复，然后保存。GCC 项目可执行
+:compiler gcc 和 :make!，用 :echo v:shell_error 查看退出状态。配置好
+nvim-dap 和 CodeLLDB 后，用 :DapToggleBreakpoint 设置断点，
+:DapViewJump scopes 查看变量，:DapContinue 继续。
+
+包管理页可更新或离线回滚。服务器版本或接口未验证时，保留原来的显示文字。
+docs/workflows.md 包含构建、pytest、Ruff 和 Git 冲突的操作指南。
+
 Help 文档                                                      *nvim-zh-help*
 
 中文译文以 .cnx 和预生成 tags-cn 随包交付，默认 'helplang' 为 cn,en，缺失

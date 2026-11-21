@@ -19,8 +19,11 @@ local id=assert(zh.status().version.active_bundle)
 vim.fn.writefile({id},marker .. '.bundle.' .. vim.uv.os_getpid())
 print('CONCURRENT_SNAPSHOT=PASS')
 ''')
-        processes = [subprocess.Popen([NVIM, '--headless', '-u', 'NONE', '-i', 'NONE', '-n', '-l', str(script)],
-                       env=self.env, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True) for _ in range(2)]
+        processes = [subprocess.Popen(
+            [NVIM, '--headless', '-u', 'NONE', '-i', 'NONE', '-n', '-l', str(script)],
+            env=dict(self.env, XDG_STATE_HOME=str(self.base / f'state-{index}')),
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
+        ) for index in range(2)]
         try:
             deadline = time.monotonic() + 10
             while len(list(self.base.glob('go.*'))) < 2 and time.monotonic() < deadline:

@@ -18,8 +18,8 @@
 | Linux x86_64，glibc 2.44（WSL2） | 官方 0.12.6 | PASS（native=ok，中文 E482、Help、UI） | PASS（摘要拒绝、损坏回退、原地修复、硬链接/EEXIST/过期代次/缺失能力报错） |
 | Windows 11 x86_64，NT 10.0.26300 | 官方 0.12.6（`nvim.exe`） | PASS（native=unsupported，英文 E482、中文 Help/UI） | PASS（同上，真实 NTFS 文件系统与已发布历史附件） |
 | Alpine edge x86_64，musl 1.2.6 | Alpine 0.12.2-r1（`bwrap` 隔离） | PASS（native=unsupported，缺 `gnu_get_libc_version`，Help/UI 通过） | PASS（同上，真实 musl 环境与已发布历史附件） |
-| macOS 15 arm64 | 官方 0.12.6 | 历史 CI PASS（见下）；本轮未重跑 | **BLOCKED**（本机无 macOS 主机/虚拟机，推送触发 GitHub Actions 需另获授权；已将 `tests/platform/packs.lua` 接入 `.github/workflows/platform.yml`） |
-| Linux x86_64，Neovim nightly（预警） | `v0.13.0-dev-2148+g2843068c7a` | PASS（native=ok） | PASS；全套离线扫测中 `test-unit`、`test-e2e` 通过，5 个固定 0.12.6 runtime 接缝规格因 `diagnostic.lua`/`lsp/handlers.lua`/`lsp/buf.lua` 摘要变化按契约回退上游英文（无崩溃、无数据污染） |
+| macOS 15.8.2 arm64（GitHub Actions，`c967a7c`） | 官方 0.12.6 | PASS（`native=unsupported`，英文 E482、中文 Help/UI） | PASS（`sdk1=synthetic+published(0.1.0,0.1.1,0.1.2)`；修复 `fs.safe` 放行 macOS 顶层系统目录别名 `/var`/`/tmp`/`/etc` 后，在 `/var/folders/...` 路径下通过摘要拒绝、损坏回退、原地修复、硬链接/EEXIST/过期代次/缺失能力报错）。[macOS CI](https://github.com/DerckHanna/nvim-zh/actions/runs/44854071678) |
+| Linux x86_64，Neovim nightly（预警） | `v0.13.0-dev` | PASS（native=ok） | PASS；本机全套离线扫测与远端 `c967a7c` nightly 预警一致：`test-unit`、`test-e2e` 与 `setup_spec.lua` 通过，固定 0.12.6 runtime 接缝规格（`diagnostic.lua`/`lsp/handlers.lua`/`lsp/buf.lua` 摘要漂移，CI 首个触发点为 `clangd_observation_spec.lua:111`）按契约回退上游英文（无崩溃、无数据污染）。[nightly CI](https://github.com/DerckHanna/nvim-zh/actions/runs/44854071613/job/136691987989) |
 
 ### P1 性能同机复测
 
@@ -63,6 +63,7 @@ LLVM 23.1.4 `7a941dfb` 与 23.1.5 `392dfff9` 的相邻基线双次复现、二�
 | 固定第三方上游矩阵（`make test-upstream`） | PASS（67/67 项全通过，`upstream.json`）。 |
 | SDK 1 附件双次复现 + `toolchain_observe.py` + `clang_toolchain.py` + `toolchain_coverage.py --require-complete` | PASS（48 次驱动调用，602 个 clang-tidy 检查零缺口，真实 PTY 启停对照通过，91,654 样本零缺译/零歧义/零证据缺口，`TOOLCHAIN_COMPLETE=PASS`）。 |
 | C++/DAP 终端（`tests/workflows/cpp_tui.py`）与 Python/Git 终端（`tests/workflows/python_git_tui.py`） | PASS（启停两组跳转位置、修复、构建退出码 2→0、CodeLLDB 调试退出码 0、pytest/Ruff/Git 冲突解决完全一致，`cpp-tui.log`、`python-git-tui.log`）。 |
+| GitHub Actions CI（`c967a7c`：`platform.yml` 与 `test.yml`） | PASS（macOS 15.8.2 arm64 `localization.lua` 与 `packs.lua` 全通过；Ubuntu `offline (v0.12.6)` 全门禁 590 文件与 `upstream-smoke` 固定矩阵全通过；实验性 `offline (nightly)` 符合上述 0.12.6 runtime 接缝漂移预警）。[platform CI](https://github.com/DerckHanna/nvim-zh/actions/runs/44854071678) · [test CI](https://github.com/DerckHanna/nvim-zh/actions/runs/44854071613) |
 
 ## Clang 工具链完整覆盖验收（2026-11-20）
 

@@ -16,8 +16,8 @@
 | Linux x86_64，glibc 2.44，WSL2 | 官方 0.12.6 | 中文 E482/E576/E136/E5005、欢迎页及 12 项运行时键修复通过 | 中文 Help、Lua UI、英文回退，以及 SDK 1 导入、已发布历史附件（0.1.0/0.1.1/0.1.2）损坏回退与修复、硬链接登记原子性通过 |
 | Windows 11 x86_64，NT 10.0.26300 | 官方 0.12.6 | 原生接线报告 `unsupported`，E482 保留英文 | 中文 `options`、英文 `credits`、中文通知、未知文案、teardown，以及 SDK 1 导入、已发布历史附件损坏回退与修复、硬链接/EEXIST/过期代次/缺失能力报错的登记原子性通过 |
 | Alpine Linux edge x86_64，musl 1.2.6 | Alpine 0.12.2-r1 | 缺少 glibc 符号，原生接线报告 `unsupported`，E482 保留英文 | 中文 `options`、英文 `credits`、中文通知、未知文案、teardown，以及 SDK 1 导入、已发布历史附件损坏回退与修复、硬链接登记原子性通过 |
-| macOS 15.8.2 arm64，GitHub Actions | 官方 0.12.6 | 原生接线报告 `unsupported`，E482 保留英文（历史实测） | 历史 CI 通过系统路径别名下的中文 Help、Lua UI 和回退；当前工作树的 SDK 1 包探针已加入 `.github/workflows/platform.yml`，本机无 macOS 环境待远端 CI 实测。[历史 CI](https://github.com/DerckHanna/nvim-zh/actions/runs/44676795841) |
-| Linux x86_64，Neovim nightly（预警） | `v0.13.0-dev-2148+g2843068c7a` | 原生 E482 中文探针通过 | Help/UI、SDK 1 包探针、单元测试和 E2E 通过；固定 runtime 文件（`diagnostic.lua`、`lsp/handlers.lua`、`lsp/buf.lua`）摘要变化后，对应诊断列表和 LSP 消息/悬浮接缝按契约回退上游英文 |
+| macOS 15.8.2 arm64，GitHub Actions | 官方 0.12.6 | 原生接线报告 `unsupported`，E482 保留英文 | 系统路径别名（`/var`）下的中文 `options`、英文 `credits`、中文通知、未知文案、teardown，以及 SDK 1 导入、已发布历史附件（0.1.0/0.1.1/0.1.2）损坏回退与修复、硬链接/EEXIST/过期代次/缺失能力报错的登记原子性通过。[macOS CI (`c967a7c`)](https://github.com/DerckHanna/nvim-zh/actions/runs/44854071678) |
+| Linux x86_64，Neovim nightly（预警） | `v0.13.0-dev` | 原生 E482 中文探针通过 | Help/UI、SDK 1 包探针、单元测试和 E2E 通过；固定 runtime 文件（`diagnostic.lua`、`lsp/handlers.lua`、`lsp/buf.lua`）摘要变化后，对应诊断列表和 LSP 消息/悬浮接缝按契约回退上游英文。[test CI (`c967a7c`)](https://github.com/DerckHanna/nvim-zh/actions/runs/44854071613) |
 
 项目不再维护 0.10/0.11 的独立基础入口，也不保留旧命令、旧 Lua API 或旧测试目录的兼容层。旧版本的历史测试记录不能作为当前版本通过证据。
 

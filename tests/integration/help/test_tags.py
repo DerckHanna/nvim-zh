@@ -249,7 +249,7 @@ class ShippedTagsResolveTests(unittest.TestCase):
         script.write_text(
             'vim.cmd("set runtimepath^=" .. vim.env.NVIM_ZH_ROOT)\n'
             'vim.cmd("runtime! plugin/nvim-zh.lua")\n'
-            'require("nvim-zh").setup()\n'
+            'require("nvim-zh").setup({ modules = { core = { enabled = false } } })\n'
             'local cases = {\n' + cases + '\n}\n'
             'local rows = {}\n'
             'for _, row in ipairs(cases) do\n'

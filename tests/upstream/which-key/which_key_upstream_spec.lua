@@ -22,6 +22,7 @@ local original_setup = wk.setup
 local zh = require('nvim-zh')
 local setup_opts = {
   modules = {
+    core = { enabled = false },
     ui = { notify = true, prompts = false, echo = false },
     plugins = { auto = true, disabled = {} },
   },

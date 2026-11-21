@@ -8,13 +8,13 @@ local function await_setup()
 end
 vim.o.helplang = 'de,it'
 zh.setup()
-check(vim.o.helplang == 'cn,de,it,en', 'unexpected helplang merge: ' .. vim.o.helplang)
 await_setup()
+check(vim.o.helplang == 'cn,de,it,en', 'unexpected helplang merge: ' .. vim.o.helplang)
 zh.setup()
+await_setup()
 check(vim.o.helplang == 'cn,de,it,en', 'setup is not idempotent')
 check(zh.status().configured == true, 'setup did not update state')
 check(zh.status().config.modules.core.apply_language == true, 'default setup must enable automatic native integration')
-await_setup()
 zh.setup({ modules = { core = { apply_language = false } } })
 check(zh.status().config.modules.core.apply_language == false, 'explicit native opt-out was ignored')
 vim.o.helplang = 'de'

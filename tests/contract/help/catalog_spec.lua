@@ -291,7 +291,7 @@ end
 
 -- The pinned baseline must be reachable through :help, and an untranslated
 -- document must still fall back to the English runtime copy.
-require('nvim-zh').setup()
+require('nvim-zh').setup({ modules = { core = { enabled = false } } })
 local opened = {}
 for _, name in ipairs(names) do
   local meta = neovim.documents[name]

@@ -13,7 +13,7 @@ zh.register_catalog(domain, function()
     { context = '', msgid = 'Bad %s', msgstr = '错误 %d' },
   } }
 end)
-zh.setup({ missing = { max_entries = 32 } })
+zh.setup({ modules = { core = { enabled = false } }, missing = { max_entries = 32 } })
 equal(zh.translate({ domain = domain, msgid = '你好 🌏\nsecond' }), '中文 🌏\n第二行', 'Unicode/newline exact')
 equal(zh.translate({ domain = domain, msgid = '' }), '', 'empty string changed')
 equal(zh.translate({ domain = domain, msgid = 'Line 一🌏\n二\nEnd', formatted = true }), '行 一🌏\n二\n结束', 'Unicode/newline template')

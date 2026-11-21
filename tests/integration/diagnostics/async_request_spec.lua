@@ -16,7 +16,7 @@ vim.ui.select = function(items, opts, callback)
   end)
 end
 require('nvim-zh').setup({
-  modules = { ui = { notify = false, prompts = false }, plugins = { auto = false }, diagnostics = { enabled = false }, lsp = { messages = true, progress = false } },
+  modules = { core = { enabled = false }, ui = { notify = false, prompts = false }, plugins = { auto = false }, diagnostics = { enabled = false }, lsp = { messages = true, progress = false } },
   overrides = { clangd = { request_message = { ['Restart clangd?'] = '重启 clangd？' }, action = { Restart = '重启', ['Not now'] = '暂不' } } },
 })
 local selected

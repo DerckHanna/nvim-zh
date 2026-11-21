@@ -4,7 +4,7 @@ local check, equal = h.check, h.equal
 local notifications = {}
 vim.notify = function(msg) table.insert(notifications, msg) return 'ok' end
 local echo = vim.api.nvim_echo
-require('nvim-zh').setup({ missing = { enabled = true, max_entries = 32 } })
+require('nvim-zh').setup({ modules = { core = { enabled = false } }, missing = { enabled = true, max_entries = 32 } })
 equal(require('nvim-zh').translate({ domain = 'nvim-ui', msgid = 'No information available' }), '没有可用的信息', 'built-in UI PO catalog')
 local info = require('nvim-zh').status()
 check(info.config.modules.ui.notify == true and info.config.modules.ui.prompts == true, 'default notify/prompts config')

@@ -1,5 +1,5 @@
 local zh = require('nvim-zh')
-zh.setup({ missing = { enabled = true, max_entries = 16 } })
+zh.setup({ modules = { core = { enabled = false } }, missing = { enabled = true, max_entries = 16 } })
 local missing = require('nvim-zh.missing')
 for _, path in ipairs({ '/机密/客户资料', '/私密🌏', '相对/客户资料', './资料', '../客户资料',
   'C:\\机密\\客户资料', '\\\\服务器\\共享\\资料', '相对\\客户资料', '~/机密' }) do

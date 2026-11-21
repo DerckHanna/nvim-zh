@@ -27,7 +27,7 @@ local overrides = { clangd = {
   progress_title = { Indexing = '正在索引' },
   progress_message = { ['Parsing files'] = '正在解析文件' },
 } }
-require('nvim-zh').setup({ modules = { ui = { notify = false, prompts = false }, plugins = { auto = false }, diagnostics = { enabled = false }, lsp = { messages = true, progress = true } }, overrides = overrides })
+require('nvim-zh').setup({ modules = { core = { enabled = false }, ui = { notify = false, prompts = false }, plugins = { auto = false }, diagnostics = { enabled = false }, lsp = { messages = true, progress = true } }, overrides = overrides })
 local old_get = vim.lsp.get_client_by_id
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 vim.lsp.get_client_by_id = function(id)
@@ -115,7 +115,7 @@ local unknown = { type = 2, message = 'Unknown message' }
 vim.lsp.handlers['window/showMessage'](err, unknown, ctx)
 equal(calls[#calls][3].message, 'Unknown message', 'unknown message changed')
 local original_show = vim.lsp.handlers['window/showMessage']
-require('nvim-zh').setup({ modules = { diagnostics = { enabled = false }, lsp = { messages = true, progress = true } }, overrides = overrides })
+require('nvim-zh').setup({ modules = { core = { enabled = false }, diagnostics = { enabled = false }, lsp = { messages = true, progress = true } }, overrides = overrides })
 equal(vim.lsp.handlers['window/showMessage'], original_show, 'handler duplicated on setup')
 vim.lsp.handlers['window/showMessage'] = builtin_show
 vim.lsp.handlers['window/showMessageRequest'] = builtin_request

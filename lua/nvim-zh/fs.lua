@@ -2,11 +2,17 @@ local M = {}
 local uv = vim.uv
 local serial = 0
 
+local function macos_system_alias(path)
+  return vim.fn.has('macunix') == 1
+    and (path == '/var' or path == '/tmp' or path == '/etc')
+    and uv.fs_realpath(path) == '/private' .. path
+end
+
 function M.safe(path)
   local current = path
   while current and current ~= '' do
     local stat = uv.fs_lstat(current)
-    assert(not stat or stat.type ~= 'link', '拒绝符号链接：' .. current)
+    assert(not stat or stat.type ~= 'link' or macos_system_alias(current), '拒绝符号链接：' .. current)
     local parent = vim.fs.dirname(current)
     if parent == current then break end
     current = parent

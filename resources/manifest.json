@@ -616,8 +616,8 @@
         "size": 17587
       },
       "lua/nvim-zh/fs.lua": {
-        "sha256": "8796a257c46d2470e2c2c04763111a48d94703009383a11fbfb0b90a101cd87f",
-        "size": 4613
+        "sha256": "ccab6e88a1bf23114d106c89a8649c7d19fb5c28b040dc1712307cf62a89a0f6",
+        "size": 4837
       },
       "lua/nvim-zh/health.lua": {
         "sha256": "a3afd77b6cd7f9ba75a7f9569fee7b867bdc2bb15c69ba70ec72e17dce1f02c5",
@@ -712,7 +712,7 @@
         "size": 1601
       }
     },
-    "id": "29db74a01ca601da4a720532c663092fe5085830d0b799de445392c4b4843660"
+    "id": "69fee5999d9059dfaaa4db2316e8d8793ac49bf1805b93cbadd8db743321445f"
   },
   "runtime_api": 1,
   "schema": 1,

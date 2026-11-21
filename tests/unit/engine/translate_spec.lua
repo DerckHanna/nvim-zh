@@ -34,7 +34,7 @@ local function loader()
   }
 end
 check(zh.register_catalog(domain, loader, { upstream = 'test' }), 'catalog registration failed')
-zh.setup({ missing = { enabled = true, max_entries = 32 } })
+zh.setup({ modules = { core = { enabled = false } }, missing = { enabled = true, max_entries = 32 } })
 
 local text, status, id = zh.translate({ domain = domain, msgid = 'Save' })
 equal(text, '保存', 'exact translation')

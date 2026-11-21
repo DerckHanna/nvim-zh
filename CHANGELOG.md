@@ -6,9 +6,10 @@
 
 - 修复诊断 quickfix/location list 条目与 LSP 进度数据被翻译的问题。中文由列表和面板显示，列表查询、LspProgress、client.progress、fileStatus handler 和通用 LSP 回调保留上游数据。
 - 同步失败保留上一份有效配置和资源，取消回调在旧任务清理后交付。汉化包自动推荐需要目标兼容证据，历史版本仍可显式选择和离线回滚。
-- 大工具词库按实际使用准备，编译器版本及摘要在后台验证。翻译检查与测试复用已解析输入和附件。 工具链 PO 从单一编辑源生成，LLVM 23.1.4 与 23.1.5 均通过重复构建。
+- 大工具词库按实际使用准备，编译器版本及摘要在后台验证。翻译检查与测试复用已解析输入和附件。工具链 PO 从单一编辑源生成，LLVM 23.1.4 与 23.1.5 均通过重复构建。
+- 修复 macOS 系统目录别名（`/var`、`/tmp`、`/etc`）路径下读取或导入汉化包被误判为符号链接的问题。
 
-- 添加固定 LLVM 23.1.5 的 Clang 和 clang-tidy 候选汉化包、quickfix/location list 显示和原文查询。
+- 添加固定 LLVM 23.1.5 的 Clang 和 clang-tidy 汉化包、quickfix/location list 显示和原文查询。
 - 增加 clangd 文件状态与 clang-tidy 转发诊断显示。工具身份、源码盘点、匹配记录和实际工作流详见 `docs/toolchain-coverage.md`。
 
 - clangd 词库增加 LSP 服务器身份、版本和所用方法的兼容声明。C/C++ 状态显示回退原因。

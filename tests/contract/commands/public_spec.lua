@@ -7,6 +7,8 @@ for _, command in ipairs({ 'NvimZhInfo', 'NvimZhMissing', 'NvimZhReload', 'NvimZ
   check(vim.fn.exists(':' .. command) == 0, command .. ' must not be defined')
 end
 require('nvim-zh').setup()
+check(vim.wait(20000, function() return require('nvim-zh').status().runtime.status ~= 'syncing' end, 20),
+  'setup did not settle')
 local notifications = {}
 vim.notify = function(msg, level) table.insert(notifications, { msg = msg, level = level }) end
 local before_lang = vim.v.lang

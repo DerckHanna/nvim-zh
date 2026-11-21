@@ -63,7 +63,27 @@ assert(pcall(store.load, 'demo', current.selected) and store.record('demo').gene
 assert(zh.status().packs.demo.active_sha256 == current.selected.sha256 and zh.translate({ domain = 'demo', msgid = 'Open' }) == '打开')
 assert(not vim.iter(vim.fs.dir(store.root() .. '/snapshots')):any(function(name) return name:find('damaged', 1, true) end))
 
+local orig_has, orig_lstat, orig_realpath = vim.fn.has, vim.uv.fs_lstat, vim.uv.fs_realpath
+local checked_alias, alias_err = pcall(function()
+  vim.fn.has = function(feature) return feature == 'macunix' and 1 or orig_has(feature) end
+  vim.uv.fs_lstat = function(path)
+    if path == '/var' or path == '/var/folders/link' then return { type = 'link' } end
+    return { type = 'directory' }
+  end
+  vim.uv.fs_realpath = function(path)
+    if path == '/var' then return '/private/var' end
+    if path == '/var/folders/link' then return '/etc' end
+    return path
+  end
+  assert(fs.safe('/var/folders/demo/pack.json') == '/var/folders/demo/pack.json')
+  assert(not pcall(fs.safe, '/var/folders/link/pack.json'), 'nested symlink under macOS alias was accepted')
+  vim.fn.has = function(feature) return feature == 'macunix' and 0 or orig_has(feature) end
+  assert(not pcall(fs.safe, '/var/folders/demo/pack.json'), 'non-macOS symlink parent was accepted')
+end)
+vim.fn.has, vim.uv.fs_lstat, vim.uv.fs_realpath = orig_has, orig_lstat, orig_realpath
+assert(checked_alias, alias_err)
+
 packs.change('demo', 'remove')
 assert(not zh.status().packs.demo and zh.translate({ domain = 'demo', msgid = 'Open' }) == 'Open')
 assert(store.record('demo').generation > first.generation)
-print('PACK_STORE_SPEC=PASS trust digest guard pause stale_generation activation_recovery snapshot_repair uninstall')
+print('PACK_STORE_SPEC=PASS trust digest guard pause stale_generation activation_recovery snapshot_repair macos_alias uninstall')

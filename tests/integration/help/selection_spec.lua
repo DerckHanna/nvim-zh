@@ -63,7 +63,7 @@ check(contains_tag('literal%tag\tfirst.cnx\t/*literal%tag*', 'literal%tag'),
 for tag in pairs(translated_tags) do
   check(contains_tag(tags_cn, tag), 'tags-cn missing ' .. tag)
 end
-require('nvim-zh').setup()
+require('nvim-zh').setup({ modules = { core = { enabled = false } } })
 vim.cmd('help nvim-intro')
 local active_doc = vim.fs.dirname(require('nvim-zh').status().help.chinese_help)
 check(vim.api.nvim_buf_get_name(0) == active_doc .. '/nvim.cnx', ':help did not select active translated nvim.cnx')

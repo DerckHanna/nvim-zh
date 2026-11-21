@@ -1,5 +1,16 @@
 # 验证记录
 
+## 0.4.0 · 验收基线（2026-11-22）
+
+主仓库对照基线为 `20bae89`（`v0.3.0`），包目录对照基线为 `7f09e53`。本轮在 Linux x86_64/glibc 使用官方 Neovim 0.12.6、隔离 XDG 与固定上游源码验证新增 8 个插件包及 `nvim-tree` 新 target。
+
+| 检查 | 本地结果 |
+| --- | --- |
+| 基础资源、测试与发布打包 | PASS。`make build-resources check-syntax check-translations check-native check-adapters check-resources check-reproducible test release-check` 全部通过（`CATALOG_CHECK=PASS domains=19 entries=71041`，`RESOURCE_BUNDLE=PASS 142 files`，发布候选含 649 个文件），`make sync` 离线检查无漂移。 |
+| 新增 8 插件 + `nvim-tree` 固定上游与 PTY TUI | PASS。`snacks`、`blink-cmp`、`cmake-tools`、`aerial`、`gitsigns`、`conform`、`mini`、`nvim-treesitter`、`nvim-tree` 全部通过 `adapter_tool.py test --upstream` 的 Lua 集成测试与 `enabled=false` / `enabled=true` PTY TUI 对比场景。 |
+| 真实 Neovim 0.12 配置实机验证 | PASS。以 SDK 2 本地语言包加载 12 个已装插件（含 8 个新包与 `nvim-tree`），全部通过 SHA-256 证据校验并激活；抽查 Snacks dashboard/picker/health、`:ConformInfo`、`:AerialInfo`/`:AerialToggle`、`cmake-tools`、Gitsigns、`mini.statusline`、`nvim-treesitter`、`blink.cmp` health 与 `nvim-tree` 映射均正常且无新增报错。 |
+| SDK 2 `0.4.0` 发行附件 | PASS。9 个 `0.4.0` 附件与合并后的 `catalog.json` 双次构建逐字节一致；既有 13 条 `0.2.0`/`0.3.0` 公开记录完整保留。 |
+
 ## 0.3.0 · 验收基线（2026-11-21）
 
 主仓库对照基线为 `47ceec9`，包目录对照基线为 `8072cf8`。本轮在 Linux x86_64/glibc 使用摘要匹配的官方 Neovim 0.12.6（SHA-256 `2e150e924a93930295deff9ca3c02c8828590ce3d04ce7b3ef49c8804adde973`）、隔离 XDG、空 `LOCPATH` 与固定上游源码。本节保留发布前的本地验证与迁移对照。

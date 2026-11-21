@@ -25,11 +25,11 @@ require('nvim-zh').setup()
 
 运行 `vim.pack.update()` 更新主包，在确认界面用 `:write` 接受变更。可选包在 `:NvimZhPacks` 中独立更新。面板会在插件实现变化时提示重启。在线安装需要 `curl`，离线可用面板的 `a` 菜单导入已下载的附件。
 
-公开目录提供 SDK 2 格式。升级到 0.3.0 后，可在 `:NvimZhPacks` 中更新已装的可选包。见[发行说明](CHANGELOG.md)。
+公开目录提供 SDK 2 格式。升级到 0.4.0 后，可在 `:NvimZhPacks` 中安装或更新可选包。见[发行说明](CHANGELOG.md)。
 
 ## 可选汉化包
 
-- **插件** · which-key、Telescope、nvim-tree、nvim-cmp、nvim-dap、nvim-dap-ui、nvim-dap-view。逐项适配范围见[插件指南](docs/adapters.md)。
+- **插件** · which-key、Telescope、nvim-tree、nvim-cmp、nvim-dap、nvim-dap-ui、nvim-dap-view、snacks.nvim、blink.cmp、cmake-tools.nvim、aerial.nvim、gitsigns.nvim、conform.nvim、mini.nvim、nvim-treesitter。逐项适配范围见[插件指南](docs/adapters.md)。
 - **C/C++** · clangd、Clang 和 clang-tidy。诊断、悬浮、签名、构建列表及若干其他显示依赖固定工具版本和来源证据。见 [C/C++ 工作流](docs/workflows.md)与[工具链覆盖](docs/toolchain-coverage.md)。
 
 ## 文档

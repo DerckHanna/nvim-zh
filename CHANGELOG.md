@@ -2,6 +2,25 @@
 
 本项目遵循语义化版本。
 
+## [0.4.0] - 2026-11-22
+
+### 新增
+
+- 新增 8 个第三方插件的 SDK 2 中文（`zh_CN`）汉化包，包含完整适配器、PO 词表、契约测试与固定上游 PTY 对比测试：
+  - `snacks.nvim`（dashboard、picker、notifier、input、bufdelete 与 `:checkhealth snacks`）
+  - `blink.cmp`（模糊引擎构建/下载通知与 `:checkhealth blink.cmp`）
+  - `cmake-tools.nvim`（构建/配置状态通知与构建类型/Target 选择提示）
+  - `aerial.nvim`（`:AerialInfo` 信息面板与大纲窗口提示）
+  - `gitsigns.nvim`（Hunk/Blame/Stage/Diff 提示消息与浮窗标题）
+  - `conform.nvim`（`:ConformInfo` 展示窗口、格式化通知与 `:checkhealth conform`）
+  - `mini.nvim`（`mini.statusline`、`mini.surround`、`mini.ai`、`mini.pairs`、`mini.icons`、`mini.tabline` 常用提示与模式标签）
+  - `nvim-treesitter`（Neovim 0.12 `main` 分支解析器安装/更新日志与 `:checkhealth nvim-treesitter`）
+
+### 变更
+
+- 更新 `nvim-tree` 基线目标提交至 `6e539e91302d2e201b078a45d214177140134523`，同步发布 `nvim-tree` `0.4.0` SDK 2 汉化包并保留 `0.3.0` 兼容旧提交 `dbc9d96a`。
+- 公开包目录新增 9 个 `0.4.0` SDK 2 发行包记录（8 个新插件 + `nvim-tree`），未改动插件与 Clang 工具包继续保留 `0.3.0` / `0.2.0` 发行记录。
+
 ## [0.3.0] - 2026-11-21
 
 ### 新增

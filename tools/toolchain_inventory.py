@@ -26,11 +26,13 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import diagnostic_inventory as diag  # noqa: E402
+from catalog_tool import atomic_write_text  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 TOOLCHAIN = ROOT / "manifests/toolchain.json"
 COMPILER_OUT = ROOT / "manifests/clang-coverage.json"
 TIDY_OUT = ROOT / "manifests/clang-tidy-coverage.json"
+CLANGD_OUT = ROOT / "manifests/clangd-coverage.json"
 ANALYZER_AUDIT = ROOT / "translations/toolchain/analyzer_audit.json"
 ANALYZER_CHECKERS = Path("clang/include/clang/StaticAnalyzer/Checkers/Checkers.td")
 
@@ -510,9 +512,9 @@ def audited_analyzer_messages(name: str, entry: dict, source_root: Path, line_co
     return messages
 
 
-def analyzer_checks(source_root: Path) -> list[dict]:
+def analyzer_checks(source_root: Path, tblgen: str) -> list[dict]:
     path = source_root / ANALYZER_CHECKERS
-    result = diag.run([diag._find_tblgen(), str(path), "-I", str(path.parent), "--dump-json"])
+    result = diag.run([tblgen, str(path), "-I", str(path.parent), "--dump-json"])
     if result.returncode:
         raise diag.InventoryError(result.stderr.strip())
     definitions = json.loads(result.stdout)
@@ -568,8 +570,41 @@ def null_dereference_messages(source_root: Path) -> list[dict]:
     return messages
 
 
-def build(toolchain: dict, source_root: Path) -> tuple[dict, dict]:
-    defs = diag.tblgen_records(source_root)
+def input_digest(source_root: Path) -> tuple[int, str]:
+    paths = {source_root / TEXT_DIAGNOSTIC_SOURCE}
+    directories = (
+        (diag.TBLGEN_INCLUDE, ("*.td",)),
+        (ANALYZER_CHECKERS.parent, ("*.td",)),
+        ("clang-tools-extra/clang-tidy", ("*.cpp", "*.h")),
+        ("clang/lib/StaticAnalyzer/Checkers", ("*.cpp", "*.h")),
+        ("clang/lib/StaticAnalyzer/Core", ("*.cpp", "*.h")),
+    )
+    for directory, patterns in directories:
+        for pattern in patterns:
+            paths.update((source_root / directory).rglob(pattern))
+    digest = hashlib.sha256()
+    for path in sorted(paths):
+        if path.is_symlink() or not path.is_file():
+            raise diag.InventoryError(f"invalid LLVM generator input: {path}")
+        digest.update(path.relative_to(source_root).as_posix().encode() + b"\0")
+        digest.update(bytes.fromhex(sha256_file(path)))
+    return len(paths), digest.hexdigest()
+
+
+def verified_tblgen(source_root: Path, pin: dict, binary: Path | None) -> str:
+    tblgen = str(binary.resolve()) if binary else diag._find_tblgen()
+    if sha256_file(Path(tblgen)) != pin["tblgen"]["sha256"]:
+        raise diag.InventoryError("llvm-tblgen SHA-256 differs from the generation lock")
+    result = diag.run([tblgen, "--version"])
+    versions = {line.strip() for line in result.stdout.splitlines()}
+    if result.returncode or f"LLVM version {pin['tblgen']['version']}" not in versions:
+        raise diag.InventoryError("llvm-tblgen version differs from the generation lock")
+    if input_digest(source_root) != (pin["source_files"], pin["source_sha256"]):
+        raise diag.InventoryError("LLVM source byte inventory differs from the generation lock")
+    return tblgen
+
+
+def build(toolchain: dict, source_root: Path, defs: dict, tblgen: str) -> tuple[dict, dict]:
     substitutions = diag.collect_substitutions(defs)
     records = compiler_records(defs)
     for record in records:
@@ -605,7 +640,7 @@ def build(toolchain: dict, source_root: Path) -> tuple[dict, dict]:
     }
     tidy_tree = source_root / "clang-tools-extra/clang-tidy"
     checks, errors = check_sources(tidy_tree)
-    analyzer = analyzer_checks(source_root)
+    analyzer = analyzer_checks(source_root, tblgen)
     for check in checks:
         for message in check["messages"]:
             message["codes"] = [check["name"]]
@@ -632,31 +667,38 @@ def build(toolchain: dict, source_root: Path) -> tuple[dict, dict]:
 
 
 def write_json(path: Path, value: dict) -> None:
-    import os
-    temporary = path.with_suffix(".json.tmp")
-    temporary.write_text(json.dumps(value, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
-    os.replace(temporary, path)
+    atomic_write_text(path, json.dumps(value, ensure_ascii=False, indent=1) + "\n")
 
 
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("command", choices=("coverage",))
     parser.add_argument("--source-root", type=Path, required=True)
+    parser.add_argument("--tblgen", type=Path, help="path to the pinned llvm-tblgen")
+    parser.add_argument("--baseline", help="LLVM tag of the inventory to generate")
+    parser.add_argument("--output", type=Path)
     args = parser.parse_args(argv)
     toolchain = load_toolchain()
-    commit = toolchain["llvm"]["commit"]
+    if args.baseline and args.baseline != toolchain["llvm"]["version"]:
+        toolchain = toolchain["adjacent_baseline"]
+        if args.baseline != toolchain["llvm"]["version"]:
+            parser.error(f"unknown pinned LLVM baseline: {args.baseline}")
+        if not args.output:
+            parser.error("--output is required for the adjacent baseline")
+    output = args.output or COMPILER_OUT.parent
     try:
-        diag.verify_checkout(args.source_root, commit)
-    except diag.InventoryError as exc:
+        diag.verify_checkout(args.source_root, toolchain["llvm"]["commit"])
+        tblgen = verified_tblgen(args.source_root, toolchain["generation"], args.tblgen)
+        defs = diag.tblgen_records(args.source_root, tblgen)
+        compiler, tidy = build(toolchain, args.source_root, defs, tblgen)
+        clangd = diag.build_coverage(toolchain["llvm"], defs)
+    except (diag.InventoryError, OSError) as exc:
         print(f"INVENTORY_ERROR={exc}", file=sys.stderr)
         return 1
-    try:
-        compiler, tidy = build(toolchain, args.source_root)
-    except diag.InventoryError as exc:
-        print(f"INVENTORY_ERROR={exc}", file=sys.stderr)
-        return 1
-    write_json(COMPILER_OUT, compiler)
-    write_json(TIDY_OUT, tidy)
+    output.mkdir(parents=True, exist_ok=True)
+    write_json(output / COMPILER_OUT.name, compiler)
+    write_json(output / TIDY_OUT.name, tidy)
+    write_json(output / CLANGD_OUT.name, clangd)
     print(
         "TOOLCHAIN_INVENTORY=PASS "
         f"compiler={compiler['counts']['diagnostics']} compiler_variants={compiler['counts']['variants']} "

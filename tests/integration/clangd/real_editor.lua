@@ -24,6 +24,10 @@ vim.lsp.handlers['$/progress'] = function(err, params, ctx)
   return handle_progress(err, params, ctx)
 end
 
+local events = {}
+vim.api.nvim_create_autocmd('LspProgress', { callback = function(event)
+  events[#events + 1] = vim.deepcopy(event.data.params)
+end })
 local selected_title, selection_error
 local select = vim.ui.select
 vim.ui.select = function(items, opts, on_choice)
@@ -151,10 +155,23 @@ equal(completion.word, 'sum', 'completion insert text changed')
 equal(raw_item.detail, '[2 overloads]', 'clangd did not bundle the expected overloads')
 equal(completion.menu, '[2 个重载]', 'completion menu was not translated')
 
-check(vim.wait(10000, function()
-  return vim.iter(progress):any(function(item) return item.value.title == '正在建立索引' end)
-end, 25), 'clangd did not display translated index progress: ' .. vim.inspect(progress))
-check(vim.iter(raw_progress):any(function(item) return item.value.title == 'indexing' end), vim.inspect(raw_progress))
+local function raw_index(rows)
+  return vim.iter(rows):any(function(item) return item.value and item.value.title == 'indexing' end)
+end
+check(vim.wait(10000, function() return raw_index(raw_progress) and raw_index(progress) and raw_index(events) end, 25),
+  'real clangd index progress did not reach all raw consumers')
+local queued = {}
+for item in client.progress do queued[#queued + 1] = item end
+check(raw_index(queued), 'client.progress lost the raw title')
+local lsp_status = require('nvim-zh').status().lsp.clangd_clients[1]
+equal(lsp_status.progress.title, '正在建立索引', 'panel progress title not projected')
+local downstream
+vim.api.nvim_win_set_cursor(0, { 1, 4 })
+vim.lsp.buf_request_all(bufnr, 'textDocument/hover', function(c)
+  return vim.lsp.util.make_position_params(0, c.offset_encoding)
+end, function(responses) downstream = responses[client_id].result end)
+check(vim.wait(5000, function() return downstream ~= nil end, 25), 'generic hover callback timed out')
+check(downstream.contents.value:find('function `sum`', 1, true), 'generic hover callback received a projected document')
 
 local tool = require('nvim-zh.packs')
 local server_info = client.server_info
@@ -186,6 +203,42 @@ check(diagnostic_text:find('此前的定义在这里', 1, true), diagnostic_text
 equal(note.message, 'Previous definition is here', 'raw related information was changed')
 vim.api.nvim_win_close(float_win, true)
 
+-- Two independent clients can have the same name and different evidence.
+local original_buf = vim.api.nvim_get_current_buf()
+local other_root = root .. '/second project'
+vim.fn.mkdir(other_root, 'p')
+local other_file = other_root .. '/second.cpp'
+vim.fn.writefile({ 'int main() { return unknown_in_second_project; }' }, other_file)
+vim.cmd.edit(vim.fn.fnameescape(other_file))
+local other_buf = vim.api.nvim_get_current_buf()
+local other_id = assert(vim.lsp.start({
+  name = 'clangd', root_dir = other_root, cmd = { executable, '--log=error' },
+  on_init = function(peer)
+    peer.server_info = vim.tbl_extend('force', peer.server_info, { version = 'unverified peer' })
+  end,
+}, { reuse_client = function() return false end }))
+check(other_id ~= client_id, 'separate projects reused a single client')
+check(vim.wait(10000, function() return #vim.diagnostic.get(other_buf) > 0 end, 25),
+  'second project did not publish diagnostics')
+local function clients()
+  return require('nvim-zh').status().lsp.clangd_clients
+end
+local peers = clients()
+equal(#peers, 1, 'panel included a client outside the current project')
+equal(peers[1].id, other_id, 'panel selected the first project client')
+equal(peers[1].reason, 'unsupported_version', 'unverified peer inherited another client’s evidence')
+float_buf, float_win = vim.diagnostic.open_float({ scope = 'buffer' })
+diagnostic_text = table.concat(vim.api.nvim_buf_get_lines(float_buf, 0, -1, false), '\n')
+check(diagnostic_text:find("Use of undeclared identifier 'unknown_in_second_project'", 1, true),
+  'unverified peer displayed a projected diagnostic')
+vim.api.nvim_win_close(float_win, true)
+vim.lsp.get_client_by_id(other_id):stop()
+vim.api.nvim_set_current_buf(original_buf)
+peers = clients()
+equal(#peers, 1, 'stopped peer remained in the active project snapshot')
+equal(peers[1].id, client_id, 'switch back did not restore the verified project status')
+equal(peers[1].reason, 'verified', 'project switch lost verified capabilities')
+
 client:stop()
-print('REAL_CLANGD_EDITOR=PASS error warning related_information hover quickfix completion signature progress unknown_version')
+print('REAL_CLANGD_EDITOR=PASS error warning related_information hover quickfix completion signature progress unknown_version multi_project')
 print('REAL_CLANGD_COMPLETION=' .. vim.json.encode({ menu = completion.menu, detail = raw_item.detail, info = completion.info }))

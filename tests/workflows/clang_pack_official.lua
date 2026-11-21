@@ -31,7 +31,7 @@ else
   assert(not state().selected, vim.inspect(state()))
   vim.cmd('NvimZhPacks install official:clangd@0.1.0')
   assert(vim.wait(60000, function() return active('0.1.0') end, 50), vim.inspect(state()))
-  vim.cmd('NvimZhPacks update clangd')
+  vim.cmd('NvimZhPacks install official:clangd@0.1.1')
   assert(vim.wait(60000, function() return active('0.1.1') end, 50), vim.inspect(state()))
   assert(state().previous == '0.1.0')
   vim.cmd('NvimZhPacks disable clangd')

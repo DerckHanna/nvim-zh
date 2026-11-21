@@ -51,12 +51,13 @@ Linux/glibc + LuaJIT；其他环境会报告原生降级，中文 Help 和 Lua U
 
 汉化包                                                         *nvim-zh-packs*
 
-在「汉化包」页，首次按回车获取可用包目录，r 刷新目录，/ 筛选。j/k 选择，
+在「汉化包」页，首次按回车或 r 联网刷新目录，/ 使用本地目录筛选。j/k 选择，
 回车打开选中包的详情和操作。i 安装，u 更新单个包，U 预览批量更新，a 打开
 页面操作菜单并可导入本地包。暂停、恢复、回滚和卸载从包详情操作。
 
 安装会话里的下载和校验在后台进行。关闭面板后可重新打开查看进度。适配代码
-变化会显示待重启，词库可以在同一会话内切换。
+变化会显示待重启，词库可以在同一会话内切换。自动推荐需要目标证据，
+详情中可以显式选择历史发行版本。
 
 :NvimZhPacks list、search、install、update、enable、disable、rollback 和
 remove 也可从命令行调用。安装时可用 telescope@1.0.0 指定版本。用
@@ -95,9 +96,8 @@ modules.ui 控制 notify、input/select、可选选择项格式化和默认关�
 modules.plugins.auto 只适配已加载的受支持插件，不强制加载插件本体；
 disabled 是适配器名称数组。
 
-诊断 formatter 先调用用户 formatter，保留 nil 隐藏语义、异常、原始诊断、
-范围、代码和 user_data.lsp。LSP 包装只复制显示字段，保留动作、token、
-进度值和取消逻辑。
+列表保留用户 formatter 返回值、nil 隐藏语义和异常。译文在列表渲染时生成。
+LSP 事件、进度队列和用户 handler 使用上游数据，面板使用派生的显示字段。
 
 override 是按 domain、显式 context 和原始 msgid 索引的纯数据： >lua
 
@@ -202,7 +202,7 @@ nvim-cmp 的补全内容来自补全源或用户 formatter。固定 commit、源
 诊断与 LSP                                                *nvim-zh-diagnostics*
 
 安装 clangd 汉化包后，已有译文的诊断在行尾、虚拟行、浮窗和诊断列表中
-显示中文。诊断原文和位置保存在 vim.diagnostic.get() 与 user_data.lsp。
+显示中文。列表查询、诊断位置及 user_data.lsp 保留上游原文。
 在源文件内执行 |:NvimZhDiagnosticRaw|，查看当前行的原文和诊断代码。
 
 lsp.messages 和 lsp.progress 控制通知与进度。lsp.hints 控制代码操作标题、

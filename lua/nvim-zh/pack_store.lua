@@ -165,7 +165,7 @@ local function validate_spec(m, files)
   end
 end
 
-local function prepare(manifest, files, allow_lua)
+local function prepare(manifest, files, allow_lua, checkpoint)
   assert(type(manifest) == 'table' and manifest.schema == 1 and manifest.sdk == 1
     and M.id(manifest.id) and M.version(manifest.version) and manifest.locale == 'zh_CN'
     and M.id(manifest.domain), '汉化包的格式、版本或语言不受支持')
@@ -178,6 +178,7 @@ local function prepare(manifest, files, allow_lua)
     assert(type(bytes) == 'string' and #bytes == info.size and fs.utf8(bytes)
       and vim.fn.sha256(bytes) == info.sha256, '包文件校验失败：' .. name)
   end
+  if checkpoint then checkpoint() end
   local tags = {}
   for name in pairs(files) do
     assert(manifest.files[name], '包中存在未声明的文件')
@@ -198,6 +199,7 @@ local function prepare(manifest, files, allow_lua)
   if files['catalogs/zh_CN.json'] then
     source = vim.json.decode(files['catalogs/zh_CN.json'])
     assert(source.locale == 'zh_CN', '词库语言不匹配')
+    if checkpoint then checkpoint() end
     require('nvim-zh.catalog').prepare_sources({ [manifest.domain] = source })
   end
   local entry = files['adapter/entry.lua']
@@ -208,46 +210,99 @@ local function prepare(manifest, files, allow_lua)
   return { manifest = manifest, catalog = source, entry = entry, tags = tags }
 end
 
+local function artifact(bytes, id, revision, checkpoint)
+  local value = vim.json.decode(bytes)
+  local manifest = value.manifest
+  assert(type(manifest) == 'table' and (not id or manifest.id == id and manifest.version == revision.version),
+    '包登记与内容不匹配')
+  return prepare(manifest, value.files, revision.allow_lua, checkpoint), value.files
+end
+
+function M.folder(revision)
+  return root() .. '/snapshots/' .. assert(M.digest(revision.sha256))
+end
+
+local function check_files(folder, files)
+  for name, data in pairs(files) do
+    assert(fs.read(folder .. '/' .. name, #data) == data, '包快照文件校验失败：' .. name)
+  end
+end
+
+local function verified_snapshot(candidate, folder)
+  candidate.root = folder
+  local stamps = { ['artifact.json'] = fs.fingerprint(folder .. '/artifact.json') }
+  for name in pairs(candidate.manifest.files) do stamps[name] = fs.fingerprint(folder .. '/' .. name) end
+  candidate.stamps = stamps
+  return candidate
+end
+
+function M.unchanged(candidate)
+  for name, stamp in pairs(candidate.stamps) do
+    if fs.fingerprint(candidate.root .. '/' .. name) ~= stamp then return false end
+  end
+  return true
+end
+
 function M.stage(bytes, expected, allow_lua)
   local sum = vim.fn.sha256(bytes)
   if expected then
     assert(sum == expected.sha256 and #bytes == expected.size, '发布附件摘要或大小不匹配')
   end
-  local value = vim.json.decode(bytes)
-  local manifest, files = value.manifest, value.files
-  local candidate = prepare(manifest, files, allow_lua)
+  local candidate, files = artifact(bytes, expected and expected.id, { version = expected and expected.version,
+    allow_lua = allow_lua })
   if expected then
-    assert(manifest.id == expected.id and manifest.version == expected.version, '发布索引与包信息不匹配')
-    assert(vim.deep_equal(manifest.tool, expected.tool), '发布索引与工具兼容性不匹配')
+    assert(vim.deep_equal(candidate.manifest.tool, expected.tool), '发布索引与工具兼容性不匹配')
   end
-  local base = root() .. '/snapshots'
-  fs.mkdir(base)
-  local destination = base .. '/' .. sum
-  if not uv.fs_stat(destination) then
-    local stage = fs.unique(base .. '/stage')
+  local destination = M.folder({ sha256 = sum })
+  fs.mkdir(vim.fs.dirname(destination))
+  fs.safe(destination)
+  local function intact()
+    return pcall(function()
+      assert(fs.read(destination .. '/artifact.json', M.limit) == bytes, '已存包摘要不匹配')
+      check_files(destination, files)
+    end)
+  end
+  local published, repaired
+  local present = uv.fs_stat(destination)
+  -- The snapshot folder is addressed by the digest of the verified bytes in
+  -- hand. A stored copy that no longer verifies is replaced by a fresh one,
+  -- so re-importing the same attachment repairs a damaged snapshot.
+  if present and not intact() then
+    repaired = fs.unique(vim.fs.dirname(destination) .. '/damaged')
+    local moved, why = uv.fs_rename(destination, repaired)
+    assert(moved, '无法替换已损坏的包快照：' .. tostring(why))
+    present = nil
+  end
+  if not present then
+    local stage = fs.unique(vim.fs.dirname(destination) .. '/stage')
     local ok, err = pcall(function()
       for name, data in pairs(files) do fs.write(stage .. '/' .. name, data) end
       fs.write(stage .. '/artifact.json', bytes)
-      local renamed, why = uv.fs_rename(stage, destination)
-      assert(renamed or uv.fs_stat(destination), why)
+      local why
+      published, why = uv.fs_rename(stage, destination)
+      assert(published or uv.fs_stat(destination), why)
     end)
     if uv.fs_stat(stage) then vim.fn.delete(stage, 'rf') end
-    if not ok then error(err, 0) end
+    if not ok then
+      if repaired and not uv.fs_stat(destination) then uv.fs_rename(repaired, destination) end
+      error(err, 0)
+    end
   end
-  local checked = M.load(manifest.id, { version = manifest.version, sha256 = sum, allow_lua = allow_lua })
-  return checked, sum
+  if repaired then vim.fn.delete(repaired, 'rf') end
+  if not published then
+    assert(intact())
+  end
+  return verified_snapshot(candidate, destination), sum
 end
 
-function M.load(id, record)
-  local folder = root() .. '/snapshots/' .. assert(M.digest(record.sha256))
+function M.load(id, record, checkpoint)
+  local folder = M.folder(record)
   local bytes = fs.read(folder .. '/artifact.json', M.limit)
   assert(vim.fn.sha256(bytes) == record.sha256, '已存包摘要不匹配')
-  local value = vim.json.decode(bytes)
-  assert(value.manifest.id == id and value.manifest.version == record.version, '包登记与内容不匹配')
-  local files = fs.verify(folder, value.manifest.files)
-  local candidate = prepare(value.manifest, files, record.allow_lua)
-  candidate.root = folder
-  return candidate
+  if checkpoint then checkpoint() end
+  local candidate, files = artifact(bytes, id, record, checkpoint)
+  check_files(folder, files)
+  return verified_snapshot(candidate, folder)
 end
 
 return M

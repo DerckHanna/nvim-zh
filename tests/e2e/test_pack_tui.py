@@ -73,7 +73,7 @@ local ok, err = xpcall(function()
     tab()
   end
   assert(pages[1]:find('插件运行版本',1,true))
-  assert(pages[2]:find('获取可用包',1,true))
+  assert(pages[2]:find('联网刷新目录',1,true))
   assert(pages[3]:find('133',1,true))
   assert(pages[4]:find('没有观察到缺失',1,true))
   vim.o.columns, vim.o.lines = 28, 10

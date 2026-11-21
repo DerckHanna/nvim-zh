@@ -46,9 +46,10 @@ local function install(value)
     row = matching(value)
     assert(row, '找不到汉化包，请检查名称和发布源')
     for _, option in ipairs(row.options or {}) do
-      if not version or version == option.version then return option end
+      if version and version == option.version then return option end
     end
-    error('没有兼容的发行版本', 0)
+    if not version and row.update then return row.update end
+    error('请选择发行版本，当前目标没有已验证的自动推荐', 0)
   end
   if row and not version and row.update then
     packs.install(row.update, notify)
@@ -99,12 +100,7 @@ function M.run(command)
       local message = #result > 0 and table.concat(result, '\n') or '暂无匹配的包'
       notify(true, message)
     end
-    if action == 'search' then
-      packs.refresh_catalog(function(ok, message)
-        if not ok then notify(false, message) end
-        list()
-      end)
-    else list() end
+    list()
   elseif action == 'install' then
     install(assert(value, '请输入包 ID'))
   elseif action == 'update' then

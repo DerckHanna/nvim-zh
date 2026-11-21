@@ -100,14 +100,17 @@ for index, item in ipairs(stored) do
   check(vim.deep_equal(item.user_data.lsp, converted[index].user_data.lsp), 'user_data.lsp raw diagnostic changed')
 end
 check(vim.deep_equal(observation, snapshot), 'raw observation mutated')
-vim.diagnostic.setqflist({ namespace = ns, open = false })
+vim.diagnostic.setqflist({ namespace = ns, open = true })
 local qf = vim.fn.getqflist()
 local qf_seen = {}
+local screen = table.concat(vim.api.nvim_buf_get_lines(0, 0, -1, false), '\n')
 for _, item in ipairs(qf) do qf_seen[item.text] = true end
 for _, raw in ipairs(converted) do
-  local message = vim.fn.has('nvim-0.12') == 1 and expected[raw.message] or raw.message
-  check(qf_seen[message], 'quickfix display mismatch: ' .. message)
+  check(qf_seen[raw.message], 'quickfix element changed: ' .. raw.message)
+  local message = expected[raw.message]
+  check(screen:find(message, 1, true), 'quickfix display mismatch: ' .. message)
 end
+vim.cmd.cclose()
 local note = { message = 'Previous definition is here', source = 'clang' }
 equal(formatter(note), '此前的定义在这里', 'real relatedInformation template missing')
 for _, response in ipairs(observation.pull) do

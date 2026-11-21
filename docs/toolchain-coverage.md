@@ -35,12 +35,23 @@ TableGen 展开处理 `%sub` 参数重编号、`%select`、枚举选择、复数
 
 ## 复跑
 
-在仓库外准备固定 LLVM 检出及证据目录。使用固定的 `llvm-tblgen`、Neovim 和四个工具，设置 `NVIM_BIN` 为官方 Neovim 路径。
+工具链译文只在 `translations/toolchain/zh_CN.json` 编辑。TableGen 摘要和诊断例外按上游 ID 或分支登记，独立 clang-tidy 译文按检查名登记，已审定的界面文案及补充出处使用 `reviewed`。分析器逐项来源记录在 `analyzer_audit.json`。生成器直接读取这些输入，并可在空目录写出完整 PO。
+
+在仓库外准备固定 LLVM 检出及证据目录。两份源码与 llvm-tblgen 的摘要锁见 `manifests/toolchain.json`。先为当前发行基线及相邻基线分别生成。相邻基线生成只用于构建再现，运行时组合仍以本页固定版本与方法清单为准。
 
 ~~~bash
-python3 -B tools/toolchain_inventory.py coverage --source-root "$llvm"
-python3 -B tools/diagnostic_inventory.py coverage --source-root "$llvm"
-python3 -B tools/toolchain_catalog.py sync
+python3 -B tools/toolchain_inventory.py coverage --source-root "$llvm" \
+  --tblgen "$tblgen" --output "$evidence/inventory"
+python3 -B tools/toolchain_inventory.py coverage --source-root "$llvm_previous" \
+  --baseline llvmorg-23.1.4 --tblgen "$tblgen_previous" --output "$evidence/previous-inventory"
+python3 -B tools/toolchain_catalog.py sync --inventory "$evidence/inventory" --output "$evidence/po"
+python3 -B tools/toolchain_catalog.py sync --inventory "$evidence/previous-inventory" --output "$evidence/previous-po"
+~~~
+
+用独立目录重跑并逐字节比较同一基线。比较发布前后的检出可输出语义差异。运行下列固定 Neovim 与 LLVM 工作流继续核对显示、协议和实际注册结果。
+
+~~~bash
+python3 -B tools/toolchain_catalog.py diff --before "$previous_checkout" --after "$PWD" --output "$evidence/diff.json"
 python3 -B tools/toolchain_observe.py --output "$evidence/compiler.json"
 NVIM_ZH_TEST_CLANGD=/usr/bin/clangd NVIM_ZH_CLANGD_RECORD="$evidence/clangd.json" \
   make test-contract test-integration >"$evidence/contracts.log" 2>&1
@@ -51,4 +62,4 @@ python3 -B tools/toolchain_coverage.py --compiler "$evidence/compiler.json" \
   --contracts "$evidence/contracts.log" --report "$evidence/coverage.json" --require-complete
 ~~~
 
-需要维护候选附件时用 `tools/pack_assets.py --id <工具> --version <版本> --output <仓库外路径>`。`clang`、`clangd`、`clang-tidy` 各有独立附件。省略 `--assets` 时，TUI 会生成测试版本的本地附件。使用真实候选时，启停对照同时核对三个附件的摘要。正式 Release、CI 和当前运行记录见[验证记录](verification.md)。
+语义差异报告按诊断 ID、检查名、context 和原文标记新增、移除、变化及译文冲突。盘点命令共用已验证的 TableGen 数据，并将输出写入指定目录。需要维护候选附件时用 `tools/pack_assets.py --id <工具> --version <版本> --output <仓库外路径>`。`clang`、`clangd`、`clang-tidy` 各有独立附件。省略 `--assets` 时，TUI 会生成测试版本的本地附件。使用真实候选时，启停对照同时核对三个附件的摘要。正式 Release、CI 和当前运行记录见[验证记录](verification.md)。

@@ -352,57 +352,48 @@ local function translate(spec)
 
   if spec.formatted == true and #original <= MAX_TEMPLATE_INPUT then
     local function scan(candidates)
-      local list = candidates
-      if #candidates > 64 then
-        local g = groups[candidates]
-        if not g then
-          g = { prefixes = {}, short = {} }
-          for _, cand in ipairs(candidates) do
-            match_template(cand, '', clangd, spec.domain)
-            local pr = probes[cand] or ''
-            if #pr >= 12 then
-              local k1 = pr:sub(1, 12)
-              local sub = g.prefixes[k1]
-              if not sub then sub = { by_len = {} }; g.prefixes[k1] = sub end
-              local by_pr = sub.by_len[#pr]
-              if not by_pr then by_pr = {}; sub.by_len[#pr] = by_pr end
-              local arr = by_pr[pr]
-              if not arr then arr = {}; by_pr[pr] = arr end
-              arr[#arr + 1] = cand
-            else
-              g.short[#g.short + 1] = cand
-            end
-          end
-          groups[candidates] = g
-        end
-        list = {}
-        for _, cand in ipairs(g.short) do list[#list + 1] = cand end
-        for k1, sub in pairs(g.prefixes) do
-          local pos = 1
-          while true do
-            local found = original:find(k1, pos, true)
-            if not found then break end
-            for len, by_pr in pairs(sub.by_len) do
-              local arr = by_pr[original:sub(found, found + len - 1)]
-              if arr then
-                for _, cand in ipairs(arr) do list[#list + 1] = cand end
-              end
-            end
-            pos = found + 1
-          end
+      if not candidates then return nil, nil, false end
+      local matched, matched_entry, best_spec, best_index, ambiguous = nil, nil, -1, 0, false
+      local function match(candidate, index)
+        local probe = probes[candidate]
+        if probe and probe ~= '' and not original:find(probe, 1, true) then return end
+        local result = match_template(candidate, original, clangd, spec.domain)
+        if not result then return end
+        local specificity = specificities[candidate] or 0
+        if specificity > best_spec then
+          matched, matched_entry, best_spec, best_index, ambiguous = result, candidate, specificity, index, false
+        elseif specificity == best_spec then
+          if matched ~= result then ambiguous = true end
+          if index < best_index then matched, matched_entry, best_index = result, candidate, index end
         end
       end
-      local matched, matched_entry, best_spec, ambiguous = nil, nil, -1, false
-      for _, candidate in ipairs(list) do
-        local result = match_template(candidate, original, clangd, spec.domain)
-        if result then
-          local sp = specificities[candidate] or 0
-          if sp > best_spec then
-            matched, matched_entry, best_spec, ambiguous = result, candidate, sp, false
-          elseif sp == best_spec and matched and matched ~= result then
-            -- Distinct entries of equal specificity rendering to different
-            -- Chinese text are ambiguous; identical surface forms are not.
-            ambiguous = true
+      if #candidates <= 64 then
+        for index, candidate in ipairs(candidates) do match(candidate, index) end
+      else
+        local group = groups[candidates]
+        if not group then
+          group = { prefixes = {}, unindexed = {} }
+          for index, candidate in ipairs(candidates) do
+            match_template(candidate, '', clangd, spec.domain)
+            local probe = probes[candidate] or ''
+            if #probe >= 4 then
+              local prefix = probe:sub(1, 4)
+              local bucket = group.prefixes[prefix] or {}
+              group.prefixes[prefix] = bucket
+              bucket[#bucket + 1] = index
+            else
+              group.unindexed[#group.unindexed + 1] = index
+            end
+          end
+          groups[candidates] = group
+        end
+        for _, index in ipairs(group.unindexed) do match(candidates[index], index) end
+        local seen = {}
+        for position = 1, #original - 3 do
+          local bucket = group.prefixes[original:sub(position, position + 3)]
+          if bucket and not seen[bucket] then
+            seen[bucket] = true
+            for _, index in ipairs(bucket) do match(candidates[index], index) end
           end
         end
       end
@@ -413,12 +404,12 @@ local function translate(spec)
     local function match_context(template_context)
       local buckets = current.template_buckets[template_context]
       if not buckets then return nil, nil, false end
-      local matched, matched_entry, ambiguous = scan(buckets[first_byte] or {})
+      local matched, matched_entry, ambiguous = scan(buckets[first_byte])
       if matched or ambiguous then return matched, matched_entry, ambiguous end
       -- A rendered argument can start with the template's leading literal, so
       -- templates whose msgid begins with a placeholder share the '' bucket and
       -- are only consulted when no literal-anchored template matched.
-      return scan(buckets[''] or {})
+      return scan(buckets[''])
     end
     local matched, matched_entry, ambiguous = match_context(context)
     if not matched and not ambiguous and context ~= '' then

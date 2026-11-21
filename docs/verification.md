@@ -1,5 +1,69 @@
 # 验证记录
 
+## 架构演进验收（2026-11-21）
+
+本轮以 `da04760` 和 `origin/packs@a7c9bab` 为基线，复核并补齐 P0/P1 验收与首用/P2 量化。Linux 固定组合在独立 XDG 和临时项目中使用官方 Neovim 0.12.6、Linux x86_64/glibc 2.44 和摘要匹配的 LLVM 23.1.5；原始日志与机器可读结果分别位于 `/tmp/nvim-zh-final-verify`（完整门禁、平台、工具链、上游与终端工作流）、`/tmp/nvim-zh-evolution.rerun`（同机前后性能对照与真实 clangd 首用）、`/tmp/nvim-zh-evolution.0TDBos`（前次演进记录）和 `/tmp/nvim-zh-generation.9WcV8h`（23.1.4/23.1.5 相邻基线与历史附件复现）。
+
+### P0 功能对照与复跑修复
+
+- 真实诊断、CLI quickfix 和 loclist 对照覆盖中文显示、原始条目、用户 formatter 的过滤（`nil`）、改写与异常传播、混合来源、多客户端同位歧义回退、列表追加失效、Window 独立 loclist、选择与跳转，核对了构建的输出和退出状态。复核补齐 `tests/contract/diagnostics/list_projection_spec.lua`，并修复通过 `setup()` 关闭 `diagnostics.lists` 或 `compiler` 时未释放自有 `quickfixtextfunc` 及编译器 autocmd/异步代次的问题。
+- 真实 clangd 对照核对了线上数据、`LspProgress`、`client.progress`、`fileStatus`、代码操作、悬浮、补全与签名标题；下游回调和 `vim.diagnostic.get()` 均接收上游原对象。
+- 故障注入覆盖原生失败、登记读取、适配器应用、资源持久化、原生部分恢复和旧回调延迟。取消回调可再次 `setup()` 或 `check()`，合并的同步回调收到最后实际应用的结果。
+- 固定索引对照覆盖未验证和已验证客户端并存、当前 Buffer 优先、显式历史版、同版本不同摘要、双进程竞争登记与延迟准备回退。新增 `tests/integration/packs/deferred_spec.lua` 验证大工具包延迟启动、准备中英文回退、`teardown`/停用取消、换代作废、同步 `translate()` 无网准备及损坏快照回退；修复损坏快照在重新导入同一有效附件时未能原地替换的问题，补齐 `tests/integration/packs/store_spec.lua` 回归。
+
+### P1 平台与 Nightly 接缝漂移
+
+| 环境 | Neovim | `tests/platform/localization.lua` | `tests/platform/packs.lua`（含已发布 `clangd` 0.1.0/0.1.1/0.1.2） |
+| --- | --- | --- | --- |
+| Linux x86_64，glibc 2.44（WSL2） | 官方 0.12.6 | PASS（native=ok，中文 E482、Help、UI） | PASS（摘要拒绝、损坏回退、原地修复、硬链接/EEXIST/过期代次/缺失能力报错） |
+| Windows 11 x86_64，NT 10.0.26300 | 官方 0.12.6（`nvim.exe`） | PASS（native=unsupported，英文 E482、中文 Help/UI） | PASS（同上，真实 NTFS 文件系统与已发布历史附件） |
+| Alpine edge x86_64，musl 1.2.6 | Alpine 0.12.2-r1（`bwrap` 隔离） | PASS（native=unsupported，缺 `gnu_get_libc_version`，Help/UI 通过） | PASS（同上，真实 musl 环境与已发布历史附件） |
+| macOS 15 arm64 | 官方 0.12.6 | 历史 CI PASS（见下）；本轮未重跑 | **BLOCKED**（本机无 macOS 主机/虚拟机，推送触发 GitHub Actions 需另获授权；已将 `tests/platform/packs.lua` 接入 `.github/workflows/platform.yml`） |
+| Linux x86_64，Neovim nightly（预警） | `v0.13.0-dev-2148+g2843068c7a` | PASS（native=ok） | PASS；全套离线扫测中 `test-unit`、`test-e2e` 通过，5 个固定 0.12.6 runtime 接缝规格因 `diagnostic.lua`/`lsp/handlers.lua`/`lsp/buf.lua` 摘要变化按契约回退上游英文（无崩溃、无数据污染） |
+
+### P1 性能同机复测
+
+前后对照使用同机 `/usr/bin/nvim` 0.12.6、相同已验收 SDK 1 附件（`clang 0.1.0`、`clangd 0.1.2`）和隔离 XDG。启停组各重复 3 轮（每轮 30 次 1,000 条诊断刷新、50 次 500 项补全），CLI 3 轮各 12 次。原始样本见 `/tmp/nvim-zh-evolution.rerun/performance.json`。
+
+| 负载 | 基线（`da04760`） | 当前工作树 | 变化 / 预算 |
+| --- | ---: | ---: | --- |
+| 两包冷启动（首次主快照） | 592.98 ms | 264.18 ms | -55.4% |
+| 两包启动（五进程复用中位数 / 最大值） | 354.56 / 364.97 ms | 55.86 / 57.17 ms | -84.2%（预算 ≤287 ms，PASS） |
+| 两包启动后 GC 后 RSS / Lua 堆 | 72.73 / 23.58 MiB | 20.73 / 1.80 MiB | -71.5% / -92.4%（PASS） |
+| 无包 / 仅 clangd 启动中位数 | 54.65 / 201.89 ms | 54.75 / 56.44 ms | +0.2% / -72.0% |
+| 启用 Clang，3,001 项列表打开 P50 / P95 | 3.70 / 7.50 ms | 0.59 / 0.73 ms | -90.3% P95（预算 ≤15 ms，PASS） |
+| 关闭 Clang，3,001 项列表打开 P50 / P95 | 0.36 / 0.40 ms | 0.35 / 0.42 ms | 基线对照 |
+| 1,000 条诊断虚拟文本（启用 P50 / P95） | 10.11 / 52.08 ms | 6.05 / 24.97 ms | -52.1% P95（预算 ≥25%，PASS） |
+| 1,000 条诊断 quickfix（启用 P50 / P95） | 7.41 / 45.14 ms | 5.03 / 14.85 ms | -67.1% P95（预算 ≥25%，PASS） |
+| 1,000 条诊断 loclist（启用 P50 / P95） | 7.70 / 40.52 ms | 5.20 / 23.70 ms | -41.5% P95（预算 ≥25%，PASS） |
+| 500 项原生补全（启用 P50 / P95） | 1.77 / 12.79 ms | 1.33 / 8.75 ms | -31.6% P95 |
+| `make check-translations`（3 次中位数） | 13.6 s（设计基线） | 2.39 s（2.33–2.43 s） | -82.4%（预算 ≤10.88 s，PASS） |
+
+诊断关闭时三类入口 P95 为基线 11.05 / 5.05 / 1.07 ms 对工作树 3.91 / 1.48 / 1.60 ms。
+
+### 首用量化与 P2 触发判断
+
+- **首用实测（同机复测）：** 显式首查 `clang_get` / `clangd_get` 由 26.14 / 38.51 ms 变为 126.76 / 129.63 ms（首次模板匹配 5.98→6.45 ms、5.54→6.20 ms）；首个单错误 Clang 构建主线程返回由 97.04 ms 降至 16.42 ms（-83.1%），中文就绪由 98.70 ms 变为 150.21 ms；真实 clangd 5 次连接至中文诊断可见中位数（`after_attach_ms`）由 44.11 ms 变为 140.23 ms（`visible_ms` 57.78→154.11 ms）。计入启动后，端到端总耗时整体下降（`setup + clangd_get` 393.1→185.5 ms，-52.8%；`setup + clangd 可见` 246.0→196.6 ms，-20.1%）。
+- **耗时与内存分解（单 9 MB 工具包）：** `store.load` 约 87 ms（其中 2 次 SHA-256 占 30–35 ms、外层+内层 2 次 JSON 解码占 29–34 ms、`prepare_sources` 校验占 9 ms、2 次磁盘读取共 18 MB 占 7–9 ms、`fs.utf8` 占 6 ms），`catalog.build` 占 37–39 ms。两域全部载入后 Lua 堆 60.44 MiB（基线 60.50 MiB）、RSS 85.24 MiB（基线 87.93 MiB）；`clang` 中 `diagnostic`+`note` 占 98.8%（33,124/33,543），`clangd` 中 `diagnostic`+`related_diagnostic` 占 99.2%（32,742/33,016），仅释出原始 `src` 表约省 5.5 MiB/域。
+- **P2 判断：本轮不启动 P2。** P1 全部五项设计预算均已达标，延迟准备与准备中/取消/换代回退均已验证；在 SDK 1 现行单 JSON 封装内按 context 拆分加载无法绕过 87 ms 附件校验/双解码且覆盖面达 99%，而消除重复校验与解码属于新发布格式（SDK 2）决策范畴，留待后续独立版本决策。
+
+### P1 构建与范围
+
+生成入口已切换至 `translations/toolchain/zh_CN.json` 与固定 LLVM 输入。盘点、英文模板展开和双语分支选择使用同一解析结构。归并了 573 条独立译文与 10 条仅补充参考出处的记录。旧的 PO 回读合并和独立 clangd 盘点入口已移除。
+
+LLVM 23.1.4 `7a941dfb` 与 23.1.5 `392dfff9` 的相邻基线双次复现、二进制/源码摘要拒写和历史 clangd 0.1.0/0.1.1 重建记录位于 `/tmp/nvim-zh-generation.9WcV8h`（2026-11-20）。本轮（2026-11-21）在当前工作树上再次双次生成三份正式 SDK 1 附件并逐字节比对，摘要与 `origin/packs@a7c9bab` 完全一致：`clang 0.1.0`（`ccaeb17c...`）、`clang-tidy 0.1.0`（`91eb1d39...`）、`clangd 0.1.2`（`0dd6344f...`）。SDK 1 和现行 JSON 继续作为交付基线。23.1.4 的证据仅用于生成再现，未扩大运行时支持。
+
+### 门禁结果（2026-11-21，官方 Neovim 0.12.6）
+
+| 检查 | 结果 |
+| --- | --- |
+| `make check-syntax check-translations check-native check-resources check-reproducible test release-check` | PASS（55 Python / 10 Shell / 121 Lua 语法通过，65 个 Lua 规格与 120 个 Python 用例通过，发布候选 590 个文件，`/tmp/nvim-zh-final-verify/gates.log`）。 |
+| 离线 `make sync` | PASS（`SYNC_STATUS=OK changes=0 network=false`，`sync.log`）。 |
+| 真实 native runtime 与真实 clangd（`NVIM_ZH_TEST_NATIVE_RUNTIME=1 NVIM_ZH_TEST_CLANGD=/usr/bin/clangd`） | PASS（项目 MO 探针与欢迎页通过；系统 locale MO 探针因官方压缩包缺 `share/locale/zh_CN.UTF-8/LC_MESSAGES/nvim.mo` 记 SKIP；15 样例 21 条 push 诊断原数据不变，真实 clangd 对 pull 返回 `-32601`，成功 pull 由独立契约覆盖，`real-native-clangd.log`）。 |
+| 固定第三方上游矩阵（`make test-upstream`） | PASS（67/67 项全通过，`upstream.json`）。 |
+| SDK 1 附件双次复现 + `toolchain_observe.py` + `clang_toolchain.py` + `toolchain_coverage.py --require-complete` | PASS（48 次驱动调用，602 个 clang-tidy 检查零缺口，真实 PTY 启停对照通过，91,654 样本零缺译/零歧义/零证据缺口，`TOOLCHAIN_COMPLETE=PASS`）。 |
+| C++/DAP 终端（`tests/workflows/cpp_tui.py`）与 Python/Git 终端（`tests/workflows/python_git_tui.py`） | PASS（启停两组跳转位置、修复、构建退出码 2→0、CodeLLDB 调试退出码 0、pytest/Ruff/Git 冲突解决完全一致，`cpp-tui.log`、`python-git-tui.log`）。 |
+
 ## Clang 工具链完整覆盖验收（2026-11-20）
 
 固定组合为官方 Neovim 0.12.6 Linux x86_64、LuaJIT 2.1.1774638290、glibc 2.44 和 WSL2，配合 Arch Linux `clang 23.1.5-1`。LLVM 源码固定到 `llvmorg-23.1.5`（commit `392dfff97d29b59d77e5cac6d4b6ef2585fe7117`）。完整运行证据位于 `/home/hanna/desktop/clang-toolchain-research/nvim-zh-run/complete-20261120-204356`。

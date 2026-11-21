@@ -30,7 +30,7 @@ make release-check
 
 ## 环境隔离
 
-`tests/run/lib/env.sh` 是全部 runner 的公共环境：私有 `XDG_STATE_HOME`、`XDG_DATA_HOME`、`XDG_CONFIG_HOME`、`XDG_CACHE_HOME`、权限 0700 的 `XDG_RUNTIME_DIR`、显式 `NVIM_LOG_FILE` 和私有 TMP 根，设置 `PYTHONDONTWRITEBYTECODE=1`，EXIT trap 删除该次环境。每个 Lua spec 单独启动一个 `nvim --headless -u NONE -i NONE -n`，用例间另建独立 case 目录；Python 子进程继承这些边界。POSIX PTY 专用 import 留在 e2e 内。
+`tests/run/lib/env.sh` 是全部 runner 的公共环境：私有 `XDG_STATE_HOME`、`XDG_DATA_HOME`、`XDG_CONFIG_HOME`、`XDG_CACHE_HOME`、权限 0700 的 `XDG_RUNTIME_DIR`、显式 `NVIM_LOG_FILE` 和私有 TMP 根，设置 `PYTHONDONTWRITEBYTECODE=1`，EXIT trap 删除该次环境。同次 runner 按输入摘要复用已构建的 SDK 1 附件，复制到用例私有目录。每个 Lua spec 单独启动一个 `nvim --headless -u NONE -i NONE -n`，用例间另建独立 case 目录；Python 子进程继承这些边界。POSIX PTY 专用 import 留在 e2e 内。
 
 并发测试有意让两个进程共享同一个临时数据目录，屏障后同时 setup，比较双方 active bundle ID、最终 `state.json.active` 与磁盘 manifest。不能仅凭两边各有资源就判为通过。vim.pack fixture commit 只写临时测试仓库，绝不提交工作项目或改用户安装。
 
@@ -86,13 +86,15 @@ python3 -B tests/workflows/python_git_tui.py
 
 C++ 终端验证需要 PATH 中的 CodeLLDB 1.12.3、GNU Make、GCC 和子进程调试权限。第二个终端脚本需要 Bash、Git、pytest 9.0.2 和 Ruff 0.15.0。两者均运行中文启停对照。可按 `manifests/adapters/` 的哈希核对固定插件，测试会为每组生成临时项目。
 
-平台消息与 Help 探针使用独立 Neovim 用户目录，设置 `NVIM_ZH_ROOT` 指向仓库，`NVIM_ZH_PLATFORM_NATIVE` 取 `unsupported` 或 `ok`。入口为 `nvim --headless -u NONE -i NONE -n -l tests/platform/localization.lua`。
+平台消息与 Help 探针使用独立 Neovim 用户目录，设置 `NVIM_ZH_ROOT` 指向仓库，`NVIM_ZH_PLATFORM_NATIVE` 取 `unsupported` 或 `ok`。入口为 `nvim --headless -u NONE -i NONE -n -l tests/platform/localization.lua`。SDK 1 汉化包平台探针入口为 `nvim --headless -u NONE -i NONE -n -l tests/platform/packs.lua`，可选设置 `NVIM_ZH_PLATFORM_ASSETS` 指向包含已发布 `clangd-0.1.0.json`、`clangd-0.1.1.json`、`clangd-0.1.2.json` 的目录，验证摘要拒绝、损坏快照回退、重导修复与硬链接登记原子性。
 
 ## Clang 工具链
 
 [覆盖清单](toolchain-coverage.md)记录源码和匹配报告的重建命令。`tests/workflows/clang_toolchain.py` 采用真实 PTY 和 libvterm，先导入三个本地候选附件，再用相同 C/C++ 项目运行启停对照。用 `--assets` 指定正式打包脚本生成的候选，屏幕与协议证据写到仓库外的新目录。完整门禁需要两组启停对照和独立 LSP 契约日志，退出非零时查看未命中记录与 `evidence_gaps`。
 
 `tests/workflows/clang_pack_official.lua` 为显式网络探针。设置 `NVIM_ZH_ROOT`、独立 `XDG_DATA_HOME`、`NVIM_ZH_OFFICIAL_DIGEST`，以 `NVIM_ZH_OFFICIAL_MODE=online` 用官方源安装和升级历史 clangd 附件。在禁用网络的会话中用 `offline` 验证回滚。复制升级后的数据目录并损坏副本中的选定附件，随后用 `damaged` 验证回退快照。
+
+固定 LLVM 盘点锁定 llvm-tblgen 和源码字节。用独立输出目录为两个相邻 LLVM 基线分别构建两次盘点和 PO，核对字节与发布输入。工具链 PO 从单一编辑源重建，打包时也校验其与编辑源一致。性能复验固定附件、同机二进制和临时 XDG，记录冷启动、五次快照复用、词库首用和 GC 后 RSS。三轮交替运行启停组，每组计时 30 次 1,000 条诊断刷新和 50 次 500 项补全。CLI 分别计时构建、验证完成和 3,001 项列表打开。预算见[设计](evolution-design.md)。
 
 ## PASS / FAIL / SKIP / BLOCKED
 

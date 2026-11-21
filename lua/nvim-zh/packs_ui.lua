@@ -29,6 +29,10 @@ local function label(row)
   if row.installed then
     if state.reason then return state.reason end
     if state.active then
+      if row.kind == 'tool' then
+        if row.display_active then return '显示已启用 · ' .. state.active end
+        return row.verified and '目标已验证 · ' .. state.active or '等待目标证据 · ' .. state.active
+      end
       if row.kind == 'plugin' and not row.target then return '等待目标或版本证据 · ' .. state.active end
       local adapter = require('nvim-zh.plugins').info()[row.id]
       if adapter and not adapter.active and not vim.iter(adapter.surfaces):any(function(_, surface)
@@ -39,7 +43,9 @@ local function label(row)
     return '已安装 · ' .. row.selected
   end
   if state.reason then return '登记异常' end
-  return row.update and (row.target and '可安装 · 已检测到目标' or '可安装') or '无兼容版本'
+  if row.update then return row.target and '可安装 · 已检测到目标' or '可安装' end
+  if row.options and #row.options > 0 then return '待验证 · 可选版本' end
+  return '无可用版本'
 end
 
 local function group(row)
@@ -53,7 +59,8 @@ end
 local function key(row) return row.source .. ':' .. row.id end
 
 function M.lines(panel, header)
-  local rows, checked, catalog_job = packs.rows()
+  local source = panel.origin and vim.api.nvim_win_is_valid(panel.origin) and vim.api.nvim_win_get_buf(panel.origin)
+  local rows, checked, catalog_job = packs.rows(source)
   local selected = M.selection(panel) or panel.pack_selection
   table.sort(rows, function(a, b)
     local first, second = group(a), group(b)
@@ -88,10 +95,10 @@ function M.lines(panel, header)
   end
   if not checked then
     local entry = { id = '@catalog', source = '', refresh = true }
-    add('获取可用包 · 按 Enter 或 r', entry)
+    add('联网刷新目录 · 按 Enter 或 r', entry)
     first = first or entry
     if key(entry) == selected then focused = entry end
-  elseif not last_group then add('无匹配的包 · / 查找或 r 刷新目录') end
+  elseif not last_group then add('无匹配的包 · / 查找或 r 联网刷新目录') end
   add('')
   focused = focused or first
   local action = focused and 'Enter 操作 · ' or ''
@@ -100,7 +107,7 @@ function M.lines(panel, header)
     shortcut = focused.installed and ' · u 更新' or ' · i 安装'
   end
   add(action .. '/ 查找' .. shortcut)
-  add('r 刷新目录' .. (remote and ' · U 批量更新' or '') .. ' · a 更多 · ? 帮助')
+  add('r 联网刷新目录' .. (remote and ' · U 批量更新' or '') .. ' · a 更多 · ? 帮助')
   panel.pack_items = items
   return lines
 end
@@ -194,10 +201,10 @@ function M.actions(panel, row)
       add(row.installed and ('更新至 ' .. row.update.version) or ('安装 ' .. row.update.version),
         function() packs.install(row.update, report) end)
     end
-    if row.options and #row.options > 1 then
-      add('选择兼容版本', function()
+    if row.options and #row.options > 0 and (#row.options > 1 or not row.update) then
+      add('选择发行版本', function()
         local versions = {}
-        for _, option in ipairs(row.options) do versions[#versions + 1] = { text = option.version, option = option } end
+        for _, option in ipairs(row.options) do versions[#versions + 1] = { text = option.version .. (option.recommended and ' · 推荐' or ' · 显式选择'), option = option } end
         select(panel, versions, '选择发行版本', function(item) packs.install(item.option, report) end)
       end)
     end
@@ -218,10 +225,20 @@ function M.actions(panel, row)
   local state = row.state or {}
   local description = { row.name, row.source, label(row) }
   if row.description then description[#description + 1] = row.description end
-  if row.selected then description[#description + 1] = '选定 ' .. row.selected end
+  if row.selected then description[#description + 1] = '已登记 ' .. row.selected end
+  if row.kind == 'tool' then
+    description[#description + 1] = row.verified and '目标已验证' or row.target and '已发现目标 · 待验证' or '等待目标'
+  end
+  if row.display_active then description[#description + 1] = '显示接缝已启用' end
+  for _, client in ipairs(row.clients or {}) do
+    description[#description + 1] =
+      ('客户端 %d · %s · %s'):format(client.id, client.version or '等待服务器身份',
+        client.reason == 'verified' and '诊断已验证' or '诊断原文')
+  end
+  if state.error then description[#description + 1] = state.error end
   if state.active then description[#description + 1] = '活动 ' .. state.active end
   if row.job and row.job.message then description[#description + 1] = row.job.message end
-  if #items == 0 then add('刷新目录', refresh) end
+  if #items == 0 then add('联网刷新目录', refresh) end
   select(panel, items, table.concat(description, ' · '), function(item) item.action() end)
 end
 
@@ -234,7 +251,7 @@ function M.key(panel, pressed, render)
       if query ~= nil and valid(panel) then panel.query = query; render() end
     end)
   elseif pressed == 'a' then
-    select(panel, { { text = '刷新目录', action = refresh },
+    select(panel, { { text = '联网刷新目录', action = refresh },
       { text = '更新已安装的包', action = function() update_all(panel) end },
       { text = '导入本地包', action = function() import(panel) end },
     }, '汉化包操作', function(item) item.action() end)

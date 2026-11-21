@@ -1,6 +1,8 @@
 local h = dofile(vim.env.NVIM_ZH_ROOT .. '/tests/support/diagnostic_helpers.lua')
 local check, equal = h.check, h.equal
 local calls = {}
+local builtin_show = vim.lsp.handlers['window/showMessage']
+local builtin_request = vim.lsp.handlers['window/showMessageRequest']
 local original = {}
 original['window/showMessage'] = function(err, params, ctx)
   if params.message == 'boom' then error('lsp-original-error') end
@@ -41,15 +43,15 @@ local show = { type = 2, message = 'Indexing completed' }
 local show_result = h.pack(vim.lsp.handlers['window/showMessage'](err, show, ctx))
 equal(show_result[1], 'show-return', 'showMessage return changed')
 equal(show_result[2], 7, 'showMessage second return changed')
-equal(calls[1][3].message, '索引已完成', 'showMessage display not translated')
+equal(calls[1][3], show, 'custom showMessage handler lost original params')
 equal(calls[1][3].type, 2, 'showMessage type changed')
 equal(show.message, 'Indexing completed', 'showMessage params mutated')
 local request = { type = 3, message = 'Restart clangd?', actions = actions }
 local selected, index = vim.lsp.handlers['window/showMessageRequest'](err, request, ctx)
 check(selected == actions[2], 'showMessageRequest did not return original action')
 equal(index, 2, 'showMessageRequest original index changed')
-equal(calls[2][3].message, '重启 clangd？', 'request display message not translated')
-equal(calls[2][3].actions[1].title, '重启', 'request action display not translated')
+equal(calls[2][3], request, 'custom request handler lost original params')
+equal(calls[2][3].actions[1], actions[1], 'custom selector action identity changed')
 equal(actions[1].title, 'Restart', 'request action mutated')
 local log = { type = 4, message = 'Indexing completed' }
 check(vim.lsp.handlers['window/logMessage'] == original['window/logMessage'], 'logMessage handler was wrapped')
@@ -57,21 +59,25 @@ vim.lsp.handlers['window/logMessage'](err, log, ctx)
 equal(calls[3][3], log, 'logMessage params identity changed')
 local progress = { token = 'fixed-token', value = { kind = 'begin', title = 'Indexing', message = 'Parsing files', percentage = 10, cancellable = true } }
 equal(vim.lsp.handlers['$/progress'](err, progress, ctx), 'progress-return', 'progress return changed')
-local shown_progress = calls[4][3]
-equal(shown_progress.value.title, '正在索引', 'progress title not translated')
-equal(shown_progress.value.message, '正在解析文件', 'progress message not translated')
-equal(shown_progress.token, 'fixed-token', 'progress token changed')
-equal(shown_progress.value.percentage, 10, 'progress percentage changed')
-equal(shown_progress.value.cancellable, true, 'progress cancellable changed')
-equal(progress.value.title, 'Indexing', 'progress params mutated')
-local index_progress = { token = 'backgroundIndexProgress', value = { kind = 'begin', title = 'indexing' } }
-vim.lsp.handlers['$/progress'](nil, index_progress, ctx)
-equal(calls[#calls][3].value.title, '正在建立索引', 'built-in clangd progress translation missing')
-local status = { uri = 'file:///tmp/test.cpp', state = 'parsing includes, file is queued' }
-local display_status = vim.lsp.handlers['textDocument/clangd.fileStatus'](nil, status, ctx)
+equal(calls[4][3], progress, 'progress handler lost original params')
+local listeners = {}
+local old_clients = vim.lsp.get_clients
+vim.lsp.get_clients = function() return { { id = 1, name = 'clangd' } } end
+vim.api.nvim_create_autocmd('LspProgress', { callback = function(event)
+  listeners[#listeners + 1] = event.data.params
+end })
+vim.api.nvim_exec_autocmds('LspProgress', { pattern = 'begin', data = { client_id = 1, params = progress } })
+equal(listeners[1].value.title, 'Indexing', 'progress subscriber received translation')
+local display = require('nvim-zh.lsp').info().clangd_clients[1].progress
+equal(display.title, '正在索引', 'panel progress title not translated')
+equal(display.message, '正在解析文件', 'panel progress message not translated')
+equal(display.raw.token, 'fixed-token', 'progress token changed')
+local file = { uri = vim.uri_from_bufnr(0), state = 'parsing includes, file is queued' }
+equal(vim.lsp.handlers['textDocument/clangd.fileStatus'](nil, file, ctx), file, 'fileStatus handler lost original params')
+local display_status = require('nvim-zh.lsp').info().clangd_clients[1].file_status
 equal(display_status.state, '正在解析包含的文件, 文件等待解析', 'clangd file status was not translated')
-equal(display_status.uri, status.uri, 'clangd file status changed URI')
-equal(status.state, 'parsing includes, file is queued', 'clangd file status mutated source')
+equal(display_status.raw_state, file.state, 'fileStatus raw state changed')
+vim.lsp.get_clients = old_clients
 
 local opts = { focus_id = 'textDocument/signatureHelp', title = 'Signature Help: clangd (1/2) (<C-s> to cycle)' }
 local lines = { '# ' .. opts.title, 'int sum(int x, int y)' }
@@ -111,7 +117,28 @@ equal(calls[#calls][3].message, 'Unknown message', 'unknown message changed')
 local original_show = vim.lsp.handlers['window/showMessage']
 require('nvim-zh').setup({ modules = { diagnostics = { enabled = false }, lsp = { messages = true, progress = true } }, overrides = overrides })
 equal(vim.lsp.handlers['window/showMessage'], original_show, 'handler duplicated on setup')
-equal(require('nvim-zh.lsp').info()['window/showMessage'].reason, 'active', 'owned handler reported external replacement')
+vim.lsp.handlers['window/showMessage'] = builtin_show
+vim.lsp.handlers['window/showMessageRequest'] = builtin_request
+local adapter = require('nvim-zh.lsp')
+adapter.setup({ messages = true, progress = true })
+local old_notify, old_select = vim.notify, vim.ui.select
+vim.notify = function(message) equal(message, 'LSP[clangd] 索引已完成', 'built-in notification text') end
+equal(vim.lsp.handlers['window/showMessage'](nil, show, ctx), show, 'built-in notification result')
+vim.notify = old_notify
+local returned
+vim.ui.select = function(items, options, choice)
+  equal(items, actions, 'built-in selection actions were copied')
+  equal(options.format_item(items[1]), '重启', 'built-in selection label')
+  choice(items[2], 2)
+end
+local thread = coroutine.create(function()
+  returned = vim.lsp.handlers['window/showMessageRequest'](nil, request, ctx)
+end)
+assert(coroutine.resume(thread))
+assert(vim.wait(1000, function() return returned ~= nil end))
+equal(returned, actions[2], 'built-in selection returned a different action')
+vim.ui.select = old_select
+equal(adapter.info()['window/showMessage'].reason, 'active', 'owned handler reported external replacement')
 local external = function() return 'external' end
 vim.lsp.handlers['window/showMessage'] = external
 dofile(vim.env.NVIM_ZH_ROOT .. '/tests/support/public.lua').refresh()

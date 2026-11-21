@@ -9,9 +9,7 @@ local function deliver(callback, result)
   if not ok then vim.schedule(function() vim.notify('nvim-zh：检查回调出错：' .. tostring(err), vim.log.levels.WARN) end) end
 end
 
-local function cancel(reason)
-  local current = pending
-  pending = nil
+local function cancel(current, reason)
   if current then
     deliver(current.fn, { ok = false, status = 'cancelled', error_code = reason,
       error = reason == 'superseded' and '检查已被更新的检查取代' or '检查已取消', task_id = current.id })
@@ -99,7 +97,7 @@ local function collect()
     table.insert(expected, 'window/showMessageRequest')
   end
   if lsp.progress then table.insert(expected, '$/progress') end
-  if lsp.hints then table.insert(expected, 'buf_request_all') end
+  if lsp.hints then table.insert(expected, 'open_floating_preview') end
   local degraded = {}
   for _, method in ipairs(expected) do
     local adapter = lsp[method]
@@ -122,7 +120,7 @@ function M.collect() return collect() end
 
 function M.run(callback)
   assert(callback == nil or type(callback) == 'function', 'check callback must be function')
-  cancel('superseded')
+  local before = pending
   task = task + 1
   local id = task
   pending = callback and { fn = callback, id = id } or nil
@@ -147,13 +145,17 @@ function M.run(callback)
         results = ok and results or nil, error = not ok and tostring(results) or nil })
     end
   end)
+  cancel(before, 'superseded')
   return id
 end
 
-function M.stop()
+function M.stop(defer)
   task = task + 1
-  cancel('stopped')
+  local before = pending
+  pending = nil
   cache.status = 'cancelled'
+  if defer then return function() cancel(before, 'stopped') end end
+  cancel(before, 'stopped')
 end
 
 function M.info() return vim.deepcopy(cache) end

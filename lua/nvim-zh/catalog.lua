@@ -8,6 +8,15 @@ local registrations = {}
 local loaded = {}
 local overrides = {}
 local bundled_sources
+local revisions = {}
+local verified = setmetatable({}, { __mode = "k" })
+
+local function invalidate(domain)
+  loaded[domain] = nil
+  revisions[domain] = (revisions[domain] or 0) + 1
+end
+
+function M.revision(domain) return revisions[domain] or 0 end
 
 local function valid_domain(domain)
   return type(domain) == 'string' and domain:match('^[%w][%w_.%-]*$') ~= nil
@@ -50,8 +59,13 @@ end
 function M.configure(config)
   local next_overrides = validate_overrides(config and config.overrides)
   if not vim.deep_equal(overrides, next_overrides) then
+    for domain, entries in pairs(overrides) do
+      if not vim.deep_equal(entries, next_overrides[domain]) then invalidate(domain) end
+    end
+    for domain in pairs(next_overrides) do
+      if overrides[domain] == nil then invalidate(domain) end
+    end
     overrides = next_overrides
-    loaded = {}
   end
 end
 
@@ -66,7 +80,7 @@ function M.register(domain, loader, metadata)
   registrations[domain] = { loader = loader, metadata = vim.deepcopy(metadata or {}), loads = 0 }
   -- A lookup before registration may have cached either a missing catalog or an
   -- overrides-only catalog. Rebuild it so late registration takes effect.
-  loaded[domain] = nil
+  invalidate(domain)
   return true
 end
 
@@ -81,12 +95,14 @@ end
 function M.register_owned(domain, loader, metadata)
   M.register(domain, loader, metadata)
   local record = registrations[domain]
+  record.owned = true
   return function()
     if registrations[domain] == record then
-      registrations[domain], loaded[domain] = nil, nil
+      registrations[domain] = nil
+      invalidate(domain)
     end
   end, function()
-    if registrations[domain] == record then loaded[domain] = nil end
+    if registrations[domain] == record then invalidate(domain) end
   end
 end
 
@@ -145,11 +161,20 @@ local function add_template(catalog, entry)
   bucket[#bucket + 1] = entry
 end
 
-local function build(source, domain)
-  if type(source) ~= 'table' or source.schema ~= 1 or source.domain ~= domain
-    or type(source.locale) ~= 'string' or type(source.entries) ~= 'table' then
-    error('invalid schema, domain, locale, or entries')
+local function validate_source(source, domain)
+  assert(type(source) == 'table' and source.schema == 1 and source.domain == domain
+    and type(source.locale) == 'string' and vim.islist(source.entries), 'invalid schema, domain, locale, or entries')
+  local seen = {}
+  for _, entry in ipairs(source.entries) do
+    assert(validate_entry(entry, domain), 'invalid or empty catalog entry')
+    local key = (entry.context or '') .. SEP .. entry.msgid
+    if seen[key] then error('duplicate domain/context/msgid: ' .. key) end
+    seen[key] = true
   end
+end
+
+local function build(source, domain)
+  if verified[source] ~= domain then validate_source(source, domain) end
   local catalog = {
     domain = domain,
     locale = source.locale,
@@ -160,17 +185,14 @@ local function build(source, domain)
     total = 0,
   }
   for _, entry in ipairs(source.entries) do
-    if not validate_entry(entry, domain) then error('invalid or empty catalog entry') end
     local context = entry.context or ''
     local key = context .. SEP .. entry.msgid
-    if catalog.exact[key] then error('duplicate domain/context/msgid: ' .. key) end
-    local copy = vim.deepcopy(entry)
-    copy.context = context
-    copy.id = domain .. ':' .. context .. ':' .. entry.msgid
+    local copy = { context = context, msgid = entry.msgid, msgstr = entry.msgstr,
+      id = domain .. ':' .. context .. ':' .. entry.msgid }
     catalog.exact[key] = copy
     if (domain == 'clang' or domain == 'clangd' or domain == 'clang-tidy') and entry.msgid:find('%%', 1, true)
       and not entry.msgid:gsub('%%%%', ''):find('%', 1, true) and not entry.msgid:find('{', 1, true) then
-      local unesc = vim.deepcopy(copy)
+      local unesc = { id = copy.id, context = copy.context }
       unesc.msgid = entry.msgid:gsub('%%%%', '%%')
       unesc.msgstr = entry.msgstr:gsub('%%%%', '%%')
       local unesc_key = context .. SEP .. unesc.msgid
@@ -212,10 +234,15 @@ end
 
 function M.get(domain)
   if not valid_domain(domain) then return nil, 'invalid domain' end
+  local registration = registrations[domain]
+  if not registration then
+    local packs = package.loaded['nvim-zh.packs']
+    if packs then packs.prepare_domain(domain) end
+    registration = registrations[domain]
+  end
   if loaded[domain] then
     return loaded[domain].catalog, loaded[domain].error
   end
-  local registration = registrations[domain]
   if not registration and not overrides[domain] then
     loaded[domain] = { error = 'catalog not registered' }
     return nil, loaded[domain].error
@@ -248,9 +275,9 @@ function M.is_translation(domain, context, msgid)
 end
 
 function M.reload()
-  loaded = {}
   local count = 0
-  for _, registration in pairs(registrations) do
+  for domain, registration in pairs(registrations) do
+    if not registration.owned then invalidate(domain) end
     if registration.module then package.loaded[registration.module] = nil end
     count = count + 1
   end
@@ -275,16 +302,17 @@ function M.prepare_sources(sources)
   assert(type(sources) == 'table', 'invalid bundled catalogs')
   for domain, source in pairs(sources) do
     assert(valid_domain(domain), 'invalid bundled domain')
-    build(source, domain)
+    validate_source(source, domain)
+    verified[source] = domain
   end
-  return vim.deepcopy(sources)
+  return sources
 end
 
 function M.use_sources(sources)
   local old = bundled_sources
   bundled_sources = sources
   for domain, registration in pairs(registrations) do
-    if registration.module then loaded[domain] = nil end
+    if registration.module and old ~= sources then invalidate(domain) end
   end
   return old
 end

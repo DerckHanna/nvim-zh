@@ -20,16 +20,23 @@ def assets(root, version, repository, only=None):
     upstreams = json.loads((root / 'manifests/upstreams.json').read_text(encoding='utf-8'))
     tools = {'clangd': upstreams['upstreams']['clangd']['tool']}
     tools.update(toolchain['tools'])
-    catalog_tool.check(root / 'translations/po/zh_CN', root / 'translations/glossary/zh_CN.toml')
+    parsed = {}
+    catalog_tool.check(root / 'translations/po/zh_CN', root / 'translations/glossary/zh_CN.toml', parsed=parsed)
     ids = {id for id, spec in specs.items() if spec['status'] == 'implemented'} | set(tools)
     if only:
         if only not in ids:
             raise ValueError(f'unknown pack: {only}')
         ids = {only}
+    tool_ids = ids & tools.keys()
+    if tool_ids:
+        import toolchain_catalog
+        generated = toolchain_catalog.generate(root / 'manifests', root / 'translations/toolchain/zh_CN.json')
+        for id in tool_ids:
+            toolchain_catalog.verify_po(domains[id], toolchain_catalog.render(id, generated[id]))
     for id in sorted(ids):
         spec = index.get(id)
         domain = spec['domain'] if spec else id
-        files = {'catalogs/zh_CN.json': bundle.encoded(bundle.catalog(domains[domain]))}
+        files = {'catalogs/zh_CN.json': bundle.encoded(bundle.catalog(domains[domain], parsed[domains[domain]]))}
         if spec:
             entry = spec['entry'].split('.')[-1]
             spec.pop('entry')

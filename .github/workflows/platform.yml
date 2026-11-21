@@ -40,3 +40,27 @@ jobs:
           export XDG_RUNTIME_DIR="$workspace/run" NVIM_LOG_FILE="$workspace/nvim.log"
           mkdir -m 700 "$XDG_RUNTIME_DIR"
           "$workspace/nvim-macos-arm64/bin/nvim" --headless -u NONE -i NONE -n -l tests/platform/localization.lua
+      - name: Probe SDK 1 pack import, damaged fallback and registration atomicity on Neovim 0.12.6
+        shell: bash
+        run: |
+          set -euo pipefail
+          workspace=$(mktemp -d)
+          curl -fsSL --retry 3 https://github.com/neovim/neovim/releases/download/v0.12.6/nvim-macos-arm64.tar.gz -o "$workspace/nvim.tar.gz"
+          printf '%s  %s\n' 1dbd148222b051ba6c307c4d17a318ed083df018a4f6a5a0ce46955ffc9ab87b "$workspace/nvim.tar.gz" | shasum -a 256 -c -
+          tar -xzf "$workspace/nvim.tar.gz" -C "$workspace"
+          mkdir -p "$workspace/assets"
+          for entry in \
+            "0.1.0:cfd5cc74f9d3f6c5dd43a6b786abd9cb19c0ee02264f742523aa299ff9c3e385" \
+            "0.1.1:a353e9f31e9975230f473106ca93043d1bf753e19bbcba9c78f5b604fc518dcb" \
+            "0.1.2:0dd6344f8921bcd37fb8daef01e0b7388206cc345f8585c349f8767eb75ae3ba"; do
+            ver="${entry%%:*}"
+            sha="${entry##*:}"
+            curl -fsSL --retry 3 "https://github.com/DerckHanna/nvim-zh/releases/download/packs-clangd-v${ver}/clangd-zh_CN.json" -o "$workspace/assets/clangd-${ver}.json"
+            printf '%s  %s\n' "$sha" "$workspace/assets/clangd-${ver}.json" | shasum -a 256 -c -
+          done
+          export NVIM_ZH_ROOT="$PWD" NVIM_ZH_PLATFORM_ASSETS="$workspace/assets"
+          export XDG_CONFIG_HOME="$workspace/config" XDG_DATA_HOME="$workspace/data"
+          export XDG_STATE_HOME="$workspace/state" XDG_CACHE_HOME="$workspace/cache"
+          export XDG_RUNTIME_DIR="$workspace/run" NVIM_LOG_FILE="$workspace/nvim.log"
+          mkdir -m 700 "$XDG_RUNTIME_DIR"
+          "$workspace/nvim-macos-arm64/bin/nvim" --headless -u NONE -i NONE -n -l tests/platform/packs.lua

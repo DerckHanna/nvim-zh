@@ -12,7 +12,6 @@ check-syntax:
 	NVIM_BIN=$(NVIM_BIN) PYTHON=$(PYTHON) ./tests/run/syntax.sh
 
 check-translations:
-	PYTHONDONTWRITEBYTECODE=1 $(PYTHON) tools/catalog_tool.py check
 	PYTHONDONTWRITEBYTECODE=1 $(PYTHON) tools/toolchain_catalog.py check
 
 check-native:
@@ -58,7 +57,7 @@ test-e2e: check-resources
 test-upstream: check-resources
 	NVIM_BIN=$(NVIM_BIN) PYTHON=$(PYTHON) ./tests/run/upstream.sh
 
-release-check: check-reproducible check-resources
+release-check: check-translations check-reproducible check-resources
 	@set -e; \
 	package_tmp=$$(mktemp -d "$${TMPDIR:-/tmp}/nvim-zh-package-XXXXXX"); \
 	trap 'rm -rf -- "$$package_tmp"' EXIT; \

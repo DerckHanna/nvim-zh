@@ -50,6 +50,13 @@ local files = {{
   [{lua_literal(first['url'])}] = {lua_literal(str(initial_file))},
   [{lua_literal(second['url'])}] = {lua_literal(str(update_file))},
 }}
+local pack_get = vim.pack.get
+vim.pack.get = function(...)
+  if PackTarget then
+    return {{{{ spec = {{ src = {lua_literal(first['repository'])} }}, rev = {lua_literal(first['targets'][0])} }}}}
+  end
+  return pack_get(...)
+end
 local system = vim.system
 vim.system = function(argv, opts, on_exit)
   if argv[1] ~= 'curl' then return system(argv, opts, on_exit) end
@@ -80,25 +87,29 @@ end
                 ui.command('NvimZh')
                 ui.expect('Enter 管理')
                 ui.send('\t')
-                ui.expect('[汉化包]', '获取可用包')
+                ui.expect('[汉化包]', '联网刷新目录')
                 self.assertFalse(requests.exists(), 'opening the panel requested the remote index')
                 ui.send('\r')
-                ui.expect('telescope', '可安装')
+                ui.expect('telescope', '待验证')
                 ui.send('/telescope\r')
                 ui.expect('查找 telescope')
-                ui.send('iq')
+                ui.send('\r')
+                choose(ui, '选择发行版本')
+                choose(ui, '1.0.0 · 显式选择')
+                ui.send('q')
                 ui.expect('PACK_WORKSPACE')
                 ui.command('NvimZhPacks')
                 ui.expect('1.0.0', 'telescope')
                 ui.command("lua PackCheck('1.0.0','查找文件')")
                 ui.expect('PACK_CHECK_1.0.0')
+                ui.command('lua PackTarget = true')
                 index.write_bytes(encoded({'schema': 1, 'packages': [first, second]}))
                 ui.send('r')
                 ui.expect('可更新', '1.1.0')
                 ui.resize(24, 55)
                 ui.expect('1.1.0')
                 ui.send('u')
-                ui.expect('等待目标或版本证据', '1.1.0')
+                ui.expect('已生效', '1.1.0')
                 ui.command("lua PackCheck('1.1.0','文件检索')")
                 ui.expect('PACK_CHECK_1.1.0')
                 ui.send('\r')

@@ -44,12 +44,47 @@ vim.diagnostic.show(ns, buf)
 local stored = vim.diagnostic.get(buf, { namespace = ns })[1]
 equal(stored.message, known, 'stored diagnostic was translated')
 check(vim.deep_equal(stored.user_data, diagnostic.user_data), 'stored user_data changed')
-vim.diagnostic.setqflist({ open = false })
-local qf = vim.fn.getqflist({ items = 1 }).items
-local list_text = vim.fn.has('nvim-0.12') == 1 and "'x' 重复定义" or known
-equal(qf[1].text, list_text, 'quickfix diagnostic display')
-vim.diagnostic.setloclist({ open = false })
-equal(vim.fn.getloclist(0)[1].text, list_text, 'location list diagnostic display')
+local win = vim.api.nvim_get_current_win()
+local list_calls = 0
+local function list_format(row)
+  list_calls = list_calls + 1
+  if row.code == 'filtered' then return nil end
+  return row.message
+end
+local filtered = vim.tbl_extend('force', diagnostic, { col = 1, code = 'filtered' })
+vim.diagnostic.set(ns, buf, { filtered, diagnostic })
+original_setqflist({ open = false, format = list_format })
+local raw = vim.fn.getqflist()
+vim.diagnostic.setqflist({ open = false, format = list_format })
+equal(list_calls, 4, 'list formatter was dropped or duplicated')
+check(vim.deep_equal(raw, vim.fn.getqflist()), 'quickfix raw entries changed')
+equal(require('nvim-zh').raw().raw_text, known, 'raw command returned the translated message')
+vim.cmd.copen()
+local list_text = "'x' 重复定义"
+check(vim.api.nvim_get_current_line():find(list_text, 1, true), 'quickfix diagnostic did not render')
+vim.cmd.cc()
+equal(vim.api.nvim_get_current_buf(), buf, 'quickfix jump changed buffer')
+equal(vim.api.nvim_win_get_cursor(0)[2], 4, 'quickfix jump changed column')
+vim.cmd.cclose()
+vim.api.nvim_set_current_win(win)
+vim.diagnostic.setloclist({ winnr = win, open = true, format = list_format })
+equal(vim.fn.getloclist(win)[1].text, known, 'location list raw text changed')
+check(vim.api.nvim_get_current_line():find(list_text, 1, true), 'location list diagnostic did not render')
+vim.cmd.lclose()
+vim.api.nvim_set_current_win(win)
+local error_ok, error_message = pcall(vim.diagnostic.setqflist, { format = function() error('list-format-error') end })
+check(not error_ok and tostring(error_message):find('list-format-error', 1, true), 'list formatter exception changed')
+vim.diagnostic.set(ns, buf, { diagnostic, diagnostic })
+vim.diagnostic.setqflist({ open = true })
+check(vim.api.nvim_get_current_line():find(known, 1, true), 'ambiguous diagnostic list entries were projected')
+vim.cmd.cclose()
+local external_list = function() return { 'external' } end
+vim.fn.setqflist({}, 'a', { quickfixtextfunc = external_list })
+vim.diagnostic.set(ns, buf, { diagnostic })
+vim.diagnostic.setqflist({ open = true })
+check(rawequal(vim.fn.getqflist({ quickfixtextfunc = 1 }).quickfixtextfunc, external_list), 'external list formatter lost')
+equal(vim.api.nvim_get_current_line(), 'external', 'external list formatter display changed')
+vim.cmd.cclose()
 vim.api.nvim_win_set_cursor(0, { 1, 4 })
 local float_buf, float_win = vim.diagnostic.open_float({ namespace = ns, scope = 'line' })
 check(float_buf and float_win, 'diagnostic float did not open')

@@ -8,6 +8,17 @@ local version = vim.version()
 local nvim_version = not version.prerelease and ('%d.%d.%d'):format(version.major, version.minor, version.patch)
 local verified = setmetatable({}, { __mode = 'k' })
 
+local runtime_digests = {}
+function M.runtime_source(relative, expected)
+  if nvim_version ~= '0.12.6' then return end
+  local path = vim.env.VIMRUNTIME .. '/lua/vim/' .. relative
+  if runtime_digests[path] == nil then
+    local ok, bytes = pcall(fs.read, path, 1024 * 1024)
+    runtime_digests[path] = ok and vim.fn.sha256(bytes) or false
+  end
+  if runtime_digests[path] == expected then return '@' .. path end
+end
+
 local function index(id, spec)
   for surface_name, surface in pairs(spec.surfaces) do
     for name, path in pairs(surface.modules or {}) do
@@ -148,11 +159,18 @@ local function loader(module)
 end
 
 local function ensure_searcher()
-  if package.loaders[2] == loader then return end
-  for i, searcher in ipairs(package.loaders) do
-    if searcher == loader then table.remove(package.loaders, i); break end
+  for _, searcher in ipairs(package.loaders) do
+    if searcher == loader then return end
   end
-  table.insert(package.loaders, 2, loader)
+  -- A resolver already ahead of Neovim's runtime searcher owns its result.
+  -- Install before the built-in runtime search, leaving that order intact.
+  local position = 2
+  while package.loaders[position] do
+    local info = debug.getinfo(package.loaders[position], 'S')
+    if info.what == 'C' or info.source == '@vim/_init_packages' or info.source == '@vim/loader' then break end
+    position = position + 1
+  end
+  table.insert(package.loaders, position, loader)
 end
 
 function M.setup(specs, loaded, health)

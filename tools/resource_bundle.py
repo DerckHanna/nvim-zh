@@ -30,8 +30,8 @@ def descriptor(files):
     return {name: {'sha256': digest(data), 'size': len(data)} for name, data in sorted(files.items())}
 
 
-def catalog(po):
-    entries, headers = ct.parse_po(po)
+def catalog(po, parsed=None):
+    entries, headers = parsed if parsed is not None else ct.parse_po(po)
     entries = [dict(context=e.get('msgctxt', ''), msgid=e['msgid'], msgstr=e['msgstr'])
                for e in sorted(entries, key=lambda e: (e.get('msgctxt', ''), e['msgid']))]
     return dict(schema=1, domain=po.stem, locale='zh_CN',

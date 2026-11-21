@@ -125,7 +125,7 @@ local catalog = require('nvim-zh.catalog')
 for _, domain in ipairs({ 'clang', 'clangd', 'clang-tidy' }) do
   catalog.register_owned(domain, function() return read(domain .. '.json') end, { locale = 'zh_CN' })
 end
-local cli = require('nvim-zh.compiler').match_message
+local cli = require('nvim-zh.tool_message').match_message
 local lsp = require('nvim-zh.diagnostics')
 local out = {}
 for i, row in ipairs(read('samples.json')) do

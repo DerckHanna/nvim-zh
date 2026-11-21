@@ -53,6 +53,13 @@ local function owned()
   return owner and binding() == owner.binding and vim.v.lang == owner.lang
 end
 
+local function failed_restore(reason)
+  local binding_active = owner ~= nil and binding() == owner.binding
+  local language_active = owner ~= nil and vim.v.lang == owner.lang
+  state = { active = binding_active and language_active, status = 'restore_failed', reason = tostring(reason),
+    mo_path = binding_active and owner.mo_path or nil, binding_owned = binding_active, language_owned = language_active }
+end
+
 function M.stop()
   generation = generation + 1
   if process then pcall(process.kill, process, 15); process = nil end
@@ -71,8 +78,7 @@ function M.stop()
   end
   if #errors > 0 then
     local reason = table.concat(errors, '；')
-    state = { active = owner ~= nil, status = 'restore_failed', reason = reason,
-      mo_path = owner and owner.mo_path or nil }
+    failed_restore(reason)
     return nil, reason
   end
   owner = nil
@@ -150,8 +156,7 @@ function M.start(config, resource, callback)
   end
 
   local function restore_failure(reason)
-    state = { active = owner ~= nil, status = 'restore_failed', reason = tostring(reason),
-      mo_path = owner and owner.mo_path }
+    failed_restore(reason)
     callback(tostring(reason))
   end
 

@@ -8,6 +8,7 @@ export NVIM_BIN PYTHON NVIM_ZH_ROOT=$ROOT PYTHONDONTWRITEBYTECODE=1
 export PYTHONPATH="$ROOT/tools:$ROOT/tests/support:$ROOT/tests/tools${PYTHONPATH:+:$PYTHONPATH}"
 TEST_ROOT=$(mktemp -d "${TMPDIR:-/tmp}/nvim-zh-tests-XXXXXX")
 trap 'rm -rf -- "$TEST_ROOT"' EXIT
+export NVIM_ZH_TEST_PACK_CACHE=$TEST_ROOT/pack-fixtures
 # A fresh case directory also prevents one spec from leaving JSON/config/state
 # for the next spec. Python subprocesses inherit the same isolation.
 case_env() {

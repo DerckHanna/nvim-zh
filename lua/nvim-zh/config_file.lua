@@ -3,7 +3,7 @@ local fs = require('nvim-zh.fs')
 local paths = require('nvim-zh.paths')
 local config = require('nvim-zh.config')
 local status = { status = 'unread', path = paths.config() }
-local last_good = {}
+local last_good
 local pending
 
 local function bounds(value, depth, count)
@@ -27,27 +27,34 @@ end
 function M.resolve(base)
   pending = nil
   local ok, result = pcall(function()
+    local present = fs.fingerprint(paths.config()) ~= 'absent'
+    local bytes = present and fs.read(paths.config(), 512 * 1024) or nil
     local layer = {}
-    if fs.fingerprint(paths.config()) ~= 'absent' then
-      layer = fs.json(paths.config(), 512 * 1024)
+    if last_good and last_good.bytes == bytes then
+      layer = last_good.layer
+    elseif present then
+      assert(fs.utf8(bytes), '文件不是有效 UTF-8：' .. paths.config())
+      layer = vim.json.decode(bytes, { luanil = { object = false, array = false } })
       assert(type(layer) == 'table' and layer.schema == 1, '本地配置需要 schema: 1')
       bounds(layer, 0, { n = 0 })
       layer.schema = nil
       assert(layer.pack_sources == nil, '汉化包发布源通过 Lua setup 配置')
     end
     local effective = config.resolve(config.merge(base, layer))
-    pending = layer
-    status = { status = 'ok', path = paths.config(), present = fs.fingerprint(paths.config()) ~= 'absent' }
+    pending = { layer = layer, bytes = bytes, present = present }
     return effective
   end)
   if ok then return result end
   status = { status = 'error', path = paths.config(), error = tostring(result) }
-  return config.resolve(config.merge(base, last_good))
+  return nil, status.error
 end
 
 function M.info() return vim.deepcopy(status) end
 function M.commit()
-  if pending then last_good = pending; pending = nil end
+  if not pending then return end
+  last_good = pending
+  status = { status = 'ok', path = paths.config(), present = pending.present }
+  pending = nil
 end
 function M.reject(reason)
   pending = nil

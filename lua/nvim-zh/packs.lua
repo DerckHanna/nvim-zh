@@ -6,10 +6,14 @@ local release_root = 'https://github.com/DerckHanna/nvim-zh/releases/download/'
 local sources = { official = { url = official, allow_lua = true } }
 local records, active, frozen, states, jobs, catalogs = {}, {}, {}, {}, {}, {}
 local modules
+local deferred = {}
+local large_domains = { clang = true, clangd = true, ['clang-tidy'] = true }
 
 local function changed()
-  pcall(vim.api.nvim_exec_autocmds, 'User', { pattern = 'NvimZhChanged', modeline = false,
-    data = { schema = 1, reason = 'packs' } })
+  local lsp = package.loaded['nvim-zh.lsp']
+  if lsp then lsp.refresh_display() end
+  require('nvim-zh.list_display').refresh()
+  require('nvim-zh.runtime').changed('packs')
 end
 
 local function trust(record)
@@ -89,11 +93,13 @@ local function mount(id, candidate, revision)
   active[id] = pack
 end
 
-local function apply(id, record)
+local function apply(id, record, prepared, failure)
   if record.error then error(record.error, 0) end
   if not record.selected then release(id); return end
-  local state = { selected = record.selected.version, source = record.selected.source, enabled = record.enabled ~= false,
-    previous = record.previous and record.previous.version }
+  local state = { selected = record.selected.version, selected_sha256 = record.selected.sha256,
+    source = record.selected.source, origin = record.selected.origin, enabled = record.enabled ~= false,
+    previous = record.previous and record.previous.version,
+    previous_sha256 = record.previous and record.previous.sha256 }
   states[id] = state
   local plugin_disabled = record.selected.kind ~= 'tool'
     and (not modules.plugins.auto or vim.tbl_contains(modules.plugins.disabled, id))
@@ -103,11 +109,18 @@ local function apply(id, record)
     return
   end
   local current = active[id]
-  if current and current.revision.allow_lua and not trust(current.revision) then release(id); current = nil end
+  if current and ((current.revision.allow_lua and not trust(current.revision))
+    or not store.unchanged(current.candidate)) then
+    release(id)
+    current = nil
+  end
   local reason
   local function attempt(revision)
+    if failure and revision == record.selected then error(failure, 0) end
     if current and current.revision.sha256 == revision.sha256 then return true end
-    local candidate = store.load(id, vim.tbl_extend('force', revision, { allow_lua = trust(revision) }))
+    local candidate = prepared and prepared[revision.sha256]
+    if not candidate then candidate = store.load(id, vim.tbl_extend('force', revision, { allow_lua = trust(revision) })) end
+    assert(not candidate.entry or trust(revision), '此来源的 Lua 入口需要明确授权')
     local retained = frozen[id]
     if retained and not compatible_contract(retained.candidate, candidate) then
       return false
@@ -128,20 +141,105 @@ local function apply(id, record)
   end
   local running = active[id]
   state.active = running and running.revision.version
+  state.active_sha256 = running and running.revision.sha256
   state.reason = reason or (plugin_disabled and '配置已禁用' or nil)
 end
 
-function M.sync(config)
-  modules = config or modules
-  if not modules then return end
-  local ok, next_records = pcall(store.records)
+local function can_defer(id, record)
+  local selected = record.selected
+  if not selected or record.enabled == false or active[id] or not large_domains[id]
+    or selected.kind ~= 'tool' or selected.domain ~= id then return false end
+  local stat = vim.uv.fs_stat(store.folder(selected) .. '/artifact.json')
+  return stat and stat.type == 'file' and stat.size >= 256 * 1024
+end
+
+function M.ensure_tool(id, async, done)
+  local target = deferred[id]
+  if not target then return true end
+  if done then target.callbacks[#target.callbacks + 1] = done end
+  local function advance()
+    if deferred[id] ~= target then return true end
+    local ok, candidate = coroutine.resume(target.worker)
+    if ok and coroutine.status(target.worker) ~= 'dead' then return false end
+    deferred[id] = nil
+    local selected = target.record.selected
+    local prepared = ok and { [selected.sha256] = candidate } or nil
+    apply(id, target.record, prepared, not ok and candidate or nil)
+    for _, callback in ipairs(target.callbacks) do pcall(callback) end
+    vim.schedule(function()
+      if not modules or records[id] ~= target.record then return end
+      local diagnostics = package.loaded['nvim-zh.diagnostics']
+      if diagnostics then diagnostics.refresh_clients(id) end
+      changed()
+    end)
+    return true
+  end
+  local pending = target.worker ~= nil
+  if not pending then
+    target.worker = coroutine.create(function()
+      local selected = target.record.selected
+      return store.load(id, vim.tbl_extend('force', selected, { allow_lua = trust(selected) }), coroutine.yield)
+    end)
+  end
+  if not async then
+    while not advance() do end
+    return true
+  end
+  if not pending then
+    local function step()
+      if not advance() then vim.schedule(step) end
+    end
+    vim.schedule(step)
+  end
+  return false
+end
+
+function M.prepare_domain(domain)
+  if deferred[domain] then M.ensure_tool(domain, false) end
+end
+
+function M.has_tool(id)
+  if active[id] or deferred[id] then return true end
+  for _, cache in pairs(catalogs) do
+    for _, row in ipairs(cache.entries) do
+      if row.id == id and row.tool and row.tool.protocol == 'cli' then return true end
+    end
+  end
+  return false
+end
+
+function M.read()
+  local snapshot = store.records()
+  for id, record in pairs(snapshot) do
+    assert(not record.error, '无法读取汉化包登记 ' .. id .. '：' .. tostring(record.error))
+  end
+  return snapshot
+end
+
+function M.snapshot() return records end
+
+function M.sync(config, snapshot, prepared)
+  if not (config or modules) then return end
+  local ok, next_records = pcall(function() return snapshot or M.read() end)
   if not ok then return nil, next_records end
+  modules = config or modules
   records, states = next_records, {}
+  for id in pairs(deferred) do deferred[id] = nil end
   for id in pairs(active) do
-    if not records[id] then release(id) end
+    if not records[id] or not records[id].selected or records[id].enabled == false then release(id) end
   end
   for _, id in ipairs(vim.fn.sort(vim.tbl_keys(records))) do
-    local success, why = pcall(apply, id, records[id])
+    local record = records[id]
+    local success, why
+    if can_defer(id, record) and not (prepared and prepared[record.selected.sha256]) then
+      deferred[id] = { record = record, callbacks = {} }
+      states[id] = { selected = record.selected.version, selected_sha256 = record.selected.sha256,
+        enabled = true, source = record.selected.source, origin = record.selected.origin,
+        previous = record.previous and record.previous.version, reason = '等待相关工具', pending = true }
+      success = true
+    else
+      success, why = pcall(apply, id, record, prepared)
+    end
     if not success then
       states[id] = { reason = tostring(why), active = active[id] and active[id].revision.version }
     end
@@ -165,7 +263,7 @@ function M.stop()
   for _, job in pairs(jobs) do
     if job.process then pcall(job.process.kill, job.process, 15) end
   end
-  jobs, states = {}, {}
+  jobs, states, deferred = {}, {}, {}
 end
 
 local function parse_catalog(bytes, source)
@@ -210,13 +308,26 @@ local function newer(a, b)
   return vim.version.gt(vim.version.parse(a), vim.version.parse(b))
 end
 
-local function target_state(row, installed)
+local function target_state(row, installed, bufnr)
   if row.executable then
     local target = vim.fn.executable(row.executable) == 1
     if not row.tool then return target end
-    if row.tool.protocol == 'cli' then return target end
+    if row.tool.protocol == 'cli' then
+      local compiler = package.loaded['nvim-zh.compiler']
+      if compiler then
+        for executable, hashes in pairs(row.tool.binaries or {}) do
+          local identity = compiler.identity(executable)
+          if identity and row.tool.versions[identity.version] and vim.tbl_contains(hashes, identity.sha256) then
+            return true, true
+          end
+        end
+      end
+      return target
+    end
     local seen = false
-    for _, client in ipairs(vim.lsp.get_clients({ name = row.tool.server })) do
+    local clients = vim.lsp.get_clients({ bufnr = bufnr or 0, name = row.tool.server })
+    if #clients == 0 then clients = vim.lsp.get_clients({ name = row.tool.server }) end
+    for _, client in ipairs(clients) do
       local info = client.server_info
       if info and info.name == row.tool.server and row.tool.versions[info.version] then return true, true end
       seen = seen or client.initialized
@@ -226,7 +337,7 @@ local function target_state(row, installed)
   end
   if row.repository and installed[row.repository] then
     local rev = installed[row.repository].rev
-    return true, type(rev) ~= 'string' or not vim.islist(row.targets) or vim.tbl_contains(row.targets, rev)
+    return true, type(rev) == 'string' and vim.islist(row.targets) and vim.tbl_contains(row.targets, rev) or nil
   end
   for _, name in ipairs(vim.islist(row.modules) and row.modules or {}) do
     if type(name) == 'string' and package.loaded[name] then return true end
@@ -247,18 +358,19 @@ local function installed_targets()
   return installed
 end
 
-local function candidates(id, source, version, installed)
+local function candidates(id, source, installed, bufnr)
   local options = {}
   for name, cache in pairs(catalogs) do
     if not source or name == source then
       for _, row in ipairs(cache.entries) do
-        if row.id == id and (not version or row.version == version) then
-          local _, compatible = target_state(row, installed)
-          if compatible ~= false then
-            local candidate = vim.deepcopy(row)
-            candidate.source = name
-            options[#options + 1] = candidate
-          end
+        if row.id == id then
+          local _, compatible = target_state(row, installed, bufnr)
+          local candidate = vim.tbl_extend('force', {}, row, { source = name })
+          candidate.recommended = compatible == true
+          candidate.compatibility = compatible == true and 'verified'
+            or compatible == false and 'unsupported_version'
+            or row.executable and not row.tool and 'legacy_pack' or 'unverified_target'
+          options[#options + 1] = candidate
         end
       end
     end
@@ -269,8 +381,17 @@ local function candidates(id, source, version, installed)
   return options
 end
 
-local function sync_state()
-  M.sync()
+local function recommended(options)
+  for _, option in ipairs(options) do
+    if option.recommended then return option end
+  end
+end
+
+local function sync_state(prepared)
+  if modules then
+    local synced, failure = M.sync(nil, nil, prepared)
+    assert(synced, failure)
+  end
   changed()
 end
 
@@ -371,17 +492,27 @@ local function select_package(id, record, selected, candidate)
   if candidate.manifest.adapter then
     require('nvim-zh.plugins').check_managed(id, candidate.manifest.adapter)
   end
-  if record.selected and record.selected.sha256 == selected.sha256 then return end
+  if record.selected and record.selected.sha256 == selected.sha256 then
+    -- The registration is already current. A snapshot repaired by this import
+    -- may still be inactive after an earlier verification failure.
+    local state = states[id]
+    if modules and record.enabled ~= false and (not state or state.active_sha256 ~= selected.sha256) then
+      sync_state({ [selected.sha256] = candidate })
+      local failure = states[id] and states[id].error
+      if failure then error(failure, 0) end
+    end
+    return
+  end
   selected.domain = candidate.manifest.domain
   selected.kind = candidate.manifest.executable and 'tool' or 'plugin'
   local next_record = { selected = selected, previous = record.selected, enabled = record.enabled ~= false }
   store.commit(id, record.generation, next_record)
-  sync_state()
-  local failure = states[id] and states[id].error
+  local synced, sync_error = pcall(sync_state, { [selected.sha256] = candidate })
+  local failure = not synced and sync_error or states[id] and states[id].error
   if failure then
     -- A concurrent writer may already have selected another revision.
     local restored, why = pcall(store.commit, id, next_record.generation, record)
-    sync_state()
+    pcall(sync_state)
     error(restored and failure or (failure .. '；恢复包登记失败：' .. tostring(why)), 0)
   end
 end
@@ -402,9 +533,13 @@ function M.install(row, done)
           and sources[row.source].allow_lua == source.allow_lua, '发布源已变更')
         job.phase = '正在校验'
         changed()
+        assert(jobs[id] == job and not job.cancelled, '操作已取消')
         local candidate, sum = store.stage(bytes, row, source.allow_lua == true)
         job.phase = '正在应用'
         changed()
+        assert(jobs[id] == job and not job.cancelled, '操作已取消')
+        assert(sources[row.source] and sources[row.source].url == source.url
+          and sources[row.source].allow_lua == source.allow_lua, '发布源已变更')
         select_package(id, record, { version = row.version, sha256 = sum, source = row.source,
           origin = source.url, allow_lua = source.allow_lua == true }, candidate)
       end)
@@ -465,29 +600,47 @@ end
 
 function M.cancel(id)
   local job = jobs[id]
-  if not job or job.finished or not job.process then return false end
+  if not job or job.finished then return false end
   job.cancelled = true
-  pcall(job.process.kill, job.process, 15)
+  if job.process then pcall(job.process.kill, job.process, 15) end
   return true
 end
 
-function M.rows()
+function M.rows(bufnr)
   M.configure_cache()
   local rows, used, installed = {}, {}, installed_targets()
   local disk = modules and records or store.records()
   for id, record in pairs(disk) do
     if record.selected then
       local selected = record.selected
-      local options = candidates(id, selected.source, nil, installed)
-      local update = options[1] and newer(options[1].version, selected.version) and options[1] or nil
+      local options = candidates(id, selected.source, installed, bufnr)
+      local offer = recommended(options)
+      local update = offer and (newer(offer.version, selected.version)
+        or (offer.version == selected.version and offer.sha256 ~= selected.sha256)) and offer or nil
       local meta = active[id] and active[id].candidate.manifest
       local spec = meta and meta.adapter or {}
-      local target = target_state({ repository = spec.repository, modules = spec.modules,
-        executable = meta and meta.executable, tool = meta and meta.tool }, installed)
+      local target, verified = target_state({ repository = spec.repository, modules = spec.modules,
+        executable = meta and meta.executable, tool = meta and meta.tool }, installed, bufnr)
+      local displays, observed
+      if meta and meta.executable == 'clangd' then
+        local lsp = package.loaded['nvim-zh.lsp']
+        local status = lsp and lsp.info(bufnr)
+        displays = status and status.clangd_clients
+        local diagnostics = package.loaded['nvim-zh.diagnostics']
+        local display = diagnostics and diagnostics.info()
+        observed = verified == true and display and display.enabled
+          and (display.virtual_text.active or display.virtual_lines.active or display.float.active)
+      elseif meta and meta.executable then
+        local compiler = package.loaded['nvim-zh.compiler']
+        local status = compiler and compiler.info()
+        local last = status and status.last
+        observed = status and status.enabled and last and last.tool == id and last.results and (last.results.translated or 0) > 0
+      end
       rows[#rows + 1] = { id = id, source = selected.source, name = id, installed = true,
         enabled = record.enabled ~= false, selected = selected.version, previous = record.previous and record.previous.version,
         update = update, options = options, state = states[id], job = job_info(id), generation = record.generation,
-        target = target, kind = selected.kind }
+        target = target, verified = verified == true, display_active = observed == true, clients = displays,
+        kind = selected.kind or (meta and meta.executable and 'tool') }
       used[id] = true
     elseif record.error then
       rows[#rows + 1] = { id = id, source = 'local', name = id, state = { reason = record.error } }
@@ -499,10 +652,11 @@ function M.rows()
     for _, row in ipairs(cache.entries) do
       local key = source .. ':' .. row.id
       if not used[row.id] and not added[key] then
-        local options = candidates(row.id, source, nil, installed)
-        local target = target_state(options[1] or row, installed)
+        local options = candidates(row.id, source, installed, bufnr)
+        local offer = recommended(options)
+        local target, verified = target_state(offer or options[1] or row, installed, bufnr)
         rows[#rows + 1] = { id = row.id, source = source, name = row.name or row.id, description = row.description,
-          target = target, update = options[1], options = options, job = job_info(row.id) }
+          target = target, verified = verified == true, update = offer, options = options, job = job_info(row.id) }
         added[key] = true
       end
     end
@@ -541,7 +695,10 @@ local requested_capabilities = {
 -- identity never authorizes a reviewed catalog.
 function M.tool_reason(id, target, method)
   local pack = active[id]
-  if not pack then return states[id] and states[id].enabled == false and 'paused' or 'pack_missing' end
+  if not pack then
+    if deferred[id] then return 'preparing_pack' end
+    return states[id] and states[id].enabled == false and 'paused' or 'pack_missing'
+  end
   local tool = pack.candidate.manifest.tool
   if not tool then return 'legacy_pack' end
   if type(target) ~= 'table' then return tool.protocol == 'cli' and 'tool_missing' or 'client_missing' end
@@ -566,11 +723,14 @@ function M.tool_reason(id, target, method)
   local info = target.server_info
   if not info or info.name ~= tool.server or not tool.versions[info.version] then return 'unsupported_version' end
   if method and not vim.tbl_contains(tool.versions[info.version], method) then return 'unverified_interface' end
-  if requested_capabilities[method] and not target:supports_method(method) then return 'unsupported_interface' end
+  if requested_capabilities[method] and (type(target.supports_method) ~= 'function' or not target:supports_method(method)) then
+    return 'unsupported_interface'
+  end
   return 'verified'
 end
 
 function M.tool_allows(id, target, method)
+  if not M.ensure_tool(id, true) then return false end
   local reason = M.tool_reason(id, target, method)
   return reason == 'verified' or reason == 'legacy_pack' or reason == 'pack_missing' or reason == 'paused'
 end

@@ -12,10 +12,10 @@ local zh = require('nvim-zh')
 local enabled = vim.env.NVIM_ZH_LANGUAGE == 'on'
 T = { raw = {}, wire = {}, displayed = {}, builds = {} }
 local file_method = 'textDocument/clangd.fileStatus'
-vim.lsp.handlers[file_method] = function(_, params) T.displayed.file = vim.deepcopy(params) end
+vim.lsp.handlers[file_method] = function(_, params) T.raw_file = vim.deepcopy(params) end
 vim.api.nvim_create_autocmd('LspProgress', { callback = function(ev)
   local value = ev.data.params.value
-  if value.kind == 'begin' then T.displayed.progress = vim.deepcopy(value) end
+  if value.kind == 'begin' then T.raw_progress = vim.deepcopy(ev.data.params) end
 end })
 vim.api.nvim_create_autocmd('QuickFixCmdPost', { pattern = { 'make', 'lmake' }, callback = function(ev)
   local fd = assert(vim.uv.fs_open(vim.o.makeef, 'r', 0))
@@ -159,7 +159,25 @@ function T.analyzer_push()
   end, 25)
 end
 
+function T.display_status()
+  local client = zh.status().lsp.clangd_clients[1]
+  T.displayed.progress = enabled and client.progress or T.raw_progress and T.raw_progress.value
+  T.displayed.file = enabled and client.file_status or T.raw_file
+  return T.displayed.progress ~= nil and T.displayed.file ~= nil
+end
+
+function T.compiler_ready()
+  return not enabled or vim.wait(5000, function()
+    local state = zh.status().compiler.last
+    return state ~= nil and state.reason ~= 'probing'
+  end, 10)
+end
+
 function T.snapshot()
+  for method, params in pairs({ ['$/progress'] = T.raw_progress, [file_method] = T.raw_file }) do
+    assert(vim.iter(T.wire):any(function(row) return row.method == method and vim.deep_equal(row.params, params) end),
+      'downstream event or handler diverged from wire: ' .. method)
+  end
   local output = { raw = T.raw, wire = T.wire, displayed = T.displayed, builds = T.builds,
     compiler = zh.status().compiler, lsp = zh.status().lsp, capabilities = T.client.server_capabilities,
     language = vim.env.NVIM_ZH_LANGUAGE }

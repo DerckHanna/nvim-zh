@@ -6,6 +6,31 @@
   "commit": "392dfff97d29b59d77e5cac6d4b6ef2585fe7117",
   "cache_hint": "research checkout outside the repository; pass --source-root"
  },
+ "generation": {
+  "tblgen": {
+   "version": "23.1.5",
+   "sha256": "93dec1be7f33af9e4ef3a4fcf5f968e0135c9f4708f9c13fda732fa809eb6430"
+  },
+  "source_files": 1202,
+  "source_sha256": "fbb6d33357fd4bf2e2b0877db7c3fc0443b5c354428a59a90eb0ef964b03c935"
+ },
+ "adjacent_baseline": {
+  "llvm": {
+   "repository": "https://github.com/llvm/llvm-project",
+   "version": "llvmorg-23.1.4",
+   "commit": "7a941dfb2877a0b8cf30323fefa85ad019e0b0f5",
+   "cache_hint": "research checkout outside the repository; pass --source-root"
+  },
+  "generation": {
+   "tblgen": {
+    "version": "23.1.4",
+    "sha256": "e627521d8690e538d8c821a0afbebc3ddeed4a47d2fb921c9d04033738a63217",
+    "archive_sha256": "b5f894952b907a50dfc5000fb41f220ede3119703fce3e02f12214a20be31f7b"
+   },
+   "source_files": 1202,
+   "source_sha256": "fbb6d33357fd4bf2e2b0877db7c3fc0443b5c354428a59a90eb0ef964b03c935"
+  }
+ },
  "tools": {
   "clang": {
    "protocol": "cli",

@@ -9,6 +9,7 @@ local tool_reasons = {
   unverified_interface = '接口未经验证，显示原文', unsupported_interface = '服务器不支持此接口',
   pack_missing = '未安装汉化包', paused = '汉化包已暂停',
   legacy_pack = '词库已启用，包未声明服务器版本', client_missing = '等待 clangd 客户端',
+  preparing_pack = '词库等待准备', probing = '正在验证工具', stale_list = '列表已变更',
   tool_missing = '无法确认工具版本', unverified_binary = '二进制摘要未经验证，显示原文',
   unknown_source = '无法确认诊断来源，显示原文', driver_only = '仅识别编译器驱动的消息',
   external_override = '沿用现有列表格式', projection_failed = '无法设置列表显示',
@@ -23,7 +24,8 @@ local function status(value) return labels[value] or clean(value) end
 local function explanation(value) return clean(value):gsub('^.-%.lua:%d+:%s*', '') end
 
 local function lines()
-  local info = require('nvim-zh.status').get()
+  local source = panel.origin and vim.api.nvim_win_is_valid(panel.origin) and vim.api.nvim_win_get_buf(panel.origin)
+  local info = require('nvim-zh.status').get(source)
   local version, runtime = info.version, info.runtime
   local tabs = {}
   for index, name in ipairs(names) do tabs[#tabs + 1] = index == panel.page and ('[' .. name .. ']') or name end
@@ -48,7 +50,7 @@ local function lines()
     if runtime.config_file.error then add('配置说明：' .. explanation(runtime.config_file.error)) end
     add('')
     local installed, pending = 0, 0
-    for _, row in ipairs(require('nvim-zh.packs').rows()) do
+    for _, row in ipairs(require('nvim-zh.packs').rows(source)) do
       if row.installed then installed = installed + 1 end
       if (row.installed and row.update) or (row.state and row.state.restart) then pending = pending + 1 end
     end
@@ -60,7 +62,10 @@ local function lines()
     for _, client in ipairs(cpp) do
       local reason = tool_reasons[client.reason] or client.reason
       if not info.diagnostics.enabled then reason = '诊断显示已关闭' end
-      add(('C/C++ · %s · %s'):format(client.version or 'clangd', reason))
+      add(('C/C++ · 客户端 %d · %s · %s'):format(client.id, client.version or 'clangd', reason))
+      if client.progress and (client.progress.title or client.progress.message) then
+        add('clangd · ' .. (client.progress.title or client.progress.message))
+      end
       if client.file_status and client.file_status.state then
         add('clangd · ' .. client.file_status.state)
       end
@@ -225,13 +230,14 @@ function M.open(requested)
     return panel.win
   end
   M.close()
+  local origin = vim.api.nvim_get_current_win()
   local buf = vim.api.nvim_create_buf(false, true)
   local win = vim.api.nvim_open_win(buf, true, size())
   vim.bo[buf].bufhidden, vim.bo[buf].swapfile = 'wipe', false
   vim.bo[buf].filetype = 'nvim-zh'
   vim.wo[win].wrap, vim.wo[win].number, vim.wo[win].relativenumber = false, false, false
   vim.wo[win].cursorline = true
-  panel = { buf = buf, win = win, group = vim.api.nvim_create_augroup('NvimZhPanel', { clear = true }) }
+  panel = { buf = buf, win = win, origin = origin, group = vim.api.nvim_create_augroup('NvimZhPanel', { clear = true }) }
   local function page(delta)
     if not panel then return end
     use_page((panel.page - 1 + delta) % #names + 1)

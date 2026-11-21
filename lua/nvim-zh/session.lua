@@ -7,7 +7,7 @@ function M.prepare(opts)
   return config
 end
 
-function M.apply(config)
+function M.apply(config, records)
   require('nvim-zh.engine').setup(config)
   require('nvim-zh.help').setup(config.modules.help)
   require('nvim-zh.ui').setup(config.modules.ui)
@@ -17,13 +17,20 @@ function M.apply(config)
   require('nvim-zh.lsp').setup(config.modules.lsp)
   local packs = require('nvim-zh.packs')
   packs.configure(config.pack_sources)
-  packs.sync(config.modules)
+  local synced, reason = packs.sync(config.modules, records)
+  assert(synced, reason)
+end
+
+function M.commit(config)
   state = { configured = true, config = config }
   return M
 end
 
-function M.restore(config, configured)
-  if configured then return M.apply(config) end
+function M.restore(config, configured, records)
+  if configured then
+    M.apply(config, records)
+    return M.commit(config)
+  end
   local packs = package.loaded['nvim-zh.packs']
   if packs then packs.stop() end
   for _, name in ipairs({ 'ui', 'plugins', 'diagnostics', 'compiler', 'lsp' }) do

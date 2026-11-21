@@ -10,7 +10,7 @@
 local zh = require('nvim-zh').setup()
 ```
 
-校验并应用配置，返回主模块。重复调用会更新基础配置，再与本地 JSON 合并；不会叠加 wrapper、autocmd 或后台任务。配置项见[配置文档](configuration.md)。
+校验并应用配置，返回主模块。重复调用以新的基础配置和本地 JSON 准备候选。校验、原生应用和资源发布成功后才更新有效配置。配置项见[配置文档](configuration.md)。
 
 原生模块准备私有 locale 时会异步完成。同步仍在进行时，新的配置会进入同一队列。需要等待队列完成时，可使用 `refresh(callback)` 的完成回调。
 
@@ -34,10 +34,10 @@ local snapshot = require('nvim-zh').status()
 | `help` | 中文 Help 路径、索引与 `'helplang'` 状态 |
 | `ui` | notify、input/select、select_items、echo 的启用/活动/原因 |
 | `adapters` | 第三方适配器的固定验证组合、安装观察和各显示面的状态与证据 |
-| `packs` | 已登记汉化包的启用状态、选定与活动版本、待重启、任务阶段和最近错误 |
+| `packs` | 包登记、选定与活动版本及 SHA-256、待验证或待重启状态、任务阶段和最近错误 |
 | `diagnostics` | 各诊断显示接缝与本进程实际观察 |
 | `compiler` | 编译器列表显示开关、近期工具身份、匹配和回退原因 |
-| `lsp` | clangd 消息、进度与提示适配状态 |
+| `lsp` | clangd 显示接缝和当前 Buffer 优先的客户端状态，包含各协议方法的兼容原因 |
 | `nvim_version` / `v_lang` / `helplang` | 当前 Neovim 与语言状态 |
 
 `version.running_implementation` 与 `version.installed_implementation` 不同，表示磁盘实现已变化；不能据此认为当前进程已经执行新代码。
@@ -65,7 +65,7 @@ local text, status, entry_id = require('nvim-zh').translate({
 - `translated = true`：调用方明确声明文本已经翻译，跳过再次翻译。
 - `observe = false`：内部差分适配使用，不把一次上下文试探记为独立用户观察。
 
-返回 `text, status, entry_id`；`status` 为 `translated` 或 `fallback`。未知文本、歧义、非法参数、目录错误和规则异常均回退原始 `msgid`，不做模糊猜测。
+返回 `text, status, entry_id`；`status` 为 `translated` 或 `fallback`。显式查询同步准备已登记的对应词库。未知文本、歧义、非法参数、目录错误和规则异常均回退原始 `msgid`，不做模糊猜测。
 
 ## `register_catalog(domain, loader, metadata?)`
 
@@ -98,7 +98,7 @@ end, { source = 'my-plugin/l10n' })
 
 ## `raw()` 和 `raw_text()`
 
-`raw()` 返回当前 quickfix 或 location list 条目的副本。可取得时包含原文本 `raw_text`、工具代码 `code`、来源 `tool` 与匹配原因 `reason`，以及原条目 `item`。无条目时返回 `nil`。`raw_text()` 返回供 `:NvimZhRaw` 使用的文本。当前光标所在行的 LSP 原文可用 `:NvimZhDiagnosticRaw` 或 `vim.diagnostic.get()` 查看。
+`raw()` 返回当前 quickfix 或 location list 条目的副本。诊断及编译器列表的中文译文在渲染时生成，列表查询与跳转沿用上游条目。可取得时包含原文本 `raw_text`、工具代码 `code`、来源 `tool` 与匹配原因 `reason`，以及原条目 `item`。无条目时返回 `nil`。`raw_text()` 返回供 `:NvimZhRaw` 使用的文本。当前光标所在行的 LSP 原文可用 `:NvimZhDiagnosticRaw` 或 `vim.diagnostic.get()` 查看。
 
 ## `stats()`
 
@@ -167,11 +167,15 @@ end)
 - `error`：候选或应用失败，已保留/恢复上一份有效状态。
 - `cancelled`：teardown 或停止流程取消的任务。
 
-忙碌时重复请求合并到同一协调队列；回调在最终完成或取消时收到结果，而不是把“已排队”误报为“已生效”。
+并发请求合并到协调队列，回调按最后实际应用的状态完成。每个分配了任务 ID 的回调交付一次。清理旧代次后再交付取消回调，回调中可启动新的操作。
 
 ## `teardown()`
 
 关闭面板，停止计时器、订阅和可取消任务，恢复仍由本插件拥有的 UI、诊断、LSP、第三方适配和原生进程状态。外部后来替换的函数、gettext 绑定或消息语言不会被抢回。
+
+## LSP 数据
+
+vim.diagnostic.get()、LspProgress、client.progress、用户注册的 fileStatus handler 和 vim.lsp.buf_request_all() 回调接收上游数据。面板从进度和文件状态派生显示。选择器回调返回原动作，补全候选保留原协议对象。
 
 ## 状态变化事件
 

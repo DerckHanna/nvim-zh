@@ -59,12 +59,10 @@ function M.teardown()
   local tui = package.loaded['nvim-zh.tui']
   if tui then tui.close() end
   local health = package.loaded['nvim-zh.health']
-  if health then health.stop() end
-  local ok, err = require('nvim-zh.runtime').stop()
-  local restored, why = pcall(require('nvim-zh.session').teardown)
-  if not ok then return nil, err end
-  if not restored then return nil, why end
-  return true
+  local cancelled = health and health.stop(true)
+  local ok, err = require('nvim-zh.runtime').stop(require('nvim-zh.session').teardown)
+  if cancelled then cancelled() end
+  return ok, err
 end
 
 return M

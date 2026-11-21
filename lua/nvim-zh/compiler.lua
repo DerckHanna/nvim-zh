@@ -1,11 +1,13 @@
 local M = {}
-local engine = require('nvim-zh.engine')
+local match_message = require('nvim-zh.tool_message').match_message
+local catalog = require('nvim-zh.catalog')
 local packs = require('nvim-zh.packs')
+local lists = require('nvim-zh.list_display')
 local config = {}
 local group
 local last
 local probes = {}
-local tracked = {}
+local generation = 0
 local levels = { e = 'error', w = 'warning', n = 'note', i = 'info', f = 'error', r = 'remark' }
 local free_codes = {
   ['-W#warnings'] = true, ['-W#pragma-messages'] = true, ['-Wuser-defined-warnings'] = true,
@@ -32,35 +34,59 @@ local function direct_command(command)
   if domains[name] then return domains[name], executable, name, args end
 end
 
-local function probe(executable, name)
+local function tool_path(executable)
   local path = vim.fn.exepath(executable)
-  if path == '' then return nil end
+  if path == '' then return end
   local stat = vim.uv.fs_stat(path)
-  if not stat then return nil end
-  local key = vim.inspect({ stat.dev, stat.ino, stat.size, stat.mtime, stat.ctime })
-  local cached = probes[path]
+  if not stat or stat.type ~= 'file' then return end
+  return path, table.concat({ stat.dev, stat.ino, stat.size, stat.mtime.sec, stat.mtime.nsec,
+    stat.ctime.sec, stat.ctime.nsec }, ':')
+end
+
+function M.identity(executable)
+  local path, key = tool_path(executable)
+  local cached = path and probes[path]
   if cached and cached.key == key then return cached.identity end
-  local ok, identity = pcall(function()
-    local version = vim.system({ path, '--version' }, { text = true }):wait(2500)
-    local hash = vim.system({ 'sha256sum', '--', path }, { text = true }):wait(2500)
-    local pattern = name == 'clang-tidy' and 'LLVM version (%d+%.%d+%.%d+)' or '^clang version (%d+%.%d+%.%d+)'
-    return { executable = name, version = version.code == 0 and version.stdout:match(pattern) or nil,
-      sha256 = hash.code == 0 and hash.stdout:match('^(%x+)') or nil }
-  end)
-  if not ok then identity = nil end
-  probes[path] = { key = key, identity = identity }
-  return identity
 end
 
-local function get_list(win, what)
-  if win then return vim.fn.getloclist(win, what) end
-  return vim.fn.getqflist(what)
-end
-
-local function set_formatter(win, id, formatter)
-  local options = { id = id, quickfixtextfunc = formatter }
-  if win then return vim.fn.setloclist(win, {}, 'a', options) end
-  return vim.fn.setqflist({}, 'a', options)
+local function probe(executable, name, done)
+  local path, key = tool_path(executable)
+  if not path then done(); return end
+  local cached = probes[path]
+  if cached and cached.key == key then
+    if cached.pending then cached.pending[#cached.pending + 1] = done else done(cached.identity) end
+    return
+  end
+  local entry = { key = key, pending = { done } }
+  probes[path] = entry
+  local results, remaining = {}, 2
+  local function received(kind, result)
+    if probes[path] ~= entry then return end
+    results[kind] = result
+    remaining = remaining - 1
+    if remaining ~= 0 then return end
+    local pending = entry.pending
+    entry.pending = nil
+    local current_path, current_key = tool_path(executable)
+    if path == current_path and key == current_key then
+      local version, hash = results.version, results.hash
+      local pattern = name == 'clang-tidy' and 'LLVM version (%d+%.%d+%.%d+)' or '^clang version (%d+%.%d+%.%d+)'
+      entry.identity = { executable = name, version = version.code == 0 and version.stdout:match(pattern) or nil,
+        sha256 = hash.code == 0 and hash.stdout:match('^(%x+)') or nil, path = path, key = key }
+    end
+    for _, callback in ipairs(pending) do
+      local ok, err = pcall(callback, entry.identity)
+      if not ok then last = { reason = 'projection_failed', error = tostring(err) } end
+    end
+  end
+  local function run(kind, argv)
+    local ok = pcall(vim.system, argv, { text = true, timeout = 2500 }, vim.schedule_wrap(function(result)
+      received(kind, result)
+    end))
+    if not ok then received(kind, { code = -1 }) end
+  end
+  run('version', { path, '--version' })
+  run('hash', { 'sha256sum', '--', path })
 end
 
 local function split(text, domain)
@@ -77,55 +103,6 @@ local function classify(body, level)
     or body:match('^(note: )') or body:match('^(remark: )')
   if prefix then return body:sub(#prefix + 1), prefix:match('^(.-):'), prefix end
   return body, level, ''
-end
-
-function M.match_message(domain, body, code, level, interface)
-  if domain == 'clang' and level == 'note' and interface == 'quickfix' then
-    local conjunction, expression, diagnostic = body:match("^([a-z]+) '([^']+)' would be invalid: (.+)$")
-    if conjunction == 'because' or conjunction == 'and' then
-      local nested, status, nested_id = engine.translate({
-        domain = domain, context = 'substitution_diagnostic', msgid = diagnostic,
-        formatted = true, observe = false, report_ambiguity = true,
-      })
-      if status == 'ambiguous' then return body, status end
-      if status == 'translated' then
-        local text, reason, id = engine.translate({
-          domain = domain, context = 'note', msgid = conjunction .. " '%1' would be invalid: %2",
-          args = { ['1'] = expression, ['2'] = nested }, observe = false,
-        })
-        if reason == 'translated' then return text, reason, 'note', id, nested_id end
-      end
-    end
-  end
-  local contexts = {}
-  if interface == 'include_stack' then
-    contexts[1] = 'include_stack'
-  elseif domain == 'clang-tidy' then
-    if code then contexts[1] = level == 'note' and code .. '/note' or code end
-    if level == 'note' then contexts[#contexts + 1] = 'fix_note' end
-  else
-    local warning = code and (code:match(',(%-W[^,]+)$') or code)
-    if warning then contexts[#contexts + 1] = warning end
-    if interface == 'driver' then
-      contexts[#contexts + 1] = 'driver'
-      contexts[#contexts + 1] = 'unlocated'
-    elseif level == 'note' then
-      contexts[#contexts + 1] = 'note'
-    else
-      if body:match('^too few template arguments for ') or body:match('^too many template arguments for ') then
-        contexts[#contexts + 1] = 'template_arity'
-      end
-      contexts[#contexts + 1] = 'diagnostic'
-    end
-  end
-  for _, context in ipairs(contexts) do
-    local result, status, id = engine.translate({
-      domain = domain, context = context, msgid = body, formatted = true, observe = false, report_ambiguity = true,
-    })
-    if status == 'ambiguous' then return body, status end
-    if status == 'translated' then return result, status, context, id end
-  end
-  return body, 'missing_translation'
 end
 
 local function loose_item(item)
@@ -146,7 +123,7 @@ local function continuation(line)
   return line:match('^(.-)\\%s*$') or line:match('^(.-)%?%?/%s*$')
 end
 
-local function source_guard(item, files, snippet, tabstop)
+local function source_guard(item, files, bounds, snippet, tabstop)
   if item.bufnr == 0 or item.lnum == 0 then return 'unverified_location' end
   local file = files[item.bufnr]
   if file == nil then
@@ -154,18 +131,21 @@ local function source_guard(item, files, snippet, tabstop)
     local stat = vim.uv.fs_stat(path)
     local ok, lines
     if stat and stat.type == 'file' and stat.size < 4 * 1024 * 1024 then
-      ok, lines = pcall(vim.fn.readfile, path)
+      ok, lines = pcall(vim.fn.readfile, path, '', bounds[item.bufnr] + 16)
     end
     file = ok and lines or false
     files[item.bufnr] = file
   end
   local line = file and file[item.lnum]
   if not line then return 'unverified_location' end
-  -- A presumed location from #line can name a different existing source file.
-  -- Verify it against the source excerpt already printed by Clang.
-  if tabstop and snippet ~= line then
+  if not snippet then return 'unverified_location' end
+  if snippet ~= line then
+    local column = 0
     local expanded = line:gsub('([^\t]*)\t', function(before)
-      return before .. (' '):rep(tabstop - #before % tabstop)
+      column = column + vim.fn.strdisplaywidth(before)
+      local width = tabstop - column % tabstop
+      column = column + width
+      return before .. (' '):rep(width)
     end)
     if snippet ~= expanded then return 'unverified_location' end
   end
@@ -177,6 +157,7 @@ local function source_guard(item, files, snippet, tabstop)
     local fragment = continuation(file[i])
     parts[#parts + 1] = fragment or file[i]
     if not fragment then break end
+    if i == #file then return 'unverified_location' end
   end
   local logical = table.concat(parts):gsub('^\239\187\191', ''):gsub('/%*.-%*/', ' ')
     :gsub('^%s*%%:', '#'):gsub('^%s*%?%?=', '#')
@@ -189,7 +170,12 @@ end
 
 local function inspect_items(items, evidence)
   local result, files, previous, parent = {}, {}, nil, nil
-  local include_stack = {}
+  local include_stack, bounds = {}, {}
+  for _, item in ipairs(items) do
+    if item.bufnr ~= 0 and item.lnum > 0 then
+      bounds[item.bufnr] = math.max(bounds[item.bufnr] or 0, item.lnum)
+    end
+  end
   for index, item in ipairs(items) do
     local text = item.text
     local body, code = split(vim.trim(text), evidence.domain)
@@ -232,7 +218,12 @@ local function inspect_items(items, evidence)
       local warning = code and (code:match(',(%-W[^,]+)$') or code)
       local location_reason
       if interface ~= 'driver' then
-        location_reason = source_guard(item, files, source_line(items, index, item.lnum), evidence.tabstop)
+        local snippet = source_line(items, index, item.lnum)
+        if evidence.domain == 'clang-tidy' and level == 'note' and code == nil then
+          location_reason = 'unverified_location'
+        else
+          location_reason = source_guard(item, files, bounds, snippet, evidence.tabstop)
+        end
       end
       if warning and free_codes[warning] then
         record.reason = 'project_text'
@@ -240,7 +231,7 @@ local function inspect_items(items, evidence)
         record.reason = location_reason
       elseif driver or (interface ~= 'driver' and evidence.source_locations) then
         local translated, reason, context, id, nested =
-          M.match_message(evidence.domain, message, code, level, interface)
+          match_message(evidence.domain, message, code, level, interface)
         record.reason, record.context, record.entry_id, record.nested_entry_id = reason, context, id, nested
         if reason == 'translated' then
           record.text = prefix .. translated .. (record.code and body ~= vim.trim(text) and (' [' .. record.code .. ']') or '')
@@ -249,7 +240,7 @@ local function inspect_items(items, evidence)
       if interface ~= 'driver' and not location_reason and evidence.source_locations then
         for _, preamble in ipairs(include_stack) do
           preamble.text, preamble.reason, preamble.context, preamble.entry_id =
-            M.match_message('clang', preamble.raw_text, nil, nil, 'include_stack')
+            match_message('clang', preamble.raw_text, nil, nil, 'include_stack')
         end
       end
       include_stack = {}
@@ -258,40 +249,23 @@ local function inspect_items(items, evidence)
   return result
 end
 
-local function display_line(item, record)
-  if not record or record.reason ~= 'translated' then return '' end
-  local name = item.module ~= '' and item.module or (item.bufnr ~= 0 and vim.fn.bufname(item.bufnr) or '')
-  local location = item.lnum > 0 and tostring(item.lnum) or ''
-  if item.end_lnum > 0 and item.end_lnum ~= item.lnum then location = location .. '-' .. item.end_lnum end
-  if item.col > 0 then location = location .. ' col ' .. item.col end
-  if item.end_col > 0 and item.end_col ~= item.col then location = location .. '-' .. item.end_col end
-  if item.lnum > 0 and item.type ~= '' then location = location .. ' ' .. (levels[item.type:lower()] or item.type) end
-  if item.nr > 0 then location = location .. (' %3d'):format(item.nr) end
-  return name .. '|' .. location .. '| ' .. record.text:gsub('\n', ' ')
-end
-
 local function act(event)
   local loc = event.match == 'lmake'
   if not config.enabled or not (loc and config.loclist or not loc and config.quickfix) then return end
   local win = loc and vim.api.nvim_get_current_win() or nil
-  local list = get_list(win, { id = 0, title = 1, items = 1, quickfixtextfunc = 1, changedtick = 1, winid = 0 })
+  local list = lists.get(win, { id = 0, title = 1, quickfixtextfunc = 1, changedtick = 1 })
   local command = vim.trim((list.title or ''):sub(2))
   local domain, executable, name, args = direct_command(command)
-  last = { list = loc and 'loclist' or 'quickfix', tool = domain, reason = 'unknown_source' }
+  local observation = { list = loc and 'loclist' or 'quickfix', tool = domain, reason = 'unknown_source' }
+  last = observation
   if not domain then return end
-  if not vim.version.eq(vim.version(), '0.12.6') then last.reason = 'unverified_interface'; return end
-  local identity = probe(executable, name)
-  local reason = packs.tool_reason(domain, identity, 'quickfix')
-  last.version, last.reason = identity and identity.version, reason
-  if reason ~= 'verified' then return end
-  if vim.o.quickfixtextfunc ~= '' or list.quickfixtextfunc ~= '' then
-    last.reason = 'external_override'
-    return
-  end
+  if not vim.version.eq(vim.version(), '0.12.6') then observation.reason = 'unverified_interface'; return end
+  if not lists.available(win, list, 'compiler') then observation.reason = 'external_override'; return end
+  if not packs.has_tool(domain) then observation.reason = packs.tool_reason(domain); return end
   -- These options can change diagnostic ownership, location or output schema.
   -- Keep the display unmodified for those invocations.
   local source_locations, frontend_only = domain == 'clang-tidy', false
-  local tabstop = domain == 'clang' and 8 or nil
+  local tabstop = 8
   if domain == 'clang' and vim.env.CCC_OVERRIDE_OPTIONS then
     last.reason = 'unverified_interface'
     return
@@ -307,68 +281,72 @@ local function act(event)
     end
     frontend_only = frontend_only or arg == '-fsyntax-only' or arg == '-E'
     source_locations = source_locations or frontend_only or arg == '-c' or arg == '-S'
-    local requested_tabstop = tabstop and tonumber(arg:match('^%-ftabstop=(%d+)$'))
+    local requested_tabstop = domain == 'clang' and tonumber(arg:match('^%-ftabstop=(%d+)$'))
     if requested_tabstop and requested_tabstop >= 1 and requested_tabstop <= 100 then tabstop = requested_tabstop end
   end
-  local evidence = { domain = domain, identity = identity, source_locations = source_locations,
-    frontend_only = frontend_only, tabstop = tabstop }
-  if not evidence.source_locations then last.reason = 'driver_only' end
-  local state = { id = list.id, evidence = evidence, win = win }
-  local formatter = function(info)
-    if not config.enabled or not (info.quickfix == 1 and config.quickfix or info.quickfix == 0 and config.loclist)
-      or packs.tool_reason(domain, identity, 'quickfix') ~= 'verified' then return {} end
-    local current = get_list(info.quickfix == 0 and info.winid or nil, { id = info.id, items = 1, changedtick = 1 })
-    if state.tick ~= current.changedtick then return {} end
-    local lines = {}
-    for i = info.start_idx, info.end_idx do
-      lines[#lines + 1] = display_line(current.items[i], state.records[i])
+  observation.reason = 'probing'
+  local token = generation
+  packs.ensure_tool(domain, true)
+  local function apply_identity(identity)
+    if token ~= generation or not config.enabled or not (loc and config.loclist or not loc and config.quickfix)
+      or (win and not vim.api.nvim_win_is_valid(win)) then return end
+    local current = lists.get(win, { id = 0, changedtick = 1, quickfixtextfunc = 1 })
+    if current.id ~= list.id or current.changedtick ~= list.changedtick or not lists.available(win, current, 'compiler') then
+      if last == observation then observation.reason = 'stale_list' end
+      return
     end
-    return lines
+    if not packs.ensure_tool(domain, true, function() apply_identity(identity) end) then return end
+    local reason = packs.tool_reason(domain, identity, 'quickfix')
+    observation.version, observation.reason = identity and identity.version, reason
+    if reason == 'verified' then
+      if not source_locations then observation.reason = 'driver_only' end
+      list.items = lists.get(win, { id = list.id, items = 1 }).items
+      local evidence = { domain = domain, identity = identity, source_locations = source_locations,
+        frontend_only = frontend_only, tabstop = tabstop }
+      local records = lists.install(win, list, 'compiler', function(items) return inspect_items(items, evidence) end, function()
+        if not config.enabled or not (loc and config.loclist or not loc and config.quickfix)
+          or packs.tool_reason(domain, identity, 'quickfix') ~= 'verified' then return end
+        local path, key = tool_path(executable)
+        if path == identity.path and key == identity.key then return catalog.revision(domain) end
+      end)
+      if not records then observation.reason = 'projection_failed'; return end
+      local counts = {}
+      for _, row in ipairs(records) do counts[row.reason] = (counts[row.reason] or 0) + 1 end
+      observation.results = counts
+    end
+    require('nvim-zh.runtime').changed('adapters')
   end
-  state.records = inspect_items(list.items, evidence)
-  state.tick = list.changedtick + 1
-  if set_formatter(win, list.id, formatter) ~= 0 then last.reason = 'projection_failed'; return end
-  state.tick = get_list(win, { id = list.id, changedtick = 1 }).changedtick
-  tracked[list.id % 64] = state
-  if list.winid and list.winid ~= 0 and vim.api.nvim_win_is_valid(list.winid) then
-    vim.api.nvim_win_call(list.winid, function()
-      local view = vim.fn.winsaveview()
-      vim.cmd(loc and 'silent noautocmd lopen' or 'silent noautocmd copen')
-      vim.fn.winrestview(view)
-    end)
-  end
-  local counts = {}
-  for _, row in ipairs(state.records) do counts[row.reason] = (counts[row.reason] or 0) + 1 end
-  last.results = counts
-  pcall(vim.api.nvim_exec_autocmds, 'User', { pattern = 'NvimZhChanged', modeline = false })
+  probe(executable, name, apply_identity)
 end
 
 function M.setup(opts)
   config = vim.deepcopy(opts)
-  if group or not config.enabled then return end
-  group = vim.api.nvim_create_augroup('NvimZhCompiler', { clear = true })
-  vim.api.nvim_create_autocmd('QuickFixCmdPost', { group = group, pattern = { 'make', 'lmake' },
-    callback = function(event)
-      local ok, err = pcall(act, event)
-      if not ok then last = { reason = 'projection_failed', error = tostring(err) } end
-    end })
+  if config.enabled then
+    lists.refresh('compiler')
+    if not group then
+      group = vim.api.nvim_create_augroup('NvimZhCompiler', { clear = true })
+      vim.api.nvim_create_autocmd('QuickFixCmdPost', { group = group, pattern = { 'make', 'lmake' },
+        callback = function(event)
+          local ok, err = pcall(act, event)
+          if not ok then last = { reason = 'projection_failed', error = tostring(err) } end
+        end })
+    end
+  else
+    generation = generation + 1
+    if group then vim.api.nvim_del_augroup_by_id(group); group = nil end
+    lists.clear('compiler')
+  end
 end
 
 function M.teardown()
+  generation = generation + 1
   config = {}
   if group then vim.api.nvim_del_augroup_by_id(group); group = nil end
   last, probes = nil, {}
+  lists.clear('compiler')
 end
 
-function M.raw()
-  local win = vim.fn.getloclist(0, { filewinid = 0 }).filewinid
-  local list = get_list(win and win > 0 and 0 or nil, { id = 0, idx = 0, items = 1, changedtick = 1 })
-  local item = list.items and list.items[list.idx]
-  if not item then return end
-  local state = tracked[list.id % 64]
-  local record = state and state.id == list.id and state.tick == list.changedtick and state.records[list.idx]
-  return vim.tbl_extend('force', { raw_text = item.text }, record or {}, { item = item, index = list.idx })
-end
+M.raw = lists.raw
 
 function M.raw_text()
   local row = M.raw()

@@ -1,16 +1,5 @@
 #!/usr/bin/env python3
-"""Sync the Clang toolchain PO catalogs from the source inventory.
-
-The maintenance map (``translations/toolchain/zh_CN.json``) holds reviewed
-msgid/msgstr pairs keyed by the diagnostic or check they belong to. The tool
-also reuses generic Clang diagnostic translations already reviewed for the
-clangd domain when the only difference is the first-letter capitalization
-(clangd capitalizes a composed diagnostic; compiler output keeps the TableGen
-spelling).
-
-Existing PO entries are preserved. Only missing entries are added and a map
-entry overrides an existing msgstr for its exact context/msgid.
-"""
+"""Generate the toolchain PO catalogs from fixed inventories and reviewed translations."""
 
 from __future__ import annotations
 
@@ -28,11 +17,7 @@ from diagnostic_inventory import expand_plural_suffixes, normalize_template, str
 ROOT = Path(__file__).resolve().parent.parent
 MAP = ROOT / "translations/toolchain/zh_CN.json"
 CLANG_INVENTORY = ROOT / "manifests/clang-coverage.json"
-CLANGD_INVENTORY = ROOT / "manifests/clangd-coverage.json"
-TIDY_INVENTORY = ROOT / "manifests/clang-tidy-coverage.json"
-CLANGD_PO = ROOT / "translations/po/zh_CN/clangd.po"
 CLANG_PO = ROOT / "translations/po/zh_CN/clang.po"
-TIDY_PO = ROOT / "translations/po/zh_CN/clang-tidy.po"
 
 HEADER = """Project-Id-Version: nvim-zh {domain}
 PO-Revision-Date: 2026-11-20 16:00+0800
@@ -44,28 +29,7 @@ Language: zh_CN
 Content-Transfer-Encoding: 8bit
 """
 
-DIAGNOSTIC_CONTEXTS = {"diagnostic", "note"}
 RAW_PLACEHOLDER_RE = re.compile(r"%\d+")
-
-
-def load_po(path: Path) -> list[dict]:
-    if not path.is_file():
-        return []
-    entries, _ = ct.parse_po(path)
-    return entries
-
-
-def clangd_candidates(obsolete: set[str] | None = None) -> dict[str, dict]:
-    """Reusable generic Clang diagnostic entries from the reviewed clangd PO."""
-    result: dict[str, dict] = {}
-    blocked = obsolete or set()
-    for row in load_po(CLANGD_PO):
-        context = row.get("msgctxt", "")
-        if row["msgid"] in blocked:
-            continue
-        if context in DIAGNOSTIC_CONTEXTS or context.startswith("-W"):
-            result.setdefault(row["msgid"], row)
-    return result
 
 
 def entry(context: str, msgid: str, msgstr: str, references: list[str], priority: bool = False) -> dict:
@@ -85,193 +49,6 @@ def variant_index(inventory: dict) -> dict[str, list[dict]]:
     return result
 
 
-def _parse_directives(template: str, substitutions: dict[str, str],
-                      mapping: list[int] | None = None, occ_counter: dict | None = None) -> list[tuple[str, dict]]:
-    """Expand TableGen directives while recording deterministic branch choice keys."""
-    if mapping is None:
-        mapping = list(range(16))
-    if occ_counter is None:
-        occ_counter = {}
-
-    def map_index(index: int) -> int:
-        return mapping[index] if index < len(mapping) else index
-
-    def literal(text: str) -> str:
-        def renumber(placeholder: re.Match) -> str:
-            if placeholder.group(0) == "%%":
-                return "%%"
-            return f"%{placeholder.group(1)}{map_index(int(placeholder.group(2)))}"
-        return di.ARGUMENT_RE.sub(renumber, text)
-
-    match = di.STRUCTURAL_RE.search(template)
-    enum_match = di.ENUM_SELECT_RE.search(template)
-    if enum_match and (not match or enum_match.start() < match.start()):
-        open_brace = enum_match.end() - 1
-        close_brace = di.find_matching_brace(template, open_brace)
-        inner = template[open_brace + 1 : close_brace]
-        after = template[close_brace + 1 :]
-        index, consumed = di._take_arg_index(after)
-        tail = after[consumed:]
-        head = literal(template[: enum_match.start()])
-        tags = di.split_top_level(inner, "|")
-        key_base = ("enum_select", map_index(index), len(tags))
-        occ = occ_counter.get(key_base, 0)
-        next_occ = {**occ_counter, key_base: occ + 1}
-        dkey = (*key_base, occ)
-        results = []
-        for idx, tag in enumerate(tags):
-            open_tag = tag.find("{")
-            body = (tag[open_tag + 1 : -1] if open_tag >= 0 and tag.endswith("}")
-                    else (tag[open_tag + 1 :] if open_tag >= 0 else ""))
-            for b_str, b_choices in _parse_directives(body, substitutions, mapping, dict(next_occ)):
-                for t_str, t_choices in _parse_directives(tail, substitutions, mapping, dict(next_occ)):
-                    results.append((head + b_str + t_str, {dkey: idx, **b_choices, **t_choices}))
-        return results
-    if not match:
-        return [(literal(template), {})]
-    kind = match.group(1)
-    open_brace = match.end() - 1
-    close_brace = di.find_matching_brace(template, open_brace)
-    inner = template[open_brace + 1 : close_brace]
-    after = template[close_brace + 1 :]
-    head = literal(template[: match.start()])
-    if kind == "sub":
-        index, consumed = di._take_arg_index(after)
-        indexes = [index]
-        while after[consumed : consumed + 1] == ",":
-            index, width = di._take_arg_index(after[consumed + 1 :])
-            indexes.append(index)
-            consumed += 1 + width
-        name_match = re.match(r"([A-Za-z_][A-Za-z0-9_]*)", inner)
-        body = substitutions.get(name_match.group(1)) if name_match else None
-        if body is None:
-            return [(template, {})]
-        inner_mapping = [map_index(i) for i in indexes]
-        tail = after[consumed:]
-        results = []
-        for b_str, b_choices in _parse_directives(body, substitutions, inner_mapping, dict(occ_counter)):
-            for t_str, t_choices in _parse_directives(tail, substitutions, mapping, dict(occ_counter)):
-                results.append((head + b_str + t_str, {**b_choices, **t_choices}))
-        return results
-    if kind in {"select", "plural"}:
-        index, consumed = di._take_arg_index(after)
-        tail = after[consumed:]
-        items = di.split_top_level(inner, "|")
-        key_base = (kind, map_index(index), len(items))
-        occ = occ_counter.get(key_base, 0)
-        next_occ = {**occ_counter, key_base: occ + 1}
-        dkey = (*key_base, occ)
-        results = []
-        for idx, item in enumerate(items):
-            part = item if kind == "select" else item.partition(":")[2]
-            for b_str, b_choices in _parse_directives(part, substitutions, mapping, dict(next_occ)):
-                for t_str, t_choices in _parse_directives(tail, substitutions, mapping, dict(next_occ)):
-                    results.append((head + b_str + t_str, {dkey: idx, **b_choices, **t_choices}))
-        return results
-    first, consumed = di._take_arg_index(after)
-    second, width = di._take_arg_index(after[consumed + 1 :])
-    tail = after[consumed + 1 + width :]
-    paired, fallback = di.split_top_level(inner, "|")
-    key_base = ("diff", (map_index(first), map_index(second)), 2)
-    occ = occ_counter.get(key_base, 0)
-    next_occ = {**occ_counter, key_base: occ + 1}
-    dkey = (*key_base, occ)
-    results = []
-    for idx, prepared in enumerate((di._substitute_diff_dollars(paired, first, second), fallback)):
-        for b_str, b_choices in _parse_directives(prepared, substitutions, mapping, dict(next_occ)):
-            for t_str, t_choices in _parse_directives(tail, substitutions, mapping, dict(next_occ)):
-                results.append((head + b_str + t_str, {dkey: idx, **b_choices, **t_choices}))
-    return results
-
-
-def _render_with_choices(template: str, substitutions: dict[str, str], choices: dict,
-                         mapping: list[int] | None = None, occ_counter: dict | None = None) -> str:
-    """Render a Chinese summary template using recorded branch choices from _parse_directives."""
-    if mapping is None:
-        mapping = list(range(16))
-    if occ_counter is None:
-        occ_counter = {}
-
-    def map_index(index: int) -> int:
-        return mapping[index] if index < len(mapping) else index
-
-    def literal(text: str) -> str:
-        def renumber(placeholder: re.Match) -> str:
-            if placeholder.group(0) == "%%":
-                return "%%"
-            return f"%{placeholder.group(1)}{map_index(int(placeholder.group(2)))}"
-        return di.ARGUMENT_RE.sub(renumber, text)
-
-    match = di.STRUCTURAL_RE.search(template)
-    enum_match = di.ENUM_SELECT_RE.search(template)
-    if enum_match and (not match or enum_match.start() < match.start()):
-        open_brace = enum_match.end() - 1
-        close_brace = di.find_matching_brace(template, open_brace)
-        inner = template[open_brace + 1 : close_brace]
-        after = template[close_brace + 1 :]
-        index, consumed = di._take_arg_index(after)
-        tail = after[consumed:]
-        head = literal(template[: enum_match.start()])
-        tags = di.split_top_level(inner, "|")
-        key_base = ("enum_select", map_index(index), len(tags))
-        occ = occ_counter.get(key_base, 0)
-        next_occ = {**occ_counter, key_base: occ + 1}
-        tag = tags[choices[(*key_base, occ)]]
-        open_tag = tag.find("{")
-        body = (tag[open_tag + 1 : -1] if open_tag >= 0 and tag.endswith("}")
-                else (tag[open_tag + 1 :] if open_tag >= 0 else ""))
-        return (head
-                + _render_with_choices(body, substitutions, choices, mapping, dict(next_occ))
-                + _render_with_choices(tail, substitutions, choices, mapping, dict(next_occ)))
-    if not match:
-        return literal(template)
-    kind = match.group(1)
-    open_brace = match.end() - 1
-    close_brace = di.find_matching_brace(template, open_brace)
-    inner = template[open_brace + 1 : close_brace]
-    after = template[close_brace + 1 :]
-    head = literal(template[: match.start()])
-    if kind == "sub":
-        index, consumed = di._take_arg_index(after)
-        indexes = [index]
-        while after[consumed : consumed + 1] == ",":
-            index, width = di._take_arg_index(after[consumed + 1 :])
-            indexes.append(index)
-            consumed += 1 + width
-        name_match = re.match(r"([A-Za-z_][A-Za-z0-9_]*)", inner)
-        body = substitutions.get(name_match.group(1)) if name_match else None
-        if body is None:
-            raise ValueError(f"Unknown %sub{{{inner}}}")
-        inner_mapping = [map_index(i) for i in indexes]
-        tail = after[consumed:]
-        return (head
-                + _render_with_choices(body, substitutions, choices, inner_mapping, dict(occ_counter))
-                + _render_with_choices(tail, substitutions, choices, mapping, dict(occ_counter)))
-    if kind in {"select", "plural"}:
-        index, consumed = di._take_arg_index(after)
-        tail = after[consumed:]
-        items = di.split_top_level(inner, "|")
-        key_base = (kind, map_index(index), len(items))
-        occ = occ_counter.get(key_base, 0)
-        next_occ = {**occ_counter, key_base: occ + 1}
-        picked = items[choices[(*key_base, occ)]]
-        part = picked if kind == "select" else picked.partition(":")[2]
-        return (head
-                + _render_with_choices(part, substitutions, choices, mapping, dict(next_occ))
-                + _render_with_choices(tail, substitutions, choices, mapping, dict(next_occ)))
-    first, consumed = di._take_arg_index(after)
-    second, width = di._take_arg_index(after[consumed + 1 :])
-    tail = after[consumed + 1 + width :]
-    paired, fallback = di.split_top_level(inner, "|")
-    key_base = ("diff", (map_index(first), map_index(second)), 2)
-    occ = occ_counter.get(key_base, 0)
-    next_occ = {**occ_counter, key_base: occ + 1}
-    prepared = (di._substitute_diff_dollars(paired, first, second), fallback)[choices[(*key_base, occ)]]
-    return (head
-            + _render_with_choices(prepared, substitutions, choices, mapping, dict(next_occ))
-            + _render_with_choices(tail, substitutions, choices, mapping, dict(next_occ)))
-
-
 def expand_summaries(clang_section: dict) -> dict[str, dict[str, str]]:
     """Expand multi-variant summary translations from translations/toolchain/zh_CN.json."""
     subs = clang_section.get("substitutions", {})
@@ -283,8 +60,8 @@ def expand_summaries(clang_section: dict) -> dict[str, dict[str, str]]:
             expanded[summary] = target
             continue
         pairs: dict[str, str] = {}
-        for raw_en, choices in _parse_directives(summary, en_subs):
-            raw_zh = _render_with_choices(target, zh_subs, choices)
+        for raw_en, choices in di.expand_template(summary, en_subs, track_choices=True):
+            [(raw_zh, _)] = di.expand_template(target, zh_subs, selected=choices)
             zh_text = strip_simple_modifiers(raw_zh)
             for en_variant in expand_plural_suffixes(strip_simple_modifiers(raw_en)):
                 pairs.setdefault(en_variant, zh_text)
@@ -297,14 +74,12 @@ def _default_clang_context(record: dict) -> str:
             "note" if record["severity"] == "note" else "diagnostic")
 
 
-def build_clang(clang_section: dict, obsolete: set[str]) -> list[dict]:
-    inventory = json.loads(CLANG_INVENTORY.read_text(encoding="utf-8"))
+def build_clang(clang_section: dict, obsolete: set[str], inventory: dict) -> list[dict]:
     index = variant_index(inventory)
     by_id = {record["id"]: record for record in inventory["diagnostics"]}
     map_entries = clang_section.get("diagnostic", {})
     summaries = expand_summaries(clang_section)
     overrides = clang_section.get("overrides", {})
-    reuse = clangd_candidates(obsolete)
     out: dict[tuple[str, str], dict] = {}
 
     def add(msgid: str, msgstr: str, record: dict, context: str, priority: bool) -> None:
@@ -379,31 +154,17 @@ def build_clang(clang_section: dict, obsolete: set[str]) -> list[dict]:
             for record in matching:
                 add(msgid, msgstr, record, context, True)
 
-    lower_map = {msgid.lower() for _, msgid in out}
-    for msgid, source in reuse.items():
-        if msgid in obsolete or msgid.lower() in lower_map:
-            continue
-        # The clangd catalog may spell some arguments as named placeholders
-        # (for example `{statement}`) while the compiler template uses `%N`.
-        # Both are valid matcher templates for identical rendered text, so the
-        # reviewed entry is reused verbatim instead of re-authored.
-        options = tuple(variant for variant in (msgid, msgid[:1].lower() + msgid[1:]) if variant in index)
-        for variant in options:
-            for record in index[variant]:
-                add(variant, source["msgstr"], record, _default_clang_context(record), False)
     return sorted(out.values(), key=lambda item: (item["msgctxt"], item["msgid"]))
 
 
-def build_clangd(mapping: dict, clang_entries: list[dict], existing_clangd: list[dict]) -> list[dict]:
+def build_clangd(mapping: dict, clang_entries: list[dict], source: dict) -> list[dict]:
     clangd_section = mapping.get("clangd", {})
     obsolete = set(clangd_section.get("obsolete", []))
     overrides = clangd_section.get("overrides", {})
     map_entries = mapping.get("clang", {}).get("diagnostic", {})
-    source = json.loads(CLANGD_INVENTORY.read_text(encoding="utf-8"))
     by_id = {item["id"]: item for item in source["diagnostics"]}
     clang_lookup = {(row["msgctxt"], row["msgid"]): row["msgstr"]
                     for row in clang_entries if row["msgctxt"] in {"diagnostic", "note", "template_arity"}}
-    existing_lookup = {(row.get("msgctxt", ""), row["msgid"]): row["msgstr"] for row in existing_clangd}
     out: dict[tuple[str, str], dict] = {}
 
     def add(context: str, msgid: str, msgstr: str, reference: str, priority: bool) -> None:
@@ -451,16 +212,13 @@ def build_clangd(mapping: dict, clang_entries: list[dict], existing_clangd: list
                 add(cd_ctx, original, clang_lookup[(c_ctx, variant)], reference, False)
             elif c_ctx == "diagnostic" and ("template_arity", variant) in clang_lookup:
                 add(cd_ctx, original, clang_lookup[("template_arity", variant)], reference, False)
-            elif (cd_ctx, original) in existing_lookup:
-                add(cd_ctx, original, existing_lookup[(cd_ctx, original)], reference, False)
             else:
                 raise SystemExit(f"clangd: missing translation for {(cd_ctx, original)!r}")
 
     return sorted(out.values(), key=lambda item: (item["msgctxt"], item["msgid"]))
 
 
-def build_frontend(map_entries: dict) -> list[dict]:
-    source = json.loads(CLANG_INVENTORY.read_text(encoding="utf-8"))
+def build_frontend(map_entries: dict, source: dict) -> list[dict]:
     inventory = {item["id"]: item for item in source["frontend_messages"]}
     out = []
     for name, msgstr in map_entries.items():
@@ -470,26 +228,25 @@ def build_frontend(map_entries: dict) -> list[dict]:
     return out
 
 
-def build_tidy(map_checks: dict) -> list[dict]:
-    inventory = json.loads(TIDY_INVENTORY.read_text(encoding="utf-8"))
+def build_tidy(map_checks: dict, inventory: dict, clang: dict) -> list[dict]:
     index: dict[tuple[str, str, bool], tuple[dict, dict]] = {}
     checks = [*inventory["checks"], *inventory["analyzer_checkers"]]
     for check in checks:
         for message in check["messages"]:
             index[(check["name"], message["message"], message["note"])] = (check, message)
     out: dict[tuple[str, str], dict] = {}
+    names = {check["name"] for check in checks}
     for check_name, entries in map_checks.items():
         if check_name == "fix_note":
             return_path = "clang/include/clang/Basic/DiagnosticFrontendKinds.td"
-            source = json.loads(CLANG_INVENTORY.read_text(encoding="utf-8"))
-            note = next(row for row in source["diagnostics"] if row["id"] == "note_fixit_applied")
+            note = next(row for row in clang["diagnostics"] if row["id"] == "note_fixit_applied")
             for msgid, info in entries.items():
                 if msgid != note["summary"]:
                     raise SystemExit(f"clang-tidy: unexpected fix application note: {msgid!r}")
                 out[(check_name, msgid)] = entry(check_name, msgid, info["msgstr"],
                                                  [f"{return_path}:{note['line']}"], True)
             continue
-        if check_name not in {check["name"] for check in checks}:
+        if check_name not in names:
             raise SystemExit(f"clang-tidy: unknown check {check_name!r}")
         for msgid, info in entries.items():
             source_message = info.get("source_variant", msgid)
@@ -540,58 +297,140 @@ def render_entries(entries: list[dict]) -> str:
     return "\n".join(lines)
 
 
-def refresh(existing: list[dict], generated: list[dict], obsolete: set[str] | None = None) -> list[dict]:
-    """Keep every existing entry; add missing ones; map values win."""
-    blocked = obsolete or set()
-    moved = {item["msgid"] for item in generated
-             if item["msgctxt"] in {"driver", "note", "err_expected_after", "template_arity"}}
-    result = [dict(item) for item in existing
-              if item["msgid"] not in blocked
-              and (item.get("msgctxt") != "diagnostic" or item["msgid"] not in moved)]
-    for item in result:
-        item["references"] = [re.sub(r":([0-9]+):\1$", r":\1", source)
-                              for source in item.get("references", [])]
-    keys = {(item.get("msgctxt", ""), item["msgid"]): index for index, item in enumerate(result)}
-    for item in generated:
-        key = (item["msgctxt"], item["msgid"])
-        if key in keys:
-            current = result[keys[key]]
-            if item.get("priority"):
-                current["msgstr"] = item["msgstr"]
-            current["references"] = sorted(set(current.get("references", [])) | set(item["references"]))
-        else:
-            keys[key] = len(result)
-            result.append(dict(item))
-    return sorted(result, key=lambda item: (item.get("msgctxt", ""), item["msgid"]))
+def merge_reviewed(domain: str, generated: list[dict], reviewed: list[dict]) -> list[dict]:
+    rows = {(row["msgctxt"], row["msgid"]): row for row in generated}
+    seen = set()
+    for row in reviewed:
+        key = row["context"], row["msgid"]
+        if key in seen:
+            raise ValueError(f"{domain}: duplicate reviewed entry {key!r}")
+        seen.add(key)
+        previous = rows.get(key)
+        text = row.get("msgstr")
+        references = row.get("references", [])
+        if previous is None:
+            if not text:
+                raise ValueError(f"{domain}: reviewed references without an entry for {key!r}")
+            rows[key] = entry(*key, text, references)
+            continue
+        if text is not None:
+            previous["msgstr"] = text
+        if references:
+            previous["references"] = sorted(set(previous["references"]) | set(references))
+    return [rows[key] for key in sorted(rows)]
+
+
+def generate(inventory_path: Path, mapping_path: Path = MAP) -> dict[str, list[dict]]:
+    mapping = json.loads(mapping_path.read_text(encoding="utf-8"))
+    clang_section = mapping["clang"]
+    obsolete = set(mapping["clangd"].get("obsolete", []))
+    inventory = inventory_rows(inventory_path, "clang")
+    clang = build_clang(clang_section, obsolete, inventory)
+    clang.extend(build_frontend(clang_section.get("frontend", {}), inventory))
+    generated = {"clang": clang,
+                 "clangd": build_clangd(mapping, clang, inventory_rows(inventory_path, "clangd")),
+                 "clang-tidy": build_tidy(mapping["clang-tidy"], inventory_rows(inventory_path, "clang-tidy"), inventory)}
+    return {domain: merge_reviewed(domain, rows, mapping["reviewed"][domain]) for domain, rows in generated.items()}
+
+
+def verify_po(path: Path, rendered: str) -> None:
+    if not path.is_file() or path.read_bytes() != rendered.encode("utf-8"):
+        raise ct.CatalogError(f"{path} is stale; run tools/toolchain_catalog.py sync")
+
+
+def inventory_path(directory: Path, domain: str) -> Path:
+    return directory / f"{domain}-coverage.json"
+
+
+def inventory_rows(directory: Path, domain: str) -> dict:
+    return json.loads(inventory_path(directory, domain).read_text(encoding="utf-8"))
+
+
+def semantic_snapshot(root: Path) -> tuple[dict, dict]:
+    if not root.is_dir():
+        raise ValueError(f"{root}: checkout directory is missing")
+    messages, translations = {}, {}
+    for domain in ("clang", "clangd", "clang-tidy"):
+        inventory = inventory_path(root / "manifests", domain)
+        source = inventory_rows(inventory.parent, domain) if inventory.is_file() else {}
+        references = {}
+        for record in source.get("diagnostics", []) + source.get("frontend_messages", []):
+            key = domain, record["id"]
+            messages[key] = sorted(record["variants"])
+            reference = f"{record['source']}:{record['line']}"
+            references.setdefault(reference, set()).add(record["id"])
+        for check in source.get("checks", []) + source.get("analyzer_checkers", []):
+            messages[domain, check["name"]] = sorted(set(
+                row["message"] for row in check.get("messages", [])
+            ))
+        po = root / "translations/po/zh_CN" / f"{domain}.po"
+        if not po.is_file():
+            continue
+        entries, _ = ct.parse_po(po)
+        for row in entries:
+            context = row.get("msgctxt", "")
+            ids = set().union(*(references.get(ref, set()) for ref in row["references"]))
+            if domain == "clang-tidy" and (domain, context.removesuffix("/note")) in messages:
+                ids.add(context.removesuffix("/note"))
+            for id in ids or {""}:
+                key = domain, id, context, row["msgid"]
+                translations.setdefault(key, set()).add(row["msgstr"])
+    return messages, translations
+
+
+def semantic_diff(before: Path, after: Path) -> list[dict]:
+    old_messages, old_translations = semantic_snapshot(before)
+    messages, translations = semantic_snapshot(after)
+    rows = []
+    for key in sorted(old_messages.keys() | messages.keys()):
+        old, new = old_messages.get(key), messages.get(key)
+        if old != new:
+            kind = "source_added" if old is None else "source_removed" if new is None else "source_changed"
+            rows.append(dict(domain=key[0], id=key[1], kind=kind, before=old, after=new))
+    for key in sorted(old_translations.keys() | translations.keys()):
+        old, new = sorted(old_translations.get(key, ())), sorted(translations.get(key, ()))
+        if old != new:
+            kind = "translation_ambiguous" if len(new) > 1 else (
+                "translation_added" if not old else "translation_removed" if not new else "translation_changed"
+            )
+            rows.append(dict(domain=key[0], id=key[1], context=key[2], msgid=key[3], kind=kind,
+                             before=old, after=new))
+    return rows
 
 
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=("check", "sync"))
+    parser.add_argument("command", choices=("check", "sync", "diff"))
+    parser.add_argument("--output", type=Path, help="write or check generated PO in this directory")
+    parser.add_argument("--inventory", type=Path, default=CLANG_INVENTORY.parent)
+    parser.add_argument("--before", type=Path, help="checkout containing the previous inventories and PO")
+    parser.add_argument("--after", type=Path, default=ROOT)
     args = parser.parse_args(argv)
-    mapping = json.loads(MAP.read_text(encoding="utf-8"))
-    clang_section = mapping.get("clang", {})
-    obsolete = set(mapping.get("clangd", {}).get("obsolete", []))
-    clang = build_clang(clang_section, obsolete)
-    clang.extend(build_frontend(clang_section.get("frontend", {})))
-    tidy = build_tidy(mapping.get("clang-tidy", {}))
-    existing_clangd = load_po(CLANGD_PO)
-    clangd = build_clangd(mapping, clang, existing_clangd)
-    catalogs = (("clang", CLANG_PO, clang), ("clangd", CLANGD_PO, clangd), ("clang-tidy", TIDY_PO, tidy))
-    if args.command == "sync":
-        for domain, path, entries in catalogs:
-            existing = load_po(path)
-            merged = refresh(existing, entries, obsolete)
-            text = render(domain, merged)
-            ct.atomic_write_text(path, text)
-            print(f"TOOLCHAIN_CATALOG={domain} entries={len(merged)} added={len(merged) - len(existing)}")
-    else:
-        for domain, path, entries in catalogs:
-            if not path.is_file():
-                raise SystemExit(f"missing {path}; run sync")
-            if path.read_text(encoding="utf-8") != render(domain, refresh(load_po(path), entries, obsolete)):
-                raise SystemExit(f"{path} is stale; run sync")
-            print(f"TOOLCHAIN_CATALOG_CHECK={domain} entries={len(load_po(path))}")
+    if args.command == "diff":
+        if not args.before:
+            parser.error("diff requires --before")
+        report = json.dumps(semantic_diff(args.before, args.after), ensure_ascii=False, indent=2) + "\n"
+        if args.output:
+            ct.atomic_write_text(args.output, report)
+        else:
+            print(report, end="")
+        return 0
+    generated = generate(args.inventory)
+    if args.command == "check":
+        ct.builtin_sources(ROOT, optional=True)
+        checked = ct.check(CLANG_PO.parent, ROOT / "translations/glossary/zh_CN.toml")
+        print(f'CATALOG_CHECK=PASS domains={checked["domains"]} entries={checked["entries"]}')
+    elif args.output:
+        args.output.mkdir(parents=True, exist_ok=True)
+    for domain, entries in generated.items():
+        path = (args.output or CLANG_PO.parent) / f"{domain}.po"
+        rendered = render(domain, entries)
+        if args.command == "sync":
+            ct.atomic_write_text(path, rendered)
+            print(f"TOOLCHAIN_CATALOG={domain} entries={len(entries)}")
+        else:
+            verify_po(path, rendered)
+            print(f"TOOLCHAIN_CATALOG_CHECK={domain} entries={len(entries)}")
     return 0
 
 

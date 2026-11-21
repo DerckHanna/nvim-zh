@@ -37,8 +37,10 @@ local passed, failure = xpcall(function()
   zh.setup({ modules = { core = { apply_language = false } } })
   -- The coordinator must preserve the backend failure rather than claim opt-out succeeded.
   assert(zh.status().runtime.status == 'error', vim.inspect(zh.status().runtime))
-  assert(native.info().status == 'restore_failed' and native.info().active,
-    'restore failure discarded retryable ownership')
+  local state = native.info()
+  assert(state.status == 'restore_failed' and state.language_owned and not state.binding_owned and not state.active,
+    'partial native restore did not report actual binding and language ownership')
+  assert(zh.status().config.modules.core.apply_language, 'restore failure committed native opt-out')
   assert(#attempts == 2 and attempts[1].path == isolated and attempts[2].path == nil)
   assert(vim.env.LOCPATH == isolated, 'failed restore leaked temporary environment')
   vim.cmd = original_command

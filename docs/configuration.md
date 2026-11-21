@@ -74,20 +74,20 @@ require('nvim-zh').setup({
 
 `enabled` 是总开关。`virtual_text`、`virtual_lines` 和 `float` 分别控制行尾、虚拟行和浮窗。Neovim 已启用的诊断显示会使用中文译文。浮窗也会翻译已收录的相关位置说明。
 
-`lists` 控制 `vim.diagnostic.setqflist()` 和 `vim.diagnostic.setloclist()` 生成的诊断列表。插件先调用用户 formatter，再翻译显示文字。用户 formatter 返回 `nil` 时仍隐藏对应诊断，其异常继续传播。`vim.diagnostic.get()` 仍返回完整原文，可用诊断代码和 `user_data.lsp` 查找上游说明。
+`lists` 控制 `vim.diagnostic.setqflist()` 和 `vim.diagnostic.setloclist()` 生成的诊断列表。Neovim 使用用户 formatter 的原返回值建立列表。中文在渲染阶段生成。重复项无法关联来源、已有列表 formatter 或自定义文案时沿用现有显示。用户 formatter 返回 `nil` 时仍隐藏对应诊断，其异常继续传播。`vim.diagnostic.get()` 仍返回完整原文，可用诊断代码和 `user_data.lsp` 查找上游说明。
 
 ### `modules.compiler`
 
 `enabled` 控制编译器和独立检查工具的列表显示，`quickfix` 对应 `:make`，`loclist` 对应 `:lmake`。匹配使用 Neovim 已解析的条目。应用优先保留用户的 `quickfixtextfunc`。`:NvimZhRaw` 显示选中项的原文和可取得的工具代码。
 
-Clang 与 clang-tidy 按命令、工具版本、二进制 SHA-256 和显示接口选择独立汉化包。间接构建、无法确认的来源和自定义诊断格式回退原文。已验证的命令和选项见[工作流指南](workflows.md)。
+Clang 与 clang-tidy 按命令、工具版本、二进制 SHA-256 和显示接口选择独立汉化包。首次工具取证和词库准备期间显示原文，证据仍匹配原列表时刷新显示。间接构建、无法确认的来源和自定义诊断格式回退原文。已验证的命令和选项见[工作流指南](workflows.md)。
 
 编译器状态的 `last.results` 按列表条目记录结果。`unverified_location` 表示 Clang 输出的源码片段无法与解析得到的文件和行对应。`project_text` 表示保留了项目生成的诊断正文。`:NvimZhRaw` 可读取当前条目的原文、识别出的工具及代码。
 
 ### `modules.lsp`
 
-- `messages`：适配 clangd 的 `window/showMessage` 和 `window/showMessageRequest` 显示字段。
-- `progress` 启用工作进度译文，并适配通过 `vim.lsp.handlers` 注册的 `textDocument/clangd.fileStatus`。
+- `messages` 适配已验证的 Neovim 内置 clangd 通知和请求选择器。
+- `progress` 启用面板里的工作进度和文件状态译文。LspProgress、client.progress 及自定义 fileStatus handler 继续收到上游数据。
 - `hints` 启用悬浮说明、重载签名标题、原生补全的头文件与重载说明，以及代码操作标题。代码操作菜单使用 `modules.ui.prompts` 的选择器适配。
 
 原生补全保留标识符、插入文本和编辑范围。语言服务器协议记录及 `window/logMessage` 仍使用英文。当前词库离线运行，遇到目录未收录的诊断和提示时显示原文。

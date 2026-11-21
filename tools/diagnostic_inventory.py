@@ -1,35 +1,16 @@
 #!/usr/bin/env python3
-"""Inventory clangd-reachable Clang diagnostics from the pinned llvm-project.
-
-Reads manifests/upstreams.json for the pinned llvm-project revision, verifies
-the pinned sparse checkout read-only, extracts every Clang TableGen diagnostic
-record reachable through clangd via llvm-tblgen, and emits
-manifests/clangd-coverage.json.
-
-For every reachable diagnostic the manifest records: upstream version/commit,
-source location, diagnostic ID, component, severity class, raw TableGen format
-string, canonical engine templates (%select/%diff/%plural/%sub expanded), the
--W warning group option names, and translation status fields the catalog
-pipeline fills in.
-
-Usage:
-    python3 tools/diagnostic_inventory.py coverage  # build manifests/clangd-coverage.json
-    python3 tools/diagnostic_inventory.py stats     # compare coverage with the PO catalog
-"""
+"""Clang TableGen definitions, format expansion, and clangd inventory assembly."""
 
 from __future__ import annotations
 
-import argparse
 import json
+import os
 import re
 import subprocess
-import sys
 from collections import Counter
+from dataclasses import dataclass
+from functools import lru_cache
 from pathlib import Path
-
-ROOT = Path(__file__).resolve().parent.parent
-MANIFEST = ROOT / "manifests/upstreams.json"
-COVERAGE = ROOT / "manifests/clangd-coverage.json"
 
 # Components whose diagnostics clangd can emit. clangd parses, lexes, and
 # sema-checks in-process and never writes PCH files; Driver/Frontend/InstallAPI
@@ -62,18 +43,8 @@ class InventoryError(Exception):
 
 
 def run(argv: list[str], timeout: int = 300) -> subprocess.CompletedProcess:
-    return subprocess.run(argv, capture_output=True, text=True, check=False, timeout=timeout)
-
-
-def load_upstream() -> dict:
-    data = json.loads(MANIFEST.read_text(encoding="utf-8"))
-    upstream = data["upstreams"]["clangd"]
-    return {
-        "repository": upstream["repository"],
-        "version": upstream["version"],
-        "commit": upstream["commit"],
-        "cache": ROOT / ".llvm-upstream/llvm-project",
-    }
+    return subprocess.run(argv, capture_output=True, text=True, check=False, timeout=timeout,
+                          env={**os.environ, "GIT_NO_LAZY_FETCH": "1"})
 
 
 def verify_checkout(cache: Path, commit: str) -> None:
@@ -83,7 +54,7 @@ def verify_checkout(cache: Path, commit: str) -> None:
     if probe.returncode != 0 or probe.stdout.strip() != "commit":
         raise InventoryError(f"{cache}: pinned commit {commit} not present")
     head = run(["git", "-C", str(cache), "rev-parse", "HEAD"])
-    if head.returncode == 0 and head.stdout.strip() != commit:
+    if head.returncode != 0 or head.stdout.strip() != commit:
         raise InventoryError(f"{cache}: HEAD {head.stdout.strip()} is not pinned {commit}")
 
 
@@ -95,8 +66,8 @@ def _find_tblgen() -> str:
     return found
 
 
-def tblgen_records(cache: Path) -> dict:
-    result = run([_find_tblgen(), str(cache / TBLGEN_TARGET), "-I", str(cache / TBLGEN_INCLUDE),
+def tblgen_records(cache: Path, tblgen: str | None = None) -> dict:
+    result = run([tblgen or _find_tblgen(), str(cache / TBLGEN_TARGET), "-I", str(cache / TBLGEN_INCLUDE),
                   "--dump-json"], timeout=600)
     if result.returncode != 0:
         raise InventoryError(f"llvm-tblgen failed: {result.stderr.strip()[:400]}")
@@ -171,99 +142,114 @@ def _substitute_diff_dollars(text: str, first: int, second: int) -> str:
     return text
 
 
-def normalize_template(template: str, substitutions: dict[str, str],
-                       mapping: list[int] | None = None) -> list[str]:
-    """Return canonical templates for one raw TableGen format string.
+@dataclass(frozen=True)
+class Directive:
+    before: str
+    kind: str
+    indexes: tuple[int, ...]
+    branches: tuple[str, ...]
+    tail: str
 
-    Implements the runtime semantics of clang/lib/Basic/Diagnostic.cpp
-    (FormatDiagnostic) and the -w documentation renumbering of
-    clang/utils/TableGen/ClangDiagnosticsEmitter.cpp (getSubstitutionMappings:
-    a substitution body indexes the %sub argument list, mapped through the
-    enclosing substitution context).
-    """
-    if mapping is None:
-        mapping = list(range(16))
 
-    def map_index(index: int) -> int:
-        return mapping[index] if index < len(mapping) else index
-
-    def literal(text: str) -> str:
-        def renumber(placeholder: re.Match) -> str:
-            if placeholder.group(0) == "%%":
-                return "%%"
-            return f"%{placeholder.group(1)}{map_index(int(placeholder.group(2)))}"
-        return ARGUMENT_RE.sub(renumber, text)
-
-    def join(head: str, branches: list[str], tail: str) -> list[str]:
-        suffixes = normalize_template(tail, substitutions, mapping)
-        return [head + branch + suffix for branch in branches for suffix in suffixes]
-
+@lru_cache(maxsize=16384)
+def split_directive(template: str) -> Directive | None:
     match = STRUCTURAL_RE.search(template)
-    enum_match = ENUM_SELECT_RE.search(template)
-    if enum_match and (not match or enum_match.start() < match.start()):
-        open_brace = enum_match.end() - 1
-        close_brace = find_matching_brace(template, open_brace)
-        inner = template[open_brace + 1 : close_brace]
-        after = template[close_brace + 1 :]
-        index, consumed = _take_arg_index(after)
-        tail = after[consumed:]
-        head = literal(template[: enum_match.start()])
-        results = []
-        for tag in split_top_level(inner, "|"):
-            open_tag = tag.find("{")
-            body = tag[open_tag + 1 : -1] if open_tag >= 0 and tag.endswith("}") else (tag[open_tag + 1 :] if open_tag >= 0 else "")
-            results.extend(normalize_template(body, substitutions, mapping))
-        return join(head, results, tail)
-    if not match:
-        return [literal(template)]
-
-    kind = match.group(1)
-    open_brace = match.end() - 1
-    close_brace = find_matching_brace(template, open_brace)
-    inner = template[open_brace + 1 : close_brace]
-    after = template[close_brace + 1 :]
-    head = literal(template[: match.start()])
+    enum = ENUM_SELECT_RE.search(template)
+    if enum and (not match or enum.start() < match.start()):
+        match = enum
+        kind = "enum_select"
+    elif match:
+        kind = match.group(1)
+    else:
+        return None
+    end = find_matching_brace(template, match.end() - 1)
+    inner = template[match.end():end]
+    after = template[end + 1:]
+    index, consumed = _take_arg_index(after)
+    indexes = [index]
     if kind == "sub":
-        index, consumed = _take_arg_index(after)
-        indexes = [index]
-        while after[consumed : consumed + 1] == ",":
-            index, width = _take_arg_index(after[consumed + 1 :])
+        while after[consumed:consumed + 1] == ",":
+            index, width = _take_arg_index(after[consumed + 1:])
             indexes.append(index)
             consumed += 1 + width
-        name_match = re.match(r"([A-Za-z_][A-Za-z0-9_]*)", inner)
-        body = substitutions.get(name_match.group(1)) if name_match else None
-        if body is None:
-            return [template]
-        inner_mapping = [map_index(i) for i in indexes]
-        tail = after[consumed:]
-        return join(head, normalize_template(body, substitutions, inner_mapping), tail)
-    if kind == "select":
-        index, consumed = _take_arg_index(after)
-        tail = after[consumed:]
-        results = []
-        for alternative in split_top_level(inner, "|"):
-            results.extend(normalize_template(alternative, substitutions, mapping))
-        return join(head, results, tail)
-    if kind == "plural":
-        index, consumed = _take_arg_index(after)
-        tail = after[consumed:]
-        results = []
-        for clause in split_top_level(inner, "|"):
-            results.extend(normalize_template(clause.partition(":")[2], substitutions, mapping))
-        return join(head, results, tail)
-    # diff: %diff{paired|fallback}N,M — the paired shape renders the first
-    # argument at the first $ and the second at the second $; the fallback
-    # shape omits both arguments.
-    first, consumed = _take_arg_index(after)
-    if after[consumed : consumed + 1] != ",":
-        raise InventoryError(f"%diff without second index: {template[:60]!r}")
-    second, width = _take_arg_index(after[consumed + 1 :])
-    tail = after[consumed + 1 + width :]
-    paired, fallback = split_top_level(inner, "|")
-    results = []
-    for prepared in (_substitute_diff_dollars(paired, first, second), fallback):
-        results.extend(normalize_template(prepared, substitutions, mapping))
-    return join(head, results, tail)
+        name = re.match(r"([A-Za-z_][A-Za-z0-9_]*)", inner)
+        branches = [name.group(1) if name else inner]
+    else:
+        branches = split_top_level(inner, "|")
+        if kind == "enum_select":
+            bodies = []
+            for tag in branches:
+                start = tag.find("{")
+                bodies.append(tag[start + 1:].removesuffix("}") if start >= 0 else "")
+            branches = bodies
+        elif kind == "plural":
+            branches = [clause.partition(":")[2] for clause in branches]
+        elif kind == "diff":
+            if after[consumed:consumed + 1] != ",":
+                raise InventoryError(f"%diff without second index: {template[:60]!r}")
+            second, width = _take_arg_index(after[consumed + 1:])
+            indexes.append(second)
+            consumed += 1 + width
+            paired, fallback = branches
+            branches = [_substitute_diff_dollars(paired, index, second), fallback]
+    return Directive(template[:match.start()], kind, tuple(indexes), tuple(branches), after[consumed:])
+
+
+def expand_template(template: str, substitutions: dict[str, str], *,
+                    track_choices: bool = False, selected: dict | None = None,
+                    mapping: tuple[int, ...] = ()) -> list[tuple[str, dict]]:
+    """Expand a format or follow the branch choices of its source-language format."""
+    use_choices = track_choices or selected is not None
+
+    def walk(text: str, arguments: tuple[int, ...], occurrences: dict) -> list[tuple[str, dict]]:
+        def mapped(index: int) -> int:
+            return arguments[index] if index < len(arguments) else index
+
+        def renumber(match: re.Match) -> str:
+            if match.group(0) == "%%":
+                return "%%"
+            return f"%{match.group(1)}{mapped(int(match.group(2)))}"
+
+        directive = split_directive(text)
+        if not directive:
+            return [(ARGUMENT_RE.sub(renumber, text), {})]
+        head = ARGUMENT_RE.sub(renumber, directive.before)
+        body_args = arguments
+        bodies = directive.branches
+        if directive.kind == "sub":
+            body = substitutions.get(bodies[0])
+            if body is None:
+                if selected is not None:
+                    raise InventoryError(f"Unknown TableGen substitution {bodies[0]!r}")
+                return [(text, {})]
+            bodies = (body,)
+            body_args = tuple(mapped(index) for index in directive.indexes)
+
+        key = None
+        if use_choices and directive.kind != "sub":
+            indexes = tuple(mapped(index) for index in directive.indexes)
+            identity = indexes if directive.kind == "diff" else indexes[0]
+            base = (directive.kind, identity, len(bodies))
+            occurrence = occurrences.get(base, 0)
+            key = (*base, occurrence)
+            occurrences = {**occurrences, base: occurrence + 1}
+        indexes = (selected[key],) if selected is not None and key is not None else range(len(bodies))
+        suffixes = walk(directive.tail, arguments, occurrences)
+        result = []
+        for index in indexes:
+            part_choice = {key: index} if track_choices and key is not None else {}
+            for body, choices in walk(bodies[index], body_args, occurrences):
+                for suffix, suffix_choices in suffixes:
+                    recorded = {**part_choice, **choices, **suffix_choices} if track_choices else {}
+                    result.append((head + body + suffix, recorded))
+        return result
+
+    return walk(template, mapping, {})
+
+
+def normalize_template(template: str, substitutions: dict[str, str],
+                       mapping: list[int] | None = None) -> list[str]:
+    return [text for text, _ in expand_template(template, substitutions, mapping=tuple(mapping or ()))]
 
 
 def strip_simple_modifiers(text: str) -> str:
@@ -425,42 +411,3 @@ def build_coverage(upstream: dict, defs: dict) -> dict:
         },
         "diagnostics": records,
     }
-
-
-def write_coverage(coverage: dict) -> None:
-    import os
-    temporary = COVERAGE.with_suffix(".json.tmp")
-    temporary.write_text(json.dumps(coverage, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
-    os.replace(temporary, COVERAGE)
-
-
-def cmd_coverage(upstream: dict, defs: dict) -> int:
-    coverage = build_coverage(upstream, defs)
-    write_coverage(coverage)
-    counts = coverage["counts"]
-    print(f"COVERAGE_WRITE=PASS diagnostics={counts['diagnostics']} variants={counts['variants']} "
-          f"capped={counts['diagnostics_with_capped_variants']} "
-          f"multi_digit={counts['diagnostics_outside_digit_arguments']} file={COVERAGE}")
-    return 0
-
-
-def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=("coverage", "stats"))
-    parser.add_argument("--source-root", type=Path, help="pinned llvm-project checkout")
-    args = parser.parse_args(argv)
-    if args.command == "stats":
-        import diagnostic_coverage
-        return diagnostic_coverage.main([])
-    try:
-        upstream = load_upstream()
-        source_root = args.source_root or upstream["cache"]
-        verify_checkout(source_root, upstream["commit"])
-        return cmd_coverage(upstream, tblgen_records(source_root))
-    except InventoryError as exc:
-        print(f"INVENTORY_ERROR={exc}", file=sys.stderr)
-        return 1
-
-
-if __name__ == "__main__":
-    sys.exit(main())

@@ -1,9 +1,8 @@
 local M = {}
 
 local config = { enabled = true, max_entries = 2000 }
-local entries = {}
-local hits = {}
-local tick = 0
+local function queue() return { rows = {}, size = 0 } end
+local entries, hits = queue(), queue()
 local totals = { observed = 0, translated = 0, fallback = 0 }
 local dropped_missing = 0
 local dropped_hits = 0
@@ -20,50 +19,37 @@ local function key_for(domain, context, msgid, dynamic)
   return domain .. '\031' .. (context or '') .. '\031' .. stored, stored
 end
 
-local function table_size(value)
-  local count = 0
-  for _ in pairs(value) do count = count + 1 end
-  return count
+local function remove(list, entry)
+  if not entry then return end
+  local previous, next_entry = entry.previous, entry.next
+  if previous then previous.next = next_entry else list.first = next_entry end
+  if next_entry then next_entry.previous = previous else list.last = previous end
+  list.rows[entry.key] = nil
+  list.size = list.size - 1
 end
 
-local function evict_one()
-  local oldest_key, oldest_tick
-  for key, entry in pairs(entries) do
-    if oldest_tick == nil or entry.last_used < oldest_tick then
-      oldest_key, oldest_tick = key, entry.last_used
-    end
-  end
-  if oldest_key then
-    entries[oldest_key] = nil
-    dropped_missing = dropped_missing + 1
-  end
+local function append(list, entry)
+  if list.last then list.last.next = entry else list.first = entry end
+  entry.previous, entry.next = list.last, nil
+  list.last, list.rows[entry.key] = entry, entry
+  list.size = list.size + 1
 end
 
-local function evict_hit_one()
-  local oldest_key, oldest_tick
-  for key, last_used in pairs(hits) do
-    if oldest_tick == nil or last_used < oldest_tick then
-      oldest_key, oldest_tick = key, last_used
-    end
-  end
-  if oldest_key then
-    hits[oldest_key] = nil
-    dropped_hits = dropped_hits + 1
-  end
+local function evict(list)
+  remove(list, list.first)
+  if list == entries then dropped_missing = dropped_missing + 1 else dropped_hits = dropped_hits + 1 end
 end
 
 function M.configure(value)
   value = value or {}
   config.enabled = value.enabled ~= false
   config.max_entries = value.max_entries or 2000
-  while table_size(entries) > config.max_entries do evict_one() end
-  while table_size(hits) > config.max_entries do evict_hit_one() end
+  while entries.size > config.max_entries do evict(entries) end
+  while hits.size > config.max_entries do evict(hits) end
 end
 
 function M.reset()
-  entries = {}
-  hits = {}
-  tick = 0
+  entries, hits = queue(), queue()
   totals = { observed = 0, translated = 0, fallback = 0 }
   dropped_missing = 0
   dropped_hits = 0
@@ -72,36 +58,29 @@ end
 function M.observe(spec)
   if not config.enabled then return end
   local key, stored = key_for(spec.domain, spec.context or '', spec.msgid, spec.dynamic)
-  tick = tick + 1
+  local counter = spec.translated and 'translated' or 'fallback'
   totals.observed = totals.observed + 1
-  totals[spec.translated and 'translated' or 'fallback'] = totals[spec.translated and 'translated' or 'fallback'] + 1
+  totals[counter] = totals[counter] + 1
   if spec.translated then
-    entries[key] = nil
-    if hits[key] == nil and table_size(hits) >= config.max_entries then evict_hit_one() end
-    hits[key] = tick
+    remove(entries, entries.rows[key])
+    remove(hits, hits.rows[key])
+    if hits.size >= config.max_entries then evict(hits) end
+    append(hits, { key = key })
     return
   end
-  hits[key] = nil
-  local entry = entries[key]
-  if not entry then
-    if table_size(entries) >= config.max_entries then evict_one() end
-    entry = {
-      domain = spec.domain,
-      context = spec.context or '',
-      key = key,
-      msgid = stored,
-      count = 0,
-      dynamic = spec.dynamic or false,
-    }
-    entries[key] = entry
-  end
+  remove(hits, hits.rows[key])
+  local entry = entries.rows[key]
+  remove(entries, entry)
+  if entries.size >= config.max_entries then evict(entries) end
+  entry = entry or { domain = spec.domain, context = spec.context or '', key = key, msgid = stored,
+    count = 0, dynamic = spec.dynamic or false }
   entry.count = entry.count + 1
-  entry.last_used = tick
+  append(entries, entry)
 end
 
 function M.list()
   local rows = {}
-  for _, entry in pairs(entries) do
+  for _, entry in pairs(entries.rows) do
     table.insert(rows, {
       domain = entry.domain,
       context = entry.context,
@@ -119,9 +98,7 @@ function M.list()
 end
 
 function M.stats()
-  local missing_unique, translated_unique = 0, 0
-  for _ in pairs(entries) do missing_unique = missing_unique + 1 end
-  for _ in pairs(hits) do translated_unique = translated_unique + 1 end
+  local missing_unique, translated_unique = entries.size, hits.size
   local unique = missing_unique + translated_unique
   return {
     missing = {

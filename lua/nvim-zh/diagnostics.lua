@@ -2,13 +2,19 @@ local M = {}
 local engine = require('nvim-zh.engine')
 local missing = require('nvim-zh.missing')
 local packs = require('nvim-zh.packs')
+local catalog = require('nvim-zh.catalog')
 local config = { enabled = false }
 local states = { virtual_text = {}, virtual_lines = {} }
 local float_state = {}
+local list_display = require('nvim-zh.list_display')
 local lists = {}
+local list_generation = 0
+local pinned_lists
 local unpack = table.unpack or unpack
 local CONTEXTS = { 'redefinition', 'previous_definition', 'undeclared_identifier', 'unknown_type_name' }
 local runtime = { observed = 0, translated = 0 }
+local match_cache, cache_size, cache_version = {}, 0, nil
+local batch_group
 local raw_codes = {
   pp_hash_error = true, pp_hash_warning = true, pragma_message = true, warn_pragma_message = true,
   apinotes_message = true, note_apinotes_message = true, warn_apinotes_message = true,
@@ -24,7 +30,7 @@ local function is_clangd(diagnostic)
   -- diagnostics as 'clangd-config'.
   if source == 'clangd' or source == 'clang' or source == 'clang-tidy'
     or source == 'clangd-config' then return true end
-  if type(diagnostic.namespace) == 'number' then
+  if source == nil and type(diagnostic.namespace) == 'number' then
     local ok, namespace = pcall(vim.diagnostic.get_namespace, diagnostic.namespace)
     return ok and type(namespace.name) == 'string' and namespace.name:match('^nvim%.lsp%.clangd%.%d') ~= nil
   end
@@ -106,7 +112,7 @@ function M.match_forwarded(text, code, note)
   local body, fixes = text:match('^(.*) %((fixe?s? available)%)$')
   body = body or text
   local cli_body = body:sub(1, 1):lower() .. body:sub(2)
-  local match = require('nvim-zh.compiler').match_message
+  local match = require('nvim-zh.tool_message').match_message
   local level = note and 'note' or nil
   local translated, reason, context, id = match('clang-tidy', cli_body, code, level)
   if reason == 'missing_translation' and cli_body ~= body then
@@ -115,6 +121,54 @@ function M.match_forwarded(text, code, note)
   if reason ~= 'translated' then return text, reason end
   local suffix = fixes and (lookup('diagnostic_suffix', ' (' .. fixes .. ')') or (' (' .. fixes .. ')')) or ''
   return translated .. suffix, reason, context, id
+end
+
+local function match_diagnostic(diagnostic, text, code, note, forwarded)
+  if forwarded then
+    local translated, reason = M.match_forwarded(text, code, note)
+    return reason == 'translated' and translated or nil
+  end
+  local result, context
+  local source = diagnostic.source
+  local first, notes = text:match('^(.-)(\n\n.*)$')
+  if first and notes:match('^\n\n[^\n]*:%d+:%d+[%s:]+') then
+    result, context = translate_sentence(first, code, source)
+    notes = notes:gsub('(\n\n[^\n]-:%d+:%d+[%s:]+)([a-z ]+): ([^\n]+)', function(location, level, note)
+      local translated = translate_sentence(note:sub(1, 1):upper() .. note:sub(2), code, source, true)
+      return location .. (lookup('diagnostic_level', level) or level) .. ': ' .. (translated or note)
+    end)
+    result = (result or first) .. notes
+    if result == text then result = nil end
+  else
+    result, context = translate_sentence(text, code, source, note)
+  end
+  return result, context
+end
+
+local function cached_match(diagnostic, text, code, note, forwarded, id, method)
+  if #text > 8192 then return match_diagnostic(diagnostic, text, code, note, forwarded) end
+  local clangd_revision, tidy_revision = catalog.revision('clangd'), catalog.revision('clang-tidy')
+  local version = clangd_revision .. ':' .. tidy_revision
+  if cache_version ~= version then
+    match_cache, cache_size, cache_version = {}, 0, version
+  end
+  local buf = diagnostic.bufnr or 0
+  local key = table.concat({ id or '', method, tostring(code or ''), diagnostic.source or '',
+    note and 'note' or '', forwarded and 'forwarded' or '', text }, '\031')
+  local bucket = match_cache[buf]
+  if not bucket or cache_size >= 4096 then
+    if cache_size >= 4096 then match_cache, cache_size = {}, 0 end
+    bucket = { size = 0 }
+    match_cache[buf] = bucket
+  end
+  local cached = bucket[key]
+  if not cached then
+    local result, context = match_diagnostic(diagnostic, text, code, note, forwarded)
+    cached = { result, context }
+    bucket[key] = cached
+    bucket.size, cache_size = bucket.size + 1, cache_size + 1
+  end
+  return cached[1], cached[2]
 end
 
 local function translate_diagnostic(diagnostic, text, code, note)
@@ -130,28 +184,14 @@ local function translate_diagnostic(diagnostic, text, code, note)
   local method = remainder and remainder ~= '' and 'textDocument/diagnostic' or 'textDocument/publishDiagnostics'
   if not packs.tool_allows('clangd', client, method) then return text end
   runtime.observed = runtime.observed + 1
-  local result, context
-  local source = diagnostic.source
-  if source == 'clang-tidy' and client and packs.tool_reason('clangd', client, method) == 'verified' then
-    if packs.tool_reason('clang-tidy', client, 'forwarded_diagnostics') ~= 'verified' then return text end
-    local translated, reason = M.match_forwarded(text, code, note)
-    if reason == 'translated' then runtime.translated = runtime.translated + 1 end
-    return translated
-  end
-  local first, notes = text:match('^(.-)(\n\n.*)$')
-  if first and notes:match('^\n\n[^\n]*:%d+:%d+[%s:]+') then
-    result, context = translate_sentence(first, code, source)
-    notes = notes:gsub('(\n\n[^\n]-:%d+:%d+[%s:]+)([a-z ]+): ([^\n]+)', function(location, level, note)
-      local translated = translate_sentence(note:sub(1, 1):upper() .. note:sub(2), code, source, true)
-      return location .. (lookup('diagnostic_level', level) or level) .. ': ' .. (translated or note)
-    end)
-    result = (result or first) .. notes
-    if result == text then result = nil end
-  else
-    result, context = translate_sentence(text, code, source, note)
-  end
+  local forwarded = diagnostic.source == 'clang-tidy' and client and packs.tool_reason('clangd', client, method) == 'verified'
+  if forwarded and (not packs.ensure_tool('clang-tidy', true)
+      or packs.tool_reason('clang-tidy', client, 'forwarded_diagnostics') ~= 'verified') then return text end
+  local result, context = cached_match(diagnostic, text, code, note, forwarded, id, method)
   if result then runtime.translated = runtime.translated + 1 end
-  missing.observe({ domain = 'clangd', context = context or '', msgid = text, dynamic = true, translated = result ~= nil })
+  if not forwarded then
+    missing.observe({ domain = 'clangd', context = context or '', msgid = text, dynamic = true, translated = result ~= nil })
+  end
   return result or text
 end
 
@@ -319,20 +359,97 @@ local function setup_float()
   vim.diagnostic.open_float = wrapper
 end
 
+local function diagnostic_list(win, title)
+  local query = { id = 0, title = 1, changedtick = 1, quickfixtextfunc = 1 }
+  if win then return list_display.get(win, query) end
+  for nr = 1, vim.fn.getqflist({ nr = '$' }).nr do
+    query.nr = nr
+    local list = vim.fn.getqflist(query)
+    if list.title == title then return list end
+  end
+  return { id = 0, changedtick = 0, quickfixtextfunc = '' }
+end
+
+local function list_key(buf, line, col, text)
+  return buf .. ':' .. line .. ':' .. col .. ':' .. text
+end
+
+local function project_list(original, loc, opts, ...)
+  local win = loc and opts.winnr or nil
+  if loc and (win == nil or win == 0) then win = vim.api.nvim_get_current_win() end
+  if win and (type(win) ~= 'number' or not vim.api.nvim_win_is_valid(win)) then return original(opts, ...) end
+  local title = opts.title or 'Diagnostics'
+  local before = diagnostic_list(win, title)
+  if vim.o.quickfixtextfunc ~= '' or (before.id ~= 0 and not list_display.available(win, before, 'diagnostic')) then
+    return original(opts, ...)
+  end
+  local copy = vim.tbl_extend('force', {}, opts)
+  local seen, count = {}, 0
+  copy.format = function(diagnostic)
+    local text
+    if opts.format then text = opts.format(diagnostic) else text = diagnostic.message end
+    if text ~= nil then
+      count = count + 1
+      if type(text) == 'string' then
+        local key = list_key(diagnostic.bufnr, diagnostic.lnum + 1, (diagnostic.col or 0) + 1, text)
+        if seen[key] ~= nil or text ~= diagnostic.message then
+          seen[key] = false
+        else
+          seen[key] = { source = diagnostic.source, namespace = diagnostic.namespace, code = diagnostic.code, bufnr = diagnostic.bufnr }
+        end
+      end
+    end
+    return text
+  end
+  local generation = list_generation
+  original(copy, ...)
+  local after = diagnostic_list(win, title)
+  if generation == list_generation and after.id ~= 0 and after.title == title
+    and (before.id == 0 or before.id == after.id)
+    and after.changedtick == before.changedtick + 1
+    and list_display.available(win, after, 'diagnostic') then
+    local list = list_display.get(win, { id = after.id, items = 1, changedtick = 1 })
+    if #list.items == count and list.changedtick == after.changedtick then
+      list_display.install(win, list, 'diagnostic', function(items)
+        local rows = {}
+        for i, item in ipairs(items) do
+          local diagnostic = seen[list_key(item.bufnr, item.lnum, item.col, item.text)]
+          if diagnostic and is_clangd(diagnostic) then
+            local text = translate_diagnostic(diagnostic, item.text, diagnostic.code)
+            rows[i] = { text = text, code = diagnostic.code, tool = diagnostic.source or 'clangd',
+              reason = text == item.text and 'source' or 'translated' }
+          end
+        end
+        return rows
+      end, function()
+        if config.enabled and config.lists then
+          return list_generation .. ':' .. catalog.revision('clangd') .. ':' .. catalog.revision('clang-tidy')
+        end
+      end)
+    end
+  end
+end
+
 local function setup_lists()
+  if config.enabled and config.lists and pinned_lists == nil then
+    pinned_lists = require('nvim-zh.adapters.evidence').runtime_source('diagnostic.lua',
+      'b5c25c369f9adf553d905f18618995f5c2e1410efd545dff0566d76d4cfe2fc7') or false
+  end
+  list_generation = list_generation + 1
   for _, name in ipairs({ 'setqflist', 'setloclist' }) do
     local state = lists[name]
-    if config.enabled and config.lists and vim.fn.has('nvim-0.12') == 1 then
-      if not state and type(vim.diagnostic[name]) == 'function' then
+    if config.enabled and config.lists and pinned_lists then
+      if not state and type(vim.diagnostic[name]) == 'function'
+        and debug.getinfo(vim.diagnostic[name], 'S').source == pinned_lists then
         local original = vim.diagnostic[name]
-        local wrapper = function(opts, ...)
-          if not config.enabled or not config.lists or (opts ~= nil and type(opts) ~= 'table') then
+        local wrapper
+        wrapper = function(opts, ...)
+          if vim.diagnostic[name] ~= wrapper or not config.enabled or not config.lists
+            or (opts ~= nil and type(opts) ~= 'table')
+            or (opts and opts.format ~= nil and type(opts.format) ~= 'function') then
             return original(opts, ...)
           end
-          local copy = vim.tbl_extend('force', {}, opts or {})
-          if copy.format ~= nil and type(copy.format) ~= 'function' then return original(opts, ...) end
-          copy.format = make_formatter(copy.format, 'lists')
-          return original(copy, ...)
+          return project_list(original, name == 'setloclist', opts or {}, ...)
         end
         lists[name] = { original = original, wrapper = wrapper }
         vim.diagnostic[name] = wrapper
@@ -342,10 +459,26 @@ local function setup_lists()
       lists[name] = nil
     end
   end
+  if config.enabled and config.lists then
+    list_display.refresh('diagnostic')
+  else
+    -- Disabled displays release their own list formatters (foreign ones stay).
+    list_display.clear('diagnostic')
+  end
 end
 
 function M.setup(next_config)
   config = vim.deepcopy(next_config or config)
+  if config.enabled and not batch_group then
+    batch_group = vim.api.nvim_create_augroup('NvimZhDiagnosticBatch', { clear = true })
+    vim.api.nvim_create_autocmd({ 'DiagnosticChanged', 'BufWipeout' }, { group = batch_group, callback = function(event)
+      local bucket = match_cache[event.buf]
+      if bucket then
+        match_cache[event.buf] = nil
+        cache_size = cache_size - bucket.size
+      end
+    end })
+  end
   setup_display('virtual_text', states.virtual_text)
   setup_display('virtual_lines', states.virtual_lines)
   setup_float()
@@ -354,10 +487,24 @@ end
 
 function M.teardown()
   config = { enabled = false }
+  if batch_group then vim.api.nvim_del_augroup_by_id(batch_group); batch_group = nil end
+  match_cache, cache_size = {}, 0
   restore_display('virtual_text', states.virtual_text)
   restore_display('virtual_lines', states.virtual_lines)
   restore_float()
   setup_lists()
+end
+
+function M.refresh_clients(domain)
+  if not config.enabled or (domain ~= 'clangd' and domain ~= 'clang-tidy') then return end
+  for _, client in ipairs(vim.lsp.get_clients({ name = 'clangd' })) do
+    for bufnr in pairs(client.attached_buffers or {}) do
+      if vim.api.nvim_buf_is_loaded(bufnr) then
+        vim.diagnostic.show(vim.lsp.diagnostic.get_namespace(client.id), bufnr)
+        vim.diagnostic.show(vim.lsp.diagnostic.get_namespace(client.id, true), bufnr)
+      end
+    end
+  end
 end
 
 function M.info()

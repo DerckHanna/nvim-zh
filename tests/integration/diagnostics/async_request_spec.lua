@@ -7,7 +7,9 @@ vim.lsp.get_client_by_id = function(id) return { id = id, name = 'clangd' } end
 local order = {}
 vim.ui.select = function(items, opts, callback)
   table.insert(order, 'select')
-  check(items ~= actions and items[1] ~= actions[1], 'request did not isolate display actions')
+  check(items == actions and items[1] == actions[1], 'request copied the protocol actions')
+  equal(opts.prompt, '重启 clangd？: ', 'async request display prompt')
+  equal(opts.format_item(items[1]), '重启', 'async request display action')
   vim.schedule(function()
     table.insert(order, 'callback')
     callback(items[1], 1)

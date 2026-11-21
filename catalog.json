@@ -5,40 +5,6 @@
       "id": "clang",
       "locale": "zh_CN",
       "name": "clang",
-      "sdk": 1,
-      "sha256": "ccaeb17cc1aeda4de077667efd85b0787f8016914be8446f21424a06d096aa59",
-      "size": 9007775,
-      "tool": {
-        "binaries": {
-          "clang": [
-            "ff89ab5fa1c49c203cd4eb4fd61acab7672fd34cd8d33762542c1e1218b4f298"
-          ],
-          "clang++": [
-            "ff89ab5fa1c49c203cd4eb4fd61acab7672fd34cd8d33762542c1e1218b4f298"
-          ]
-        },
-        "executable": "clang",
-        "interfaces": {
-          "compile": "command-line diagnostics printed by clang/clang++",
-          "quickfix": ":make/:lmake text parsed by compiler/nvim-zh-clang.vim"
-        },
-        "name": "Clang 编译器诊断",
-        "protocol": "cli",
-        "versions": {
-          "23.1.5": [
-            "compile",
-            "quickfix"
-          ]
-        }
-      },
-      "url": "https://github.com/DerckHanna/nvim-zh/releases/download/packs-clang-v0.1.0/clang-zh_CN.json",
-      "version": "0.1.0"
-    },
-    {
-      "executable": "clang",
-      "id": "clang",
-      "locale": "zh_CN",
-      "name": "clang",
       "sdk": 2,
       "sha256": "e7ed12a13e603d6f5e7b3fbb603e7103c8d88eef0675974026ea8c7eadfd9e85",
       "size": 5953896,
@@ -69,40 +35,38 @@
       "version": "0.2.0"
     },
     {
-      "executable": "clang-tidy",
-      "id": "clang-tidy",
+      "executable": "clang",
+      "id": "clang",
       "locale": "zh_CN",
-      "name": "clang-tidy",
-      "sdk": 1,
-      "sha256": "91eb1d397675ef805542884ed7e8be50100c5b8201daa4d8bb0541cca29e54f5",
-      "size": 846533,
+      "name": "clang",
+      "sdk": 2,
+      "sha256": "85d890d3ce320b5113053a414aaa263f36f10a22996eb58a1e11fd629049555c",
+      "size": 5953896,
       "tool": {
         "binaries": {
-          "clang-tidy": [
-            "61929b0d85e67b01a50c04015a66144d098636f9419ccfd9a7e1b4b5f407eeaa"
+          "clang": [
+            "ff89ab5fa1c49c203cd4eb4fd61acab7672fd34cd8d33762542c1e1218b4f298"
+          ],
+          "clang++": [
+            "ff89ab5fa1c49c203cd4eb4fd61acab7672fd34cd8d33762542c1e1218b4f298"
           ]
         },
-        "executable": "clang-tidy",
-        "forwarded": {
-          "clangd version 23.1.5 linux x86_64-pc-linux-gnu": [
-            "forwarded_diagnostics"
-          ]
-        },
+        "executable": "clang",
         "interfaces": {
-          "checks": "standalone clang-tidy diagnostics",
-          "quickfix": ":make/:lmake text parsed by compiler/nvim-zh-clang-tidy.vim"
+          "compile": "command-line diagnostics printed by clang/clang++",
+          "quickfix": ":make/:lmake text parsed by compiler/nvim-zh-clang.vim"
         },
-        "name": "clang-tidy 检查",
+        "name": "Clang 编译器诊断",
         "protocol": "cli",
         "versions": {
           "23.1.5": [
-            "checks",
+            "compile",
             "quickfix"
           ]
         }
       },
-      "url": "https://github.com/DerckHanna/nvim-zh/releases/download/packs-clang-tidy-v0.1.0/clang-tidy-zh_CN.json",
-      "version": "0.1.0"
+      "url": "https://github.com/DerckHanna/nvim-zh/releases/download/packs-clang-v0.3.0/clang-zh_CN.json",
+      "version": "0.3.0"
     },
     {
       "executable": "clang-tidy",
@@ -141,66 +105,40 @@
       "version": "0.2.0"
     },
     {
-      "executable": "clangd",
-      "id": "clangd",
+      "executable": "clang-tidy",
+      "id": "clang-tidy",
       "locale": "zh_CN",
-      "name": "clangd",
-      "sdk": 1,
-      "sha256": "cfd5cc74f9d3f6c5dd43a6b786abd9cb19c0ee02264f742523aa299ff9c3e385",
-      "size": 69445,
-      "url": "https://github.com/DerckHanna/nvim-zh/releases/download/packs-clangd-v0.1.0/clangd-zh_CN.json",
-      "version": "0.1.0"
-    },
-    {
-      "executable": "clangd",
-      "id": "clangd",
-      "locale": "zh_CN",
-      "name": "clangd",
-      "sdk": 1,
-      "sha256": "a353e9f31e9975230f473106ca93043d1bf753e19bbcba9c78f5b604fc518dcb",
-      "size": 71106,
+      "name": "clang-tidy",
+      "sdk": 2,
+      "sha256": "5ea1cf84e619d6f5bad201dede09995bef3d6b26181183204037f97f8a9ea636",
+      "size": 503341,
       "tool": {
-        "protocol": "lsp",
-        "server": "clangd",
-        "versions": {
+        "binaries": {
+          "clang-tidy": [
+            "61929b0d85e67b01a50c04015a66144d098636f9419ccfd9a7e1b4b5f407eeaa"
+          ]
+        },
+        "executable": "clang-tidy",
+        "forwarded": {
           "clangd version 23.1.5 linux x86_64-pc-linux-gnu": [
-            "textDocument/publishDiagnostics",
-            "textDocument/codeAction",
-            "textDocument/hover",
-            "textDocument/completion",
-            "textDocument/signatureHelp",
-            "$/progress"
+            "forwarded_diagnostics"
+          ]
+        },
+        "interfaces": {
+          "checks": "standalone clang-tidy diagnostics",
+          "quickfix": ":make/:lmake text parsed by compiler/nvim-zh-clang-tidy.vim"
+        },
+        "name": "clang-tidy 检查",
+        "protocol": "cli",
+        "versions": {
+          "23.1.5": [
+            "checks",
+            "quickfix"
           ]
         }
       },
-      "url": "https://github.com/DerckHanna/nvim-zh/releases/download/packs-clangd-v0.1.1/clangd-zh_CN.json",
-      "version": "0.1.1"
-    },
-    {
-      "executable": "clangd",
-      "id": "clangd",
-      "locale": "zh_CN",
-      "name": "clangd",
-      "sdk": 1,
-      "sha256": "0dd6344f8921bcd37fb8daef01e0b7388206cc345f8585c349f8767eb75ae3ba",
-      "size": 9043685,
-      "tool": {
-        "protocol": "lsp",
-        "server": "clangd",
-        "versions": {
-          "clangd version 23.1.5 linux x86_64-pc-linux-gnu": [
-            "textDocument/publishDiagnostics",
-            "textDocument/codeAction",
-            "textDocument/hover",
-            "textDocument/completion",
-            "textDocument/signatureHelp",
-            "$/progress",
-            "textDocument/clangd.fileStatus"
-          ]
-        }
-      },
-      "url": "https://github.com/DerckHanna/nvim-zh/releases/download/packs-clangd-v0.1.2/clangd-zh_CN.json",
-      "version": "0.1.2"
+      "url": "https://github.com/DerckHanna/nvim-zh/releases/download/packs-clang-tidy-v0.3.0/clang-tidy-zh_CN.json",
+      "version": "0.3.0"
     },
     {
       "executable": "clangd",
@@ -229,6 +167,49 @@
       "version": "0.2.0"
     },
     {
+      "executable": "clangd",
+      "id": "clangd",
+      "locale": "zh_CN",
+      "name": "clangd",
+      "sdk": 2,
+      "sha256": "9e1d0e6ad967b5da2c874377766e6d4137cdd60bd2ea9487a3471256051c4c26",
+      "size": 5884074,
+      "tool": {
+        "protocol": "lsp",
+        "server": "clangd",
+        "versions": {
+          "clangd version 23.1.5 linux x86_64-pc-linux-gnu": [
+            "textDocument/publishDiagnostics",
+            "textDocument/codeAction",
+            "textDocument/hover",
+            "textDocument/completion",
+            "textDocument/signatureHelp",
+            "$/progress",
+            "textDocument/clangd.fileStatus"
+          ]
+        }
+      },
+      "url": "https://github.com/DerckHanna/nvim-zh/releases/download/packs-clangd-v0.3.0/clangd-zh_CN.json",
+      "version": "0.3.0"
+    },
+    {
+      "id": "nvim-cmp",
+      "locale": "zh_CN",
+      "modules": [
+        "cmp"
+      ],
+      "name": "nvim-cmp",
+      "repository": "https://github.com/hrsh7th/nvim-cmp",
+      "sdk": 2,
+      "sha256": "e80c89c12217e6f8a54385219dc6295404ab331d838e856eaea75bd49aec2065",
+      "size": 53560,
+      "targets": [
+        "2ffe79f1f021def8dd1fcd81deb16f1bb0d989f3"
+      ],
+      "url": "https://github.com/DerckHanna/nvim-zh/releases/download/packs-nvim-cmp-v0.3.0/nvim-cmp-zh_CN.json",
+      "version": "0.3.0"
+    },
+    {
       "id": "nvim-dap",
       "locale": "zh_CN",
       "modules": [
@@ -236,14 +217,14 @@
       ],
       "name": "nvim-dap",
       "repository": "https://github.com/mfussenegger/nvim-dap",
-      "sdk": 1,
-      "sha256": "69bd2c094dd28a5c56411d00e3f849c01ec388c780faa276afedf27bc76e7dab",
-      "size": 84439,
+      "sdk": 2,
+      "sha256": "1b85ac0a9d7386aa3312dd14500f34c1a4dfa71a8aaf2c98968bee678c0b9032",
+      "size": 68194,
       "targets": [
         "cfa2d58f4537aca6ca83e2de1a0d9f1491121264"
       ],
-      "url": "https://github.com/DerckHanna/nvim-zh/releases/download/packs-nvim-dap-v0.1.0/nvim-dap-zh_CN.json",
-      "version": "0.1.0"
+      "url": "https://github.com/DerckHanna/nvim-zh/releases/download/packs-nvim-dap-v0.3.0/nvim-dap-zh_CN.json",
+      "version": "0.3.0"
     },
     {
       "id": "nvim-dap-ui",
@@ -253,14 +234,14 @@
       ],
       "name": "nvim-dap-ui",
       "repository": "https://github.com/rcarriga/nvim-dap-ui",
-      "sdk": 1,
-      "sha256": "2097890125b2abcdd34a33c92845141869e282b326983a680e2468e5e4d15685",
-      "size": 40353,
+      "sdk": 2,
+      "sha256": "183c5ce3e05e4cdaa7b67681c977ea873d3545d7a7068b633466519dab19d9f4",
+      "size": 36790,
       "targets": [
         "cc9dd33aade7f20bae414d0cba163bc60d4d4b43"
       ],
-      "url": "https://github.com/DerckHanna/nvim-zh/releases/download/packs-nvim-dap-ui-v0.1.0/nvim-dap-ui-zh_CN.json",
-      "version": "0.1.0"
+      "url": "https://github.com/DerckHanna/nvim-zh/releases/download/packs-nvim-dap-ui-v0.3.0/nvim-dap-ui-zh_CN.json",
+      "version": "0.3.0"
     },
     {
       "id": "nvim-dap-view",
@@ -270,14 +251,14 @@
       ],
       "name": "nvim-dap-view",
       "repository": "https://github.com/igorlfs/nvim-dap-view",
-      "sdk": 1,
-      "sha256": "af452f51ea7e26e57a1a21c1a464ed9386992fe1d2f530d020581d3b9aac1b00",
-      "size": 106028,
+      "sdk": 2,
+      "sha256": "63e2ced87da9a9d0845b2d4c0024472ad9ee2db352fb5d18d88a3c4f7a0e4393",
+      "size": 93851,
       "targets": [
         "1c3b9cc295303fc173f24d442739a8557e23e987"
       ],
-      "url": "https://github.com/DerckHanna/nvim-zh/releases/download/packs-nvim-dap-view-v0.1.0/nvim-dap-view-zh_CN.json",
-      "version": "0.1.0"
+      "url": "https://github.com/DerckHanna/nvim-zh/releases/download/packs-nvim-dap-view-v0.3.0/nvim-dap-view-zh_CN.json",
+      "version": "0.3.0"
     },
     {
       "id": "nvim-tree",
@@ -293,14 +274,14 @@
       ],
       "name": "nvim-tree",
       "repository": "https://github.com/nvim-tree/nvim-tree.lua",
-      "sdk": 1,
-      "sha256": "2c04b3d0a7c439eb99a17fdfc1d53617d93eec87ae2eb3d5941bf4c6b465d13f",
-      "size": 92029,
+      "sdk": 2,
+      "sha256": "47e65b00f2355d96996c8bd42a3b9d4c7e2f0e6791bb45178cf5cbe165096133",
+      "size": 72996,
       "targets": [
         "dbc9d96a3633c2de85f409416ebd4a3aacf4220a"
       ],
-      "url": "https://github.com/DerckHanna/nvim-zh/releases/download/packs-nvim-tree-v0.1.0/nvim-tree-zh_CN.json",
-      "version": "0.1.0"
+      "url": "https://github.com/DerckHanna/nvim-zh/releases/download/packs-nvim-tree-v0.3.0/nvim-tree-zh_CN.json",
+      "version": "0.3.0"
     },
     {
       "id": "telescope",
@@ -317,14 +298,14 @@
       ],
       "name": "telescope",
       "repository": "https://github.com/nvim-telescope/telescope.nvim",
-      "sdk": 1,
-      "sha256": "6eba28e8676466c94431fcc6a20f58f1eb1a95987fe3ed789aad5173adfc5891",
-      "size": 84755,
+      "sdk": 2,
+      "sha256": "8b880a85a376f5dcdc85965ea0725d8f04defd074d864c57e13719bba2011471",
+      "size": 66954,
       "targets": [
         "1e1bab730218eaf97fce743be3f56e51075928ac"
       ],
-      "url": "https://github.com/DerckHanna/nvim-zh/releases/download/packs-telescope-v0.1.0/telescope-zh_CN.json",
-      "version": "0.1.0"
+      "url": "https://github.com/DerckHanna/nvim-zh/releases/download/packs-telescope-v0.3.0/telescope-zh_CN.json",
+      "version": "0.3.0"
     },
     {
       "id": "which-key",
@@ -339,14 +320,14 @@
       ],
       "name": "which-key",
       "repository": "https://github.com/folke/which-key.nvim",
-      "sdk": 1,
-      "sha256": "62ccb351054b2c8f9d1e1adf57c820c858075245b3f34f1e9f51d9799a2eb768",
-      "size": 59834,
+      "sdk": 2,
+      "sha256": "4909c4e72ac251882f249e3b65269ad234c24e845f15a174dd51e2bc0c7c6994",
+      "size": 39312,
       "targets": [
         "3aab2147e74890957785941f0c1ad87d0a44c15a"
       ],
-      "url": "https://github.com/DerckHanna/nvim-zh/releases/download/packs-which-key-v0.1.0/which-key-zh_CN.json",
-      "version": "0.1.0"
+      "url": "https://github.com/DerckHanna/nvim-zh/releases/download/packs-which-key-v0.3.0/which-key-zh_CN.json",
+      "version": "0.3.0"
     }
   ],
   "schema": 1

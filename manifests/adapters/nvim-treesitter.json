@@ -1,0 +1,158 @@
+{
+  "contracts": [
+    "tests/upstream/nvim-treesitter/nvim_treesitter_upstream_spec.lua"
+  ],
+  "domain": "nvim-treesitter",
+  "entry": "nvim-zh.adapters.nvim_treesitter",
+  "id": "nvim-treesitter",
+  "lazy_names": [
+    "nvim-treesitter"
+  ],
+  "modules": [
+    "nvim-treesitter",
+    "nvim-treesitter.config",
+    "nvim-treesitter.health",
+    "nvim-treesitter.install",
+    "nvim-treesitter.log"
+  ],
+  "notes": {
+    "domain": "nvim-treesitter",
+    "excluded": "parser query definitions, compiler stdout/stderr payloads, language names and ABI numbers",
+    "limitations": "historical log entries recorded before adapter attach are not rewritten",
+    "public_path": "Logger:info/warn/error and TSLog output; checkhealth nvim-treesitter report",
+    "seam": "nvim-treesitter.log.Logger.{info,warn,error}; User TSUpdate lifecycle hook; nvim-treesitter.health.check",
+    "status": "implemented",
+    "writes": "logger_echo_and_health_display_only"
+  },
+  "scenarios": {
+    "health": {
+      "surfaces": [
+        "health"
+      ],
+      "tui": "tests/upstream/nvim-treesitter/tui.py"
+    },
+    "notifications": {
+      "surfaces": [
+        "notifications"
+      ],
+      "tui": "tests/upstream/nvim-treesitter/tui.py"
+    }
+  },
+  "schema": 1,
+  "status": "implemented",
+  "surfaces": {
+    "health": {
+      "kind": "versioned",
+      "modules": {
+        "nvim-treesitter.health": "lua/nvim-treesitter/health.lua",
+        "vim.health": "lua/vim/health.lua"
+      }
+    },
+    "notifications": {
+      "independent": true,
+      "kind": "versioned",
+      "modules": {
+        "nvim-treesitter": "lua/nvim-treesitter/init.lua",
+        "nvim-treesitter.config": "lua/nvim-treesitter/config.lua",
+        "nvim-treesitter.install": "lua/nvim-treesitter/install.lua",
+        "nvim-treesitter.log": "lua/nvim-treesitter/log.lua"
+      }
+    }
+  },
+  "targets": {
+    "baseline": {
+      "commit": "37e52c733ada9d8d544d53a763140ef1ba404353",
+      "dependencies": [],
+      "neovim": "0.12.6",
+      "sources": {
+        "doc/nvim-treesitter.txt": "21640ddd83ec770d049868e2da1ba76231f44f73001369437ad9df0561593f32",
+        "lua/nvim-treesitter/_meta/parsers.lua": "8c8c2918a1537d9a4f338b4eaae0526b7cc90991cc6f31a2cbfbfb6b8fb9d3eb",
+        "lua/nvim-treesitter/async.lua": "c9fb077dc37d9e09c0204c46629081d51a437f33dce7d2b94250c98babd3b8f6",
+        "lua/nvim-treesitter/config.lua": "f7b49abc218364f5269c7acdb74d4fdb3f38234ce626323f34dff80ec8f014bf",
+        "lua/nvim-treesitter/health.lua": "68310c6ffa5d019a679c983b0c7e2febf7de4da14069b1712eb074e1041160d9",
+        "lua/nvim-treesitter/indent.lua": "f0d1fed0f52eb354437d429f4e43b5bbe133a3974d73f462a597dcea6e1c3d81",
+        "lua/nvim-treesitter/init.lua": "4e6d8f0f2283185319015ff588f141858f1dece96d737a79955bac0587790335",
+        "lua/nvim-treesitter/install.lua": "b2f8e91d855e7a377feb19744114ead870587f3694f6573feecc6cc642c8bcb3",
+        "lua/nvim-treesitter/log.lua": "eeb667e5301f44273ac545fecdcb1d599965146e1baae42f97154d99b951c813",
+        "lua/nvim-treesitter/parsers.lua": "56296a3e27fb3dc3a11dfa1ea50cbcc20d5633870c4c08484528a92562181d39",
+        "lua/nvim-treesitter/util.lua": "be48e19a487484825f8a611ba113852dec19b04e47a08596d6ea75e62555e903",
+        "lua/vim/health.lua": "c664ab88afbac7e20dbe3d000bb0775a630ca2da1a73cb7d17a8d53d4ab537c6",
+        "plugin/filetypes.lua": "ee0a46ad99546bdef28439d9db1ebafd373124f7a1fc041b1b4c6355b917887a",
+        "plugin/nvim-treesitter.lua": "76c90319c669ed580eeab682cb275a5870d7e75cd1f327f13147c4dcc9c450b8",
+        "plugin/query_predicates.lua": "f60aeafd0b9df8354bb463020b2667051d41f1a1f1dd6fb9473966213e0bdb67",
+        "scripts/check-parsers.lua": "0fb06456651627e7e530661e86af5177c4107fe368e4d9abe7e3293e3437af5f",
+        "scripts/check-queries.lua": "7e8e6a6b94e3a6646c8e31e0800b983d120600e20d9ea24f1c1061fd290e2e46",
+        "scripts/install-parsers.lua": "30c90f8dadf91760d4de0ffdcf1735251790a1bb70d1569f4bdf928374090510",
+        "scripts/minimal_init.lua": "d053efe00a697e4b717b9f19130b0f12ff0094e8bcffcb44ea3d01d917a01d94",
+        "scripts/update-parsers.lua": "3c21d001a37c23bc62a56d6c60f025d9d7e0d6e99f81234efd2b8fdd0b41cbaa",
+        "scripts/update-readme.lua": "ff60ef6f7faa11947533e7d6eed35e95f715abb0ee4489f7c97fe190e7a01105",
+        "tests/indent/algorithm_spec.lua": "ae17398ee8ea925aa93112168541b68b01047d5b5450750f9bcc5a3d7292098c",
+        "tests/indent/angular_spec.lua": "75f91fb00a441e4801b504b7a28b1e3d8a59361f3ccdfa727f2694a88215bd12",
+        "tests/indent/bash_spec.lua": "582c769418074e8c9fc0854c7448116c9a846418f93050dc16c6bd1a01c2ad3a",
+        "tests/indent/c_spec.lua": "149535a60eceb1254b4f1628551112f5c81ed0dd755a54ee5a61dacd1038f84e",
+        "tests/indent/capnp_spec.lua": "6aa33a4c58de3f4f3a0eadeaca1c57df2ee3242d3d5c74a46d762efe5423c80b",
+        "tests/indent/common.lua": "7266c965e990203645636ad4f13a5a9cd58a037e0a35b407cf4ef7aa987a0c45",
+        "tests/indent/cpp_spec.lua": "e3084fd0a85112823e391c5001409b68f5d6e178af7bc612c9f8037a79006edd",
+        "tests/indent/css_spec.lua": "5cf47b1734f53f21726f1305adeefabf20a2f3865c34ccc22e6f2346f7d03ee4",
+        "tests/indent/dart_spec.lua": "8d3a60ab5b4379ac79e761d89e12cda3ea2a4e943411540e860e7f7a4e29699b",
+        "tests/indent/dot_spec.lua": "c37052e517f1d6942de41f5ac6e0fc2f3021b0abcd75f202020bfb7b4cbc1551",
+        "tests/indent/gdscript_spec.lua": "9bb9eb7350a5b4782aff955a6e9417451bec3ea65794db9415df6735ec6fe0fe",
+        "tests/indent/gleam_spec.lua": "7cfc5cb7c502b7aebb18596b0d91ded66608af7e9793005af22b091b9a5e64c6",
+        "tests/indent/go_spec.lua": "1cb5053a66f9460e6a81a95f5b8956297386b7a5e07c809e0ac86e778b3df183",
+        "tests/indent/graphql_spec.lua": "b01977d2c23bf638757f0dc2fa47de259a2fcb29cd337287faaefccc91063771",
+        "tests/indent/html_spec.lua": "f27bb97f5c09213da61344eb2b9f25d6e6b58413e7c411eeb333a79cc4dcb365",
+        "tests/indent/java_spec.lua": "7564ef2692ecd7cbc2e146dd147d89d749e6a090659762556114077288391148",
+        "tests/indent/javascript_spec.lua": "84cbb9f8e0a08c2367864012feb2c7099a625ba416ee704941cd5c1d1dbe562d",
+        "tests/indent/jsx_spec.lua": "4522deb5c4d5e646cf8189a534a1b9c9dab4971bbe5950ed0a5b692d4920a83e",
+        "tests/indent/julia_spec.lua": "0aa5c6288394a37c5cff3e20247db99825721abd7eae3f5fa0bb43c1021efaf9",
+        "tests/indent/lua/comment.lua": "f877f005814c6824b8ef3f5506b83a6b149ad326e3f88ee099d32d20a3cb3ed8",
+        "tests/indent/lua/cond.lua": "b203332f3328e61e5df41ef55a434f3e2a2f8dae89a41e4f871c7c167a521b96",
+        "tests/indent/lua/func.lua": "be183f53e6cdb3330610b1efbc72c86805f2dc3ca4f0f784d60cd384cfa7a294",
+        "tests/indent/lua/loop.lua": "0de8425797d0dc503b3c4b620219ac471b06214d54718bbc3dda68f194d611bf",
+        "tests/indent/lua/method_index_expr.lua": "3ef30f64f7602b13f0fc16623c75ccf12d050a7959d934f87252997db36ac9d4",
+        "tests/indent/lua/nested-table.lua": "4c19cf15e1563802fbd3813766ccd7e35cbd11560b93292b9a76f5d880afb81f",
+        "tests/indent/lua/no-indent-after-paren-pairs.lua": "4a639ee8c089bfb476674f8f378bda97db063426af971203d5ba69253ee128e2",
+        "tests/indent/lua/string.lua": "e1bc39e845f4d806186bc9f2cda95e2ce2e52a8ace66e516bcb008b9195e942e",
+        "tests/indent/lua/table.lua": "1688fabc6c59dddbcb897a96e8d9988ece72112db969bf4729a3e51a229c3cf9",
+        "tests/indent/lua_spec.lua": "b318b01a9f396e39386c79e3d9c6cf712d612dc664e20c284a8d16b6afe8740c",
+        "tests/indent/meson_spec.lua": "89745cddae480ae099fd28b6e319713860c531d123a4434ff2773a0670eaad7a",
+        "tests/indent/nickel_spec.lua": "29cce41b0a0606bcdb72dc586d161904578d1eab7d56a36a518adce86b3490db",
+        "tests/indent/nix_spec.lua": "a419e462ab054f533e8b23bd4fa591d85e73fcf7c7f851842d3c25fad2fc3a66",
+        "tests/indent/nu_spec.lua": "03ddef29255b2e56b765decd613cc94ad4465a181f68f708ec0d1a4ac3ac2abf",
+        "tests/indent/php_spec.lua": "90f7f7037b73387851f98ad09ad682b91486d4b4d17f8c46af30eb40669d1826",
+        "tests/indent/python_spec.lua": "3c5d2b06a6568bcbacc77a06f600bc909c5cd967d2f1d1ccf2093d0029244966",
+        "tests/indent/ql_spec.lua": "a7802737abd815c78e0ab613e8e4e616bec22ea9436c4c54f2aad58b9be30b07",
+        "tests/indent/query_spec.lua": "f859cfc337ecb9f1196fec4562a121dd5523ea251c70e9ed644d23a886a7d322",
+        "tests/indent/r_spec.lua": "d2ff9db0a6e0a85cde904f765f510dc7971f7e81bec2b5b628784244f4a68c9f",
+        "tests/indent/rescript_spec.lua": "6b2b0f8ab6b192a1849fa77a97b2bf3ac2d24335394ed4af349596b22609a1a2",
+        "tests/indent/ruby_spec.lua": "cf17622af1f44c88c3dd72ccda25a0b796ec205e8d255ce34ba706ec316222f4",
+        "tests/indent/rust_spec.lua": "d7fdcc5befc5b7c8bd16de8a7bfddf82fa1b89ccc7245040cab5f8646d2b2dad",
+        "tests/indent/smali_spec.lua": "0b00b01454e4770bd6d366a54b13a5b0a38c8199c9b1831b6ffd36d25530eb1e",
+        "tests/indent/snakemake_spec.lua": "df549b91cadac4009e36463e5fb73b0d44c0639eaf2aacdfc06eae2deb449e3f",
+        "tests/indent/sql_spec.lua": "6fc5d927e378ef748827f685d942124da050122b6bee35142c9dbab24179f714",
+        "tests/indent/sway_spec.lua": "ebc3edab6a71e111ae02d143d504e45e68c70254c6829f2d5819c3e26358bedf",
+        "tests/indent/swift_spec.lua": "d58e12d8898dce519fab795380cf3e2f1984473e3a456931a5ec8355b9c1a3f7",
+        "tests/indent/t32_spec.lua": "44f44dfedea7f09bc04a062286181d4b56040092beb6e5b534996552204a6940",
+        "tests/indent/terraform_spec.lua": "5e708d9b6b3c0deeedef63abdd33fd25420d159fff6903a0b5cafaf93c1006be",
+        "tests/indent/tiger_spec.lua": "7473e4251b30450c71f14586a4c7f8bc44f66580ef9424c142f41ca913de746f",
+        "tests/indent/typst_spec.lua": "854a6ae88bf287fe98ee3668efc866175b36f3d10400b3b6f9972b5ebade9f2d",
+        "tests/indent/usd_spec.lua": "4209240579027296f068f4a0d324111fc82b420cd57fd08e8a534eea648e5c79",
+        "tests/indent/vue_spec.lua": "5b23ea5d630af54dff0969dde6c69588a19eb8289c90e00eeaab796f508c7e33",
+        "tests/indent/wgsl_spec.lua": "e5423659a5d0bf378ac89d09e404d8545d47e0ca957d7565066fb21282b2b1a9",
+        "tests/indent/yaml_spec.lua": "50fbd0c92bf0aaf2ca5b873117b1ceb57e9d56d9f69170818aa41fc0caed8ec7",
+        "tests/indent/yang_spec.lua": "fe07c7f3639c0f5c1b2fb88238701997739acb53206fdf5c80ad67a68561e073",
+        "tests/indent/yuck_spec.lua": "1a6e9544099df21af4814e749121eda11054072da0db76dad4a446b575025ca4",
+        "tests/indent/zig_spec.lua": "8abccea50fe6b9e7b3967c7e2e0ee5c68b7f540aa3564fa5bc1b98bb090ecbc6",
+        "tests/query/highlights/lua/test.lua": "e29e76ea11c18639cb92d7fd85f3294a50880b8277fd9c7ae497f54953b18250",
+        "tests/query/highlights_spec.lua": "654180c6199a102e09cc4af1a70e766cae5dc9225f5f4445faa49df7e1b5f106",
+        "tests/query/injection_spec.lua": "473f11bfa2a65f98fa4c8c8475334d373a38a0af1f502c66c6cb898f68329638"
+      }
+    }
+  },
+  "upstream": {
+    "follow": {
+      "kind": "default_branch"
+    },
+    "repository": "https://github.com/nvim-treesitter/nvim-treesitter"
+  }
+}

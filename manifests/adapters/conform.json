@@ -1,0 +1,95 @@
+{
+  "contracts": [
+    "tests/upstream/conform/conform_upstream_spec.lua"
+  ],
+  "domain": "conform",
+  "entry": "nvim-zh.adapters.conform",
+  "id": "conform",
+  "lazy_names": [
+    "conform.nvim"
+  ],
+  "modules": [
+    "conform",
+    "conform.health",
+    "conform.log",
+    "conform.runner"
+  ],
+  "notes": {
+    "domain": "conform",
+    "excluded": "formatter stdout/stderr, raw log file payloads, user callback error strings and formatter arguments",
+    "limitations": "existing ConformInfo buffers are not retroactively rewritten",
+    "public_path": "ConformInfo window lines and status reasons; setup/resolve_formatters/format notifications; health.check report",
+    "seam": "conform.health.show_window; conform.health.check; conform.setup/resolve_formatters/format scoped notification projection",
+    "status": "implemented",
+    "writes": "conform_info_buffer_health_and_notification_display_only"
+  },
+  "scenarios": {
+    "health": {
+      "surfaces": [
+        "health"
+      ],
+      "tui": "tests/upstream/conform/tui.py"
+    },
+    "info_window": {
+      "surfaces": [
+        "health"
+      ],
+      "tui": "tests/upstream/conform/tui.py"
+    },
+    "notifications": {
+      "surfaces": [
+        "notifications"
+      ],
+      "tui": "tests/upstream/conform/tui.py"
+    }
+  },
+  "schema": 1,
+  "status": "implemented",
+  "surfaces": {
+    "health": {
+      "kind": "versioned",
+      "modules": {
+        "conform.health": "lua/conform/health.lua",
+        "vim.health": "lua/vim/health.lua"
+      }
+    },
+    "notifications": {
+      "independent": true,
+      "kind": "versioned",
+      "modules": {
+        "conform": "lua/conform/init.lua",
+        "conform.log": "lua/conform/log.lua",
+        "conform.runner": "lua/conform/runner.lua"
+      }
+    }
+  },
+  "targets": {
+    "baseline": {
+      "commit": "016802de402556da54c36bd7359b441266b01cdd",
+      "dependencies": [],
+      "neovim": "0.12.6",
+      "sources": {
+        "doc/conform.txt": "d68bd8d06f7bf1612fbc6e34d387933b2364e543bc8770c880f785cab99a18e1",
+        "lua/conform/dir_manager.lua": "ffd4be3d7424c37e55ca174bf460bc2ce35f0a699c7bba1b74cb3ae96b68fd28",
+        "lua/conform/errors.lua": "fb6181a6b4542e77880d1efd2a1c59a31071ae3b4803a057f53ac4391eb28051",
+        "lua/conform/fs.lua": "4061e0fceff75bb77f095e5c7fc505b6e62090e5f5e64fcb3364d45ff7903604",
+        "lua/conform/ft_to_ext.lua": "cc56f153a876936f39ad443d4dbf8256b5a125a7d71d764e8c5f0e8bd885e60a",
+        "lua/conform/health.lua": "d55100a78b41808390ec2e2931544a21e7f0c234f6d5758e4074a1f55525af15",
+        "lua/conform/init.lua": "b827b6f406ec0bd53e1a65728871633963b178b2895324256d967ec0084b89d4",
+        "lua/conform/log.lua": "e03731aa4bff7caa98f87d287610927a4a13726a85bde6bfd1611695943f1286",
+        "lua/conform/lsp_format.lua": "825f97e5200100a4232a0b5965e127137ed71385250e8c904889e8c2d9b13932",
+        "lua/conform/runner.lua": "9d475bacec1edfb33298269b33fa835b291fff8b9d150376ae8c71467cffd451",
+        "lua/conform/types.lua": "75d78f428ccdae055a1aaf83ff07c10f0b634122cf9c7f9f1a7312d97a949093",
+        "lua/conform/util.lua": "67f0f915a60b680acdc8293c06384039e4d4810fdfa34668a30cceacf5693f02",
+        "lua/vim/health.lua": "c664ab88afbac7e20dbe3d000bb0775a630ca2da1a73cb7d17a8d53d4ab537c6",
+        "plugin/conform.lua": "bfb853388bc887174d75ab69528fb5107cafce786f51ac4b4e65c0cef238b313"
+      }
+    }
+  },
+  "upstream": {
+    "follow": {
+      "kind": "default_branch"
+    },
+    "repository": "https://github.com/stevearc/conform.nvim"
+  }
+}

@@ -43,12 +43,20 @@
 |---|---|---|
 | which-key | `3aab2147e74890957785941f0c1ad87d0a44c15a` | preset、动态数量、底部提示、marks/Register 标签、通知、健康检查和 3 篇中文帮助 |
 | Telescope | `1e1bab730218eaf97fce743be3f56e51075928ac` | 首开与动态标题、精炼、映射浮窗、Git 和 Register 提示、通知、操作输出、健康检查和 3 篇中文帮助 |
-| nvim-tree | `dbc9d96a3633c2de85f409416ebd4a3aacf4220a` | 默认映射、通知、文件操作、文件信息、Window 选择、帮助浮窗、隐藏统计和 4 篇中文帮助 |
+| nvim-tree | `6e539e91302d2e201b078a45d214177140134523` | 默认映射、通知、文件操作、文件信息、Window 选择、帮助浮窗、隐藏统计和 4 篇中文帮助 |
 | nvim-dap | `cfa2d58f4537aca6ca83e2de1a0d9f1491121264` | 通知、选择器、REPL、输入、quickfix、健康检查、Widget、诊断前缀和 4 篇中文帮助 |
 | nvim-dap-ui | `cc9dd33aade7f20bae414d0cba163bc60d4d4b43` | 固定渲染文案、映射、浮窗、选择器、Window 提示、通知和 3 篇中文帮助 |
 | nvim-dap-view | `1c3b9cc295303fc173f24d442739a8557e23e987` | 监视、作用域、调试面板、键位、异常、Help 及 CodeLLDB 1.12.3 的固定显示标签 |
 | lazy.nvim | `306a05526ada86a7b30af95c5cc81ffba93fef97` | `User LazyLoad` 生命周期桥接 |
 | nvim-cmp | `2ffe79f1f021def8dd1fcd81deb16f1bb0d989f3` | SDK 2。状态、配置弃用、自定义视图默认类别和完整中文 Help。原生候选与用户 formatter 输出保持上游值 |
+| snacks.nvim | `882c996cf28183f4d63640de0b4c02ec886d01f2` | Dashboard preset 与启动页脚、Picker 内置标题、Input/Select 默认提示、Notifier/Bufdelete/Notify 提示及健康检查 |
+| blink.cmp | `78336bc89ee5365633bcf754d93df01678b5c08f` | 模糊匹配库下载/构建/配置通知与健康检查 |
+| cmake-tools.nvim | `782a254c62a61af1d4febddd0d6dbc5ea414a027` | CMake 构建/Target/预设交互提示、设置浮窗标题与通知 |
+| aerial.nvim | `28fe6e822ae344544c379d60fcb13c9519a1f08a` | 大纲空状态/加载提示、帮助浮窗、映射描述、`:AerialInfo` 与通知 |
+| gitsigns.nvim | `c0862d382a35b7b45757d8d151a6a634c09bf3ce` | Hunk/Blame/Diff 浮窗标题与帮助、Stage/Reset/Nav 提示及通知 |
+| conform.nvim | `016802de402556da54c36bd7359b441266b01cdd` | `:ConformInfo` 信息窗口、格式化失败/超时/不可用通知与健康检查 |
+| mini.nvim | `b8a0af521530f8ee68c738657429eab59de6a2ae` | `mini.statusline` 长模式标签、`mini.surround` 与 `mini.ai` 交互提示与反馈 |
+| nvim-treesitter | `37e52c733ada9d8d544d53a763140ef1ba404353` | `main` 分支解析器安装/编译/更新/卸载日志、报错与健康检查 |
 
 固定组合和实际检查的源码 SHA-256 见 `manifests/adapters/`。正式显示 API 与固定源码接缝的证据各自记录。详细范围和加载方法见[第三方插件适配](adapters.md)。
 

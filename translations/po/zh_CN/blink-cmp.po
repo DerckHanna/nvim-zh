@@ -1,0 +1,201 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: nvim-zh\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Domain: blink-cmp\n"
+
+#: lua/blink/cmp/health.lua:4
+msgctxt "health"
+msgid "System"
+msgstr "系统环境"
+
+#: lua/blink/cmp/health.lua:9
+msgctxt "health"
+msgid "%s is not installed"
+msgstr "%s 未安装"
+
+#: lua/blink/cmp/health.lua:11
+msgctxt "health"
+msgid "%s is installed"
+msgstr "%s 已安装"
+
+#: lua/blink/cmp/health.lua:19
+msgctxt "health"
+msgid "Your system is supported by pre-built binaries (%s)"
+msgstr "你的系统支持预编译二进制文件 (%s)"
+
+#: lua/blink/cmp/health.lua:23
+msgctxt "health"
+msgid "Your system (%s/%s) is not supported by pre-built binaries. You must run cargo build --release via your package manager. See the README for more info."
+msgstr "你的系统 (%s/%s) 不支持预编译二进制文件。你必须通过插件管理器运行 cargo build --release。详见 README。"
+
+#: lua/blink/cmp/health.lua:34
+msgctxt "health"
+msgid "blink_cmp_fuzzy lib is downloaded/built"
+msgstr "blink_cmp_fuzzy 库已下载或构建"
+
+#: lua/blink/cmp/health.lua:36
+msgctxt "health"
+msgid "blink_cmp_fuzzy lib is not downloaded/built"
+msgstr "blink_cmp_fuzzy 库尚未下载或构建"
+
+#: lua/blink/cmp/health.lua:41
+msgctxt "health"
+msgid "Sources"
+msgstr "补全源"
+
+#: lua/blink/cmp/health.lua:52
+msgctxt "health"
+msgid "Some providers may show up as \"disabled\" but are enabled dynamically (e.g. cmdline)"
+msgstr "部分提供程序可能显示为 \"disabled\"，但会动态启用（例如 cmdline）"
+
+#: lua/blink/cmp/health.lua:64
+msgctxt "health"
+msgid "Default sources"
+msgstr "默认补全源"
+
+#: lua/blink/cmp/health.lua:65
+msgctxt "health"
+msgid "Cmdline sources"
+msgstr "命令行补全源"
+
+#: lua/blink/cmp/health.lua:66
+msgctxt "health"
+msgid "Disabled sources"
+msgstr "已禁用补全源"
+
+#: lua/blink/cmp/init.lua:15
+msgctxt "notification"
+msgid "blink.cmp requires nvim 0.10 and newer"
+msgstr "blink.cmp 需要 Neovim 0.10 或更高版本"
+
+#: lua/blink/cmp/config/utils.lua:50
+msgctxt "notification"
+msgid " Unexpected field in configuration!"
+msgstr " 配置中存在未知字段！"
+
+#: lua/blink/cmp/fuzzy/build/init.lua:41
+msgctxt "notification"
+msgid "Building fuzzy matching library from source..."
+msgstr "正在从源码构建模糊匹配库..."
+
+#: lua/blink/cmp/fuzzy/build/init.lua:57
+msgctxt "notification"
+msgid "Successfully built fuzzy matching library. "
+msgstr "已成功构建模糊匹配库。"
+
+#: lua/blink/cmp/fuzzy/build/init.lua:65
+msgctxt "notification"
+msgid "Failed to build fuzzy matching library! "
+msgstr "构建模糊匹配库失败！"
+
+#: lua/blink/cmp/fuzzy/build/log.lua:21
+msgctxt "notification"
+msgid "No build log available"
+msgstr "没有可用的构建日志"
+
+#: lua/blink/cmp/fuzzy/download/init.lua:40
+msgctxt "notification"
+msgid "Incomplete build of the "
+msgstr "检测到不完整的 "
+
+#: lua/blink/cmp/fuzzy/download/init.lua:41
+#: lua/blink/cmp/fuzzy/download/init.lua:55
+#: lua/blink/cmp/fuzzy/download/init.lua:77
+msgctxt "notification"
+msgid "fuzzy matching library"
+msgstr "模糊匹配库"
+
+#: lua/blink/cmp/fuzzy/download/init.lua:42
+msgctxt "notification"
+msgid " detected, please re-run "
+msgstr " 构建，请重新运行 "
+
+#: lua/blink/cmp/fuzzy/download/init.lua:44
+msgctxt "notification"
+msgid " such as by re-installing. "
+msgstr "（例如重新安装）。"
+
+#: lua/blink/cmp/fuzzy/download/init.lua:45
+msgctxt "notification"
+msgid "Error: %s"
+msgstr "错误：%s"
+
+#: lua/blink/cmp/fuzzy/download/init.lua:52
+msgctxt "notification"
+msgid "Found an "
+msgstr "发现本地构建的 "
+
+#: lua/blink/cmp/fuzzy/download/init.lua:53
+msgctxt "notification"
+msgid "outdated version"
+msgstr "旧版本"
+
+#: lua/blink/cmp/fuzzy/download/init.lua:54
+msgctxt "notification"
+msgid " of the locally built "
+msgstr " "
+
+#: lua/blink/cmp/fuzzy/download/init.lua:61
+msgctxt "notification"
+msgid "Couldn't update fuzzy matching library due to github downloads being disabled."
+msgstr "由于已禁用 GitHub 下载，无法更新模糊匹配库。"
+
+#: lua/blink/cmp/fuzzy/download/init.lua:100
+#: lua/blink/cmp/fuzzy/download/init.lua:113
+msgctxt "notification"
+msgid "No fuzzy matching library found!"
+msgstr "未找到模糊匹配库！"
+
+#: lua/blink/cmp/fuzzy/download/init.lua:131
+msgctxt "notification"
+msgid "Pre-built binary checksum verification failed, "
+msgstr "预编译二进制文件校验和验证失败，"
+
+#: lua/blink/cmp/fuzzy/download/init.lua:139
+msgctxt "notification"
+msgid "Downloading pre-built binary"
+msgstr "正在下载预编译二进制文件"
+
+#: lua/blink/cmp/fuzzy/download/init.lua:142
+msgctxt "notification"
+msgid "Downloaded pre-built binary successfully"
+msgstr "已成功下载预编译二进制文件"
+
+#: lua/blink/cmp/fuzzy/download/init.lua:161
+msgctxt "notification"
+msgid "Falling back to "
+msgstr "正在回退到 "
+
+#: lua/blink/cmp/fuzzy/download/init.lua:162
+msgctxt "notification"
+msgid "Lua implementation"
+msgstr "Lua 实现"
+
+#: lua/blink/cmp/fuzzy/download/init.lua:163
+msgctxt "notification"
+msgid " due to error while downloading pre-built binary, set "
+msgstr "（因下载预编译二进制文件出错），可将 "
+
+#: lua/blink/cmp/fuzzy/download/init.lua:170
+msgctxt "notification"
+msgid " to disable this warning. See "
+msgstr " 以关闭此警告。详见 "
+
+#: lua/blink/cmp/fuzzy/download/init.lua:172
+msgctxt "notification"
+msgid " for details."
+msgstr "。"
+
+#: lua/blink/cmp/fuzzy/download/init.lua:202
+msgctxt "notification"
+msgid "Your system is not supported by "
+msgstr "你的系统不支持 "
+
+#: lua/blink/cmp/fuzzy/download/init.lua:203
+msgctxt "notification"
+msgid " pre-built binaries "
+msgstr " 预编译二进制文件 "

@@ -1,0 +1,240 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: nvim-zh\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Domain: gitsigns\n"
+
+#: lua/gitsigns/actions/blame_line.lua:83
+msgctxt "popup"
+msgid "File added in commit"
+msgstr "在此提交中新增的文件"
+
+#: lua/gitsigns/actions/blame_line.lua:91
+#: lua/gitsigns/actions/preview.lua:128
+#: lua/gitsigns/actions/preview.lua:151
+msgctxt "popup"
+msgid "Hunk %d of %d"
+msgstr "第 %d / %d 个 Hunk"
+
+#: lua/gitsigns/actions/blame_line.lua:97
+msgctxt "popup"
+msgid " (guessed: %s%d offset from original line)"
+msgstr "（推测：距原始行偏移 %s%d）"
+
+#: lua/gitsigns/actions/blame_line.lua:181
+msgctxt "popup"
+msgid "Loading..."
+msgstr "正在加载..."
+
+#: lua/gitsigns/actions/diff.lua:140
+msgctxt "popup"
+msgid "File panel"
+msgstr "文件面板"
+
+#: lua/gitsigns/actions/diff.lua:148
+msgctxt "popup"
+msgid "File buffers"
+msgstr "文件 Buffer"
+
+#: lua/gitsigns/actions/diff.lua:149
+msgctxt "popup"
+msgid "]f / [f  Next / previous file (accepts count)"
+msgstr "]f / [f  下一个 / 上一个文件（支持计数）"
+
+#: lua/gitsigns/actions/diff.lua:152
+msgctxt "popup"
+msgid "]c / [c  Next / previous change"
+msgstr "]c / [c  下一个 / 上一个变更"
+
+#: lua/gitsigns/actions/diff.lua:156
+msgctxt "popup"
+msgid "q / <Esc> / g?  Close this help"
+msgstr "q / <Esc> / g?  关闭此帮助"
+
+#: lua/gitsigns/actions/diff.lua:917
+#: lua/gitsigns/actions/diff.lua:1039
+msgctxt "popup"
+msgid "Next file"
+msgstr "下一个文件"
+
+#: lua/gitsigns/actions/diff.lua:918
+#: lua/gitsigns/actions/diff.lua:1043
+msgctxt "popup"
+msgid "Previous file"
+msgstr "上一个文件"
+
+#: lua/gitsigns/actions/diff.lua:919
+msgctxt "popup"
+msgid "Next change"
+msgstr "下一个变更"
+
+#: lua/gitsigns/actions/diff.lua:920
+msgctxt "popup"
+msgid "Previous change"
+msgstr "上一个变更"
+
+#: lua/gitsigns/actions/diff.lua:1025
+msgctxt "popup"
+msgid "Open file, show commit message, or toggle directory fold"
+msgstr "打开文件、显示提交说明或切换目录折叠"
+
+#: lua/gitsigns/actions/diff.lua:1028
+msgctxt "popup"
+msgid "Open clicked entry or toggle directory fold"
+msgstr "打开点击的条目或切换目录折叠"
+
+#: lua/gitsigns/actions/diff.lua:1035
+msgctxt "popup"
+msgid "Open file and keep focus in the panel"
+msgstr "打开文件并将焦点保留在面板中"
+
+#: lua/gitsigns/actions/diff.lua:1047
+msgctxt "popup"
+msgid "View target file (tab)"
+msgstr "在新标签页查看目标文件"
+
+#: lua/gitsigns/actions/diff.lua:1051
+msgctxt "popup"
+msgid "View file at base revision (tab)"
+msgstr "在新标签页查看基准版本文件"
+
+#: lua/gitsigns/actions/diff.lua:1055
+msgctxt "popup"
+msgid "Toggle unified diff"
+msgstr "切换统一差异视图"
+
+#: lua/gitsigns/actions/diff.lua:1066
+msgctxt "popup"
+msgid "Stage file or directory"
+msgstr "暂存文件或目录"
+
+#: lua/gitsigns/actions/diff.lua:1070
+msgctxt "popup"
+msgid "Unstage file or directory"
+msgstr "取消暂存文件或目录"
+
+#: lua/gitsigns/actions/diff.lua:1074
+msgctxt "popup"
+msgid "Toggle file or directory staging"
+msgstr "切换文件或目录的暂存状态"
+
+#: lua/gitsigns/actions/diff.lua:1079
+msgctxt "popup"
+msgid "Show available keys"
+msgstr "显示可用按键"
+
+#: lua/gitsigns/actions/diff.lua:1083
+msgctxt "popup"
+msgid "Close diff"
+msgstr "关闭差异视图"
+
+#: lua/gitsigns/actions.lua:314
+msgctxt "echo"
+msgid "Error: Cannot stage lines. Please add the file to the working tree."
+msgstr "错误：无法暂存行，请先将文件添加到工作区。"
+
+#: lua/gitsigns/actions.lua:329
+msgctxt "echo"
+msgid "No hunk to stage"
+msgstr "没有可暂存的 Hunk"
+
+#: lua/gitsigns/actions.lua:405
+msgctxt "echo"
+msgid "No hunk to reset"
+msgstr "没有可重置的 Hunk"
+
+#: lua/gitsigns/actions.lua:430
+msgctxt "echo"
+msgid "No unstaged changes in the buffer to reset"
+msgstr "当前 Buffer 中没有可重置的未暂存更改"
+
+#: lua/gitsigns/actions.lua:460
+msgctxt "echo"
+msgid "No hunks to undo"
+msgstr "没有可撤销的 Hunk"
+
+#: lua/gitsigns/actions.lua:494
+msgctxt "echo"
+msgid "No unstaged changes in file to stage"
+msgstr "文件中没有可暂存的未暂存更改"
+
+#: lua/gitsigns/actions.lua:499
+msgctxt "echo"
+msgid "Error: Cannot stage file. Please add it to the working tree."
+msgstr "错误：无法暂存文件，请先将其添加到工作区。"
+
+#: lua/gitsigns/actions/diffthis.lua:312
+msgctxt "echo"
+msgid "Error: Buffer is not attached."
+msgstr "错误：Buffer 未附加。"
+
+#: lua/gitsigns/actions/nav.lua:122
+msgctxt "echo"
+msgid "No hunks"
+msgstr "没有 Hunk"
+
+#: lua/gitsigns/actions/nav.lua:138
+msgctxt "echo"
+msgid "No more hunks"
+msgstr "没有更多 Hunk"
+
+#: lua/gitsigns/actions/nav.lua:181
+msgctxt "echo"
+msgid "Hunk %d of %d"
+msgstr "第 %d / %d 个 Hunk"
+
+#: lua/gitsigns.lua:240
+msgctxt "echo"
+msgid "gitsigns: git not in path. Aborting setup"
+msgstr "gitsigns：PATH 中未找到 git，已中止初始化"
+
+#: lua/gitsigns/actions/diff.lua:1118
+msgctxt "notification"
+msgid "Invalid diff mode: %s (expected none, split, or unified)"
+msgstr "无效的差异模式：%s（应为 none、split 或 unified）"
+
+#: lua/gitsigns/actions/diff.lua:1126
+msgctxt "notification"
+msgid "Not in a Git repository"
+msgstr "不在 Git 仓库中"
+
+#: lua/gitsigns/actions/diff.lua:1134
+msgctxt "notification"
+msgid "Unable to read revision"
+msgstr "无法读取版本修订"
+
+#: lua/gitsigns/cli.lua:123
+msgctxt "notification"
+msgid "%s is not a valid function or action"
+msgstr "%s 不是有效的函数或动作"
+
+#: lua/gitsigns/config.lua:965
+msgctxt "notification"
+msgid "gitsigns: Ignoring invalid configuration field '%s'"
+msgstr "gitsigns：已忽略无效的配置字段 '%s'"
+
+#: lua/gitsigns/config.lua:974
+msgctxt "notification"
+msgid "%s is now deprecated; ignoring"
+msgstr "%s 已弃用，已忽略"
+
+#: lua/gitsigns/current_line_blame.lua:90
+msgctxt "notification"
+msgid ""
+"Failed running config.%s, using default:\n"
+"   %s"
+msgstr ""
+"运行 config.%s 失败，将使用默认值：\n"
+"   %s"
+
+#: lua/gitsigns/current_line_blame.lua:98
+msgctxt "notification"
+msgid ""
+"Invalid return from config.%s, using default:\n"
+"   %s"
+msgstr ""
+"config.%s 返回值无效，将使用默认值：\n"
+"   %s"

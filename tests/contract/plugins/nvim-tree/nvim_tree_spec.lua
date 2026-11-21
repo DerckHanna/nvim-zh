@@ -97,7 +97,7 @@ check(package.loaded['nvim-tree.keymap'] == keymap, 'post-setup keymap module mi
 check(keymap.on_attach_default ~= original_default, 'default on_attach was not wrapped after setup')
 check(info().active, 'default mapping capability not active after setup')
 check(type(info().version_related) == 'string' and info().targets.baseline
-  == 'dbc9d96a3633c2de85f409416ebd4a3aacf4220a', 'pinned seam metadata missing')
+  == '6e539e91302d2e201b078a45d214177140134523', 'pinned seam metadata missing')
 
 equal(zh.translate({ domain = 'nvim-tree', context = 'mapping', msgid = 'Open' }), '打开',
   'mapping suffix missing from active catalog')

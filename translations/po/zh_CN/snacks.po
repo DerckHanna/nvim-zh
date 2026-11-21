@@ -1,0 +1,634 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: nvim-zh\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Domain: snacks\n"
+
+#: lua/snacks/dashboard.lua:94
+msgctxt "dashboard"
+msgid "Find File"
+msgstr "查找文件"
+
+#: lua/snacks/dashboard.lua:95
+msgctxt "dashboard"
+msgid "New File"
+msgstr "新建文件"
+
+#: lua/snacks/dashboard.lua:96
+msgctxt "dashboard"
+msgid "Find Text"
+msgstr "查找文本"
+
+#: lua/snacks/dashboard.lua:97
+msgctxt "dashboard"
+msgid "Recent Files"
+msgstr "最近文件"
+
+#: lua/snacks/dashboard.lua:98
+msgctxt "dashboard"
+msgid "Config"
+msgstr "打开配置"
+
+#: lua/snacks/dashboard.lua:99
+msgctxt "dashboard"
+msgid "Restore Session"
+msgstr "恢复会话"
+
+#: lua/snacks/dashboard.lua:100
+msgctxt "dashboard"
+msgid "Lazy"
+msgstr "插件管理"
+
+#: lua/snacks/dashboard.lua:101
+msgctxt "dashboard"
+msgid "Quit"
+msgstr "退出"
+
+#: lua/snacks/dashboard.lua:1101
+msgctxt "dashboard"
+msgid "%sNeovim loaded "
+msgstr "%sNeovim 已加载 "
+
+#: lua/snacks/dashboard.lua:1103
+msgctxt "dashboard"
+msgid " plugins in "
+msgstr " 个插件，耗时 "
+
+#: lua/snacks/picker/core/picker.lua:129
+msgctxt "title"
+msgid "Files"
+msgstr "文件"
+
+#: lua/snacks/picker/core/picker.lua:129
+msgctxt "title"
+msgid "Grep"
+msgstr "全局搜索"
+
+#: lua/snacks/picker/core/picker.lua:129
+msgctxt "title"
+msgid "Grep Buffers"
+msgstr "搜索已打开 Buffer"
+
+#: lua/snacks/picker/core/picker.lua:129
+msgctxt "title"
+msgid "Grep Word"
+msgstr "搜索光标词"
+
+#: lua/snacks/picker/core/picker.lua:129
+msgctxt "title"
+msgid "Buffers"
+msgstr "Buffer 列表"
+
+#: lua/snacks/picker/core/picker.lua:129
+msgctxt "title"
+msgid "Recent"
+msgstr "最近文件"
+
+#: lua/snacks/picker/core/picker.lua:129
+msgctxt "title"
+msgid "Smart"
+msgstr "智能查找"
+
+#: lua/snacks/picker/core/picker.lua:129
+msgctxt "title"
+msgid "Explorer"
+msgstr "文件浏览"
+
+#: lua/snacks/picker/core/picker.lua:129
+msgctxt "title"
+msgid "Git Branches"
+msgstr "Git 分支"
+
+#: lua/snacks/picker/core/picker.lua:129
+msgctxt "title"
+msgid "Git Log"
+msgstr "Git 提交记录"
+
+#: lua/snacks/picker/core/picker.lua:129
+msgctxt "title"
+msgid "Git Log File"
+msgstr "当前文件 Git 记录"
+
+#: lua/snacks/picker/core/picker.lua:129
+msgctxt "title"
+msgid "Git Log Line"
+msgstr "当前行 Git 记录"
+
+#: lua/snacks/picker/core/picker.lua:129
+msgctxt "title"
+msgid "Git Status"
+msgstr "Git 状态"
+
+#: lua/snacks/picker/core/picker.lua:129
+msgctxt "title"
+msgid "Git Diff"
+msgstr "Git 差异"
+
+#: lua/snacks/picker/core/picker.lua:129
+msgctxt "title"
+msgid "Git Files"
+msgstr "Git 文件"
+
+#: lua/snacks/picker/core/picker.lua:129
+msgctxt "title"
+msgid "Git Stash"
+msgstr "Git 贮藏"
+
+#: lua/snacks/picker/core/picker.lua:129
+msgctxt "title"
+msgid "Diagnostics"
+msgstr "诊断列表"
+
+#: lua/snacks/picker/core/picker.lua:129
+msgctxt "title"
+msgid "Diagnostics Buffer"
+msgstr "当前 Buffer 诊断"
+
+#: lua/snacks/picker/core/picker.lua:129
+msgctxt "title"
+msgid "Help"
+msgstr "帮助文档"
+
+#: lua/snacks/picker/core/picker.lua:129
+msgctxt "title"
+msgid "Keymaps"
+msgstr "键映射"
+
+#: lua/snacks/picker/core/picker.lua:129
+msgctxt "title"
+msgid "Commands"
+msgstr "命令"
+
+#: lua/snacks/picker/core/picker.lua:129
+msgctxt "title"
+msgid "Command History"
+msgstr "命令历史"
+
+#: lua/snacks/picker/core/picker.lua:129
+msgctxt "title"
+msgid "Colorschemes"
+msgstr "配色方案"
+
+#: lua/snacks/picker/core/picker.lua:129
+msgctxt "title"
+msgid "Highlights"
+msgstr "高亮组"
+
+#: lua/snacks/picker/core/picker.lua:129
+msgctxt "title"
+msgid "Icons"
+msgstr "图标"
+
+#: lua/snacks/picker/core/picker.lua:129
+msgctxt "title"
+msgid "Jumps"
+msgstr "跳转列表"
+
+#: lua/snacks/picker/core/picker.lua:129
+msgctxt "title"
+msgid "Lines"
+msgstr "当前行搜索"
+
+#: lua/snacks/picker/core/picker.lua:129
+msgctxt "title"
+msgid "Loclist"
+msgstr "位置列表"
+
+#: lua/snacks/picker/core/picker.lua:129
+msgctxt "title"
+msgid "Qflist"
+msgstr "Quickfix 列表"
+
+#: lua/snacks/picker/core/picker.lua:129
+msgctxt "title"
+msgid "Marks"
+msgstr "标记"
+
+#: lua/snacks/picker/core/picker.lua:129
+msgctxt "title"
+msgid "Man"
+msgstr "Man 手册"
+
+#: lua/snacks/picker/core/picker.lua:129
+msgctxt "title"
+msgid "Notifications"
+msgstr "通知历史"
+
+#: lua/snacks/picker/core/picker.lua:129
+msgctxt "title"
+msgid "Pickers"
+msgstr "选择器列表"
+
+#: lua/snacks/picker/core/picker.lua:129
+msgctxt "title"
+msgid "Projects"
+msgstr "项目列表"
+
+#: lua/snacks/picker/core/picker.lua:129
+msgctxt "title"
+msgid "Registers"
+msgstr "Register"
+
+#: lua/snacks/picker/core/picker.lua:129
+msgctxt "title"
+msgid "Resume"
+msgstr "恢复上次选择"
+
+#: lua/snacks/picker/core/picker.lua:129
+msgctxt "title"
+msgid "Search History"
+msgstr "搜索历史"
+
+#: lua/snacks/picker/core/picker.lua:129
+msgctxt "title"
+msgid "Spelling"
+msgstr "拼写建议"
+
+#: lua/snacks/picker/core/picker.lua:129
+msgctxt "title"
+msgid "Treesitter"
+msgstr "Treesitter 符号"
+
+#: lua/snacks/picker/core/picker.lua:129
+msgctxt "title"
+msgid "Undo"
+msgstr "撤销历史"
+
+#: lua/snacks/picker/core/picker.lua:129
+msgctxt "title"
+msgid "Zoxide"
+msgstr "Zoxide 目录"
+
+#: lua/snacks/picker/core/picker.lua:129
+msgctxt "title"
+msgid "Lsp Symbols"
+msgstr "LSP 文档符号"
+
+#: lua/snacks/picker/core/picker.lua:129
+msgctxt "title"
+msgid "Lsp Workspace Symbols"
+msgstr "LSP 工作区符号"
+
+#: lua/snacks/picker/core/picker.lua:129
+msgctxt "title"
+msgid "Lsp References"
+msgstr "LSP 引用"
+
+#: lua/snacks/picker/core/picker.lua:129
+msgctxt "title"
+msgid "Lsp Definitions"
+msgstr "LSP 定义"
+
+#: lua/snacks/picker/core/picker.lua:129
+msgctxt "title"
+msgid "Lsp Declarations"
+msgstr "LSP 声明"
+
+#: lua/snacks/picker/core/picker.lua:129
+msgctxt "title"
+msgid "Lsp Implementations"
+msgstr "LSP 实现"
+
+#: lua/snacks/picker/core/picker.lua:129
+msgctxt "title"
+msgid "Lsp Type Definitions"
+msgstr "LSP 类型定义"
+
+#: lua/snacks/picker/core/picker.lua:129
+msgctxt "title"
+msgid "Lsp Incoming Calls"
+msgstr "LSP 调用方"
+
+#: lua/snacks/picker/core/picker.lua:129
+msgctxt "title"
+msgid "Lsp Outgoing Calls"
+msgstr "LSP 被调用方"
+
+#: lua/snacks/picker/core/picker.lua:129
+msgctxt "title"
+msgid "Lsp Config"
+msgstr "LSP 配置"
+
+#: lua/snacks/picker/core/picker.lua:129
+msgctxt "title"
+msgid "Search"
+msgstr "搜索"
+
+#: lua/snacks/picker/select.lua:18
+msgctxt "prompt"
+msgid "Select"
+msgstr "选择"
+
+#: lua/snacks/input.lua:139
+msgctxt "prompt"
+msgid "Input"
+msgstr "输入"
+
+#: lua/snacks/notifier.lua:100
+msgctxt "prompt"
+msgid " Notification History "
+msgstr " 通知历史 "
+
+#: lua/snacks/bufdelete.lua:55
+msgctxt "prompt"
+msgid "Save changes to %s?"
+msgstr "是否保存对 %s 的更改？"
+
+#: lua/snacks/bufdelete.lua:55
+msgctxt "prompt"
+msgid ""
+"&Yes\n"
+"&No\n"
+"&Cancel"
+msgstr ""
+"是(&Y)\n"
+"否(&N)\n"
+"取消(&C)"
+
+#: lua/snacks/dashboard.lua:773
+msgctxt "notification"
+msgid "No picker found for %s"
+msgstr "未找到用于 %s 的选择器"
+
+#: lua/snacks/picker/core/picker.lua:729
+msgctxt "notification"
+msgid "No results"
+msgstr "无结果"
+
+#: lua/snacks/picker/core/picker.lua:731
+msgctxt "notification"
+msgid "No results found for `%s`"
+msgstr "未找到 `%s` 的结果"
+
+#: lua/snacks/picker/actions.lua:349
+msgctxt "notification"
+msgid "Only open buffers can be deleted"
+msgstr "仅可删除已打开的 Buffer"
+
+#: lua/snacks/picker/actions.lua:372
+#: lua/snacks/picker/actions.lua:386
+msgctxt "notification"
+msgid "Can't stage/unstage this change"
+msgstr "无法暂存或取消暂存此更改"
+
+#: lua/snacks/picker/actions.lua:406
+#: lua/snacks/picker/actions.lua:434
+msgctxt "notification"
+msgid "Can't restore this change"
+msgstr "无法恢复此更改"
+
+#: lua/snacks/picker/actions.lua:458
+msgctxt "notification"
+msgid "Stash applied: `%s`"
+msgstr "已应用贮藏：`%s`"
+
+#: lua/snacks/picker/actions.lua:467
+#: lua/snacks/picker/actions.lua:510
+msgctxt "notification"
+msgid "No branch or commit found"
+msgstr "未找到分支或提交"
+
+#: lua/snacks/picker/actions.lua:479
+msgctxt "notification"
+msgid "Checkout %s"
+msgstr "已切换到 %s"
+
+#: lua/snacks/picker/actions.lua:495
+msgctxt "notification"
+msgid "Branch '%s' already exists."
+msgstr "分支 '%s' 已存在。"
+
+#: lua/snacks/picker/actions.lua:498
+msgctxt "notification"
+msgid "Created Branch `%s`"
+msgstr "已创建分支 `%s`"
+
+#: lua/snacks/picker/actions.lua:517
+msgctxt "notification"
+msgid "Cannot delete the current branch."
+msgstr "无法删除当前分支。"
+
+#: lua/snacks/picker/actions.lua:524
+msgctxt "notification"
+msgid "Deleted Branch `%s`"
+msgstr "已删除分支 `%s`"
+
+#: lua/snacks/picker/actions.lua:747
+msgctxt "notification"
+msgid "Live search is not supported for `%s`"
+msgstr "`%s` 不支持实时搜索"
+
+#: lua/snacks/words.lua:163
+msgctxt "notification"
+msgid "Reference [%d/%d]"
+msgstr "引用 [%d/%d]"
+
+#: lua/snacks/words.lua:169
+msgctxt "notification"
+msgid "No more references"
+msgstr "没有更多引用"
+
+#: lua/snacks/terminal.lua:43
+msgctxt "notification"
+msgid "No file under cursor"
+msgstr "光标下没有文件"
+
+#: lua/snacks/terminal.lua:141
+msgctxt "notification"
+msgid ""
+"Terminal exited with code %d.\n"
+"Check for any errors."
+msgstr ""
+"终端已退出，退出码为 %d。\n"
+"请检查是否有错误。"
+
+#: lua/snacks/indent.lua:419
+msgctxt "notification"
+msgid "Invalid animate style: %s"
+msgstr "无效的动画样式：%s"
+
+#: lua/snacks/health.lua:34
+msgctxt "health"
+msgid "setup called"
+msgstr "已调用 setup"
+
+#: lua/snacks/health.lua:36
+msgctxt "health"
+msgid "setup called *after* `VimEnter`"
+msgstr "setup 在 `VimEnter` 之后调用"
+
+#: lua/snacks/health.lua:39
+msgctxt "health"
+msgid "setup not called"
+msgstr "尚未调用 setup"
+
+#: lua/snacks/health.lua:45
+msgctxt "health"
+msgid "`snacks.nvim` should not be lazy-loaded. Add `lazy=false` to the plugin spec"
+msgstr "`snacks.nvim` 不应延迟加载，请在插件配置中添加 `lazy=false`"
+
+#: lua/snacks/health.lua:48
+msgctxt "health"
+msgid "`snacks.nvim` should have a priority of 1000 or higher. Add `priority=1000` to the plugin spec"
+msgstr "`snacks.nvim` 的优先级应为 1000 或更高，请在插件配置中添加 `priority=1000`"
+
+#: lua/snacks/health.lua:51
+msgctxt "health"
+msgid "`snacks.nvim` not found in lazy"
+msgstr "在 lazy 中未找到 `snacks.nvim`"
+
+#: lua/snacks/health.lua:61
+msgctxt "health"
+msgid "setup {enabled}"
+msgstr "初始化配置 {enabled}"
+
+#: lua/snacks/health.lua:63
+msgctxt "health"
+msgid "setup {disabled}"
+msgstr "初始化配置 {disabled}"
+
+#: lua/snacks/health.lua:97
+msgctxt "health"
+msgid "'%s' `%s` is too old, expected `%s`"
+msgstr "'%s' `%s` 版本过旧，要求 `%s`"
+
+#: lua/snacks/health.lua:117
+msgctxt "health"
+msgid "Tool not found: %s"
+msgstr "未找到工具：%s"
+
+#: lua/snacks/health.lua:119
+msgctxt "health"
+msgid "None of the tools found: %s"
+msgstr "未找到以下任何工具：%s"
+
+#: lua/snacks/health.lua:143
+msgctxt "health"
+msgid ""
+"Available Treesitter languages:\n"
+"  %s"
+msgstr ""
+"可用的 Treesitter 语言：\n"
+"  %s"
+
+#: lua/snacks/health.lua:146
+msgctxt "health"
+msgid ""
+"Missing Treesitter languages:\n"
+"  %s"
+msgstr ""
+"缺失的 Treesitter 语言：\n"
+"  %s"
+
+#: lua/snacks/dashboard.lua:1228
+msgctxt "health"
+msgid "setup ran"
+msgstr "初始化已执行"
+
+#: lua/snacks/dashboard.lua:1230
+msgctxt "health"
+msgid "dashboard opened"
+msgstr "启动面板已打开"
+
+#: lua/snacks/dashboard.lua:1232
+msgctxt "health"
+msgid "dashboard did not open: `%s`"
+msgstr "启动面板未打开：`%s`"
+
+#: lua/snacks/dashboard.lua:1235
+msgctxt "health"
+msgid "setup did not run"
+msgstr "初始化未执行"
+
+#: lua/snacks/dashboard.lua:1240
+msgctxt "health"
+msgid "`%s` conflicts with `Snacks.dashboard`"
+msgstr "`%s` 与 `Snacks.dashboard` 冲突"
+
+#: lua/snacks/notifier.lua:779
+msgctxt "health"
+msgid "is ready"
+msgstr "已就绪"
+
+#: lua/snacks/notifier.lua:781
+msgctxt "health"
+msgid "is not ready"
+msgstr "未就绪"
+
+#: lua/snacks/input.lua:315
+msgctxt "health"
+msgid "`vim.ui.input` is set to `Snacks.input`"
+msgstr "`vim.ui.input` 已设置为 `Snacks.input`"
+
+#: lua/snacks/input.lua:317
+msgctxt "health"
+msgid "`vim.ui.input` is not set to `Snacks.input`"
+msgstr "`vim.ui.input` 未设置为 `Snacks.input`"
+
+#: lua/snacks/lazygit.lua:230
+msgctxt "health"
+msgid "{lazygit} installed"
+msgstr "{lazygit} 已安装"
+
+#: lua/snacks/lazygit.lua:230
+msgctxt "health"
+msgid "{lazygit} not installed"
+msgstr "{lazygit} 未安装"
+
+#: lua/snacks/picker/core/_health.lua:8
+msgctxt "health"
+msgid "`vim.ui.select` is set to `Snacks.picker.select`"
+msgstr "`vim.ui.select` 已设置为 `Snacks.picker.select`"
+
+#: lua/snacks/picker/core/_health.lua:10
+msgctxt "health"
+msgid "`vim.ui.select` is not set to `Snacks.picker.select`"
+msgstr "`vim.ui.select` 未设置为 `Snacks.picker.select`"
+
+#: lua/snacks/picker/core/_health.lua:13
+msgctxt "health"
+msgid "`vim.ui.select` for `Snacks.picker` is not enabled"
+msgstr "尚未启用 `Snacks.picker` 的 `vim.ui.select`"
+
+#: lua/snacks/picker/core/_health.lua:22
+msgctxt "health"
+msgid "'rg' is required for `Snacks.picker.grep()`"
+msgstr "`Snacks.picker.grep()` 需要 'rg'"
+
+#: lua/snacks/picker/core/_health.lua:24
+msgctxt "health"
+msgid "`Snacks.picker.grep()` is available"
+msgstr "`Snacks.picker.grep()` 可用"
+
+#: lua/snacks/picker/core/_health.lua:35
+msgctxt "health"
+msgid "`Snacks.picker.files()` is available"
+msgstr "`Snacks.picker.files()` 可用"
+
+#: lua/snacks/picker/core/_health.lua:37
+msgctxt "health"
+msgid "'rg', 'fd' or 'find' is required for `Snacks.picker.files()`"
+msgstr "`Snacks.picker.files()` 需要 'rg'、'fd' 或 'find'"
+
+#: lua/snacks/picker/core/_health.lua:41
+msgctxt "health"
+msgid "'fd' `v8.4` is required for searching with `Snacks.picker.explorer()`"
+msgstr "使用 `Snacks.picker.explorer()` 搜索需要 'fd' `v8.4`"
+
+#: lua/snacks/picker/core/_health.lua:43
+msgctxt "health"
+msgid "`Snacks.picker.explorer()` is available"
+msgstr "`Snacks.picker.explorer()` 可用"
+
+#: lua/snacks/picker/core/_health.lua:48
+msgctxt "health"
+msgid "`SQLite3` is available"
+msgstr "`SQLite3` 可用"
+
+#: lua/snacks/picker/core/_health.lua:50
+msgctxt "health"
+msgid "`SQLite3` is not available. Frecency and history will be stored in a file instead."
+msgstr "`SQLite3` 不可用，频率统计与历史记录将改为存储在文件中。"

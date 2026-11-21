@@ -1,0 +1,204 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: nvim-zh\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Domain: nvim-treesitter\n"
+
+#: lua/nvim-treesitter/health.lua:24
+msgctxt "health"
+msgid "Requirements"
+msgstr "依赖要求"
+
+#: lua/nvim-treesitter/health.lua:28
+msgctxt "health"
+msgid "Nvim-treesitter requires Neovim 0.12.0 or later."
+msgstr "nvim-treesitter 需要 Neovim 0.12.0 或更高版本。"
+
+#: lua/nvim-treesitter/health.lua:33
+msgctxt "health"
+msgid "Neovim was compiled with tree-sitter runtime ABI version %d (required >=%d)."
+msgstr "Neovim 编译时使用的 tree-sitter 运行时 ABI 版本为 %d（要求 >=%d）。"
+
+#: lua/nvim-treesitter/health.lua:41
+msgctxt "health"
+msgid ""
+"Neovim was compiled with tree-sitter runtime ABI version %d.\n"
+"nvim-treesitter expects at least ABI version %d\n"
+"Please make sure that Neovim is linked against a recent tree-sitter library when building or raise an issue at your Neovim packager. Parsers must be compatible with runtime ABI."
+msgstr ""
+"Neovim 编译时使用的 tree-sitter 运行时 ABI 版本为 %d。\n"
+"nvim-treesitter 需要至少 ABI 版本 %d\n"
+"请确保构建 Neovim 时链接了较新的 tree-sitter 库，或向你的 Neovim 打包维护者反馈。解析器必须与运行时 ABI 兼容。"
+
+#: lua/nvim-treesitter/health.lua:60
+msgctxt "health"
+msgid "tree-sitter-cli v%d.%d.%d is required"
+msgstr "需要 tree-sitter-cli v%d.%d.%d"
+
+#: lua/nvim-treesitter/health.lua:64
+msgctxt "health"
+msgid "tree-sitter-cli not found"
+msgstr "未找到 tree-sitter-cli"
+
+#: lua/nvim-treesitter/health.lua:73
+msgctxt "health"
+msgid "tar not found"
+msgstr "未找到 tar"
+
+#: lua/nvim-treesitter/health.lua:80
+msgctxt "health"
+msgid "curl not found"
+msgstr "未找到 curl"
+
+#: lua/nvim-treesitter/health.lua:84
+msgctxt "health"
+msgid "OS Info"
+msgstr "操作系统信息"
+
+#: lua/nvim-treesitter/health.lua:91
+msgctxt "health"
+msgid "Install directory for parsers and queries"
+msgstr "解析器与查询文件的安装目录"
+
+#: lua/nvim-treesitter/health.lua:94
+msgctxt "health"
+msgid "is writable."
+msgstr "可写。"
+
+#: lua/nvim-treesitter/health.lua:96
+msgctxt "health"
+msgid "is not writable."
+msgstr "不可写。"
+
+#: lua/nvim-treesitter/health.lua:101
+msgctxt "health"
+msgid "is in runtimepath."
+msgstr "已在 runtimepath 中。"
+
+#: lua/nvim-treesitter/health.lua:103
+msgctxt "health"
+msgid "is not in runtimepath."
+msgstr "不在 runtimepath 中。"
+
+#: lua/nvim-treesitter/health.lua:125
+msgctxt "health"
+msgid "Installed languages     H L F I J"
+msgstr "已安装的语言            H L F I J"
+
+#: lua/nvim-treesitter/health.lua:149
+msgctxt "health"
+msgid "  Legend: [H]ighlights, [L]ocals, [F]olds, [I]ndents, In[J]ections"
+msgstr "  图例：[H] 高亮，[L] 局部作用域，[F] 折叠，[I] 缩进，[J] 注入"
+
+#: lua/nvim-treesitter/health.lua:152
+msgctxt "health"
+msgid "The following errors have been detected in query files:"
+msgstr "在查询文件中检测到以下错误："
+
+#: lua/nvim-treesitter/config.lua:146
+msgctxt "log"
+msgid "skipping unsupported language: %s"
+msgstr "跳过不支持的语言：%s"
+
+#: lua/nvim-treesitter/install.lua:149
+msgctxt "log"
+msgid "Parser not available for language \"%s\""
+msgstr "语言 \"%s\" 没有可用的解析器"
+
+#: lua/nvim-treesitter/install.lua:202
+msgctxt "log"
+msgid "Generating parser.c from %s..."
+msgstr "正在从 %s 生成 parser.c..."
+
+#: lua/nvim-treesitter/install.lua:213
+msgctxt "log"
+msgid "Error during \"tree-sitter generate\": %s"
+msgstr "\"tree-sitter generate\" 出错：%s"
+
+#: lua/nvim-treesitter/install.lua:237
+msgctxt "log"
+msgid "Downloading %s..."
+msgstr "正在下载 %s..."
+
+#: lua/nvim-treesitter/install.lua:251
+msgctxt "log"
+msgid "Error during download: %s"
+msgstr "下载出错：%s"
+
+#: lua/nvim-treesitter/install.lua:260
+msgctxt "log"
+msgid "Could not create %s-tmp: %s"
+msgstr "无法创建 %s-tmp：%s"
+
+#: lua/nvim-treesitter/install.lua:272
+msgctxt "log"
+msgid "Error during tarball extraction: %s"
+msgstr "解压归档包出错：%s"
+
+#: lua/nvim-treesitter/install.lua:281
+msgctxt "log"
+msgid "Could not remove tarball: %s"
+msgstr "无法删除归档包：%s"
+
+#: lua/nvim-treesitter/install.lua:293
+msgctxt "log"
+msgid "Could not rename temp: %s"
+msgstr "无法重命名临时目录：%s"
+
+#: lua/nvim-treesitter/install.lua:306
+msgctxt "log"
+msgid "Compiling parser"
+msgstr "正在编译解析器"
+
+#: lua/nvim-treesitter/install.lua:315
+msgctxt "log"
+msgid "Error during \"tree-sitter build\": %s"
+msgstr "\"tree-sitter build\" 出错：%s"
+
+#: lua/nvim-treesitter/install.lua:325
+msgctxt "log"
+msgid "Installing parser"
+msgstr "正在安装解析器"
+
+#: lua/nvim-treesitter/install.lua:334
+msgctxt "log"
+msgid "Error during parser installation: %s"
+msgstr "安装解析器出错：%s"
+
+#: lua/nvim-treesitter/install.lua:462
+msgctxt "log"
+msgid "Language installed"
+msgstr "语言解析器已安装"
+
+#: lua/nvim-treesitter/install.lua:535
+msgctxt "log"
+msgid "All parsers are already installed"
+msgstr "所有解析器均已安装"
+
+#: lua/nvim-treesitter/install.lua:537
+msgctxt "log"
+msgid "Installed %d/%d languages"
+msgstr "已安装 %d/%d 个语言解析器"
+
+#: lua/nvim-treesitter/install.lua:572
+msgctxt "log"
+msgid "All parsers are up-to-date"
+msgstr "所有解析器均已是最新"
+
+#: lua/nvim-treesitter/install.lua:611
+msgctxt "log"
+msgid "Language uninstalled"
+msgstr "语言解析器已卸载"
+
+#: lua/nvim-treesitter/install.lua:630
+msgctxt "log"
+msgid "Parser for %s is not managed by nvim-treesitter"
+msgstr "%s 的解析器不由 nvim-treesitter 管理"
+
+#: lua/nvim-treesitter/install.lua:647
+msgctxt "log"
+msgid "Uninstalled %d/%d languages"
+msgstr "已卸载 %d/%d 个语言解析器"

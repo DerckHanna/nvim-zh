@@ -1,0 +1,330 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: nvim-zh\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Domain: aerial\n"
+
+#: lua/aerial/actions.lua:6
+msgctxt "action"
+msgid "Show default keymaps"
+msgstr "显示默认键映射"
+
+#: lua/aerial/actions.lua:14
+#: lua/aerial/nav_actions.lua:6
+msgctxt "action"
+msgid "Jump to the symbol under the cursor"
+msgstr "跳转到光标下的符号"
+
+#: lua/aerial/actions.lua:19
+#: lua/aerial/nav_actions.lua:17
+msgctxt "action"
+msgid "Jump to the symbol in a vertical split"
+msgstr "在垂直分屏中跳转到符号"
+
+#: lua/aerial/actions.lua:26
+#: lua/aerial/nav_actions.lua:32
+msgctxt "action"
+msgid "Jump to the symbol in a horizontal split"
+msgstr "在水平分屏中跳转到符号"
+
+#: lua/aerial/actions.lua:33
+msgctxt "action"
+msgid "Scroll to the symbol (stay in aerial buffer)"
+msgstr "滚动到符号处（停留在 Aerial Buffer）"
+
+#: lua/aerial/actions.lua:40
+msgctxt "action"
+msgid "Go down one line and scroll to that symbol"
+msgstr "下移一行并滚动到该符号"
+
+#: lua/aerial/actions.lua:50
+msgctxt "action"
+msgid "Go up one line and scroll to that symbol"
+msgstr "上移一行并滚动到该符号"
+
+#: lua/aerial/actions.lua:60
+msgctxt "action"
+msgid "Jump to the previous symbol"
+msgstr "跳转到上一个符号"
+
+#: lua/aerial/actions.lua:65
+msgctxt "action"
+msgid "Jump to the next symbol"
+msgstr "跳转到下一个符号"
+
+#: lua/aerial/actions.lua:70
+msgctxt "action"
+msgid "Jump up the tree, moving backwards in the file"
+msgstr "在文件中向上跳转到上层树节点"
+
+#: lua/aerial/actions.lua:75
+msgctxt "action"
+msgid "Jump up the tree, moving forwards in the file"
+msgstr "在文件中向下跳转到上层树节点"
+
+#: lua/aerial/actions.lua:80
+msgctxt "action"
+msgid "Close the aerial window"
+msgstr "关闭 Aerial Window"
+
+#: lua/aerial/actions.lua:91
+msgctxt "action"
+msgid "Toggle the symbol under the cursor open/closed"
+msgstr "展开或折叠光标下的符号"
+
+#: lua/aerial/actions.lua:96
+msgctxt "action"
+msgid "Recursively toggle the symbol under the cursor open/closed"
+msgstr "递归展开或折叠光标下的符号"
+
+#: lua/aerial/actions.lua:103
+msgctxt "action"
+msgid "Expand the symbol under the cursor"
+msgstr "展开光标下的符号"
+
+#: lua/aerial/actions.lua:108
+msgctxt "action"
+msgid "Recursively expand the symbol under the cursor"
+msgstr "递归展开光标下的符号"
+
+#: lua/aerial/actions.lua:115
+msgctxt "action"
+msgid "Collapse the symbol under the cursor"
+msgstr "折叠光标下的符号"
+
+#: lua/aerial/actions.lua:120
+msgctxt "action"
+msgid "Recursively collapse the symbol under the cursor"
+msgstr "递归折叠光标下的符号"
+
+#: lua/aerial/actions.lua:127
+msgctxt "action"
+msgid "Increase the fold level of the tree"
+msgstr "增加树的折叠层级"
+
+#: lua/aerial/actions.lua:134
+msgctxt "action"
+msgid "Decrease the fold level of the tree"
+msgstr "减少树的折叠层级"
+
+#: lua/aerial/actions.lua:141
+msgctxt "action"
+msgid "Expand all nodes in the tree"
+msgstr "展开树中的所有节点"
+
+#: lua/aerial/actions.lua:146
+msgctxt "action"
+msgid "Collapse all nodes in the tree"
+msgstr "折叠树中的所有节点"
+
+#: lua/aerial/actions.lua:151
+msgctxt "action"
+msgid "Sync code folding to the tree (useful if they get out of sync)"
+msgstr "将代码折叠同步到树（不同步时可用）"
+
+#: lua/aerial/nav_actions.lua:49
+msgctxt "action"
+msgid "Navigate to parent symbol"
+msgstr "导航到父符号"
+
+#: lua/aerial/nav_actions.lua:59
+msgctxt "action"
+msgid "Navigate to child symbol"
+msgstr "导航到子符号"
+
+#: lua/aerial/nav_actions.lua:69
+msgctxt "action"
+msgid "Close the nav windows"
+msgstr "关闭导航 Window"
+
+#: lua/aerial/render.lua:86
+msgctxt "outline"
+msgid "No symbols"
+msgstr "暂无符号"
+
+#: lua/aerial/loading.lua:26
+msgctxt "outline"
+msgid "%s Loading"
+msgstr "%s 正在加载"
+
+#: lua/aerial/render.lua:95
+msgctxt "outline"
+msgid "%s (not supported) [%s]"
+msgstr "%s (不支持) [%s]"
+
+#: lua/aerial/command.lua:96
+msgctxt "info"
+msgid "Aerial Info"
+msgstr "Aerial 信息"
+
+#: lua/aerial/command.lua:98
+msgctxt "info"
+msgid "Filetype: %s"
+msgstr "文件类型：%s"
+
+#: lua/aerial/command.lua:102
+msgctxt "info"
+msgid "Aerial ignores this window: %s. See the 'ignore' config in :help aerial-options"
+msgstr "Aerial 忽略了此 Window：%s。请参阅 :help aerial-options 中的 'ignore' 配置"
+
+#: lua/aerial/command.lua:107
+msgctxt "info"
+msgid "Configured backends:"
+msgstr "已配置的后端："
+
+#: lua/aerial/command.lua:111
+msgctxt "info"
+msgid "  %s (supported)"
+msgstr "  %s (已支持)"
+
+#: lua/aerial/command.lua:111
+#: lua/aerial/command.lua:116
+msgctxt "info"
+msgid "  %s (supported) (attached)"
+msgstr "  %s (已支持) (已附加)"
+
+#: lua/aerial/command.lua:113
+msgctxt "info"
+msgid "  %s (not supported) [%s]"
+msgstr "  %s (不支持) [%s]"
+
+#: lua/aerial/command.lua:113
+#: lua/aerial/command.lua:116
+msgctxt "info"
+msgid "  %s (not supported) [%s] (attached)"
+msgstr "  %s (不支持) [%s] (已附加)"
+
+#: lua/aerial/command.lua:120
+msgctxt "info"
+msgid "Show symbols: %s"
+msgstr "显示符号：%s"
+
+#: lua/aerial/backends/init.lua:24
+msgctxt "status"
+msgid "Buffer is invalid"
+msgstr "Buffer 无效"
+
+#: lua/aerial/backends/init.lua:28
+msgctxt "status"
+msgid "File exceeds disable_max_lines size"
+msgstr "文件超出 disable_max_lines 行数限制"
+
+#: lua/aerial/backends/init.lua:35
+msgctxt "status"
+msgid "File exceeds disable_max_size"
+msgstr "文件超出 disable_max_size 大小限制"
+
+#: lua/aerial/backends/init.lua:43
+msgctxt "status"
+msgid "No such backend"
+msgstr "无此后端"
+
+#: lua/aerial/backends/lsp/init.lua:97
+msgctxt "status"
+msgid "No LSP client found that supports symbols"
+msgstr "未找到支持符号的 LSP 客户端"
+
+#: lua/aerial/backends/treesitter/init.lua:20
+msgctxt "status"
+msgid "No treesitter parser for %s"
+msgstr "未找到 %s 的 Treesitter 解析器"
+
+#: lua/aerial/backends/treesitter/init.lua:24
+msgctxt "status"
+msgid "No queries defined for '%s'"
+msgstr "未定义 '%s' 的查询文件"
+
+#: lua/aerial/backends/markdown.lua:10
+msgctxt "status"
+msgid "Filetype is not markdown"
+msgstr "文件类型不是 markdown"
+
+#: lua/aerial/backends/asciidoc.lua:15
+msgctxt "status"
+msgid "Filetype is not asciidoc"
+msgstr "文件类型不是 asciidoc"
+
+#: lua/aerial/backends/man.lua:10
+msgctxt "status"
+msgid "Filetype is not man"
+msgstr "文件类型不是 man"
+
+#: lua/aerial/util.lua:242
+msgctxt "status"
+msgid "Buffer is not valid"
+msgstr "Buffer 无效"
+
+#: lua/aerial/util.lua:251
+msgctxt "status"
+msgid "Buffer is not listed"
+msgstr "Buffer 未列入列表"
+
+#: lua/aerial/util.lua:258
+msgctxt "status"
+msgid "Buftype '%s' is \"special\""
+msgstr "Buftype '%s' 为特殊类型"
+
+#: lua/aerial/util.lua:262
+#: lua/aerial/util.lua:266
+msgctxt "status"
+msgid "Buftype '%s' is ignored"
+msgstr "Buftype '%s' 已忽略"
+
+#: lua/aerial/util.lua:273
+msgctxt "status"
+msgid "Filetype '%s' is ignored"
+msgstr "文件类型 '%s' 已忽略"
+
+#: lua/aerial/util.lua:294
+msgctxt "status"
+msgid "Viewing a diff"
+msgstr "正在查看差异对比"
+
+#: lua/aerial/util.lua:299
+msgctxt "status"
+msgid "Wintype '%s' is \"special\""
+msgstr "Wintype '%s' 为特殊类型"
+
+#: lua/aerial/util.lua:302
+msgctxt "status"
+msgid "Wintype '%s' is ignored"
+msgstr "Wintype '%s' 已忽略"
+
+#: lua/aerial/init.lua:212
+msgctxt "notification"
+msgid "aerial is deprecated for Neovim <0.12. Please use a nvim-0.x branch or upgrade Neovim"
+msgstr "aerial 已停止支持 Neovim <0.12，请使用 nvim-0.x 分支或升级 Neovim"
+
+#: lua/aerial/backends/init.lua:175
+msgctxt "notification"
+msgid "aerial.config.post_add_all_symbols should return the symbols to display, but you returned nil or didn't return anything."
+msgstr "aerial.config.post_add_all_symbols 应返回要显示的符号列表，但返回了 nil 或未返回任何值。"
+
+#: lua/aerial/backends/init.lua:219
+msgctxt "notification"
+msgid "Aerial could find no supported backend"
+msgstr "Aerial 未找到支持的后端"
+
+#: lua/aerial/backends/lsp/init.lua:41
+#: lua/aerial/backends/lsp/init.lua:71
+msgctxt "notification"
+msgid "Error requesting document symbols"
+msgstr "请求文档符号时出错"
+
+#: lua/aerial/backends/lsp/init.lua:56
+msgctxt "notification"
+msgid "No LSP client found that supports symbols in buffer %d"
+msgstr "在 Buffer %d 中未找到支持符号的 LSP 客户端"
+
+#: lua/aerial/backends/lsp/init.lua:81
+msgctxt "notification"
+msgid "Error requesting document symbols: %s"
+msgstr "请求文档符号时出错：%s"
+
+#: lua/aerial/backends/lsp/init.lua:88
+msgctxt "notification"
+msgid "Timeout when requesting document symbols"
+msgstr "请求文档符号超时"

@@ -1,0 +1,123 @@
+{
+  "contracts": [
+    "tests/upstream/cmake-tools/cmake_tools_upstream_spec.lua"
+  ],
+  "domain": "cmake-tools",
+  "entry": "nvim-zh.adapters.cmake_tools",
+  "id": "cmake-tools",
+  "lazy_names": [
+    "cmake-tools.nvim"
+  ],
+  "modules": [
+    "cmake-tools",
+    "cmake-tools.log",
+    "cmake-tools.notification",
+    "cmake-tools.quickstart",
+    "cmake-tools.window"
+  ],
+  "notes": {
+    "domain": "cmake-tools",
+    "excluded": "CMake build output, target names, preset names, kit names and raw CMakeCache/CodeModel values",
+    "limitations": "user command descriptions registered on plugin load remain upstream text",
+    "public_path": "exact CMakeTools vim.notify title and log/notification methods; interactive select/input prompts; settings popup title",
+    "seam": "vim.notify:title=CMakeTools; cmake-tools.log.notify; cmake-tools.notification.notify; cmake-tools interactive select/input prompt projection; cmake-tools.window.open title projection",
+    "status": "implemented",
+    "writes": "prompt_window_title_and_notification_display_only"
+  },
+  "scenarios": {
+    "notifications": {
+      "surfaces": [
+        "notifications"
+      ],
+      "tui": "tests/upstream/cmake-tools/tui.py"
+    },
+    "prompts": {
+      "surfaces": [
+        "prompts"
+      ],
+      "tui": "tests/upstream/cmake-tools/tui.py"
+    }
+  },
+  "schema": 1,
+  "status": "implemented",
+  "surfaces": {
+    "notifications": {
+      "independent": true,
+      "kind": "versioned",
+      "modules": {
+        "cmake-tools.log": "lua/cmake-tools/log.lua",
+        "cmake-tools.notification": "lua/cmake-tools/notification.lua"
+      },
+      "source": [
+        "lua/cmake-tools/log.lua",
+        "lua/cmake-tools/notification.lua"
+      ]
+    },
+    "prompts": {
+      "independent": true,
+      "kind": "versioned",
+      "modules": {
+        "cmake-tools": "lua/cmake-tools/init.lua",
+        "cmake-tools.quickstart": "lua/cmake-tools/quickstart/init.lua",
+        "cmake-tools.window": "lua/cmake-tools/window.lua"
+      }
+    }
+  },
+  "targets": {
+    "baseline": {
+      "commit": "782a254c62a61af1d4febddd0d6dbc5ea414a027",
+      "dependencies": [
+        "plenary"
+      ],
+      "neovim": "0.12.6",
+      "sources": {
+        "lua/cmake-tools/build_preset.lua": "2140b3ccea406eb9653f7f73e87582c425b7a35b2832eaf8e2da0c4d5760e763",
+        "lua/cmake-tools/config.lua": "ae11bae5f002e3b3f12303188fbcbf766ead12d85318aea90a001125385a3aac",
+        "lua/cmake-tools/const.lua": "63ba59a93a590adeb3793c278b3759278b35aaa29796ac4abfa55519a39b3e82",
+        "lua/cmake-tools/environment.lua": "c503b45a32b023038fa38574c539f270759401ace8c21445ba533c5a1e52ab72",
+        "lua/cmake-tools/executors/init.lua": "97393c575ec471910f26c18251d8f3cad374fdce4bf619879bc6fdf80d368f52",
+        "lua/cmake-tools/executors/types.lua": "556747c2017732323f2cafb845ec6b05ee1ad2fcfa21af42b214c8605af457d5",
+        "lua/cmake-tools/file_picker.lua": "8eb947da17250a701388c246f8dbb34ec06d1fb8cf0a7ab93b61513a529d1d10",
+        "lua/cmake-tools/hints.lua": "b2a30d8f5900acdbe940c822faafe90a43dc15c6f47976c603f627489e015bc7",
+        "lua/cmake-tools/init.lua": "bc405e02ec9a2719156262079a48da446b787a4d11d1e88bdf1df39d1c948e97",
+        "lua/cmake-tools/kits.lua": "e535efa25458907c4aff59887cb09699ca0ccbe52ebe3f8f8dde078991959df3",
+        "lua/cmake-tools/log.lua": "87f3905b0f3115206c94623ea48738e2711f395f04c9d16d11f65d0731b1980f",
+        "lua/cmake-tools/notification.lua": "a01a08603e812559805e859adcde67b46ae201a731501fdb5b2281eda213d446",
+        "lua/cmake-tools/osys.lua": "fb2127837fdae3d0ec08686e9649c7e696d997b45ff1673507f62afb356048d8",
+        "lua/cmake-tools/overseer.lua": "292c4f5bcbceea965cf32033d43dde8588bc5c7ebc345b6fe95f8fa7783b26bf",
+        "lua/cmake-tools/preset.lua": "5f4e39b0fea06b08bddba588159753b167107daae3083ca951d43f905cc436e3",
+        "lua/cmake-tools/presets.lua": "f1976ce9b4fb085399f930d08a7d29379de0b03245266f14b9faf03f6bb1f10c",
+        "lua/cmake-tools/quickfix.lua": "25c60f59895ae48707761249852a69464449a8119f9f405eeb12b0c33dda62cc",
+        "lua/cmake-tools/quickstart/etlua.lua": "9d50f8fcfd36e939cb3adce00bb8492717dcd7920b486c75e6953df60cbd4d9f",
+        "lua/cmake-tools/quickstart/init.lua": "8084649e144e2dbf172fb3b624cd7f2b49c267b6c9de91524dca165b696386e6",
+        "lua/cmake-tools/result.lua": "5fb7465722c3b671e517f9d50743137fdc3ec73bcbe5b069eebd6c39b165cb45",
+        "lua/cmake-tools/runners/init.lua": "97393c575ec471910f26c18251d8f3cad374fdce4bf619879bc6fdf80d368f52",
+        "lua/cmake-tools/runners/types.lua": "98781dd37d0ea4542db6304438bf893a9d72229a3446fd660d0cfac88e140de3",
+        "lua/cmake-tools/scratch.lua": "7a0ab5243238ed21e2fd9c4c16aafe3046256ae64bc0895ca1f4fb9bb81dcfde",
+        "lua/cmake-tools/session.lua": "de4677388fcb0151a88e3004163ebcdf74a4ee830c3a05c81d4c0dd6661743cb",
+        "lua/cmake-tools/terminal.lua": "d655b7a366bf77ae10e3635bfd57a0c18b8ccce2d3df736cf7e6a24fecad50ca",
+        "lua/cmake-tools/test/ctest.lua": "a301632dd9defd43b6500a4ced125fcb87eaf03e31c7703eac59f98136f0d4a7",
+        "lua/cmake-tools/test_preset.lua": "80c1a4ad038d84e1e1d9dd6d13babbb78b7c91d848bf88ac549c51f968831844",
+        "lua/cmake-tools/toggleterm.lua": "dcc1c5da327fec69cf11004df16f3c00c480ca9ee4582f0d94de362418a9613e",
+        "lua/cmake-tools/types.lua": "2815c2b370b5c51442f141086543c90a3733e8cf70f2c4bffc1a230c5686897a",
+        "lua/cmake-tools/utils.lua": "b22aff5b898b445404be74b2fc361a8b5d0f562d94fc001b1251bc044803e12a",
+        "lua/cmake-tools/variants.lua": "a8e4458a97f3c0a5e26c3bc738eb91b1ec912c3154eb850fba7ab61255fb7be2",
+        "lua/cmake-tools/vimux.lua": "edf7a1c82d13e0ddf3bd178e464f908b07c1e696d6859ef4632626996c243131",
+        "lua/cmake-tools/window.lua": "57c4cb081e02b54c882fb4af177cc2e193a94569fed8fea1718fe5a06028c78f",
+        "lua/simpleyaml.lua": "df6161504ebd941c37416b844bd60517167d5eb7f065146849b3e92b4463040c",
+        "lua/telescope/_extensions/cmake_tools.lua": "7ae79d48f097c21d81f479e257e9435e1a24ce65fb246a00af836f7be839e169",
+        "lua/types/cmake-preset/build_preset.lua": "2d0f453592cc71c450414f5ade341c45e7db7b70dbd9d9cd5791fc4f0b0559f4",
+        "lua/types/cmake-preset/condition.lua": "34078e2e94fb2d1a96ff6994a420ae9f1dbccd5ff74392dd859ac8a24987668a",
+        "lua/types/cmake-preset/configure_preset.lua": "1d1d3aeff054da44e6387dd79f48333bf88222ab7698b903eec7e36c7249160e",
+        "lua/types/cmake-preset/test_preset.lua": "110c0847b4f4c6b4db4860f0155ce78ec5d23ae26e6a92253de8be94c07442cc",
+        "plugin/cmake-tools.lua": "debf7a59310406c1efe90a7ce16d829cc3d0befffc14c285f63b2b64c8cd6ebc"
+      }
+    }
+  },
+  "upstream": {
+    "follow": {
+      "kind": "default_branch"
+    },
+    "repository": "https://github.com/Civitasv/cmake-tools.nvim"
+  }
+}

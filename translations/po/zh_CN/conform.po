@@ -1,0 +1,228 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: nvim-zh\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Domain: conform\n"
+
+#: lua/conform/health.lua:32
+msgctxt "health"
+msgid "conform.nvim report"
+msgstr "conform.nvim 报告"
+
+#: lua/conform/health.lua:36
+#: lua/conform/health.lua:76
+msgctxt "health"
+msgid "Neovim 0.10 or later is required"
+msgstr "需要 Neovim 0.10 或更高版本"
+
+#: lua/conform/health.lua:38
+#: lua/conform/health.lua:80
+msgctxt "health"
+msgid "Log file: %s"
+msgstr "日志文件：%s"
+
+#: lua/conform/health.lua:43
+#: lua/conform/health.lua:106
+msgctxt "health"
+msgid "%s unavailable: %s"
+msgstr "%s 不可用：%s"
+
+#: lua/conform/health.lua:43
+#: lua/conform/init.lua:797
+msgctxt "health"
+msgid "%s unavailable: Command '%s' not found"
+msgstr "%s 不可用：未找到命令 '%s'"
+
+#: lua/conform/health.lua:43
+#: lua/conform/init.lua:779
+msgctxt "health"
+msgid "%s unavailable: Condition failed"
+msgstr "%s 不可用：条件不满足"
+
+#: lua/conform/health.lua:43
+#: lua/conform/init.lua:808
+msgctxt "health"
+msgid "%s unavailable: Root directory not found"
+msgstr "%s 不可用：未找到根目录"
+
+#: lua/conform/health.lua:43
+#: lua/conform/init.lua:766
+msgctxt "health"
+msgid "%s unavailable: Unknown formatter. Formatter config missing or incomplete"
+msgstr "%s 不可用：未知格式化器。缺少格式化器配置或配置不完整"
+
+#: lua/conform/health.lua:43
+#: lua/conform/init.lua:736
+msgctxt "health"
+msgid "%s unavailable: Missing built-in definition. Set `command` to get rid of this error."
+msgstr "%s 不可用：缺少内置定义。请设置 `command` 以消除此错误。"
+
+#: lua/conform/health.lua:43
+#: lua/conform/init.lua:702
+msgctxt "health"
+msgid "%s unavailable: Cannot define both 'command' and 'format' function"
+msgstr "%s 不可用：不能同时定义 'command' 和 'format' 函数"
+
+#: lua/conform/health.lua:43
+#: lua/conform/init.lua:728
+msgctxt "health"
+msgid "%s unavailable: Attempting to inherit from non-existent built-in formatter '%s'"
+msgstr "%s 不可用：尝试继承不存在的内置格式化器 '%s'"
+
+#: lua/conform/health.lua:46
+msgctxt "health"
+msgid "%s ready (%s)"
+msgstr "%s 就绪 (%s)"
+
+#: lua/conform/health.lua:76
+msgctxt "info"
+msgid "Neovim 0.10 or later is required"
+msgstr "需要 Neovim 0.10 或更高版本"
+
+#: lua/conform/health.lua:80
+msgctxt "info"
+msgid "Log file: %s"
+msgstr "日志文件：%s"
+
+#: lua/conform/health.lua:106
+msgctxt "info"
+msgid "%s unavailable: %s"
+msgstr "%s 不可用：%s"
+
+#: lua/conform/health.lua:106
+msgctxt "info"
+msgid "%s error: %s"
+msgstr "%s 错误：%s"
+
+#: lua/conform/health.lua:117
+msgctxt "info"
+msgid "%s ready (%s) %s"
+msgstr "%s 就绪 (%s) %s"
+
+#: lua/conform/health.lua:146
+msgctxt "info"
+msgid "Formatters for this buffer:"
+msgstr "当前 Buffer 的格式化器："
+
+#: lua/conform/health.lua:161
+msgctxt "info"
+msgid "<none>"
+msgstr "<无>"
+
+#: lua/conform/health.lua:165
+msgctxt "info"
+msgid "Other formatters:"
+msgstr "其他格式化器："
+
+#: lua/conform/init.lua:702
+msgctxt "status"
+msgid "Cannot define both 'command' and 'format' function"
+msgstr "不能同时定义 'command' 和 'format' 函数"
+
+#: lua/conform/init.lua:728
+msgctxt "status"
+msgid "Attempting to inherit from non-existent built-in formatter '%s'"
+msgstr "尝试继承不存在的内置格式化器 '%s'"
+
+#: lua/conform/init.lua:736
+msgctxt "status"
+msgid "Missing built-in definition. Set `command` to get rid of this error."
+msgstr "缺少内置定义。请设置 `command` 以消除此错误。"
+
+#: lua/conform/init.lua:766
+msgctxt "status"
+msgid "Unknown formatter. Formatter config missing or incomplete"
+msgstr "未知格式化器。缺少格式化器配置或配置不完整"
+
+#: lua/conform/init.lua:779
+#: lua/conform/init.lua:800
+msgctxt "status"
+msgid "Condition failed"
+msgstr "条件不满足"
+
+#: lua/conform/init.lua:797
+msgctxt "status"
+msgid "Command '%s' not found"
+msgstr "未找到命令 '%s'"
+
+#: lua/conform/init.lua:808
+msgctxt "status"
+msgid "Root directory not found"
+msgstr "未找到根目录"
+
+#: lua/conform/init.lua:55
+msgctxt "notification"
+msgid "conform.setup: the \"*\" key in formatters_by_ft does not support configuring format options, such as \"%s\""
+msgstr "conform.setup：formatters_by_ft 中的 \"*\" 键不支持配置格式化选项，例如 \"%s\""
+
+#: lua/conform/init.lua:68
+#: lua/conform/init.lua:398
+msgctxt "notification"
+msgid "conform.nvim requires Neovim 0.10+"
+msgstr "conform.nvim 需要 Neovim 0.10+"
+
+#: lua/conform/init.lua:109
+msgctxt "notification"
+msgid "Conform format_on_save cannot use async=true. Use format_after_save instead."
+msgstr "Conform 的 format_on_save 不能使用 async=true，请改用 format_after_save。"
+
+#: lua/conform/init.lua:151
+msgctxt "notification"
+msgid "Conform format_after_save cannot use async=false. Use format_on_save instead."
+msgstr "Conform 的 format_after_save 不能使用 async=false，请改用 format_on_save。"
+
+#: lua/conform/init.lua:352
+msgctxt "notification"
+msgid "Formatter '%s' unavailable: %s"
+msgstr "格式化器 '%s' 不可用：%s"
+
+#: lua/conform/init.lua:471
+msgctxt "notification"
+msgid "Formatter failed. See :ConformInfo for details"
+msgstr "格式化器执行失败。详见 :ConformInfo"
+
+#: lua/conform/init.lua:549
+msgctxt "notification"
+msgid "Formatters unavailable for %s file"
+msgstr "%s 文件没有可用的格式化器"
+
+#: lua/conform/init.lua:553
+msgctxt "notification"
+msgid "No formatters available for buffer"
+msgstr "当前 Buffer 没有可用的格式化器"
+
+#: lua/conform/log.lua:78
+msgctxt "notification"
+msgid "Failed to open conform.nvim log file: %s"
+msgstr "无法打开 conform.nvim 日志文件：%s"
+
+#: lua/conform/runner.lua:354
+#: lua/conform/runner.lua:462
+msgctxt "notification"
+msgid "Formatter '%s' error: %s"
+msgstr "格式化器 '%s' 错误：%s"
+
+#: lua/conform/runner.lua:457
+#: lua/conform/runner.lua:727
+msgctxt "notification"
+msgid "Formatter '%s' was interrupted"
+msgstr "格式化器 '%s' 已中断"
+
+#: lua/conform/runner.lua:471
+msgctxt "notification"
+msgid "Formatter '%s' error in vim.system: %s"
+msgstr "格式化器 '%s' 在 vim.system 中出错：%s"
+
+#: lua/conform/runner.lua:571
+msgctxt "notification"
+msgid "Async formatter discarding changes for %d: concurrent modification"
+msgstr "异步格式化器已丢弃 Buffer %d 的更改：发生并发修改"
+
+#: lua/conform/runner.lua:684
+#: lua/conform/runner.lua:720
+msgctxt "notification"
+msgid "Formatter '%s' timeout"
+msgstr "格式化器 '%s' 超时"

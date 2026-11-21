@@ -1,0 +1,160 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: nvim-zh\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Domain: mini\n"
+
+#: lua/mini/statusline.lua:566
+msgctxt "mode"
+msgid "Normal"
+msgstr "普通"
+
+#: lua/mini/statusline.lua:567
+msgctxt "mode"
+msgid "Visual"
+msgstr "可视"
+
+#: lua/mini/statusline.lua:568
+msgctxt "mode"
+msgid "V-Line"
+msgstr "可视行"
+
+#: lua/mini/statusline.lua:569
+msgctxt "mode"
+msgid "V-Block"
+msgstr "可视块"
+
+#: lua/mini/statusline.lua:570
+msgctxt "mode"
+msgid "Select"
+msgstr "选择"
+
+#: lua/mini/statusline.lua:571
+msgctxt "mode"
+msgid "S-Line"
+msgstr "选择行"
+
+#: lua/mini/statusline.lua:572
+msgctxt "mode"
+msgid "S-Block"
+msgstr "选择块"
+
+#: lua/mini/statusline.lua:573
+msgctxt "mode"
+msgid "Insert"
+msgstr "插入"
+
+#: lua/mini/statusline.lua:574
+msgctxt "mode"
+msgid "Replace"
+msgstr "替换"
+
+#: lua/mini/statusline.lua:575
+msgctxt "mode"
+msgid "Command"
+msgstr "命令"
+
+#: lua/mini/statusline.lua:576
+msgctxt "mode"
+msgid "Prompt"
+msgstr "提示"
+
+#: lua/mini/statusline.lua:577
+msgctxt "mode"
+msgid "Shell"
+msgstr "终端命令"
+
+#: lua/mini/statusline.lua:578
+msgctxt "mode"
+msgid "Terminal"
+msgstr "终端"
+
+#: lua/mini/statusline.lua:582
+msgctxt "mode"
+msgid "Unknown"
+msgstr "未知"
+
+#: lua/mini/surround.lua:899
+msgctxt "prompt"
+msgid "New number of neighbor lines"
+msgstr "新的相邻搜索行数"
+
+#: lua/mini/surround.lua:1113
+#: lua/mini/surround.lua:1121
+msgctxt "prompt"
+msgid "Left surrounding"
+msgstr "左侧包围符"
+
+#: lua/mini/surround.lua:1115
+#: lua/mini/surround.lua:1123
+msgctxt "prompt"
+msgid "Right surrounding"
+msgstr "右侧包围符"
+
+#: lua/mini/surround.lua:1134
+msgctxt "prompt"
+msgid "Function name"
+msgstr "函数名"
+
+#: lua/mini/surround.lua:1143
+msgctxt "prompt"
+msgid "Tag"
+msgstr "标签"
+
+#: lua/mini/ai.lua:1116
+msgctxt "prompt"
+msgid "(mini.ai) Left edge: "
+msgstr "(mini.ai) 左边界："
+
+#: lua/mini/ai.lua:1118
+msgctxt "prompt"
+msgid "(mini.ai) Right edge: "
+msgstr "(mini.ai) 右边界："
+
+#: lua/mini/surround.lua:1402
+msgctxt "echo"
+msgid "No surrounding %s found within %d line and `config.search_method = '%s'`."
+msgstr "未找到包围符 %s（范围：%d 行内，`config.search_method = '%s'`）。"
+
+#: lua/mini/surround.lua:1402
+msgctxt "echo"
+msgid "No surrounding %s found within %d lines and `config.search_method = '%s'`."
+msgstr "未找到包围符 %s（范围：%d 行内，`config.search_method = '%s'`）。"
+
+#: lua/mini/surround.lua:1988
+msgctxt "echo"
+msgid "Reminder to press %s surrounding id "
+msgstr "请按下 %s 的包围符标识符 "
+
+#: lua/mini/ai.lua:679
+msgctxt "echo"
+msgid "No textobject %s found covering region within %d line and `search_method = '%s'`."
+msgstr "未找到覆盖区域的文本对象 %s（范围：%d 行内，`search_method = '%s'`）。"
+
+#: lua/mini/ai.lua:679
+msgctxt "echo"
+msgid "No textobject %s found covering region within %d lines and `search_method = '%s'`."
+msgstr "未找到覆盖区域的文本对象 %s（范围：%d 行内，`search_method = '%s'`）。"
+
+#: lua/mini/ai.lua:679
+msgctxt "echo"
+msgid "No textobject %s found covering region %d times within %d line and `search_method = '%s'`."
+msgstr "未找到覆盖区域的文本对象 %s（%d 次，%d 行内，`search_method = '%s'`）。"
+
+#: lua/mini/ai.lua:679
+msgctxt "echo"
+msgid "No textobject %s found covering region %d times within %d lines and `search_method = '%s'`."
+msgstr "未找到覆盖区域的文本对象 %s（%d 次，%d 行内，`search_method = '%s'`）。"
+
+#: lua/mini/ai.lua:1177
+msgctxt "echo"
+msgid "Textobject region is empty. Nothing is done."
+msgstr "文本对象区域为空，未执行任何操作。"
+
+#: lua/mini/ai.lua:2044
+msgctxt "echo"
+msgid "Reminder to press `%s` textobject id "
+msgstr "请按下 `%s` 的文本对象标识符 "

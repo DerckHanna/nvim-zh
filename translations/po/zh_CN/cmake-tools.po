@@ -1,0 +1,256 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: nvim-zh\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Domain: cmake-tools\n"
+
+#: lua/cmake-tools/init.lua:453
+msgctxt "prompt"
+msgid "Select target to build"
+msgstr "选择要构建的 Target"
+
+#: lua/cmake-tools/init.lua:691
+msgctxt "prompt"
+msgid "Select target to run"
+msgstr "选择要运行的 Target"
+
+#: lua/cmake-tools/init.lua:752
+msgctxt "prompt"
+msgid "Select build type"
+msgstr "选择构建类型"
+
+#: lua/cmake-tools/init.lua:797
+msgctxt "prompt"
+msgid "Select cmake kits"
+msgstr "选择 CMake 工具链套件"
+
+#: lua/cmake-tools/init.lua:842
+msgctxt "prompt"
+msgid "Select cmake configure presets"
+msgstr "选择 CMake 配置预设"
+
+#: lua/cmake-tools/init.lua:892
+msgctxt "prompt"
+msgid "Select cmake test preset"
+msgstr "选择 CMake 测试预设"
+
+#: lua/cmake-tools/init.lua:941
+msgctxt "prompt"
+msgid "Select cmake build presets"
+msgstr "选择 CMake 构建预设"
+
+#: lua/cmake-tools/init.lua:1017
+#: lua/cmake-tools/init.lua:1397
+msgctxt "prompt"
+msgid "Select build target"
+msgstr "选择构建 Target"
+
+#: lua/cmake-tools/init.lua:1081
+#: lua/cmake-tools/init.lua:1365
+#: lua/cmake-tools/init.lua:2013
+msgctxt "prompt"
+msgid "Select launch target"
+msgstr "选择启动 Target"
+
+#: lua/cmake-tools/init.lua:1166
+msgctxt "prompt"
+msgid "CMake-Tools base settings"
+msgstr "CMake-Tools 基础设置"
+
+#: lua/cmake-tools/init.lua:1226
+msgctxt "prompt"
+msgid "CMake-Tools settings for %s"
+msgstr "%s 的 CMake-Tools 设置"
+
+#: lua/cmake-tools/init.lua:1319
+msgctxt "prompt"
+msgid "select test to run"
+msgstr "选择要运行的测试"
+
+#: lua/cmake-tools/init.lua:1616
+msgctxt "prompt"
+msgid "The directory where the main CMakeLists.txt is located: \n"
+msgstr "主 CMakeLists.txt 所在的目录：\n"
+
+#: lua/cmake-tools/init.lua:1648
+msgctxt "prompt"
+msgid "The directory where the build files should locate: \n"
+msgstr "构建文件所在的目录：\n"
+
+#: lua/cmake-tools/init.lua:1982
+msgctxt "prompt"
+msgid "Select target to debug"
+msgstr "选择要调试的 Target"
+
+#: lua/cmake-tools/init.lua:2087
+msgctxt "prompt"
+msgid "Select target to inspect"
+msgstr "选择要检查的 Target"
+
+#: lua/cmake-tools/quickstart/init.lua:74
+msgctxt "prompt"
+msgid "Select language"
+msgstr "选择语言"
+
+#: lua/cmake-tools/quickstart/init.lua:89
+msgctxt "prompt"
+msgid "Select project type"
+msgstr "选择项目类型"
+
+#: lua/cmake-tools/quickstart/init.lua:108
+msgctxt "prompt"
+msgid "Enter the name of the project"
+msgstr "输入项目名称"
+
+#: lua/cmake-tools/file_picker.lua:101
+#: lua/cmake-tools/file_picker.lua:122
+msgctxt "notification"
+msgid "Target not found in CodeModel"
+msgstr "在 CodeModel 中未找到 Target"
+
+#: lua/cmake-tools/init.lua:526
+msgctxt "notification"
+msgid "CMakeCache.txt not found"
+msgstr "未找到 CMakeCache.txt"
+
+#: lua/cmake-tools/init.lua:811
+msgctxt "notification"
+msgid "Cannot find CMakeKits.[json|yaml] at Root (%s)!!"
+msgstr "在根目录 (%s) 下找不到 CMakeKits.[json|yaml]！！"
+
+#: lua/cmake-tools/init.lua:861
+#: lua/cmake-tools/init.lua:910
+msgctxt "notification"
+msgid "Cannot find CMake[User]Presets.json at Root (%s) !!"
+msgstr "在根目录 (%s) 下找不到 CMake[User]Presets.json！！"
+
+#: lua/cmake-tools/init.lua:978
+msgctxt "notification"
+msgid "Cannot find CMake[User]Presets.json at Root (%s)!!"
+msgstr "在根目录 (%s) 下找不到 CMake[User]Presets.json！！"
+
+#: lua/cmake-tools/init.lua:1201
+msgctxt "notification"
+msgid "No launch target selected!"
+msgstr "未选择启动 Target！"
+
+#: lua/cmake-tools/init.lua:1218
+msgctxt "notification"
+msgid "Target has not been configured!"
+msgstr "Target 尚未配置！"
+
+#: lua/cmake-tools/init.lua:1354
+msgctxt "notification"
+msgid "Current file is not belong to any executable."
+msgstr "当前文件不属于任何可执行 Target。"
+
+#: lua/cmake-tools/init.lua:1390
+msgctxt "notification"
+msgid "Current file is not belong to any library."
+msgstr "当前文件不属于任何库 Target。"
+
+#: lua/cmake-tools/init.lua:1849
+msgctxt "notification"
+msgid "nvim-dap is required for debugging, but it could not be loaded"
+msgstr "调试需要 nvim-dap，但无法加载该插件"
+
+#: lua/cmake-tools/init.lua:1873
+msgctxt "notification"
+msgid "Reselect build type to ensure it contains debug information!"
+msgstr "请重新选择构建类型以确保包含调试信息！"
+
+#: lua/cmake-tools/config.lua:190
+#: lua/cmake-tools/config.lua:199
+msgctxt "notification"
+msgid "cannot create directory"
+msgstr "无法创建目录"
+
+#: lua/cmake-tools/config.lua:205
+#: lua/cmake-tools/config.lua:216
+msgctxt "notification"
+msgid "Unable to create file %s"
+msgstr "无法创建文件 %s"
+
+#: lua/cmake-tools/config.lua:232
+#: lua/cmake-tools/config.lua:249
+msgctxt "notification"
+msgid "Configure fail"
+msgstr "配置失败"
+
+#: lua/cmake-tools/config.lua:237
+#: lua/cmake-tools/config.lua:254
+msgctxt "notification"
+msgid "Unable to find codemodel file"
+msgstr "找不到 codemodel 文件"
+
+#: lua/cmake-tools/config.lua:279
+#: lua/cmake-tools/config.lua:356
+msgctxt "notification"
+msgid "You need to configure it first"
+msgstr "请先执行 CMake 配置"
+
+#: lua/cmake-tools/config.lua:284
+msgctxt "notification"
+msgid "You need to select launch target first"
+msgstr "请先选择启动 Target"
+
+#: lua/cmake-tools/config.lua:299
+msgctxt "notification"
+msgid "You need to select a executable target"
+msgstr "请选择一个可执行 Target"
+
+#: lua/cmake-tools/config.lua:305
+#: lua/cmake-tools/config.lua:381
+msgctxt "notification"
+msgid "Unable to find the following target: %s"
+msgstr "找不到以下 Target：%s"
+
+#: lua/cmake-tools/config.lua:328
+msgctxt "notification"
+msgid "Selected target is not built: %s"
+msgstr "所选 Target 尚未构建：%s"
+
+#: lua/cmake-tools/config.lua:361
+msgctxt "notification"
+msgid "You need to select Build target first"
+msgstr "请先选择构建 Target"
+
+#: lua/cmake-tools/terminal.lua:37
+#: lua/cmake-tools/terminal.lua:773
+msgctxt "notification"
+msgid "There is no terminal instance"
+msgstr "当前没有终端实例"
+
+#: lua/cmake-tools/terminal.lua:335
+msgctxt "notification"
+msgid "Caution: Multiple termianls may clutter your workspace!"
+msgstr "注意：打开多个终端可能会使工作区杂乱！"
+
+#: lua/cmake-tools/utils.lua:33
+msgctxt "notification"
+msgid "Cannot find CMakeLists.txt at cwd (%s)."
+msgstr "在当前工作目录 (%s) 下找不到 CMakeLists.txt。"
+
+#: lua/cmake-tools/utils.lua:109
+msgctxt "notification"
+msgid "Cannot create directory %s: %s"
+msgstr "无法创建目录 %s：%s"
+
+#: lua/cmake-tools/utils.lua:125
+msgctxt "notification"
+msgid "Cannot copy %s to %s: %s"
+msgstr "无法将 %s 复制到 %s：%s"
+
+#: lua/cmake-tools/utils.lua:152
+msgctxt "notification"
+msgid "Cannot link %s to %s: %s"
+msgstr "无法将 %s 链接到 %s：%s"
+
+#: lua/cmake-tools/utils.lua:278
+#: lua/cmake-tools/utils.lua:322
+msgctxt "notification"
+msgid "Exited with code %d"
+msgstr "已退出，退出码为 %d"

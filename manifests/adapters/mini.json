@@ -1,0 +1,91 @@
+{
+  "contracts": [
+    "tests/upstream/mini/mini_upstream_spec.lua"
+  ],
+  "domain": "mini",
+  "entry": "nvim-zh.adapters.mini",
+  "id": "mini",
+  "lazy_names": [
+    "mini.nvim"
+  ],
+  "modules": [
+    "mini.ai",
+    "mini.icons",
+    "mini.pairs",
+    "mini.statusline",
+    "mini.surround",
+    "mini.tabline"
+  ],
+  "notes": {
+    "domain": "mini",
+    "excluded": "short 1-letter statusline mode codes, buffer names, icon glyphs and user custom statusline content functions",
+    "limitations": "covers enabled submodules mini.statusline, mini.tabline, mini.surround, mini.ai, mini.pairs and mini.icons",
+    "public_path": "MiniStatusline.section_mode long mode labels; MiniSurround.user_input and search feedback; MiniAi prompts and search feedback",
+    "seam": "MiniStatusline.section_mode; MiniSurround.user_input; MiniSurround.{add,delete,replace,find,highlight,update_n_lines}; MiniAi.{find_textobject,select_textobject,move_cursor}",
+    "status": "implemented",
+    "writes": "statusline_mode_prompt_and_feedback_display_only"
+  },
+  "scenarios": {
+    "prompts_and_feedback": {
+      "surfaces": [
+        "prompts_and_feedback"
+      ],
+      "tui": "tests/upstream/mini/tui.py"
+    },
+    "statusline": {
+      "surfaces": [
+        "statusline"
+      ],
+      "tui": "tests/upstream/mini/tui.py"
+    }
+  },
+  "schema": 1,
+  "status": "implemented",
+  "surfaces": {
+    "prompts_and_feedback": {
+      "independent": true,
+      "kind": "versioned",
+      "modules": {
+        "mini.ai": "lua/mini/ai.lua",
+        "mini.icons": "lua/mini/icons.lua",
+        "mini.pairs": "lua/mini/pairs.lua",
+        "mini.surround": "lua/mini/surround.lua"
+      }
+    },
+    "statusline": {
+      "independent": true,
+      "kind": "versioned",
+      "modules": {
+        "mini.statusline": "lua/mini/statusline.lua",
+        "mini.tabline": "lua/mini/tabline.lua"
+      }
+    }
+  },
+  "targets": {
+    "baseline": {
+      "commit": "b8a0af521530f8ee68c738657429eab59de6a2ae",
+      "dependencies": [],
+      "neovim": "0.12.6",
+      "sources": {
+        "doc/mini-ai.txt": "966c00b9defbce5651671a3103d2ac3fd3c6acfa16ab1bb886c0ebd203ba8a43",
+        "doc/mini-icons.txt": "fc82094d3b54174e32fd22bf3648c07786cdb66c6e8acfafe6c6021f0c1c878a",
+        "doc/mini-pairs.txt": "605696692e2b81a127be952cb83f8477eb1ff83bea0d15c9a4cec1c3ea5e4362",
+        "doc/mini-statusline.txt": "fccd4dd5fafc5a3f21e5a9ac8d240fb957cd0e28ef5fee3cba6f78f6c7f88962",
+        "doc/mini-surround.txt": "6745706fb4d348c08cadf1de4e24d099a6a131afbe716d09b75961777ac8fdae",
+        "doc/mini-tabline.txt": "252776b34a4ef553a8607da950f46bdfc96533b06b12bf6575c000d998e376ae",
+        "lua/mini/ai.lua": "48cf5e13c8cdf53156c0bca190fd0e5f9bc6451326792ba64ba761b193854ae4",
+        "lua/mini/icons.lua": "31ff6481bc09d5107aa67862d7f07970771f93042e9aa89b86ac0bf45af5d742",
+        "lua/mini/pairs.lua": "0c164c531c49b423aedc4f4b292b145788cbee908291f71e12a52c2459b6dcad",
+        "lua/mini/statusline.lua": "4cff384d6d25beade6e8fd2ed2cc743d1a16c5b7b19e2b7b778c52cb4f22c00b",
+        "lua/mini/surround.lua": "b4e2752422b1971eb1ac8a6f6ccad293d6c4c549d4255f9adaa7ffefedf44347",
+        "lua/mini/tabline.lua": "4a209cc897acfae613c7e9f5f87c1a4f3232bb32543f0c4eb84b94e9f1e5dee5"
+      }
+    }
+  },
+  "upstream": {
+    "follow": {
+      "kind": "default_branch"
+    },
+    "repository": "https://github.com/nvim-mini/mini.nvim"
+  }
+}

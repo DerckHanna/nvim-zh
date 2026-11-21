@@ -1,0 +1,153 @@
+{
+  "contracts": [
+    "tests/upstream/gitsigns/gitsigns_upstream_spec.lua"
+  ],
+  "domain": "gitsigns",
+  "entry": "nvim-zh.adapters.gitsigns",
+  "id": "gitsigns",
+  "lazy_names": [
+    "gitsigns.nvim"
+  ],
+  "modules": [
+    "gitsigns",
+    "gitsigns.actions",
+    "gitsigns.actions.nav",
+    "gitsigns.message",
+    "gitsigns.popup"
+  ],
+  "notes": {
+    "domain": "gitsigns",
+    "excluded": "diff body lines, commit messages, author names, SHAs, sign characters and raw git stderr",
+    "limitations": "already open popups keep their rendered lines until updated or reopened",
+    "public_path": "gitsigns.popup.create/update headers and diff help; gitsigns.message warn/error/error_once; hunk stage/reset/nav echo and print messages",
+    "seam": "vim.notify:title=gitsigns; gitsigns.message.{warn,error,error_once}; gitsigns.popup.{create,update}; gitsigns.actions.{stage_hunk,reset_hunk,reset_buffer,undo_stage_hunk,stage_buffer,nav_hunk}",
+    "status": "implemented",
+    "writes": "popup_linesspec_echo_and_notification_display_only"
+  },
+  "scenarios": {
+    "messages": {
+      "surfaces": [
+        "messages"
+      ],
+      "tui": "tests/upstream/gitsigns/tui.py"
+    },
+    "popups": {
+      "surfaces": [
+        "popups"
+      ],
+      "tui": "tests/upstream/gitsigns/tui.py"
+    }
+  },
+  "schema": 1,
+  "status": "implemented",
+  "surfaces": {
+    "messages": {
+      "independent": true,
+      "kind": "versioned",
+      "modules": {
+        "gitsigns": "lua/gitsigns.lua",
+        "gitsigns.actions": "lua/gitsigns/actions.lua",
+        "gitsigns.actions.nav": "lua/gitsigns/actions/nav.lua",
+        "gitsigns.cli": "lua/gitsigns/cli.lua",
+        "gitsigns.message": "lua/gitsigns/message.lua"
+      },
+      "source": [
+        "lua/gitsigns/config.lua",
+        "lua/gitsigns/message.lua"
+      ]
+    },
+    "popups": {
+      "independent": true,
+      "kind": "versioned",
+      "modules": {
+        "gitsigns.actions.blame_line": "lua/gitsigns/actions/blame_line.lua",
+        "gitsigns.actions.diff": "lua/gitsigns/actions/diff.lua",
+        "gitsigns.actions.preview": "lua/gitsigns/actions/preview.lua",
+        "gitsigns.popup": "lua/gitsigns/popup.lua"
+      }
+    }
+  },
+  "targets": {
+    "baseline": {
+      "commit": "c0862d382a35b7b45757d8d151a6a634c09bf3ce",
+      "dependencies": [],
+      "neovim": "0.12.6",
+      "sources": {
+        "doc/gitsigns.txt": "275055381a4858670a62ee5c4eaa9e7306d1e48d4992dbdcda4f82ebb7ba59ae",
+        "etc/doc_template.txt": "cecc28ee081687a97155d21c944886fee45f80d200a98bcb6bab36c65af9bb8c",
+        "lua/gitsigns.lua": "855c4ec3ce4d1ae80ca0d0f6c60bd51426c855d5a4d8ec667b389edc6a924d11",
+        "lua/gitsigns/actions.lua": "8a4eee3daa6207ca88397b19c0009b0e6301b2f5a86e12e6ebca8256c3d8a598",
+        "lua/gitsigns/actions/blame.lua": "ff4452460a51449d59d327ac8b4c2dee15126d40b1b754b33586ac9cfeb43e41",
+        "lua/gitsigns/actions/blame_line.lua": "0d801375fe0120c26893b6192186ef9a8315b7c170c6e4cfe127bc3a57052a2f",
+        "lua/gitsigns/actions/diff.lua": "5c21f5a41d380c6a32ed207bb51b9512e969070bad80dfe2b51ca6512bf3a0b6",
+        "lua/gitsigns/actions/diffthis.lua": "21d54c4783d93498d5d7804e566d8507dcb79591e3f9771aae7fdad1c95b67df",
+        "lua/gitsigns/actions/nav.lua": "3bf4f6c4eb88a600fd04fab58d6bb72e9ab35f417a7fbda688cd7635356c9e10",
+        "lua/gitsigns/actions/preview.lua": "9a553c670af11be542d038f2cee6767bbcf360d2729bdbc5107c63a6265cc582",
+        "lua/gitsigns/actions/qflist.lua": "154ce953ca63bdef59bb6cbfe2835f9376054bc6197b69a10ec08d83f7c33199",
+        "lua/gitsigns/actions/show_commit.lua": "d09f0b6bcd97088ced57a18186f037dc2076c0047450fd89a843997eb61b12d5",
+        "lua/gitsigns/async.lua": "df5d9a89c273c7859eeebcbdbc669f4e8144805a0c6eb2a54af16d4bfc712711",
+        "lua/gitsigns/attach.lua": "777158245247796284a44ec778cf4480fe83463c9266ad4da62624f05f5ff07b",
+        "lua/gitsigns/blame_formatter.lua": "0db07fb866ecd15c7e6369afce99e4fc821f41266a3cdac654fdb4fbe7d52a4f",
+        "lua/gitsigns/cache.lua": "ae04305ca51ebd37ce1f50b6aef6b98714a79aa5c4189ad1fdd02ca4b6511c5f",
+        "lua/gitsigns/cli.lua": "5238ae9996755c8c406d9fe54288bae2f48bd04d7d2a24e24d6a499daf1abc94",
+        "lua/gitsigns/cli/argparse.lua": "7e6926752d0c978da2000a1f2b009a27a8fb92711d654421390e267e5721b7c1",
+        "lua/gitsigns/cli/completion.lua": "abcc20a60ae5f639049a581cdd9a556aa57ecfcf93e050a6b313ec8ef5029a08",
+        "lua/gitsigns/cli/completion/generated.lua": "948af04c369caac199ec453e1ab47082a11586f5a70de01123aacef032d9517a",
+        "lua/gitsigns/cli/context.lua": "9fd9eec5d014d456beaf4239e2fe27ccd6494bd51a13b8f1ff41b9a6479f2453",
+        "lua/gitsigns/color.lua": "7dee457be6d0d673c35b0cab160e97b21f5bbcd27a1f19082207ac5e011a7e43",
+        "lua/gitsigns/config.lua": "f4b547372374d3fe6a52cf6867e9f8f9af779a02af56e52bf0767bbc94256be9",
+        "lua/gitsigns/current_line_blame.lua": "36ed470858e38054f7ba0595c8fcd95a31420abfb10f5f807d17a6c43cc92266",
+        "lua/gitsigns/debounce.lua": "e7f44b9f1d0c3e3a1e4e9e7adae294b4d6ae936c2801040dc5df1f642e593017",
+        "lua/gitsigns/debug.lua": "fe5666d1ea8effc32ec33537d6b7636c92ed17772e1942c70beddc76f05dbc1a",
+        "lua/gitsigns/debug/log.lua": "d5fae490d4df5278a3e67ce01c105dab1b7bd7ee5ca4876f3137949f0acc5288",
+        "lua/gitsigns/deleted_preview.lua": "07b25b139c7e33e020d6a451126aa83faefde77c5dd4a8720140bf6def712ee6",
+        "lua/gitsigns/diff.lua": "05a9b179b4c08521a4d7b6c0e50a50d00bcb8102d4cebfdaa3c2ad1f738505e5",
+        "lua/gitsigns/diff_buffers.lua": "6222f2c9dd7db48fb8e3d754ad76d236c4f96db0ab3c30bbd886f734d06f4f91",
+        "lua/gitsigns/diff_ext.lua": "4186ec102bbe429de0f3247d3b9be68095d497da01c42ac6f0f3b52362af26ea",
+        "lua/gitsigns/diff_int.lua": "3781628e9955ac1347c3ef0f8104e7e106f1174f54b8b74fd295bc4fdde61811",
+        "lua/gitsigns/fs_event.lua": "2e87b98214d8eac57d7a8615e6c3e8ff18f86e88e2cc40d76078dcf2b554b7be",
+        "lua/gitsigns/gh.lua": "f9f8da59468cf8eb51ca10b159f48a16b9d3cbfc78ba4115c9e610a6dc29cff9",
+        "lua/gitsigns/git.lua": "7fd0dbfccb4679211fa8858fc9590aaf829ea70ad8b910e05c16d455ddb6b7b1",
+        "lua/gitsigns/git/blame.lua": "f97a2754226361cf1cb0e0901aa5f284aede00a8704742ca090340b7cad4b517",
+        "lua/gitsigns/git/cmd.lua": "e7778d3864bded1bf296db5e4a692ccf418f6cf27fa95d6bd8e22b3f1d885f66",
+        "lua/gitsigns/git/commit.lua": "e09453f243f98d1d6320840348c6a858432ea10b367848b252d1bea9a5ddef15",
+        "lua/gitsigns/git/diff.lua": "e3b43c1d0be07d17c47efd23cb4162d52150b9d40264344ed188da203e6fe7a6",
+        "lua/gitsigns/git/errors.lua": "9d00d31f17f54975a97a6de92eb8be4a5b65e76416edd1cd593aade3b1a4b4f6",
+        "lua/gitsigns/git/repo.lua": "248ff5356b371575b66b7349b3c326c9b6274fe638bdfbed157096a1ddfcb311",
+        "lua/gitsigns/git/repo/watcher.lua": "21d86d91539e6d5d63b68d9d757aef65accc4ab43982dc5db69aefb531eda671",
+        "lua/gitsigns/git/version.lua": "dfb74936fdab419cb0871377f685c9d819d0fd7c2c86982cdcf813776137a7c5",
+        "lua/gitsigns/highlight.lua": "938e6541228302bda93751b2c7639e6bff6203dff36070daec57394543793c5a",
+        "lua/gitsigns/hunk_preview.lua": "92c923c092696a8572acfd9ba605b146e669e2f09a3826be77ca50b7c17b4e94",
+        "lua/gitsigns/hunks.lua": "8dc243243f5e4dcf8b3a517486723109a40ddbb6170d00ef77b4164453993e46",
+        "lua/gitsigns/inspect.lua": "892704307f5f9cb0feb90aaafbf75ea8ba720716e70076a27edb07fbab243fbf",
+        "lua/gitsigns/inspect/compat.lua": "530538e0469263eb03a601d58415c340cc1f178af48c06467b203c7fea57a9c7",
+        "lua/gitsigns/manager.lua": "e3873f85873c37827e10ca1c8cab5afc784d811084e859851c7647f9289b1080",
+        "lua/gitsigns/message.lua": "ae7b728a3d58447eeba67c510792a3abbd6e24d3595fd856225f45650ab5a1e7",
+        "lua/gitsigns/popup.lua": "c903a77a4ce54ac5e49ae581660f56dee71b9bfae411e3e2ddf3b58346b715be",
+        "lua/gitsigns/render/capture.lua": "6538123f0112018b43ada8a0e9e0c45b2bffa90e669265e81361171ca110eb96",
+        "lua/gitsigns/render/overlay.lua": "6ab698eee112f3e12c20c2eadf934c6952c1097bdee2ecec917100b774cfa07c",
+        "lua/gitsigns/render/virt.lua": "4c0cb4a071c59b214c6545d3cf1f8cd4a00700a2359835ddf0ec282f47c10a84",
+        "lua/gitsigns/repeat.lua": "c6e1bbbc4afc29d8dca5c7f1002c2d372e87c80efd77f5fd6ff3d75e533ca357",
+        "lua/gitsigns/sign_renderer.lua": "b1436d5505df4286d97c6b36202055beff80ce6a161907157cdb56751ac402ea",
+        "lua/gitsigns/signs.lua": "c83d1d4272eecba7e24bbc6ac8ed3af99283ba178d9a0187e8c131ce4a6afdbd",
+        "lua/gitsigns/status.lua": "69c7d05b54579a99df633ca1c646406d80220a5d2f764830d97495765d7e4bac",
+        "lua/gitsigns/system.lua": "cc09f55b7aaba8333438ffa8087ecfc32b11fd055d72982252882d1da4fa403d",
+        "lua/gitsigns/system/compat.lua": "2b5d67c96c094c05c2cdf4614041efde74326bf0ac34cccd88d757769e06fa18",
+        "lua/gitsigns/test.lua": "b220b7f2d48c9a3a684aa072cdf12cf196278873553a79c2450141b133829f3e",
+        "lua/gitsigns/unified.lua": "06ca2a7fbd330b96610668f10349e3c53d64ba6cf7f5e05a56ab0c0dcf5bc539",
+        "lua/gitsigns/util.lua": "07eb27a9ceee3dbb980589180731d0c33eb72fbb9ce9ef1e0f24fc08f2933007",
+        "lua/gitsigns/word_diff.lua": "0c3b5a913f9def6b6646cebc9472d2297eeff97b1e986de008a11ef80ba1a3ad",
+        "plugin/gitsigns.lua": "209e33a45331ff5752fd4f0cbba0fafa75e0aed34eba29f4352cc031bb8b3bcd",
+        "scripts/gen_completion.lua": "a1eebd0bd1b9c259b3ad585efdecac6e8d0ae555245758646e7c1b2868636916",
+        "scripts/gen_emydoc.lua": "4efc15d21846fd54933222d454fbaef4870437467bb6f31cb986efb003e9b642",
+        "scripts/gen_help.lua": "29a8278f2ab798b2abf388f5cdffdeff44329ea0ea7a15e6f85c3e320dafcb7c"
+      }
+    }
+  },
+  "upstream": {
+    "follow": {
+      "kind": "default_branch"
+    },
+    "repository": "https://github.com/lewis6991/gitsigns.nvim"
+  }
+}

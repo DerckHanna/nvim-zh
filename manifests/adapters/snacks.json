@@ -1,0 +1,122 @@
+{
+  "contracts": [
+    "tests/upstream/snacks/snacks_upstream_spec.lua"
+  ],
+  "domain": "snacks",
+  "entry": "nvim-zh.adapters.snacks",
+  "id": "snacks",
+  "lazy_names": [
+    "snacks.nvim"
+  ],
+  "modules": [
+    "snacks",
+    "snacks.bufdelete",
+    "snacks.dashboard",
+    "snacks.health",
+    "snacks.input",
+    "snacks.notifier",
+    "snacks.notify",
+    "snacks.picker",
+    "snacks.picker.select",
+    "snacks.picker.util"
+  ],
+  "notes": {
+    "domain": "snacks",
+    "excluded": "user custom dashboard items, picker entry text/paths, terminal output, lazygit UI and user explicit picker/input titles",
+    "limitations": "preserves vim.ui.input == Snacks.input.input and vim.ui.select == Snacks.picker.select identity for checkhealth",
+    "public_path": "dashboard preset keys and startup footer; picker auto-generated source titles; input/select default prompts; notifier history title; bufdelete confirm dialog; Snacks.notify messages; checkhealth snacks",
+    "seam": "snacks.dashboard.sections.{keys,startup}/Dashboard.format_field; snacks.picker.util.title (picker.lua call-site); snacks.picker.select.select; snacks.input.input; snacks.notify.notify; snacks.notifier.show_history; snacks.bufdelete.delete; snacks.health.check",
+    "status": "implemented",
+    "writes": "dashboard_picker_prompt_notify_and_health_display_only"
+  },
+  "scenarios": {
+    "dashboard": {
+      "surfaces": [
+        "dashboard"
+      ],
+      "tui": "tests/upstream/snacks/tui.py"
+    },
+    "health": {
+      "surfaces": [
+        "health"
+      ],
+      "tui": "tests/upstream/snacks/tui.py"
+    },
+    "picker_and_ui": {
+      "surfaces": [
+        "picker_and_ui"
+      ],
+      "tui": "tests/upstream/snacks/tui.py"
+    }
+  },
+  "schema": 1,
+  "status": "implemented",
+  "surfaces": {
+    "dashboard": {
+      "independent": true,
+      "kind": "versioned",
+      "modules": {
+        "snacks": "lua/snacks/init.lua",
+        "snacks.dashboard": "lua/snacks/dashboard.lua"
+      }
+    },
+    "health": {
+      "kind": "versioned",
+      "modules": {
+        "snacks.health": "lua/snacks/health.lua",
+        "vim.health": "lua/vim/health.lua"
+      }
+    },
+    "picker_and_ui": {
+      "independent": true,
+      "kind": "versioned",
+      "modules": {
+        "snacks.bufdelete": "lua/snacks/bufdelete.lua",
+        "snacks.input": "lua/snacks/input.lua",
+        "snacks.notifier": "lua/snacks/notifier.lua",
+        "snacks.notify": "lua/snacks/notify.lua",
+        "snacks.picker": "lua/snacks/picker/init.lua",
+        "snacks.picker.core.picker": "lua/snacks/picker/core/picker.lua",
+        "snacks.picker.select": "lua/snacks/picker/select.lua",
+        "snacks.picker.util": "lua/snacks/picker/util/init.lua"
+      }
+    }
+  },
+  "targets": {
+    "baseline": {
+      "commit": "882c996cf28183f4d63640de0b4c02ec886d01f2",
+      "dependencies": [],
+      "neovim": "0.12.6",
+      "sources": {
+        "lua/snacks/bufdelete.lua": "6d65f7d7382e8f1cf9aece00c85a0d44b6020577f1347b1a933b3ea3528fcff9",
+        "lua/snacks/dashboard.lua": "df72d2d5f058925a6d54f4abb064ef8942751b64dc638ebeedfbb634f8c55eee",
+        "lua/snacks/health.lua": "5b35293807e1d97da7a1c1baa471813873f5d55318672167e090feeeebab47a2",
+        "lua/snacks/indent.lua": "bb5b5604e8b7717c5270c535d72e638d8aa460c2257396655684dd95f4a27931",
+        "lua/snacks/init.lua": "f115b40991b67fcb41795b6c9c070ab52deac3030e11cf999d385cc72873a6c4",
+        "lua/snacks/input.lua": "344b8bd7040f9120beef12630a1a70a4e655ea288d4cf6dff6afc6cf21dad49f",
+        "lua/snacks/lazygit.lua": "35e75ea44f8bf4c5868172b4d951c8736a89ffd2f78dac8d7bef3b1329ec71f4",
+        "lua/snacks/notifier.lua": "54984636d8530cd0ed0cf0bf81140b6f52678308d8b312a2d6979ee98ea9e7a9",
+        "lua/snacks/notify.lua": "daa2ee4db8dcc491feda619d068ebe25837ab5f00bc11aeef3153e005af6aff4",
+        "lua/snacks/picker/actions.lua": "c648231ca169b32527d4736556311987d6247ad7c330a24dbfef9b89a90c123b",
+        "lua/snacks/picker/config/defaults.lua": "62ae47a4e9f3a649dbd206faa36218e9faae0f5b369b254057e41836b1ea8598",
+        "lua/snacks/picker/config/init.lua": "02a1a4441a1dd18faae68b28cdc5ad0c10bc8e2b4c47b278b661481a77f2febe",
+        "lua/snacks/picker/config/sources.lua": "10f0086960d91c479bc5ae718c7aabec91b71084c55b2e7a036c749f0f69d4bb",
+        "lua/snacks/picker/core/_health.lua": "4496fab64f2348c455b0e9d57aa813e3dea40c28aa68f10c97f45aa93f3bfb43",
+        "lua/snacks/picker/core/picker.lua": "d381d943bfab0753a757f54555c311310cc6acf320e47564f77b7b83022760a3",
+        "lua/snacks/picker/init.lua": "8013a944a0344244fdec16d12368d02a742d3d37e697314e820213c8e15b0761",
+        "lua/snacks/picker/select.lua": "5dffec4d956c17334ef7b0bfa47782813cec427cb83e891a39c9709979c8b80f",
+        "lua/snacks/picker/util/init.lua": "2c028e3da756e7d021f4c7f18a63e5deaf5e8d264da349cf2ea58e1229daf278",
+        "lua/snacks/terminal.lua": "b92b790567b719c14e03aa499bcf6a47d78f41e1b3da46f11d68d9c2b4ab3994",
+        "lua/snacks/win.lua": "e16bb9ea4d6d00ca188b3e06c02e1ccca2f8e09419afa261f41998bb19b7dec9",
+        "lua/snacks/words.lua": "ccf1d52c3a54a3da26b869a36e0ecab2440038f3c1c50f6e8c20b9d232b9f990",
+        "lua/vim/health.lua": "c664ab88afbac7e20dbe3d000bb0775a630ca2da1a73cb7d17a8d53d4ab537c6"
+      }
+    }
+  },
+  "upstream": {
+    "follow": {
+      "kind": "default_branch"
+    },
+    "repository": "https://github.com/folke/snacks.nvim"
+  }
+}

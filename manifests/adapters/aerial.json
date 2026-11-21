@@ -1,0 +1,118 @@
+{
+  "contracts": [
+    "tests/upstream/aerial/aerial_upstream_spec.lua"
+  ],
+  "domain": "aerial",
+  "entry": "nvim-zh.adapters.aerial",
+  "id": "aerial",
+  "lazy_names": [
+    "aerial.nvim"
+  ],
+  "modules": [
+    "aerial",
+    "aerial.backends",
+    "aerial.command",
+    "aerial.keymap_util",
+    "aerial.util"
+  ],
+  "notes": {
+    "domain": "aerial",
+    "excluded": "symbol names, user-defined custom action descriptions, LSP symbol kinds and raw treesitter query parse errors",
+    "limitations": "existing aerial buffers keep their attached keymap descriptions until reopened",
+    "public_path": "AerialToggle/AerialOpen empty/loading centered text and keymap help float; AerialInfo command output; backend notifications",
+    "seam": "aerial.util.render_centered_text; aerial.keymap_util.set_keymaps/show_help; aerial.command.info; aerial.backends.log_support_err",
+    "status": "implemented",
+    "writes": "outline_buffer_help_float_and_info_display_only"
+  },
+  "scenarios": {
+    "command_info": {
+      "surfaces": [
+        "command_info"
+      ],
+      "tui": "tests/upstream/aerial/tui.py"
+    },
+    "outline_window": {
+      "surfaces": [
+        "outline_window"
+      ],
+      "tui": "tests/upstream/aerial/tui.py"
+    }
+  },
+  "schema": 1,
+  "status": "implemented",
+  "surfaces": {
+    "command_info": {
+      "independent": true,
+      "kind": "versioned",
+      "modules": {
+        "aerial": "lua/aerial/init.lua",
+        "aerial.backends": "lua/aerial/backends/init.lua",
+        "aerial.command": "lua/aerial/command.lua"
+      }
+    },
+    "outline_window": {
+      "independent": true,
+      "kind": "versioned",
+      "modules": {
+        "aerial.actions": "lua/aerial/actions.lua",
+        "aerial.keymap_util": "lua/aerial/keymap_util.lua",
+        "aerial.loading": "lua/aerial/loading.lua",
+        "aerial.nav_actions": "lua/aerial/nav_actions.lua",
+        "aerial.render": "lua/aerial/render.lua",
+        "aerial.util": "lua/aerial/util.lua"
+      }
+    }
+  },
+  "targets": {
+    "baseline": {
+      "commit": "28fe6e822ae344544c379d60fcb13c9519a1f08a",
+      "dependencies": [],
+      "neovim": "0.12.6",
+      "sources": {
+        "autoload/aerial.vim": "81f08aece705716b8af3ad09f420d49614f58545c1fbce5be9911da24f34521f",
+        "doc/aerial.txt": "cd3968b32a50ef44131703842185546069c356f22773d44504b979e891f79240",
+        "lua/aerial/actions.lua": "c9c5d93daba15d7a83afc0a1866fb20660563fca267b9881f40208a43b086fcd",
+        "lua/aerial/autocommands.lua": "f873f52372504a62e98c9861255434761da97ce03d3f654aca9d1ab887b4e2b8",
+        "lua/aerial/backends/asciidoc.lua": "c6d218cdd4a75155adada32b81468f5f84bcdc0a734e9b4baa4960d263ce56a9",
+        "lua/aerial/backends/init.lua": "dd2c900ced376ae0c0e00f6f2e7294580bc0dd90ef69d69ab2821259ed2d1a47",
+        "lua/aerial/backends/lsp/callbacks.lua": "2e0e3828abd430915adbbd31308164d2cc2826abcd640090f40150e68bd6c1bc",
+        "lua/aerial/backends/lsp/init.lua": "d21f2cc2b7e8986578c4b65c849db121279ae4026dc1658b2ecb2459479b294c",
+        "lua/aerial/backends/lsp/util.lua": "f278b178a167f05edb12e97e39c718fca84d72ecacaa08c43ff1abac7e201afb",
+        "lua/aerial/backends/man.lua": "5c49978c75a63ebc9234304f7a5da6c0ccc5d9a7c796482410335643af9a41d8",
+        "lua/aerial/backends/markdown.lua": "310b1ce178fadcab6c540992296722f391c463e48122b24a8eef7d1da8059c75",
+        "lua/aerial/backends/treesitter/extensions.lua": "b75d575fc35794b1a56402eecb2be33e3245053581df6892062d97ed5ee71623",
+        "lua/aerial/backends/treesitter/helpers.lua": "3f6483f333080be895fab315fdd3721e23bb6cb330b675ed9bec38aabafb0ba9",
+        "lua/aerial/backends/treesitter/init.lua": "8d3f812aff8802e9a8fb35d32dc9fc1e1f55923df9e2a2aecc55af3d1bace34c",
+        "lua/aerial/backends/util.lua": "98eb1dc3f098484775106796aacd8dbd802fca440c532ac2190230572fcef1bb",
+        "lua/aerial/command.lua": "48b6133913f95ef28977af66ef4df57ce758ad30cfaf2ca9d8cbc55c84ac71e5",
+        "lua/aerial/config.lua": "aa08061a3bd12af78a385bfc879ab5aa2e6a33e600fdb6bbc8c3751603daf8ad",
+        "lua/aerial/data.lua": "8234d75f572d1f19448b4335e8ccb57bf3e7bcad15c6c065658b853344a02eae",
+        "lua/aerial/fold.lua": "126394d47cd4c8553453472debce30f004b04bb944c3dbb73dbe7c1444d94952",
+        "lua/aerial/fzf-lua.lua": "caa11062000519c1d75a9ff0bdd9d02d3729f242ea4fef49b0c748c85a355991",
+        "lua/aerial/fzf.lua": "18b1e934a43a64b743aa6cede2cc7a8b9c126a8ddd187e6ae75a772746ef62a8",
+        "lua/aerial/highlight.lua": "b464b14e4860ac135e56bf1f35cdcf7b2e3b6c2ac2a4c1c3a3e308b745dd78ed",
+        "lua/aerial/init.lua": "78aff86b2faf0333f801f212805bd643e7ad5cc77c66468d8ac5c5235b577161",
+        "lua/aerial/keymap_util.lua": "68185eafcdf762a58b0bb7466604a4b333e4c1f45c61989c1970275112b4c15f",
+        "lua/aerial/layout.lua": "bf7c6ed9971ac6cadb6a2e8a156beccfb25bb1f253c74a769deebd75c23f723b",
+        "lua/aerial/loading.lua": "f1fb19996329d02f584cae3101737d72a5aa2cd77a8ffd6b8636c0e5a52d93d1",
+        "lua/aerial/nav_actions.lua": "40b4b4027c7e41e565483949826be3e800623d537207ffb5f35f8c44d85b2950",
+        "lua/aerial/nav_view.lua": "27bd90a741ac6b7c3aca68606e86a51f64c742b53a58dec875acd72a6f591190",
+        "lua/aerial/navigation.lua": "e9392b2cedebf8db9940d364e3ce94712c634f1ce498cf4b991a3257eda02312",
+        "lua/aerial/render.lua": "07d93ab87fc7730b62ba43424d6cb68172768773e22c2339e806da0524f8ac67",
+        "lua/aerial/snacks.lua": "747a1b87a3afa471cab64a5f0698ce2a26ef8077a34f437b9db68b28c502f941",
+        "lua/aerial/tree.lua": "89ace6651f3c9152bb9828ba6f1ea69b4a01936a81a8cf5de7da677bd7e9670f",
+        "lua/aerial/util.lua": "1a6baeea8a46d9e4f84a1339c1869707561fae1283e6645908ce7efb44861490",
+        "lua/aerial/window.lua": "22a652e7ee46ad05663409c1f30e18a43cdaabaf94da1a351b8c70b65c6d5c5b",
+        "lua/lualine/components/aerial.lua": "81057fb8e21ab8ba0ca7ae47372a25594b4c00e41ece107b2d7305a8be7ac961",
+        "lua/resession/extensions/aerial.lua": "7937ac0addfef25c93c1ff763ef77c53f7687d7d4446edd28d4e7babe8f28e12",
+        "lua/telescope/_extensions/aerial.lua": "3f39ceb858b243c9a5eb31981bdcdedb47bcee05be51f969b0d67332a11aa3a2"
+      }
+    }
+  },
+  "upstream": {
+    "follow": {
+      "kind": "default_branch"
+    },
+    "repository": "https://github.com/stevearc/aerial.nvim"
+  }
+}

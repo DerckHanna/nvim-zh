@@ -79,7 +79,7 @@ vim.pack.add({
 
 ## nvim-tree
 
-固定上游：`dbc9d96a3633c2de85f409416ebd4a3aacf4220a`。
+固定上游：`6e539e91302d2e201b078a45d214177140134523`。
 
 ### 已接入
 
@@ -154,6 +154,62 @@ vim.pack.add({
 - nvim-cmp 汉化包以 `2ffe79f1` 为上游组合，使用 SDK 2。`:CmpStatus` 的四组标题、三项配置弃用提示、自定义视图的默认类别和完整中文 Help 已纳入适配。
 - 只有使用 nvim-cmp 默认 formatter 的自定义菜单才投影类别标签。用户 formatter 与 lspkind 持有自己的输出。原生菜单、候选名称、来源字段、筛选、编辑、snippet 和 resolve 使用上游值。
 - 固定代码接缝在目标源码首次加载时取证。晚安装仍可使用已核对上游文档摘要的中文 Help。
+
+## snacks.nvim
+
+固定上游：`882c996cf28183f4d63640de0b4c02ec886d01f2`。
+
+- 已接入：Dashboard 默认 preset 键位项描述与启动耗时页脚；Picker 自动生成的内置来源标题（仅限定在 `snacks/picker/core/picker.lua` 调用点，不影响 `source/gh.lua` 高亮组拼接）；`Snacks.picker.select` 与 `Snacks.input` 默认提示标题（并保持 `vim.ui.select == Snacks.picker.select` 与 `vim.ui.input == Snacks.input.input` 身份一致）；`Snacks.notifier` 历史标题、`Snacks.bufdelete` 确认框、`Snacks.notify` 固定提示以及 `:checkhealth snacks`。
+- 边界：用户自定义的 Dashboard 条目、显式指定的 Picker/Input 标题、条目路径、终端输出和 lazygit 界面保持原文。
+
+## blink.cmp
+
+固定上游：`78336bc89ee5365633bcf754d93df01678b5c08f`。
+
+- 已接入：`blink.cmp.lib.utils.notify` 分段通知消息（预编译二进制下载、源码构建、配置未知字段、构建日志状态等）、精确 `blink.cmp` 通知标题路由以及 `:checkhealth blink.cmp` 报告。
+- 边界：补全候选项、提供程序 ID、模块名、系统三元组及原始构建日志正文保持原文。
+
+## cmake-tools.nvim
+
+固定上游：`782a254c62a61af1d4febddd0d6dbc5ea414a027`。
+
+- 已接入：精确 `CMakeTools` 通知标题路由及 `log.notify` / `notification.notify` 提示；构建类型、Target、预设、套件与快速开始向导的 `vim.ui.select` / `vim.ui.input` 交互标题；设置浮窗标题。
+- 边界：CMake 构建输出、Target 名称、预设/套件名称和原始 CodeModel 数据保持原文。
+
+## aerial.nvim
+
+固定上游：`28fe6e822ae344544c379d60fcb13c9519a1f08a`。
+
+- 已接入：大纲窗口空状态（`No symbols`）、加载提示与后端不支持原因；`g?` 键位帮助浮窗与 Buffer 默认映射描述；`:AerialInfo` 诊断输出及后端通知。
+- 边界：符号名称、用户自定义动作描述和 Treesitter 原始查询解析错误保持原文。
+
+## gitsigns.nvim
+
+固定上游：`c0862d382a35b7b45757d8d151a6a634c09bf3ce`。
+
+- 已接入：精确 `gitsigns` 通知标题路由及 `message.{warn,error,error_once}`；Hunk 暂存、重置、撤销与导航的同步提示；`popup.{create,update}` 中的 Hunk 标题、Blame 提示与 Diff 帮助浮窗（仅翻译字符串高亮片段，不触碰差异代码正文）。
+- 边界：差异正文、提交说明、作者名、SHA 和原始 git stderr 保持原文。
+
+## conform.nvim
+
+固定上游：`016802de402556da54c36bd7359b441266b01cdd`。
+
+- 已接入：`:ConformInfo` 信息窗口标题、状态与不可用原因（按中文字节宽度安全重算高亮范围）；`setup` / `resolve_formatters` / `format` 通知以及 `:checkhealth conform`。
+- 边界：格式化器 stdout/stderr、原始日志文件正文和用户回调错误值保持原文。
+
+## mini.nvim
+
+固定上游：`b8a0af521530f8ee68c738657429eab59de6a2ae`。
+
+- 已接入：优先覆盖当前启用子模块，包括 `mini.statusline` 长模式标签（保留单字母短模式）、`mini.surround` 交互输入提示与查找反馈，以及 `mini.ai` 边界输入与文本对象反馈。
+- 边界：短模式缩写、文件名、图标字形及用户自定义状态栏内容函数保持原文。
+
+## nvim-treesitter
+
+固定上游：`37e52c733ada9d8d544d53a763140ef1ba404353`（Neovim 0.12 `main` 分支架构）。
+
+- 已接入：`nvim-treesitter.log.Logger.{info,warn,error}` 的解析器下载、生成、编译、安装、更新与卸载日志及报错（通过 `User TSUpdate` 生命周期钩子确保首次命令即时接管）；`:checkhealth nvim-treesitter` 健康报告。
+- 边界：解析器查询定义、编译器 stdout/stderr 载荷、语言标识符和 ABI 版本号保持原文。
 
 ## 新增适配器的要求
 

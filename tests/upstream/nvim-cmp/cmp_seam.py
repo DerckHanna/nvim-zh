@@ -7,6 +7,7 @@ from adapter_manifest import upstreams
 from help_parity import example_blocks, links, tags
 import os
 from pathlib import Path
+import re
 
 ROOT = Path(os.environ['NVIM_ZH_ROOT']).resolve()
 
@@ -41,9 +42,8 @@ english = (root / 'doc/cmp.txt').read_text(encoding='utf-8')
 chinese = (ROOT / 'translations/help/adapters/nvim-cmp/cmp.cnx').read_text(encoding='utf-8')
 require(Counter(tags(chinese)) == Counter(tags(english)), 'nvim-cmp Help tags changed')
 require(links(chinese) == links(english), 'nvim-cmp Help links changed')
-# The pinned Help omits the opening fence for the icon formatter example.
-examples = english.replace('in your format table (e.g.):\n    \n      local function set_colors',
-                           'in your format table (e.g.):\n>lua\n      local function set_colors')
-require(examples != english, 'nvim-cmp icon formatter example moved')
-require(Counter(example_blocks(chinese)) == Counter(example_blocks(examples)), 'nvim-cmp Help examples changed')
+require(Counter(example_blocks(chinese)) == Counter(example_blocks(english)), 'nvim-cmp Help examples changed')
+# This pinned example has no opening fence.
+icon_example = re.search(r'^      local function set_colors\(str\)\n(?:[^\n]+\n)+?(?=^<$)', english, re.M)
+require(icon_example is not None and icon_example[0] in chinese, 'nvim-cmp icon formatter example changed')
 print(f'CMP_PUBLIC_SEAM_SMOKE=PASS nvim-cmp=2ffe79f hashes={len(manifest["sources"])} formatter=identity help=full')

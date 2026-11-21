@@ -426,7 +426,7 @@ nvim-cmp 的映射机制支持多种配置和按键组合。
 *CmpItemKind%KIND_NAME%Icon
   指定 `lsp.CompletionItemKind` 图标的高亮组。
   可以沿用上述覆盖方式，也可以在 format 表中使用自定义函数。
->lua
+
       local function set_colors(str)
         local color = vim.api.nvim_get_hl(args...)
         vim.api.nvim_set_hl(args...)

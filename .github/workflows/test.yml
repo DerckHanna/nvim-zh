@@ -58,9 +58,12 @@ jobs:
             sudo apt-get install -y gettext libvterm-dev pkg-config
           fi
       - name: Syntax, catalogs, resources, offline suites and release gates
-        run: make check-syntax check-translations check-native check-resources check-reproducible test release-check
-      - name: Probe Linux Help and SDK 2 snapshots
         if: ${{ !matrix.experimental }}
+        run: make check-syntax check-translations check-native check-resources check-reproducible test release-check
+      - name: Check Nightly with version-independent suites
+        if: ${{ matrix.experimental }}
+        run: make check-syntax check-resources test-unit
+      - name: Probe Linux Help, runtime fallback and SDK 2 snapshots
         run: |
           source tests/run/lib/env.sh
           NVIM_ZH_PLATFORM_NATIVE=ok run_lua "$NVIM_ZH_ROOT/tests/platform/localization.lua"

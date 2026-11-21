@@ -116,6 +116,6 @@ nvim --headless -u NONE -i NONE -n -l tests/platform/packs.lua
 
 Help parity 只在 manifest 固定 runtime 上比较上游文本。其他 runtime 明确 SKIP 上游比较，但 tag/示例块/链接摘要、索引与术语的内部契约仍运行。版本自报固定基线却为 prerelease 或摘要不符时必须 FAIL。
 
-CI 固定 0.12.6 必跑，nightly 仅实验性预警；没有在 GitHub 实际执行就不能写 CI 已通过。未验证平台见[兼容性](compatibility.md)，本次实际结果见[验证记录](verification.md)。
+固定 0.12.6 的 CI 运行完整门禁。滚动 Nightly 只运行不依赖固定源码摘要的语法、资源、单元测试和平台探针。平台边界见[兼容性](compatibility.md)，发行结果见[验证记录](verification.md)。
 
 测试重构前的路径对应关系见[迁移记录](archive/test-path-migration.md)。

@@ -1,5 +1,43 @@
 # 验证记录
 
+## P2 紧凑词库与 SDK 2 验收（2026-11-21）
+
+本轮以 `main@f73be7c`（P1 闭环基线）和 `origin/packs@a7c9bab` 为对照基线，实施 P2.1 紧凑词库重构（[catalog.lua](../lua/nvim-zh/catalog.lua)、[engine.lua](../lua/nvim-zh/engine.lua)、[packs.lua](../lua/nvim-zh/packs.lua)）与 P2.2 路线 B 单层紧凑 SDK 2 附件格式（[pack_store.lua](../lua/nvim-zh/pack_store.lua)、[resource_bundle.py](../tools/resource_bundle.py)、[pack_assets.py](../tools/pack_assets.py)，候选版本 `0.2.0`）。固定对照环境为官方 Neovim 0.12.6（`sha256: 2e150e924a93930295deff9ca3c02c8828590ce3d04ce7b3ef49c8804adde973`）、Linux x86_64/glibc 2.44（WSL2）与摘要匹配的 LLVM 23.1.5；全部原始日志与机器可读结果位于 `/tmp/nvim-zh-p2-verify`。
+
+### P2 同机前后性能对照（官方 Neovim 0.12.6，隔离 XDG，`PYTHONDONTWRITEBYTECODE=1`）
+
+同机三组对照使用相同官方 Neovim 0.12.6：`p1_sdk1`（`git archive f73be7c` + 已验收 SDK 1 `clang 0.1.0` / `clangd 0.1.2`）、`p2_sdk1`（当前工作树 + 相同 SDK 1）、`p2_sdk2`（当前工作树 + 候选 SDK 2 `clang 0.2.0` / `clangd 0.2.0`）。原始读数见 `/tmp/nvim-zh-p2-verify/performance.json`。
+
+| 负载 | `p1_sdk1`（`f73be7c`） | `p2_sdk1`（存量 SDK 1） | `p2_sdk2`（候选 `0.2.0`） | 变化 / 预算判定 |
+| --- | ---: | ---: | ---: | --- |
+| 两包冷启动 / 5 进程复用中位数（最大） | `263.13 / 59.87 (60.33) ms` | `287.36 / 59.91 (62.76) ms` | `281.84 / 62.74 (65.26) ms` | 延迟启动无回归，启动后 RSS `21.60 MiB` / Lua 堆 `1.80 MiB`（PASS） |
+| 显式首查 `clang_get`（5 次 P50 / P95） | `144.91 / 147.44 ms` | `94.87 / 97.92 ms`（-34.5%） | **`44.03 / 48.04 ms`** | **-69.6% P50 / -67.4% P95**（预算 `≤45 / ≤55 ms`，PASS） |
+| 显式首查 `clangd_get`（5 次 P50 / P95） | `146.42 / 168.91 ms` | `100.80 / 107.76 ms`（-31.2%） | **`44.26 / 45.27 ms`** | **-69.8% P50 / -73.2% P95**（预算 `≤45 / ≤55 ms`，PASS） |
+| 首个单错误 Clang 构建（主线程返回 / 中文就绪 P50） | `18.93 / 177.72 ms` | `19.08 / 126.55 ms`（-28.8%） | **`18.30 / 73.09 ms`** | 主线程返回 -3.3%，中文就绪 **-58.9%**（超 ≥55% 相对目标，PASS） |
+| 真实 clangd `after_attach_ms`（5 次 P50 / P95） | `165.56 / 171.63 ms` | `104.74 / 112.51 ms`（-36.7%） | **`51.77 / 55.37 ms`** | **-68.7% P50**（预算 `≤65 ms`，PASS） |
+| 真实 clangd `visible_ms`（5 次 P50 / P95） | `178.94 / 184.74 ms` | `118.20 / 125.73 ms`（-33.9%） | **`65.25 / 69.20 ms`** | **-63.5% P50**（预算 `≤80 ms`，PASS） |
+| 单域载入后 GC 后 Lua 堆 / RSS / Peak RSS | `33.99 / 55.73 / 61.93 MiB` | `10.62 / 36.71 / 53.99 MiB` | **`10.62 / 28.19 / 33.83 MiB`** | Lua **-68.8%**、RSS **-49.4%**（预算 `≤12 / ≤30 MiB`，PASS） |
+| 双域载入后 GC 后 Lua 堆 / RSS / Peak RSS | `59.44 / 83.53 / 102.33 MiB` | `17.14 / 43.80 / 61.18 MiB` | **`17.16 / 35.11 / 40.77 MiB`** | Lua **-71.1%**、RSS **-58.0%**、Peak **-60.2%**（预算 `≤18 / ≤36 / ≤45 MiB`，PASS） |
+| 1,000 条诊断虚拟文本 / QF / Loc P95（启用） | `30.68 / 13.69 / 27.44 ms` | `17.29 / 16.71 / 19.18 ms` | **`15.90 / 14.91 / 17.80 ms`** | VT **-48.2%**、Loc **-35.1%**（零回归，PASS） |
+| 3,001 项 Clang 列表打开 P50 / P95（启用） | `0.60 / 0.76 ms` | `0.61 / 0.75 ms` | **`0.62 / 0.83 ms`** | 零回归（预算 `≤15 ms`，PASS） |
+| 500 项原生补全 P50 / P95（启用） | `1.50 / 10.14 ms` | `1.50 / 7.47 ms` | **`1.51 / 6.71 ms`** | **-33.8% P95**（PASS） |
+| SDK 2 损坏回退至已验证 SDK 1 `0.1.2`（5 次 P50 / P95） | — | — | `119.79 / 121.87 ms` | 1 字节篡改经 SHA-256 拒绝并回退至 `0.1.2` 译文就绪（PASS） |
+| `make check-translations`（3 次中位数） | — | — | `2.46 s`（`2.41–2.47 s`） | 预算 `≤3.0 s`（PASS） |
+
+### SDK 1 与 SDK 2（`0.2.0`）双次复现与全量门禁（2026-11-21）
+
+| 检查 | 结果 |
+| --- | --- |
+| 空 `LOCPATH` 全量离线门禁：`make check-syntax check-translations check-native check-resources check-reproducible test release-check` | PASS（56 Python / 10 Shell / 122 Lua 语法通过，含新增 `sdk2_spec.lua` 与 `test_pack_assets.py`，发布候选 592 个文件，`/tmp/nvim-zh-p2-verify/gates.log`）。 |
+| 离线 `make sync` | PASS（`SYNC_STATUS=OK changes=0 network=false`，`sync.log`）。 |
+| 真实 native runtime 与真实 clangd（空 `LOCPATH`，`NVIM_ZH_TEST_NATIVE_RUNTIME=1 NVIM_ZH_TEST_CLANGD=/usr/bin/clangd`） | PASS（项目 MO 探针与欢迎页通过；系统 locale MO 探针因空 `LOCPATH` / 官方包缺系统 MO 记 SKIP；15 样例 21 条 push 诊断原数据不变，pull 返回 `-32601`，`real-native-clangd.log`）。 |
+| SDK 1 双次复现 + SDK 2（`0.2.0`）双次复现与合并索引 | PASS。SDK 1 逐字节复现且与 `origin/packs@a7c9bab` 摘要一致：`clang 0.1.0`（`ccaeb17c...`，8.6 MiB）、`clang-tidy 0.1.0`（`91eb1d39...`，827 KiB）、`clangd 0.1.2`（`0dd6344f...`，8.7 MiB）。SDK 2 候选 `0.2.0` 双次逐字节一致：`clang 0.2.0`（`e7ed12a1...`，5.7 MiB，-34%）、`clang-tidy 0.2.0`（`7eb609a6...`，492 KiB，-40.5%）、`clangd 0.2.0`（`26371615...`，5.7 MiB，-35%）、合并 `catalog.json`（`d595e181...`）。 |
+| 完整 Clang 工具链门禁（`toolchain_observe.py` + `clang_toolchain.py` SDK 1 & SDK 2 双组 PTY + `toolchain_coverage.py --require-complete`） | PASS（48 次驱动调用，602 个 clang-tidy 检查零缺口，SDK 1 与 SDK 2 真实 PTY 启停对照均 `CLANG_TOOLCHAIN_TUI_DIFFERENTIAL=PASS`，官方 0.12.6 上 91,654 样本零缺译/零歧义/零证据缺口，`TOOLCHAIN_COMPLETE=PASS`）。 |
+| 固定第三方上游矩阵（`make test-upstream`，官方 0.12.6） | PASS（67/67 全通过，`upstream.json`）。 |
+| C++/DAP（`cpp_tui.py`）与 Python/Git（`python_git_tui.py`）终端工作流（官方 0.12.6） | PASS（启停两组跳转、修复、退出码 2→0、CodeLLDB 调试退出码 0、pytest/Ruff/Git 冲突解决完全一致，`cpp-tui.log`、`python-git-tui.log`）。 |
+| 本机 Linux 平台探针（`tests/platform/localization.lua` 与 `tests/platform/packs.lua`） | PASS（`native=ok`，`sdk1=synthetic+published(0.1.0,0.1.1,0.1.2)` + `sdk2=synthetic`，覆盖跨 SDK 损坏回退、原地修复、离线回滚及硬链接/EEXIST/过期代次/EPERM）。 |
+| 远端/跨平台（Windows 11、Alpine musl、macOS 15.8.2 CI、Neovim nightly CI） | SKIP / 待推送后复测（本轮尚未提交/推送，远端 CI 尚未在 P2 工作树上运行；候选 `0.2.0` 附件仅存本地 `/tmp/nvim-zh-p2-verify/sdk2-a`，待明确授权后再发布）。 |
+
 ## 架构演进验收（2026-11-21）
 
 本轮以 `da04760` 和 `origin/packs@a7c9bab` 为基线，复核并补齐 P0/P1 验收与首用/P2 量化。Linux 固定组合在独立 XDG 和临时项目中使用官方 Neovim 0.12.6、Linux x86_64/glibc 2.44 和摘要匹配的 LLVM 23.1.5；原始日志与机器可读结果分别位于 `/tmp/nvim-zh-final-verify`（完整门禁、平台、工具链、上游与终端工作流）、`/tmp/nvim-zh-evolution.rerun`（同机前后性能对照与真实 clangd 首用）、`/tmp/nvim-zh-evolution.0TDBos`（前次演进记录）和 `/tmp/nvim-zh-generation.9WcV8h`（23.1.4/23.1.5 相邻基线与历史附件复现）。

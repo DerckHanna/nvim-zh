@@ -153,6 +153,39 @@ assert(not state().active and translate() == 'Open' and store.record('platform-d
 packs.change('platform-demo', 'remove')
 assert(not store.record('platform-demo').selected and translate() == 'Open')
 
+-- 3b. SDK 2 single-file snapshot, damage fallback to SDK 1, in-place repair,
+-- and offline rollback across SDK 2 <-> SDK 1 on this filesystem.
+local function write_pack_sdk2(name, version, msgstr)
+  local path = scratch .. '/' .. name .. '.json'
+  fs.write(path, vim.json.encode({
+    manifest = { schema = 1, sdk = 2, locale = 'zh_CN', id = 'platform-demo',
+      domain = 'platform_demo', version = version, files = {} },
+    catalog = { schema = 2, locale = 'zh_CN', domain = 'platform_demo',
+      entries = { [''] = { Open = msgstr } } },
+    files = {},
+  }))
+  return path
+end
+assert(packs.import(first, false) == 'platform-demo')
+local sdk2_pack = write_pack_sdk2('sdk2', '2.0.0', '二代打开')
+assert(packs.import(sdk2_pack, false, packs.inspect(sdk2_pack).sha256) == 'platform-demo')
+assert(state().selected == '2.0.0' and state().active == '2.0.0' and state().previous == '1.0.0' and translate() == '二代打开',
+  vim.inspect(state()))
+local sdk2_folder = store.folder(store.record('platform-demo').selected)
+assert(uv.fs_stat(sdk2_folder .. '/artifact.json') and not uv.fs_stat(sdk2_folder .. '/catalogs'),
+  'SDK 2 snapshot should not extract catalogs/')
+damage(sdk2_folder .. '/artifact.json')
+restart()
+assert(state().selected == '2.0.0' and state().active == '1.0.0' and state().error and translate() == '打开',
+  vim.inspect(state()))
+assert(packs.import(sdk2_pack, false) == 'platform-demo')
+assert(state().selected == '2.0.0' and state().active == '2.0.0' and not state().error and translate() == '二代打开',
+  vim.inspect(state()))
+packs.change('platform-demo', 'rollback')
+assert(state().selected == '1.0.0' and state().active == '1.0.0' and translate() == '打开', vim.inspect(state()))
+packs.change('platform-demo', 'remove')
+assert(not store.record('platform-demo').selected and translate() == 'Open')
+
 -- 4. Published historical and formal attachments.
 local summary = 'synthetic'
 local assets = vim.env.NVIM_ZH_PLATFORM_ASSETS
@@ -197,5 +230,5 @@ if assets and assets ~= '' then
 end
 
 assert(zh.teardown())
-print(('PLATFORM_PACKS=PASS system=%s arch=%s nvim=%s sdk1=%s import=digest_checked damaged=previous_verified atomic=link,eexist,stale,unsupported_reported')
+print(('PLATFORM_PACKS=PASS system=%s arch=%s nvim=%s sdk1=%s sdk2=synthetic import=digest_checked damaged=previous_verified atomic=link,eexist,stale,unsupported_reported')
   :format(uv.os_uname().sysname, uv.os_uname().machine, tostring(vim.version()), summary))

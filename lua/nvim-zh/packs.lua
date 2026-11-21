@@ -26,6 +26,7 @@ local function release(id)
   local pack = active[id]
   if not pack then return end
   active[id] = nil
+  pack.catalog_ref = nil
   if pack.release_adapter then pack.release_adapter() end
   if pack.release_catalog then pack.release_catalog() end
 end
@@ -48,17 +49,25 @@ local function mount(id, candidate, revision)
   local existing = active[id]
   if existing then
     local old, old_root = existing.candidate, existing.spec and existing.spec.help_root
+    local old_catalog = existing.catalog_ref
     existing.candidate = candidate
     if existing.spec then existing.spec.help_root = candidate.root .. '/help' end
-    if existing.invalidate then existing.invalidate() end
+    if existing.update_catalog and candidate.built_catalog then
+      existing.update_catalog(candidate.built_catalog)
+      existing.catalog_ref = candidate.built_catalog
+    end
     local ok, err = pcall(function() if existing.sync_help then existing.sync_help() end end)
     if not ok then
       existing.candidate = old
       if existing.spec then existing.spec.help_root = old_root end
-      if existing.invalidate then existing.invalidate() end
+      if existing.update_catalog and old_catalog then
+        existing.update_catalog(old_catalog)
+        existing.catalog_ref = old_catalog
+      end
       if existing.sync_help then pcall(existing.sync_help) end
       error(err, 0)
     end
+    candidate.catalog, candidate.built_catalog = nil, nil
     existing.revision = revision
     return
   end
@@ -66,9 +75,11 @@ local function mount(id, candidate, revision)
   local meta = candidate.manifest
   local previous = frozen[id]
   local ok, err = pcall(function()
-    if candidate.catalog then
-      pack.release_catalog, pack.invalidate = require('nvim-zh.catalog').register_owned(meta.domain,
-        function() return pack.candidate.catalog end, { locale = 'zh_CN' })
+    if candidate.has_catalog then
+      local built = assert(candidate.built_catalog, '词库未就绪')
+      pack.release_catalog, pack.update_catalog = require('nvim-zh.catalog').register_prebuilt(meta.domain,
+        built, { locale = 'zh_CN' })
+      pack.catalog_ref = built
     end
     if meta.adapter then
       local spec = vim.deepcopy(meta.adapter)
@@ -86,10 +97,12 @@ local function mount(id, candidate, revision)
     end
   end)
   if not ok then
+    pack.catalog_ref = nil
     if pack.release_adapter then pack.release_adapter() end
     if pack.release_catalog then pack.release_catalog() end
     error(err, 0)
   end
+  candidate.catalog, candidate.built_catalog = nil, nil
   active[id] = pack
 end
 
@@ -126,7 +139,7 @@ local function apply(id, record, prepared, failure)
       return false
     end
     if current and (not compatible_contract(current.candidate, candidate)
-        or (current.candidate.catalog == nil) ~= (candidate.catalog == nil)) then
+        or (current.candidate.has_catalog == true) ~= (candidate.has_catalog == true)) then
       return false
     end
     mount(id, candidate, revision)
@@ -283,7 +296,7 @@ local function parse_catalog(bytes, source)
     local key = row.id .. '@' .. row.version .. '/' .. tostring(row.locale)
     assert(not keys[key], '发布索引版本重复：' .. key)
     keys[key] = true
-    if row.locale == 'zh_CN' and row.sdk == 1 then
+    if row.locale == 'zh_CN' and (row.sdk == 1 or row.sdk == 2) then
       entries[#entries + 1] = row
     end
   end
@@ -479,10 +492,10 @@ end
 
 local function select_package(id, record, selected, candidate)
   local before = active[id]
-  if candidate.catalog then
+  if candidate.has_catalog then
     local registry = require('nvim-zh.catalog')
     assert(not registry.is_builtin(candidate.manifest.domain), '包使用了主包词库域')
-    local owns = before and before.candidate.catalog and before.candidate.manifest.domain == candidate.manifest.domain
+    local owns = before and before.candidate.has_catalog and before.candidate.manifest.domain == candidate.manifest.domain
     assert(owns or not registry.is_registered(candidate.manifest.domain), '词库域已在使用')
     for other_id, other in pairs(records) do
       assert(other_id == id or not other.selected or other.selected.domain ~= candidate.manifest.domain,

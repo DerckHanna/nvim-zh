@@ -10,9 +10,11 @@ import catalog_tool
 import resource_bundle as bundle
 
 
-def assets(root, version, repository, only=None):
+def assets(root, version, repository, only=None, sdk=1):
     if not re.fullmatch(r'\d+\.\d+\.\d+', version):
         raise ValueError('pack version must be major.minor.patch')
+    if sdk not in (1, 2):
+        raise ValueError(f'unsupported pack sdk: {sdk}')
     specs = adapter_manifest.validate(root)
     index = adapter_manifest.runtime_specs(specs)
     domains = catalog_tool.builtin_sources(root, optional=True)
@@ -36,23 +38,32 @@ def assets(root, version, repository, only=None):
     for id in sorted(ids):
         spec = index.get(id)
         domain = spec['domain'] if spec else id
-        files = {'catalogs/zh_CN.json': bundle.encoded(bundle.catalog(domains[domain], parsed[domains[domain]]))}
+        files = {}
+        embedded_catalog = None
+        if sdk == 1:
+            files['catalogs/zh_CN.json'] = bundle.encoded(bundle.catalog(domains[domain], parsed[domains[domain]]))
+        else:
+            embedded_catalog = bundle.catalog_v2(domains[domain], parsed[domains[domain]])
         if spec:
             entry = spec['entry'].split('.')[-1]
             spec.pop('entry')
             files.update(bundle.adapter_help(root, {id: specs[id]}))
             files['adapter/entry.lua'] = (root / 'translations/adapters' / f'{entry}.lua').read_bytes()
-        manifest = {'schema': 1, 'sdk': 1, 'id': id, 'locale': 'zh_CN', 'version': version,
+        manifest = {'schema': 1, 'sdk': sdk, 'id': id, 'locale': 'zh_CN', 'version': version,
                     'domain': domain, 'name': id, 'files': bundle.descriptor(files)}
         if spec:
             manifest['adapter'] = spec
         else:
             manifest['executable'] = id
             manifest['tool'] = tools[id]
-        content = bundle.encoded({'manifest': manifest, 'files': {
-            name: value.decode('utf-8') for name, value in files.items()}})
+        decoded_files = {name: value.decode('utf-8') for name, value in files.items()}
+        if sdk == 1:
+            content = bundle.encoded({'manifest': manifest, 'files': decoded_files})
+        else:
+            content = bundle.encoded_compact({'manifest': manifest, 'catalog': embedded_catalog,
+                                              'files': decoded_files})
         filename = f'{id}-zh_CN.json'
-        record = {'id': id, 'version': version, 'locale': 'zh_CN', 'sdk': 1, 'name': id,
+        record = {'id': id, 'version': version, 'locale': 'zh_CN', 'sdk': sdk, 'name': id,
                   'url': f'{repository}/releases/download/packs-{id}-v{version}/{filename}',
                   'sha256': bundle.digest(content), 'size': len(content)}
         if spec:
@@ -68,6 +79,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--root', type=Path, default=adapter_manifest.ROOT)
     parser.add_argument('--version', required=True)
+    parser.add_argument('--sdk', type=int, choices=(1, 2), default=1)
     parser.add_argument('--repository', default='https://github.com/DerckHanna/nvim-zh')
     parser.add_argument('--output', required=True, type=Path)
     parser.add_argument('--id', help='build a single pack')
@@ -81,7 +93,8 @@ def main():
         for item in index['packages']:
             records[item['id'], item['version'], item['locale']] = item
     args.output.mkdir(parents=True, exist_ok=True)
-    for filename, content, record in assets(args.root, args.version, args.repository.rstrip('/'), args.id):
+    for filename, content, record in assets(args.root, args.version, args.repository.rstrip('/'), args.id,
+                                            sdk=args.sdk):
         key = record['id'], record['version'], record['locale']
         if key in records and records[key] != record:
             parser.error(f'{key[0]} {key[1]} already has a different asset')

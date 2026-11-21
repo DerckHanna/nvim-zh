@@ -17,6 +17,10 @@ def encoded(value):
     return (json.dumps(value, ensure_ascii=False, sort_keys=True, indent=2) + '\n').encode()
 
 
+def encoded_compact(value):
+    return (json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(',', ':')) + '\n').encode()
+
+
 def digest(data):
     return hashlib.sha256(data).hexdigest()
 
@@ -36,6 +40,15 @@ def catalog(po, parsed=None):
                for e in sorted(entries, key=lambda e: (e.get('msgctxt', ''), e['msgid']))]
     return dict(schema=1, domain=po.stem, locale='zh_CN',
                 metadata={'source': po.name, 'headers': headers}, entries=entries)
+
+
+def catalog_v2(po, parsed=None):
+    entries, headers = parsed if parsed is not None else ct.parse_po(po)
+    by_context = {}
+    for entry in sorted(entries, key=lambda e: (e.get('msgctxt', ''), e['msgid'])):
+        by_context.setdefault(entry.get('msgctxt', ''), {})[entry['msgid']] = entry['msgstr']
+    return dict(schema=2, domain=po.stem, locale='zh_CN',
+                metadata={'source': po.name, 'headers': headers}, entries=by_context)
 
 
 def adapter_help(root, specs):

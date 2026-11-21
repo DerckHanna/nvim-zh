@@ -2,13 +2,8 @@ local M = {}
 
 local catalog = require('nvim-zh.catalog')
 local missing = require('nvim-zh.missing')
-local SEP = catalog._key_separator()
 local MAX_TEMPLATE_INPUT = 8192
 local unpack = table.unpack or unpack
-local matchers = setmetatable({}, { __mode = 'k' })
-local probes = setmetatable({}, { __mode = 'k' })
-local groups = setmetatable({}, { __mode = 'k' })
-local specificities = setmetatable({}, { __mode = 'k' })
 
 local function flush_literal(tokens, buffer)
   if #buffer > 0 then
@@ -114,17 +109,17 @@ local function render_named(template, values)
   return table.concat(output)
 end
 
-local function format_entry(entry, args, clangd)
-  local source = parse_template(entry.msgid, clangd)
-  if not source then return entry.msgstr end
-  local target = parse_template(entry.msgstr, clangd)
+local function format_entry(msgid, msgstr, args, clangd)
+  local source = parse_template(msgid, clangd)
+  if not source then return msgstr end
+  local target = parse_template(msgstr, clangd)
   if not compatible(source, target) or type(args) ~= 'table' then return nil end
   if source.kind ~= 'printf' then return render_named(target, args) end
   if #args ~= #source.placeholders then return nil end
   for index = 1, #args do
     if args[index] == nil then return nil end
   end
-  local ok, result = pcall(string.format, entry.msgstr, unpack(args, 1, #args))
+  local ok, result = pcall(string.format, msgstr, unpack(args, 1, #args))
   return ok and result or nil
 end
 
@@ -154,15 +149,15 @@ local function printf_runs(template)
   return runs
 end
 
-local function compile_matcher(entry, clangd, domain)
-  local source = parse_template(entry.msgid, clangd)
-  local target = parse_template(entry.msgstr, clangd)
+local function compile_matcher(msgid, msgstr, context, clangd, domain)
+  local source = parse_template(msgid, clangd)
+  local target = parse_template(msgstr, clangd)
   if not compatible(source, target) then return nil end
 
   if source.kind ~= 'printf' then
     local pattern, literal_bytes, raw_quoted = { '^' }, 0, false
     local overload_conversion = clangd and source.kind == 'index'
-      and entry.msgid:lower():match('^candidate .+ not viable: no known conversion ')
+      and msgid:lower():match('^candidate .+ not viable: no known conversion ')
     for index, token in ipairs(source.tokens) do
       if token.literal then
         literal_bytes = literal_bytes + #token.literal
@@ -181,8 +176,8 @@ local function compile_matcher(entry, clangd, domain)
           and previous.literal:sub(-1) == "'" and following.literal:sub(1, 1) == "'"
         -- This driver message quotes the complete path, including any
         -- apostrophes in its name. Suggestions use a separate form ending '?'.
-        raw_quoted = quoted and domain == 'clang' and entry.context == 'driver' and #source.placeholders == 1
-          and entry.msgid == "no such file or directory: '%0'"
+        raw_quoted = quoted and domain == 'clang' and context == 'driver' and #source.placeholders == 1
+          and msgid == "no such file or directory: '%0'"
         if previous and not previous.literal then
           pattern[#pattern + 1] = '()'
         else
@@ -201,8 +196,6 @@ local function compile_matcher(entry, clangd, domain)
         if #lit > #probe then probe = lit end
       end
     end
-    probes[entry] = probe
-    specificities[entry] = literal_bytes
     local adj_next = {}
     local p_idx = 0
     for ti, tok in ipairs(source.tokens) do
@@ -214,7 +207,7 @@ local function compile_matcher(entry, clangd, domain)
       end
     end
     local anchor = table.concat(pattern)
-    return function(text)
+    local fn = function(text)
       if probe ~= '' and not text:find(probe, 1, true) then return nil end
       local captures = { text:match(anchor) }
       if #captures ~= #source.placeholders then return nil end
@@ -253,6 +246,7 @@ local function compile_matcher(entry, clangd, domain)
       end
       return render_named(target, values)
     end
+    return fn, probe, literal_bytes
   end
 
   local source_runs, target_runs = printf_runs(source), printf_runs(target)
@@ -277,10 +271,8 @@ local function compile_matcher(entry, clangd, domain)
       if sizes[capture] ~= run.size then return nil end
     end
   end
-  probes[entry] = probe
-  specificities[entry] = literal_bytes
   local anchor = table.concat(pattern)
-  return function(text)
+  local fn = function(text)
     local captures = { text:match(anchor) }
     if #captures ~= #sizes then return nil end
     local output, index = {}, 0
@@ -294,15 +286,77 @@ local function compile_matcher(entry, clangd, domain)
     end
     return table.concat(output)
   end
+  return fn, probe, literal_bytes
 end
 
-local function match_template(entry, text, clangd, domain)
-  local matcher = matchers[entry]
-  if matcher == nil then
-    matcher = compile_matcher(entry, clangd, domain) or false
-    matchers[entry] = matcher
+local function bucket_candidates(current, template_context, key)
+  local base_buckets = current.template_buckets[template_context]
+  local base = base_buckets and base_buckets[key]
+  local ov_buckets = current.ov_buckets and current.ov_buckets[template_context]
+  local extra = ov_buckets and ov_buckets[key]
+  if not extra then return base end
+  if not base then return extra end
+  local merged_by_ctx = current._merged_buckets
+  if not merged_by_ctx then
+    merged_by_ctx = {}
+    current._merged_buckets = merged_by_ctx
   end
-  if matcher then return matcher(text) end
+  local by_key = merged_by_ctx[template_context]
+  if not by_key then
+    by_key = {}
+    merged_by_ctx[template_context] = by_key
+  end
+  local merged = by_key[key]
+  if not merged then
+    if current._unsorted and current._unsorted[base] then
+      table.sort(base)
+      current._unsorted[base] = nil
+    end
+    merged = {}
+    for i = 1, #base do merged[i] = base[i] end
+    for i = 1, #extra do merged[#merged + 1] = extra[i] end
+    by_key[key] = merged
+  end
+  return merged
+end
+
+local function find_translated(current, context, text)
+  local ov = current.ov_translated
+  if ov then
+    local m = ov[context]
+    if m and m[text] then return current.domain .. ':' .. context .. ':' .. m[text] end
+    if context ~= '' then
+      m = ov['']
+      if m and m[text] then return current.domain .. '::' .. m[text] end
+    end
+  end
+  local m = current.translated[context]
+  if m and m[text] then return current.domain .. ':' .. context .. ':' .. m[text] end
+  if context ~= '' then
+    m = current.translated['']
+    if m and m[text] then return current.domain .. '::' .. m[text] end
+  end
+end
+
+local function find_exact(current, context, text)
+  local function in_ctx(ctx)
+    local ov = current.ov_exact and current.ov_exact[ctx]
+    if ov and ov[text] ~= nil then
+      return text, ov[text], current.domain .. ':' .. ctx .. ':' .. text
+    end
+    local ex = current.exact[ctx]
+    if ex and ex[text] ~= nil then
+      return text, ex[text], current.domain .. ':' .. ctx .. ':' .. text
+    end
+    local un = current.unesc and current.unesc[ctx]
+    local u = un and un[text]
+    if u then
+      return text, u.msgstr, current.domain .. ':' .. ctx .. ':' .. u.orig
+    end
+  end
+  local msgid, msgstr, id = in_ctx(context)
+  if msgid then return msgid, msgstr, id end
+  if context ~= '' then return in_ctx('') end
 end
 
 local function observe(spec, translated)
@@ -331,15 +385,15 @@ local function translate(spec)
     observe(spec, false)
     return original, 'fallback', nil
   end
-  local translated_id = current.translated[context .. SEP .. original] or current.translated['' .. SEP .. original]
+  local translated_id = find_translated(current, context, original)
   if translated_id then return original, 'translated', translated_id end
 
-  local entry = current.exact[context .. SEP .. original] or current.exact['' .. SEP .. original]
-  if entry then
-    local result = format_entry(entry, spec.args, clangd)
+  local exact_msgid, exact_msgstr, exact_id = find_exact(current, context, original)
+  if exact_msgid then
+    local result = format_entry(exact_msgid, exact_msgstr, spec.args, clangd)
     if result then
       observe(spec, true)
-      return result, 'translated', entry.id
+      return result, 'translated', exact_id
     end
     -- A formatted diagnostic may itself contain placeholder-like source text.
     -- Let the anchored matcher capture it verbatim instead of treating it as
@@ -351,69 +405,95 @@ local function translate(spec)
   end
 
   if spec.formatted == true and #original <= MAX_TEMPLATE_INPUT then
-    local function scan(candidates)
+    local function scan(candidates, template_context)
       if not candidates then return nil, nil, false end
-      local matched, matched_entry, best_spec, best_index, ambiguous = nil, nil, -1, 0, false
-      local function match(candidate, index)
-        local probe = probes[candidate]
+      if current._unsorted and current._unsorted[candidates] then
+        table.sort(candidates)
+        current._unsorted[candidates] = nil
+      end
+      local state = current._bucket_state[candidates]
+      if not state then
+        state = { matchers = {}, probes = {}, specs = {} }
+        current._bucket_state[candidates] = state
+      end
+      local ov_ctx = current.ov_exact and current.ov_exact[template_context]
+      local exact_ctx = current.exact[template_context]
+      local state_matchers, state_probes, state_specs = state.matchers, state.probes, state.specs
+      local function compile_at(index)
+        local msgid = candidates[index]
+        local msgstr = (ov_ctx and ov_ctx[msgid]) or (exact_ctx and exact_ctx[msgid])
+        local matcher, probe, specificity = compile_matcher(msgid, msgstr, template_context, clangd, spec.domain)
+        state_matchers[index] = matcher or false
+        state_probes[index] = probe or ''
+        state_specs[index] = specificity or 0
+        return state_matchers[index]
+      end
+      local matched, matched_msgid, best_spec, best_index, ambiguous = nil, nil, -1, 0, false
+      local function match(index)
+        local probe = state_probes[index]
         if probe and probe ~= '' and not original:find(probe, 1, true) then return end
-        local result = match_template(candidate, original, clangd, spec.domain)
+        local matcher = state_matchers[index]
+        if matcher == nil then matcher = compile_at(index) end
+        if not matcher then return end
+        local result = matcher(original)
         if not result then return end
-        local specificity = specificities[candidate] or 0
+        local specificity = state_specs[index] or 0
         if specificity > best_spec then
-          matched, matched_entry, best_spec, best_index, ambiguous = result, candidate, specificity, index, false
+          matched, matched_msgid, best_spec, best_index, ambiguous = result, candidates[index], specificity, index, false
         elseif specificity == best_spec then
           if matched ~= result then ambiguous = true end
-          if index < best_index then matched, matched_entry, best_index = result, candidate, index end
+          if index < best_index then matched, matched_msgid, best_index = result, candidates[index], index end
         end
       end
       if #candidates <= 64 then
-        for index, candidate in ipairs(candidates) do match(candidate, index) end
+        for index = 1, #candidates do match(index) end
       else
-        local group = groups[candidates]
+        local group = state.group
         if not group then
           group = { prefixes = {}, unindexed = {} }
-          for index, candidate in ipairs(candidates) do
-            match_template(candidate, '', clangd, spec.domain)
-            local probe = probes[candidate] or ''
+          for index = 1, #candidates do
+            if state_matchers[index] == nil then compile_at(index) end
+            local probe = state_probes[index] or ''
             if #probe >= 4 then
               local prefix = probe:sub(1, 4)
-              local bucket = group.prefixes[prefix] or {}
-              group.prefixes[prefix] = bucket
+              local bucket = group.prefixes[prefix]
+              if not bucket then
+                bucket = {}
+                group.prefixes[prefix] = bucket
+              end
               bucket[#bucket + 1] = index
             else
               group.unindexed[#group.unindexed + 1] = index
             end
           end
-          groups[candidates] = group
+          state.group = group
         end
-        for _, index in ipairs(group.unindexed) do match(candidates[index], index) end
+        for _, index in ipairs(group.unindexed) do match(index) end
         local seen = {}
         for position = 1, #original - 3 do
           local bucket = group.prefixes[original:sub(position, position + 3)]
           if bucket and not seen[bucket] then
             seen[bucket] = true
-            for _, index in ipairs(bucket) do match(candidates[index], index) end
+            for _, index in ipairs(bucket) do match(index) end
           end
         end
       end
       if ambiguous then return nil, nil, true end
-      return matched, matched_entry, false
+      return matched, matched_msgid, false
     end
     local first_byte = catalog._template_key(original)
     local function match_context(template_context)
-      local buckets = current.template_buckets[template_context]
-      if not buckets then return nil, nil, false end
-      local matched, matched_entry, ambiguous = scan(buckets[first_byte])
-      if matched or ambiguous then return matched, matched_entry, ambiguous end
+      local matched, matched_msgid, ambiguous = scan(bucket_candidates(current, template_context, first_byte), template_context)
+      if matched or ambiguous then return matched, matched_msgid, template_context, ambiguous end
       -- A rendered argument can start with the template's leading literal, so
       -- templates whose msgid begins with a placeholder share the '' bucket and
       -- are only consulted when no literal-anchored template matched.
-      return scan(buckets[''])
+      matched, matched_msgid, ambiguous = scan(bucket_candidates(current, template_context, ''), template_context)
+      return matched, matched_msgid, template_context, ambiguous
     end
-    local matched, matched_entry, ambiguous = match_context(context)
+    local matched, matched_msgid, matched_ctx, ambiguous = match_context(context)
     if not matched and not ambiguous and context ~= '' then
-      matched, matched_entry, ambiguous = match_context('')
+      matched, matched_msgid, matched_ctx, ambiguous = match_context('')
     end
     if ambiguous then
       observe(spec, false)
@@ -421,7 +501,7 @@ local function translate(spec)
     end
     if matched then
       observe(spec, true)
-      return matched, 'translated', matched_entry.id
+      return matched, 'translated', current.domain .. ':' .. matched_ctx .. ':' .. matched_msgid
     end
   end
   observe(spec, false)

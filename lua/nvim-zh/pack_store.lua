@@ -165,14 +165,22 @@ local function validate_spec(m, files)
   end
 end
 
-local function prepare(manifest, files, allow_lua, checkpoint)
-  assert(type(manifest) == 'table' and manifest.schema == 1 and manifest.sdk == 1
+local function prepare(manifest, files, doc_catalog, allow_lua, checkpoint)
+  assert(type(manifest) == 'table' and manifest.schema == 1 and (manifest.sdk == 1 or manifest.sdk == 2)
     and M.id(manifest.id) and M.version(manifest.version) and manifest.locale == 'zh_CN'
     and M.id(manifest.domain), '汉化包的格式、版本或语言不受支持')
   assert(type(files) == 'table' and type(manifest.files) == 'table', '无效的文件清单')
   assert(not manifest.executable or (M.id(manifest.executable) and not manifest.adapter), '无效的工具包标识')
   M.validate_tool(manifest.tool, manifest.executable)
-  fs.index_id(manifest.files)
+  if manifest.sdk == 1 then
+    assert(doc_catalog == nil, 'SDK 1 附件不允许内嵌顶层词库')
+    fs.index_id(manifest.files)
+  else
+    assert(files['catalogs/zh_CN.json'] == nil and manifest.files['catalogs/zh_CN.json'] == nil,
+      'SDK 2 词库必须使用顶层内嵌结构')
+    assert(doc_catalog ~= nil or next(manifest.files) ~= nil, '无效的空汉化包')
+    if next(manifest.files) ~= nil then fs.index_id(manifest.files) end
+  end
   for name, info in pairs(manifest.files) do
     local bytes = files[name]
     assert(type(bytes) == 'string' and #bytes == info.size and fs.utf8(bytes)
@@ -183,7 +191,7 @@ local function prepare(manifest, files, allow_lua, checkpoint)
   for name in pairs(files) do
     assert(manifest.files[name], '包中存在未声明的文件')
     local help = name:match('^help/[%w_.%-]+/doc/([%w_.%-]+)$')
-    assert(name == 'catalogs/zh_CN.json' or name == 'adapter/entry.lua'
+    assert((manifest.sdk == 1 and name == 'catalogs/zh_CN.json') or name == 'adapter/entry.lua'
       or (help and (help == 'tags-cn' or help:match('%.cnx$'))), '非法的包文件：' .. name)
     if name:match('/tags%-cn$') then
       for line in files[name]:gmatch('[^\n]+') do
@@ -195,27 +203,40 @@ local function prepare(manifest, files, allow_lua, checkpoint)
     end
   end
   validate_spec(manifest, files)
-  local source
-  if files['catalogs/zh_CN.json'] then
-    source = vim.json.decode(files['catalogs/zh_CN.json'])
-    assert(source.locale == 'zh_CN', '词库语言不匹配')
+  local source, built
+  if manifest.sdk == 1 then
+    if files['catalogs/zh_CN.json'] then
+      source = vim.json.decode(files['catalogs/zh_CN.json'])
+      assert(type(source) == 'table' and source.schema == 1 and source.locale == 'zh_CN', '词库语言不匹配')
+      if checkpoint then checkpoint() end
+      built = require('nvim-zh.catalog').build_source(source, manifest.domain)
+    end
+  elseif doc_catalog ~= nil then
+    assert(type(doc_catalog) == 'table' and doc_catalog.schema == 2 and doc_catalog.locale == 'zh_CN',
+      '词库格式或语言不匹配')
     if checkpoint then checkpoint() end
-    require('nvim-zh.catalog').prepare_sources({ [manifest.domain] = source })
+    source = doc_catalog
+    built = require('nvim-zh.catalog').build_source(doc_catalog, manifest.domain)
   end
   local entry = files['adapter/entry.lua']
   if entry then
     assert(allow_lua, '此来源的 Lua 入口需要明确授权')
     assert(entry:byte() ~= 27 and loadstring(entry), '适配入口必须是可解析的 Lua 源码')
   end
-  return { manifest = manifest, catalog = source, entry = entry, tags = tags }
+  return { manifest = manifest, catalog = source, built_catalog = built, has_catalog = built ~= nil,
+    entry = entry, tags = tags }
 end
 
 local function artifact(bytes, id, revision, checkpoint)
   local value = vim.json.decode(bytes)
+  assert(type(value) == 'table', '无效的汉化包')
   local manifest = value.manifest
   assert(type(manifest) == 'table' and (not id or manifest.id == id and manifest.version == revision.version),
     '包登记与内容不匹配')
-  return prepare(manifest, value.files, revision.allow_lua, checkpoint), value.files
+  if manifest.sdk == 2 then
+    assert(fs.utf8(bytes), '包文件不是有效 UTF-8')
+  end
+  return prepare(manifest, value.files, value.catalog, revision.allow_lua, checkpoint), value.files
 end
 
 function M.folder(revision)

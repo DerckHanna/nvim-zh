@@ -59,13 +59,23 @@ end
 function M.configure(config)
   local next_overrides = validate_overrides(config and config.overrides)
   if not vim.deep_equal(overrides, next_overrides) then
+    local changed = {}
     for domain, entries in pairs(overrides) do
-      if not vim.deep_equal(entries, next_overrides[domain]) then invalidate(domain) end
+      if not vim.deep_equal(entries, next_overrides[domain]) then changed[domain] = true end
     end
     for domain in pairs(next_overrides) do
-      if overrides[domain] == nil then invalidate(domain) end
+      if overrides[domain] == nil then changed[domain] = true end
     end
     overrides = next_overrides
+    for domain in pairs(changed) do
+      local state = loaded[domain]
+      if state and state.catalog and (registrations[domain] or overrides[domain]) then
+        M._apply_overrides(state.catalog)
+        revisions[domain] = (revisions[domain] or 0) + 1
+      else
+        invalidate(domain)
+      end
+    end
   end
 end
 
@@ -145,91 +155,221 @@ function M._template_key(text)
   return text:sub(1, 1):lower()
 end
 
-local function add_template(catalog, entry)
-  local first = entry.msgid:sub(1, 1)
-  local key = (first == '%' or first == '{') and '' or M._template_key(entry.msgid)
-  local buckets = catalog.template_buckets[entry.context]
+local function add_template(buckets_by_ctx, context, msgid)
+  local first = msgid:sub(1, 1)
+  local key = (first == '%' or first == '{') and '' or M._template_key(msgid)
+  local buckets = buckets_by_ctx[context]
   if not buckets then
     buckets = {}
-    catalog.template_buckets[entry.context] = buckets
+    buckets_by_ctx[context] = buckets
   end
   local bucket = buckets[key]
   if not bucket then
     bucket = {}
     buckets[key] = bucket
   end
-  bucket[#bucket + 1] = entry
+  bucket[#bucket + 1] = msgid
+  return bucket
+end
+
+local function is_map_table(value)
+  return type(value) == 'table' and (next(value) == nil or not vim.islist(value))
 end
 
 local function validate_source(source, domain)
-  assert(type(source) == 'table' and source.schema == 1 and source.domain == domain
-    and type(source.locale) == 'string' and vim.islist(source.entries), 'invalid schema, domain, locale, or entries')
-  local seen = {}
-  for _, entry in ipairs(source.entries) do
-    assert(validate_entry(entry, domain), 'invalid or empty catalog entry')
-    local key = (entry.context or '') .. SEP .. entry.msgid
-    if seen[key] then error('duplicate domain/context/msgid: ' .. key) end
-    seen[key] = true
+  assert(type(source) == 'table' and (source.schema == 1 or source.schema == 2) and source.domain == domain
+    and type(source.locale) == 'string', 'invalid schema, domain, locale, or entries')
+  if source.schema == 1 then
+    assert(vim.islist(source.entries), 'invalid schema, domain, locale, or entries')
+    local seen = {}
+    for _, entry in ipairs(source.entries) do
+      assert(validate_entry(entry, domain), 'invalid or empty catalog entry')
+      local context = entry.context or ''
+      local by_ctx = seen[context]
+      if not by_ctx then by_ctx = {}; seen[context] = by_ctx end
+      if by_ctx[entry.msgid] then error('duplicate domain/context/msgid: ' .. context .. SEP .. entry.msgid) end
+      by_ctx[entry.msgid] = true
+    end
+    return
+  end
+  assert(is_map_table(source.entries), 'invalid schema, domain, locale, or entries')
+  for context, map in pairs(source.entries) do
+    assert(valid_context(context) and is_map_table(map), 'invalid or empty catalog entry')
+    for msgid, msgstr in pairs(map) do
+      assert(type(msgid) == 'string' and msgid ~= '' and type(msgstr) == 'string' and msgstr ~= '',
+        'invalid or empty catalog entry')
+    end
   end
 end
 
 local function build(source, domain)
-  if verified[source] ~= domain then validate_source(source, domain) end
-  local catalog = {
+  assert(type(source) == 'table' and (source.schema == 1 or source.schema == 2) and source.domain == domain
+    and type(source.locale) == 'string', 'invalid schema, domain, locale, or entries')
+  local skip_validate = verified[source] == domain
+  local is_clang = domain == 'clang' or domain == 'clangd' or domain == 'clang-tidy'
+  local exact, template_buckets, translated = {}, {}, {}
+  local unesc, unsorted
+  local total = 0
+  local function index_entry(context, msgid, msgstr)
+    if is_clang and msgid:find('%%', 1, true)
+      and not msgid:gsub('%%%%', ''):find('%', 1, true) and not msgid:find('{', 1, true) then
+      local u_id = msgid:gsub('%%%%', '%%')
+      local u_str = msgstr:gsub('%%%%', '%%')
+      local ex = exact[context]
+      if not ex or ex[u_id] == nil then
+        unesc = unesc or {}
+        local u_ctx = unesc[context]
+        if not u_ctx then u_ctx = {}; unesc[context] = u_ctx end
+        if u_ctx[u_id] == nil then u_ctx[u_id] = { msgstr = u_str, orig = msgid } end
+      end
+    end
+    total = total + 1
+    local tr = translated[context]
+    if not tr then tr = {}; translated[context] = tr end
+    tr[msgstr] = msgid
+    if msgid:find('{', 1, true) or msgid:find('%', 1, true) then
+      return add_template(template_buckets, context, msgid)
+    end
+  end
+  if source.schema == 1 then
+    assert(vim.islist(source.entries), 'invalid schema, domain, locale, or entries')
+    for _, entry in ipairs(source.entries) do
+      if not skip_validate then
+        assert(validate_entry(entry, domain), 'invalid or empty catalog entry')
+      end
+      local context = entry.context or ''
+      local msgid, msgstr = entry.msgid, entry.msgstr
+      local ex = exact[context]
+      if not ex then ex = {}; exact[context] = ex end
+      if not skip_validate and ex[msgid] ~= nil then
+        error('duplicate domain/context/msgid: ' .. context .. SEP .. msgid)
+      end
+      ex[msgid] = msgstr
+      index_entry(context, msgid, msgstr)
+    end
+  else
+    assert(is_map_table(source.entries), 'invalid schema, domain, locale, or entries')
+    exact = source.entries
+    unsorted = {}
+    for context, map in pairs(source.entries) do
+      if not skip_validate then
+        assert(valid_context(context) and is_map_table(map), 'invalid or empty catalog entry')
+      end
+      for msgid, msgstr in pairs(map) do
+        if not skip_validate then
+          assert(type(msgid) == 'string' and msgid ~= '' and type(msgstr) == 'string' and msgstr ~= '',
+            'invalid or empty catalog entry')
+        end
+        local bucket = index_entry(context, msgid, msgstr)
+        if bucket then unsorted[bucket] = true end
+      end
+    end
+  end
+  if unesc then
+    for context, u_ctx in pairs(unesc) do
+      local ex = exact[context]
+      if ex then
+        for u_id in pairs(u_ctx) do
+          if ex[u_id] ~= nil then u_ctx[u_id] = nil end
+        end
+        if next(u_ctx) == nil then unesc[context] = nil end
+      end
+    end
+    if next(unesc) == nil then unesc = nil end
+  end
+  return {
     domain = domain,
     locale = source.locale,
     metadata = source.metadata or {},
-    exact = {},
-    template_buckets = {},
-    translated = {},
-    total = 0,
+    exact = exact,
+    unesc = unesc,
+    template_buckets = template_buckets,
+    translated = translated,
+    base_total = total,
+    total = total,
+    _unsorted = unsorted,
+    _bucket_state = {},
+    _merged_buckets = nil,
   }
-  for _, entry in ipairs(source.entries) do
-    local context = entry.context or ''
-    local key = context .. SEP .. entry.msgid
-    local copy = { context = context, msgid = entry.msgid, msgstr = entry.msgstr,
-      id = domain .. ':' .. context .. ':' .. entry.msgid }
-    catalog.exact[key] = copy
-    if (domain == 'clang' or domain == 'clangd' or domain == 'clang-tidy') and entry.msgid:find('%%', 1, true)
-      and not entry.msgid:gsub('%%%%', ''):find('%', 1, true) and not entry.msgid:find('{', 1, true) then
-      local unesc = { id = copy.id, context = copy.context }
-      unesc.msgid = entry.msgid:gsub('%%%%', '%%')
-      unesc.msgstr = entry.msgstr:gsub('%%%%', '%%')
-      local unesc_key = context .. SEP .. unesc.msgid
-      catalog.exact[unesc_key] = catalog.exact[unesc_key] or unesc
-    end
-    catalog.total = catalog.total + 1
-    catalog.translated[context .. SEP .. entry.msgstr] = copy.id
-    if entry.msgid:find('{', 1, true) or entry.msgid:find('%', 1, true) then
-      add_template(catalog, copy)
-    end
-  end
-  return catalog
 end
 
 local function apply_overrides(catalog)
-  for context, entries in pairs(overrides[catalog.domain] or {}) do
+  local domain_overrides = overrides[catalog.domain]
+  catalog.ov_exact = nil
+  catalog.ov_translated = nil
+  catalog.ov_buckets = nil
+  catalog._merged_buckets = nil
+  catalog._bucket_state = {}
+  catalog.total = catalog.base_total
+  if not domain_overrides or next(domain_overrides) == nil then return end
+  local ov_exact, ov_translated, ov_buckets = {}, {}, nil
+  local added = 0
+  for context, entries in pairs(domain_overrides) do
+    local ex = catalog.exact[context]
+    local ov_ctx = {}
+    ov_exact[context] = ov_ctx
+    local tr_ctx = {}
+    ov_translated[context] = tr_ctx
     for msgid, value in pairs(entries) do
-      local key = context .. SEP .. msgid
       local msgstr = validate_override_value(value)
-      local entry = catalog.exact[key]
-      if entry then
-        entry.msgstr = msgstr
-      else
-        entry = {
-          context = context,
-          msgid = msgid,
-          msgstr = msgstr,
-          id = catalog.domain .. ':' .. context .. ':' .. msgid,
-          override = true,
-        }
-        catalog.exact[key] = entry
-        catalog.total = catalog.total + 1
-        if msgid:find('{', 1, true) or msgid:find('%', 1, true) then add_template(catalog, entry) end
+      ov_ctx[msgid] = msgstr
+      tr_ctx[msgstr] = msgid
+      if not ex or ex[msgid] == nil then
+        added = added + 1
+        if msgid:find('{', 1, true) or msgid:find('%', 1, true) then
+          ov_buckets = ov_buckets or {}
+          add_template(ov_buckets, context, msgid)
+        end
       end
-      catalog.translated[context .. SEP .. msgstr] = entry.id
     end
   end
+  if ov_buckets then
+    for _, buckets in pairs(ov_buckets) do
+      for _, bucket in pairs(buckets) do table.sort(bucket) end
+    end
+  end
+  catalog.ov_exact = ov_exact
+  catalog.ov_translated = ov_translated
+  catalog.ov_buckets = ov_buckets
+  catalog.total = catalog.base_total + added
+end
+
+M._apply_overrides = apply_overrides
+
+function M.build_source(source, domain)
+  assert(valid_domain(domain), 'invalid domain')
+  return build(source, domain)
+end
+
+function M.register_prebuilt(domain, built_catalog, metadata)
+  if not valid_domain(domain) or type(built_catalog) ~= 'table' or built_catalog.domain ~= domain then
+    error('nvim-zh: register_prebuilt expects a valid domain and built catalog', 2)
+  end
+  if registrations[domain] then error('nvim-zh: catalog already registered: ' .. domain, 2) end
+  if metadata ~= nil and type(metadata) ~= 'table' then
+    error('nvim-zh: catalog metadata must be a table', 2)
+  end
+  local record = { owned = true, prebuilt = built_catalog, metadata = vim.deepcopy(metadata or {}), loads = 1 }
+  registrations[domain] = record
+  apply_overrides(built_catalog)
+  loaded[domain] = { catalog = built_catalog }
+  revisions[domain] = (revisions[domain] or 0) + 1
+  local function release()
+    if registrations[domain] == record then
+      registrations[domain] = nil
+      record.prebuilt = nil
+      invalidate(domain)
+    end
+  end
+  local function update(next_catalog)
+    if registrations[domain] ~= record then return end
+    assert(type(next_catalog) == 'table' and next_catalog.domain == domain, 'invalid prebuilt catalog')
+    record.prebuilt = next_catalog
+    apply_overrides(next_catalog)
+    loaded[domain] = { catalog = next_catalog }
+    revisions[domain] = (revisions[domain] or 0) + 1
+  end
+  return release, update
 end
 
 function M.get(domain)
@@ -246,6 +386,11 @@ function M.get(domain)
   if not registration and not overrides[domain] then
     loaded[domain] = { error = 'catalog not registered' }
     return nil, loaded[domain].error
+  end
+  if registration and registration.prebuilt then
+    apply_overrides(registration.prebuilt)
+    loaded[domain] = { catalog = registration.prebuilt }
+    return registration.prebuilt
   end
   local source = { schema = 1, domain = domain, locale = 'zh_CN', entries = {} }
   if registration then
@@ -270,8 +415,22 @@ end
 function M.is_translation(domain, context, msgid)
   local catalog = M.get(domain)
   if not catalog then return nil end
-  return catalog.translated[(context or '') .. SEP .. msgid]
-    or catalog.translated['' .. SEP .. msgid]
+  local ctx = context or ''
+  local ov = catalog.ov_translated
+  if ov then
+    local m = ov[ctx]
+    if m and m[msgid] then return catalog.domain .. ':' .. ctx .. ':' .. m[msgid] end
+    if ctx ~= '' then
+      m = ov['']
+      if m and m[msgid] then return catalog.domain .. '::' .. m[msgid] end
+    end
+  end
+  local m = catalog.translated[ctx]
+  if m and m[msgid] then return catalog.domain .. ':' .. ctx .. ':' .. m[msgid] end
+  if ctx ~= '' then
+    m = catalog.translated['']
+    if m and m[msgid] then return catalog.domain .. '::' .. m[msgid] end
+  end
 end
 
 function M.reload()

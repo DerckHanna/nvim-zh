@@ -49,6 +49,33 @@ zh.register_catalog('broken-fixture', function() error('broken catalog') end)
 equal(zh.translate({ domain = 'broken-fixture', msgid = 'Keep' }), 'Keep', 'loader error did not fall back')
 zh.register_catalog('invalid-fixture', function() return { schema = 1, domain = 'wrong', entries = {} } end)
 equal(zh.translate({ domain = 'invalid-fixture', msgid = 'Keep' }), 'Keep', 'invalid catalog did not fall back')
+
+local cat = require('nvim-zh.catalog')
+local v2_loads = 0
+zh.register_catalog('schema2-fixture', function()
+  v2_loads = v2_loads + 1
+  return {
+    schema = 2,
+    domain = 'schema2-fixture',
+    locale = 'zh_CN',
+    entries = {
+      [''] = { Save = '保存V2', ['Item {name}'] = '条目 {name}' },
+      menu = { Open = '打开V2' },
+    },
+  }
+end)
+equal(zh.translate({ domain = 'schema2-fixture', msgid = 'Save' }), '保存V2', 'schema 2 exact')
+equal(zh.translate({ domain = 'schema2-fixture', context = 'menu', msgid = 'Open' }), '打开V2', 'schema 2 context')
+equal(zh.translate({ domain = 'schema2-fixture', msgid = 'Item foo', formatted = true }), '条目 foo', 'schema 2 template')
+cat.configure({ overrides = {
+  ['schema2-fixture'] = { [''] = { Save = '覆盖保存', ['Item {name}'] = '覆盖条目 {name}' } },
+} })
+equal(zh.translate({ domain = 'schema2-fixture', msgid = 'Save' }), '覆盖保存', 'schema 2 override')
+equal(zh.translate({ domain = 'schema2-fixture', msgid = 'Item foo', formatted = true }), '覆盖条目 foo', 'schema 2 template override')
+equal(v2_loads, 1, 'override overlay should not reload base catalog')
+cat.configure({ overrides = {} })
+equal(zh.translate({ domain = 'schema2-fixture', msgid = 'Save' }), '保存V2', 'schema 2 override cleared')
+equal(v2_loads, 1, 'clearing override overlay should not reload base catalog')
 dofile(vim.env.NVIM_ZH_ROOT .. '/tests/support/public.lua').refresh()
 equal(zh.translate({ domain = domain, msgid = 'Save' }), '保存', 'reload changed built-in data')
 print('CATALOG_SPEC=PASS')

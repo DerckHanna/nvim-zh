@@ -10,6 +10,14 @@ local generations = {}
 local configs = setmetatable({}, { __mode = 'k' })
 local mappings = setmetatable({}, { __mode = 'k' })
 local jump_options = setmetatable({}, { __mode = 'k' })
+local executable_evidence = setmetatable({}, { __mode = 'k' })
+local scope_frames = setmetatable({}, { __mode = 'k' })
+local scope_views = setmetatable({}, { __mode = 'k' })
+local scope_fields = {
+  'collapsed_scopes', 'line_to_scope_name', 'line_to_variable_path', 'variable_path_is_expanded',
+  'variable_path_to_evaluate_name', 'variable_path_to_name', 'variable_path_to_parent_line',
+  'variable_path_to_parent_reference', 'variable_path_to_set_variables', 'variable_path_to_value',
+}
 
 -- Each substitution is anchored to a unique expression on the indicated line
 -- of verified upstream bytes. Run the original rendering and callbacks with
@@ -129,28 +137,44 @@ local edits = {
       [=[.. dapzh.label(setup.config, v, label, true) ..]=] },
   },
   ["dap-view.scopes.actions"] = {
+    { 11, [=[local variable_path = state.line_to_variable_path[line]]=],
+      [=[local state, current = dapzh.scope_action(state); if not state then return end; local variable_path = state.line_to_variable_path[line]]=] },
     { 22, [=["New value: "]=],
       [=[dapzh.text("prompt", "New value: ")]=] },
+    { 26, [=[if value then]=], [=[if value and current() then]=] },
+    { 45, [=[local variable_path = state.line_to_variable_path[line]]=],
+      [=[local state = dapzh.scope_action(state); if not state then return end; local variable_path = state.line_to_variable_path[line]]=] },
+    { 62, [=[local path = state.line_to_variable_path[line]]=],
+      [=[local state = dapzh.scope_action(state); if not state then return end; local path = state.line_to_variable_path[line]]=] },
     { 86, [=["Nothing to expand"]=],
       [=[dapzh.text("notification", "Nothing to expand")]=] },
   },
   ["dap-view.scopes.view"] = {
+    { 13, 'local session', '' },
+    { 27, 'depth, canvas)', 'depth, canvas, session, state, current)' },
+    { 29, ' })', ' }); if not current() then return line end' },
     { 52, [=[variable.name]=],
       [=[dapzh.register_name(session, parent_path, variables_reference, variable)]=] },
     { 93, [=[#variable.name]=],
       [=[#variable_name]=] },
+    { 102, 'depth + 1, canvas)', 'depth + 1, canvas, session, state, current); if not current() then return line end' },
     { 113, [=["No active session"]=],
       [=[dapzh.text("panel_message", "No active session")]=] },
+    { 119, 'session = tmp_session', 'local session = tmp_session' },
     { 123, [=["Session not stopped"]=],
       [=[dapzh.text("panel_message", "Session not stopped")]=] },
     { 133, [=["No scopes for the current frame"]=],
       [=[dapzh.text("panel_message", "No scopes for the current frame")]=] },
     { 147, [=["No eligible scopes returned from adapter"]=],
       [=[dapzh.text("panel_message", "No eligible scopes returned from adapter")]=] },
+    { 151, 'local all_scopes_collapsed', 'local owner = state; local state, current, commit = dapzh.scope_render(owner, session, current_frame); local all_scopes_collapsed' },
     { 177, [=[scope.name]=],
       [=[dapzh.scope_name(session, scope)]=] },
+    { 188, '1, canvas)', '1, canvas, session, state, current); if not current() then return end' },
     { 208, [=["No variables returned from adapter"]=],
       [=[dapzh.text("panel_message", "No variables returned from adapter")]=] },
+    { 212, 'util.set_lines(state.bufnr', 'if not current() then return end; commit(); util.set_lines(owner.bufnr' },
+    { 220, 'util.set_lines(state.bufnr', 'util.set_lines(owner.bufnr' },
   },
   ["dap-view.sessions.actions"] = {
     { 12, [=["No session under the cursor"]=],
@@ -245,8 +269,13 @@ local edits = {
       [=[dapzh.text("notification", "Adapter doesn't support `setVariable` request")]=] },
     { 30, [=["has active session"]=],
       [=[dapzh.text("assertion", "has active session")]=] },
+    { 32, 'if session.capabilities.supportsSetExpression then',
+      'local scope, current = dapzh.scope_action(state); if session.capabilities.supportsSetExpression then' },
     { 40, [=["Failed to set expression " .. expr .. " to value " .. value]=],
       [=[dapzh.text("notification", "Failed to set expression %s to value %s", expr, value)]=] },
+    { 41, 'elseif variable_path', 'elseif scope and current() and variable_path' },
+    { 44, 'state.variable_path_to_value', 'scope.variable_path_to_value' },
+    { 45, 'state.variable_path_to_set_variables', 'scope.variable_path_to_set_variables' },
     { 49, [=["Adapter doesn't support `setExpression` request"]=],
       [=[dapzh.text("notification", "Adapter doesn't support `setExpression` request")]=] },
     { 63, [=["has active session"]=],
@@ -323,6 +352,7 @@ local register_groups = {
   ['Advanced Vector Extensions'] = true,
 }
 local exception_labels = { cpp_throw = 'C++: on throw', cpp_catch = 'C++: on catch' }
+local codelldb_linux_x64 = '8d714773b3416190bad90c6f5fae46e0d3c106bc3b7778a9547a8eb96cff219e'
 
 local function lookup(kind, msgid, ...)
   local ok, translated, status = pcall(engine.translate, {
@@ -350,16 +380,30 @@ local function remember_config(previous, merged, supplied)
 end
 
 local function codelldb(session)
-  if not session or not session.config or session.config.type ~= 'codelldb' then return false end
+  if not session or session.closed or not session.config or session.config.type ~= 'codelldb' then return false end
+  local known = executable_evidence[session]
+  if known ~= nil then return known end
+  executable_evidence[session] = false
   local adapter = session.adapter
   if not adapter then return false end
   local executable = adapter.type == 'executable' and adapter or adapter.executable
   local command = executable and executable.command
   if type(command) ~= 'string' then return false end
-  local resolved = vim.fn.exepath(command)
-  if resolved == '' then return false end
-  local actual = vim.uv.fs_realpath(resolved) or resolved
-  return vim.fs.basename(actual):lower():gsub('%.exe$', '') == 'codelldb'
+  local resolved = command
+  if command == 'codelldb' then
+    -- A relative search path cannot establish which binary the session spawned.
+    for _, path in ipairs(vim.split(vim.env.PATH or '', ':', { plain = true })) do
+      if not vim.startswith(path, '/') then return false end
+    end
+    resolved = vim.fn.exepath(command)
+  end
+  if not vim.startswith(resolved, '/') then return false end
+  local actual = vim.uv.fs_realpath(resolved)
+  if not actual or vim.fs.basename(actual) ~= 'codelldb' then return false end
+  local ok, bytes = pcall(require('nvim-zh.fs').read, actual, 8 * 1024 * 1024)
+  local verified = ok and vim.fn.sha256(bytes) == codelldb_linux_x64
+  executable_evidence[session] = verified
+  return verified
 end
 
 local function notify_once(original, display, ...)
@@ -399,8 +443,56 @@ local function projector(is_current)
     return msgid
   end
 
+  local function focused()
+    local dap = package.loaded.dap
+    return dap and dap.session()
+  end
+
+  local function scope_action(owner)
+    local session = focused()
+    local frame = session and session.current_frame
+    local render = scope_views[owner]
+    local function current()
+      return (not enabled() or is_current()) and session ~= nil and not session.closed and focused() == session
+        and session.current_frame == frame and (not enabled() or scope_views[owner] == render)
+    end
+    if not enabled() then return owner, current end
+    if session and render and render.committed and render.session_id == session.id and render.frame == frame and current() then
+      return render.fields, current
+    end
+  end
+
+  local function scope_render(owner, session, frame)
+    local buf, win = owner.bufnr, owner.winnr
+    local active = enabled()
+    local previous = scope_frames[session]
+    local fields = owner
+    if active then
+      fields = {}
+      for _, key in ipairs(scope_fields) do
+        fields[key] = previous and previous.frame == frame and vim.deepcopy(previous.fields[key]) or {}
+      end
+    end
+    local render = { session_id = session.id, frame = frame, fields = fields }
+    scope_views[owner] = render
+    local function current()
+      return scope_views[owner] == render and enabled() == active and (not active or is_current())
+        and focused() == session and not session.closed and session.current_frame == frame
+        and owner.bufnr == buf and owner.winnr == win and vim.api.nvim_win_is_valid(win)
+    end
+    return fields, current, function()
+      render.committed = true
+      if active then
+        scope_frames[session] = render
+        for _, key in ipairs(scope_fields) do owner[key] = fields[key] end
+      end
+    end
+  end
+
   return {
     text = text,
+    scope_action = scope_action,
+    scope_render = scope_render,
     notify_once = notify_once,
     default_config = function(config)
       configs[config] = default_labels
@@ -534,7 +626,12 @@ function M.project_source(module, bytes, path, current)
 end
 
 function M.attach(ctx) context = ctx end
-function M.detach() context = nil end
+function M.detach()
+  context = nil
+  executable_evidence = setmetatable({}, { __mode = 'k' })
+  scope_frames = setmetatable({}, { __mode = 'k' })
+  scope_views = setmetatable({}, { __mode = 'k' })
+end
 
 function M.info(ctx)
   local slots = {}

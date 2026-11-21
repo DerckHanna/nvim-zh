@@ -5,7 +5,7 @@ local packs = require('nvim-zh.packs')
 local lists = require('nvim-zh.list_display')
 local config = {}
 local group
-local last
+local builds, pending = {}, {}
 local probes = {}
 local generation = 0
 local levels = { e = 'error', w = 'warning', n = 'note', i = 'info', f = 'error', r = 'remark' }
@@ -34,24 +34,44 @@ local function direct_command(command)
   if domains[name] then return domains[name], executable, name, args end
 end
 
-local function tool_path(executable)
-  local path = vim.fn.exepath(executable)
-  if path == '' then return end
+local function fingerprint(path)
   local stat = vim.uv.fs_stat(path)
   if not stat or stat.type ~= 'file' then return end
-  return path, table.concat({ stat.dev, stat.ino, stat.size, stat.mtime.sec, stat.mtime.nsec,
+  return table.concat({ stat.dev, stat.ino, stat.size, stat.mtime.sec, stat.mtime.nsec,
     stat.ctime.sec, stat.ctime.nsec }, ':')
 end
 
-function M.identity(executable)
-  local path, key = tool_path(executable)
+local function window_cwd(win)
+  local tab, number = unpack(vim.fn.win_id2tabwin(win))
+  if tab ~= 0 and number ~= 0 then return vim.fn.getcwd(number, tab) end
+end
+
+local function tool_path(executable, cwd)
+  local path
+  if not cwd or cwd == vim.uv.cwd() then
+    path = vim.fn.exepath(executable)
+    if path == '' then return end
+    path = vim.fs.abspath(path)
+  else
+    for _, dir in ipairs(vim.split(vim.env.PATH or '', ':', { plain = true })) do
+      local prefix = vim.startswith(dir, '/') and dir or vim.fs.joinpath(cwd, dir)
+      local candidate = vim.fs.joinpath(prefix, executable)
+      if vim.fn.executable(candidate) == 1 then path = candidate; break end
+    end
+  end
+  if path then return path, fingerprint(path) end
+end
+
+function M.identity(executable, win)
+  local cwd = win and window_cwd(win)
+  if win and not cwd then return end
+  local path, key = tool_path(executable, cwd)
   local cached = path and probes[path]
   if cached and cached.key == key then return cached.identity end
 end
 
-local function probe(executable, name, done)
-  local path, key = tool_path(executable)
-  if not path then done(); return end
+local function probe(path, key, name, done)
+  if not key then done(); return end
   local cached = probes[path]
   if cached and cached.key == key then
     if cached.pending then cached.pending[#cached.pending + 1] = done else done(cached.identity) end
@@ -61,22 +81,19 @@ local function probe(executable, name, done)
   probes[path] = entry
   local results, remaining = {}, 2
   local function received(kind, result)
-    if probes[path] ~= entry then return end
     results[kind] = result
     remaining = remaining - 1
     if remaining ~= 0 then return end
     local pending = entry.pending
     entry.pending = nil
-    local current_path, current_key = tool_path(executable)
-    if path == current_path and key == current_key then
+    if probes[path] == entry and key == fingerprint(path) then
       local version, hash = results.version, results.hash
       local pattern = name == 'clang-tidy' and 'LLVM version (%d+%.%d+%.%d+)' or '^clang version (%d+%.%d+%.%d+)'
       entry.identity = { executable = name, version = version.code == 0 and version.stdout:match(pattern) or nil,
         sha256 = hash.code == 0 and hash.stdout:match('^(%x+)') or nil, path = path, key = key }
     end
     for _, callback in ipairs(pending) do
-      local ok, err = pcall(callback, entry.identity)
-      if not ok then last = { reason = 'projection_failed', error = tostring(err) } end
+      callback(entry.identity)
     end
   end
   local function run(kind, argv)
@@ -249,16 +266,30 @@ local function inspect_items(items, evidence)
   return result
 end
 
-local function act(event)
+local function capture(event)
+  local win = vim.api.nvim_get_current_win()
+  pending[win] = {
+    method = event.match, cwd = vim.uv.cwd(), path = vim.env.PATH, override = vim.env.CCC_OVERRIDE_OPTIONS,
+    bufnr = vim.api.nvim_get_current_buf(),
+    list_id = lists.get(event.match == 'lmake' and lists.owner(win) or nil, { id = 0 }).id,
+  }
+end
+
+local function act(event, build)
   local loc = event.match == 'lmake'
   if not config.enabled or not (loc and config.loclist or not loc and config.quickfix) then return end
-  local win = loc and vim.api.nvim_get_current_win() or nil
+  local origin = vim.api.nvim_get_current_win()
+  local win = loc and lists.owner(origin) or nil
   local list = lists.get(win, { id = 0, title = 1, quickfixtextfunc = 1, changedtick = 1 })
+  if not build or build.method ~= event.match or list.id == build.list_id then return end
   local command = vim.trim((list.title or ''):sub(2))
   local domain, executable, name, args = direct_command(command)
   local observation = { list = loc and 'loclist' or 'quickfix', tool = domain, reason = 'unknown_source' }
-  last = observation
+  local record = { cwd = build.cwd, id = list.id, observation = observation }
+  builds[origin] = record
   if not domain then return end
+  if build.cwd ~= vim.uv.cwd() or build.path ~= vim.env.PATH or build.override ~= vim.env.CCC_OVERRIDE_OPTIONS
+    or build.bufnr ~= vim.api.nvim_get_current_buf() then observation.reason = 'unverified_context'; return end
   if not vim.version.eq(vim.version(), '0.12.6') then observation.reason = 'unverified_interface'; return end
   if not lists.available(win, list, 'compiler') then observation.reason = 'external_override'; return end
   if not packs.has_tool(domain) then observation.reason = packs.tool_reason(domain); return end
@@ -266,8 +297,8 @@ local function act(event)
   -- Keep the display unmodified for those invocations.
   local source_locations, frontend_only = domain == 'clang-tidy', false
   local tabstop = 8
-  if domain == 'clang' and vim.env.CCC_OVERRIDE_OPTIONS then
-    last.reason = 'unverified_interface'
+  if domain == 'clang' and build.override then
+    observation.reason = 'unverified_interface'
     return
   end
   for _, arg in ipairs(args) do
@@ -276,7 +307,7 @@ local function act(event)
       or arg:match('^%-fno%-diagnostics%-show%-option') or arg:match('^%-%-load')
       or arg:match('^%-%-experimental%-custom%-checks') or arg:match('^%-%-extra%-arg')
       or arg == '-fno-caret-diagnostics' or arg == '-fno-integrated-as' or arg:match('^%-B') then
-      last.reason = 'unverified_interface'
+      observation.reason = 'unverified_interface'
       return
     end
     frontend_only = frontend_only or arg == '-fsyntax-only' or arg == '-E'
@@ -285,16 +316,19 @@ local function act(event)
     if requested_tabstop and requested_tabstop >= 1 and requested_tabstop <= 100 then tabstop = requested_tabstop end
   end
   observation.reason = 'probing'
+  local path, key = tool_path(executable)
   local token = generation
   packs.ensure_tool(domain, true)
   local function apply_identity(identity)
-    if token ~= generation or not config.enabled or not (loc and config.loclist or not loc and config.quickfix)
+    if token ~= generation or builds[origin] ~= record or not config.enabled
+      or not (loc and config.loclist or not loc and config.quickfix)
       or (win and not vim.api.nvim_win_is_valid(win)) then return end
-    local current = lists.get(win, { id = 0, changedtick = 1, quickfixtextfunc = 1 })
+    local current = lists.get(win, { id = list.id, changedtick = 1, quickfixtextfunc = 1 })
     if current.id ~= list.id or current.changedtick ~= list.changedtick or not lists.available(win, current, 'compiler') then
-      if last == observation then observation.reason = 'stale_list' end
+      observation.reason = 'stale_list'
       return
     end
+    if key and fingerprint(path) ~= key then observation.reason = 'stale_tool'; return end
     if not packs.ensure_tool(domain, true, function() apply_identity(identity) end) then return end
     local reason = packs.tool_reason(domain, identity, 'quickfix')
     observation.version, observation.reason = identity and identity.version, reason
@@ -306,8 +340,7 @@ local function act(event)
       local records = lists.install(win, list, 'compiler', function(items) return inspect_items(items, evidence) end, function()
         if not config.enabled or not (loc and config.loclist or not loc and config.quickfix)
           or packs.tool_reason(domain, identity, 'quickfix') ~= 'verified' then return end
-        local path, key = tool_path(executable)
-        if path == identity.path and key == identity.key then return catalog.revision(domain) end
+        if fingerprint(identity.path) == identity.key then return catalog.revision(domain) end
       end)
       if not records then observation.reason = 'projection_failed'; return end
       local counts = {}
@@ -316,7 +349,12 @@ local function act(event)
     end
     require('nvim-zh.runtime').changed('adapters')
   end
-  probe(executable, name, apply_identity)
+  probe(path, key, name, function(identity)
+    local ok, err = pcall(apply_identity, identity)
+    if not ok and builds[origin] == record then
+      observation.reason, observation.error = 'projection_failed', tostring(err)
+    end
+  end)
 end
 
 function M.setup(opts)
@@ -325,14 +363,26 @@ function M.setup(opts)
     lists.refresh('compiler')
     if not group then
       group = vim.api.nvim_create_augroup('NvimZhCompiler', { clear = true })
+      vim.api.nvim_create_autocmd('QuickFixCmdPre', { group = group, pattern = { 'make', 'lmake' }, callback = capture })
       vim.api.nvim_create_autocmd('QuickFixCmdPost', { group = group, pattern = { 'make', 'lmake' },
         callback = function(event)
-          local ok, err = pcall(act, event)
-          if not ok then last = { reason = 'projection_failed', error = tostring(err) } end
+          local win = vim.api.nvim_get_current_win()
+          local build = pending[win]
+          pending[win] = nil
+          local ok, err = pcall(act, event, build)
+          if not ok and build then
+            builds[win] = { cwd = build.cwd, observation = { reason = 'projection_failed', error = tostring(err) } }
+          end
+        end })
+      vim.api.nvim_create_autocmd('WinClosed', { group = group,
+        callback = function(event)
+          local win = tonumber(event.match)
+          if win then builds[win], pending[win] = nil, nil end
         end })
     end
   else
     generation = generation + 1
+    builds, pending = {}, {}
     if group then vim.api.nvim_del_augroup_by_id(group); group = nil end
     lists.clear('compiler')
   end
@@ -342,7 +392,7 @@ function M.teardown()
   generation = generation + 1
   config = {}
   if group then vim.api.nvim_del_augroup_by_id(group); group = nil end
-  last, probes = nil, {}
+  builds, pending, probes = {}, {}, {}
   lists.clear('compiler')
 end
 
@@ -357,9 +407,13 @@ function M.raw_text()
   return table.concat(fields, ' · ')
 end
 
-function M.info()
+function M.info(win)
+  win = win or vim.api.nvim_get_current_win()
+  local owner = lists.owner(win)
+  local record = builds[win] or builds[owner]
+  local scope = record and window_cwd(owner)
   return { enabled = config.enabled == true, quickfix = config.quickfix == true,
-    loclist = config.loclist == true, last = vim.deepcopy(last) }
+    loclist = config.loclist == true, last = record and record.cwd == scope and vim.deepcopy(record.observation) or nil }
 end
 
 return M

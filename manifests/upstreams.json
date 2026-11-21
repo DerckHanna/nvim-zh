@@ -1025,6 +1025,15 @@
     }
   },
   "test_dependencies": {
+    "lspkind": {
+      "repository": "https://github.com/onsails/lspkind.nvim",
+      "commit": "c7274c48137396526b59d86232eabcdc7fed8a32",
+      "sources": {
+        "lua/lspkind/init.lua": {
+          "sha256": "926982b3fd672de3c3bb9f2d07d88c7fde41102993e3ccbc777db320b7fd6408"
+        }
+      }
+    },
     "plenary": {
       "repository": "https://github.com/nvim-lua/plenary.nvim",
       "commit": "74b06c6c75e4eeb3108ec01852001636d85a932b",

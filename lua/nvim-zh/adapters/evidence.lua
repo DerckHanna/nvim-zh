@@ -128,7 +128,7 @@ local function loader(module)
   local root = explicit[id] and explicit[id] or pack_root(source, actual)
   if not root or root .. '/' .. source.path ~= actual then return end
   local ok, bytes = pcall(fs.read, actual, 4 * 1024 * 1024)
-  if not ok then return end
+  if not ok or bytes:byte(1) == 27 or not fs.utf8(bytes) then return end
   local chunk = loadstring(bytes, '@' .. actual)
   if not chunk then return end
   local installation = set_root(id, root)

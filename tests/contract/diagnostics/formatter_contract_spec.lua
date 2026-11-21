@@ -11,7 +11,7 @@ end
 local buf = vim.api.nvim_create_buf(false, true)
 vim.api.nvim_set_current_buf(buf)
 vim.api.nvim_buf_set_lines(buf, 0, -1, false, { 'example' })
-local ns = vim.api.nvim_create_namespace('nvim-zh-formatter-contract')
+local ns = h.client(buf)
 local diagnostic = { lnum = 0, col = 0, source = 'clangd', code = 'redefinition', message = "Redefinition of 'x'" }
 local function rendered_lines()
   local result = {}

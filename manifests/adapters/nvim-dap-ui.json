@@ -74,11 +74,13 @@
     }
   },
   "schema": 1,
+  "source_projection": true,
   "status": "implemented",
   "surfaces": {
     "float_title": {
       "kind": "versioned",
       "modules": {
+        "dapui": "lua/dapui/init.lua",
         "dapui.windows": "lua/dapui/windows/init.lua"
       },
       "status_key": "float"

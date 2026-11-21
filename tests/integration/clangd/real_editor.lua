@@ -153,7 +153,7 @@ local raw_item = completion.user_data.nvim.lsp.completion_item
 check(raw_item.label:find('sum', 1, true), vim.inspect(raw_item))
 equal(completion.word, 'sum', 'completion insert text changed')
 equal(raw_item.detail, '[2 overloads]', 'clangd did not bundle the expected overloads')
-equal(completion.menu, '[2 个重载]', 'completion menu was not translated')
+equal(completion.menu, raw_item.detail, 'completion callback display fields changed')
 
 local function raw_index(rows)
   return vim.iter(rows):any(function(item) return item.value and item.value.title == 'indexing' end)

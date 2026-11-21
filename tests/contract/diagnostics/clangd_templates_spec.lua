@@ -3,8 +3,10 @@ local check, equal = h.check, h.equal
 h.setup()
 local formatter = vim.diagnostic.config().virtual_text.format
 check(type(formatter) == 'function', 'diagnostic formatter not installed')
+local buf = vim.api.nvim_get_current_buf()
+local ns = dofile(vim.env.NVIM_ZH_ROOT .. '/tests/support/diagnostic_helpers.lua').client(buf)
 local function diagnostic(message, source)
-  return { message = message, source = source or 'clang', code = 'fixture', lnum = 0, col = 0 }
+  return { bufnr = buf, namespace = ns, message = message, source = source or 'clang', code = 'fixture', lnum = 0, col = 0 }
 end
 local cases = {
   { "Redefinition of '重复'", "'重复' 重复定义" },

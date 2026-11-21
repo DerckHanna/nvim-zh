@@ -4,6 +4,7 @@ local M = {}
 
 local DOMAIN = 'nvim-dap-ui'
 local unpack = table.unpack or unpack
+local default_titles = setmetatable({}, { __mode = 'k' })
 
 local state = {
   attached = false,
@@ -45,6 +46,31 @@ local select_labels = {
 local select_item_count = 6
 local setup_elements = { 'breakpoints', 'repl', 'scopes', 'stacks', 'watches', 'hover', 'console' }
 
+function M.project_source(module, bytes, path, current)
+  if module ~= 'dapui' then return assert(loadstring(bytes, '@' .. path)) end
+  local lines = vim.split(bytes, '\n', { plain = true })
+  assert(lines[153] == '    args = vim.tbl_deep_extend(')
+  assert(lines[156] == '      elem.float_defaults and elem.float_defaults() or {},')
+  assert(lines[160] == '    open_float = require("dapui.windows").open_float(elem_name, elem, position, args)')
+  lines[153] = '    local explicit_title = args and args.title; local defaults = elem.float_defaults and elem.float_defaults() or {}; args = vim.tbl_deep_extend('
+  lines[156] = '      defaults,'
+  lines[160] = '    open_float = require("dapui.windows").open_float(elem_name, elem, position, dapzh(elem_name, elem, args, explicit_title, defaults.title))'
+  local chunk = assert(loadstring('return function(dapzh, ...) ' .. table.concat(lines, '\n') .. '\nend',
+    '@' .. path))()
+  local object
+  local function mark(name, element, args, explicit_title, default_title)
+    if current() and explicit_title == nil and default_title == nil and args.title == name
+      and vim.tbl_contains(setup_elements, name) and object.elements[name] == element then
+      default_titles[args] = element
+    end
+    return args
+  end
+  return function(...)
+    object = chunk(mark, ...)
+    return object
+  end
+end
+
 local function translate(context, text)
   if type(text) ~= 'string' or text == '' then return text end
   local ctx = state.ctx
@@ -76,14 +102,13 @@ end
 local restore_canvases
 local sync_all
 
-local function project_settings(name, settings, element)
+local function project_settings(name, settings, buffer)
   if type(settings) ~= 'table' or settings.title ~= name then return settings end
   local translated = translate('element_title', settings.title)
   if translated == settings.title then return settings end
   local copy = common.copy(settings)
   copy.title = translated
-  if copy.width == nil and type(element) == 'table' and type(element.buffer) == 'function' then
-    local buffer = element.buffer()
+  if copy.width == nil then
     if type(buffer) == 'number' and vim.api.nvim_buf_is_valid(buffer) then
       local columns, points = vim.fn.strdisplaywidth(translated), 0
       for _, line in ipairs(vim.api.nvim_buf_get_lines(buffer, 0, -1, false)) do
@@ -277,19 +302,24 @@ factories.render = canvas_factory(slots.render)
 function factories.float(original, generation)
   local slot = slots.float
   return function(name, element, position, settings)
-    if active(slot, generation) then
-      if type(settings) == 'function' then
-        local settings_original = settings
-        settings = function()
-          -- The original resolves function settings at this same point.
-          return project_settings(name, settings_original(), element)
-        end
-      else
-        settings = project_settings(name, settings, element)
-      end
+    if not active(slot, generation) or default_titles[settings] ~= element
+      or type(element) ~= 'table' or type(element.buffer) ~= 'function' then
+      return original(name, element, position, settings)
     end
+    local buffer
+    local input = type(settings) == 'function' and settings or function() return settings end
+    local proxy = setmetatable({
+      buffer = function()
+        buffer = element.buffer()
+        return buffer
+      end,
+    }, { __index = element })
     -- name remains the float_windows key and close-command identity.
-    return original(name, element, position, settings)
+    return original(name, proxy, position, function()
+      local value = input()
+      if active(slot, generation) then return project_settings(name, value, buffer) end
+      return value
+    end)
   end
 end
 
@@ -413,6 +443,7 @@ function M.detach()
     release()
   end
   state.source_error = nil
+  default_titles = setmetatable({}, { __mode = 'k' })
   restore_canvases()
   for _, slot in pairs(slots) do
     if slot.generation ~= nil then common.unwrap(slot.records, slot.method) end

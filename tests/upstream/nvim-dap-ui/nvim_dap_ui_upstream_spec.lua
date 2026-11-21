@@ -69,7 +69,12 @@ vim.ui.select = function(items, opts, on_choice)
   on_choice(selected or items[1], selected_index or 1)
 end
 
+local adapter = require('nvim-zh.adapters.nvim_dap_ui')
+local path = ui_root .. '/lua/dapui/init.lua'
+local bytes = require('nvim-zh.fs').read(path, 1024 * 1024)
+package.preload.dapui = adapter.project_source('dapui', bytes, path, function() return package.loaded.dapui ~= nil end)
 local dapui = require('dapui')
+package.preload.dapui = nil
 local dap = require('dap')
 local util = require('dapui.util')
 local windows = require('dapui.windows')
@@ -118,7 +123,6 @@ equal(vim.api.nvim_buf_get_name(baseline_buffer):match('DAP Watches$'), 'DAP Wat
   'baseline Buffer identity')
 
 local common = require('nvim-zh.adapters.common')
-local adapter = require('nvim-zh.adapters.nvim_dap_ui')
 local enabled = true
 local ctx = {
   enabled = function() return enabled end,
@@ -226,6 +230,11 @@ if type(win_title) == 'table' then
   win_title = table.concat(parts)
 end
 equal(win_title, '监视', 'real nvim_win_get_config title')
+windows.close_float('watches')
+captured_float = nil
+dapui.float_element('watches', { title = 'watches', width = 50, height = 4, enter = false })
+check(vim.wait(5000, function() return captured_float ~= nil end, 10), 'user-titled float did not open')
+equal(captured_float.title, 'watches', 'same-text user title translated')
 windows.close_float('watches')
 float_module.open_float = original_float_open
 

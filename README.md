@@ -1,109 +1,41 @@
 # nvim-zh
 
-Neovim 简体中文本地化插件，基础安装覆盖核心消息、中文帮助和常见 UI。第三方插件和 Clang 工具链的显示译文可通过独立汉化包按需启用。命令、快捷键、用户输入和协议数据沿用原值。
-
-## 要求
-
-- Neovim **0.12+**，使用内置 `vim.pack` 安装和更新。
-- 安装包自带帮助、翻译目录与 MO。自动启用核心消息需要 **Linux/glibc + LuaJIT**，中文帮助与 Lua UI 可独立使用。
-- 当前版本为 `0.1.0`，固定验证版本为 Neovim **0.12.6**。见[兼容性说明](docs/compatibility.md)。
+Neovim 简体中文本地化插件。基础安装提供核心消息、中文帮助和常见界面译文。可选汉化包补充第三方插件和 Clang 工具链的界面。命令、快捷键、用户输入和协议数据沿用原值。
 
 ## 安装
+
+需要 Neovim 0.12 或更高版本。项目以官方 0.12.6 验证固定源码接缝。自动切换核心 gettext 消息需要 Linux/glibc 与 LuaJIT，中文帮助和 Lua 界面可独立使用。见[兼容性](docs/compatibility.md)。
 
 ```lua
 vim.pack.add({ 'https://github.com/DerckHanna/nvim-zh' }, { load = true })
 require('nvim-zh').setup()
 ```
 
-首次 `setup()` 会校验并启用主包资源，随后加载已登记的汉化包。使用受支持的第三方插件时，把上面的配置放在目标插件加载之前。标准 `vim.pack` 按仓库地址识别固定接缝，镜像或其他管理器可显式登记源码。见[第三方插件适配](docs/adapters.md#启用版本相关接缝)。
+在目标插件加载前运行 `setup()`，以启用需要固定源码证据的适配。见[第三方插件](docs/adapters.md)。
 
-## 日常使用
+## 使用和更新
 
-- 用 `:NvimZh` 查看版本、资源、缺失记录和健康状态。`Tab` 与 `Shift-Tab` 切页，`j` 与 `k` 滚动，`/` 搜索，`?` 打开帮助，`q` 或 `Esc` 关闭。
-- 在「汉化包」页查找、安装和更新可选资源，也可用 `:NvimZhPacks` 直达。首次进入时按回车获取目录，之后用 `/` 筛选、`i` 安装、`u` 更新，回车打开选中包的操作菜单。在线操作使用 `curl`，本地附件可通过 `a` 菜单离线导入。
-- 用 `:NvimZhCheck` 或 `:checkhealth nvim-zh` 查看检查结果。
-- 用 `:help nvim-zh` 打开帮助，或用 `:help nvim-zh@en` 选择英文版本。
+| 命令 | 用途 |
+| --- | --- |
+| `:help nvim-zh` | 阅读中文帮助，追加 `@en` 查看英文 |
+| `:NvimZh` | 查看当前资源、缺失记录和状态 |
+| `:NvimZhPacks` | 管理可选汉化包，首次进入按回车获取目录 |
+| `:NvimZhCheck` | 查看运行检查，也可执行 `:checkhealth nvim-zh` |
+| `:NvimZhRaw` | 查看选中的诊断或编译器列表条目的原文 |
 
-### C/C++ 与 Clang 工具链
+运行 `vim.pack.update()` 更新主包，在确认界面用 `:write` 接受变更。可选包在 `:NvimZhPacks` 中独立更新。面板会在插件实现变化时提示重启。在线安装需要 `curl`，离线可用面板的 `a` 菜单导入已下载的附件。
 
-已有 clangd 配置时，在 `:NvimZhPacks` 中安装 `clangd` 汉化包。安装后，`require('nvim-zh').setup()` 默认启用相应的显示适配。常见 C++ 报错、警告、clang-tidy 检查和诊断注释会在编辑器中显示中文。代码操作菜单、悬浮说明、索引进度和原生补全里的部分说明也使用中文。
+公开目录提供 SDK 2 格式。升级到 0.3.0 后，可在 `:NvimZhPacks` 中更新已装的可选包。见[发行说明](CHANGELOG.md)。
 
-如果希望在代码行尾显示诊断，可在调用 `setup()` 前设置 `vim.diagnostic.config({ virtual_text = true })`。未知诊断保留英文，可通过配置补充译文。[clangd 配置与译文覆盖](docs/configuration.md#modulesdiagnostics)
+## 可选汉化包
 
-编译器与独立 clang-tidy 词库可从开发版附件导入。打开 quickfix 后用 `:NvimZhRaw` 查看原文和工具代码。版本范围、真实验证和当前缺口见[覆盖清单](docs/toolchain-coverage.md)。
+- **插件** · which-key、Telescope、nvim-tree、nvim-cmp、nvim-dap、nvim-dap-ui、nvim-dap-view。逐项适配范围见[插件指南](docs/adapters.md)。
+- **C/C++** · clangd、Clang 和 clang-tidy。诊断、悬浮、签名、构建列表及若干其他显示依赖固定工具版本和来源证据。见 [C/C++ 工作流](docs/workflows.md)与[工具链覆盖](docs/toolchain-coverage.md)。
 
-从编辑、修复和构建到断点调试，见[中文工作流指南](docs/workflows.md)或 `:help nvim-zh-cpp`。
+## 文档
 
-### 更新
+- [配置](docs/configuration.md) · [Lua API](docs/api.md) · [常用工作流](docs/workflows.md)
+- [兼容性](docs/compatibility.md) · [验证记录](docs/verification.md) · [变更记录](CHANGELOG.md)
+- [贡献指南](CONTRIBUTING.md) · [测试](docs/testing.md) · [架构](docs/architecture.md)
 
-```lua
-vim.pack.update()
-```
-
-在 vim.pack 的确认界面用 `:write` 接受主包更新。汉化包在「汉化包」页独立管理。
-
-- 纯资源更新用于后续查询。实现变化会提示重启，并在下一次启动时应用。
-- 取消更新或资源校验失败时继续使用上一份已验证资源。包版本和回退由 vim.pack 的锁文件管理。
-
-### 常用配置
-
-按需启用选择项格式化、禁用单个适配器或覆盖译文。
-
-```lua
-require('nvim-zh').setup({
-  modules = {
-    ui = { select_items = true },
-    plugins = { disabled = { 'telescope' } },
-  },
-  overrides = {
-    ['my-plugin'] = { [''] = { Save = '保存' } },
-  },
-})
-```
-
-需要持久热配置时，可创建 `stdpath('config')/nvim-zh.json`。保存后自动校验并应用。校验失败时保留上一份有效配置。
-
-完整默认值、模块开关、JSON 格式和优先级见[配置文档](docs/configuration.md)。
-
-## 覆盖范围
-
-| 范围 | 行为 |
-|---|---|
-| 核心消息 | 继续使用 Neovim gettext，绑定用户数据目录中的已验证合并 MO，不替换系统 MO |
-| 中文 Help | 通过 `.cnx` 与预生成 `tags-cn` 选择中文，缺失主题回退英文 |
-| Neovim UI | 支持 notify、input/select；select item 格式化与 echo 为可选功能 |
-| 第三方插件 | 围绕固定上游的公开或已验证显示接缝适配 which-key、Telescope、nvim-tree、nvim-dap、nvim-dap-ui、nvim-dap-view |
-| 诊断与 LSP | 常见 clangd、Clang 和 clang-tidy 诊断，以及修复、悬浮、签名、补全和进度中的说明文字 |
-| 状态与排错 | 面板、健康检查、结构化状态、实际观察与脱敏缺失记录 |
-
-缺少中文帮助主题或匹配译文时使用上游文字。后续打开的帮助及新通知使用当前资源。逐插件的实际验证与剩余英文来源见[验证记录](docs/verification.md)。
-
-## Lua 接口摘要
-
-```lua
-local zh = require('nvim-zh')
-
-local snapshot = zh.status()       -- 配置、版本、资源和模块状态
-local stats = zh.stats()          -- 已加载目录与本进程实际观察
-local missing = zh.missing()      -- 脱敏缺失记录
-local task_id = zh.refresh(function(result)
-  vim.notify(vim.inspect(result)) -- 只重新协调本地配置和已安装资源，不下载
-end)
-```
-
-完整接口、回调和错误字段见[Lua API](docs/api.md)。
-
-## 文档与帮助
-
-- 插件内 Help：`:help nvim-zh`
-- [完整配置](docs/configuration.md)
-- [Lua API](docs/api.md)
-- [第三方插件适配](docs/adapters.md)
-- [架构说明](docs/architecture.md)
-- [完整中文工作体验设计](docs/architecture.md#完整中文工作体验)
-- [兼容性与验证边界](docs/compatibility.md)
-- [测试与质量门禁](docs/testing.md)
-- [贡献指南](CONTRIBUTING.md)
-- [变更记录](CHANGELOG.md)
-
-遇到问题时，先查看 `:NvimZh` 的“检查”页或执行 `:checkhealth nvim-zh`，再附上面板中的运行版本、资源状态和具体降级原因。
+报告问题时，请附上 Neovim 版本、复现步骤及 `:checkhealth nvim-zh` 中相关的状态和降级原因。

@@ -7,7 +7,7 @@ import unittest
 
 from adapter_tui import ROOT, Terminal, lua_literal
 from pack_assets import assets
-from resource_bundle import descriptor, digest, encoded
+from resource_bundle import digest, encoded
 
 
 def choose(ui, label):
@@ -26,9 +26,7 @@ class PackageManagementTests(unittest.TestCase):
                                                       'https://github.com/DerckHanna/nvim-zh', 'telescope'))
             changed = json.loads(original)
             changed['manifest']['version'] = '1.1.0'
-            catalog = 'catalogs/zh_CN.json'
-            changed['files'][catalog] = changed['files'][catalog].replace('查找文件', '文件检索')
-            changed['manifest']['files'] = descriptor({name: value.encode() for name, value in changed['files'].items()})
+            changed['catalog']['entries']['title']['Find Files'] = '文件检索'
             update = encoded(changed)
             second = {**first, 'version': '1.1.0', 'size': len(update), 'sha256': digest(update),
                       'url': first['url'].replace('v1.0.0', 'v1.1.0')}

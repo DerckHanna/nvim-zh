@@ -10,7 +10,7 @@ local original_setqflist = vim.diagnostic.setqflist
 local buf = vim.api.nvim_create_buf(false, true)
 vim.api.nvim_set_current_buf(buf)
 vim.api.nvim_buf_set_lines(buf, 0, -1, false, { 'int x; int x; int y;', 'second line' })
-local ns_a = vim.api.nvim_create_namespace('nvim-zh-list-a')
+local ns_a = h.client(buf)
 local ns_b = vim.api.nvim_create_namespace('nvim-zh-list-b')
 
 local function item(extra)
@@ -136,15 +136,27 @@ vim.diagnostic.setloclist({ winnr = win_a, open = false, title = 'loc-a' })
 vim.diagnostic.setloclist({ winnr = win_b, open = false, title = 'loc-b', format = function() return 'only b' end })
 equal(vim.fn.getloclist(win_a)[1].text, known, 'window A raw text changed')
 equal(vim.fn.getloclist(win_b)[1].text, 'only b', 'window B user text lost')
+local loc_id = vim.fn.getloclist(win_a, { id = 0 }).id
+for _ = 1, 63 do
+  if vim.fn.getqflist({ id = 0 }).id == loc_id + 63 then break end
+  equal(vim.fn.setqflist({}, ' ', { title = 'history' }), 0, 'could not advance list IDs')
+end
+vim.diagnostic.setqflist({ open = false, title = 'colliding-quickfix' })
+local colliding_id = vim.fn.getqflist({ id = 0 }).id
+equal(colliding_id, loc_id + 64, 'test must reuse the legacy tracking slot')
+equal(line(1):find(shown, 1, true) ~= nil, true, 'colliding quickfix not projected')
 vim.api.nvim_set_current_win(win_a)
 vim.cmd.lopen()
 equal(vim.api.nvim_get_current_line():find(shown, 1, true) ~= nil, true, 'window A location list not projected')
+vim.cmd.NvimZhRaw()
+equal(require('nvim-zh').raw().raw_text, known, 'location list raw text in the shared slot')
 vim.cmd.lclose()
 vim.api.nvim_set_current_win(win_b)
 vim.cmd.lopen()
 equal(vim.api.nvim_get_current_line():find('only b', 1, true) ~= nil, true, 'window B location list was replaced')
 vim.cmd.lclose()
 vim.api.nvim_win_close(win_b, true)
+equal(line(1):find(shown, 1, true) ~= nil, true, 'closing location list owner reset quickfix')
 
 -- 8. Disabling clears only our formatters and leaves foreign ones.
 local foreign = function() return { 'foreign' } end
@@ -156,10 +168,12 @@ local foreign_id = vim.fn.getqflist({ id = 0 }).id
 h.setup({ enabled = false })
 settle(false)
 equal(vim.fn.getqflist({ id = ours_id, quickfixtextfunc = 1 }).quickfixtextfunc, '', 'our formatter outlived teardown')
+equal(vim.fn.getqflist({ id = colliding_id, quickfixtextfunc = 1 }).quickfixtextfunc, '', 'colliding quickfix formatter survived')
+equal(vim.fn.getloclist(win_a, { id = loc_id, quickfixtextfunc = 1 }).quickfixtextfunc, '', 'location list formatter survived')
 check(rawequal(vim.fn.getqflist({ id = foreign_id, quickfixtextfunc = 1 }).quickfixtextfunc, foreign),
   'foreign formatter removed')
 equal(vim.diagnostic.setqflist, original_setqflist, 'setqflist not restored')
 
 require('nvim-zh.diagnostics').teardown()
 vim.api.nvim_buf_delete(buf, { force = true })
-print('DIAGNOSTIC_LIST_PROJECTION_SPEC=PASS mixed_sources ambiguous_clients user_rewrite filter stale loclist_windows ownership')
+print('DIAGNOSTIC_LIST_PROJECTION_SPEC=PASS mixed_sources ambiguous_clients user_rewrite filter stale loclist_windows id_collision ownership')

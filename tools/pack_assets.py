@@ -10,7 +10,7 @@ import catalog_tool
 import resource_bundle as bundle
 
 
-def assets(root, version, repository, only=None, sdk=1):
+def assets(root, version, repository, only=None, sdk=2):
     if not re.fullmatch(r'\d+\.\d+\.\d+', version):
         raise ValueError('pack version must be major.minor.patch')
     if sdk not in (1, 2):
@@ -26,9 +26,10 @@ def assets(root, version, repository, only=None, sdk=1):
     catalog_tool.check(root / 'translations/po/zh_CN', root / 'translations/glossary/zh_CN.toml', parsed=parsed)
     ids = {id for id, spec in specs.items() if spec['status'] == 'implemented'} | set(tools)
     if only:
-        if only not in ids:
-            raise ValueError(f'unknown pack: {only}')
-        ids = {only}
+        selected = {only} if isinstance(only, str) else set(only)
+        if selected - ids:
+            raise ValueError(f'unknown packs: {", ".join(sorted(selected - ids))}')
+        ids = selected
     tool_ids = ids & tools.keys()
     if tool_ids:
         import toolchain_catalog
@@ -79,10 +80,11 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--root', type=Path, default=adapter_manifest.ROOT)
     parser.add_argument('--version', required=True)
-    parser.add_argument('--sdk', type=int, choices=(1, 2), default=1)
+    parser.add_argument('--sdk', type=int, choices=(1, 2), default=2,
+                        help='attachment format (default: 2; 1 is for local compatibility tests)')
     parser.add_argument('--repository', default='https://github.com/DerckHanna/nvim-zh')
     parser.add_argument('--output', required=True, type=Path)
-    parser.add_argument('--id', help='build a single pack')
+    parser.add_argument('--id', action='append', help='select a pack to build (repeatable)')
     parser.add_argument('--index', type=Path, help='append to an existing published catalog')
     args = parser.parse_args()
     records = {}
@@ -91,7 +93,10 @@ def main():
         if index['schema'] != 1:
             parser.error('unsupported existing catalog schema')
         for item in index['packages']:
-            records[item['id'], item['version'], item['locale']] = item
+            key = item['id'], item['version'], item['locale']
+            if key in records:
+                parser.error(f'duplicate existing catalog version: {key}')
+            records[key] = item
     args.output.mkdir(parents=True, exist_ok=True)
     for filename, content, record in assets(args.root, args.version, args.repository.rstrip('/'), args.id,
                                             sdk=args.sdk):

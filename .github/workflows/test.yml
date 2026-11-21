@@ -2,6 +2,8 @@ name: test
 
 on:
   push:
+    branches: [main]
+    tags: ['v*']
   pull_request:
   workflow_dispatch:
   schedule:
@@ -57,6 +59,12 @@ jobs:
           fi
       - name: Syntax, catalogs, resources, offline suites and release gates
         run: make check-syntax check-translations check-native check-resources check-reproducible test release-check
+      - name: Probe Linux Help and SDK 2 snapshots
+        if: ${{ !matrix.experimental }}
+        run: |
+          source tests/run/lib/env.sh
+          NVIM_ZH_PLATFORM_NATIVE=ok run_lua "$NVIM_ZH_ROOT/tests/platform/localization.lua"
+          run_lua "$NVIM_ZH_ROOT/tests/platform/packs.lua"
       - name: CI compatibility evidence
         run: nvim --version | head -n 3
 

@@ -64,6 +64,12 @@
         "mappings"
       ],
       "tui": "tests/upstream/nvim-dap-view/tui.py"
+    },
+    "parallel_sessions": {
+      "surfaces": [
+        "codelldb_scopes"
+      ],
+      "tui": "tests/upstream/nvim-dap-view/tui.py"
     }
   },
   "schema": 1,

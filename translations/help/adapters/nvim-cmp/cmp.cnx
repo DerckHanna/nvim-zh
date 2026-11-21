@@ -1,0 +1,1117 @@
+*nvim-cmp* *cmp*
+
+用 Lua 编写的 Neovim 补全插件。
+
+==============================================================================
+目录                                                              *cmp-contents*
+
+简介                                                              |cmp-abstract|
+设计目标                                                           |cmp-concept|
+用法                                                                 |cmp-usage|
+函数                                                              |cmp-function|
+映射                                                               |cmp-mapping|
+命令                                                               |cmp-command|
+高亮                                                             |cmp-highlight|
+文件类型                                                         |cmp-filetype|
+自动命令                                                          |cmp-autocmd|
+配置                                                                |cmp-config|
+配置辅助函数                                                 |cmp-config-helper|
+开发                                                               |cmp-develop|
+常见问题                                                               |cmp-faq|
+
+==============================================================================
+简介                                                              *cmp-abstract*
+
+本文档介绍 nvim-cmp。
+
+1. 本帮助使用 `{lsp,cmp,vim}.*` 这样的类型定义记法。
+  - 定义见 `../lua/cmp/types/init.lua`。
+2. 高级配置见 Wiki。
+  - https://github.com/hrsh7th/nvim-cmp/wiki
+
+==============================================================================
+设计目标                                                          *cmp-concept*
+
+- 完整支持 LSP 的补全相关能力
+- 可用 Lua 函数灵活定制
+- 自动协调按键映射
+- 菜单无闪烁
+
+==============================================================================
+用法                                                                 *cmp-usage*
+
+下面是推荐配置。
+  注意
+    1. 必须提供 `snippet.expand` 函数。
+    2. 使用 `native` 补全菜单时，`cmp.setup.cmdline` 无法工作。
+    3. 将选项设为 `cmp.config.disable` 可禁用相应默认值。
+>vim
+  call plug#begin(s:plug_dir)
+  Plug 'neovim/nvim-lspconfig'
+  Plug 'hrsh7th/cmp-nvim-lsp'
+  Plug 'hrsh7th/cmp-buffer'
+  Plug 'hrsh7th/cmp-path'
+  Plug 'hrsh7th/cmp-cmdline'
+  Plug 'hrsh7th/nvim-cmp'
+
+  " For vsnip users.
+  Plug 'hrsh7th/cmp-vsnip'
+  Plug 'hrsh7th/vim-vsnip'
+
+  " For luasnip users.
+  " Plug 'L3MON4D3/LuaSnip'
+  " Plug 'saadparwaiz1/cmp_luasnip'
+
+  " For mini.snippets users.
+  " Plug 'echasnovski/mini.snippets'
+  " Plug 'abeldekat/cmp-mini-snippets'
+
+  " For snippy users.
+  " Plug 'dcampos/nvim-snippy'
+  " Plug 'dcampos/cmp-snippy'
+
+  " For ultisnips users.
+  " Plug 'SirVer/ultisnips'
+  " Plug 'quangnguyen30192/cmp-nvim-ultisnips'
+
+  call plug#end()
+
+  set completeopt=menu,menuone,noselect
+
+  lua <<EOF
+    local cmp = require'cmp'
+
+    -- Global setup.
+    cmp.setup({
+      snippet = {
+        expand = function(args)
+          vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
+          -- require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
+          -- require'snippy'.expand_snippet(args.body) -- For `snippy` users.
+          -- vim.fn["UltiSnips#Anon"](args.body) -- For `ultisnips` users.
+          -- vim.snippet.expand(args.body) -- For native neovim snippets (Neovim v0.10+)
+
+          -- For `mini.snippets` users:
+          -- local insert = MiniSnippets.config.expand.insert or MiniSnippets.default_insert
+          -- insert({ body = args.body }) -- Insert at cursor
+          -- cmp.resubscribe({ "TextChangedI", "TextChangedP" })
+          -- require("cmp.config").set_onetime({ sources = {} })
+        end,
+      },
+      window = {
+        -- completion = cmp.config.window.bordered(),
+        -- documentation = cmp.config.window.bordered(),
+      },
+      mapping = cmp.mapping.preset.insert({
+        ['<C-d>'] = cmp.mapping.scroll_docs(-4),
+        ['<C-f>'] = cmp.mapping.scroll_docs(4),
+        ['<C-Space>'] = cmp.mapping.complete(),
+        ['<CR>'] = cmp.mapping.confirm({ select = true }),
+      }),
+      sources = cmp.config.sources({
+        { name = 'nvim_lsp' },
+        { name = 'vsnip' }, -- For vsnip users.
+        -- { name = 'luasnip' }, -- For luasnip users.
+        -- { name = 'snippy' }, -- For snippy users.
+        -- { name = 'ultisnips' }, -- For ultisnips users.
+      }, {
+        { name = 'buffer' },
+      })
+    })
+
+    -- `/` cmdline setup.
+    cmp.setup.cmdline('/', {
+      mapping = cmp.mapping.preset.cmdline(),
+      sources = {
+        { name = 'buffer' }
+      }
+    })
+
+    -- `:` cmdline setup.
+    cmp.setup.cmdline(':', {
+      mapping = cmp.mapping.preset.cmdline(),
+      sources = cmp.config.sources({
+        { name = 'path' }
+      }, {
+        { name = 'cmdline' }
+      }),
+      matching = { disallow_symbol_nonprefix_matching = false }
+    })
+
+    -- Setup lspconfig.
+    local capabilities = require('cmp_nvim_lsp').default_capabilities()
+    vim.lsp.config(%YOUR_LSP_SERVER%, {
+      capabilities = capabilities
+    })
+    vim.lsp.enable(%YOUR_LSP_SERVER%)
+  EOF
+<
+==============================================================================
+函数                                                              *cmp-function*
+
+可在映射中使用 `<Cmd>lua require('cmp').complete()<CR>` 调用这些函数。
+
+*cmp.setup* (config: cmp.ConfigSchema)
+  设置全局配置。参见配置选项。
+
+*cmp.setup.filetype* (filetype: string, config: cmp.ConfigSchema)
+  设置指定文件类型的配置。
+
+*cmp.setup.buffer* (config: cmp.ConfigSchema)
+  设置当前缓冲区的配置。
+
+*cmp.setup.cmdline* (cmdtype: string, config: cmp.ConfigSchema)
+  设置指定类型的命令行配置。
+  参见 |getcmdtype()|。
+  注意，nvim-cmp 不支持 `=` 类型的命令行。
+
+*cmp.get_registered_sources* ()
+  获取所有已注册的补全源。
+
+*cmp.visible* ()
+  返回布尔值，表示补全菜单是否可见。
+
+*cmp.visible_docs* ()
+  返回布尔值，表示文档窗口是否可见。
+
+*cmp.get_entries* ()
+  返回当前所有候选项。
+
+*cmp.get_selected_entry* ()
+  返回当前选中的候选项，包括预选项。
+
+*cmp.get_active_entry* ()
+  返回当前选中的候选项，排除预选项。
+
+*cmp.close* ()
+  关闭补全菜单。
+
+*cmp.abort* ()
+  关闭补全菜单，将当前行恢复到本次补全开始前的状态。
+
+*cmp.select_next_item* (option: { behavior = cmp.SelectBehavior, count = 1 })
+  选中下一项。增大 `count` 可以向下翻页。
+  `behavior` 可取以下值。
+  - `cmp.SelectBehavior.Insert` 在光标处插入文本。
+  - `cmp.SelectBehavior.Select` 只选中文本，可能在光标处显示
+    幽灵文本。
+>lua
+  cmp.setup {
+    mapping = {
+      ["<C-j>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Select }),
+    }
+  }
+<
+
+*cmp.select_prev_item* (option: { behavior = cmp.SelectBehavior, count = 1 })
+  选中上一项。增大 `count` 可以向上翻页。
+  `behavior` 可取以下值。
+  - `cmp.SelectBehavior.Insert` 在光标处插入文本。
+  - `cmp.SelectBehavior.Select` 只选中文本，可能在光标处显示
+    幽灵文本。
+>lua
+  cmp.setup {
+    mapping = {
+      ["<C-k>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Select }),
+    }
+  }
+<
+*cmp.open_docs* ()
+  打开文档窗口。
+
+*cmp.close_docs* ()
+  关闭文档窗口。
+
+*cmp.scroll_docs* (delta: number)
+  在文档窗口可见时滚动该窗口。
+
+*cmp.complete* (option: { reason = cmp.ContextReason, config = cmp.ConfigSchema })
+  触发补全。
+
+  以下配置定义了一个只显示 vsnip 片段补全的按键映射。
+>lua
+  cmp.setup {
+    mapping = {
+      ['<C-s>'] = cmp.mapping.complete({
+        config = {
+          sources = {
+            { name = 'vsnip' }
+          }
+        }
+      })
+    }
+  }
+< >vim
+  inoremap <C-S> <Cmd>lua require('cmp').complete({ config = { sources = { { name = 'vsnip' } } } })<CR>
+<
+  注意，这里的 `config` 是临时设置，`config.mapping` 仍是持久设置。
+
+*cmp.complete_common_string* ()
+  补全各候选的公共字符串，行为类似 shell 补全。
+>lua
+  cmp.setup {
+    mapping = {
+      ['<C-l>'] = cmp.mapping(function(fallback)
+        if cmp.visible() then
+          return cmp.complete_common_string()
+        end
+        fallback()
+      end, { 'i', 'c' }),
+    }
+  }
+<
+*cmp.confirm* (option: cmp.ConfirmOption, callback: function)
+  接受当前选中的补全项。
+  若尚未选中任何候选项，且选项表含 `select = true`，
+  nvim-cmp 会自动选中第一项。
+
+  用 `behavior` 选项指定补全项
+  如何写入文件。
+
+  `behavior=cmp.ConfirmBehavior.Insert` 插入选中项，
+    并将相邻文本右移，这是默认行为。
+  `behavior=cmp.ConfirmBehavior.Replace` 用选中项
+    替换相邻文本。
+>lua
+  cmp.setup {
+    mapping = {
+      ["<CR>"] = cmp.mapping.confirm({ select = true, behavior = cmp.ConfirmBehavior.Replace }),
+    }
+  }
+<
+*cmp.event:on* (%EVENT_NAME%, callback)
+  订阅 nvim-cmp 的事件。可订阅以下事件。
+
+  - `complete_done` 在当前补全结束后触发。
+  - `confirm_done` 在确认补全后触发。
+  - `menu_opened` 在打开新的补全菜单后触发。回调接收一个表，
+    其中 `window` 键指向补全菜单的实现。
+  - `menu_closed` 在关闭补全菜单后触发。回调接收一个表，
+    其中 `window` 键指向补全菜单的实现。
+
+==============================================================================
+映射                                                               *cmp-mapping*
+
+nvim-cmp 的映射机制支持多种配置和按键组合。
+
+可以定义以 `fallback` 函数为参数的映射函数。
+调用 `fallback` 可执行原有映射。
+
+例如，自动配对插件通常会为 `<CR>` 和 `(` 定义映射。
+如果为这些按键配置了 nvim-cmp 映射，插件会覆盖原有映射。
+要调用原有映射，请执行 `fallback`。
+>lua
+  cmp.setup {
+    mapping = {
+      ['<CR>'] = function(fallback)
+        if cmp.visible() then
+          cmp.confirm()
+        else
+          fallback() -- If you use vim-endwise, this fallback will behave the same as vim-endwise.
+        end
+      end
+    }
+  }
+< >lua
+  cmp.setup {
+    mapping = {
+      ['<Tab>'] = function(fallback)
+        if cmp.visible() then
+          cmp.select_next_item()
+        else
+          fallback()
+        end
+      end
+    }
+  }
+<
+
+可以指定映射生效的模式（`i` 为插入模式，`c` 为命令行模式，`s` 为选择模式）。
+>lua
+  cmp.setup {
+    mapping = {
+      ['<CR>'] = cmp.mapping(your_mapping_function, { 'i', 'c' })
+    }
+  }
+<
+也可以用表为不同模式指定不同的映射。
+>lua
+  cmp.setup {
+    mapping = {
+      ['<CR>'] = cmp.mapping({
+        i = your_mapping_function_a,
+        c = your_mapping_function_b,
+      })
+    }
+  }
+<
+可使用以下内置映射辅助函数。
+
+  *cmp.mapping.close* ()
+    同 |cmp.close|。
+
+  *cmp.mapping.abort* ()
+    同 |cmp.abort|。
+
+  *cmp.mapping.select_next_item* (option: { behavior = cmp.SelectBehavior, count = 1 })
+    同 |cmp.select_next_item|。
+
+  *cmp.mapping.select_prev_item* (option: { behavior = cmp.SelectBehavior, count = 1 })
+    同 |cmp.select_prev_item|。
+
+  *cmp.mapping.open_docs* ()
+    同 |cmp.open_docs|。
+
+  *cmp.mapping.close_docs* ()
+    同 |cmp.close_docs|。
+
+  *cmp.mapping.scroll_docs* (delta: number)
+    同 |cmp.scroll_docs|。
+
+  *cmp.mapping.complete* (option: cmp.CompleteParams)
+    同 |cmp.complete|。
+
+  *cmp.mapping.complete_common_string* ()
+    同 |cmp.complete_common_string|。
+
+  *cmp.mapping.confirm* (option: cmp.ConfirmOption)
+    同 |cmp.confirm|。
+
+内置映射辅助函数只能作为配置选项使用。
+如需直接调用功能，请参见 |cmp-function|。
+
+
+
+==============================================================================
+命令                                                               *cmp-command*
+
+*CmpStatus*
+  显示补全源的状态。
+  有时会显示 `unknown`，这是预期行为。
+  例如，`cmp-nvim-lsp` 会在 InsertEnter 自动命令触发时注册，
+  所以此时运行命令可能显示 `unknown`。
+
+
+
+==============================================================================
+高亮                                                             *cmp-highlight*
+
+*CmpItemAbbr*
+  各补全字段中未匹配字符的高亮组。
+
+*CmpItemAbbrDeprecated*
+  各已弃用补全字段中未匹配字符的高亮组。
+
+*CmpItemAbbrMatch*
+  各补全字段中已匹配字符的高亮组。匹配字符须组成
+  从字段起始位置开始的子串。
+
+*CmpItemAbbrMatchFuzzy*
+  各补全字段中模糊匹配字符的高亮组。
+
+*CmpItemKind*
+  候选类别字段的高亮组。
+
+  注意，`kind` 是显示在每个补全项后面的类别标记。
+
+*CmpItemKindIcon
+  各 `lsp.CompletionItemKind` 图标的高亮组。
+
+*CmpItemKind%KIND_NAME%*
+  指定 `lsp.CompletionItemKind` 的类别高亮组。
+  例如，可以按以下方式只覆盖 `method` 类别的高亮组。
+>vim
+    highlight CmpItemKindMethod guibg=NONE guifg=Orange
+
+*CmpItemKind%KIND_NAME%Icon
+  指定 `lsp.CompletionItemKind` 图标的高亮组。
+  可以沿用上述覆盖方式，也可以在 format 表中使用自定义函数。
+>lua
+      local function set_colors(str)
+        local color = vim.api.nvim_get_hl(args...)
+        vim.api.nvim_set_hl(args...)
+      end
+<
+*CmpItemMenu*
+  菜单字段的高亮组。
+
+==============================================================================
+文件类型                                                         *cmp-filetype*
+
+*cmp_menu*
+  补全菜单缓冲区的文件类型。
+
+*cmp_docs*
+  文档窗口缓冲区的文件类型。
+
+==============================================================================
+自动命令                                                          *cmp-autocmd*
+
+可以为 User 事件注册自动命令，使用下列模式
+响应 nvim-cmp 的相应事件。
+
+*CmpReady*
+  加载 `plugin/cmp.lua` 时触发。
+
+*CmpRegisterSource*
+  注册补全源时触发。
+
+*CmpUnregisterSource*
+  注销补全源时触发。
+
+==============================================================================
+配置                                                                *cmp-config*
+
+可通过 `cmp.setup { ... }` 设置以下选项。
+
+                                                            *cmp-config.enabled*
+enabled~
+  `boolean | fun(): boolean`
+  启用或禁用插件。
+
+                                                *cmp-config.performance.debounce*
+performance.debounce~
+  `number`
+  设置防抖间隔。
+  在此间隔内收集各个补全源的结果，
+  以便集中筛选并显示。
+
+                                                *cmp-config.performance.throttle*
+performance.throttle~
+  `number`
+  设置节流间隔。
+  用于延后筛选和显示补全结果。
+
+                                        *cmp-config.performance.fetching_timeout*
+performance.fetching_timeout~
+    `number`
+    设置获取候选项的超时时间。
+    显示前，nvim-cmp 会等待优先级最高的补全源。
+
+                                *cmp-config.performance.filtering_context_budget*
+performance.filtering_context_budget~
+    `number`
+    设置每次筛选的时间预算，单位为毫秒。
+    筛选超过该时间时，剩余工作会被推迟。
+
+                                 *cmp-config.performance.confirm_resolve_timeout*
+performance.confirm_resolve_timeout~
+    `number`
+    设置确认前解析候选项的超时时间。
+
+                                            *cmp-config.performance.async_budget*
+performance.async_budget~
+    `number`
+    一个异步函数在事件循环的单个步骤中
+    最多可运行的时间，单位为毫秒。
+
+                                        *cmp-config.performance.max_view_entries*
+performance.max_view_entries~
+    `number`
+    候选列表最多显示的候选项数。
+
+                                                          *cmp-config.preselect*
+preselect~
+  `cmp.PreselectMode`
+
+  1. `cmp.PreselectMode.Item`
+    nvim-cmp 预选由补全源指定的候选项。
+  2. `cmp.PreselectMode.None`
+    nvim-cmp 不预选任何候选项。
+
+                                                            *cmp-config.mapping*
+mapping~
+  `table<string, fun(fallback: function)`
+  参见 |cmp-mapping|。
+
+                                                     *cmp-config.snippet.expand*
+snippet.expand~
+  `fun(option: cmp.SnippetExpansionParams)`
+  展开代码片段的函数。nvim-cmp 通过该函数
+  与所用的片段引擎交互。
+
+                                          *cmp-config.completion.keyword_length*
+completion.keyword_length~
+  `number`
+  触发自动补全所需的字符数。
+
+                                         *cmp-config.completion.keyword_pattern*
+completion.keyword_pattern~
+  `string`
+  默认关键字匹配模式。
+
+                                            *cmp-config.completion.autocomplete*
+completion.autocomplete~
+  `cmp.TriggerEvent[] | false`
+  用于触发自动补全的事件。设为 `false` 后，
+  只能手动触发补全，例如调用 `cmp.complete`。
+
+                                             *cmp-config.completion.completeopt*
+completion.completeopt~
+  `string`
+  类似 Vim 的 'completeopt' 选项。
+  通常无需修改此项。
+
+                                 *cmp-config.confirmation.get_commit_characters*
+confirmation.get_commit_characters~
+  `fun(commit_characters:string[]):string[]`
+  可用此配置函数添加或排除提交字符。
+  提交字符由 LSP 规范定义。
+
+                                    *cmp-config.formatting.expandable_indicator*
+formatting.expandable_indicator~
+  `cmp.expandable_indicator`
+  控制是否在 cmp 浮窗中显示可展开标记 `~`。
+
+                                                  *cmp-config.formatting.fields*
+formatting.fields~
+  `cmp.ItemField[]`
+  指定补全字段及其显示顺序的数组。
+
+                                                  *cmp-config.formatting.format*
+formatting.format~
+  `fun(entry: cmp.Entry, vim_item: vim.CompletedItem): vim.CompletedItem`
+  定制补全菜单外观的函数。参见
+  |complete-items|。也可以用它修改 `dup` 属性。
+  注意，`vim.CompletedItem` 可包含下列附加属性。
+  `abbr_hl_group`、`icon_hl_group`、`kind_hl_group` 和 `menu_hl_group`。
+
+                                   *cmp-config.matching.disallow_fuzzy_matching*
+matching.disallow_fuzzy_matching~
+  `boolean`
+  控制是否允许模糊匹配。
+
+                               *cmp-config.matching.disallow_fullfuzzy_matching*
+matching.disallow_fullfuzzy_matching~
+  `boolean`
+  控制是否允许全模糊匹配。
+
+                           *cmp-config.matching.disallow_partial_fuzzy_matching*
+matching.disallow_partial_fuzzy_matching~
+  `boolean`
+  控制没有前缀匹配时是否允许模糊匹配。
+                                 *cmp-config.matching.disallow_partial_matching*
+matching.disallow_partial_matching~
+  `boolean`
+  Whether to allow partial matching.
+  控制是否允许部分匹配。
+                                *cmp-config.matching.disallow_prefix_unmatching*
+matching.disallow_prefix_unmatching~
+  `boolean`
+  Whether to allow prefix unmatching.
+  控制是否允许不匹配前缀。
+                                cmp-config.matching.disallow_symbol_nonprefix_matching
+matching.disallow_symbol_nonprefix_matching
+  `boolean`
+  控制非前缀匹配是否允许匹配符号。
+
+                                            *cmp-config.sorting.priority_weight*
+sorting.priority_weight~
+  `number`
+  各候选项从所属补全源取得原始优先级。系统将
+  `#sources - (source_index - 1)` 乘以 `priority_weight` 后加到原始优先级。
+  最终优先级按下式计算。
+>lua
+  final_score = orig_score + ((#sources - (source_index - 1)) * sorting.priority_weight)
+<
+                                                *cmp-config.sorting.comparators*
+sorting.comparators~
+  `(fun(entry1: cmp.Entry, entry2: cmp.Entry): boolean | nil)[]`
+  定制排序行为的比较函数。
+  可通过 `cmp.config.compare.*` 使用内置比较器。
+
+                                                            *cmp-config.sources*
+sources~
+  `cmp.SourceConfig[]`
+  补全源及其配置的列表。
+  补全源的顺序决定它们在补全结果中的顺序。
+
+                                                    *cmp-config.sources[n].name*
+sources[n].name~
+  `string`
+  补全源名称。
+
+                                                  *cmp-config.sources[n].option*
+sources[n].option~
+  `table`
+  补全源自行定义的专属选项。
+
+                                          *cmp-config.sources[n].keyword_length*
+sources[n].keyword_length~
+  `number`
+  该补全源触发自动补全所需的关键字长度。
+
+                                         *cmp-config.sources[n].keyword_pattern*
+sources[n].keyword_pattern~
+  `string`
+  该补全源的关键字匹配模式。
+
+                                      *cmp-config.sources[n].trigger_characters*
+sources[n].trigger_characters~
+  `string[]`
+  该补全源的关键字匹配模式。
+
+                                                *cmp-config.sources[n].priority*
+sources[n].priority~
+  `number`
+  该补全源的优先级。
+
+                                          *cmp-config.sources[n].max_item_count*
+sources[n].max_item_count~
+  `number`
+  该补全源提供的候选项数量上限。
+  注意，上限在排序前应用，因此可能留下匹配度不高的项。
+
+                                             *cmp-config.sources[n].group_index*
+sources[n].group_index~
+  `number`
+  补全源所属组的编号。
+
+  例如，可以增大 `buffer` 源的 `group_index`，
+  使 `nvim-lsp` 源可用时隐藏 `buffer` 源的候选项。
+>lua
+    cmp.setup {
+      sources = {
+        { name = 'nvim_lsp', group_index = 1 },
+        { name = 'buffer', group_index = 2 },
+      }
+    }
+<
+  也可通过下列内置配置辅助函数实现。
+>lua
+    cmp.setup {
+      sources = cmp.config.sources({
+        { name = 'nvim_lsp' },
+      }, {
+        { name = 'buffer' },
+      })
+    }
+<
+
+                                             *cmp-config.sources[n].entry_filter*
+sources[n].entry_filter~
+  `function`
+  补全源专用的候选筛选函数，其签名如下。
+>
+  function(entry: cmp.Entry, ctx: cmp.Context): boolean
+<
+
+  返回 `true` 保留该项。返回 `false` 移除该项。
+
+  可借此隐藏指定补全源中的某些候选项。
+  例如，用以下补全源定义
+  从 `nvim_lsp` 的候选中隐藏类别为 `Text` 的项。
+>lua
+  {
+    name = 'nvim_lsp',
+    entry_filter = function(entry, ctx)
+      return require('cmp.types').lsp.CompletionItemKind[entry:get_kind()] ~= 'Text'
+    end
+  }
+<
+  使用 `ctx` 参数可以进一步
+  定制补全源的行为。
+
+                                                               *cmp-config.view*
+view~
+  `{ docs: cmp.DocsViewConfig }`
+  `{ entries: cmp.EntriesViewConfig|string }`
+  用于定制 nvim-cmp 外观的视图类。
+  目前可用的配置选项如下。
+
+                                                *cmp-config.view.docs.auto_open*
+view.docs.auto_open~
+  `boolean`
+
+  指定选中候选项时是否显示文档视图。
+
+                                                *cmp-config.view.entries.selection_order*
+view.entries.selection_order~
+  `string`
+
+  指定在弹出菜单中从顶部开始选中（`top_down`），
+  或从离光标最近的一项开始选中（`near_cursor`）。
+  当菜单位于光标上方时可用它修改选择方向。
+  仅用于自定义视图，默认为 `top_down`。
+
+                                                 *cmp-config.view.entries.follow_cursor*
+view.entries.follow_cursor~
+  `boolean`
+
+  指定用户键入时弹出菜单是否
+  跟随光标。仅用于自定义视图，默认为 `false`。
+
+                           *cmp-config.window.{completion,documentation}.border*
+window.{completion,documentation}.border~
+  `string | string[] | nil`
+  禁用 |experimental.native_menu| 时用于补全菜单的边框字符。
+  参见 |nvim_open_win|。
+
+                     *cmp-config.window.{completion,documentation}.winhighlight*
+window.{completion,documentation}.winhighlight~
+  `string | cmp.WinhighlightConfig`
+  指定窗口的 winhighlight 选项。
+  参见 |nvim_open_win|。
+
+                     *cmp-config.window.{completion,documentation}.winblend*
+window.{completion,documentation}.winblend~
+  `string | cmp.WinhighlightConfig`
+  指定窗口的 winblend 选项。
+  参见 |nvim_open_win|。
+
+                           *cmp-config.window.{completion,documentation}.zindex*
+window.{completion,documentation}.zindex~
+  `number`
+  补全窗口的层叠顺序 zindex。
+  参见 |nvim_open_win|。
+
+                        *cmp-config.window.{completion,documentation}.scrolloff*
+window.completion.scrolloff~
+  `number`
+  指定窗口的 scrolloff 选项。
+  参见 |'scrolloff'|。
+
+                       *cmp-config.window.{completion,documentation}.col_offset*
+window.completion.col_offset~
+  `number`
+  补全窗口相对于光标的偏移。
+  文档窗口相对于补全窗口的偏移。
+
+                                     *cmp-config.window.completion.side_padding*
+window.completion.side_padding~
+  `number`
+  补全窗口两侧的留白量。
+
+                                     *cmp-config.window.completion.scrollbar*
+window.completion.scrollbar~
+  `boolean`
+  候选项过多时是否启用滚动条。
+
+                                     *cmp-config.window.completion.max_height*
+window.completion.max_height~
+  `number | nil`
+  补全窗口的最大高度。设为 0 时使用可用空间。
+  设为 `nil` 时使用 `vim.o.pumheight`。
+  参见 |'pumheight'|。
+
+                                     *cmp-config.window.documentation.max_width*
+window.documentation.max_width~
+  `number`
+  文档窗口的最大宽度。设为 0 时
+  使用全部可用空间。
+
+                                    *cmp-config.window.documentation.max_height*
+window.documentation.max_height~
+  `number`
+  文档窗口的最大高度。设为 0 时
+  使用全部可用空间。
+
+                                            *cmp-config.experimental.ghost_text*
+experimental.ghost_text~
+  `boolean | { hl_group = string }`
+  是否启用幽灵文本。
+
+==============================================================================
+配置辅助函数                                                 *cmp-config-helper*
+
+可以使用以下配置辅助函数。
+
+cmp.config.compare~
+
+  待补充。
+
+cmp.config.context~
+
+  可用 `cmp.config.context` 根据上下文启用或禁用补全。
+>lua
+    cmp.setup {
+      enabled = function()
+        -- disable completion if the cursor is `Comment` syntax group.
+        return not cmp.config.context.in_syntax_group('Comment')
+      end
+    }
+<
+  *cmp.config.context.in_syntax_group* (group)
+    可指定 Vim 的内置语法组。
+    使用 Tree-sitter 时应改用 `cmp.config.context.in_treesitter_capture`。
+
+  *cmp.config.context.in_treesitter_capture* (capture)
+    可指定 Tree-sitter 捕获名称。
+    未使用 `nvim-treesitter` 插件时，该辅助函数无法正常工作。
+
+cmp.config.mapping~
+
+  参见 |cmp-mapping|。
+
+cmp.config.sources~
+
+  *cmp.config.sources* (...sources)
+    可以指定多个补全源数组。补全源按指定顺序分组，
+    前一组没有结果时使用下一组，
+    类似链式补全。
+>lua
+    cmp.setup {
+      sources = cmp.config.sources({
+        { name = 'nvim_lsp' },
+      }, {
+        { name = 'buffer' },
+      })
+    }
+<
+cmp.config.window~
+
+  *cmp.config.window.bordered* (option)
+    为补全窗口添加边框。
+    选项见 `cmp.ConfigSchema`。
+>lua
+    cmp.setup {
+      window = {
+        completion = cmp.config.window.bordered(),
+        documentation = cmp.config.window.bordered(),
+      }
+    }
+<
+==============================================================================
+开发                                                               *cmp-develop*
+
+创建自定义补全源~
+
+注意
+  1. 必须实现 `complete` 方法。其他方法可以省略。
+  2. 每次都必须调用 `callback` 函数。
+  3. 自定义补全源只需依赖 `require('cmp')`。
+  4. LSP 规范变更时，nvim-cmp 可能直接跟进实现，可能引入破坏性变化。
+  5. 请阅读 ./lua/cmp/types 和 https://microsoft.github.io/language-server-protocol/specifications/specification-current。
+  6. 请将补全源加入 Wiki 的清单（https://github.com/hrsh7th/nvim-cmp/wiki/List-of-sources），
+  如果在 GitHub 发布，请添加 `nvim-cmp` 主题，方便用户查找。
+
+下面是创建自定义补全源的示例。
+>lua
+  local source = {}
+
+  ---Return whether this source is available in the current context or not (optional).
+  ---@return boolean
+  function source:is_available()
+    return true
+  end
+
+  ---Return the debug name of this source (optional).
+  ---@return string
+  function source:get_debug_name()
+    return 'debug name'
+  end
+
+  ---Return LSP's PositionEncodingKind.
+  ---@NOTE: If this method is omitted, the default value will be `utf-16`.
+  ---@return lsp.PositionEncodingKind
+  function source:get_position_encoding_kind()
+    return 'utf-16'
+  end
+
+  ---Return the keyword pattern for triggering completion (optional).
+  ---If this is omitted, nvim-cmp will use a default keyword pattern. See |cmp-config.completion.keyword_pattern|.
+  ---@return string
+  function source:get_keyword_pattern()
+    return [[\k\+]]
+  end
+
+  ---Return trigger characters for triggering completion (optional).
+  function source:get_trigger_characters()
+    return { '.' }
+  end
+
+  ---Invoke completion (required).
+  ---@param params cmp.SourceCompletionApiParams
+  ---@param callback fun(response: lsp.CompletionResponse|nil)
+  function source:complete(params, callback)
+    callback({
+      { label = 'January' },
+      { label = 'February' },
+      { label = 'March' },
+      { label = 'April' },
+      { label = 'May' },
+      { label = 'June' },
+      { label = 'July' },
+      { label = 'August' },
+      { label = 'September' },
+      { label = 'October' },
+      { label = 'November' },
+      { label = 'December' },
+    })
+  end
+
+  ---Resolve completion item (optional). This is called right before the completion is about to be displayed.
+  ---Useful for setting the text shown in the documentation window (`completion_item.documentation`).
+  ---@param completion_item lsp.CompletionItem
+  ---@param callback fun(completion_item: lsp.CompletionItem|nil)
+  function source:resolve(completion_item, callback)
+    callback(completion_item)
+  end
+
+  ---Executed after the item was selected.
+  ---@param completion_item lsp.CompletionItem
+  ---@param callback fun(completion_item: lsp.CompletionItem|nil)
+  function source:execute(completion_item, callback)
+    callback(completion_item)
+  end
+
+  ---Register your source to nvim-cmp.
+  require('cmp').register_source('month', source)
+<
+==============================================================================
+常见问题                                                               *cmp-faq*
+
+为什么 cmp 会自动选中某个候选项？~
+如何禁用预选？~
+
+  nvim-cmp 遵循 LSP（语言服务器协议）规范。
+  LSP 规范定义了补全的 `preselect` 特性。
+
+  可以按以下方式禁用预选。
+>lua
+  cmp.setup {
+    preselect = cmp.PreselectMode.None
+  }
+<
+如何只禁用某个语言服务器的补全？~
+
+  可以在 lspconfig 配置中禁用 `completionProvider`。
+>lua
+  lspconfig[%SERVER_NAME%].setup {
+    on_attach = function(client)
+      client.server_capabilities.completionProvider = false
+    end
+  }
+<
+
+
+如何禁用提交字符？~
+
+  可以按以下方式禁用 LSP 定义的提交字符功能。
+>lua
+  cmp.setup {
+    confirmation = {
+      get_commit_characters = function(commit_characters)
+        return {}
+      end
+    }
+  }
+<
+
+如何禁止自动显示文档视图？~
+
+  在配置中加入 `view.docs.auto_open = false`。
+>lua
+  cmp.setup {
+    ...
+    view = {
+      docs = {
+        auto_open = false
+      }
+    }
+    ...
+  }
+<
+
+  如果希望使用按键打开或关闭文档视图，
+  可以按以下方式定义映射。
+>lua
+  cmp.setup {
+    ...
+    mapping = {
+      ['<C-g>'] = function()
+        if cmp.visible_docs() then
+          cmp.close_docs()
+        else
+          cmp.open_docs()
+        end
+      end
+    }
+    ...
+  }
+<
+
+如何禁用自动补全？~
+如何将 nvim-cmp 用作 omnifunc？~
+
+  可以按以下方式禁用自动补全。
+>lua
+  cmp.setup {
+    ...
+    completion = {
+      autocomplete = false
+    }
+    ...
+  }
+<
+  此后需要手动触发补全。
+>vim
+  inoremap <C-x><C-o> <Cmd>lua require('cmp').complete()<CR>
+<
+
+如何在特定缓冲区禁用 nvim-cmp？~
+如何为特定缓冲区配置 nvim-cmp？~
+
+  可以按以下方式设置缓冲区专用配置。
+>lua
+  cmp.setup.filetype({ 'markdown', 'help' }, {
+    sources = {
+      { name = 'path' },
+      { name = 'buffer' },
+    }
+  })
+<
+
+如何禁用文档窗口？~
+
+  使用以下配置即可。
+>lua
+  cmp.setup.filetype({ 'markdown', 'help' }, {
+    window = {
+      documentation = cmp.config.disable
+    }
+  })
+<
+
+使用 clangd 时菜单项缩进错乱，怎么办？~
+
+  这是 clangd 引起的。可以在 clangd 的命令行参数中
+  指定 `--header-insertion-decorators`。参见 #999。
+
+
+如何与 copilot.vim 集成？~
+
+  Copilot.vim 和 nvim-cmp 都有按键映射回退机制。
+  因此需要自行协调这两个插件的映射。
+
+  copilot.vim 提供了禁用回退机制的选项。
+>vim
+  let g:copilot_no_tab_map = v:true
+  imap <expr> <Plug>(vimrc:copilot-dummy-map) copilot#Accept("\<Tab>")
+<
+  可以在 nvim-cmp 的按键映射函数中调用 copilot.vim 的接受功能。
+>lua
+  cmp.setup {
+    mapping = {
+      ['<C-g>'] = cmp.mapping(function(fallback)
+        vim.api.nvim_feedkeys(vim.fn['copilot#Accept'](vim.api.nvim_replace_termcodes('<Tab>', true, true, true)), 'n', true)
+      end)
+    },
+    experimental = {
+      ghost_text = false -- this feature conflict with copilot.vim's preview.
+    }
+  }
+<
+nvim-cmp 的行为不符合预期，怎么办？~
+
+  请检查以下已知问题。
+
+  - 启用 `set paste` 后 nvim-cmp 无法工作。
+  - 命令行模式的映射同时适用于 `:`、`/` 和 `?`，无法只将映射应用于 `:`。
+
+如何定制菜单外观？~
+
+  参见 Wiki（https://github.com/hrsh7th/nvim-cmp/wiki）。
+
+==============================================================================
+ vim:tw=78:ts=2:et:ft=help:norl:

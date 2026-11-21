@@ -7,8 +7,11 @@ local user_calls = 0
 local user_format = function(diagnostic) user_calls = user_calls + 1; return diagnostic.message end
 vim.diagnostic.config({ virtual_text = { format = user_format }, virtual_lines = { format = user_format }, float = { format = user_format } })
 h.setup()
+local buf = vim.api.nvim_create_buf(false, true)
+vim.api.nvim_set_current_buf(buf)
+local ns = h.client(buf)
 local diagnostic = {
-  bufnr = 0, lnum = 0, end_lnum = 0, col = 4, end_col = 5,
+  bufnr = buf, namespace = ns, lnum = 0, end_lnum = 0, col = 4, end_col = 5,
   severity = vim.diagnostic.severity.ERROR, message = known, source = 'clangd', code = 'redefinition',
   tags = { 1 }, user_data = { lsp = { message = known, relatedInformation = { { message = 'Previous definition is here', location = { uri = 'file:///tmp/nvim-zh-fixture.cpp', range = { start = { line = 0, character = 4 }, ['end'] = { line = 0, character = 5 } } } } } } },
 }
@@ -35,10 +38,7 @@ for _, message in ipairs({ '', '你好 🌏', 'line one\nline two', string.rep('
   equal(vt(unknown), message, 'unsafe diagnostic fallback')
 end
 
-local buf = vim.api.nvim_create_buf(false, true)
-vim.api.nvim_set_current_buf(buf)
 vim.api.nvim_buf_set_lines(buf, 0, -1, false, { 'int x; int x;' })
-local ns = vim.api.nvim_create_namespace('nvim-zh-diagnostic-display')
 vim.diagnostic.set(ns, buf, { diagnostic })
 vim.diagnostic.show(ns, buf)
 local stored = vim.diagnostic.get(buf, { namespace = ns })[1]

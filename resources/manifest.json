@@ -1,9 +1,9 @@
 {
-  "adapter_contract": "2a01a4575fa464ffcc9c36aca94e84424b1cb601fc212c335a97e82d718ca2d6",
+  "adapter_contract": "f3579363b904c77cb4100ab402d074963c2dfef26ff57c8f70a34b434cbbd726",
   "bundle": {
     "files": {
       "adapter-contract.json": {
-        "sha256": "0ca8a7997f5dd5cd1304fb764cfe3a698c4c90d0827d0aadd28d5ae3ccd1b7a6",
+        "sha256": "41bd975fe497ded4341fe189c1a27f26e5840561d080f05b8398cfa4158f36a2",
         "size": 79
       },
       "catalogs/nvim-ui.json": {
@@ -567,7 +567,7 @@
         "size": 597
       }
     },
-    "id": "a14cddcb0de18925ae648935b3fca19419153f37d1417ceb7827ee62f8af1f58"
+    "id": "ae2be19de2ca07cb36deee40b9bb520d5b2aa991cf2bce86c34fb1ba15ffa0fc"
   },
   "implementation": {
     "files": {
@@ -584,8 +584,8 @@
         "size": 2260
       },
       "lua/nvim-zh/adapters/evidence.lua": {
-        "sha256": "9c64e36686f85fe65c41310378463c6d4898a6b5cc5bc7d03a1d0d41e97e02ba",
-        "size": 10816
+        "sha256": "0dec8d5ca3529f385d6d66714a6465f7ea21c0ed9f7d90c278020462b29b665d",
+        "size": 10861
       },
       "lua/nvim-zh/adapters/scope.lua": {
         "sha256": "5aaa93194354bfdfc60053176605b379efc50914d07efb93597f6727a05fdb38",
@@ -596,8 +596,8 @@
         "size": 16624
       },
       "lua/nvim-zh/compiler.lua": {
-        "sha256": "c5436bcf8662ee6132d95c432dd9d8a7db5ffe0b4c12c00cdf9d9e29062ff3e5",
-        "size": 16309
+        "sha256": "64d21fb6a16826d19e42e17c7588e88719bdea5d73300fbde4efa59c1599e974",
+        "size": 18709
       },
       "lua/nvim-zh/config.lua": {
         "sha256": "d61ec1612d211ed944c2c575f50de142f0eef7f163c812e4ed28543c39c78a61",
@@ -608,8 +608,8 @@
         "size": 2401
       },
       "lua/nvim-zh/diagnostics.lua": {
-        "sha256": "88374944ea5267ee10b145af1771821793cf10cfa17fcb01841332543e73a23a",
-        "size": 23379
+        "sha256": "91e0f6ad09e445756fa3a127635b93783fff2816c2f065615a20a00ecce1398d",
+        "size": 25465
       },
       "lua/nvim-zh/engine.lua": {
         "sha256": "39c739a0b777c3f00e981f1c3d6157a32a7f9e40accb6b89be361100babaf0ad",
@@ -632,12 +632,12 @@
         "size": 1556
       },
       "lua/nvim-zh/list_display.lua": {
-        "sha256": "a862e3d1a807bd8762d15ee54de2a988fe33011eb81fd021149414e169e2ef54",
-        "size": 5666
+        "sha256": "b3d2e8e93917a33ae942bd5b2a18490928901b42ed830ea1edbe810e31045493",
+        "size": 6929
       },
       "lua/nvim-zh/lsp.lua": {
-        "sha256": "a246229a61c0f63f4176f97d52833f7581bdd3c4a6e4acf895fcfd1b73b2a9e3",
-        "size": 16268
+        "sha256": "e02372700995f72ccd87a76eb93c637849f31c584c344a1ae1b7652f7c80ba5b",
+        "size": 19984
       },
       "lua/nvim-zh/missing.lua": {
         "sha256": "430ac05a44f844148fcf79c2b84a4ea1d7e0f9071182236ac7e011c3395d9d88",
@@ -660,16 +660,16 @@
         "size": 5003
       },
       "lua/nvim-zh/pack_store.lua": {
-        "sha256": "79ee2c7aab8d14904e2fc88f3733834b7a6d7bbac52d65d39279861c37514299",
-        "size": 14235
+        "sha256": "930180323b79c20472e8e612b5054aee359fc0dafb706f277113dcbe3dbee5ad",
+        "size": 14981
       },
       "lua/nvim-zh/packs.lua": {
-        "sha256": "cac61ca383147c473014436ca0f9cba6178240d36ab8aeed82e7ac493365b9b2",
-        "size": 31613
+        "sha256": "883f1546ed27a67343adac7739df746fc95c5a9cd6af1c4afb9377eea117d70c",
+        "size": 32055
       },
       "lua/nvim-zh/packs_ui.lua": {
-        "sha256": "a2cba376f9ca41465c4f361f9e164a786a16b1001dffae43f26f1a88f10d6908",
-        "size": 11403
+        "sha256": "d53b5c7b40c7b46b5cdcea7e093ca402895042ff46a0f21ddddc9715610bd4b9",
+        "size": 11684
       },
       "lua/nvim-zh/paths.lua": {
         "sha256": "6a8d71b271ebf72ae64962c6c3dbbe5d2b5e42880d5d352f45442782295c4886",
@@ -692,16 +692,16 @@
         "size": 1657
       },
       "lua/nvim-zh/status.lua": {
-        "sha256": "36cdd811603f8741fa40ceb5962f98b3f2a832088e57420de52206358f2ccce6",
-        "size": 808
+        "sha256": "3144bac4f240533b676194e3c1860c6ee68f44e0588c7826b0e9a1673bff95b4",
+        "size": 816
       },
       "lua/nvim-zh/tool_message.lua": {
         "sha256": "49496b943c3b718a6a475e4881f7c81ceb2d8459f48fae0fd6524e3476e16e12",
         "size": 2265
       },
       "lua/nvim-zh/tui.lua": {
-        "sha256": "1cdd3c17d9a05599480f23189c7854fd37d2fc86062f1523b2509d24437047b9",
-        "size": 14381
+        "sha256": "f8f29f56ba3efbae3eefc3a98b65c66f929293221b314e3745ea438afc48f85e",
+        "size": 14708
       },
       "lua/nvim-zh/ui.lua": {
         "sha256": "155531f51f1b4a6783ad7f4474a2d3c81bc27c1955e891befac28dc0f598f011",
@@ -712,9 +712,9 @@
         "size": 1601
       }
     },
-    "id": "8d73938c2440c09aad71c87003b44478421cde242d9d9b869b4fffb9fbd8bd46"
+    "id": "3d9cc1a031b0b9c4f8fccd971e4542264377c986a4457f3106ae4d97bedaa93f"
   },
   "runtime_api": 1,
   "schema": 1,
-  "version": "0.2.0"
+  "version": "0.3.0"
 }

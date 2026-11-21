@@ -36,7 +36,7 @@ local snapshot = require('nvim-zh').status()
 | `adapters` | 第三方适配器的固定验证组合、安装观察和各显示面的状态与证据 |
 | `packs` | 包登记、选定与活动版本及 SHA-256、待验证或待重启状态、任务阶段和最近错误 |
 | `diagnostics` | 各诊断显示接缝与本进程实际观察 |
-| `compiler` | 编译器列表显示开关、近期工具身份、匹配和回退原因 |
+| `compiler` | 编译器列表显示开关、来源窗口及其工作目录中的最后一次构建观察 |
 | `lsp` | clangd 显示接缝和当前 Buffer 优先的客户端状态，包含各协议方法的兼容原因 |
 | `nvim_version` / `v_lang` / `helplang` | 当前 Neovim 与语言状态 |
 
@@ -175,7 +175,9 @@ end)
 
 ## LSP 数据
 
-vim.diagnostic.get()、LspProgress、client.progress、用户注册的 fileStatus handler 和 vim.lsp.buf_request_all() 回调接收上游数据。面板从进度和文件状态派生显示。选择器回调返回原动作，补全候选保留原协议对象。
+`vim.diagnostic.get()`、`LspProgress`、`client.progress`、用户注册的 fileStatus handler 和 `vim.lsp.buf_request_all()` 回调接收上游数据。选择器回调返回原动作，补全候选保留原协议对象。
+
+`status().lsp.clangd_clients` 为当前缓冲区挂载的 clangd 客户端，`background_clangd_clients` 为其他仍连通的 clangd。每个客户端记录各方法的来源判定，`file_status` 仅显示当前缓冲区的状态。活跃进度按 token 列在 `progress_tokens`，`progress` 提供单条最近进度供面板显示。
 
 ## 状态变化事件
 

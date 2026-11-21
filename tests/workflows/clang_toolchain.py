@@ -164,7 +164,7 @@ def run(base, enabled, asset_directory):
             assert_lua(ui, "T.diagnostic('undeclared_var_use','completion')", 'COMPLETION_READY')
             lua(ui, 'vim.api.nvim_win_set_cursor(0,{3,16})')
             ui.send(b'i\x1b[15~')
-            frame(ui, evidence, 'completion', 'sum', '[2 个重载]' if enabled else '[2 overloads]')
+            frame(ui, evidence, 'completion', 'sum', '[2 overloads]')
             ui.send(b'\x1b\x1b')
             ui.command('edit 检查.cpp')
             lua(ui, 'assert(vim.lsp.buf_attach_client(0,T.client.id))')

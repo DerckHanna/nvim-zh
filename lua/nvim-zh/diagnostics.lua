@@ -14,6 +14,8 @@ local unpack = table.unpack or unpack
 local CONTEXTS = { 'redefinition', 'previous_definition', 'undeclared_identifier', 'unknown_type_name' }
 local runtime = { observed = 0, translated = 0 }
 local match_cache, cache_size, cache_version = {}, 0, nil
+local origin_revision = 0
+local diagnostic_source
 local batch_group
 local raw_codes = {
   pp_hash_error = true, pp_hash_warning = true, pragma_message = true, warn_pragma_message = true,
@@ -23,18 +25,21 @@ local raw_codes = {
   ['-W#pragma-messages'] = true, ['-Winline-asm'] = true, ['-Wsource-mgr'] = true,
 }
 
-local function is_clangd(diagnostic)
+local function origin(diagnostic)
   local source = diagnostic.source
-  -- clangd publishes its own findings as 'clangd', Clang diagnostics as
-  -- 'clang', clang-tidy findings as 'clang-tidy', and configuration
-  -- diagnostics as 'clangd-config'.
-  if source == 'clangd' or source == 'clang' or source == 'clang-tidy'
-    or source == 'clangd-config' then return true end
-  if source == nil and type(diagnostic.namespace) == 'number' then
-    local ok, namespace = pcall(vim.diagnostic.get_namespace, diagnostic.namespace)
-    return ok and type(namespace.name) == 'string' and namespace.name:match('^nvim%.lsp%.clangd%.%d') ~= nil
+  if source and source ~= 'clangd' and source ~= 'clang' and source ~= 'clang-tidy' and source ~= 'clangd-config' then return end
+  local namespace, buf = diagnostic.namespace, diagnostic.bufnr
+  if type(namespace) ~= 'number' or type(buf) ~= 'number' or buf == 0 then return end
+  local ns = vim.diagnostic.get_namespace(namespace)
+  local id, suffix = (ns.name or ''):match('^nvim%.lsp%.clangd%.(%d+)(.*)$')
+  local client = id and vim.lsp.get_client_by_id(tonumber(id))
+  if not client or client.name ~= 'clangd' or not (client.attached_buffers and client.attached_buffers[buf])
+    or (client.is_stopped and client:is_stopped()) then return end
+  local pull_id = suffix:match('^%.(.+)$')
+  if suffix ~= '' and not pull_id then return end
+  if namespace == vim.lsp.diagnostic.get_namespace(client.id, pull_id ~= nil, pull_id) then
+    return client, pull_id and 'textDocument/diagnostic' or 'textDocument/publishDiagnostics'
   end
-  return false
 end
 
 local function lookup(context, text, args)
@@ -152,42 +157,40 @@ local function cached_match(diagnostic, text, code, note, forwarded, id, method)
   if cache_version ~= version then
     match_cache, cache_size, cache_version = {}, 0, version
   end
-  local buf = diagnostic.bufnr or 0
-  local key = table.concat({ id or '', method, tostring(code or ''), diagnostic.source or '',
+  local buf = diagnostic.bufnr
+  local code_text = tostring(code or '')
+  local key = table.concat({ tostring(diagnostic.namespace), type(code), #code_text, code_text, diagnostic.source or '',
     note and 'note' or '', forwarded and 'forwarded' or '', text }, '\031')
-  local bucket = match_cache[buf]
-  if not bucket or cache_size >= 4096 then
-    if cache_size >= 4096 then match_cache, cache_size = {}, 0 end
-    bucket = { size = 0 }
-    match_cache[buf] = bucket
-  end
-  local cached = bucket[key]
+  if cache_size >= 4096 then match_cache, cache_size = {}, 0 end
+  local clients = match_cache[buf] or {}
+  match_cache[buf] = clients
+  local bucket = clients[id] or { size = 0 }
+  clients[id] = bucket
+  local methods = bucket[method] or {}
+  bucket[method] = methods
+  local cached = methods[key]
   if not cached then
     local result, context = match_diagnostic(diagnostic, text, code, note, forwarded)
     cached = { result, context }
-    bucket[key] = cached
+    methods[key] = cached
     bucket.size, cache_size = bucket.size + 1, cache_size + 1
   end
   return cached[1], cached[2]
 end
 
 local function translate_diagnostic(diagnostic, text, code, note)
-  if type(text) ~= 'string' or text == '' or type(diagnostic) ~= 'table' or not is_clangd(diagnostic) then return text end
+  if type(text) ~= 'string' or text == '' or type(diagnostic) ~= 'table' then return text end
+  local client, method = origin(diagnostic)
+  if not client or not packs.tool_allows('clangd', client, method, diagnostic.bufnr) then return text end
   if raw_codes[code] then
     runtime.observed = runtime.observed + 1
     return text
   end
-  local ns = diagnostic.namespace and vim.diagnostic.get_namespace(diagnostic.namespace)
-  local id, remainder
-  if ns then id, remainder = ns.name:match('^nvim%.lsp%.clangd%.(%d+)(.*)$') end
-  local client = id and vim.lsp.get_client_by_id(tonumber(id))
-  local method = remainder and remainder ~= '' and 'textDocument/diagnostic' or 'textDocument/publishDiagnostics'
-  if not packs.tool_allows('clangd', client, method) then return text end
   runtime.observed = runtime.observed + 1
-  local forwarded = diagnostic.source == 'clang-tidy' and client and packs.tool_reason('clangd', client, method) == 'verified'
+  local forwarded = diagnostic.source == 'clang-tidy' and packs.tool_reason('clangd', client, method, diagnostic.bufnr) == 'verified'
   if forwarded and (not packs.ensure_tool('clang-tidy', true)
       or packs.tool_reason('clang-tidy', client, 'forwarded_diagnostics') ~= 'verified') then return text end
-  local result, context = cached_match(diagnostic, text, code, note, forwarded, id, method)
+  local result, context = cached_match(diagnostic, text, code, note, forwarded, client.id, method)
   if result then runtime.translated = runtime.translated + 1 end
   if not forwarded then
     missing.observe({ domain = 'clangd', context = context or '', msgid = text, dynamic = true, translated = result ~= nil })
@@ -205,7 +208,7 @@ local function make_formatter(user_format, display)
     end
     -- A user formatter may return nil to suppress a diagnostic. Retained
     -- callbacks must also become inert when their module or display is disabled.
-    if config.enabled and config[display] then
+    if config.enabled and config[display] and text == diagnostic.message then
       text = translate_diagnostic(diagnostic, text, diagnostic.code)
     end
     -- Preserve Neovim's default virtual_lines rendering when no user formatter
@@ -230,7 +233,7 @@ local function float_suffix(suffix)
     else
       text = diagnostic.code and (' [%s]'):format(diagnostic.code) or ''
     end
-    if config.enabled and config.float and is_clangd(diagnostic) then
+    if config.enabled and config.float and origin(diagnostic) then
       -- Neovim calls suffix on a deep copy produced by opts.format, then renders its related locations.
       local related = vim.tbl_get(diagnostic, 'user_data', 'lsp', 'relatedInformation')
       if type(related) == 'table' then
@@ -279,6 +282,11 @@ local function setup_display(name, state)
   -- Never enable a display the user disabled. A table/true is an existing display seam.
   if current ~= true and type(current) ~= 'table' then
     state.active, state.reason = false, 'display_disabled'
+    return
+  end
+  if name == 'virtual_text' and type(current) == 'table'
+    and (type(current.prefix) == 'function' or type(current.suffix) == 'function') then
+    state.active, state.reason = false, 'external_override'
     return
   end
   local user_format = type(current) == 'table' and current.format or nil
@@ -334,6 +342,13 @@ local function setup_float()
     local copy = {}
     for key, value in pairs(current or {}) do copy[key] = value end
     local global_float = vim.diagnostic.config().float
+    if not diagnostic_source or debug.getinfo(original, 'S').source ~= diagnostic_source
+      or type(global_float) == 'function' then return original(opts, ...) end
+    for _, field in ipairs({ 'prefix', 'suffix' }) do
+      local value = copy[field]
+      if value == nil and type(global_float) == 'table' then value = global_float[field] end
+      if type(value) == 'function' then return original(opts, ...) end
+    end
     local user_format = copy.format
     if user_format == nil and type(global_float) == 'function' then return original(opts, ...) end
     if user_format == nil and type(global_float) == 'table' then user_format = global_float.format end
@@ -378,6 +393,7 @@ local function project_list(original, loc, opts, ...)
   local win = loc and opts.winnr or nil
   if loc and (win == nil or win == 0) then win = vim.api.nvim_get_current_win() end
   if win and (type(win) ~= 'number' or not vim.api.nvim_win_is_valid(win)) then return original(opts, ...) end
+  win = list_display.owner(win)
   local title = opts.title or 'Diagnostics'
   local before = diagnostic_list(win, title)
   if vim.o.quickfixtextfunc ~= '' or (before.id ~= 0 and not list_display.available(win, before, 'diagnostic')) then
@@ -414,7 +430,7 @@ local function project_list(original, loc, opts, ...)
         local rows = {}
         for i, item in ipairs(items) do
           local diagnostic = seen[list_key(item.bufnr, item.lnum, item.col, item.text)]
-          if diagnostic and is_clangd(diagnostic) then
+          if diagnostic and origin(diagnostic) then
             local text = translate_diagnostic(diagnostic, item.text, diagnostic.code)
             rows[i] = { text = text, code = diagnostic.code, tool = diagnostic.source or 'clangd',
               reason = text == item.text and 'source' or 'translated' }
@@ -423,7 +439,7 @@ local function project_list(original, loc, opts, ...)
         return rows
       end, function()
         if config.enabled and config.lists then
-          return list_generation .. ':' .. catalog.revision('clangd') .. ':' .. catalog.revision('clang-tidy')
+          return list_generation .. ':' .. origin_revision .. ':' .. catalog.revision('clangd') .. ':' .. catalog.revision('clang-tidy')
         end
       end)
     end
@@ -469,14 +485,29 @@ end
 
 function M.setup(next_config)
   config = vim.deepcopy(next_config or config)
+  if config.enabled and diagnostic_source == nil then
+    diagnostic_source = require('nvim-zh.adapters.evidence').runtime_source('diagnostic.lua',
+      'b5c25c369f9adf553d905f18618995f5c2e1410efd545dff0566d76d4cfe2fc7') or false
+  end
   if config.enabled and not batch_group then
     batch_group = vim.api.nvim_create_augroup('NvimZhDiagnosticBatch', { clear = true })
     vim.api.nvim_create_autocmd({ 'DiagnosticChanged', 'BufWipeout' }, { group = batch_group, callback = function(event)
-      local bucket = match_cache[event.buf]
-      if bucket then
-        match_cache[event.buf] = nil
-        cache_size = cache_size - bucket.size
+      for _, bucket in pairs(match_cache[event.buf] or {}) do cache_size = cache_size - bucket.size end
+      match_cache[event.buf] = nil
+      if event.event == 'BufWipeout' then origin_revision = origin_revision + 1 end
+    end })
+    vim.api.nvim_create_autocmd({ 'LspAttach', 'LspDetach' }, { group = batch_group, callback = function(event)
+      local clients = match_cache[event.buf]
+      local id = event.data.client_id
+      if clients and clients[id] then
+        cache_size = cache_size - clients[id].size
+        clients[id] = nil
       end
+      origin_revision = origin_revision + 1
+      local group = batch_group
+      vim.schedule(function()
+        if config.enabled and group == batch_group then list_display.refresh('diagnostic') end
+      end)
     end })
   end
   setup_display('virtual_text', states.virtual_text)
@@ -497,11 +528,19 @@ end
 
 function M.refresh_clients(domain)
   if not config.enabled or (domain ~= 'clangd' and domain ~= 'clang-tidy') then return end
+  local namespaces = {}
+  for name, namespace in pairs(vim.api.nvim_get_namespaces()) do
+    local id, suffix = name:match('^nvim%.lsp%.clangd%.(%d+)(.*)$')
+    if id and (suffix == '' or suffix:match('^%..+')) then
+      id = tonumber(id)
+      namespaces[id] = namespaces[id] or {}
+      namespaces[id][#namespaces[id] + 1] = namespace
+    end
+  end
   for _, client in ipairs(vim.lsp.get_clients({ name = 'clangd' })) do
     for bufnr in pairs(client.attached_buffers or {}) do
       if vim.api.nvim_buf_is_loaded(bufnr) then
-        vim.diagnostic.show(vim.lsp.diagnostic.get_namespace(client.id), bufnr)
-        vim.diagnostic.show(vim.lsp.diagnostic.get_namespace(client.id, true), bufnr)
+        for _, namespace in ipairs(namespaces[client.id] or {}) do vim.diagnostic.show(namespace, bufnr) end
       end
     end
   end

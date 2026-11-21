@@ -11,15 +11,15 @@
 | nightly | CI 中仅作实验性预警，不形成稳定兼容承诺 |
 | Windows、macOS、musl、无 FFI 构建 | 原生自动接线能力依赖本机环境，下表记录逐平台实测 |
 
-| 环境 | Neovim | 原生探针 | 中文 Help、Lua UI、SDK 1 包与回退 |
-|---|---|---|---|
-| Linux x86_64，glibc 2.44，WSL2 | 官方 0.12.6 | 中文 E482/E576/E136/E5005、欢迎页及 12 项运行时键修复通过 | 中文 Help、Lua UI、英文回退，以及 SDK 1/SDK 2 导入、已发布历史附件（0.1.0/0.1.1/0.1.2）与跨 SDK 损坏回退、原地修复、离线回滚和硬链接登记原子性通过 |
-| Windows 11 x86_64，NT 10.0.26300 | 官方 0.12.6 | 原生接线报告 `unsupported`，E482 保留英文 | `24355a5` 实机通过中文 Help/UI、SDK 1 历史附件（0.1.0/0.1.1/0.1.2）与 SDK 2 跨版本损坏回退、原地修复及真实 NTFS 硬链接登记原子性 |
-| Alpine Linux edge x86_64，musl 1.2.6 | Alpine 0.12.2-r1 | 缺少 glibc 符号，原生接线报告 `unsupported`，E482 保留英文 | `24355a5`（`bwrap`）通过中文 Help/UI、SDK 1 历史附件（0.1.0/0.1.1/0.1.2）与 SDK 2 跨版本损坏回退、原地修复及硬链接登记原子性 |
-| macOS 15.8.2 arm64，GitHub Actions | 官方 0.12.6 | 原生接线报告 `unsupported`，E482 保留英文 | `24355a5` 通过系统路径别名（`/var`）下的中文 Help/UI、SDK 1 历史附件（0.1.0/0.1.1/0.1.2）与 SDK 2 跨版本损坏回退、原地修复及硬链接登记原子性。[macOS CI (`24355a5`)](https://github.com/DerckHanna/nvim-zh/actions/runs/44860401301) |
-| Linux x86_64，Neovim nightly（预警） | `v0.13.0-dev` | 原生 E482 中文探针通过 | `24355a5` 本机通过 `localization.lua` 与 `packs.lua`（SDK 1 历史附件 + SDK 2）；远端 CI 固定 0.12.6 runtime 接缝摘要漂移按契约回退上游英文。[test CI (`24355a5`)](https://github.com/DerckHanna/nvim-zh/actions/runs/44860401362/job/136712213967) |
+| 环境 | 固定接入与回退 |
+| --- | --- |
+| Linux/glibc · 官方 0.12.6 | 固定源码、原生中文消息、中文 Help、Lua 界面与 SDK 2。 |
+| macOS arm64 · 官方 0.12.6 | 中文 Help、Lua 界面与 SDK 2。自动 gettext 保留系统行为。 |
+| Windows · 官方 0.12.6 | 中文 Help、Lua 界面与 SDK 2 的上一可用平台基线见历史验证记录。 |
+| Alpine/musl · 0.12.2 | 中文 Help、Lua 界面与 SDK 2 的上一可用平台基线见历史验证记录。 |
+| Nightly | 实验性检查。固定源码摘要变化时相应显示面回退上游。 |
 
-项目不再维护 0.10/0.11 的独立基础入口，也不保留旧命令、旧 Lua API 或旧测试目录的兼容层。旧版本的历史测试记录不能作为当前版本通过证据。
+平台探针和 GitHub Actions 的实际结果见[验证记录](verification.md)。
 
 ## 机器清单代表什么
 
@@ -48,17 +48,19 @@
 | nvim-dap-ui | `cc9dd33aade7f20bae414d0cba163bc60d4d4b43` | 固定渲染文案、映射、浮窗、选择器、Window 提示、通知和 3 篇中文帮助 |
 | nvim-dap-view | `1c3b9cc295303fc173f24d442739a8557e23e987` | 监视、作用域、调试面板、键位、异常、Help 及 CodeLLDB 1.12.3 的固定显示标签 |
 | lazy.nvim | `306a05526ada86a7b30af95c5cc81ffba93fef97` | `User LazyLoad` 生命周期桥接 |
-| nvim-cmp | `2ffe79f1f021def8dd1fcd81deb16f1bb0d989f3` | inventory-only，实测公共 formatter 与输入数据契约 |
+| nvim-cmp | `2ffe79f1f021def8dd1fcd81deb16f1bb0d989f3` | SDK 2。状态、配置弃用、自定义视图默认类别和完整中文 Help。原生候选与用户 formatter 输出保持上游值 |
 
 固定组合和实际检查的源码 SHA-256 见 `manifests/adapters/`。正式显示 API 与固定源码接缝的证据各自记录。详细范围和加载方法见[第三方插件适配](adapters.md)。
 
+公开目录仅提供 SDK 2。0.3.0 继续读取本地已验证的 SDK 1 快照，已有用户可直接更新到 SDK 2。公开 SDK 1 附件已退出发行流程。
+
 ## 诊断、LSP 与外部工具
 
-诊断与 LSP 适配按诊断代码和显示文本匹配译文。诊断列表在 Neovim 0.12.6 的固定实现中使用列表专属 quickfixtextfunc 投影。原生补全使用已验证的显示转换入口。固定样例和真实服务器测试只统计实际验证的文本。原始 LSP 诊断、日志和外部编译器的 stdout/stderr 继续使用上游文本。
+诊断与 LSP 适配按客户端、方法、诊断代码和显示文本匹配译文。诊断列表在 Neovim 0.12.6 的固定实现中使用列表专属 quickfixtextfunc 投影。原生补全候选字段沿用上游值，头文件来源只在能核对客户端与 include 编辑时投影文档浮窗。固定样例和真实服务器测试只统计实际验证的文本。原始 LSP 诊断、日志和外部编译器的 stdout/stderr 使用上游文本。
 
 真实 clangd pull 的支持取决于服务器能力；不支持的方法要报告真实错误，不能把它写成成功。测试必须同时保留成功 pull 反例，避免用 `and/or` 之类表达式让已知消息断言失效。
 
-声明工具目标的 clangd 汉化包使用 LSP `serverInfo` 和协议方法选择词库显示面。已验证目标为 `clangd version 23.1.5 linux x86_64-pc-linux-gnu`。其他版本、缺失身份和未验证方法使用服务器原文。历史 0.1.0 clangd 附件沿用当时的词库规则。可以显式选择历史版本、离线导入及回滚。自动推荐需要当前目标的兼容证据，其他候选仍可浏览。独立版本号的 SDK 2 附件（已发布 `0.2.0`：`origin/packs@8072cf8`）与已发布 SDK 1（`clangd 0.1.0/0.1.1/0.1.2`、`clang 0.1.0`、`clang-tidy 0.1.0`）共存于同一 `catalog.json`（按 `(id, version, locale)` 去重）；旧客户端自动过滤并继续选取 SDK 1，新客户端支持 SDK 2 与 SDK 1 互通及离线回滚。
+声明工具目标的 clangd 汉化包使用 LSP `serverInfo` 与协议方法确认来源。固定身份为 `clangd version 23.1.5 linux x86_64-pc-linux-gnu`。其他版本、身份缺失和方法未验证时沿用上游原文。包面板根据当前 Buffer 的证据推荐版本，也支持显式选择、离线导入和本地回滚。
 
 Clang 与 clang-tidy 的命令行显示在 Neovim 0.12.6 的 `:make`、`:lmake` 和列表回调上验证。固定二进制为 Arch Linux `clang 23.1.5-1` 软件包的 Linux x86_64 构建。编译器和独立 clang-tidy 同时校验版本与二进制摘要。clangd 按连接的服务器 `serverInfo` 和已验证方法选择显示规则。Windows、macOS、其余 LLVM 版本和 Neovim nightly 的编译器显示未验证。相同自报版本的其他 CLI 二进制也需要摘要验证。逐工具范围、边界与实测结论见[覆盖清单](toolchain-coverage.md)。
 

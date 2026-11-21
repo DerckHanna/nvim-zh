@@ -30,7 +30,7 @@ make release-check
 
 ## 环境隔离
 
-`tests/run/lib/env.sh` 是全部 runner 的公共环境：私有 `XDG_STATE_HOME`、`XDG_DATA_HOME`、`XDG_CONFIG_HOME`、`XDG_CACHE_HOME`、权限 0700 的 `XDG_RUNTIME_DIR`、显式 `NVIM_LOG_FILE` 和私有 TMP 根，设置 `PYTHONDONTWRITEBYTECODE=1`，EXIT trap 删除该次环境。同次 runner 按输入摘要复用已构建的 SDK 1 附件，复制到用例私有目录。每个 Lua spec 单独启动一个 `nvim --headless -u NONE -i NONE -n`，用例间另建独立 case 目录；Python 子进程继承这些边界。POSIX PTY 专用 import 留在 e2e 内。
+`tests/run/lib/env.sh` 是全部 runner 的公共环境：私有 `XDG_STATE_HOME`、`XDG_DATA_HOME`、`XDG_CONFIG_HOME`、`XDG_CACHE_HOME`、权限 0700 的 `XDG_RUNTIME_DIR`、显式 `NVIM_LOG_FILE` 和私有 TMP 根，设置 `PYTHONDONTWRITEBYTECODE=1`，EXIT trap 删除该次环境。同次 runner 按输入摘要复用已构建的 SDK 2 附件，复制到用例私有目录。每个 Lua spec 单独启动一个 `nvim --headless -u NONE -i NONE -n`，用例间另建独立 case 目录；Python 子进程继承这些边界。POSIX PTY 专用 import 留在 e2e 内。
 
 并发测试有意让两个进程共享同一个临时数据目录，屏障后同时 setup，比较双方 active bundle ID、最终 `state.json.active` 与磁盘 manifest。不能仅凭两边各有资源就判为通过。vim.pack fixture commit 只写临时测试仓库，绝不提交工作项目或改用户安装。
 
@@ -86,7 +86,18 @@ python3 -B tests/workflows/python_git_tui.py
 
 C++ 终端验证需要 PATH 中的 CodeLLDB 1.12.3、GNU Make、GCC 和子进程调试权限。第二个终端脚本需要 Bash、Git、pytest 9.0.2 和 Ruff 0.15.0。两者均运行中文启停对照。可按 `manifests/adapters/` 的哈希核对固定插件，测试会为每组生成临时项目。
 
-平台消息与 Help 探针使用独立 Neovim 用户目录，设置 `NVIM_ZH_ROOT` 指向仓库，`NVIM_ZH_PLATFORM_NATIVE` 取 `unsupported` 或 `ok`。入口为 `nvim --headless -u NONE -i NONE -n -l tests/platform/localization.lua`。SDK 1 汉化包平台探针入口为 `nvim --headless -u NONE -i NONE -n -l tests/platform/packs.lua`，可选设置 `NVIM_ZH_PLATFORM_ASSETS` 指向包含已发布 `clangd-0.1.0.json`、`clangd-0.1.1.json`、`clangd-0.1.2.json` 的目录，验证摘要拒绝、损坏快照回退、重导修复与硬链接登记原子性。
+平台探针使用独立 Neovim 用户目录。设置 `NVIM_ZH_ROOT` 指向仓库，`NVIM_ZH_PLATFORM_NATIVE` 取 `unsupported` 或 `ok`。两项均可离线运行。
+
+```bash
+nvim --headless -u NONE -i NONE -n -l tests/platform/localization.lua
+nvim --headless -u NONE -i NONE -n -l tests/platform/packs.lua
+```
+
+包探针覆盖 SDK 2 摘要拒绝、受损附件和 Help 文件的回退、重导修复、离线回滚及硬链接登记。发布时还需按[发布清单](../RELEASE_CHECKLIST.md)验证真实在线附件和目录。
+
+## P3 插件包迁移
+
+运行 `python3 -B tests/workflows/plugin_pack_migration.py --catalog <基线目录.json> --historical <六个已发布 SDK 1 附件目录> --legacy-root <v0.1.0 导出目录> --output <仓库外新目录>`。工作流双次构建候选，核对历史及新增目录项，运行隔离发布源传输和离线迁移，并生成六包的体积和同机验证加载对照。真实终端固定上游门禁另用 `make test-upstream`。
 
 ## Clang 工具链
 

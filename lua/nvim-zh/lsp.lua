@@ -5,15 +5,24 @@ local packs = require('nvim-zh.packs')
 local config = {}
 local states = {}
 local file_status, progress = {}, {}
+local signatures = setmetatable({}, { __mode = 'k' })
+local sequence = 0
 local scope
 local evidence = require('nvim-zh.adapters.evidence')
-local handlers_source, buf_source
+local handlers_source, buf_source, util_source
 local file_status_method = 'textDocument/clangd.fileStatus'
+
+local function attached(client, buf)
+  return type(buf) == 'number' and vim.api.nvim_buf_is_valid(buf) and client.attached_buffers
+    and client.attached_buffers[buf] ~= nil
+end
 
 local function clangd(ctx, method)
   if type(ctx) ~= 'table' or type(ctx.client_id) ~= 'number' then return false end
   local ok, client = pcall(vim.lsp.get_client_by_id, ctx.client_id)
-  return ok and type(client) == 'table' and client.name == 'clangd' and packs.tool_allows('clangd', client, method)
+  return ok and type(client) == 'table' and client.name == 'clangd'
+    and (not ctx.bufnr or attached(client, ctx.bufnr))
+    and packs.tool_allows('clangd', client, method, ctx.bufnr)
 end
 
 local function translate(context, text)
@@ -127,9 +136,21 @@ local function project_file(id, record)
 end
 
 function M.refresh_display()
-  for id, record in pairs(progress) do project_progress(id, record) end
+  for id, state in pairs(progress) do
+    if state.latest then project_progress(id, state.latest) end
+    for _, record in pairs(state.tokens) do
+      if record ~= state.latest then project_progress(id, record) end
+    end
+  end
   for id, files in pairs(file_status) do
     for _, record in pairs(files) do project_file(id, record) end
+  end
+end
+
+local function prune_client(id)
+  local client = vim.lsp.get_client_by_id(id)
+  if not client or (client.is_stopped and client:is_stopped()) or not next(client.attached_buffers or {}) then
+    file_status[id], progress[id] = nil, nil
   end
 end
 
@@ -138,12 +159,32 @@ local function progress_event(event)
   local params = data and data.params
   local value = params and params.value
   local client = data and vim.lsp.get_client_by_id(data.client_id)
-  if type(value) ~= 'table' or not client or client.name ~= 'clangd' then return end
+  if type(value) ~= 'table' or not client or client.name ~= 'clangd' or not next(client.attached_buffers or {}) then return end
   if value.kind ~= 'begin' and value.kind ~= 'report' and value.kind ~= 'end' then return end
-  local record = { raw = vim.deepcopy(params) }
+  local token = params.token
+  if type(token) ~= 'string' and type(token) ~= 'number' then return end
+  local state = progress[client.id]
+  if not state or state.client ~= client then
+    state = { client = client, tokens = {} }
+    progress[client.id] = state
+  end
+  if value.kind == 'end' and not state.tokens[token] then return end
+  sequence = sequence + 1
+  local record = { raw = vim.deepcopy(params), sequence = sequence }
   project_progress(data.client_id, record)
-  progress[data.client_id] = record
+  if value.kind == 'end' then state.tokens[token] = nil else state.tokens[token] = record end
+  state.latest = record
   display_changed()
+end
+
+local function clear_buffer(buf)
+  for id, files in pairs(file_status) do
+    files[buf] = nil
+    if not next(files) then file_status[id] = nil end
+  end
+  for opts, origin in pairs(signatures) do
+    if origin == buf then signatures[opts] = nil end
+  end
 end
 
 local function file_status_wrapper(original)
@@ -151,12 +192,19 @@ local function file_status_wrapper(original)
     local client = type(ctx) == 'table' and vim.lsp.get_client_by_id(ctx.client_id)
     if config.progress and not err and client and client.name == 'clangd' and type(params) == 'table'
       and type(params.uri) == 'string' and type(params.state) == 'string' then
-      local files = file_status[ctx.client_id] or {}
-      local record = { uri = params.uri, raw_state = params.state }
-      project_file(ctx.client_id, record)
-      files[params.uri] = record
-      file_status[ctx.client_id] = files
-      vim.schedule(display_changed)
+      -- clangd and Neovim use different case for percent escapes in filenames.
+      local uri = params.uri:gsub('%%%x%x', string.upper)
+      for buf in pairs(client.attached_buffers or {}) do
+        if attached(client, buf) and vim.uri_from_bufnr(buf):gsub('%%%x%x', string.upper) == uri then
+          local files = file_status[ctx.client_id] or {}
+          local record = { uri = params.uri, raw_state = params.state }
+          project_file(ctx.client_id, record)
+          files[buf] = record
+          file_status[ctx.client_id] = files
+          vim.schedule(display_changed)
+          break
+        end
+      end
     end
     return original(err, params, ctx, ...)
   end
@@ -171,95 +219,103 @@ local function hover_text(text, markdown)
   return '### ' .. translate('hover_kind', kind) .. ' ' .. name .. rest
 end
 
-local function preview_wrapper(original)
-  return function(lines, syntax, opts, ...)
-    if config.hints and type(opts) == 'table' and opts.focus_id == 'textDocument/hover'
-      and syntax == 'markdown' and type(lines) == 'table' and type(lines[1]) == 'string' then
-      -- install() invokes this projection through one tail call. Only the
-      -- fixed built-in renderer establishes which client produced the heading.
-      local caller = debug.getinfo(2, 'S')
-      if caller and caller.source == buf_source then
-        local clients = vim.lsp.get_clients({ bufnr = 0, method = 'textDocument/hover' })
-        local client = #clients == 1 and clients[1]
-        if client and client.name == 'clangd' and packs.tool_allows('clangd', client, 'textDocument/hover') then
-          local text = hover_text(lines[1] .. '\n', true):sub(1, -2)
-          if text ~= lines[1] then
-            lines = vim.list_slice(lines, 1)
-            lines[1] = text
-          end
-        end
-      end
-    end
-    if config.hints and type(opts) == 'table' and opts.focus_id == 'textDocument/signatureHelp'
-      and type(opts.title) == 'string' and opts.title:match('^Signature Help: clangd[ (]') then
-      local clients = vim.lsp.get_clients({ bufnr = 0, name = 'clangd' })
-      if #clients > 1 or not packs.tool_allows('clangd', clients[1], 'textDocument/signatureHelp') then
-        return original(lines, syntax, opts, ...)
-      end
-      local title, cycle = opts.title:match('^(.-)( %(<C%-s> to cycle%))$')
-      title = translate('signature_help', title or opts.title)
-      if cycle then title = title .. translate('signature_help', cycle) end
-      if title ~= opts.title then
-        if type(lines) == 'table' and lines[1] == '# ' .. opts.title then
-          lines = vim.list_slice(lines, 1)
-          lines[1] = '# ' .. title
-        end
-        opts = vim.tbl_extend('force', {}, opts, { title = title })
-      end
-    end
-    return original(lines, syntax, opts, ...)
+-- These locals are used only at the pinned Neovim display call sites. Upstream
+-- aggregates replies and retains their raw values for other consumers.
+local function local_value(level, name)
+  local index = 1
+  while true do
+    local key, value = debug.getlocal(level + 1, index)
+    if not key or key == name then return value end
+    index = index + 1
   end
 end
 
-local function completion_wrapper(original)
-  return function(result, prefix, client_id, ...)
-    local items = original(result, prefix, client_id, ...)
-    if not config.hints or not clangd({ client_id = client_id }, 'textDocument/completion') or type(items) ~= 'table' then return items end
-    local client = vim.lsp.get_client_by_id(client_id)
-    local reviewed = packs.tool_reason('clangd', client, 'textDocument/completion') == 'verified'
-    local copy
-    local labels = {}
-    local function label(text)
-      local cached = labels[text]
-      if not cached then
-        local value, status = engine.translate({ domain = 'clangd', context = 'completion', msgid = text,
-          formatted = true, observe = false })
-        cached = { text = value, status = status }
-        labels[text] = cached
-      end
-      if cached.text ~= text or cached.status == 'fallback' then
-        missing.observe({ domain = 'clangd', context = 'completion', msgid = text, dynamic = true,
-          translated = cached.status == 'translated' })
-      end
-      return cached.text
-    end
-    for i, item in ipairs(items) do
-      local raw = type(item) == 'table' and vim.tbl_get(item, 'user_data', 'nvim', 'lsp', 'completion_item')
-      if type(raw) == 'table' then
-        local menu, info = item.menu, item.info
-        if menu == raw.detail and type(menu) == 'string' and menu:match('^%[%d+ overloads%]$') then
-          menu = label(menu)
-        end
-        local doc = type(raw.documentation) == 'table' and raw.documentation.value or raw.documentation
-        if info == doc and type(info) == 'string' then
-          local first, rest = info:match('^([^\n]*)(.*)$')
-          local header = first:match('^From `+(.-)`+$') or first:match('^From (<.+>)$') or first:match('^From (".+")$')
-          -- clangd places both documentation and include information in the
-          -- same string. A corresponding insertion establishes header origin.
-          if header and (not reviewed or vim.iter(raw.additionalTextEdits or {}):any(function(edit)
-            return type(edit.newText) == 'string' and edit.newText:find('#include ' .. header, 1, true)
-          end)) then
-            info = label(first) .. rest
-          end
-        end
-        if menu ~= item.menu or info ~= item.info then
-          copy = copy or vim.list_slice(items, 1)
-          copy[i] = vim.tbl_extend('force', {}, item, { menu = menu, info = info })
-        end
-      end
-    end
-    return copy or items
+local function upvalue(fn, name)
+  local index = 1
+  while true do
+    local key, value = debug.getupvalue(fn, index)
+    if not key or key == name then return key == name, value end
+    index = index + 1
   end
+end
+
+local function hover_wrapper(original)
+  return function(input, ...)
+    local caller = debug.getinfo(2, 'Sl')
+    if not config.hints or not caller or caller.source ~= buf_source or caller.currentline ~= 163
+      or type(input) ~= 'table' or input.kind ~= 'markdown' then return original(input, ...) end
+    local client = local_value(2, 'client')
+    local buf = local_value(2, 'bufnr')
+    if type(client) ~= 'table' or type(buf) ~= 'number'
+      or not clangd({ client_id = client.id, bufnr = buf }, 'textDocument/hover') then return original(input, ...) end
+    local text = hover_text(input.value, true)
+    if text == input.value then return original(input, ...) end
+    return original(vim.tbl_extend('force', {}, input, { value = text }), ...)
+  end
+end
+
+local function preview_wrapper(original)
+  return function(lines, syntax, opts, ...)
+    local caller = debug.getinfo(2, 'fSl')
+    if not config.hints or not caller or caller.source ~= buf_source or caller.currentline ~= 471
+      or type(opts) ~= 'table' or opts.focus_id ~= 'textDocument/signatureHelp' or type(opts.title) ~= 'string' then
+      return original(lines, syntax, opts, ...)
+    end
+    local client = local_value(2, 'client')
+    local found_title, user_title = upvalue(caller.func, 'user_title')
+    local parent = debug.getinfo(3, 'Sl')
+    if parent and parent.source == buf_source and parent.currentline == 486 then
+      local ctx = local_value(3, 'ctx')
+      if ctx then signatures[opts] = ctx.bufnr end
+    end
+    local buf = signatures[opts]
+    if not found_title or user_title ~= nil or type(client) ~= 'table' or not buf
+      or not clangd({ client_id = client.id, bufnr = buf }, 'textDocument/signatureHelp') then
+      return original(lines, syntax, opts, ...)
+    end
+    local title, cycle = opts.title:match('^(.-)( %(<C%-s> to cycle%))$')
+    title = translate('signature_help', title or opts.title)
+    if cycle then title = title .. translate('signature_help', cycle) end
+    if title == opts.title then return original(lines, syntax, opts, ...) end
+    if type(lines) == 'table' and lines[1] == '# ' .. opts.title then
+      lines = vim.list_slice(lines, 1)
+      lines[1] = '# ' .. title
+    end
+    return original(lines, syntax, vim.tbl_extend('force', {}, opts, { title = title }), ...)
+  end
+end
+
+local function completion_documentation(event)
+  local item = vim.v.event.completed_item
+  local origin = vim.tbl_get(item or {}, 'user_data', 'nvim', 'lsp')
+  local raw = origin and origin.completion_item
+  local doc = raw and raw.documentation
+  doc = type(doc) == 'table' and doc.value or doc
+  if type(doc) ~= 'string' or item.info ~= doc or type(origin.client_id) ~= 'number' then return end
+  local first = doc:match('^[^\n]+')
+  local header = first and (first:match('^From `+(.-)`+$') or first:match('^From (<.+>)$') or first:match('^From (".+")$'))
+  if not header or not vim.iter(raw.additionalTextEdits or {}):any(function(edit)
+    return type(edit.newText) == 'string' and edit.newText:find('#include ' .. header, 1, true)
+  end) then return end
+  local buf = event.buf
+  local client = vim.lsp.get_client_by_id(origin.client_id)
+  if not client or client.name ~= 'clangd' or not attached(client, buf)
+    or packs.tool_reason('clangd', client, 'textDocument/completion', buf) ~= 'verified' then return end
+  local current_scope = scope
+  vim.schedule(function()
+    if scope ~= current_scope or not config.hints or vim.api.nvim_get_current_buf() ~= buf
+      or vim.lsp.get_client_by_id(client.id) ~= client or not attached(client, buf)
+      or packs.tool_reason('clangd', client, 'textDocument/completion', buf) ~= 'verified' then return end
+    local info = vim.fn.complete_info({ 'completed', 'selected' })
+    local selected = info.completed
+    if not selected or selected.word ~= item.word or selected.info ~= doc
+      or not vim.deep_equal(vim.tbl_get(selected, 'user_data', 'nvim', 'lsp'), origin) then return end
+    local preview = info.preview_bufnr
+    if type(preview) ~= 'number' or preview <= 0 or not vim.api.nvim_buf_is_valid(preview)
+      or not vim.bo[preview].modifiable or vim.api.nvim_buf_get_lines(preview, 0, 1, false)[1] ~= first then return end
+    local display = translate('completion', first)
+    if display ~= first then vim.api.nvim_buf_set_lines(preview, 0, 1, false, { display }) end
+  end)
 end
 
 function M.hints_enabled() return config.hints == true end
@@ -287,6 +343,8 @@ function M.setup(next_config)
   if config.hints and buf_source == nil then
     buf_source = evidence.runtime_source('lsp/buf.lua',
       '481c8133ba7977e9c7f8103122d797ba362cfc6ec246f0f4d76c0b8338ce01a9') or false
+    util_source = evidence.runtime_source('lsp/util.lua',
+      '22179bbf8a8fd11f2b2c275d5d3641558ff5c037de2227ddd4766a19ad9bd5dd') or false
   end
   install('window/showMessage', message_wrapper, config.messages and handlers_source, nil, handlers_source)
   install('window/showMessageRequest', request_wrapper, config.messages and handlers_source, nil, handlers_source)
@@ -302,14 +360,36 @@ function M.setup(next_config)
     scope.autocmd('LspProgress', { callback = function(event)
       if config.progress then progress_event(event) end
     end })
+    scope.autocmd('CompleteChanged', { callback = function(event)
+      if config.hints then completion_documentation(event) end
+    end })
     scope.autocmd('LspDetach', { callback = function(event)
       local id = event.data.client_id
       local files = file_status[id]
-      if files then files[vim.uri_from_bufnr(event.buf)] = nil end
+      if files then
+        files[event.buf] = nil
+        if not next(files) then file_status[id] = nil end
+      end
+      local current_scope = scope
       vim.schedule(function()
-        if not vim.lsp.get_client_by_id(id) then file_status[id], progress[id] = nil, nil end
+        if scope ~= current_scope then return end
+        prune_client(id)
         display_changed()
       end)
+    end })
+    scope.autocmd({ 'BufFilePost', 'BufWipeout' }, { callback = function(event)
+      clear_buffer(event.buf)
+      if event.event == 'BufWipeout' then
+        local current_scope = scope
+        vim.schedule(function()
+          if scope == current_scope then
+            for id in pairs(progress) do prune_client(id) end
+          end
+        end)
+      end
+    end })
+    scope.autocmd('BufEnter', { callback = function()
+      for id in pairs(progress) do prune_client(id) end
     end })
   elseif not (config.progress or config.hints) and scope then
     scope.close()
@@ -317,6 +397,7 @@ function M.setup(next_config)
     file_status, progress = {}, {}
   end
   if not config.progress then file_status, progress = {}, {} end
+  if not config.hints then signatures = setmetatable({}, { __mode = 'k' }) end
   if config.progress and not vim.lsp.handlers[file_status_method] and not states[file_status_method] then
     local wrapper = file_status_wrapper(function() end)
     states[file_status_method] = { target = vim.lsp.handlers, wrapper = wrapper, active = true }
@@ -325,9 +406,9 @@ function M.setup(next_config)
     install(file_status_method, file_status_wrapper, config.progress)
   end
   M.refresh_display()
-  install('open_floating_preview', preview_wrapper, config.hints, vim.lsp.util)
-  -- The converter produces native popup items and retains their original LSP item in user_data.
-  if vim.lsp.completion then install('_lsp_to_complete_items', completion_wrapper, config.hints, vim.lsp.completion) end
+  install('open_floating_preview', preview_wrapper, config.hints and buf_source and util_source, vim.lsp.util, util_source)
+  install('convert_input_to_markdown_lines', hover_wrapper,
+    config.hints and buf_source and util_source, vim.lsp.util, util_source)
 end
 
 function M.teardown()
@@ -336,30 +417,39 @@ function M.teardown()
 end
 function M.info(bufnr)
   local result = { messages = config.messages == true, progress = config.progress == true,
-    hints = config.hints == true, logMessage = 'source', domain = 'clangd', clangd_clients = {} }
+    hints = config.hints == true, logMessage = 'source', domain = 'clangd',
+    clangd_clients = {}, background_clangd_clients = {} }
   if config.messages then
     for _, method in ipairs({ 'window/showMessage', 'window/showMessageRequest' }) do
       result[method] = { active = false, reason = handlers_source and 'external_override' or 'unsupported_interface' }
     end
   end
   result['$/progress'] = { active = config.progress == true and scope ~= nil, reason = config.progress and 'active' or 'disabled' }
-  local buf = bufnr or vim.api.nvim_get_current_buf()
-  local uri = vim.uri_from_bufnr(buf)
-  local clients = vim.lsp.get_clients({ bufnr = buf, name = 'clangd' })
-  if #clients == 0 then clients = vim.lsp.get_clients({ name = 'clangd' }) end
+  local buf = bufnr and bufnr ~= 0 and bufnr or vim.api.nvim_get_current_buf()
+  local clients = vim.lsp.get_clients({ name = 'clangd' })
+  table.sort(clients, function(a, b) return a.id < b.id end)
   for _, client in ipairs(clients) do
     local files = file_status[client.id]
+    local here = not not attached(client, buf)
+    local state = progress[client.id]
+    local tokens = state and state.client == client and vim.tbl_values(state.tokens) or {}
+    table.sort(tokens, function(a, b) return a.sequence > b.sequence end)
     local methods = {}
     for _, method in ipairs({ 'textDocument/publishDiagnostics', 'textDocument/diagnostic', 'textDocument/hover',
       'textDocument/codeAction', 'textDocument/completion', 'textDocument/signatureHelp', '$/progress', file_status_method }) do
-      methods[method] = packs.tool_reason('clangd', client, method)
+      methods[method] = packs.tool_reason('clangd', client, method, here and buf or nil)
     end
-    result.clangd_clients[#result.clangd_clients + 1] = {
-      id = client.id, bufnr = buf, attached = client.attached_buffers and client.attached_buffers[buf] == true,
+    if here and client.handlers and client.handlers[file_status_method] then
+      methods[file_status_method] = 'external_override'
+    end
+    local rows = here and result.clangd_clients or result.background_clangd_clients
+    rows[#rows + 1] = {
+      id = client.id, bufnr = buf, attached = here,
       version = client.server_info and client.server_info.version,
       reason = methods['textDocument/publishDiagnostics'], methods = methods,
-      file_status = vim.deepcopy(files and files[uri]),
-      progress = vim.deepcopy(progress[client.id]),
+      file_status = vim.deepcopy(here and files and files[buf] or nil),
+      progress = vim.deepcopy(tokens[1] or state and state.client == client and state.latest or nil),
+      progress_tokens = vim.deepcopy(tokens),
     }
   end
   for method, state in pairs(states) do result[method] = { active = state.active == true, reason = state.reason or (state.active and 'active') or 'external_override' } end

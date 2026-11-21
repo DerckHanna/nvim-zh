@@ -837,8 +837,41 @@ def codelldb(ui, enabled):
     capture(ui, 'exit-verified', '\nTest 1', 'DV_EXIT_OK', timeout=12)
 
 
+def parallel_sessions(ui, enabled):
+    path = ui.cwd / 'main.cpp'
+    path.write_text('int main() {\n  volatile int counter = SESSION_VALUE;\n  return counter == 0;\n}\n')
+    for suffix, value in (('first', '101'), ('second', '202')):
+        subprocess.run(['g++', '-g', '-O0', '-DSESSION_VALUE=' + value, 'main.cpp', '-o', suffix],
+                       cwd=ui.cwd, check=True, timeout=30)
+    ui.command('edit main.cpp')
+    ui.command('3')
+    ui.send(F8)
+    lua(ui, """local dap = require('dap'); DvParallel = {};
+      dap.adapters.second_codelldb = vim.deepcopy(dap.adapters.codelldb);
+      dap.listeners.after.event_stopped.zh_parallel = function(session)
+        DvParallel[session.config.name] = session
+      end""".replace('\n', ' '))
+
+    def launch(name, adapter):
+        lua(ui, f"""require('dap').run({{name='{name}', type='{adapter}', request='launch',
+          program=vim.fn.getcwd() .. '/{name}', cwd=vim.fn.getcwd(), terminal='integrated'}},
+          {{new=true}})""".replace('\n', ' '))
+        probe(ui, f'vim.wait(10000, function() return DvParallel.{name} and DvParallel.{name}.current_frame end)')
+
+    launch('first', 'codelldb')
+    launch('second', 'second_codelldb')
+    probe(ui, 'DvParallel.first.id ~= DvParallel.second.id and not DvParallel.first.closed and not DvParallel.second.closed')
+    for name, value in (('first', '101'), ('second', '202'), ('first', '101')):
+        other = '202' if value == '101' else '101'
+        lua(ui, f'require("dap").set_session(DvParallel.{name})')
+        open_view(ui, 'scopes')
+        label = '局部' if enabled and name == 'first' else 'Local'
+        capture(ui, 'session-' + name, label, 'counter = ' + value, reject=('counter = ' + other,))
+        probe(ui, f'require("dap").session() == DvParallel.{name}')
+
+
 CASES = {'panel': panel, 'interaction': interaction, 'diagnostics': diagnostics, 'help': help_topics,
-         'lifecycle': lifecycle, 'codelldb': codelldb}
+         'lifecycle': lifecycle, 'codelldb': codelldb, 'parallel_sessions': parallel_sessions}
 
 
 def run_case(case, enabled, *, variant=None):
@@ -856,7 +889,7 @@ def run_case(case, enabled, *, variant=None):
                 with modified.open('a', encoding='utf-8') as stream:
                     stream.write('\n-- hash mismatch fixture\n')
                 os.environ[DEPS[-1]] = str(directory / 'modified')
-            extra = SETUP + (real_setup() if case == 'codelldb' else '\nDvSetup()\n')
+            extra = SETUP + (real_setup() if case in ('codelldb', 'parallel_sessions') else '\nDvSetup()\n')
             init = init_for(ID, enabled, extra, DEPS, verify=variant != 'missing')
             files = {'main.cpp': contents, 'virtual.c': 'int main(void) {\n    int counter = 7;\n    return counter;\n}\n'}
             with Terminal(directory, init, rows=46, cols=148, files=files) as ui:

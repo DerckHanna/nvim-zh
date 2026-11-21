@@ -1,6 +1,6 @@
 local M = {}
 
-function M.get(bufnr)
+function M.get(bufnr, win)
   local session = require('nvim-zh.session').snapshot()
   return {
     schema = 1,
@@ -12,7 +12,7 @@ function M.get(bufnr)
     adapters = require('nvim-zh.plugins').info(),
     packs = require('nvim-zh.packs').info(),
     diagnostics = require('nvim-zh.diagnostics').info(),
-    compiler = require('nvim-zh.compiler').info(),
+    compiler = require('nvim-zh.compiler').info(win),
     lsp = require('nvim-zh.lsp').info(bufnr),
     v_lang = vim.v.lang,
     helplang = vim.o.helplang,

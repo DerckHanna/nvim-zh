@@ -151,7 +151,9 @@ vim.pack.add({
 ## lazy.nvim 与 nvim-cmp
 
 - lazy.nvim 提供 `User LazyLoad`，用于发现受支持插件。Lazy 主面板、安装进度、插件自有通知和 Help 沿用上游。
-- nvim-cmp 固定版本的审查仍未找到可证明由 cmp 自己拥有、且不会触及 completion item/source 的固定标签，保持 `inventory_only`。不翻译 abbr、kind/menu、文档或用户 formatter 数据。
+- nvim-cmp 汉化包以 `2ffe79f1` 为上游组合，使用 SDK 2。`:CmpStatus` 的四组标题、三项配置弃用提示、自定义视图的默认类别和完整中文 Help 已纳入适配。
+- 只有使用 nvim-cmp 默认 formatter 的自定义菜单才投影类别标签。用户 formatter 与 lspkind 持有自己的输出。原生菜单、候选名称、来源字段、筛选、编辑、snippet 和 resolve 使用上游值。
+- 固定代码接缝在目标源码首次加载时取证。晚安装仍可使用已核对上游文档摘要的中文 Help。
 
 ## 新增适配器的要求
 

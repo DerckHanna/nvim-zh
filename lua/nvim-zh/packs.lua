@@ -33,6 +33,7 @@ end
 
 local function compatible_contract(previous, candidate)
   return vim.deep_equal(previous.manifest.adapter, candidate.manifest.adapter)
+    and (not previous.manifest.adapter or previous.manifest.sdk == candidate.manifest.sdk)
     and previous.manifest.domain == candidate.manifest.domain
     and previous.manifest.executable == candidate.manifest.executable
     and previous.entry == candidate.entry
@@ -150,7 +151,10 @@ local function apply(id, record, prepared, failure)
     state.restart = ok
     reason = ok and '重启后应用选定版本' or tostring(switched)
     if not ok then state.error = reason end
-    if not active[id] and record.previous then pcall(attempt, record.previous) end
+    if not active[id] and record.previous then
+      local fallback_ok, applied = pcall(attempt, record.previous)
+      if fallback_ok and not applied then state.restart = true end
+    end
   end
   local running = active[id]
   state.active = running and running.revision.version
@@ -262,9 +266,17 @@ end
 
 function M.spec_for_evidence(id)
   local ok, result = pcall(function()
+    local current = active[id]
+    if current and store.unchanged(current.candidate) and trust(current.revision) then
+      return current.candidate.manifest.adapter
+    end
     local record = store.record(id)
     if record.selected and record.enabled ~= false then
-      return store.load(id, record.selected).manifest.adapter
+      local selected = vim.tbl_extend('force', {}, record.selected, { allow_lua = trust(record.selected) })
+      local candidate = store.load(id, selected)
+      if not frozen[id] or compatible_contract(frozen[id].candidate, candidate) then
+        return candidate.manifest.adapter
+      end
     end
   end)
   return ok and result or nil
@@ -321,15 +333,16 @@ local function newer(a, b)
   return vim.version.gt(vim.version.parse(a), vim.version.parse(b))
 end
 
-local function target_state(row, installed, bufnr)
+local function target_state(row, installed, bufnr, win)
   if row.executable then
-    local target = vim.fn.executable(row.executable) == 1
+    local function found() return vim.fn.executable(row.executable) == 1 end
+    local target = win and vim.api.nvim_win_call(win, found) or not win and found()
     if not row.tool then return target end
     if row.tool.protocol == 'cli' then
       local compiler = package.loaded['nvim-zh.compiler']
       if compiler then
         for executable, hashes in pairs(row.tool.binaries or {}) do
-          local identity = compiler.identity(executable)
+          local identity = compiler.identity(executable, win)
           if identity and row.tool.versions[identity.version] and vim.tbl_contains(hashes, identity.sha256) then
             return true, true
           end
@@ -339,7 +352,6 @@ local function target_state(row, installed, bufnr)
     end
     local seen = false
     local clients = vim.lsp.get_clients({ bufnr = bufnr or 0, name = row.tool.server })
-    if #clients == 0 then clients = vim.lsp.get_clients({ name = row.tool.server }) end
     for _, client in ipairs(clients) do
       local info = client.server_info
       if info and info.name == row.tool.server and row.tool.versions[info.version] then return true, true end
@@ -371,13 +383,13 @@ local function installed_targets()
   return installed
 end
 
-local function candidates(id, source, installed, bufnr)
+local function candidates(id, source, installed, bufnr, win)
   local options = {}
   for name, cache in pairs(catalogs) do
     if not source or name == source then
       for _, row in ipairs(cache.entries) do
         if row.id == id then
-          local _, compatible = target_state(row, installed, bufnr)
+          local _, compatible = target_state(row, installed, bufnr, win)
           local candidate = vim.tbl_extend('force', {}, row, { source = name })
           candidate.recommended = compatible == true
           candidate.compatibility = compatible == true and 'verified'
@@ -576,12 +588,7 @@ function M.import(path, allow_lua, inspected)
 end
 
 function M.inspect(path)
-  local bytes = fs.read(vim.fn.fnamemodify(path, ':p'), store.limit)
-  local doc = vim.json.decode(bytes)
-  local meta = doc.manifest
-  assert(type(meta) == 'table' and store.id(meta.id) and store.version(meta.version)
-    and type(doc.files) == 'table', '无效的汉化包')
-  return { id = meta.id, version = meta.version, lua = doc.files['adapter/entry.lua'] ~= nil, sha256 = vim.fn.sha256(bytes) }
+  return store.inspect(fs.read(vim.fn.fnamemodify(path, ':p'), store.limit))
 end
 
 function M.change(id, operation, expected)
@@ -619,33 +626,33 @@ function M.cancel(id)
   return true
 end
 
-function M.rows(bufnr)
+function M.rows(bufnr, win)
   M.configure_cache()
   local rows, used, installed = {}, {}, installed_targets()
   local disk = modules and records or store.records()
   for id, record in pairs(disk) do
     if record.selected then
       local selected = record.selected
-      local options = candidates(id, selected.source, installed, bufnr)
+      local options = candidates(id, selected.source, installed, bufnr, win)
       local offer = recommended(options)
       local update = offer and (newer(offer.version, selected.version)
         or (offer.version == selected.version and offer.sha256 ~= selected.sha256)) and offer or nil
       local meta = active[id] and active[id].candidate.manifest
       local spec = meta and meta.adapter or {}
       local target, verified = target_state({ repository = spec.repository, modules = spec.modules,
-        executable = meta and meta.executable, tool = meta and meta.tool }, installed, bufnr)
+        executable = meta and meta.executable, tool = meta and meta.tool }, installed, bufnr, win)
       local displays, observed
       if meta and meta.executable == 'clangd' then
         local lsp = package.loaded['nvim-zh.lsp']
         local status = lsp and lsp.info(bufnr)
-        displays = status and status.clangd_clients
+        displays = status and vim.list_extend(vim.list_slice(status.clangd_clients, 1), status.background_clangd_clients)
         local diagnostics = package.loaded['nvim-zh.diagnostics']
         local display = diagnostics and diagnostics.info()
         observed = verified == true and display and display.enabled
           and (display.virtual_text.active or display.virtual_lines.active or display.float.active)
       elseif meta and meta.executable then
         local compiler = package.loaded['nvim-zh.compiler']
-        local status = compiler and compiler.info()
+        local status = compiler and compiler.info(win)
         local last = status and status.last
         observed = status and status.enabled and last and last.tool == id and last.results and (last.results.translated or 0) > 0
       end
@@ -665,9 +672,9 @@ function M.rows(bufnr)
     for _, row in ipairs(cache.entries) do
       local key = source .. ':' .. row.id
       if not used[row.id] and not added[key] then
-        local options = candidates(row.id, source, installed, bufnr)
+        local options = candidates(row.id, source, installed, bufnr, win)
         local offer = recommended(options)
-        local target, verified = target_state(offer or options[1] or row, installed, bufnr)
+        local target, verified = target_state(offer or options[1] or row, installed, bufnr, win)
         rows[#rows + 1] = { id = row.id, source = source, name = row.name or row.id, description = row.description,
           target = target, verified = verified == true, update = offer, options = options, job = job_info(row.id) }
         added[key] = true
@@ -706,7 +713,7 @@ local requested_capabilities = {
 -- Tool identity comes from two verified sources: an LSP client's declared
 -- serverInfo, or a command-line tool's own --version output. A target without
 -- identity never authorizes a reviewed catalog.
-function M.tool_reason(id, target, method)
+function M.tool_reason(id, target, method, bufnr)
   local pack = active[id]
   if not pack then
     if deferred[id] then return 'preparing_pack' end
@@ -736,15 +743,16 @@ function M.tool_reason(id, target, method)
   local info = target.server_info
   if not info or info.name ~= tool.server or not tool.versions[info.version] then return 'unsupported_version' end
   if method and not vim.tbl_contains(tool.versions[info.version], method) then return 'unverified_interface' end
-  if requested_capabilities[method] and (type(target.supports_method) ~= 'function' or not target:supports_method(method)) then
+  if requested_capabilities[method]
+    and (type(target.supports_method) ~= 'function' or not target:supports_method(method, bufnr)) then
     return 'unsupported_interface'
   end
   return 'verified'
 end
 
-function M.tool_allows(id, target, method)
+function M.tool_allows(id, target, method, bufnr)
   if not M.ensure_tool(id, true) then return false end
-  local reason = M.tool_reason(id, target, method)
+  local reason = M.tool_reason(id, target, method, bufnr)
   return reason == 'verified' or reason == 'legacy_pack' or reason == 'pack_missing' or reason == 'paused'
 end
 

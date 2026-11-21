@@ -12,7 +12,7 @@ from resource_bundle import descriptor, encoded
 def candidate(base, original, version, translation, *, code=False):
     asset = json.loads(original)
     asset['manifest']['version'] = version
-    asset['files']['catalogs/zh_CN.json'] = asset['files']['catalogs/zh_CN.json'].replace('查找文件', translation)
+    asset['catalog']['entries']['title']['Find Files'] = translation
     if code:
         asset['files']['adapter/entry.lua'] += '\n-- Changed implementation for the restart test.\n'
     asset['manifest']['files'] = descriptor({name: value.encode() for name, value in asset['files'].items()})

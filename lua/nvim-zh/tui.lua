@@ -24,8 +24,8 @@ local function status(value) return labels[value] or clean(value) end
 local function explanation(value) return clean(value):gsub('^.-%.lua:%d+:%s*', '') end
 
 local function lines()
-  local source = panel.origin and vim.api.nvim_win_is_valid(panel.origin) and vim.api.nvim_win_get_buf(panel.origin)
-  local info = require('nvim-zh.status').get(source)
+  local origin = panel.origin and vim.api.nvim_win_is_valid(panel.origin) and panel.origin or nil
+  local info = require('nvim-zh.status').get(origin and vim.api.nvim_win_get_buf(origin), origin)
   local version, runtime = info.version, info.runtime
   local tabs = {}
   for index, name in ipairs(names) do tabs[#tabs + 1] = index == panel.page and ('[' .. name .. ']') or name end
@@ -58,11 +58,12 @@ local function lines()
     panel.pack_overview = #result
     add('主包更新由 vim.pack 管理。')
     local cpp = info.lsp.clangd_clients
-    if #cpp == 0 then add('C/C++ · 等待 clangd · :help nvim-zh-cpp') end
-    for _, client in ipairs(cpp) do
+    if #cpp == 0 and #info.lsp.background_clangd_clients == 0 then add('C/C++ · 等待 clangd · :help nvim-zh-cpp') end
+    for _, client in ipairs(vim.list_extend(cpp, info.lsp.background_clangd_clients)) do
       local reason = tool_reasons[client.reason] or client.reason
       if not info.diagnostics.enabled then reason = '诊断显示已关闭' end
-      add(('C/C++ · 客户端 %d · %s · %s'):format(client.id, client.version or 'clangd', reason))
+      local scope = client.attached and '' or '其他缓冲区 · '
+      add(('C/C++ · %s客户端 %d · %s · %s'):format(scope, client.id, client.version or 'clangd', reason))
       if client.progress and (client.progress.title or client.progress.message) then
         add('clangd · ' .. (client.progress.title or client.progress.message))
       end
@@ -225,8 +226,11 @@ end
 function M.open(requested)
   if #vim.api.nvim_list_uis() == 0 then return nil, '当前会话没有 UI；请使用 status()/stats()/check() 查询。' end
   if panel and vim.api.nvim_win_is_valid(panel.win) then
+    local current = vim.api.nvim_get_current_win()
+    if current ~= panel.win then panel.origin = current end
     vim.api.nvim_set_current_win(panel.win)
     if requested and PAGES[requested] ~= panel.page then use_page(assert(PAGES[requested])) end
+    M.render()
     return panel.win
   end
   M.close()

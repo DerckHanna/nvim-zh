@@ -11,8 +11,8 @@ from pack_assets import assets
 from resource_bundle import encoded
 
 
-def build_fixture(root, base, only, verified_tools):
-    for _, content, record in assets(root, '1.0.0', 'https://example.invalid/nvim-zh', only):
+def build_fixture(root, base, only, verified_tools, sdk):
+    for _, content, record in assets(root, '1.0.0', 'https://example.invalid/nvim-zh', only, sdk=sdk):
         value = json.loads(content)
         if record.get('tool') and not verified_tools:
             value['manifest'].pop('tool')
@@ -35,12 +35,13 @@ def build_fixture(root, base, only, verified_tools):
         }))
 
 
-def fixture_key(root, only, verified_tools):
+def fixture_key(root, only, verified_tools, sdk):
     paths = [root / "tools" / f"{name}.py" for name in
              ("pack_assets", "adapter_manifest", "catalog_tool", "resource_bundle", "toolchain_catalog", "diagnostic_inventory")]
-    for name in ("manifests", "translations/adapters", "translations/po/zh_CN", "translations/glossary", "translations/toolchain", "doc"):
+    for name in ("manifests", "translations/adapters", "translations/po/zh_CN", "translations/glossary",
+                 "translations/help/adapters", "translations/toolchain", "doc"):
         paths.extend(path for path in (root / name).rglob("*") if path.is_file())
-    digest = hashlib.sha256(f"SDK1:{only}:{verified_tools}".encode())
+    digest = hashlib.sha256(f"SDK{sdk}:{only}:{verified_tools}".encode())
     for path in sorted(paths):
         digest.update(path.relative_to(root).as_posix().encode() + b"\0")
         digest.update(hashlib.sha256(path.read_bytes()).digest())
@@ -51,16 +52,17 @@ def seed(root, data, only=None, *, verified_tools=False):
     root = root.resolve()
     base = data / os.environ.get("NVIM_APPNAME", "nvim") / "nvim-zh/packs"
     cache = os.environ.get("NVIM_ZH_TEST_PACK_CACHE")
+    sdk = int(os.environ.get("NVIM_ZH_TEST_PACK_SDK", "2"))
     if not cache:
-        build_fixture(root, base, only, verified_tools)
+        build_fixture(root, base, only, verified_tools, sdk)
         return
     cache = Path(cache)
     cache.mkdir(parents=True, exist_ok=True)
-    ready = cache / fixture_key(root, only, verified_tools)
+    ready = cache / fixture_key(root, only, verified_tools, sdk)
     if not ready.is_dir():
         with tempfile.TemporaryDirectory(dir=cache) as stage:
             built = Path(stage) / "packs"
-            build_fixture(root, built, only, verified_tools)
+            build_fixture(root, built, only, verified_tools, sdk)
             try:
                 built.rename(ready)
             except OSError:

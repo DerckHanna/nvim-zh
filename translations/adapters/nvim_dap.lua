@@ -8,15 +8,8 @@ local unpack = table.unpack or unpack
 local attached = false
 local ctx
 local release_notification
-local help_depth = 0
-local stack_hint_depth = 0
--- Set while a public REPL execution path runs. The no-session branch happens
--- synchronously inside dap.async.run's coroutine (repl.lua:287-302, before any
--- yield), so a depth counter reaches it from both the wrapped M.execute call and
--- the wrapped prompt callback.
-local no_session_depth = 0
-
-
+local main = {}
+local repl_calls = setmetatable({}, { __mode = 'k' })
 local function resolve_owner(slot, module)
   if type(module) ~= 'table' then return nil end
   if slot.owner then return slot.owner(module) end
@@ -157,19 +150,28 @@ local function is_help_command(text)
   return false
 end
 
--- Both public REPL execution entries (M.execute and the prompt callback
--- installed by new_buf) run repl.lua's local execute() from here, so this is the
--- one shared scope for the fixed replies that path appends. `no_session_depth`
--- reaches repl.lua:299, whose branch runs before coexecute yields.
-local function with_help(fn, text, ...)
-  local help = is_help_command(text)
-  if help then help_depth = help_depth + 1 end
-  no_session_depth = no_session_depth + 1
-  local results = common.pack(pcall(fn, text, ...))
-  no_session_depth = no_session_depth - 1
-  if help then help_depth = help_depth - 1 end
+local function running()
+  return coroutine.running() or main
+end
+
+local function session()
+  local dap = package.loaded.dap
+  return dap and type(dap.session) == 'function' and dap.session() or nil
+end
+
+-- A suspended REPL command cannot authorize another coroutine's output.
+local function with_repl_call(kind, fn, ...)
+  local thread, calls = running(), repl_calls
+  local parent = calls[thread]
+  calls[thread] = { kind = kind, session = session() }
+  local results = common.pack(pcall(fn, ...))
+  calls[thread] = parent
   if not results[1] then error(results[2], 0) end
   return unpack(results, 2, results.n)
+end
+
+local function with_help(fn, text, ...)
+  return with_repl_call(is_help_command(text) and 'repl_help' or nil, fn, text, ...)
 end
 
 -- new_buf() is private. These three public entry points are the fixed paths that
@@ -179,11 +181,12 @@ local function with_repl_buffer_hooks(slot, generation, fn, ...)
   if not enabled(slot, generation) then return fn(...) end
   local original_keymap_set = vim.keymap.set
   local original_prompt_setcallback = vim.fn.prompt_setcallback
+  local thread = running()
   local keymap_wrapper, prompt_wrapper
 
   if type(original_keymap_set) == 'function' then
     keymap_wrapper = function(mode, lhs, rhs, opts)
-      if type(opts) ~= 'table' or type(opts.desc) ~= 'string' then
+      if running() ~= thread or not enabled(slot, generation) or type(opts) ~= 'table' or type(opts.desc) ~= 'string' then
         return original_keymap_set(mode, lhs, rhs, opts)
       end
       local translated = translate('mapping', opts.desc)
@@ -197,8 +200,11 @@ local function with_repl_buffer_hooks(slot, generation, fn, ...)
 
   if type(original_prompt_setcallback) == 'function' then
     prompt_wrapper = function(buf, callback)
-      if type(callback) ~= 'function' then return original_prompt_setcallback(buf, callback) end
+      if running() ~= thread or not enabled(slot, generation) or type(callback) ~= 'function' then
+        return original_prompt_setcallback(buf, callback)
+      end
       return original_prompt_setcallback(buf, function(text)
+        if not enabled(slot, generation) then return callback(text) end
         return with_help(callback, text)
       end)
     end
@@ -222,9 +228,10 @@ end
 local function with_input_prompt(slot, generation, fn, ...)
   if not enabled(slot, generation) or type(vim.fn.input) ~= 'function' then return fn(...) end
   local original_input = vim.fn.input
+  local thread = running()
   local wrapper
   wrapper = function(prompt, ...)
-    if not enabled(slot, generation) then return original_input(prompt, ...) end
+    if running() ~= thread or not enabled(slot, generation) then return original_input(prompt, ...) end
     return original_input(translate('prompt', prompt), ...)
   end
   vim.fn.input = wrapper
@@ -246,13 +253,16 @@ end
 factories.repl_append = function(original, generation)
   return function(line, ...)
     if not enabled(slots.repl_append, generation) then return original(line, ...) end
+    local invocation = repl_calls[running()]
+    local caller = debug.getinfo(2, 'Sl')
+    local upstream = debug.getinfo(original, 'S').source
     local function call(input, ...)
-      if help_depth > 0 then
-        input = translate('repl_help', input)
-      elseif stack_hint_depth > 0 then
-        input = translate('repl_hint', input)
-      elseif no_session_depth > 0 then
-        input = translate('repl_message', input)
+      if caller and caller.source == upstream then
+        if caller.currentline == 299 and input == 'No active debug session' and not session() then
+          input = translate('repl_message', input)
+        elseif invocation and invocation.kind and rawequal(invocation.session, session()) then
+          input = translate(invocation.kind, input)
+        end
       end
       return original(input, ...)
     end
@@ -275,11 +285,7 @@ end
 factories.repl_frames = function(original, generation)
   return function(...)
     if not enabled(slots.repl_frames, generation) then return original(...) end
-    stack_hint_depth = stack_hint_depth + 1
-    local results = common.pack(pcall(original, ...))
-    stack_hint_depth = stack_hint_depth - 1
-    if not results[1] then error(results[2], 0) end
-    return unpack(results, 2, results.n)
+    return with_repl_call('repl_hint', original, ...)
   end
 end
 
@@ -499,9 +505,10 @@ end
 local function with_notify(generation, slot, project, fn, ...)
   if not enabled(slot, generation) or type(vim.notify) ~= 'function' then return fn(...) end
   local previous = vim.notify
+  local thread = running()
   local wrapper
   wrapper = function(message, ...)
-    if not enabled(slot, generation) then return previous(message, ...) end
+    if running() ~= thread or not enabled(slot, generation) then return previous(message, ...) end
     local translated = project(message)
     if translated == nil then return previous(message, ...) end
     return previous(translated, ...)
@@ -519,9 +526,10 @@ end
 local function with_notify_once(generation, slot, msgid, fn, ...)
   if not enabled(slot, generation) or type(vim.notify_once) ~= 'function' then return fn(...) end
   local previous = vim.notify_once
+  local thread = running()
   local wrapper
   wrapper = function(message, ...)
-    if not enabled(slot, generation) or type(message) ~= 'string' or message ~= msgid then
+    if running() ~= thread or not enabled(slot, generation) or type(message) ~= 'string' or message ~= msgid then
       return previous(message, ...)
     end
     return previous(translate('deprecation', msgid), ...)
@@ -905,7 +913,7 @@ end
 
 function M.detach()
   attached = false
-  help_depth, stack_hint_depth, no_session_depth = 0, 0, 0
+  repl_calls = setmetatable({}, { __mode = 'k' })
   clear_runtime_paths()
   restore_launch_provider()
   if release_notification then

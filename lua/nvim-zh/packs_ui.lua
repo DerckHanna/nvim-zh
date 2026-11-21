@@ -59,8 +59,8 @@ end
 local function key(row) return row.source .. ':' .. row.id end
 
 function M.lines(panel, header)
-  local source = panel.origin and vim.api.nvim_win_is_valid(panel.origin) and vim.api.nvim_win_get_buf(panel.origin)
-  local rows, checked, catalog_job = packs.rows(source)
+  local origin = panel.origin and vim.api.nvim_win_is_valid(panel.origin) and panel.origin or nil
+  local rows, checked, catalog_job = packs.rows(origin and vim.api.nvim_win_get_buf(origin), origin)
   local selected = M.selection(panel) or panel.pack_selection
   table.sort(rows, function(a, b)
     local first, second = group(a), group(b)
@@ -232,8 +232,13 @@ function M.actions(panel, row)
   if row.display_active then description[#description + 1] = '显示接缝已启用' end
   for _, client in ipairs(row.clients or {}) do
     description[#description + 1] =
-      ('客户端 %d · %s · %s'):format(client.id, client.version or '等待服务器身份',
-        client.reason == 'verified' and '诊断已验证' or '诊断原文')
+      ('客户端 %d · %s · %s'):format(client.id, client.version or '等待服务器身份', not client.attached and '其他 Buffer'
+        or client.reason == 'verified' and '诊断已验证' or '诊断原文')
+    if client.attached then
+      for _, progress in ipairs(client.progress_tokens) do
+        description[#description + 1] = progress.title or progress.message or tostring(progress.raw.token)
+      end
+    end
   end
   if state.error then description[#description + 1] = state.error end
   if state.active then description[#description + 1] = '活动 ' .. state.active end

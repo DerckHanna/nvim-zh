@@ -33,7 +33,7 @@ vim.api.nvim_set_current_buf(buf)
 vim.diagnostic.config({ virtual_text = true, virtual_lines = true, float = true })
 h.setup()
 local formatter = vim.diagnostic.config().virtual_text.format
-local ns = vim.api.nvim_create_namespace('nvim-zh-clangd-observation')
+local ns = dofile(vim.env.NVIM_ZH_ROOT .. '/tests/support/diagnostic_helpers.lua').client(buf)
 local converted, expected = {}, {}
 local translations = {
   ["Redefinition of 'repeated'"] = "'repeated' 重复定义",
@@ -83,10 +83,10 @@ end
 check(#converted >= 6, 'real corpus diagnostic count')
 local translated_count = 0
 for _, item in ipairs(converted) do
+  item.bufnr, item.namespace = buf, ns
   local display = formatter(item)
   equal(display, expected[item.message], 'real diagnostic display mismatch')
   if expected[item.message] ~= item.message then translated_count = translated_count + 1 end
-  item.bufnr = buf
 end
 local coverage = require('nvim-zh.diagnostics').info()
 equal(coverage.runtime_observed, #converted, 'real runtime observed count')
@@ -111,7 +111,7 @@ for _, raw in ipairs(converted) do
   check(screen:find(message, 1, true), 'quickfix display mismatch: ' .. message)
 end
 vim.cmd.cclose()
-local note = { message = 'Previous definition is here', source = 'clang' }
+local note = { bufnr = buf, namespace = ns, message = 'Previous definition is here', source = 'clang' }
 equal(formatter(note), '此前的定义在这里', 'real relatedInformation template missing')
 for _, response in ipairs(observation.pull) do
   if response.error then

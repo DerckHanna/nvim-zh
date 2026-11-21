@@ -227,15 +227,28 @@ local function prepare(manifest, files, doc_catalog, allow_lua, checkpoint)
     entry = entry, tags = tags }
 end
 
-local function artifact(bytes, id, revision, checkpoint)
+local function decode(bytes)
   local value = vim.json.decode(bytes)
   assert(type(value) == 'table', '无效的汉化包')
   local manifest = value.manifest
-  assert(type(manifest) == 'table' and (not id or manifest.id == id and manifest.version == revision.version),
-    '包登记与内容不匹配')
+  assert(type(manifest) == 'table' and manifest.schema == 1 and (manifest.sdk == 1 or manifest.sdk == 2)
+    and M.id(manifest.id) and M.version(manifest.version) and manifest.locale == 'zh_CN'
+    and type(value.files) == 'table', '无效的汉化包')
   if manifest.sdk == 2 then
     assert(fs.utf8(bytes), '包文件不是有效 UTF-8')
   end
+  return value, manifest
+end
+
+function M.inspect(bytes)
+  local value, manifest = decode(bytes)
+  return { id = manifest.id, version = manifest.version, sdk = manifest.sdk,
+    lua = value.files['adapter/entry.lua'] ~= nil, sha256 = vim.fn.sha256(bytes) }
+end
+
+local function artifact(bytes, id, revision, checkpoint)
+  local value, manifest = decode(bytes)
+  assert(not id or manifest.id == id and manifest.version == revision.version, '包登记与内容不匹配')
   return prepare(manifest, value.files, value.catalog, revision.allow_lua, checkpoint), value.files
 end
 
@@ -272,6 +285,8 @@ function M.stage(bytes, expected, allow_lua)
   local candidate, files = artifact(bytes, expected and expected.id, { version = expected and expected.version,
     allow_lua = allow_lua })
   if expected then
+    assert((not expected.sdk or candidate.manifest.sdk == expected.sdk)
+      and (not expected.locale or candidate.manifest.locale == expected.locale), '发布索引与包 SDK 或语言不匹配')
     assert(vim.deep_equal(candidate.manifest.tool, expected.tool), '发布索引与工具兼容性不匹配')
   end
   local destination = M.folder({ sha256 = sum })

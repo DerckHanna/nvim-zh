@@ -51,6 +51,38 @@ assert(line() == state.threads_error, 'adapter error with matching text was tran
 state.threads_error = nil
 dap.session = session
 
+local scopes = require('dap-view.scopes.view')
+local focused
+local delayed
+local function stopped(id, delayed_response)
+  return {
+    id = id, stopped_thread_id = 1, config = { type = 'fixture' },
+    adapter = { type = 'executable', command = 'echo' },
+    current_frame = { id = 1, scopes = { { name = 'Local', variablesReference = 42 } } },
+    request = function(self, method, args)
+      assert(self.id == id and method == 'variables' and args.variablesReference == 42)
+      if delayed_response then delayed = coroutine.running(); coroutine.yield() end
+      return nil, { variables = { { name = 'same_name', value = 'session-' .. id, variablesReference = 0 } } }
+    end,
+  }
+end
+view.show_view('scopes')
+local first, second = stopped(101, true), stopped(102, false)
+dap.session = function() return focused end
+focused = first
+coroutine.wrap(scopes.show)()
+assert(delayed and coroutine.status(delayed) == 'suspended')
+focused = second
+scopes.show()
+local function scope_text()
+  return table.concat(vim.api.nvim_buf_get_lines(state.bufnr, 0, -1, false), '\n')
+end
+assert(scope_text():find('same_name = session-102', 1, true), scope_text())
+local focused_text = scope_text()
+assert(coroutine.resume(delayed))
+assert(scope_text() == focused_text, 'a stale request overwrote the current session scope')
+dap.session = session
+
 local calls = 0
 view.setup({ winbar = { show_keymap_hints = false, base_sections = {
   scopes = { label = 'Scopes' },
@@ -81,4 +113,4 @@ view.open()
 view.show_view('breakpoints')
 assert(winbar():find(' Breakpoints ', 1, true) and line() == 'No breakpoints')
 view.close()
-print('NVIM_DAP_VIEW_UPSTREAM_SPEC=PASS')
+print('NVIM_DAP_VIEW_UPSTREAM_SPEC=PASS concurrent_scopes stale_response')

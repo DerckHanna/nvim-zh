@@ -2,6 +2,7 @@ vim.opt.loadplugins = false
 vim.opt.rtp:prepend(vim.env.NVIM_ZH_ROOT)
 vim.cmd('runtime plugin/nvim-zh.lua')
 vim.o.shortmess = 'I'
+vim.o.hidden = true
 vim.o.winborder = 'single'
 vim.o.shell = '/bin/sh'
 vim.o.shellpipe = '>%s 2>&1'
@@ -83,6 +84,7 @@ function T.start()
     init_options = { clangdFileStatus = true },
   }))
   T.client = assert(vim.lsp.get_client_by_id(client_id))
+  T.source_buf = vim.api.nvim_get_current_buf()
   vim.lsp.completion.enable(true, client_id, 0, { autotrigger = false })
 end
 
@@ -160,9 +162,17 @@ function T.analyzer_push()
 end
 
 function T.display_status()
-  local client = zh.status().lsp.clangd_clients[1]
-  T.displayed.progress = enabled and client.progress or T.raw_progress and T.raw_progress.value
-  T.displayed.file = enabled and client.file_status or T.raw_file
+  if enabled then
+    local clients = require('nvim-zh.lsp').info(T.source_buf).clangd_clients
+    local client = vim.iter(clients):find(function(row) return row.id == T.client.id end)
+    assert(client, 'the source buffer lost its clangd attachment')
+    T.displayed.progress, T.displayed.file = client.progress, client.file_status
+    assert(T.displayed.progress, 'attached client has no indexing record')
+    assert(T.displayed.file, 'attached source buffer has no file status')
+  else
+    T.displayed.progress = T.raw_progress and T.raw_progress.value
+    T.displayed.file = T.raw_file
+  end
   return T.displayed.progress ~= nil and T.displayed.file ~= nil
 end
 

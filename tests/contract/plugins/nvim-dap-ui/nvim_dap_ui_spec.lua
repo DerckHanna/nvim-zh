@@ -154,6 +154,7 @@ end
 
 local windows = {}
 windows.open_float = function(name, element, position, settings)
+  element.buffer()
   if type(settings) == 'function' then settings = settings() end
   float_calls[#float_calls + 1] = { name = name, element = element, position = position, settings = settings }
   return settings.title, 'float-tail'
@@ -311,17 +312,20 @@ check(_G.print == external_print, 'select_win overwrote later external print')
 _G.print = global_print
 
 local default_settings = { title = 'scopes', width = 20 }
-local float_returns = pack(windows.open_float('scopes', 'element', 'position', default_settings))
-equal(float_returns[1], '作用域', 'default float title')
+local float_buffer_calls = 0
+local element = { buffer = function() float_buffer_calls = float_buffer_calls + 1; return 0 end }
+local float_returns = pack(windows.open_float('scopes', element, 'position', default_settings))
+equal(float_returns[1], 'scopes', 'unproven title translated')
 equal(float_returns[2], 'float-tail', 'float trailing return')
 equal(default_settings.title, 'scopes', 'caller settings mutated')
 equal(float_calls[#float_calls].name, 'scopes', 'float internal name translated')
 local custom_settings = { title = 'User Title' }
-windows.open_float('scopes', 'element', 'position', custom_settings)
+windows.open_float('scopes', element, 'position', custom_settings)
 check(float_calls[#float_calls].settings == custom_settings, 'custom title settings copied')
 equal(float_calls[#float_calls].settings.title, 'User Title', 'custom float title translated')
-windows.open_float('watches', 'element', 'position', function() return { title = 'watches' } end)
-equal(float_calls[#float_calls].settings.title, '监视', 'function float settings')
+windows.open_float('watches', element, 'position', function() return { title = 'watches' } end)
+equal(float_calls[#float_calls].settings.title, 'watches', 'unproven function title translated')
+equal(float_buffer_calls, 3, 'float requested the element buffer more than once')
 
 local items = { 'scopes', 'breakpoints', 'stacks', 'watches', 'repl', 'console' }
 local select_args = {

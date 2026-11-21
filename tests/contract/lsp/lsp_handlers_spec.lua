@@ -30,14 +30,17 @@ local overrides = { clangd = {
 require('nvim-zh').setup({ modules = { core = { enabled = false }, ui = { notify = false, prompts = false }, plugins = { auto = false }, diagnostics = { enabled = false }, lsp = { messages = true, progress = true } }, overrides = overrides })
 local old_get = vim.lsp.get_client_by_id
 local capabilities = vim.lsp.protocol.make_client_capabilities()
-vim.lsp.get_client_by_id = function(id)
-  return {
+local clients = {}
+for id = 1, 2 do
+  clients[id] = {
     id = id, name = id == 1 and 'clangd' or 'other',
+    attached_buffers = { [vim.api.nvim_get_current_buf()] = 'cpp' },
     capabilities = capabilities,
     server_capabilities = { completionProvider = {} },
     _get_registrations = function() return {} end,
   }
 end
+vim.lsp.get_client_by_id = function(id) return clients[id] end
 local err, ctx = { code = 0 }, { client_id = 1 }
 local show = { type = 2, message = 'Indexing completed' }
 local show_result = h.pack(vim.lsp.handlers['window/showMessage'](err, show, ctx))
@@ -62,7 +65,7 @@ equal(vim.lsp.handlers['$/progress'](err, progress, ctx), 'progress-return', 'pr
 equal(calls[4][3], progress, 'progress handler lost original params')
 local listeners = {}
 local old_clients = vim.lsp.get_clients
-vim.lsp.get_clients = function() return { { id = 1, name = 'clangd' } } end
+vim.lsp.get_clients = function() return { clients[1] } end
 vim.api.nvim_create_autocmd('LspProgress', { callback = function(event)
   listeners[#listeners + 1] = event.data.params
 end })
@@ -82,7 +85,7 @@ vim.lsp.get_clients = old_clients
 local opts = { focus_id = 'textDocument/signatureHelp', title = 'Signature Help: clangd (1/2) (<C-s> to cycle)' }
 local lines = { '# ' .. opts.title, 'int sum(int x, int y)' }
 local preview_lines, preview_opts = vim.lsp.util.open_floating_preview(lines, 'markdown', opts)
-equal(preview_opts.title, '函数签名：clangd (1/2)（按 <C-s> 切换）', 'signature title was not translated')
+equal(preview_opts.title, opts.title, 'unowned signature title was translated')
 equal(preview_lines[1], '# ' .. preview_opts.title, 'inline signature title was not translated')
 equal(preview_lines[2], lines[2], 'signature source changed')
 equal(lines[1], '# ' .. opts.title, 'signature preview mutated input')
@@ -99,11 +102,8 @@ if vim.lsp.completion._lsp_to_complete_items then
     equal(original_item.menu, raw.detail, 'pinned completion menu shape changed')
     equal(original_item.info, raw.documentation.value, 'pinned completion documentation shape changed')
   end
-  local expected_menu = original_item.menu == raw.detail and '[2 个重载]' or original_item.menu
-  local expected_info = original_item.info == raw.documentation.value
-    and '来自 `<math.h>`\n\nProject docs' or original_item.info
-  equal(item.menu, expected_menu, 'completion menu projection or fallback changed')
-  equal(item.info, expected_info, 'completion documentation projection or fallback changed')
+  equal(item.menu, original_item.menu, 'completion menu changed')
+  equal(item.info, original_item.info, 'completion documentation payload changed')
   equal(item.word, 'sum', 'completion insertion text changed')
   equal(item.user_data.nvim.lsp.completion_item, raw, 'completion protocol item identity changed')
   equal(raw.detail, '[2 overloads]', 'completion protocol item mutated')

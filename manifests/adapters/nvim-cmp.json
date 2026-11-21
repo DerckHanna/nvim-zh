@@ -1,40 +1,125 @@
 {
-  "schema": 1,
+  "contracts": [
+    "tests/upstream/nvim-cmp/cmp_seam.py"
+  ],
+  "domain": "nvim-cmp",
+  "entry": "nvim-zh.adapters.nvim_cmp",
+  "help": {
+    "doc/cmp.txt": [
+      "cmp.cnx"
+    ]
+  },
   "id": "nvim-cmp",
-  "status": "inventory_only",
-  "upstream": {
-    "repository": "https://github.com/hrsh7th/nvim-cmp",
-    "follow": {
-      "kind": "default_branch"
+  "lazy_names": [
+    "nvim-cmp"
+  ],
+  "modules": [
+    "cmp"
+  ],
+  "notes": {
+    "excluded": "native candidates, user formatters, abbr/word/menu/source names, LSP documents and edits",
+    "seam": "fixed status and deprecation echoes; default kind on custom menu display copies"
+  },
+  "scenarios": {
+    "behavior": {
+      "surfaces": [
+        "default_kind"
+      ],
+      "tui": "tests/upstream/nvim-cmp/tui.py"
+    },
+    "custom": {
+      "surfaces": [
+        "default_kind"
+      ],
+      "tui": "tests/upstream/nvim-cmp/tui.py"
+    },
+    "deprecation": {
+      "surfaces": [
+        "deprecation"
+      ],
+      "tui": "tests/upstream/nvim-cmp/tui.py"
+    },
+    "help": {
+      "surfaces": [
+        "help"
+      ],
+      "tui": "tests/upstream/nvim-cmp/tui.py"
+    },
+    "lspkind": {
+      "surfaces": [
+        "default_kind"
+      ],
+      "tui": "tests/upstream/nvim-cmp/tui.py"
+    },
+    "native": {
+      "surfaces": [
+        "default_kind"
+      ],
+      "tui": "tests/upstream/nvim-cmp/tui.py"
+    },
+    "status": {
+      "surfaces": [
+        "status"
+      ],
+      "tui": "tests/upstream/nvim-cmp/tui.py"
+    }
+  },
+  "schema": 1,
+  "source_projection": true,
+  "status": "implemented",
+  "surfaces": {
+    "default_kind": {
+      "kind": "versioned",
+      "modules": {
+        "cmp.config.default": "lua/cmp/config/default.lua",
+        "cmp.entry": "lua/cmp/entry.lua",
+        "cmp.view.custom_entries_view": "lua/cmp/view/custom_entries_view.lua"
+      }
+    },
+    "deprecation": {
+      "kind": "versioned",
+      "modules": {
+        "cmp.config": "lua/cmp/config.lua"
+      }
+    },
+    "help": {
+      "kind": "help"
+    },
+    "status": {
+      "kind": "versioned",
+      "modules": {
+        "cmp": "lua/cmp/init.lua"
+      }
     }
   },
   "targets": {
     "baseline": {
       "commit": "2ffe79f1f021def8dd1fcd81deb16f1bb0d989f3",
+      "dependencies": [
+        "lspkind"
+      ],
       "neovim": "0.12.6",
-      "dependencies": [],
       "sources": {
-        "lua/cmp/init.lua": "f6070a511d27c9dc39bea910ba3078a84651025bbd1657ce291680aa3bf108aa",
+        "doc/cmp.txt": "345b60e7b8ede6191080669a01bb426befec1b6381ac22f7620a784131326089",
+        "lua/cmp/config.lua": "f090135984a1224bccb3e77fb73c1029118d5c3d401778acbf9938ac0f667623",
+        "lua/cmp/config/compare.lua": "95ce16adbd4bb3640815a6f4a0e3fce8acff322573bb6469ebdc99900c68585a",
         "lua/cmp/config/default.lua": "2c6ec1dac07f4cf5de74e844915a3fef02f5dd8376980ec0a3039b74e3a4c0cc",
-        "lua/cmp/entry.lua": "810422a540f640ba6783d1adfddc1c6d9600d3c397a0dd495ff21ea669e756b5"
+        "lua/cmp/context.lua": "4aa773a9b11028c473a097396a3c3c75a7b700835dd034d5d225c2cd2e2e4278",
+        "lua/cmp/core.lua": "dbdab04e485aede14dae3cec908a99e5f2fbb252e6342cd14c6daba82b65560c",
+        "lua/cmp/entry.lua": "810422a540f640ba6783d1adfddc1c6d9600d3c397a0dd495ff21ea669e756b5",
+        "lua/cmp/init.lua": "f6070a511d27c9dc39bea910ba3078a84651025bbd1657ce291680aa3bf108aa",
+        "lua/cmp/types/lsp.lua": "4da12d1b2140226498bb03b4c8ca8ca9de5c29faded9368f361aa6d1438fc6a8",
+        "lua/cmp/view/custom_entries_view.lua": "8dcff78ad95c0636d343be171e2ee3bc4a34e074aacdb6e43c429727410939f1",
+        "lua/cmp/view/native_entries_view.lua": "a59fe03c38899bdd694ae5f60401f20b0bc71182c71b4d41b6f8b02a1fdc93ce",
+        "lua/cmp/view/wildmenu_entries_view.lua": "188435f4c3d83b69c41d75e20d938198f8a088d51167d32e06bc66e6cea19857",
+        "plugin/cmp.lua": "f68673a3df8d07af05e14810ae9ae7ab079411542d82dfacfd7141bbc726e266"
       }
     }
   },
-  "modules": [
-    "cmp"
-  ],
-  "lazy_names": [
-    "nvim-cmp"
-  ],
-  "notes": {
-    "status": "inventory_only",
-    "public_path": "formatting.format for cmp-owned labels only",
-    "excluded": "completion abbr, kind/menu labels, source data and documentation: no fixed cmp-owned label safe to translate",
-    "reviewed_contract": "fixed public formatter and entry source fields"
-  },
-  "surfaces": {},
-  "scenarios": {},
-  "contracts": [
-    "tests/upstream/nvim-cmp/cmp_seam.py"
-  ]
+  "upstream": {
+    "follow": {
+      "kind": "default_branch"
+    },
+    "repository": "https://github.com/hrsh7th/nvim-cmp"
+  }
 }

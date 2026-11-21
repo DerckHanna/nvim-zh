@@ -106,7 +106,9 @@ local lazy = require('lazy')
 local cmp = require('cmp')
 check(type(lazy.setup) == 'function', 'real lazy.setup missing')
 check(type(cmp.setup) == 'table', 'real nvim-cmp public setup missing')
-check(zh.status().adapters['nvim-cmp'] == nil, 'nvim-cmp inventory was registered as a runtime adapter')
+local cmp_adapter = zh.status().adapters['nvim-cmp']
+check(cmp_adapter and not cmp_adapter.surfaces.default_kind.active,
+  'unverified nvim-cmp source unexpectedly enabled menu projection')
 
 local order = {}
 local setup_events, lazy_events = 0, 0
@@ -295,6 +297,6 @@ require('nvim-zh.plugins').teardown()
 equal(next_keymap.on_attach_default, next_original_default, 'real keymap teardown failed')
 equal(next_tree.setup, next_original_setup, 'real tree setup teardown failed')
 check(tree_notify.warn == original_notify_warn, 'teardown changed plugin-owned notify')
-check(zh.status().adapters['nvim-cmp'] == nil,
-  'nvim-cmp inventory assertion changed after teardown')
-print('ADDITIONAL_UPSTREAM_SMOKE_SPEC=PASS lazy=306a055 nvim-tree=69eb0c3 mappings=60 custom_desc=original notify=source_only generations=true nvim-cmp=inventory_only')
+local after_cmp = zh.status().adapters['nvim-cmp']
+check(not after_cmp or not after_cmp.active, 'nvim-cmp remained active after teardown')
+print('ADDITIONAL_UPSTREAM_SMOKE_SPEC=PASS lazy=306a055 nvim-tree=69eb0c3 mappings=60 custom_desc=original notify=source_only generations=true nvim-cmp=unverified')

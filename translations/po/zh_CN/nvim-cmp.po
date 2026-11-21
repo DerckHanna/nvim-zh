@@ -1,0 +1,167 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: nvim-zh\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: lua/cmp/init.lua:300
+msgctxt "status"
+msgid "ready source names"
+msgstr "就绪的补全源"
+
+#: lua/cmp/init.lua:308
+msgctxt "status"
+msgid "unavailable source names"
+msgstr "不可用的补全源"
+
+#: lua/cmp/init.lua:316
+msgctxt "status"
+msgid "unused source names"
+msgstr "未启用的补全源"
+
+#: lua/cmp/init.lua:324
+msgctxt "status"
+msgid "unknown source names"
+msgstr "未知的补全源"
+
+#: lua/cmp/config.lua:185
+msgctxt "deprecation"
+msgid " is deprecated.\n"
+msgstr " 已弃用。\n"
+
+#: lua/cmp/config.lua:186
+msgctxt "deprecation"
+msgid "[nvim-cmp] Please use "
+msgstr "[nvim-cmp] 请改用 "
+
+#: lua/cmp/config.lua:188
+msgctxt "deprecation"
+msgid " instead."
+msgstr "。"
+
+#: lua/cmp/types/lsp.lua:177
+msgctxt "kind"
+msgid "Text"
+msgstr "文本"
+
+#: lua/cmp/types/lsp.lua:178
+msgctxt "kind"
+msgid "Method"
+msgstr "方法"
+
+#: lua/cmp/types/lsp.lua:179
+msgctxt "kind"
+msgid "Function"
+msgstr "函数"
+
+#: lua/cmp/types/lsp.lua:180
+msgctxt "kind"
+msgid "Constructor"
+msgstr "构造函数"
+
+#: lua/cmp/types/lsp.lua:181
+msgctxt "kind"
+msgid "Field"
+msgstr "字段"
+
+#: lua/cmp/types/lsp.lua:182
+msgctxt "kind"
+msgid "Variable"
+msgstr "变量"
+
+#: lua/cmp/types/lsp.lua:183
+msgctxt "kind"
+msgid "Class"
+msgstr "类"
+
+#: lua/cmp/types/lsp.lua:184
+msgctxt "kind"
+msgid "Interface"
+msgstr "接口"
+
+#: lua/cmp/types/lsp.lua:185
+msgctxt "kind"
+msgid "Module"
+msgstr "模块"
+
+#: lua/cmp/types/lsp.lua:186
+msgctxt "kind"
+msgid "Property"
+msgstr "属性"
+
+#: lua/cmp/types/lsp.lua:187
+msgctxt "kind"
+msgid "Unit"
+msgstr "单位"
+
+#: lua/cmp/types/lsp.lua:188
+msgctxt "kind"
+msgid "Value"
+msgstr "值"
+
+#: lua/cmp/types/lsp.lua:189
+msgctxt "kind"
+msgid "Enum"
+msgstr "枚举"
+
+#: lua/cmp/types/lsp.lua:190
+msgctxt "kind"
+msgid "Keyword"
+msgstr "关键字"
+
+#: lua/cmp/types/lsp.lua:191
+msgctxt "kind"
+msgid "Snippet"
+msgstr "代码片段"
+
+#: lua/cmp/types/lsp.lua:192
+msgctxt "kind"
+msgid "Color"
+msgstr "颜色"
+
+#: lua/cmp/types/lsp.lua:193
+msgctxt "kind"
+msgid "File"
+msgstr "文件"
+
+#: lua/cmp/types/lsp.lua:194
+msgctxt "kind"
+msgid "Reference"
+msgstr "引用"
+
+#: lua/cmp/types/lsp.lua:195
+msgctxt "kind"
+msgid "Folder"
+msgstr "文件夹"
+
+#: lua/cmp/types/lsp.lua:196
+msgctxt "kind"
+msgid "EnumMember"
+msgstr "枚举成员"
+
+#: lua/cmp/types/lsp.lua:197
+msgctxt "kind"
+msgid "Constant"
+msgstr "常量"
+
+#: lua/cmp/types/lsp.lua:198
+msgctxt "kind"
+msgid "Struct"
+msgstr "结构体"
+
+#: lua/cmp/types/lsp.lua:199
+msgctxt "kind"
+msgid "Event"
+msgstr "事件"
+
+#: lua/cmp/types/lsp.lua:200
+msgctxt "kind"
+msgid "Operator"
+msgstr "运算符"
+
+#: lua/cmp/types/lsp.lua:201
+msgctxt "kind"
+msgid "TypeParameter"
+msgstr "类型参数"

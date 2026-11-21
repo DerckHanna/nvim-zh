@@ -2,20 +2,26 @@
 
 本项目遵循语义化版本。
 
-## Unreleased
+## [0.2.0] - 2026-11-21
 
-- 重构词库内存表示为按 `context` 两级索引与非破坏性 `overrides` 覆盖层，挂载后立即释放原始解码表，双域常驻 Lua 堆降低 71%（59.4→17.2 MiB）、RSS 降低 58%。
+### Added
+
 - 在单一 `pack_store.lua` 验证边界内新增独立版本号 SDK 2 单层紧凑附件格式（支持 `tools/pack_assets.py --sdk 2`，纯数据包仅落盘 `artifact.json` 并在每次加载执行完整 SHA-256 与 UTF-8 校验）；候选 `0.2.0` 首用耗时降至 ~44 ms（-70%），并保留与已发布 SDK 1 的损坏回退、离线回滚及旧客户端 `sdk == 1` 自动兼容。
-- 修复诊断 quickfix/location list 条目与 LSP 进度数据被翻译的问题。中文由列表和面板显示，列表查询、LspProgress、client.progress、fileStatus handler 和通用 LSP 回调保留上游数据。
-- 同步失败保留上一份有效配置和资源，取消回调在旧任务清理后交付。汉化包自动推荐需要目标兼容证据，历史版本仍可显式选择和离线回滚。
-- 大工具词库按实际使用准备，编译器版本及摘要在后台验证。翻译检查与测试复用已解析输入和附件。工具链 PO 从单一编辑源生成，LLVM 23.1.4 与 23.1.5 均通过重复构建。
-- 修复 macOS 系统目录别名（`/var`、`/tmp`、`/etc`）路径下读取或导入汉化包被误判为符号链接的问题。
-
-- 添加固定 LLVM 23.1.5 的 Clang 和 clang-tidy 汉化包、quickfix/location list 显示和原文查询。
+- 添加固定 LLVM 23.1.5 的 Clang 与 clang-tidy 汉化包、quickfix/location list 显示和原文查询。
 - 增加 clangd 文件状态与 clang-tidy 转发诊断显示。工具身份、源码盘点、匹配记录和实际工作流详见 `docs/toolchain-coverage.md`。
-
 - clangd 词库增加 LSP 服务器身份、版本和所用方法的兼容声明。C/C++ 状态显示回退原因。
 - 增加中文 C/C++、pytest、Ruff 和 Git 冲突操作指南与实际终端对照。
+
+### Changed
+
+- 重构词库内存表示为按 `context` 两级索引与非破坏性 `overrides` 覆盖层，挂载后立即释放原始解码表，双域常驻 Lua 堆降低 71%（59.4→17.2 MiB）、RSS 降低 58%。
+- 大工具词库按实际使用准备，编译器版本及摘要在后台验证。翻译检查与测试复用已解析输入和附件。工具链 PO 从单一编辑源生成，LLVM 23.1.4 与 23.1.5 均通过重复构建。
+- 同步失败保留上一份有效配置和资源，取消回调在旧任务清理后交付。汉化包自动推荐需要目标兼容证据，历史版本仍可显式选择和离线回滚。
+
+### Fixed
+
+- 修复诊断 quickfix/location list 条目与 LSP 进度数据被翻译的问题。中文由列表和面板显示，列表查询、LspProgress、client.progress、fileStatus handler 和通用 LSP 回调保留上游数据。
+- 修复 macOS 系统目录别名（`/var`、`/tmp`、`/etc`）路径下读取或导入汉化包被误判为符号链接的问题。
 - 修复 12 个 Neovim 0.12.6 核心 gettext 键，补记 Windows、macOS 和 Linux/musl 回退验证。
 
 ## [0.1.0] - 2026-11-20

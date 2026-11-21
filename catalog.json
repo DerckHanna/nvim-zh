@@ -1,6 +1,49 @@
 {
   "packages": [
     {
+      "id": "aerial",
+      "locale": "zh_CN",
+      "modules": [
+        "aerial",
+        "aerial.backends",
+        "aerial.command",
+        "aerial.keymap_util",
+        "aerial.util"
+      ],
+      "name": "aerial",
+      "repository": "https://github.com/stevearc/aerial.nvim",
+      "sdk": 2,
+      "sha256": "18a9f3cafe3e9e7b93a6bc0536a2aa1ec495b262fbefce092ffd10bdadba7152",
+      "size": 22784,
+      "targets": [
+        "28fe6e822ae344544c379d60fcb13c9519a1f08a"
+      ],
+      "url": "https://github.com/DerckHanna/nvim-zh/releases/download/packs-aerial-v0.4.0/aerial-zh_CN.json",
+      "version": "0.4.0"
+    },
+    {
+      "id": "blink-cmp",
+      "locale": "zh_CN",
+      "modules": [
+        "blink.cmp",
+        "blink.cmp.fuzzy.build",
+        "blink.cmp.fuzzy.build.log",
+        "blink.cmp.fuzzy.download",
+        "blink.cmp.health",
+        "blink.cmp.lib.utils"
+      ],
+      "name": "blink-cmp",
+      "repository": "https://github.com/saghen/blink.cmp",
+      "sdk": 2,
+      "sha256": "d5a0e762cca830d7faa58a7bd6601ba26b0bc2389c9357ca7c69148cc3ed36a9",
+      "size": 27073,
+      "targets": [
+        "78336bc89ee5365633bcf754d93df01678b5c08f"
+      ],
+      "url": "https://github.com/DerckHanna/nvim-zh/releases/download/packs-blink-cmp-v0.4.0/blink-cmp-zh_CN.json",
+      "version": "0.4.0"
+    },
+    {
       "executable": "clang",
       "id": "clang",
       "locale": "zh_CN",
@@ -193,6 +236,90 @@
       "version": "0.3.0"
     },
     {
+      "id": "cmake-tools",
+      "locale": "zh_CN",
+      "modules": [
+        "cmake-tools",
+        "cmake-tools.log",
+        "cmake-tools.notification",
+        "cmake-tools.quickstart",
+        "cmake-tools.window"
+      ],
+      "name": "cmake-tools",
+      "repository": "https://github.com/Civitasv/cmake-tools.nvim",
+      "sdk": 2,
+      "sha256": "6b6fe5e129684f0603be8a45c5c1a9c7bfbbafe46adb89bd5bc18c91d342b109",
+      "size": 21376,
+      "targets": [
+        "782a254c62a61af1d4febddd0d6dbc5ea414a027"
+      ],
+      "url": "https://github.com/DerckHanna/nvim-zh/releases/download/packs-cmake-tools-v0.4.0/cmake-tools-zh_CN.json",
+      "version": "0.4.0"
+    },
+    {
+      "id": "conform",
+      "locale": "zh_CN",
+      "modules": [
+        "conform",
+        "conform.health",
+        "conform.log",
+        "conform.runner"
+      ],
+      "name": "conform",
+      "repository": "https://github.com/stevearc/conform.nvim",
+      "sdk": 2,
+      "sha256": "877f5419039169a05aaf29218dc7382eda0a7e1d34873d005719901e7eb955c7",
+      "size": 19636,
+      "targets": [
+        "016802de402556da54c36bd7359b441266b01cdd"
+      ],
+      "url": "https://github.com/DerckHanna/nvim-zh/releases/download/packs-conform-v0.4.0/conform-zh_CN.json",
+      "version": "0.4.0"
+    },
+    {
+      "id": "gitsigns",
+      "locale": "zh_CN",
+      "modules": [
+        "gitsigns",
+        "gitsigns.actions",
+        "gitsigns.actions.nav",
+        "gitsigns.message",
+        "gitsigns.popup"
+      ],
+      "name": "gitsigns",
+      "repository": "https://github.com/lewis6991/gitsigns.nvim",
+      "sdk": 2,
+      "sha256": "982d5c81d9dd7ca42576e0e86afb247b11a2e536eee169f82fadbbe5da3af553",
+      "size": 25136,
+      "targets": [
+        "c0862d382a35b7b45757d8d151a6a634c09bf3ce"
+      ],
+      "url": "https://github.com/DerckHanna/nvim-zh/releases/download/packs-gitsigns-v0.4.0/gitsigns-zh_CN.json",
+      "version": "0.4.0"
+    },
+    {
+      "id": "mini",
+      "locale": "zh_CN",
+      "modules": [
+        "mini.ai",
+        "mini.icons",
+        "mini.pairs",
+        "mini.statusline",
+        "mini.surround",
+        "mini.tabline"
+      ],
+      "name": "mini",
+      "repository": "https://github.com/nvim-mini/mini.nvim",
+      "sdk": 2,
+      "sha256": "7f676598e7bce5e0e29d7db9f1ae085eb10a61b0a604b7e3112f8f525c3ede8e",
+      "size": 14664,
+      "targets": [
+        "b8a0af521530f8ee68c738657429eab59de6a2ae"
+      ],
+      "url": "https://github.com/DerckHanna/nvim-zh/releases/download/packs-mini-v0.4.0/mini-zh_CN.json",
+      "version": "0.4.0"
+    },
+    {
       "id": "nvim-cmp",
       "locale": "zh_CN",
       "modules": [
@@ -282,6 +409,76 @@
       ],
       "url": "https://github.com/DerckHanna/nvim-zh/releases/download/packs-nvim-tree-v0.3.0/nvim-tree-zh_CN.json",
       "version": "0.3.0"
+    },
+    {
+      "id": "nvim-tree",
+      "locale": "zh_CN",
+      "modules": [
+        "nvim-tree",
+        "nvim-tree.actions.node.file-popup",
+        "nvim-tree.actions.node.open-file",
+        "nvim-tree.help",
+        "nvim-tree.keymap",
+        "nvim-tree.lib",
+        "nvim-tree.renderer.builder"
+      ],
+      "name": "nvim-tree",
+      "repository": "https://github.com/nvim-tree/nvim-tree.lua",
+      "sdk": 2,
+      "sha256": "cbfa3d2e3b472523962b5fe3da6c51946ff45caf7768498f5b15edac7afecfe5",
+      "size": 73009,
+      "targets": [
+        "6e539e91302d2e201b078a45d214177140134523"
+      ],
+      "url": "https://github.com/DerckHanna/nvim-zh/releases/download/packs-nvim-tree-v0.4.0/nvim-tree-zh_CN.json",
+      "version": "0.4.0"
+    },
+    {
+      "id": "nvim-treesitter",
+      "locale": "zh_CN",
+      "modules": [
+        "nvim-treesitter",
+        "nvim-treesitter.config",
+        "nvim-treesitter.health",
+        "nvim-treesitter.install",
+        "nvim-treesitter.log"
+      ],
+      "name": "nvim-treesitter",
+      "repository": "https://github.com/nvim-treesitter/nvim-treesitter",
+      "sdk": 2,
+      "sha256": "2496a79ba8c4a2d23a7929c09793f8d18ee92aeaa2d9fdd2cb3c94be655754fc",
+      "size": 20398,
+      "targets": [
+        "37e52c733ada9d8d544d53a763140ef1ba404353"
+      ],
+      "url": "https://github.com/DerckHanna/nvim-zh/releases/download/packs-nvim-treesitter-v0.4.0/nvim-treesitter-zh_CN.json",
+      "version": "0.4.0"
+    },
+    {
+      "id": "snacks",
+      "locale": "zh_CN",
+      "modules": [
+        "snacks",
+        "snacks.bufdelete",
+        "snacks.dashboard",
+        "snacks.health",
+        "snacks.input",
+        "snacks.notifier",
+        "snacks.notify",
+        "snacks.picker",
+        "snacks.picker.select",
+        "snacks.picker.util"
+      ],
+      "name": "snacks",
+      "repository": "https://github.com/folke/snacks.nvim",
+      "sdk": 2,
+      "sha256": "5186d8ec836e10045dee3ca0fc06a17d03cc248cbaa0ef4cffaaa2dcf5116979",
+      "size": 32157,
+      "targets": [
+        "882c996cf28183f4d63640de0b4c02ec886d01f2"
+      ],
+      "url": "https://github.com/DerckHanna/nvim-zh/releases/download/packs-snacks-v0.4.0/snacks-zh_CN.json",
+      "version": "0.4.0"
     },
     {
       "id": "telescope",

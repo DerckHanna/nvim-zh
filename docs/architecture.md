@@ -167,7 +167,7 @@ translate / register_catalog ──► catalog / engine / missing
 ## 编辑源与生成物
 
 - `translations/po/zh_CN/*.po` 经 `catalog_tool.py` 生成 Lua 目录，并经 `resource_bundle.py` 生成随包 JSON 目录。
-- 工具链译文的编辑源为 `translations/toolchain/zh_CN.json`。盘点读取 `manifests/toolchain.json` 锁定的 LLVM 源码和 llvm-tblgen，使用同一套 TableGen 分支结构生成英文形态和双语对应。三份覆盖清单与工具链 PO 是可审查的生成物，SDK 1 附件生成器会检查 PO 是否与编辑源一致。
+- 工具链译文的编辑源为 `translations/toolchain/zh_CN.json`。盘点读取 `manifests/toolchain.json` 锁定的 LLVM 源码和 llvm-tblgen，使用同一套 TableGen 分支结构生成英文形态和双语对应。三份覆盖清单与工具链 PO 是可审查的生成物，附件生成器会检查 PO 是否与编辑源一致。
 - `translations/native/*.po`、固定上游缓存和修复清单经 `native_catalog.py` 生成合并 MO。
 - `doc/tags`、`doc/tags-cn` 由 Neovim `:helptags` 生成。
 - `manifests/help_inventory.json` 由 Help 清单工具生成。

@@ -5,10 +5,10 @@
 | 工具 | 固定组合中的可用入口 | 原文及版本回退 |
 | --- | --- | --- |
 | `clang` / `clang++` | Neovim 0.12.6 直接调用后的 quickfix/location list。包含栈、驱动和前端参数提示、预处理、语法、类型、模板与约束、目标 ABI 和相关说明使用已匹配的词条。 | 由 `errorformat` 生成原始条目。未核实的来源、歧义、其他二进制或接口使用原文。Clang 的 `-v` 记录了 GNU ld、GNU as 的实际调用。 |
-| `clangd` | 用已验证的 `serverInfo` 查看 push 诊断、相关位置、代码动作标题、悬浮标题、补全重载数、签名标题、索引和文件状态。 | 保留项目注释、声明、补全插入、修复编辑、日志与运行时生成的 AST。固定服务器的 pull 和 completion resolve 返回 `-32601`。 |
+| `clangd` | 用已验证的 `serverInfo` 查看 push 诊断、相关位置、代码动作标题、悬浮标题、补全文档中的头文件来源、签名标题、索引和文件状态。 | 保留项目注释、声明、补全插入、修复编辑、日志与运行时生成的 AST。固定服务器的 pull 和 completion resolve 返回 `-32601`。 |
 | `clang-tidy` | 独立 quickfix 和 clangd 转发。按检查名查主诊断和附加说明。空指针静态分析有独立列表和路径说明。 | 独立命令按版本及摘要选择。clangd 运行模块检查。未识别的检查说明与编辑保留原文。 |
 
-其他 LLVM 版本、macOS、Windows、Neovim nightly 的 CLI 显示未纳入这组固定验证。历史发布的 clangd 0.1.0 词库沿用其历史匹配规则。已发布的 clangd 0.1.1 支持其附件清单声明的方法。当前开发版附加接缝用本地候选包验证。
+其他 LLVM 版本、macOS、Windows、Neovim nightly 的 CLI 显示未纳入这组固定验证。官方目录提供 SDK 2 附件。原生补全候选与回调仍使用服务器字段。
 
 ## 源码与匹配证据
 

@@ -44,7 +44,7 @@ C 文件可将 `makeprg` 设为 `clang -std=c11 -fsyntax-only`。需要位置列
 
 独立运行 `clang-tidy 文件.cpp --checks=-*,clang-analyzer-core.NullDereference -- -std=c++20` 可检查空指针解引用，并在列表里阅读匹配的路径说明。固定版本的 clangd 使用检查模块，静态分析器检查通过独立命令运行。
 
-主包开发版支持本地候选附件。用 `tools/pack_assets.py` 生成的附件可通过 `:NvimZhPacks import <附件路径>` 安装。官方目录和当前覆盖状态见[覆盖清单](toolchain-coverage.md)。
+在 `:NvimZhPacks` 中安装 Clang 工具链的 SDK 2 包。已下载的附件可用 `:NvimZhPacks import <附件路径>` 离线安装。见[工具链覆盖](toolchain-coverage.md)。
 
 ## 测试失败、Git 冲突和 Python 检查
 

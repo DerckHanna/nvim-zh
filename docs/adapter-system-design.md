@@ -18,7 +18,7 @@
 
 在 `DerckHanna/nvim-zh` 的 `main` 分支交付主包，在同仓库的 `packs` 分支维护汉化包源文件和 `catalog.json`。每个包有自己的源目录，包含 PO、Help、所需适配代码和验证用例。`catalog.json` 只存包的发现和选版元数据。工具汉化包可以沿用相同的分发方式。
 
-每个包版本生成一个可独立下载的 JSON 附件，发布在同仓库的 GitHub Release。例如，Telescope 的 `0.1.0` 版可使用 `packs-telescope-v0.1.0` 标签和 `telescope-zh_CN.json` 附件，标签指向构建该包的源提交。资源 Release 发布时关闭 `make_latest`，仓库的 Latest 标记用于主包。发布流程先构建、验收并上传附件，再核对可下载的文件大小和摘要，最后更新 `catalog.json`。同一包版本对应固定附件，修订时发布新版本。[GitHub Releases](https://docs.github.com/en/repositories/releasing-projects-on-github/about-releases) · [附件下载地址](https://docs.github.com/en/rest/releases/assets) · [Release 的 Latest 标记](https://docs.github.com/en/rest/releases/releases#create-a-release)
+每个包版本生成一个可独立下载的 JSON 附件，发布在同仓库的 GitHub Release。例如，Telescope 的 `0.3.0` 版使用 `packs-telescope-v0.3.0` 标签和 `telescope-zh_CN.json` 附件，标签指向构建该包的源提交。资源 Release 发布时关闭 `make_latest`，仓库的 Latest 标记用于主包。发布流程先构建、验收并上传附件，再核对可下载的文件大小和摘要，最后更新 `catalog.json`。同一包版本对应固定附件，修订时发布新版本。[GitHub Releases](https://docs.github.com/en/repositories/releasing-projects-on-github/about-releases) · [附件下载地址](https://docs.github.com/en/rest/releases/assets) · [Release 的 Latest 标记](https://docs.github.com/en/rest/releases/releases#create-a-release)
 
 用户在面板获取包目录时只读取小型索引。选中 Telescope 并安装时，`nvim-zh` 仅下载索引指向的兼容 Telescope 附件。已安装包可独立更新、回滚和移除。附件也能从 Release 页面手动下载后离线导入。安装主包取得的是主包工作树，可选发布附件通过独立下载取得。完整 Git 克隆可能包含资源分支的编辑源历史。[Git 克隆行为](https://git-scm.com/docs/git-clone)
 
@@ -30,9 +30,9 @@
 nvim-zh   概览  [汉化包]  翻译  缺失  检查
 
 待处理
-  Telescope       可更新  0.1.0 → 0.1.1
+  clang-tidy      可更新  0.2.0 → 0.3.0
 已安装
-  clangd          已生效  0.2.0
+  clangd          已生效  0.3.0
 可用
 > nvim-dap-view   可安装  已检测到目标
 

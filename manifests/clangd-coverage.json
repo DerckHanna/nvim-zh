@@ -12,29 +12,31 @@
   "Lex",
   "Common",
   "AST",
-  "Comment"
+  "Comment",
+  "Serialization",
+  "Frontend (clangd-reachable subset)"
  ],
  "excluded_components": [
   "Driver",
-  "Frontend",
+  "Frontend (CodeGen/CIR/ExtractAPI/SSAF/Verify/SerializedDiag/DependencyFile/Plugin)",
   "InstallAPI",
   "CrossTU",
   "Refactoring",
   "Trap"
  ],
- "excluded_reason": "component diagnostics belong to compiler-driver processes or non-language-server paths; clangd parses, lexes, and sema-checks in-process and never writes PCH files",
+ "excluded_reason": "Driver, InstallAPI, CrossTU, Refactoring, Trap, and CodeGen/CIR/ExtractAPI/SSAF/Verify/SerializedDiag/DependencyFile/Plugin subsets of Frontend belong to compiler-driver, codegen, standalone tooling, or disabled frontend paths; clangd compiles in-process via SyntaxOnlyAction, VFS, and PrecompiledPreamble/Modules Serialization",
  "variant_cap": 16384,
  "counts": {
-  "diagnostics": 6663,
-  "variants": 34099,
+  "diagnostics": 6782,
+  "variants": 34289,
   "diagnostics_with_capped_variants": 0,
   "diagnostics_outside_digit_arguments": 0,
   "by_severity": {
-   "warning": 1587,
+   "warning": 1610,
    "extension": 477,
-   "error": 3515,
-   "note": 1074,
-   "remark": 10
+   "error": 3587,
+   "note": 1091,
+   "remark": 17
   },
   "by_component": {
    "Lex": 429,
@@ -42,6 +44,8 @@
    "Sema": 5025,
    "Common": 168,
    "AST": 281,
+   "Frontend": 57,
+   "Serialization": 62,
    "Comment": 35
   }
  },
@@ -6246,6 +6250,358 @@
    "summary": "use of this expression in an %0 attribute requires parentheses",
    "variants": [
     "use of this expression in an %0 attribute requires parentheses"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_ast_action_on_llvm_ir",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 445,
+   "component": "Frontend",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "cannot apply AST actions to LLVM IR file '%0'",
+   "variants": [
+    "cannot apply AST actions to LLVM IR file '%0'"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_ast_file_codegenopt_mismatch",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 55,
+   "component": "Serialization",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "%0 was %select{disabled|enabled}1 in precompiled file '%3' but is currently %select{disabled|enabled}2",
+   "variants": [
+    "%0 was disabled in precompiled file '%3' but is currently disabled",
+    "%0 was disabled in precompiled file '%3' but is currently enabled",
+    "%0 was enabled in precompiled file '%3' but is currently disabled",
+    "%0 was enabled in precompiled file '%3' but is currently enabled"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_ast_file_codegenopt_value_mismatch",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 57,
+   "component": "Serialization",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "%0 differs in precompiled file '%1' vs. current file",
+   "variants": [
+    "%0 differs in precompiled file '%1' vs. current file"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_ast_file_diagopt_mismatch",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 59,
+   "component": "Serialization",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "%0 is currently enabled, but was not in the precompiled file '%1'",
+   "variants": [
+    "%0 is currently enabled, but was not in the precompiled file '%1'"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_ast_file_different_branch",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 73,
+   "component": "Serialization",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "%select{PCH|module|precompiled}0 file '%1' built from a different branch (%2) than the compiler (%3)",
+   "variants": [
+    "PCH file '%1' built from a different branch (%2) than the compiler (%3)",
+    "module file '%1' built from a different branch (%2) than the compiler (%3)",
+    "precompiled file '%1' built from a different branch (%2) than the compiler (%3)"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_ast_file_invalid",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 89,
+   "component": "Serialization",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "file '%1' is not a valid %select{PCH|module|precompiled}0 file: %2",
+   "variants": [
+    "file '%1' is not a valid PCH file: %2",
+    "file '%1' is not a valid module file: %2",
+    "file '%1' is not a valid precompiled file: %2"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_ast_file_langopt_mismatch",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 45,
+   "component": "Serialization",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "%0 was %select{disabled|enabled}1 in precompiled file '%3' but is currently %select{disabled|enabled}2",
+   "variants": [
+    "%0 was disabled in precompiled file '%3' but is currently disabled",
+    "%0 was disabled in precompiled file '%3' but is currently enabled",
+    "%0 was enabled in precompiled file '%3' but is currently disabled",
+    "%0 was enabled in precompiled file '%3' but is currently enabled"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_ast_file_langopt_value_mismatch",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 53,
+   "component": "Serialization",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "%0 differs in precompiled file '%1' vs. current file",
+   "variants": [
+    "%0 differs in precompiled file '%1' vs. current file"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_ast_file_macro_def_conflict",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 135,
+   "component": "Serialization",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "definition of macro '%0' differs between the precompiled file '%3' ('%1') and the command line ('%2')",
+   "variants": [
+    "definition of macro '%0' differs between the precompiled file '%3' ('%1') and the command line ('%2')"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_ast_file_macro_def_undef",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 132,
+   "component": "Serialization",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "macro '%0' was %select{defined|undef'd}1 in the precompiled file '%2' but %select{undef'd|defined}1 on the command line",
+   "variants": [
+    "macro '%0' was defined in the precompiled file '%2' but undef'd on the command line",
+    "macro '%0' was defined in the precompiled file '%2' but defined on the command line",
+    "macro '%0' was undef'd in the precompiled file '%2' but undef'd on the command line",
+    "macro '%0' was undef'd in the precompiled file '%2' but defined on the command line"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_ast_file_modulecache_mismatch",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 61,
+   "component": "Serialization",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "precompiled file '%2' was compiled with module cache path '%0', but the path is currently '%1'",
+   "variants": [
+    "precompiled file '%2' was compiled with module cache path '%0', but the path is currently '%1'"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_ast_file_not_found",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 80,
+   "component": "Serialization",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "%select{PCH|module|precompiled}0 file '%1' not found",
+   "variants": [
+    "PCH file '%1' not found",
+    "module file '%1' not found",
+    "precompiled file '%1' not found"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_ast_file_out_of_date",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 86,
+   "component": "Serialization",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "%select{PCH|module|precompiled}0 file '%1' is out of date and needs to be rebuilt",
+   "variants": [
+    "PCH file '%1' is out of date and needs to be rebuilt",
+    "module file '%1' is out of date and needs to be rebuilt",
+    "precompiled file '%1' is out of date and needs to be rebuilt"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_ast_file_pp_detailed_record",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 142,
+   "component": "Serialization",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "%select{command line contains|precompiled file '%1' was built with}0 '-detailed-preprocessing-record' but %select{precompiled file '%1' was not built with it|it is not present on the command line}0",
+   "variants": [
+    "command line contains '-detailed-preprocessing-record' but precompiled file '%1' was not built with it",
+    "command line contains '-detailed-preprocessing-record' but it is not present on the command line",
+    "precompiled file '%1' was built with '-detailed-preprocessing-record' but precompiled file '%1' was not built with it",
+    "precompiled file '%1' was built with '-detailed-preprocessing-record' but it is not present on the command line"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_ast_file_targetopt_feature_mismatch",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 41,
+   "component": "Serialization",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "%select{precompiled file '%1' was|current translation unit is}0 compiled with the target feature '%2' but the %select{current translation unit is|precompiled file '%1' was}0 not",
+   "variants": [
+    "precompiled file '%1' was compiled with the target feature '%2' but the current translation unit is not",
+    "precompiled file '%1' was compiled with the target feature '%2' but the precompiled file '%1' was not",
+    "current translation unit is compiled with the target feature '%2' but the current translation unit is not",
+    "current translation unit is compiled with the target feature '%2' but the precompiled file '%1' was not"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_ast_file_targetopt_mismatch",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 38,
+   "component": "Serialization",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "precompiled file '%0' was compiled for the %1 '%2' but the current translation unit is being compiled for target '%3'",
+   "variants": [
+    "precompiled file '%0' was compiled for the %1 '%2' but the current translation unit is being compiled for target '%3'"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_ast_file_undef",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 138,
+   "component": "Serialization",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "%select{command line contains|precompiled file '%1' was built with}0 '-undef' but %select{precompiled file '%1' was not built with it|it is not present on the command line}0",
+   "variants": [
+    "command line contains '-undef' but precompiled file '%1' was not built with it",
+    "command line contains '-undef' but it is not present on the command line",
+    "precompiled file '%1' was built with '-undef' but precompiled file '%1' was not built with it",
+    "precompiled file '%1' was built with '-undef' but it is not present on the command line"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_ast_file_version_too_new",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 71,
+   "component": "Serialization",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "%select{PCH|module|precompiled }0 file '%1' uses a newer format that cannot be read",
+   "variants": [
+    "PCH file '%1' uses a newer format that cannot be read",
+    "module file '%1' uses a newer format that cannot be read",
+    "precompiled  file '%1' uses a newer format that cannot be read"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_ast_file_version_too_old",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 69,
+   "component": "Serialization",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "%select{PCH|module|precompiled}0 file '%1' uses an older format that is no longer supported",
+   "variants": [
+    "PCH file '%1' uses an older format that is no longer supported",
+    "module file '%1' uses an older format that is no longer supported",
+    "precompiled file '%1' uses an older format that is no longer supported"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_ast_file_with_compiler_errors",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 75,
+   "component": "Serialization",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "%select{PCH|module|precompiled}0 file '%1' contains compiler errors",
+   "variants": [
+    "PCH file '%1' contains compiler errors",
+    "module file '%1' contains compiler errors",
+    "precompiled file '%1' contains compiler errors"
    ],
    "variants_capped": false,
    "untranslated_multi_digit": false
@@ -19602,6 +19958,22 @@
    "untranslated_multi_digit": false
   },
   {
+   "id": "err_builtin_needs_feature",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 306,
+   "component": "Frontend",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "%0 needs target feature %1",
+   "variants": [
+    "%0 needs target feature %1"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
    "id": "err_builtin_non_vector_type",
    "source": "clang/include/clang/Basic/DiagnosticSemaKinds.td",
    "line": 11500,
@@ -29875,6 +30247,22 @@
    "untranslated_multi_digit": false
   },
   {
+   "id": "err_failed_to_find_module_file",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 178,
+   "component": "Serialization",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "failed to find module file for module '%0'",
+   "variants": [
+    "failed to find module file for module '%0'"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
    "id": "err_falloff_nonvoid",
    "source": "clang/include/clang/Basic/DiagnosticSemaKinds.td",
    "line": 796,
@@ -29941,6 +30329,348 @@
    "summary": "%0 attribute is only allowed on empty statements",
    "variants": [
     "%0 attribute is only allowed on empty statements"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_fe_ast_file_malformed",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 16,
+   "component": "Serialization",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "malformed or corrupted precompiled file: '%0'",
+   "variants": [
+    "malformed or corrupted precompiled file: '%0'"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_fe_ast_file_modified",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 20,
+   "component": "Serialization",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "file '%0' has been modified since the %select{precompiled header|module file|precompiled file}1 '%2' was built",
+   "variants": [
+    "file '%0' has been modified since the precompiled header '%2' was built",
+    "file '%0' has been modified since the module file '%2' was built",
+    "file '%0' has been modified since the precompiled file '%2' was built"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_fe_dependency_file_requires_MT",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 113,
+   "component": "Frontend",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "-dependency-file requires at least one -MT or -MQ option",
+   "variants": [
+    "-dependency-file requires at least one -MT or -MQ option"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_fe_error_reading",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 14,
+   "component": "Frontend",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "error reading '%0': %1",
+   "variants": [
+    "error reading '%0': %1"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_fe_error_reading_stdin",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 15,
+   "component": "Frontend",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "error reading stdin: %0",
+   "variants": [
+    "error reading stdin: %0"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_fe_expected_clang_command",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 119,
+   "component": "Frontend",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "expected a clang compiler command",
+   "variants": [
+    "expected a clang compiler command"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_fe_expected_compiler_job",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 117,
+   "component": "Frontend",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "unable to handle compilation, expected exactly one compiler job in '%0'",
+   "variants": [
+    "unable to handle compilation, expected exactly one compiler job in '%0'"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_fe_invalid_alignment",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 151,
+   "component": "Frontend",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "invalid value '%1' in '%0'; alignment must be a power of 2",
+   "variants": [
+    "invalid value '%1' in '%0'; alignment must be a power of 2"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_fe_invalid_code_complete_file",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 111,
+   "component": "Frontend",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "cannot locate code-completion file %0",
+   "variants": [
+    "cannot locate code-completion file %0"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_fe_invalid_exception_model",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 153,
+   "component": "Frontend",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "invalid exception model '%select{none|sjlj|seh|dwarf|wasm}0' for target '%1'",
+   "variants": [
+    "invalid exception model 'none' for target '%1'",
+    "invalid exception model 'sjlj' for target '%1'",
+    "invalid exception model 'seh' for target '%1'",
+    "invalid exception model 'dwarf' for target '%1'",
+    "invalid exception model 'wasm' for target '%1'"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_fe_invalid_multiple_actions",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 149,
+   "component": "Frontend",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "'%0' action ignored; '%1' action specified previously",
+   "variants": [
+    "'%0' action ignored; '%1' action specified previously"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_fe_invalid_source_date_epoch",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 155,
+   "component": "Frontend",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "environment variable 'SOURCE_DATE_EPOCH' ('%0') must be a non-negative decimal integer <= %1",
+   "variants": [
+    "environment variable 'SOURCE_DATE_EPOCH' ('%0') must be a non-negative decimal integer <= %1"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_fe_no_pch_in_dir",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 143,
+   "component": "Frontend",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "no suitable precompiled header file found in directory '%0'",
+   "variants": [
+    "no suitable precompiled header file found in directory '%0'"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_fe_not_a_pch_file",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 14,
+   "component": "Serialization",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "input is not a PCH file: '%0'",
+   "variants": [
+    "input is not a PCH file: '%0'"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_fe_pch_file_overridden",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 26,
+   "component": "Serialization",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "file '%0' from the precompiled header has been overridden",
+   "variants": [
+    "file '%0' from the precompiled header has been overridden"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_fe_pch_malformed_block",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 18,
+   "component": "Serialization",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "malformed block record in PCH file: '%0'",
+   "variants": [
+    "malformed block record in PCH file: '%0'"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_fe_remap_missing_to_file",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 121,
+   "component": "Frontend",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "could not remap file '%0' to the contents of file '%1'",
+   "variants": [
+    "could not remap file '%0' to the contents of file '%1'"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_fe_text_encoding_config",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 369,
+   "component": "Frontend",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "failed to set fexec-charset to '%0'",
+   "variants": [
+    "failed to set fexec-charset to '%0'"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_fe_unable_to_load_ast_file",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 123,
+   "component": "Frontend",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "unable to load precompiled file",
+   "variants": [
+    "unable to load precompiled file"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_fe_unable_to_open_output",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 132,
+   "component": "Frontend",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "unable to open output file '%0': '%1'",
+   "variants": [
+    "unable to open output file '%0': '%1'"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_fe_unable_to_read_pch_file",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 12,
+   "component": "Serialization",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "unable to read PCH file %0: '%1'",
+   "variants": [
+    "unable to read PCH file %0: '%1'"
    ],
    "variants_capped": false,
    "untranslated_multi_digit": false
@@ -30087,6 +30817,22 @@
    "summary": "field may not be qualified with an address space",
    "variants": [
     "field may not be qualified with an address space"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_file_is_not_module",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 248,
+   "component": "Frontend",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "file '%0' is not a module file",
+   "variants": [
+    "file '%0' is not a module file"
    ],
    "variants_capped": false,
    "untranslated_multi_digit": false
@@ -31012,6 +31758,25 @@
    "summary": "a friend declaration that befriends a template must contain exactly one type-specifier",
    "variants": [
     "a friend declaration that befriends a template must contain exactly one type-specifier"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_frontend_action_unsupported_input_format",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 284,
+   "component": "Frontend",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "%0 does not support input file format of file '%1': '%select{Source|ModuleMap|Precompiled|Unknown}2'",
+   "variants": [
+    "%0 does not support input file format of file '%1': 'Source'",
+    "%0 does not support input file format of file '%1': 'ModuleMap'",
+    "%0 does not support input file format of file '%1': 'Precompiled'",
+    "%0 does not support input file format of file '%1': 'Unknown'"
    ],
    "variants_capped": false,
    "untranslated_multi_digit": false
@@ -34075,6 +34840,56 @@
    "untranslated_multi_digit": false
   },
   {
+   "id": "err_imported_module_modmap_changed",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 122,
+   "component": "Serialization",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "module '%0' %select{in|imported by}4 precompiled file '%1' found in a different module map file (%2) than when the importing precompiled file was built (%3)",
+   "variants": [
+    "module '%0' in precompiled file '%1' found in a different module map file (%2) than when the importing precompiled file was built (%3)",
+    "module '%0' imported by precompiled file '%1' found in a different module map file (%2) than when the importing precompiled file was built (%3)"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_imported_module_not_found",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 116,
+   "component": "Serialization",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "module '%0' in precompiled file '%1' %select{(imported by precompiled file '%2') |}4is not defined in any loaded module map file; maybe you need to load '%3'?",
+   "variants": [
+    "module '%0' in precompiled file '%1' (imported by precompiled file '%2') is not defined in any loaded module map file; maybe you need to load '%3'?",
+    "module '%0' in precompiled file '%1' is not defined in any loaded module map file; maybe you need to load '%3'?"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_imported_module_relocated",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 125,
+   "component": "Serialization",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "module '%0' was built in directory '%1' but now resides in directory '%2'",
+   "variants": [
+    "module '%0' was built in directory '%1' but now resides in directory '%2'"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
    "id": "err_in_class_initializer_bad_type",
    "source": "clang/include/clang/Basic/DiagnosticSemaKinds.td",
    "line": 10251,
@@ -34166,6 +34981,24 @@
    "summary": "target exception specification is not superset of source",
    "variants": [
     "target exception specification is not superset of source"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_incompatible_fp_eval_method_options",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 67,
+   "component": "Frontend",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "option 'ffp-eval-method' cannot be used with option %select{'fapprox-func'|'mreassociate'|'freciprocal'}0",
+   "variants": [
+    "option 'ffp-eval-method' cannot be used with option 'fapprox-func'",
+    "option 'ffp-eval-method' cannot be used with option 'mreassociate'",
+    "option 'ffp-eval-method' cannot be used with option 'freciprocal'"
    ],
    "variants_capped": false,
    "untranslated_multi_digit": false
@@ -37495,6 +38328,22 @@
    "untranslated_multi_digit": false
   },
   {
+   "id": "err_invalid_vfs_overlay",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 300,
+   "component": "Frontend",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "invalid virtual filesystem overlay file '%0'",
+   "variants": [
+    "invalid virtual filesystem overlay file '%0'"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
    "id": "err_invalid_width_spec",
    "source": "clang/include/clang/Basic/DiagnosticSemaKinds.td",
    "line": 342,
@@ -39838,6 +40687,38 @@
    "untranslated_multi_digit": false
   },
   {
+   "id": "err_missing_module",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 249,
+   "component": "Frontend",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "no module named '%0' declared in module map file '%1'",
+   "variants": [
+    "no module named '%0' declared in module map file '%1'"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_missing_module_name",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 245,
+   "component": "Frontend",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "no module name provided; specify one with -fmodule-name=",
+   "variants": [
+    "no module name provided; specify one with -fmodule-name="
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
    "id": "err_missing_open_square_message_send",
    "source": "clang/include/clang/Basic/DiagnosticSemaKinds.td",
    "line": 8424,
@@ -39929,6 +40810,22 @@
    "summary": "a type specifier is required for all declarations",
    "variants": [
     "a type specifier is required for all declarations"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_missing_vfs_overlay_file",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 298,
+   "component": "Frontend",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "virtual filesystem overlay file '%0' not found",
+   "variants": [
+    "virtual filesystem overlay file '%0' not found"
    ],
    "variants_capped": false,
    "untranslated_multi_digit": false
@@ -40711,6 +41608,22 @@
    "untranslated_multi_digit": false
   },
   {
+   "id": "err_module_build_requires_fmodules",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 239,
+   "component": "Frontend",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "module compilation requires '-fmodules'",
+   "variants": [
+    "module compilation requires '-fmodules'"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
    "id": "err_module_build_shadowed_submodule",
    "source": "clang/include/clang/Basic/DiagnosticCommonKinds.td",
    "line": 119,
@@ -40722,6 +41635,22 @@
    "summary": "build a shadowed submodule '%0'",
    "variants": [
     "build a shadowed submodule '%0'"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_module_cannot_create_includes",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 262,
+   "component": "Frontend",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "cannot create includes file for module %0: %1",
+   "variants": [
+    "cannot create includes file for module %0: %1"
    ],
    "variants_capped": false,
    "untranslated_multi_digit": false
@@ -40823,6 +41752,25 @@
    "untranslated_multi_digit": false
   },
   {
+   "id": "err_module_different_modmap",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 128,
+   "component": "Serialization",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "module '%0' %select{uses|does not use}1 additional module map '%2'%select{| not}1 used when the module was built",
+   "variants": [
+    "module '%0' uses additional module map '%2' used when the module was built",
+    "module '%0' uses additional module map '%2' not used when the module was built",
+    "module '%0' does not use additional module map '%2' used when the module was built",
+    "module '%0' does not use additional module map '%2' not used when the module was built"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
    "id": "err_module_expected_semi",
    "source": "clang/include/clang/Basic/DiagnosticParseKinds.td",
    "line": 1822,
@@ -40834,6 +41782,54 @@
    "summary": "expected ';' after module name",
    "variants": [
     "expected ';' after module name"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_module_file_conflict",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 78,
+   "component": "Serialization",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "module '%0' is defined in both '%1' and '%2'",
+   "variants": [
+    "module '%0' is defined in both '%1' and '%2'"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_module_file_missing_top_level_submodule",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 95,
+   "component": "Serialization",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "module file '%0' is missing its top-level submodule",
+   "variants": [
+    "module file '%0' is missing its top-level submodule"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_module_file_not_module",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 93,
+   "component": "Serialization",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "precompiled file '%0' was not built as a module",
+   "variants": [
+    "precompiled file '%0' was not built as a module"
    ],
    "variants_capped": false,
    "untranslated_multi_digit": false
@@ -40867,6 +41863,22 @@
    "variants": [
     "global module fragment cannot be exported",
     "private module fragment cannot be exported"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_module_header_file_not_found",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 282,
+   "component": "Frontend",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "module header file '%0' not found",
+   "variants": [
+    "module header file '%0' not found"
    ],
    "variants_capped": false,
    "untranslated_multi_digit": false
@@ -40948,6 +41960,55 @@
    "summary": "missing 'export' specifier in module declaration while building module interface",
    "variants": [
     "missing 'export' specifier in module declaration while building module interface"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_module_interface_requires_cpp_modules",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 241,
+   "component": "Frontend",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "module interface compilation requires '-std=c++20'",
+   "variants": [
+    "module interface compilation requires '-std=c++20'"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_module_map_not_found",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 243,
+   "component": "Frontend",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "module map file '%0' not found",
+   "variants": [
+    "module map file '%0' not found"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_module_no_size_mtime_for_header",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 186,
+   "component": "Serialization",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "cannot emit module %0: %select{size|mtime}1 must be explicitly specified for missing header file \"%2\"",
+   "variants": [
+    "cannot emit module %0: size must be explicitly specified for missing header file \"%2\"",
+    "cannot emit module %0: mtime must be explicitly specified for missing header file \"%2\""
    ],
    "variants_capped": false,
    "untranslated_multi_digit": false
@@ -41066,6 +42127,22 @@
    "variants": [
     "%0 has different definitions in different modules; definition in module '%2' is here",
     "%0 has different definitions in different modules; defined here"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_module_odr_violation_different_instantiations",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 155,
+   "component": "Serialization",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "instantiation of %q0 is different in different modules",
+   "variants": [
+    "instantiation of %0 is different in different modules"
    ],
    "variants_capped": false,
    "untranslated_multi_digit": false
@@ -41296,6 +42373,23 @@
     "%0 defined here has different definitions in different modules; first difference is this instance variable",
     "%0 defined here has different definitions in different modules; first difference is this property",
     "%0 defined here has different definitions in different modules; first difference is this unexpected decl"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_module_odr_violation_missing_decl",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 147,
+   "component": "Serialization",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "%q0 from module '%1' is not present in definition of %q2%select{ in module '%4'| provided earlier}3",
+   "variants": [
+    "%0 from module '%1' is not present in definition of %2 in module '%4'",
+    "%0 from module '%1' is not present in definition of %2 provided earlier"
    ],
    "variants_capped": false,
    "untranslated_multi_digit": false
@@ -41936,6 +43030,22 @@
    "untranslated_multi_digit": false
   },
   {
+   "id": "err_module_unable_to_hash_content",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 189,
+   "component": "Serialization",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "failed to hash content for '%0' because memory buffer cannot be retrieved",
+   "variants": [
+    "failed to hash content for '%0' because memory buffer cannot be retrieved"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
    "id": "err_module_unavailable",
    "source": "clang/include/clang/Basic/DiagnosticCommonKinds.td",
    "line": 110,
@@ -42019,6 +43129,22 @@
     "default argument of %1 must be imported from one of the following modules before it is required:%2",
     "explicit specialization of %1 must be imported from one of the following modules before it is required:%2",
     "partial specialization of %1 must be imported from one of the following modules before it is required:%2"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_modules_embed_file_not_found",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 279,
+   "component": "Frontend",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "file '%0' specified by '-fmodules-embed-file=' not found",
+   "variants": [
+    "file '%0' specified by '-fmodules-embed-file=' not found"
    ],
    "variants_capped": false,
    "untranslated_multi_digit": false
@@ -43516,6 +44642,38 @@
    "summary": "cannot find interface declaration for %0",
    "variants": [
     "cannot find interface declaration for %0"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_no_submodule",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 251,
+   "component": "Frontend",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "no submodule named %0 in module '%1'",
+   "variants": [
+    "no submodule named %0 in module '%1'"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_no_submodule_suggest",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 252,
+   "component": "Frontend",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "no submodule named %0 in module '%1'; did you mean '%2'?",
+   "variants": [
+    "no submodule named %0 in module '%1'; did you mean '%2'?"
    ],
    "variants_capped": false,
    "untranslated_multi_digit": false
@@ -59169,6 +60327,22 @@
    "untranslated_multi_digit": false
   },
   {
+   "id": "err_relocatable_without_isysroot",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 222,
+   "component": "Frontend",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "must specify system root with -isysroot when building a relocatable PCH file",
+   "variants": [
+    "must specify system root with -isysroot when building a relocatable PCH file"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
    "id": "err_repeat_attribute",
    "source": "clang/include/clang/Basic/DiagnosticSemaKinds.td",
    "line": 2907,
@@ -62108,6 +63282,38 @@
    "summary": "'target_clones' multiversioning requires a default target",
    "variants": [
     "'target_clones' multiversioning requires a default target"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_target_spirv_invalid_shader_stage",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 48,
+   "component": "Frontend",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "SPIR-V target requires a valid shader stage or no environment",
+   "variants": [
+    "SPIR-V target requires a valid shader stage or no environment"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "err_target_spirv_requires_vulkan",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 46,
+   "component": "Frontend",
+   "class": "CLASS_ERROR",
+   "severity": "error",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "SPIR-V target requires a Vulkan environment",
+   "variants": [
+    "SPIR-V target requires a Vulkan environment"
    ],
    "variants_capped": false,
    "untranslated_multi_digit": false
@@ -81821,6 +83027,90 @@
    "untranslated_multi_digit": false
   },
   {
+   "id": "note_ast_file_buffer_failed",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 82,
+   "component": "Serialization",
+   "class": "CLASS_NOTE",
+   "severity": "note",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "unable to load buffer for precompiled file: %0",
+   "variants": [
+    "unable to load buffer for precompiled file: %0"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "note_ast_file_input_files_validation_status",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 33,
+   "component": "Serialization",
+   "class": "CLASS_NOTE",
+   "severity": "note",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "earlier input file validation %select{was not performed|was disabled for this kind of precompiled file|was skipped for the current build session|has covered only user files|has covered all files}0",
+   "variants": [
+    "earlier input file validation was not performed",
+    "earlier input file validation was disabled for this kind of precompiled file",
+    "earlier input file validation was skipped for the current build session",
+    "earlier input file validation has covered only user files",
+    "earlier input file validation has covered all files"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "note_ast_file_rebuild_required",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 29,
+   "component": "Serialization",
+   "class": "CLASS_NOTE",
+   "severity": "note",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "precompiled file '%0' needs to be rebuilt",
+   "variants": [
+    "precompiled file '%0' needs to be rebuilt"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "note_ast_file_required_by",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 28,
+   "component": "Serialization",
+   "class": "CLASS_NOTE",
+   "severity": "note",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "'%0' required by '%1'",
+   "variants": [
+    "'%0' required by '%1'"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "note_ast_file_signature_failed",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 84,
+   "component": "Serialization",
+   "class": "CLASS_NOTE",
+   "severity": "note",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "unable to verify precompiled file signature: %0",
+   "variants": [
+    "unable to verify precompiled file signature: %0"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
    "id": "note_atomic_constraint_evaluated_to_false",
    "source": "clang/include/clang/Basic/DiagnosticSemaKinds.td",
    "line": 3192,
@@ -89419,6 +90709,27 @@
    "untranslated_multi_digit": false
   },
   {
+   "id": "note_fe_ast_file_modified",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 24,
+   "component": "Serialization",
+   "class": "CLASS_NOTE",
+   "severity": "note",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "%select{size|mtime|content}0 changed%select{| from expected %2 to %3}1",
+   "variants": [
+    "size changed",
+    "size changed from expected %2 to %3",
+    "mtime changed",
+    "mtime changed from expected %2 to %3",
+    "content changed",
+    "content changed from expected %2 to %3"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
    "id": "note_field_designator_found",
    "source": "clang/include/clang/Basic/DiagnosticSemaKinds.td",
    "line": 272,
@@ -90575,6 +91886,22 @@
    "summary": "explicitly defaulted function was implicitly deleted here",
    "variants": [
     "explicitly defaulted function was implicitly deleted here"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "note_imported_by_pch_module_not_found",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 120,
+   "component": "Serialization",
+   "class": "CLASS_NOTE",
+   "severity": "note",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "consider adding '%0' to the header search path",
+   "variants": [
+    "consider adding '%0' to the header search path"
    ],
    "variants_capped": false,
    "untranslated_multi_digit": false
@@ -92246,6 +93573,22 @@
    "untranslated_multi_digit": false
   },
   {
+   "id": "note_module_cache_path",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 31,
+   "component": "Serialization",
+   "class": "CLASS_NOTE",
+   "severity": "note",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "after modifying system headers, please delete the module cache at '%0'",
+   "variants": [
+    "after modifying system headers, please delete the module cache at '%0'"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
    "id": "note_module_declared_here",
    "source": "clang/include/clang/Basic/DiagnosticParseKinds.td",
    "line": 1826,
@@ -92258,6 +93601,72 @@
    "variants": [
     "module directive defined here",
     "import directive defined here"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "note_module_def_undef_here",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 269,
+   "component": "Frontend",
+   "class": "CLASS_NOTE",
+   "severity": "note",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "macro was %select{defined|#undef'd}0 here",
+   "variants": [
+    "macro was defined here",
+    "macro was #undef'd here"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "note_module_file_conflict",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 97,
+   "component": "Serialization",
+   "class": "CLASS_NOTE",
+   "severity": "note",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "compiled from '%0' and '%1'",
+   "variants": [
+    "compiled from '%0' and '%1'"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "note_module_file_imported_by",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 91,
+   "component": "Serialization",
+   "class": "CLASS_NOTE",
+   "severity": "note",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "imported by %select{|module '%2' in }1'%0'",
+   "variants": [
+    "imported by '%0'",
+    "imported by module '%2' in '%0'"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "note_module_import_here",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 261,
+   "component": "Frontend",
+   "class": "CLASS_NOTE",
+   "severity": "note",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "module imported here",
+   "variants": [
+    "module imported here"
    ],
    "variants_capped": false,
    "untranslated_multi_digit": false
@@ -92535,6 +93944,22 @@
    "untranslated_multi_digit": false
   },
   {
+   "id": "note_module_odr_violation_no_possible_decls",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 150,
+   "component": "Serialization",
+   "class": "CLASS_NOTE",
+   "severity": "note",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "definition has no member %0",
+   "variants": [
+    "definition has no member %0"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
    "id": "note_module_odr_violation_objc_interface",
    "source": "clang/include/clang/Basic/DiagnosticASTKinds.td",
    "line": 676,
@@ -92655,6 +94080,22 @@
     "but in definition here found property %3 with different 'null_resettable' attribute",
     "but in definition here found property %3 with different 'class' attribute",
     "but in definition here found property %3 with different 'direct' attribute"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "note_module_odr_violation_possible_decl",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 152,
+   "component": "Serialization",
+   "class": "CLASS_NOTE",
+   "severity": "note",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "declaration of %0 does not match",
+   "variants": [
+    "declaration of %0 does not match"
    ],
    "variants_capped": false,
    "untranslated_multi_digit": false
@@ -103726,6 +105167,40 @@
    "untranslated_multi_digit": false
   },
   {
+   "id": "note_pch_vfsoverlay_empty",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 67,
+   "component": "Serialization",
+   "class": "CLASS_NOTE",
+   "severity": "note",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "%select{PCH|current translation unit}0 has no VFS overlays",
+   "variants": [
+    "PCH has no VFS overlays",
+    "current translation unit has no VFS overlays"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "note_pch_vfsoverlay_files",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 66,
+   "component": "Serialization",
+   "class": "CLASS_NOTE",
+   "severity": "note",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "%select{PCH|current translation unit}0 has the following VFS overlays:\n%1",
+   "variants": [
+    "PCH has the following VFS overlays:\n%1",
+    "current translation unit has the following VFS overlays:\n%1"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
    "id": "note_performs_forbidden_arc_conversion",
    "source": "clang/include/clang/Basic/DiagnosticSemaKinds.td",
    "line": 7278,
@@ -104527,6 +106002,22 @@
    "summary": "private module fragment begins here",
    "variants": [
     "private module fragment begins here"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "note_private_top_level_defined",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 257,
+   "component": "Frontend",
+   "class": "CLASS_NOTE",
+   "severity": "note",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "module defined here",
+   "variants": [
+    "module defined here"
    ],
    "variants_capped": false,
    "untranslated_multi_digit": false
@@ -108469,6 +109960,97 @@
    "untranslated_multi_digit": false
   },
   {
+   "id": "remark_module_build",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 271,
+   "component": "Frontend",
+   "class": "CLASS_REMARK",
+   "severity": "remark",
+   "default_ignore": false,
+   "groups": [
+    "module-build"
+   ],
+   "summary": "building module '%0' as '%1'",
+   "variants": [
+    "building module '%0' as '%1'"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "remark_module_build_done",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 274,
+   "component": "Frontend",
+   "class": "CLASS_REMARK",
+   "severity": "remark",
+   "default_ignore": false,
+   "groups": [
+    "module-build"
+   ],
+   "summary": "finished building module '%0'",
+   "variants": [
+    "finished building module '%0'"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "remark_module_check_relocation",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 108,
+   "component": "Serialization",
+   "class": "CLASS_REMARK",
+   "severity": "remark",
+   "default_ignore": false,
+   "groups": [
+    "module-validation"
+   ],
+   "summary": "checking if module '%0' from '%1' has relocated",
+   "variants": [
+    "checking if module '%0' from '%1' has relocated"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "remark_module_import",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 100,
+   "component": "Serialization",
+   "class": "CLASS_REMARK",
+   "severity": "remark",
+   "default_ignore": false,
+   "groups": [
+    "module-import"
+   ],
+   "summary": "importing module '%0'%select{| into '%3'}2 from '%1'",
+   "variants": [
+    "importing module '%0' from '%1'",
+    "importing module '%0' into '%3' from '%1'"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "remark_module_lock",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 277,
+   "component": "Frontend",
+   "class": "CLASS_REMARK",
+   "severity": "remark",
+   "default_ignore": false,
+   "groups": [
+    "module-lock"
+   ],
+   "summary": "locking '%0' to build module '%1'",
+   "variants": [
+    "locking '%0' to build module '%1'"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
    "id": "remark_module_lock_failure",
    "source": "clang/include/clang/Basic/DiagnosticCommonKinds.td",
    "line": 114,
@@ -108500,6 +110082,42 @@
    "summary": "timed out waiting to acquire lock file for module '%0'",
    "variants": [
     "timed out waiting to acquire lock file for module '%0'"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "remark_module_relocated",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 112,
+   "component": "Serialization",
+   "class": "CLASS_REMARK",
+   "severity": "remark",
+   "default_ignore": false,
+   "groups": [
+    "module-validation"
+   ],
+   "summary": "module '%0' relocated from '%1' to '%2'",
+   "variants": [
+    "module '%0' relocated from '%1' to '%2'"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "remark_module_validation",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 104,
+   "component": "Serialization",
+   "class": "CLASS_REMARK",
+   "severity": "remark",
+   "default_ignore": false,
+   "groups": [
+    "module-validation"
+   ],
+   "summary": "validating %0 input files in module '%1' from '%2'",
+   "variants": [
+    "validating %0 input files in module '%1' from '%2'"
    ],
    "variants_capped": false,
    "untranslated_multi_digit": false
@@ -110163,6 +111781,24 @@
    "summary": "assumption is ignored because it contains (potential) side-effects",
    "variants": [
     "assumption is ignored because it contains (potential) side-effects"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "warn_ast_file_config_mismatch",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 47,
+   "component": "Serialization",
+   "class": "CLASS_WARNING",
+   "severity": "warning",
+   "default_ignore": false,
+   "groups": [
+    "module-file-config-mismatch"
+   ],
+   "summary": "precompiled file '%0' cannot be loaded due to a configuration mismatch with the current compilation",
+   "variants": [
+    "precompiled file '%0' cannot be loaded due to a configuration mismatch with the current compilation"
    ],
    "variants_capped": false,
    "untranslated_multi_digit": false
@@ -119464,6 +121100,24 @@
    "untranslated_multi_digit": false
   },
   {
+   "id": "warn_decls_in_multiple_modules",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 167,
+   "component": "Serialization",
+   "class": "CLASS_WARNING",
+   "severity": "warning",
+   "default_ignore": true,
+   "groups": [
+    "decls-in-multiple-modules"
+   ],
+   "summary": "declaration %0 is detected to be defined in multiple module units, first is from '%1' and second is from '%2'; the compiler may not be good at merging the definitions. ",
+   "variants": [
+    "declaration %0 is detected to be defined in multiple module units, first is from '%1' and second is from '%2'; the compiler may not be good at merging the definitions. "
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
    "id": "warn_declspec_allocator_nonpointer",
    "source": "clang/include/clang/Basic/DiagnosticSemaKinds.td",
    "line": 4172,
@@ -121544,6 +123198,24 @@
    "untranslated_multi_digit": false
   },
   {
+   "id": "warn_duplicate_module_file_extension",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 158,
+   "component": "Serialization",
+   "class": "CLASS_WARNING",
+   "severity": "warning",
+   "default_ignore": false,
+   "groups": [
+    "module-file-extension"
+   ],
+   "summary": "duplicate module file extension block name '%0'",
+   "variants": [
+    "duplicate module file extension block name '%0'"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
    "id": "warn_duplicate_protocol_def",
    "source": "clang/include/clang/Basic/DiagnosticSemaKinds.td",
    "line": 1303,
@@ -121606,6 +123278,24 @@
     "second operand of this %1 call is a pointer to class containing a dynamic class %3; vtable pointer will be copied",
     "second operand of this %1 call is a pointer to class containing a dynamic class %3; vtable pointer will be moved",
     "second operand of this %1 call is a pointer to class containing a dynamic class %3; vtable pointer will be compared"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "warn_eagerly_load_for_standard_cplusplus_modules",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 293,
+   "component": "Frontend",
+   "class": "CLASS_WARNING",
+   "severity": "warning",
+   "default_ignore": false,
+   "groups": [
+    "eager-load-cxx-named-modules"
+   ],
+   "summary": "the form '-fmodule-file=<BMI-path>' is deprecated for standard C++ named modules; consider to use '-fmodule-file=<module-name>=<BMI-path>' instead",
+   "variants": [
+    "the form '-fmodule-file=<BMI-path>' is deprecated for standard C++ named modules; consider to use '-fmodule-file=<module-name>=<BMI-path>' instead"
    ],
    "variants_capped": false,
    "untranslated_multi_digit": false
@@ -122355,6 +124045,132 @@
     "non-void lambda does not return a value in all control paths",
     "non-void coroutine does not return a value",
     "non-void coroutine does not return a value in all control paths"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "warn_fe_backend_invalid_feature_flag",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 60,
+   "component": "Frontend",
+   "class": "CLASS_WARNING",
+   "severity": "warning",
+   "default_ignore": false,
+   "groups": [
+    "IgnoredOptimizationArgument",
+    "ignored-optimization-argument",
+    "invalid-command-line-argument"
+   ],
+   "summary": "feature flag '%0' must start with either '+' to enable the feature or '-' to disable it; flag ignored",
+   "variants": [
+    "feature flag '%0' must start with either '+' to enable the feature or '-' to disable it; flag ignored"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "warn_fe_backend_readonly_feature_flag",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 63,
+   "component": "Frontend",
+   "class": "CLASS_WARNING",
+   "severity": "warning",
+   "default_ignore": false,
+   "groups": [
+    "IgnoredOptimizationArgument",
+    "ignored-optimization-argument",
+    "invalid-command-line-argument"
+   ],
+   "summary": "feature flag '%0' is ignored since the feature is read only",
+   "variants": [
+    "feature flag '%0' is ignored since the feature is read only"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "warn_fe_backend_unsupported_fp_exceptions",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 57,
+   "component": "Frontend",
+   "class": "CLASS_WARNING",
+   "severity": "warning",
+   "default_ignore": false,
+   "groups": [
+    "unsupported-floating-point-opt"
+   ],
+   "summary": "overriding currently unsupported use of floating point exceptions on this target",
+   "variants": [
+    "overriding currently unsupported use of floating point exceptions on this target"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "warn_fe_backend_unsupported_fp_rounding",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 54,
+   "component": "Frontend",
+   "class": "CLASS_WARNING",
+   "severity": "warning",
+   "default_ignore": false,
+   "groups": [
+    "unsupported-floating-point-opt"
+   ],
+   "summary": "overriding currently unsupported rounding mode on this target",
+   "variants": [
+    "overriding currently unsupported rounding mode on this target"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "warn_fe_cc_log_diagnostics_failure",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 138,
+   "component": "Frontend",
+   "class": "CLASS_WARNING",
+   "severity": "warning",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "unable to open CC_LOG_DIAGNOSTICS file: %0 (using stderr)",
+   "variants": [
+    "unable to open CC_LOG_DIAGNOSTICS file: %0 (using stderr)"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "warn_fe_macro_contains_embedded_newline",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 134,
+   "component": "Frontend",
+   "class": "CLASS_WARNING",
+   "severity": "warning",
+   "default_ignore": false,
+   "groups": [],
+   "summary": "macro '%0' contains embedded newline; text after the newline is ignored",
+   "variants": [
+    "macro '%0' contains embedded newline; text after the newline is ignored"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "warn_fe_unable_to_open_stats_file",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 140,
+   "component": "Frontend",
+   "class": "CLASS_WARNING",
+   "severity": "warning",
+   "default_ignore": false,
+   "groups": [
+    "unable-to-open-stats-file"
+   ],
+   "summary": "unable to open statistics output file '%0': '%1'",
+   "variants": [
+    "unable to open statistics output file '%0': '%1'"
    ],
    "variants_capped": false,
    "untranslated_multi_digit": false
@@ -124703,6 +126519,24 @@
    "summary": "resource has implicit register binding",
    "variants": [
     "resource has implicit register binding"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "warn_hlsl_langstd_minimal",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 458,
+   "component": "Frontend",
+   "class": "CLASS_WARNING",
+   "severity": "warning",
+   "default_ignore": false,
+   "groups": [
+    "hlsl-dxc-compatability"
+   ],
+   "summary": "support for HLSL language version %0 is incomplete, recommend using %1 instead",
+   "variants": [
+    "support for HLSL language version %0 is incomplete, recommend using %1 instead"
    ],
    "variants_capped": false,
    "untranslated_multi_digit": false
@@ -128429,6 +130263,24 @@
    "untranslated_multi_digit": false
   },
   {
+   "id": "warn_missing_submodule",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 259,
+   "component": "Frontend",
+   "class": "CLASS_WARNING",
+   "severity": "warning",
+   "default_ignore": false,
+   "groups": [
+    "incomplete-umbrella"
+   ],
+   "summary": "missing submodule '%0'",
+   "variants": [
+    "missing submodule '%0'"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
    "id": "warn_missing_type_specifier",
    "source": "clang/include/clang/Basic/DiagnosticCommonKinds.td",
    "line": 139,
@@ -128701,6 +130553,27 @@
    "untranslated_multi_digit": false
   },
   {
+   "id": "warn_module_config_macro_undef",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 264,
+   "component": "Frontend",
+   "class": "CLASS_WARNING",
+   "severity": "warning",
+   "default_ignore": false,
+   "groups": [
+    "config-macros"
+   ],
+   "summary": "%select{definition|#undef}0 of configuration macro '%1' has no effect on the import of '%2'; pass '%select{-D%1=...|-U%1}0' on the command line to configure the module",
+   "variants": [
+    "definition of configuration macro '%1' has no effect on the import of '%2'; pass '-D%1=...' on the command line to configure the module",
+    "definition of configuration macro '%1' has no effect on the import of '%2'; pass '-U%1' on the command line to configure the module",
+    "#undef of configuration macro '%1' has no effect on the import of '%2'; pass '-D%1=...' on the command line to configure the module",
+    "#undef of configuration macro '%1' has no effect on the import of '%2'; pass '-U%1' on the command line to configure the module"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
    "id": "warn_module_conflict",
    "source": "clang/include/clang/Basic/DiagnosticLexKinds.td",
    "line": 1022,
@@ -128714,6 +130587,61 @@
    "summary": "module '%0' conflicts with already-imported module '%1': %2",
    "variants": [
     "module '%0' conflicts with already-imported module '%1': %2"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "warn_module_file_mapping_mismatch",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 173,
+   "component": "Serialization",
+   "class": "CLASS_WARNING",
+   "severity": "warning",
+   "default_ignore": true,
+   "groups": [
+    "module-file-mapping-mismatch"
+   ],
+   "summary": "loaded module file '%0' conflicts with imported file '%1'",
+   "variants": [
+    "loaded module file '%0' conflicts with imported file '%1'"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "warn_module_system_bit_conflict",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 162,
+   "component": "Serialization",
+   "class": "CLASS_WARNING",
+   "severity": "warning",
+   "default_ignore": false,
+   "groups": [
+    "module-conflict"
+   ],
+   "summary": "module file '%0' was validated as a system module and is now being imported as a non-system module; any difference in diagnostic options will be ignored",
+   "variants": [
+    "module file '%0' was validated as a system module and is now being imported as a non-system module; any difference in diagnostic options will be ignored"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "warn_module_uses_date_time",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 183,
+   "component": "Serialization",
+   "class": "CLASS_WARNING",
+   "severity": "warning",
+   "default_ignore": false,
+   "groups": [
+    "pch-date-time"
+   ],
+   "summary": "%select{precompiled header|module}0 uses __DATE__ or __TIME__",
+   "variants": [
+    "precompiled header uses __DATE__ or __TIME__",
+    "module uses __DATE__ or __TIME__"
    ],
    "variants_capped": false,
    "untranslated_multi_digit": false
@@ -129038,6 +130966,24 @@
    "summary": "no newline at end of file",
    "variants": [
     "no newline at end of file"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "warn_no_priv_submodule_use_toplevel",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 254,
+   "component": "Frontend",
+   "class": "CLASS_WARNING",
+   "severity": "warning",
+   "default_ignore": false,
+   "groups": [
+    "private-module"
+   ],
+   "summary": "no submodule named %0 in module '%1'; using top level '%2'",
+   "variants": [
+    "no submodule named %0 in module '%1'; using top level '%2'"
    ],
    "variants_capped": false,
    "untranslated_multi_digit": false
@@ -132444,6 +134390,82 @@
    "untranslated_multi_digit": false
   },
   {
+   "id": "warn_option_invalid_ocl_version",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 303,
+   "component": "Frontend",
+   "class": "CLASS_WARNING",
+   "severity": "warning",
+   "default_ignore": false,
+   "groups": [
+    "CXX11CompatDeprecatedWritableStr",
+    "DeprecatedAnonEnumEnumConversion",
+    "DeprecatedArrayCompare",
+    "DeprecatedAttributes",
+    "DeprecatedBuiltins",
+    "DeprecatedCommaSubscript",
+    "DeprecatedCopy",
+    "DeprecatedCopyWithDtor",
+    "DeprecatedCopyWithUserProvidedCopy",
+    "DeprecatedCopyWithUserProvidedDtor",
+    "DeprecatedDeclarations",
+    "DeprecatedDeclarationsSwitchCase",
+    "DeprecatedDynamicExceptionSpec",
+    "DeprecatedEnumCompare",
+    "DeprecatedEnumCompareConditional",
+    "DeprecatedEnumEnumConversion",
+    "DeprecatedEnumFloatConversion",
+    "DeprecatedIncrementBool",
+    "DeprecatedLiteralOperator",
+    "DeprecatedMissingCommaVariadicParam",
+    "DeprecatedOFast",
+    "DeprecatedOctalLiterals",
+    "DeprecatedPragma",
+    "DeprecatedRedundantConstexprStaticDef",
+    "DeprecatedRegister",
+    "DeprecatedThisCapture",
+    "DeprecatedType",
+    "DeprecatedVolatile",
+    "DeprecatedWritableStr",
+    "c++11-compat-deprecated-writable-strings",
+    "deprecated",
+    "deprecated-anon-enum-enum-conversion",
+    "deprecated-array-compare",
+    "deprecated-attributes",
+    "deprecated-builtins",
+    "deprecated-comma-subscript",
+    "deprecated-copy",
+    "deprecated-copy-with-dtor",
+    "deprecated-copy-with-user-provided-copy",
+    "deprecated-copy-with-user-provided-dtor",
+    "deprecated-declarations",
+    "deprecated-declarations-switch-case",
+    "deprecated-dynamic-exception-spec",
+    "deprecated-enum-compare",
+    "deprecated-enum-compare-conditional",
+    "deprecated-enum-enum-conversion",
+    "deprecated-enum-float-conversion",
+    "deprecated-increment-bool",
+    "deprecated-literal-operator",
+    "deprecated-missing-comma-variadic-parameter",
+    "deprecated-octal-literals",
+    "deprecated-ofast",
+    "deprecated-pragma",
+    "deprecated-redundant-constexpr-static-def",
+    "deprecated-register",
+    "deprecated-this-capture",
+    "deprecated-type",
+    "deprecated-volatile",
+    "deprecated-writable-strings"
+   ],
+   "summary": "%0 does not support the option '%1'",
+   "variants": [
+    "%0 does not support the option '%1'"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
    "id": "warn_os_log_format_narg",
    "source": "clang/include/clang/Basic/DiagnosticSemaKinds.td",
    "line": 11269,
@@ -132890,6 +134912,24 @@
     "passing object of class type %0 through variadic method; did you mean to call '%3'?",
     "passing object of class type %0 through variadic constructor",
     "passing object of class type %0 through variadic constructor; did you mean to call '%3'?"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "warn_pch_vfsoverlay_mismatch",
+   "source": "clang/include/clang/Basic/DiagnosticSerializationKinds.td",
+   "line": 63,
+   "component": "Serialization",
+   "class": "CLASS_WARNING",
+   "severity": "warning",
+   "default_ignore": false,
+   "groups": [
+    "pch-vfs-diff"
+   ],
+   "summary": "PCH was compiled with different VFS overlay files than are currently in use",
+   "variants": [
+    "PCH was compiled with different VFS overlay files than are currently in use"
    ],
    "variants_capped": false,
    "untranslated_multi_digit": false
@@ -135969,6 +138009,24 @@
    "summary": "use of __private_extern__ on a declaration may not produce external symbol private to the linkage unit and is deprecated",
    "variants": [
     "use of __private_extern__ on a declaration may not produce external symbol private to the linkage unit and is deprecated"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "warn_profile_data_misexpect",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 404,
+   "component": "Frontend",
+   "class": "CLASS_WARNING",
+   "severity": "warning",
+   "default_ignore": false,
+   "groups": [
+    "misexpect"
+   ],
+   "summary": "potential performance regression from use of __builtin_expect(): annotation was correct on %0 of profiled executions",
+   "variants": [
+    "potential performance regression from use of __builtin_expect(): annotation was correct on %0 of profiled executions"
    ],
    "variants_capped": false,
    "untranslated_multi_digit": false
@@ -140702,6 +142760,27 @@
    "untranslated_multi_digit": false
   },
   {
+   "id": "warn_unknown_diag_option",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 226,
+   "component": "Frontend",
+   "class": "CLASS_WARNING",
+   "severity": "warning",
+   "default_ignore": false,
+   "groups": [
+    "unknown-warning-option"
+   ],
+   "summary": "unknown %select{warning|remark}0 option '%1'%select{|; did you mean '%3'?}2",
+   "variants": [
+    "unknown warning option '%1'",
+    "unknown warning option '%1'; did you mean '%3'?",
+    "unknown remark option '%1'",
+    "unknown remark option '%1'; did you mean '%3'?"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
    "id": "warn_unknown_sanitizer_ignored",
    "source": "clang/include/clang/Basic/DiagnosticSemaKinds.td",
    "line": 4532,
@@ -140715,6 +142794,24 @@
    "summary": "unknown sanitizer '%0' ignored",
    "variants": [
     "unknown sanitizer '%0' ignored"
+   ],
+   "variants_capped": false,
+   "untranslated_multi_digit": false
+  },
+  {
+   "id": "warn_unknown_warning_specifier",
+   "source": "clang/include/clang/Basic/DiagnosticFrontendKinds.td",
+   "line": 229,
+   "component": "Frontend",
+   "class": "CLASS_WARNING",
+   "severity": "warning",
+   "default_ignore": false,
+   "groups": [
+    "unknown-warning-option"
+   ],
+   "summary": "unknown %0 warning specifier: '%1'",
+   "variants": [
+    "unknown %0 warning specifier: '%1'"
    ],
    "variants_capped": false,
    "untranslated_multi_digit": false

@@ -11,11 +11,15 @@ CompilerSet errorformat=%f:%l:%c:\ %trror:\ %m,
       \%f:%l:%c:\ %tote:\ %m,
       \%f:%l:%c:\ %temark:\ %m,
       \%f:%l:\ %trror:\ %m,
+      \%f:%l:\ %tatal\ error:\ %m,
       \%f:%l:\ %tarning:\ %m,
       \%f:%l:\ %tote:\ %m,
+      \%f:%l:\ %temark:\ %m,
       \%f:\ %trror:\ %m,
+      \%f:\ %tatal\ error:\ %m,
       \%f:\ %tarning:\ %m,
       \%f:\ %tote:\ %m,
+      \%f:\ %temark:\ %m,
       \%+G%.%#
 let &cpo = s:cpo_save
 unlet s:cpo_save

@@ -46,9 +46,19 @@ msgctxt "clangd_config"
 msgid "Exactly one of File, Server or None must be set."
 msgstr "File、Server、None 三者必须且只能设置其一"
 
+#: clang-tools-extra/clangd/ConfigYAML.cpp:477
+msgctxt "clangd_config"
+msgid "Expected scalar or list of scalars"
+msgstr "需要标量值或标量列表"
+
 msgctxt "clangd_config"
 msgid "Experiment is deprecated for UnusedIncludes, use Strict instead."
 msgstr "UnusedIncludes 的 Experiment 已废弃，请改用 Strict"
+
+#: clang-tools-extra/clangd/ConfigYAML.cpp:206
+msgctxt "clangd_config"
+msgid "External must be either a scalar or a mapping."
+msgstr "External 必须是标量或映射。"
 
 msgctxt "clangd_config"
 msgid "Invalid clang-tidy check name"
@@ -62,17 +72,33 @@ msgctxt "clangd_config"
 msgid "Invalid regular expression '{pattern}': {reason}"
 msgstr "无效的正则表达式 '{pattern}'：{reason}"
 
+#: clang-tools-extra/clangd/ConfigCompile.cpp:164
+msgctxt "clangd_config"
+msgid "Invalid {key} value '{value}'. Valid values are {valid}."
+msgstr "无效的 {key} 值 '{value}'。有效值为 {valid}。"
+
 msgctxt "clangd_config"
 msgid "Latency of clang-tidy check '{check}' is not known. It will only run if ClangTidy.FastCheckFilter is Loose or None"
 msgstr "未知 clang-tidy 检查 '{check}' 的延迟。仅当 ClangTidy.FastCheckFilter 为 Loose 或 None 时才会运行"
+
+#: clang-tools-extra/clangd/ConfigYAML.cpp:222
+msgctxt "clangd_config"
+msgid "Only scalar value supported for External is 'None'"
+msgstr "External 支持的唯一标量值是 'None'"
 
 msgctxt "clangd_config"
 msgid "Remote index may not be specified by untrusted configuration. Copy this into user config to use it."
 msgstr "不受信任的配置不能指定远程索引。请复制到用户配置中以启用"
 
+#: clang-tools-extra/clangd/ConfigYAML.cpp:420
 msgctxt "clangd_config"
-msgid "Unknown {kind} key '{key}' ignored"
-msgstr "已忽略未知的 {kind} 键 '{key}'"
+msgid "Unknown {kind} key '{key}'"
+msgstr "未知的 {kind} 键 '{key}'"
+
+#: clang-tools-extra/clangd/ConfigYAML.cpp:424
+msgctxt "clangd_config"
+msgid "Unknown {kind} key '{key}'; did you mean '{suggestion}'?"
+msgstr "未知的 {kind} 键 '{key}'，是否想使用 '{suggestion}'？"
 
 msgctxt "clangd_config"
 msgid "clang-tidy check '{check}' is slow. It will only run if ClangTidy.FastCheckFilter is None"
@@ -82,9 +108,19 @@ msgctxt "clangd_config"
 msgid "clang-tidy check '{check}' was not found"
 msgstr "未找到 clang-tidy 检查 '{check}'"
 
+#: clang-tools-extra/clangd/ConfigYAML.cpp:458
+msgctxt "clangd_config"
+msgid "{key} invalid number"
+msgstr "{key} 包含无效数字"
+
 msgctxt "clangd_config"
 msgid "{key} should be a boolean"
 msgstr "{key} 应为布尔值"
+
+#: clang-tools-extra/clangd/ConfigYAML.cpp:367
+msgctxt "clangd_config"
+msgid "{key} should be a dictionary"
+msgstr "{key} 应为字典"
 
 msgctxt "clangd_config"
 msgid "{key} should be scalar"
@@ -114,9 +150,10 @@ msgctxt "code_action"
 msgid "Add using-declaration"
 msgstr "添加 using 声明"
 
+#: clang-tools-extra/clangd/refactor/tweaks/AddUsing.cpp:149
 msgctxt "code_action"
-msgid "Add using-declaration for {0} and remove qualifier"
-msgstr "为 {0} 添加 using 声明并移除限定符"
+msgid "Add using-declaration for {qualifier} and remove qualifier"
+msgstr "为 {qualifier} 添加 using 声明并移除限定符"
 
 msgctxt "code_action"
 msgid "Add {header} for {symbol}"
@@ -125,6 +162,11 @@ msgstr "添加 {header} 以使用 {symbol}"
 msgctxt "code_action"
 msgid "Annotate highlighting tokens"
 msgstr "标注高亮记号"
+
+#: clang-tools-extra/clangd/ClangdLSPServer.cpp:1067
+msgctxt "code_action"
+msgid "Apply fix: {title}"
+msgstr "应用修复：{title}"
 
 msgctxt "code_action"
 msgid "Change '{old}' to '{new}'"
@@ -142,9 +184,10 @@ msgctxt "code_action"
 msgid "Create function body out-of-line"
 msgstr "在声明之外创建函数体"
 
+#: clang-tools-extra/clangd/refactor/tweaks/SpecialMembers.cpp:146
 msgctxt "code_action"
-msgid "Declare implicit {0} members"
-msgstr "声明隐式 {0} 成员"
+msgid "Declare implicit {kinds} members"
+msgstr "声明隐式 {kinds} 成员"
 
 msgctxt "code_action"
 msgid "Declare memberwise initializer"
@@ -158,9 +201,10 @@ msgctxt "code_action"
 msgid "Dump symbol under the cursor"
 msgstr "输出光标下的符号信息"
 
+#: clang-tools-extra/clangd/refactor/tweaks/DumpAST.cpp:69
 msgctxt "code_action"
-msgid "Dump {0} AST"
-msgstr "导出 {0} 的 AST"
+msgid "Dump {node} AST"
+msgstr "导出 {node} 的 AST"
 
 msgctxt "code_action"
 msgid "Expand auto type"
@@ -174,9 +218,10 @@ msgctxt "code_action"
 msgid "Expand macro"
 msgstr "展开宏"
 
+#: clang-tools-extra/clangd/refactor/tweaks/ExpandMacro.cpp:74
 msgctxt "code_action"
-msgid "Expand macro '{0}'"
-msgstr "展开宏 '{0}'"
+msgid "Expand macro '{macro}'"
+msgstr "展开宏 '{macro}'"
 
 msgctxt "code_action"
 msgid "Extract function"
@@ -197,6 +242,26 @@ msgstr "提取变量"
 msgctxt "code_action"
 msgid "Generate memberwise initializer"
 msgstr "生成逐成员初始化器"
+
+#: clang-tools-extra/clangd/IncludeFixer.cpp:262
+msgctxt "code_action"
+msgid "Import {header}"
+msgstr "导入 {header}"
+
+#: clang-tools-extra/clangd/IncludeFixer.cpp:264
+msgctxt "code_action"
+msgid "Import {header} for symbol {symbol}"
+msgstr "导入 {header} 以使用符号 {symbol}"
+
+#: clang-tools-extra/clangd/IncludeFixer.cpp:262
+msgctxt "code_action"
+msgid "Include {header}"
+msgstr "包含 {header}"
+
+#: clang-tools-extra/clangd/IncludeFixer.cpp:264
+msgctxt "code_action"
+msgid "Include {header} for symbol {symbol}"
+msgstr "包含 {header} 以使用符号 {symbol}"
 
 msgctxt "code_action"
 msgid "Invert if condition"
@@ -250,6 +315,11 @@ msgctxt "code_action"
 msgid "Show selection tree"
 msgstr "显示选区语法树"
 
+#: clang-tools-extra/clangd/refactor/tweaks/DumpAST.cpp:95
+msgctxt "code_action"
+msgid "Show {kind} layout"
+msgstr "显示 {kind} 布局"
+
 msgctxt "code_action"
 msgid "Split declaration and assignment"
 msgstr "拆分声明与赋值"
@@ -262,9 +332,10 @@ msgctxt "code_action"
 msgid "Swap if/else branches"
 msgstr "交换 if/else 分支"
 
+#: clang-tools-extra/clangd/refactor/tweaks/SwapBinaryOperands.cpp:74
 msgctxt "code_action"
-msgid "Swap operands to {0}"
-msgstr "交换操作数为 {0}"
+msgid "Swap operands to {op}"
+msgstr "交换操作数为 {op}"
 
 msgctxt "code_action"
 msgid "Wrap in NSLocalizedString"
@@ -282,6 +353,11 @@ msgctxt "code_action"
 msgid "fix all includes"
 msgstr "修复所有包含指令"
 
+#: clang-tools-extra/clangd/Diagnostics.cpp:834
+msgctxt "code_action"
+msgid "insert '{text}'"
+msgstr "插入 '{text}'"
+
 msgctxt "code_action"
 msgid "insert {text}"
 msgstr "插入 {text}"
@@ -289,6 +365,11 @@ msgstr "插入 {text}"
 msgctxt "code_action"
 msgid "remove #include directive"
 msgstr "移除 #include 指令"
+
+#: clang-tools-extra/clangd/Diagnostics.cpp:830
+msgctxt "code_action"
+msgid "remove '{text}'"
+msgstr "移除 '{text}'"
 
 msgctxt "code_action"
 msgid "remove all unused includes"
@@ -305,10 +386,6 @@ msgstr "将 '{old}' 替换为 '{new}'"
 msgctxt "completion"
 msgid "From {header}"
 msgstr "来自 {header}"
-
-msgctxt "completion"
-msgid "[{0} overloads]"
-msgstr "[{0} 个重载]"
 
 msgctxt "completion"
 msgid "[{count} overloads]"
@@ -569,10 +646,6 @@ msgctxt "diagnostic"
 msgid "#include resolved using non-portable Microsoft search rules as: %0"
 msgstr "#include 使用不可移植的 Microsoft 搜索规则解析为：%0"
 
-msgctxt "diagnostic"
-msgid "#include {0}"
-msgstr "#include {0}"
-
 #: clang/include/clang/Basic/DiagnosticLexKinds.td:369
 msgctxt "diagnostic"
 msgid "#include_next in file found relative to primary source file or found by absolute path; will search from start of include path"
@@ -717,6 +790,16 @@ msgstr "#pragma warning 应为警告编号"
 msgctxt "diagnostic"
 msgid "#pragma warning(push, level) requires a level between 0 and 4"
 msgstr "#pragma warning(push, level) 需要 0 到 4 之间的级别"
+
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:264
+msgctxt "diagnostic"
+msgid "#undef of configuration macro '%1' has no effect on the import of '%2'; pass '-D%1=...' on the command line to configure the module"
+msgstr "配置宏 '%1' 的#undef 对导入 '%2' 没有影响；请在命令行上传递 '-D%1=...' 以配置该模块"
+
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:264
+msgctxt "diagnostic"
+msgid "#undef of configuration macro '%1' has no effect on the import of '%2'; pass '-U%1' on the command line to configure the module"
+msgstr "配置宏 '%1' 的#undef 对导入 '%2' 没有影响；请在命令行上传递 '-U%1' 以配置该模块"
 
 #: clang/include/clang/Basic/DiagnosticLexKinds.td:471
 msgctxt "diagnostic"
@@ -39341,6 +39424,12 @@ msgctxt "diagnostic"
 msgid "%0 defined here has different definitions in different modules; first difference is this unexpected decl"
 msgstr "%0（定义于此处）在不同模块中有不同的定义；第一处差异是此意外声明"
 
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:53
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:57
+msgctxt "diagnostic"
+msgid "%0 differs in precompiled file '%1' vs. current file"
+msgstr "%0 在预编译文件 '%1' 与当前文件中不同"
+
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:13480
 msgctxt "diagnostic"
 msgid "%0 dimension is outside the allowed range [1, %1]"
@@ -39412,6 +39501,26 @@ msgctxt "diagnostic"
 msgid "%0 does not refer to the name of a parameter pack; did you mean %1?"
 msgstr "%0 未引用形参包的名称；您是指 %1 吗？"
 
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:284
+msgctxt "diagnostic"
+msgid "%0 does not support input file format of file '%1': 'ModuleMap'"
+msgstr "%0 不支持文件 '%1' 的输入文件格式：'ModuleMap'"
+
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:284
+msgctxt "diagnostic"
+msgid "%0 does not support input file format of file '%1': 'Precompiled'"
+msgstr "%0 不支持文件 '%1' 的输入文件格式：'Precompiled'"
+
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:284
+msgctxt "diagnostic"
+msgid "%0 does not support input file format of file '%1': 'Source'"
+msgstr "%0 不支持文件 '%1' 的输入文件格式：'Source'"
+
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:284
+msgctxt "diagnostic"
+msgid "%0 does not support input file format of file '%1': 'Unknown'"
+msgstr "%0 不支持文件 '%1' 的输入文件格式：'Unknown'"
+
 #: clang/include/clang/Basic/DiagnosticCommonKinds.td:179
 msgctxt "diagnostic"
 msgid "%0 does not support the '%1' storage class specifier"
@@ -39421,6 +39530,11 @@ msgstr "%0 不支持 '%1' 存储类说明符"
 msgctxt "diagnostic"
 msgid "%0 does not support the '%1' type qualifier"
 msgstr "%0 不支持 '%1' 类型限定符"
+
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:303
+msgctxt "diagnostic"
+msgid "%0 does not support the option '%1'"
+msgstr "%0 不支持选项 '%1'"
 
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:11309
 msgctxt "diagnostic"
@@ -39447,6 +39561,16 @@ msgstr "跟在 'template' 关键字之后的 %0 不能引用依赖模板"
 msgctxt "diagnostic"
 msgid "%0 following the 'template' keyword does not refer to a template"
 msgstr "紧跟在 'template' 关键字之后的 %0 未指向模板"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:147
+msgctxt "diagnostic"
+msgid "%0 from module '%1' is not present in definition of %2 in module '%4'"
+msgstr "来自模块 '%1' 的 %0 不存在于模块 '%4' 中 %2 的定义中"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:147
+msgctxt "diagnostic"
+msgid "%0 from module '%1' is not present in definition of %2 provided earlier"
+msgstr "来自模块 '%1' 的 %0 不存在于先前提供的 %2 的定义中"
 
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:551
 msgctxt "diagnostic"
@@ -41998,6 +42122,11 @@ msgctxt "diagnostic"
 msgid "%0 is an unsafe pointer used for buffer access"
 msgstr "%0 是用于缓冲访问的不安全指针"
 
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:59
+msgctxt "diagnostic"
+msgid "%0 is currently enabled, but was not in the precompiled file '%1'"
+msgstr "%0 当前已启用，但在预编译文件 '%1' 中未启用"
+
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:6369
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:6371
 msgctxt "diagnostic"
@@ -42338,6 +42467,11 @@ msgstr "%0 不得同时出现在 '%1' 和 '%2' 子句中"
 msgctxt "diagnostic"
 msgid "%0 must return type %1"
 msgstr "%0 必须返回类型 %1"
+
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:306
+msgctxt "diagnostic"
+msgid "%0 needs target feature %1"
+msgstr "%0 需要目标特性 %1"
 
 #: clang/include/clang/Basic/DiagnosticCommonKinds.td:284
 msgctxt "diagnostic"
@@ -42706,6 +42840,30 @@ msgstr "%0 变量不能出现在 '#pragma omp %2' 指令的 %1 子句中"
 msgctxt "diagnostic"
 msgid "%0 variable must be %1"
 msgstr "%0 变量必须为 %1"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:45
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:55
+msgctxt "diagnostic"
+msgid "%0 was disabled in precompiled file '%3' but is currently disabled"
+msgstr "%0 在预编译文件 '%3' 中为禁用状态，但当前为禁用状态"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:45
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:55
+msgctxt "diagnostic"
+msgid "%0 was disabled in precompiled file '%3' but is currently enabled"
+msgstr "%0 在预编译文件 '%3' 中为禁用状态，但当前为启用状态"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:45
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:55
+msgctxt "diagnostic"
+msgid "%0 was enabled in precompiled file '%3' but is currently disabled"
+msgstr "%0 在预编译文件 '%3' 中为启用状态，但当前为禁用状态"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:45
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:55
+msgctxt "diagnostic"
+msgid "%0 was enabled in precompiled file '%3' but is currently enabled"
+msgstr "%0 在预编译文件 '%3' 中为启用状态，但当前为启用状态"
 
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:501
 msgctxt "diagnostic"
@@ -43490,6 +43648,11 @@ msgstr "此平台不支持 '%%n' 说明符"
 msgctxt "diagnostic"
 msgid "'%0' ABI is not supported with FPU"
 msgstr "FPU 不支持 '%0' ABI"
+
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:149
+msgctxt "diagnostic"
+msgid "'%0' action ignored; '%1' action specified previously"
+msgstr "已忽略 '%0' 操作；先前已指定 '%1' 操作"
 
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:12549
 msgctxt "diagnostic"
@@ -48146,6 +48309,11 @@ msgstr "析构函数名中的 '~' 应位于嵌套名称说明符之后"
 msgctxt "diagnostic"
 msgid "-dealloc is being overridden in a category"
 msgstr "正在分类中重写 -dealloc"
+
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:113
+msgctxt "diagnostic"
+msgid "-dependency-file requires at least one -MT or -MQ option"
+msgstr "-dependency-file 至少需要一个 -MT 或 -MQ 选项"
 
 #: clang/include/clang/Basic/DiagnosticASTKinds.td:1021
 msgctxt "diagnostic"
@@ -58546,6 +58714,11 @@ msgctxt "diagnostic"
 msgid "Build a shadowed submodule '%0'"
 msgstr "构建被遮蔽的子模块 '%0'"
 
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:271
+msgctxt "diagnostic"
+msgid "Building module '%0' as '%1'"
+msgstr "正在将模块 '%0' 构建为 '%1'"
+
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:5504
 msgctxt "diagnostic"
 msgid "Built-in subscript operator for type %0 expects exactly one argument"
@@ -59248,6 +59421,11 @@ msgctxt "diagnostic"
 msgid "Cannot allocate reference type %0 with new"
 msgstr "无法使用 new 分配引用类型 %0"
 
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:445
+msgctxt "diagnostic"
+msgid "Cannot apply AST actions to LLVM IR file '%0'"
+msgstr "无法将 AST 操作应用于 LLVM IR 文件 '%0'"
+
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:6655
 msgctxt "diagnostic"
 msgid "Cannot apply asm label to function after its first use"
@@ -59871,6 +60049,11 @@ msgctxt "diagnostic"
 msgid "Cannot create a non-constant pointer to member function"
 msgstr "无法创建指向成员函数的非常量指针"
 
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:262
+msgctxt "diagnostic"
+msgid "Cannot create includes file for module %0: %1"
+msgstr "无法为模块 %0 创建 includes 文件：%1"
+
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:8281
 msgctxt "diagnostic"
 msgid "Cannot create object of function type %0"
@@ -60155,6 +60338,16 @@ msgstr "无法从初始化器确定分配的数组大小"
 msgctxt "diagnostic"
 msgid "Cannot determine underlying type of incomplete enumeration type %0"
 msgstr "无法确定不完整枚举类型 %0 的底层类型"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:186
+msgctxt "diagnostic"
+msgid "Cannot emit module %0: mtime must be explicitly specified for missing header file \"%2\""
+msgstr "无法生成模块 %0：必须为缺失的头文件 \"%2\" 显式指定 mtime"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:186
+msgctxt "diagnostic"
+msgid "Cannot emit module %0: size must be explicitly specified for missing header file \"%2\""
+msgstr "无法生成模块 %0：必须为缺失的头文件 \"%2\" 显式指定 size"
 
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:3779
 msgctxt "diagnostic"
@@ -64669,6 +64862,11 @@ msgctxt "diagnostic"
 msgid "Cannot jump from this indirect goto statement to one of its possible targets"
 msgstr "无法从此间接 goto 语句跳转到其某个可能的目标"
 
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:111
+msgctxt "diagnostic"
+msgid "Cannot locate code-completion file %0"
+msgstr "无法定位代码补全文件 %0"
+
 #: clang/include/clang/Basic/DiagnosticASTKinds.td:1062
 msgctxt "diagnostic"
 msgid "Cannot mangle this %0 %1 yet"
@@ -66938,6 +67136,11 @@ msgctxt "diagnostic"
 msgid "Charizing operator #@ is a Microsoft extension"
 msgstr "字符化运算符 #@ 是 Microsoft 扩展"
 
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:108
+msgctxt "diagnostic"
+msgid "Checking if module '%0' from '%1' has relocated"
+msgstr "正在检查来自 '%1' 的模块 '%0' 是否已重定位"
+
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:2642
 msgctxt "diagnostic"
 msgid "Chosen constructor is explicit in copy-initialization"
@@ -67348,6 +67551,26 @@ msgstr "矩阵下标表达式中不允许将逗号表达式用作索引"
 msgctxt "diagnostic"
 msgid "Comma operator in operand of #if"
 msgstr "#if 的操作数中存在逗号运算符"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:142
+msgctxt "diagnostic"
+msgid "Command line contains '-detailed-preprocessing-record' but it is not present on the command line"
+msgstr "命令行包含 '-detailed-preprocessing-record'，但命令行中未包含它"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:142
+msgctxt "diagnostic"
+msgid "Command line contains '-detailed-preprocessing-record' but precompiled file '%1' was not built with it"
+msgstr "命令行包含 '-detailed-preprocessing-record'，但预编译文件 '%1' 构建时未启用它"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:138
+msgctxt "diagnostic"
+msgid "Command line contains '-undef' but it is not present on the command line"
+msgstr "命令行包含 '-undef'，但命令行中未提供该选项"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:138
+msgctxt "diagnostic"
+msgid "Command line contains '-undef' but precompiled file '%1' was not built with it"
+msgstr "命令行包含 '-undef'，但预编译文件 '%1' 构建时未带有该选项"
 
 #: clang/include/clang/Basic/DiagnosticParseKinds.td:106
 msgctxt "diagnostic"
@@ -70030,6 +70253,11 @@ msgctxt "diagnostic"
 msgid "Could not match types"
 msgstr "无法匹配类型"
 
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:121
+msgctxt "diagnostic"
+msgid "Could not remap file '%0' to the contents of file '%1'"
+msgstr "无法将文件 '%0' 重映射到文件 '%1' 的内容"
+
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:11075
 msgctxt "diagnostic"
 msgid "Could not verify that the return value can be lifetime bound to '%1'"
@@ -70074,6 +70302,16 @@ msgstr "当前文件比依赖项 %0 更旧"
 msgctxt "diagnostic"
 msgid "Current handling of vector bool and vector pixel types in this context are deprecated; the default behaviour will soon change to that implied by the '-altivec-compat=xl' option"
 msgstr "当前在此上下文中对 vector bool 和 vector pixel 类型的处理已弃用；默认行为很快将更改为 '-altivec-compat=xl' 选项所隐含的行为"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:41
+msgctxt "diagnostic"
+msgid "Current translation unit is compiled with the target feature '%2' but the current translation unit is not"
+msgstr "当前翻译单元在编译时启用了目标特性 '%2'，但当前翻译单元未启用"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:41
+msgctxt "diagnostic"
+msgid "Current translation unit is compiled with the target feature '%2' but the precompiled file '%1' was not"
+msgstr "当前翻译单元在编译时启用了目标特性 '%2'，但预编译文件 '%1'未启用"
 
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:4410
 msgctxt "diagnostic"
@@ -70159,6 +70397,11 @@ msgstr "在 ARC 下，dealloc 的返回类型必须正确指定为 'void'，而�
 msgctxt "diagnostic"
 msgid "Declaration %0 attached to named module '%1' cannot be attached to other modules"
 msgstr "附加到具名模块 '%1' 的声明 %0 不能附加到其他模块"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:167
+msgctxt "diagnostic"
+msgid "Declaration %0 is detected to be defined in multiple module units, first is from '%1' and second is from '%2'; the compiler may not be good at merging the definitions. "
+msgstr "检测到声明 %0 在多个模块单元中定义，首次来自 '%1'，第二次来自 '%2'；编译器可能不擅长合并这些定义。"
 
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:731
 msgctxt "diagnostic"
@@ -71306,6 +71549,16 @@ msgctxt "diagnostic"
 msgid "Definition of class in a dependent scope"
 msgstr "在待决作用域中定义 class"
 
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:264
+msgctxt "diagnostic"
+msgid "Definition of configuration macro '%1' has no effect on the import of '%2'; pass '-D%1=...' on the command line to configure the module"
+msgstr "配置宏 '%1' 的定义 对导入 '%2' 没有影响；请在命令行上传递 '-D%1=...' 以配置该模块"
+
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:264
+msgctxt "diagnostic"
+msgid "Definition of configuration macro '%1' has no effect on the import of '%2'; pass '-U%1' on the command line to configure the module"
+msgstr "配置宏 '%1' 的定义 对导入 '%2' 没有影响；请在命令行上传递 '-U%1' 以配置该模块"
+
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:3977
 msgctxt "diagnostic"
 msgid "Definition of dllimport data"
@@ -71465,6 +71718,11 @@ msgstr "在待决作用域中定义 interface"
 msgctxt "diagnostic"
 msgid "Definition of macro %0 does not match definition in precompiled header"
 msgstr "宏 %0 的定义与预编译头中的定义不匹配"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:135
+msgctxt "diagnostic"
+msgid "Definition of macro '%0' differs between the precompiled file '%3' ('%1') and the command line ('%2')"
+msgstr "宏 '%0' 的定义在预编译文件 '%3' ('%1') 与命令行 ('%2') 之间不一致"
 
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:12888
 msgctxt "diagnostic"
@@ -72678,6 +72936,11 @@ msgctxt "diagnostic"
 msgid "Duplicate modifier '%0' in '%1' clause"
 msgstr "'%1' 子句中存在重复的修饰符 '%0'"
 
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:158
+msgctxt "diagnostic"
+msgid "Duplicate module file extension block name '%0'"
+msgstr "重复的模块文件扩展块名称 '%0'"
+
 #: clang/include/clang/Basic/DiagnosticCommonKinds.td:152
 msgctxt "diagnostic"
 msgid "Duplicate nullability specifier %0"
@@ -73323,6 +73586,11 @@ msgctxt "diagnostic"
 msgid "Enums in the Microsoft ABI are signed integers by default; consider giving the enum %0 an unsigned underlying type to make this code portable"
 msgstr "Microsoft ABI 中的枚举默认是有符号整数；请考虑为枚举 %0 指定无符号底层类型以提高代码可移植性"
 
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:155
+msgctxt "diagnostic"
+msgid "Environment variable 'SOURCE_DATE_EPOCH' ('%0') must be a non-negative decimal integer <= %1"
+msgstr "环境变量 'SOURCE_DATE_EPOCH' ('%0') 必须是 <= %1 的非负十进制整数"
+
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:8036
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:8038
 msgctxt "diagnostic"
@@ -73366,6 +73634,16 @@ msgstr "打开文件 '%0' 时出错：%1"
 msgctxt "diagnostic"
 msgid "Error opening file '{file}': {error}"
 msgstr "打开文件 '{file}' 时出错：{error}"
+
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:14
+msgctxt "diagnostic"
+msgid "Error reading '%0': %1"
+msgstr "读取 '%0' 时出错：%1"
+
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:15
+msgctxt "diagnostic"
+msgid "Error reading stdin: %0"
+msgstr "读取标准输入时出错：%0"
 
 #: clang/include/clang/Basic/DiagnosticLexKinds.td:21
 msgctxt "diagnostic"
@@ -74279,6 +74557,11 @@ msgstr "第一个实参期望为 'float'、'double' 或 '__float128'"
 msgctxt "diagnostic"
 msgid "Expected a callable expression as %0 argument to %1, found %2"
 msgstr "期望可调用表达式作为 %1 的 %0 实参，但找到 %2"
+
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:119
+msgctxt "diagnostic"
+msgid "Expected a clang compiler command"
+msgstr "应为 clang 编译器命令"
 
 #: clang/include/clang/Basic/DiagnosticParseKinds.td:1208
 msgctxt "diagnostic"
@@ -76061,10 +76344,25 @@ msgctxt "diagnostic"
 msgid "Failed requirement '%0'; 'enable_if' cannot be used to disable this declaration"
 msgstr "未能满足要求 '%0'；'enable_if' 不能用于禁用此声明"
 
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:178
+msgctxt "diagnostic"
+msgid "Failed to find module file for module '%0'"
+msgstr "找不到模块 '%0' 的模块文件"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:189
+msgctxt "diagnostic"
+msgid "Failed to hash content for '%0' because memory buffer cannot be retrieved"
+msgstr "无法对 '%0' 的内容计算哈希，因为无法获取内存缓冲"
+
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:1250
 msgctxt "diagnostic"
 msgid "Failed to resolve '#pragma %0' to a declaration"
 msgstr "无法将 '#pragma %0' 解析为声明"
+
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:369
+msgctxt "diagnostic"
+msgid "Failed to set fexec-charset to '%0'"
+msgstr "无法将 fexec-charset 设置为 '%0'"
 
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:9711
 msgctxt "diagnostic"
@@ -76155,6 +76453,16 @@ msgstr "特性在 %1 版本 %2 中废弃的时间不能早于在版本 %4 中引
 msgctxt "diagnostic"
 msgid "Feature cannot be obsoleted in %1 version %2 before it was obsoleted in version %4; attribute ignored"
 msgstr "特性在 %1 版本 %2 中废弃的时间不能早于在版本 %4 中废弃的时间；已忽略属性"
+
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:63
+msgctxt "diagnostic"
+msgid "Feature flag '%0' is ignored since the feature is read only"
+msgstr "由于特性为只读，特性标志 '%0' 已被忽略"
+
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:60
+msgctxt "diagnostic"
+msgid "Feature flag '%0' must start with either '+' to enable the feature or '-' to disable it; flag ignored"
+msgstr "特性标志 '%0' 必须以 '+' 开头以启用该特性，或以 '-' 开头以禁用它；已忽略标志"
 
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:10742
 msgctxt "diagnostic"
@@ -76379,6 +76687,31 @@ msgctxt "diagnostic"
 msgid "Fields must have a constant size: 'variable length array in structure' extension will never be supported"
 msgstr "字段必须具有常量大小：永远不会支持“结构体中的变长数组”扩展"
 
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:26
+msgctxt "diagnostic"
+msgid "File '%0' from the precompiled header has been overridden"
+msgstr "来自预编译头的文件 '%0' 已被覆盖"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:20
+msgctxt "diagnostic"
+msgid "File '%0' has been modified since the module file '%2' was built"
+msgstr "自构建模块文件 '%2' 以来，文件 '%0' 已被修改"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:20
+msgctxt "diagnostic"
+msgid "File '%0' has been modified since the precompiled file '%2' was built"
+msgstr "自构建预编译文件 '%2' 以来，文件 '%0' 已被修改"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:20
+msgctxt "diagnostic"
+msgid "File '%0' has been modified since the precompiled header '%2' was built"
+msgstr "自构建预编译头 '%2' 以来，文件 '%0' 已被修改"
+
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:248
+msgctxt "diagnostic"
+msgid "File '%0' is not a module file"
+msgstr "文件 '%0' 不是模块文件"
+
 #: clang/include/clang/Basic/DiagnosticCommonKinds.td:398
 msgctxt "diagnostic"
 msgid "File '%0' is too large for Clang to process"
@@ -76389,10 +76722,35 @@ msgctxt "diagnostic"
 msgid "File '%0' modified since it was first processed"
 msgstr "文件 '%0' 自首次处理后已被修改"
 
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:279
+msgctxt "diagnostic"
+msgid "File '%0' specified by '-fmodules-embed-file=' not found"
+msgstr "找不到由 '-fmodules-embed-file=' 指定的文件 '%0'"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:89
+msgctxt "diagnostic"
+msgid "File '%1' is not a valid PCH file: %2"
+msgstr "文件 '%1' 不是有效的 PCH 文件：%2"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:89
+msgctxt "diagnostic"
+msgid "File '%1' is not a valid module file: %2"
+msgstr "文件 '%1' 不是有效的 模块 文件：%2"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:89
+msgctxt "diagnostic"
+msgid "File '%1' is not a valid precompiled file: %2"
+msgstr "文件 '%1' 不是有效的 预编译 文件：%2"
+
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:11832
 msgctxt "diagnostic"
 msgid "Filter expression has non-integral type %0"
 msgstr "过滤表达式具有非整型类型 %0"
+
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:274
+msgctxt "diagnostic"
+msgid "Finished building module '%0'"
+msgstr "已完成构建模块 '%0'"
 
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:13452
 msgctxt "diagnostic"
@@ -78067,10 +78425,6 @@ msgctxt "diagnostic"
 msgid "Header file %0 (aka '%1') cannot be imported because it is not known to be a header unit"
 msgstr "头文件 %0（即 '%1'）无法导入，因为未知其是否为头文件单元"
 
-msgctxt "diagnostic"
-msgid "Header {header} is not used directly"
-msgstr "头文件 {header} 未被直接使用"
-
 #: clang/include/clang/Basic/DiagnosticLexKinds.td:285
 msgctxt "diagnostic"
 msgid "Hex escape sequence out of range"
@@ -79318,6 +79672,16 @@ msgctxt "diagnostic"
 msgid "Importing an implementation partition unit in a module interface is not recommended. Names from %0 may not be reachable"
 msgstr "不建议在模块接口中导入实现分区单元。来自 %0 的名称可能不可达"
 
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:100
+msgctxt "diagnostic"
+msgid "Importing module '%0' from '%1'"
+msgstr "正在从 '%1' 导入模块 '%0'"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:100
+msgctxt "diagnostic"
+msgid "Importing module '%0' into '%3' from '%1'"
+msgstr "正在从 '%1' 导入模块 '%0'到 '%3' 中"
+
 #: clang/include/clang/Basic/DiagnosticParseKinds.td:1838
 msgctxt "diagnostic"
 msgid "Imports must immediately follow the module declaration"
@@ -79389,6 +79753,11 @@ msgstr "在框架模块 '%0' 内包含了非模块化头文件：'%1'"
 msgctxt "diagnostic"
 msgid "Include of non-modular header inside module '%0': '%1'"
 msgstr "在模块 '%0' 中包含了非模块化头文件：'%1'"
+
+#: clang-tools-extra/clangd/IncludeCleaner.cpp:219
+msgctxt "diagnostic"
+msgid "Included header {header} is not used directly"
+msgstr "头文件 {header} 未被直接使用"
 
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:9475
 msgctxt "diagnostic"
@@ -82966,6 +83335,11 @@ msgctxt "diagnostic"
 msgid "Input conversion stopped due to an input byte that does not belong to the input codeset UTF-8"
 msgstr "由于输入字节不属于输入编码集 UTF-8，输入转换已停止"
 
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:14
+msgctxt "diagnostic"
+msgid "Input is not a PCH file: '%0'"
+msgstr "输入不是 PCH 文件：'%0'"
+
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:6864
 msgctxt "diagnostic"
 msgid "Insert an explicit cast to silence this issue"
@@ -83120,6 +83494,11 @@ msgstr "实例变量必须具有常量大小"
 msgctxt "diagnostic"
 msgid "Instantiating fold expression with %0 arguments exceeded expression nesting limit of %1"
 msgstr "使用 %0 个实参实例化折叠表达式超过了表达式嵌套限制 %1"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:155
+msgctxt "diagnostic"
+msgid "Instantiation of %0 is different in different modules"
+msgstr "%0 的实例化在不同模块中有所不同"
 
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:12988
 msgctxt "diagnostic"
@@ -84247,6 +84626,31 @@ msgctxt "diagnostic"
 msgid "Invalid escape sequence '%0' in an unevaluated string literal"
 msgstr "未求值字符串字面量中存在无效的转义序列 '%0'"
 
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:153
+msgctxt "diagnostic"
+msgid "Invalid exception model 'dwarf' for target '%1'"
+msgstr "目标 '%1' 的异常模型 'dwarf' 无效"
+
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:153
+msgctxt "diagnostic"
+msgid "Invalid exception model 'none' for target '%1'"
+msgstr "目标 '%1' 的异常模型 'none' 无效"
+
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:153
+msgctxt "diagnostic"
+msgid "Invalid exception model 'seh' for target '%1'"
+msgstr "目标 '%1' 的异常模型 'seh' 无效"
+
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:153
+msgctxt "diagnostic"
+msgid "Invalid exception model 'sjlj' for target '%1'"
+msgstr "目标 '%1' 的异常模型 'sjlj' 无效"
+
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:153
+msgctxt "diagnostic"
+msgid "Invalid exception model 'wasm' for target '%1'"
+msgstr "目标 '%1' 的异常模型 'wasm' 无效"
+
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:8251
 msgctxt "diagnostic"
 msgid "Invalid explicit object parameter type %0 in lambda with capture; the type must be the same as, or derived from, the lambda"
@@ -84839,6 +85243,11 @@ msgctxt "diagnostic"
 msgid "Invalid value '%0'; must be positive"
 msgstr "无效的值 '%0'；必须为正数"
 
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:151
+msgctxt "diagnostic"
+msgid "Invalid value '%1' in '%0'; alignment must be a power of 2"
+msgstr "'%0' 中的值 '%1' 无效；对齐量必须是 2 的幂"
+
 #: clang/include/clang/Basic/DiagnosticParseKinds.td:1486
 msgctxt "diagnostic"
 msgid "Invalid value for 'default' clause; expected 'present' or 'none'"
@@ -84863,6 +85272,11 @@ msgstr "%1 的值无效"
 msgctxt "diagnostic"
 msgid "Invalid vector element type %0"
 msgstr "无效的向量元素类型 %0"
+
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:300
+msgctxt "diagnostic"
+msgid "Invalid virtual filesystem overlay file '%0'"
+msgstr "无效的虚拟文件系统覆盖文件 '%0'"
 
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:13217
 msgctxt "diagnostic"
@@ -85365,6 +85779,11 @@ msgctxt "diagnostic"
 msgid "Load and store exclusive builtins are not available on this architecture"
 msgstr "独占加载和存储内建函数在此架构上不可用"
 
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:173
+msgctxt "diagnostic"
+msgid "Loaded module file '%0' conflicts with imported file '%1'"
+msgstr "加载的模块文件 '%0' 与导入的文件 '%1' 冲突"
+
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:1157
 msgctxt "diagnostic"
 msgid "Loading directly from pointer to type %1 requires cl_khr_fp16. Use vector data load builtin functions instead"
@@ -85434,6 +85853,11 @@ msgstr "局部变量 '%0' 不应在 'declare target' 指令中使用；"
 msgctxt "diagnostic"
 msgid "Local variable cannot be declared 'constinit'"
 msgstr "局部变量不能声明为 'constinit'"
+
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:277
+msgctxt "diagnostic"
+msgid "Locking '%0' to build module '%1'"
+msgstr "正在锁定 '%0' 以构建模块 '%1'"
 
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:8008
 msgctxt "diagnostic"
@@ -85655,6 +86079,31 @@ msgctxt "diagnostic"
 msgid "Macro %0 has been marked as unsafe for use in headers: %2"
 msgstr "宏 %0 已被标记为在头文件中使用不安全：%2"
 
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:134
+msgctxt "diagnostic"
+msgid "Macro '%0' contains embedded newline; text after the newline is ignored"
+msgstr "宏 '%0' 包含嵌入的换行符；换行符之后的文本将被忽略"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:132
+msgctxt "diagnostic"
+msgid "Macro '%0' was defined in the precompiled file '%2' but defined on the command line"
+msgstr "宏 '%0' 在预编译文件 '%2' 中已定义，但在命令行上已定义"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:132
+msgctxt "diagnostic"
+msgid "Macro '%0' was defined in the precompiled file '%2' but undef'd on the command line"
+msgstr "宏 '%0' 在预编译文件 '%2' 中已定义，但在命令行上已取消定义"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:132
+msgctxt "diagnostic"
+msgid "Macro '%0' was undef'd in the precompiled file '%2' but defined on the command line"
+msgstr "宏 '%0' 在预编译文件 '%2' 中已取消定义，但在命令行上已定义"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:132
+msgctxt "diagnostic"
+msgid "Macro '%0' was undef'd in the precompiled file '%2' but undef'd on the command line"
+msgstr "宏 '%0' 在预编译文件 '%2' 中已取消定义，但在命令行上已取消定义"
+
 #: clang/include/clang/Basic/DiagnosticLexKinds.td:1071
 #: clang/include/clang/Basic/DiagnosticLexKinds.td:1074
 msgctxt "diagnostic"
@@ -85709,6 +86158,16 @@ msgstr "不能将 main 声明为具有 C 语言链接的变量"
 msgctxt "diagnostic"
 msgid "Main file cannot be included recursively when building a preamble"
 msgstr "构建前导码时不能递归包含主文件"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:18
+msgctxt "diagnostic"
+msgid "Malformed block record in PCH file: '%0'"
+msgstr "PCH 文件中的块记录格式错误：'%0'"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:16
+msgctxt "diagnostic"
+msgid "Malformed or corrupted precompiled file: '%0'"
+msgstr "预编译文件格式错误或已损坏：'%0'"
 
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:770
 msgctxt "diagnostic"
@@ -86875,6 +87334,11 @@ msgctxt "diagnostic"
 msgid "Missing state for %0"
 msgstr "缺少 %0 的状态"
 
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:259
+msgctxt "diagnostic"
+msgid "Missing submodule '%0'"
+msgstr "缺少子模块 '%0'"
+
 #: clang/include/clang/Basic/DiagnosticLexKinds.td:82
 msgctxt "diagnostic"
 msgid "Missing terminating ' character"
@@ -86975,6 +87439,41 @@ msgctxt "diagnostic"
 msgid "Module '%0' conflicts with already-imported module '%1': %2"
 msgstr "模块 '%0' 与已导入的模块 '%1' 冲突：%2"
 
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:128
+msgctxt "diagnostic"
+msgid "Module '%0' does not use additional module map '%2' not used when the module was built"
+msgstr "模块 '%0' 未使用构建该模块时未使用的附加模块映射 '%2'"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:128
+msgctxt "diagnostic"
+msgid "Module '%0' does not use additional module map '%2' used when the module was built"
+msgstr "模块 '%0' 未使用构建该模块时使用的附加模块映射 '%2'"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:122
+msgctxt "diagnostic"
+msgid "Module '%0' imported by precompiled file '%1' found in a different module map file (%2) than when the importing precompiled file was built (%3)"
+msgstr "由预编译文件 '%1' 导入的模块 '%0' 在与构建导入预编译文件时（%3）不同的模块映射文件（%2）中找到"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:116
+msgctxt "diagnostic"
+msgid "Module '%0' in precompiled file '%1' (imported by precompiled file '%2') is not defined in any loaded module map file; maybe you need to load '%3'?"
+msgstr "预编译文件 '%1' 中的模块 '%0'（由预编译文件 '%2' 导入）未在任何已加载的模块映射文件中定义；你可能需要加载 '%3'？"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:122
+msgctxt "diagnostic"
+msgid "Module '%0' in precompiled file '%1' found in a different module map file (%2) than when the importing precompiled file was built (%3)"
+msgstr "位于预编译文件 '%1' 中的模块 '%0' 在与构建导入预编译文件时（%3）不同的模块映射文件（%2）中找到"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:116
+msgctxt "diagnostic"
+msgid "Module '%0' in precompiled file '%1' is not defined in any loaded module map file; maybe you need to load '%3'?"
+msgstr "预编译文件 '%1' 中的模块 '%0'未在任何已加载的模块映射文件中定义；你可能需要加载 '%3'？"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:78
+msgctxt "diagnostic"
+msgid "Module '%0' is defined in both '%1' and '%2'"
+msgstr "模块 '%0' 同时在 '%1' 和 '%2' 中定义"
+
 #: clang/include/clang/Basic/DiagnosticCommonKinds.td:110
 msgctxt "diagnostic"
 msgid "Module '%0' is incompatible with feature '%2'"
@@ -86990,10 +87489,35 @@ msgctxt "diagnostic"
 msgid "Module '%0' not found"
 msgstr "找不到模块 '%0'"
 
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:112
+msgctxt "diagnostic"
+msgid "Module '%0' relocated from '%1' to '%2'"
+msgstr "模块 '%0' 已从 '%1' 重定位到 '%2'"
+
 #: clang/include/clang/Basic/DiagnosticCommonKinds.td:110
 msgctxt "diagnostic"
 msgid "Module '%0' requires feature '%2'"
 msgstr "模块 '%0' 需要特性 '%2'"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:128
+msgctxt "diagnostic"
+msgid "Module '%0' uses additional module map '%2' not used when the module was built"
+msgstr "模块 '%0' 使用了构建该模块时未使用的附加模块映射 '%2'"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:128
+msgctxt "diagnostic"
+msgid "Module '%0' uses additional module map '%2' used when the module was built"
+msgstr "模块 '%0' 使用了构建该模块时使用的附加模块映射 '%2'"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:125
+msgctxt "diagnostic"
+msgid "Module '%0' was built in directory '%1' but now resides in directory '%2'"
+msgstr "模块 '%0' 是在目录 '%1' 中构建的，但现在位于目录 '%2'"
+
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:239
+msgctxt "diagnostic"
+msgid "Module compilation requires '-fmodules'"
+msgstr "模块编译需要 '-fmodules'"
 
 #: clang/include/clang/Basic/DiagnosticParseKinds.td:1812
 msgctxt "diagnostic"
@@ -87015,6 +87539,51 @@ msgctxt "diagnostic"
 msgid "Module directive lines are not allowed on lines controlled by preprocessor conditionals"
 msgstr "模块指令行不允许出现在受预处理器条件控制的行上"
 
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:95
+msgctxt "diagnostic"
+msgid "Module file '%0' is missing its top-level submodule"
+msgstr "模块文件 '%0' 缺少其顶层子模块"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:162
+msgctxt "diagnostic"
+msgid "Module file '%0' was validated as a system module and is now being imported as a non-system module; any difference in diagnostic options will be ignored"
+msgstr "模块文件 '%0' 已作为系统模块验证，现正作为非系统模块导入；诊断选项中的任何差异都将被忽略"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:73
+msgctxt "diagnostic"
+msgid "Module file '%1' built from a different branch (%2) than the compiler (%3)"
+msgstr "模块文件 '%1' 构建自与编译器（%3）不同的分支（%2）"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:75
+msgctxt "diagnostic"
+msgid "Module file '%1' contains compiler errors"
+msgstr "模块文件 '%1' 包含编译器错误"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:86
+msgctxt "diagnostic"
+msgid "Module file '%1' is out of date and needs to be rebuilt"
+msgstr "模块文件 '%1' 已过期，需要重新构建"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:80
+msgctxt "diagnostic"
+msgid "Module file '%1' not found"
+msgstr "未找到模块文件 '%1'"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:71
+msgctxt "diagnostic"
+msgid "Module file '%1' uses a newer format that cannot be read"
+msgstr "模块文件 '%1' 使用了无法读取的较新格式"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:69
+msgctxt "diagnostic"
+msgid "Module file '%1' uses an older format that is no longer supported"
+msgstr "模块 文件 '%1' 使用了不再受支持的旧格式"
+
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:282
+msgctxt "diagnostic"
+msgid "Module header file '%0' not found"
+msgstr "未找到模块头文件 '%0'"
+
 #: clang/include/clang/Basic/DiagnosticParseKinds.td:1842
 msgctxt "diagnostic"
 msgid "Module imports cannot be in the global module fragment"
@@ -87024,6 +87593,16 @@ msgstr "模块导入不能位于全局模块片段中"
 msgctxt "diagnostic"
 msgid "Module imports cannot be in the private module fragment"
 msgstr "模块导入不能位于私有模块片段中"
+
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:241
+msgctxt "diagnostic"
+msgid "Module interface compilation requires '-std=c++20'"
+msgstr "编译模块接口需要 '-std=c++20'"
+
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:243
+msgctxt "diagnostic"
+msgid "Module map file '%0' not found"
+msgstr "找不到模块映射文件 '%0'"
 
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:12882
 msgctxt "diagnostic"
@@ -87059,6 +87638,11 @@ msgstr "模块分区导入必须在模块管辖范围内"
 msgctxt "diagnostic"
 msgid "Module partitions are only supported for C++20 onwards"
 msgstr "模块分区仅从 C++20 开始受支持"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:183
+msgctxt "diagnostic"
+msgid "Module uses __DATE__ or __TIME__"
+msgstr "模块使用了 __DATE__ 或 __TIME__"
 
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:10740
 msgctxt "diagnostic"
@@ -87357,6 +87941,11 @@ msgctxt "diagnostic"
 msgid "Must specify '-fmodule-name=%0' to enter this module (current module is %3)"
 msgstr "必须指定 '-fmodule-name=%0' 才能进入此模块（当前模块为 %3）"
 
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:222
+msgctxt "diagnostic"
+msgid "Must specify system root with -isysroot when building a relocatable PCH file"
+msgstr "构建可重定位 PCH 文件时必须使用 -isysroot 指定系统根目录"
+
 #: clang/include/clang/Basic/DiagnosticCommonKinds.td:191
 msgctxt "diagnostic"
 msgid "Must use '%1' tag to refer to type %0"
@@ -87617,9 +88206,10 @@ msgctxt "diagnostic"
 msgid "No handler registered for module format '%0'"
 msgstr "未为模块格式 '%0' 注册处理程序"
 
+#: clang-tools-extra/clangd/IncludeCleaner.cpp:174
 msgctxt "diagnostic"
-msgid "No header providing \"{0}\" is directly included"
-msgstr "没有直接包含提供 \"{0}\" 的头文件"
+msgid "No header providing \"{symbol}\" is directly included"
+msgstr "没有直接包含提供 \"{symbol}\" 的头文件"
 
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:14019
 msgctxt "diagnostic"
@@ -87837,6 +88427,16 @@ msgctxt "diagnostic"
 msgid "No module map available for module %0"
 msgstr "模块 %0 没有可用的模块映射"
 
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:245
+msgctxt "diagnostic"
+msgid "No module name provided; specify one with -fmodule-name="
+msgstr "未提供模块名称；请使用 -fmodule-name= 指定"
+
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:249
+msgctxt "diagnostic"
+msgid "No module named '%0' declared in module map file '%1'"
+msgstr "模块映射文件 '%1' 中未声明名为 '%0' 的模块"
+
 #: clang/include/clang/Basic/DiagnosticLexKinds.td:920
 msgctxt "diagnostic"
 msgid "No module named '%0' found, parent module must be defined before the submodule"
@@ -87927,10 +88527,30 @@ msgctxt "diagnostic"
 msgid "No struct named %1 in %2"
 msgstr "%2 中没有名为 %1 的 struct"
 
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:251
+msgctxt "diagnostic"
+msgid "No submodule named %0 in module '%1'"
+msgstr "模块 '%1' 中没有名为 %0 的子模块"
+
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:252
+msgctxt "diagnostic"
+msgid "No submodule named %0 in module '%1'; did you mean '%2'?"
+msgstr "模块 '%1' 中没有名为 %0 的子模块；是否意指 '%2'？"
+
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:254
+msgctxt "diagnostic"
+msgid "No submodule named %0 in module '%1'; using top level '%2'"
+msgstr "模块 '%1' 中没有名为 %0 的子模块；使用顶层 '%2'"
+
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:8721
 msgctxt "diagnostic"
 msgid "No suitable member %0 in %1"
 msgstr "%1 中没有合适的成员 %0"
+
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:143
+msgctxt "diagnostic"
+msgid "No suitable precompiled header file found in directory '%0'"
+msgstr "在目录 '%0' 中未找到合适的预编译头文件"
 
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:11754
 msgctxt "diagnostic"
@@ -90364,6 +90984,7 @@ msgctxt "diagnostic"
 msgid "Option 'ffp-eval-method' cannot be used with '#pragma clang fp reciprocal'"
 msgstr "选项 'ffp-eval-method' 不能与'#pragma clang fp reciprocal' 一起使用"
 
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:67
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:7579
 msgctxt "diagnostic"
 msgid "Option 'ffp-eval-method' cannot be used with option 'fapprox-func'"
@@ -90374,11 +90995,13 @@ msgctxt "diagnostic"
 msgid "Option 'ffp-eval-method' cannot be used with option 'ffp-eval-method'"
 msgstr "选项 'ffp-eval-method' 不能与选项 'ffp-eval-method' 一起使用"
 
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:67
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:7579
 msgctxt "diagnostic"
 msgid "Option 'ffp-eval-method' cannot be used with option 'freciprocal'"
 msgstr "选项 'ffp-eval-method' 不能与选项 'freciprocal' 同时使用"
 
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:67
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:7579
 msgctxt "diagnostic"
 msgid "Option 'ffp-eval-method' cannot be used with option 'mreassociate'"
@@ -90641,6 +91264,16 @@ msgctxt "diagnostic"
 msgid "Overloaded operator >> has higher precedence than comparison operator"
 msgstr "重载运算符 >> 的优先级高于比较运算符"
 
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:54
+msgctxt "diagnostic"
+msgid "Overriding currently unsupported rounding mode on this target"
+msgstr "正在覆盖此目标上当前不支持的舍入模式"
+
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:57
+msgctxt "diagnostic"
+msgid "Overriding currently unsupported use of floating point exceptions on this target"
+msgstr "正在覆盖此目标上当前不受支持的浮点异常用法"
+
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:12087
 msgctxt "diagnostic"
 msgid "Overriding function is missing '%0' attribute from base declaration"
@@ -90708,6 +91341,41 @@ msgstr "覆写方法在 %1 上废弃时间早于其所实现的协议方法（%2
 msgctxt "diagnostic"
 msgid "Overriding virtual function must specify the same code segment as its overridden function"
 msgstr "重写的虚函数必须指定与其被重写函数相同的代码段"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:73
+msgctxt "diagnostic"
+msgid "PCH file '%1' built from a different branch (%2) than the compiler (%3)"
+msgstr "PCH 文件 '%1' 构建自与编译器（%3）不同的分支（%2）"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:75
+msgctxt "diagnostic"
+msgid "PCH file '%1' contains compiler errors"
+msgstr "PCH 文件 '%1' 包含编译器错误"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:86
+msgctxt "diagnostic"
+msgid "PCH file '%1' is out of date and needs to be rebuilt"
+msgstr "PCH文件 '%1' 已过期，需要重新构建"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:80
+msgctxt "diagnostic"
+msgid "PCH file '%1' not found"
+msgstr "未找到PCH 文件 '%1'"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:71
+msgctxt "diagnostic"
+msgid "PCH file '%1' uses a newer format that cannot be read"
+msgstr "PCH 文件 '%1' 使用了无法读取的较新格式"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:69
+msgctxt "diagnostic"
+msgid "PCH file '%1' uses an older format that is no longer supported"
+msgstr "PCH 文件 '%1' 使用了不再受支持的旧格式"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:63
+msgctxt "diagnostic"
+msgid "PCH was compiled with different VFS overlay files than are currently in use"
+msgstr "PCH 编译时使用的 VFS 叠加文件与当前使用的不同"
 
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:6320
 msgctxt "diagnostic"
@@ -92628,6 +93296,11 @@ msgctxt "diagnostic"
 msgid "Postfix attributes are not allowed on Objective-C directives, place them in front of '@protocol'"
 msgstr "Objective-C 指令上不允许使用后缀属性，请将其放在 '@protocol' 之前"
 
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:404
+msgctxt "diagnostic"
+msgid "Potential performance regression from use of __builtin_expect(): annotation was correct on %0 of profiled executions"
+msgstr "使用 __builtin_expect() 可能导致性能回退：注解在 %0 的性能剖析执行中是正确的"
+
 #: clang/include/clang/Basic/DiagnosticLexKinds.td:715
 msgctxt "diagnostic"
 msgid "Pragma %0 requires a parenthesized string"
@@ -92702,6 +93375,91 @@ msgstr "pragma warning 需要带括号的字符串"
 msgctxt "diagnostic"
 msgid "Precision used with '%1' conversion specifier, resulting in undefined behavior"
 msgstr "精度与 '%1' 转换说明符一起使用，会导致未定义行为"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:71
+msgctxt "diagnostic"
+msgid "Precompiled  file '%1' uses a newer format that cannot be read"
+msgstr "预编译文件 '%1' 使用了无法读取的较新格式"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:47
+msgctxt "diagnostic"
+msgid "Precompiled file '%0' cannot be loaded due to a configuration mismatch with the current compilation"
+msgstr "由于与当前编译配置不匹配，无法加载预编译文件 '%0'"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:38
+msgctxt "diagnostic"
+msgid "Precompiled file '%0' was compiled for the %1 '%2' but the current translation unit is being compiled for target '%3'"
+msgstr "预编译文件 '%0' 是针对 %1 '%2' 编译的，但当前翻译单元正在针对目标 '%3' 编译"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:93
+msgctxt "diagnostic"
+msgid "Precompiled file '%0' was not built as a module"
+msgstr "预编译文件 '%0' 未作为模块构建"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:73
+msgctxt "diagnostic"
+msgid "Precompiled file '%1' built from a different branch (%2) than the compiler (%3)"
+msgstr "预编译文件 '%1' 构建自与编译器（%3）不同的分支（%2）"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:75
+msgctxt "diagnostic"
+msgid "Precompiled file '%1' contains compiler errors"
+msgstr "预编译文件 '%1' 包含编译器错误"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:86
+msgctxt "diagnostic"
+msgid "Precompiled file '%1' is out of date and needs to be rebuilt"
+msgstr "预编译文件 '%1' 已过期，需要重新构建"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:80
+msgctxt "diagnostic"
+msgid "Precompiled file '%1' not found"
+msgstr "未找到预编译文件 '%1'"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:69
+msgctxt "diagnostic"
+msgid "Precompiled file '%1' uses an older format that is no longer supported"
+msgstr "预编译 文件 '%1' 使用了不再受支持的旧格式"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:142
+msgctxt "diagnostic"
+msgid "Precompiled file '%1' was built with '-detailed-preprocessing-record' but it is not present on the command line"
+msgstr "预编译文件 '%1' 构建时启用了 '-detailed-preprocessing-record'，但命令行中未包含它"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:142
+msgctxt "diagnostic"
+msgid "Precompiled file '%1' was built with '-detailed-preprocessing-record' but precompiled file '%1' was not built with it"
+msgstr "预编译文件 '%1' 构建时启用了 '-detailed-preprocessing-record'，但预编译文件 '%1' 构建时未启用它"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:138
+msgctxt "diagnostic"
+msgid "Precompiled file '%1' was built with '-undef' but it is not present on the command line"
+msgstr "预编译文件 '%1' 构建时带有 '-undef'，但命令行中未提供该选项"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:138
+msgctxt "diagnostic"
+msgid "Precompiled file '%1' was built with '-undef' but precompiled file '%1' was not built with it"
+msgstr "预编译文件 '%1' 构建时带有 '-undef'，但预编译文件 '%1' 构建时未带有该选项"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:41
+msgctxt "diagnostic"
+msgid "Precompiled file '%1' was compiled with the target feature '%2' but the current translation unit is not"
+msgstr "预编译文件 '%1'在编译时启用了目标特性 '%2'，但当前翻译单元未启用"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:41
+msgctxt "diagnostic"
+msgid "Precompiled file '%1' was compiled with the target feature '%2' but the precompiled file '%1' was not"
+msgstr "预编译文件 '%1'在编译时启用了目标特性 '%2'，但预编译文件 '%1'未启用"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:61
+msgctxt "diagnostic"
+msgid "Precompiled file '%2' was compiled with module cache path '%0', but the path is currently '%1'"
+msgstr "预编译文件 '%2' 编译时使用的模块缓存路径为 '%0'，但当前路径为 '%1'"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:183
+msgctxt "diagnostic"
+msgid "Precompiled header uses __DATE__ or __TIME__"
+msgstr "预编译头使用了 __DATE__ 或 __TIME__"
 
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:12775
 msgctxt "diagnostic"
@@ -98507,6 +99265,16 @@ msgctxt "diagnostic"
 msgid "SEH '__try' is not supported on this target"
 msgstr "此目标平台不支持 SEH '__try'"
 
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:46
+msgctxt "diagnostic"
+msgid "SPIR-V target requires a Vulkan environment"
+msgstr "SPIR-V 目标需要 Vulkan 环境"
+
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:48
+msgctxt "diagnostic"
+msgid "SPIR-V target requires a valid shader stage or no environment"
+msgstr "SPIR-V 目标需要有效的着色器阶段或不指定环境"
+
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:3414
 msgctxt "diagnostic"
 msgid "SVE vector type %0 cannot be used in a non-streaming function"
@@ -100703,6 +101471,11 @@ msgctxt "diagnostic"
 msgid "Support for HLSL language version %0 is incomplete"
 msgstr "对 HLSL 语言版本 %0 的支持尚不完整"
 
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:458
+msgctxt "diagnostic"
+msgid "Support for HLSL language version %0 is incomplete, recommend using %1 instead"
+msgstr "对 HLSL 语言版本 %0 的支持尚不完整，建议改用 %1"
+
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:13772
 msgctxt "diagnostic"
 msgid "Support for groupshared parameter annotation not added until HLSL 202x"
@@ -101915,6 +102688,11 @@ msgstr "表达式（位于此内联汇编操作数中）必须具有 'size()' �
 msgctxt "diagnostic"
 msgid "The expression in this static assertion is not a constant expression"
 msgstr "表达式（位于此静态断言中）不是常量表达式"
+
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:293
+msgctxt "diagnostic"
+msgid "The form '-fmodule-file=<BMI-path>' is deprecated for standard C++ named modules; consider to use '-fmodule-file=<module-name>=<BMI-path>' instead"
+msgstr "对于标准 C++ 具名模块，'-fmodule-file=<BMI-path>' 形式已弃用；请考虑改用 '-fmodule-file=<module-name>=<BMI-path>'"
 
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:12604
 msgctxt "diagnostic"
@@ -104935,15 +105713,45 @@ msgctxt "diagnostic"
 msgid "Unable to find module '%0'"
 msgstr "找不到模块 '%0'"
 
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:117
+msgctxt "diagnostic"
+msgid "Unable to handle compilation, expected exactly one compiler job in '%0'"
+msgstr "无法处理编译，期望 '%0' 中恰好有一个编译任务"
+
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:123
+msgctxt "diagnostic"
+msgid "Unable to load precompiled file"
+msgstr "无法加载预编译文件"
+
 #: clang/include/clang/Basic/DiagnosticCommonKinds.td:406
 msgctxt "diagnostic"
 msgid "Unable to make temporary file: %0"
 msgstr "无法创建临时文件：%0"
 
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:138
+msgctxt "diagnostic"
+msgid "Unable to open CC_LOG_DIAGNOSTICS file: %0 (using stderr)"
+msgstr "无法打开 CC_LOG_DIAGNOSTICS 文件：%0（改用 stderr）"
+
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:132
+msgctxt "diagnostic"
+msgid "Unable to open output file '%0': '%1'"
+msgstr "无法打开输出文件 '%0'：'%1'"
+
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:140
+msgctxt "diagnostic"
+msgid "Unable to open statistics output file '%0': '%1'"
+msgstr "无法打开统计输出文件 '%0'：'%1'"
+
 #: clang/include/clang/Basic/DiagnosticCommonKinds.td:314
 msgctxt "diagnostic"
 msgid "Unable to protect inline asm that clobbers stack pointer against stack clash"
 msgstr "无法针对栈冲突保护会破坏栈指针的内联汇编"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:12
+msgctxt "diagnostic"
+msgid "Unable to read PCH file %0: '%1'"
+msgstr "无法读取 PCH 文件 %0：'%1'"
 
 #: clang/include/clang/Basic/DiagnosticCommonKinds.td:404
 msgctxt "diagnostic"
@@ -105544,6 +106352,11 @@ msgctxt "diagnostic"
 msgid "Unknown  preprocessor parameter '%1'"
 msgstr "未知的预处理器形参 '%1'"
 
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:229
+msgctxt "diagnostic"
+msgid "Unknown %0 warning specifier: '%1'"
+msgstr "未知的 %0 警告说明符：'%1'"
+
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:3453
 msgctxt "diagnostic"
 msgid "Unknown '%2' in the 'target' attribute string;"
@@ -105824,6 +106637,16 @@ msgctxt "diagnostic"
 msgid "Unknown register name '%0' in asm"
 msgstr "asm 中未知的 register 名称 '%0'"
 
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:226
+msgctxt "diagnostic"
+msgid "Unknown remark option '%1'"
+msgstr "未知的备注选项 '%1'"
+
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:226
+msgctxt "diagnostic"
+msgid "Unknown remark option '%1'; did you mean '%3'?"
+msgstr "未知的备注选项 '%1'；您是否想输入 '%3'？"
+
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:4532
 msgctxt "diagnostic"
 msgid "Unknown sanitizer '%0' ignored"
@@ -105952,6 +106775,16 @@ msgstr "未知的警告组 '%0'"
 msgctxt "diagnostic"
 msgid "Unknown warning group '%0', ignored"
 msgstr "未知的警告组 '%0'，已忽略"
+
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:226
+msgctxt "diagnostic"
+msgid "Unknown warning option '%1'"
+msgstr "未知的警告选项 '%1'"
+
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:226
+msgctxt "diagnostic"
+msgid "Unknown warning option '%1'; did you mean '%3'?"
+msgstr "未知的警告选项 '%1'；您是否想输入 '%3'？"
 
 #: clang/include/clang/Basic/DiagnosticParseKinds.td:114
 msgctxt "diagnostic"
@@ -108303,6 +109136,11 @@ msgctxt "diagnostic"
 msgid "Valid %0 clauses start with %1; tokens will be ignored"
 msgstr "有效的 %0 子句以 %1 开头；将忽略这些记号"
 
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:104
+msgctxt "diagnostic"
+msgid "Validating %0 input files in module '%1' from '%2'"
+msgstr "正在从 '%2' 验证模块 '%1' 中的 %0 个输入文件"
+
 #: clang/include/clang/Basic/DiagnosticCommonKinds.td:278
 msgctxt "diagnostic"
 msgid "Value '%0' is too large"
@@ -109226,6 +110064,11 @@ msgstr "版本优先级 '%0' 超出允许范围 [1-255]；忽略优先级"
 msgctxt "diagnostic"
 msgid "Virtual constexpr functions are incompatible with C++ standards before C++20"
 msgstr "虚 constexpr 函数与 C++20 之前的 C++ 标准不兼容"
+
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:298
+msgctxt "diagnostic"
+msgid "Virtual filesystem overlay file '%0' not found"
+msgstr "未找到虚拟文件系统叠加文件 '%0'"
 
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:2333
 msgctxt "diagnostic"
@@ -110723,6 +111566,11 @@ msgctxt "hover_kind"
 msgid "class-method"
 msgstr "类方法"
 
+#: clang/lib/Index/IndexSymbol.cpp
+msgctxt "hover_kind"
+msgid "class-property"
+msgstr "类属性"
+
 msgctxt "hover_kind"
 msgid "concept"
 msgstr "概念"
@@ -110731,8 +111579,9 @@ msgctxt "hover_kind"
 msgid "constructor"
 msgstr "构造函数"
 
+#: clang/lib/Index/IndexSymbol.cpp
 msgctxt "hover_kind"
-msgid "conversion-function"
+msgid "conversion-func"
 msgstr "转换函数"
 
 msgctxt "hover_kind"
@@ -110747,6 +111596,11 @@ msgctxt "hover_kind"
 msgid "enumerator"
 msgstr "枚举常量"
 
+#: clang/lib/Index/IndexSymbol.cpp
+msgctxt "hover_kind"
+msgid "extension"
+msgstr "扩展"
+
 msgctxt "hover_kind"
 msgid "field"
 msgstr "字段"
@@ -110759,6 +111613,11 @@ msgctxt "hover_kind"
 msgid "instance-method"
 msgstr "实例方法"
 
+#: clang/lib/Index/IndexSymbol.cpp
+msgctxt "hover_kind"
+msgid "instance-property"
+msgstr "实例属性"
+
 msgctxt "hover_kind"
 msgid "macro"
 msgstr "宏"
@@ -110766,6 +111625,11 @@ msgstr "宏"
 msgctxt "hover_kind"
 msgid "method"
 msgstr "方法"
+
+#: clang/lib/Index/IndexSymbol.cpp
+msgctxt "hover_kind"
+msgid "module"
+msgstr "模块"
 
 msgctxt "hover_kind"
 msgid "namespace"
@@ -110775,37 +111639,56 @@ msgctxt "hover_kind"
 msgid "namespace-alias"
 msgstr "命名空间别名"
 
+#: clang/lib/Index/IndexSymbol.cpp
 msgctxt "hover_kind"
-msgid "non-type-template-parm"
+msgid "non-type-template-param"
 msgstr "非类型模板形参"
 
+#: clang/lib/Index/IndexSymbol.cpp
 msgctxt "hover_kind"
-msgid "parameter"
+msgid "param"
 msgstr "形参"
+
+#: clang/lib/Index/IndexSymbol.cpp
+msgctxt "hover_kind"
+msgid "protocol"
+msgstr "协议"
 
 msgctxt "hover_kind"
 msgid "static-method"
 msgstr "静态方法"
 
+#: clang/lib/Index/IndexSymbol.cpp
+msgctxt "hover_kind"
+msgid "static-property"
+msgstr "静态属性"
+
 msgctxt "hover_kind"
 msgid "struct"
 msgstr "结构体"
 
+#: clang/lib/Index/IndexSymbol.cpp
 msgctxt "hover_kind"
-msgid "template-template-parm"
+msgid "template-template-param"
 msgstr "模板模板形参"
+
+#: clang/lib/Index/IndexSymbol.cpp
+msgctxt "hover_kind"
+msgid "template-type-param"
+msgstr "类型模板形参"
 
 msgctxt "hover_kind"
 msgid "type-alias"
 msgstr "类型别名"
 
 msgctxt "hover_kind"
-msgid "type-template-parm"
-msgstr "类型模板形参"
-
-msgctxt "hover_kind"
 msgid "union"
 msgstr "联合体"
+
+#: clang/lib/Index/IndexSymbol.cpp
+msgctxt "hover_kind"
+msgid "using"
+msgstr "using 声明"
 
 msgctxt "hover_kind"
 msgid "variable"
@@ -112008,6 +112891,11 @@ msgctxt "related_diagnostic"
 msgid "'%0' previously encountered here"
 msgstr "此前曾在此处遇到 '%0'"
 
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:28
+msgctxt "related_diagnostic"
+msgid "'%0' required by '%1'"
+msgstr "'%1' 需要 '%0'"
+
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:12411
 msgctxt "related_diagnostic"
 msgid "', '<<', or '>>' built-in operations"
@@ -112392,6 +113280,11 @@ msgstr "在此处的初始化声明上添加 'require_constant_initialization' �
 msgctxt "related_diagnostic"
 msgid "Address of non-static constexpr variable %0 may differ on each invocation of the enclosing function; add 'static' to give it a constant address"
 msgstr "非静态 constexpr 变量 %0 的地址在每次调用外围函数时可能不同；请添加 'static' 以赋予其常量地址"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:31
+msgctxt "related_diagnostic"
+msgid "After modifying system headers, please delete the module cache at '%0'"
+msgstr "修改系统头文件后，请删除位于 '%0' 的模块缓存"
 
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:4801
 msgctxt "related_diagnostic"
@@ -150655,6 +151548,11 @@ msgctxt "related_diagnostic"
 msgid "Compile time floating point arithmetic suppressed in strict evaluation modes"
 msgstr "在严格求值模式下抑制了编译期浮点运算"
 
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:97
+msgctxt "related_diagnostic"
+msgid "Compiled from '%0' and '%1'"
+msgstr "分别编译自 '%0' 和 '%1'"
+
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:8488
 msgctxt "related_diagnostic"
 msgid "Compiler has implicitly changed method %0 return type"
@@ -150694,6 +151592,11 @@ msgstr "冲突的原型在此处"
 msgctxt "related_diagnostic"
 msgid "Conformance of forward class %0 to protocol %1 cannot be confirmed"
 msgstr "无法确认前向类 %0 是否遵循协议 %1"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:120
+msgctxt "related_diagnostic"
+msgid "Consider adding '%0' to the header search path"
+msgstr "考虑将 '%0' 添加到头文件搜索路径中"
 
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:9954
 msgctxt "related_diagnostic"
@@ -152079,6 +152982,16 @@ msgstr "从基类 %0 继承的构造函数不能用于常量表达式；派生�
 msgctxt "related_diagnostic"
 msgid "Constructor of base class %0 is not called"
 msgstr "未调用基类 %0 的构造函数"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:24
+msgctxt "related_diagnostic"
+msgid "Content changed"
+msgstr "内容已更改"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:24
+msgctxt "related_diagnostic"
+msgid "Content changed from expected %2 to %3"
+msgstr "内容已更改（从预期的 %2 变为 %3）"
 
 #: clang/include/clang/Basic/DiagnosticParseKinds.td:1643
 msgctxt "related_diagnostic"
@@ -154501,6 +155414,16 @@ msgctxt "related_diagnostic"
 msgid "Current method is part of the 'self' method family and is expected to return an instance of its class type"
 msgstr "当前的方法属于 'self' 方法族，且预期返回其类类型的实例"
 
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:67
+msgctxt "related_diagnostic"
+msgid "Current translation unit has no VFS overlays"
+msgstr "当前翻译单元没有 VFS 覆盖层"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:66
+msgctxt "related_diagnostic"
+msgid "Current translation unit has the following VFS overlays:\n%1"
+msgstr "当前翻译单元包含以下 VFS 覆盖：\n%1"
+
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:3057
 msgctxt "related_diagnostic"
 msgid "Data member %1 declared here"
@@ -154590,6 +155513,11 @@ msgstr "接口中的声明不属于 'new' 系列，因为其结果类型与其�
 msgctxt "related_diagnostic"
 msgid "Declaration missing '[[carries_dependency]]' attribute is here"
 msgstr "缺少 '[[carries_dependency]]' 属性的声明在此处"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:152
+msgctxt "related_diagnostic"
+msgid "Declaration of %0 does not match"
+msgstr "%0 的声明不匹配"
 
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:7282
 msgctxt "related_diagnostic"
@@ -156077,6 +157005,11 @@ msgstr "默认化的 %0 被隐式删除，因为此未被重写的比较函数�
 msgctxt "related_diagnostic"
 msgid "Defined as %0"
 msgstr "定义为 %0"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:150
+msgctxt "related_diagnostic"
+msgid "Definition has no member %0"
+msgstr "定义中没有成员 %0"
 
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:12922
 msgctxt "related_diagnostic"
@@ -157659,6 +158592,31 @@ msgctxt "related_diagnostic"
 msgid "Dynamic_cast of variable %1 whose value is not known"
 msgstr "对其执行 dynamic_cast 值未知的变量 %1"
 
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:33
+msgctxt "related_diagnostic"
+msgid "Earlier input file validation has covered all files"
+msgstr "先前的输入文件验证已覆盖所有文件"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:33
+msgctxt "related_diagnostic"
+msgid "Earlier input file validation has covered only user files"
+msgstr "先前的输入文件验证仅覆盖了用户文件"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:33
+msgctxt "related_diagnostic"
+msgid "Earlier input file validation was disabled for this kind of precompiled file"
+msgstr "先前的输入文件验证针对此类预编译文件已禁用"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:33
+msgctxt "related_diagnostic"
+msgid "Earlier input file validation was not performed"
+msgstr "先前的输入文件验证未执行"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:33
+msgctxt "related_diagnostic"
+msgid "Earlier input file validation was skipped for the current build session"
+msgstr "先前的输入文件验证已在当前构建会话中跳过"
+
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:92
 msgctxt "related_diagnostic"
 msgid "Element %0 also has value %1"
@@ -159019,6 +159977,16 @@ msgctxt "related_diagnostic"
 msgid "Import directive defined here"
 msgstr "此处定义了 import 指令"
 
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:91
+msgctxt "related_diagnostic"
+msgid "Imported by '%0'"
+msgstr "由 '%0' 导入"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:91
+msgctxt "related_diagnostic"
+msgid "Imported by module '%2' in '%0'"
+msgstr "由 '%0' 中的模块 '%2' 导入"
+
 #: clang/include/clang/Basic/DiagnosticASTKinds.td:259
 msgctxt "related_diagnostic"
 msgid "In call to '%0'"
@@ -160229,6 +161197,16 @@ msgctxt "related_diagnostic"
 msgid "Macro marked 'restrict_expansion' here"
 msgstr "宏在此处被标记为 'restrict_expansion'"
 
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:269
+msgctxt "related_diagnostic"
+msgid "Macro was #undef'd here"
+msgstr "宏在此处被取消定义（#undef）"
+
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:269
+msgctxt "related_diagnostic"
+msgid "Macro was defined here"
+msgstr "宏在此处被定义"
+
 #: clang/include/clang/Basic/DiagnosticParseKinds.td:1547
 msgctxt "related_diagnostic"
 msgid "Map type '%0' is previous specified here"
@@ -160509,6 +161487,7 @@ msgctxt "related_diagnostic"
 msgid "Modification of object of const-qualified type %0 is not allowed in a constant expression"
 msgstr "常量表达式中不允许修改 const 限定的类型 %0 的对象"
 
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:257
 #: clang/include/clang/Basic/DiagnosticLexKinds.td:1035
 msgctxt "related_diagnostic"
 msgid "Module defined here"
@@ -160518,6 +161497,11 @@ msgstr "模块定义在此处"
 msgctxt "related_diagnostic"
 msgid "Module directive defined here"
 msgstr "此处定义了 module 指令"
+
+#: clang/include/clang/Basic/DiagnosticFrontendKinds.td:261
+msgctxt "related_diagnostic"
+msgid "Module imported here"
+msgstr "模块在此处导入"
 
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:12887
 msgctxt "related_diagnostic"
@@ -162694,6 +163678,16 @@ msgctxt "related_diagnostic"
 msgid "Move constructor of %1 is implicitly deleted because variant field %3 is an ObjC pointer"
 msgstr "%1 的移动构造函数被隐式删除，因为变体字段 %3 是 ObjC 指针"
 
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:24
+msgctxt "related_diagnostic"
+msgid "Mtime changed"
+msgstr "修改时间 (mtime)已更改"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:24
+msgctxt "related_diagnostic"
+msgid "Mtime changed from expected %2 to %3"
+msgstr "修改时间 (mtime)已更改（从预期的 %2 变为 %3）"
+
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:13085
 msgctxt "related_diagnostic"
 msgid "Must be declared with 'noexcept'"
@@ -163249,6 +164243,16 @@ msgctxt "related_diagnostic"
 msgid "Overridden virtual function is here"
 msgstr "被重写的虚函数在此处"
 
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:67
+msgctxt "related_diagnostic"
+msgid "PCH has no VFS overlays"
+msgstr "PCH没有 VFS 覆盖层"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:66
+msgctxt "related_diagnostic"
+msgid "PCH has the following VFS overlays:\n%1"
+msgstr "PCH包含以下 VFS 覆盖：\n%1"
+
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:11146
 msgctxt "related_diagnostic"
 msgid "Param returned here"
@@ -163503,6 +164507,11 @@ msgstr "前面的 '...' 声明了一个函数形参包"
 msgctxt "related_diagnostic"
 msgid "Preceding bit-field %0 declared here with type %1"
 msgstr "先前的位域 %0 在此处以类型 %1 声明"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:29
+msgctxt "related_diagnostic"
+msgid "Precompiled file '%0' needs to be rebuilt"
+msgstr "预编译文件 '%0' 需要重新构建"
 
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:12777
 msgctxt "related_diagnostic"
@@ -164532,6 +165541,16 @@ msgctxt "related_diagnostic"
 msgid "Similar constraint expressions not considered equivalent; constraint expressions cannot be considered equivalent unless they originate from the same concept"
 msgstr "相似的约束表达式不被视为等价；除非源自同一个概念，否则约束表达式不能被视为等价"
 
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:24
+msgctxt "related_diagnostic"
+msgid "Size changed"
+msgstr "大小已更改"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:24
+msgctxt "related_diagnostic"
+msgid "Size changed from expected %2 to %3"
+msgstr "大小已更改（从预期的 %2 变为 %3）"
+
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:14298
 msgctxt "related_diagnostic"
 msgid "Size must be 1, 2, 4, 12 or 16"
@@ -165467,6 +166486,16 @@ msgctxt "related_diagnostic"
 msgid "Typeid applied to variable %1 whose value is not known"
 msgstr "对其应用 typeid 值未知的变量 %1"
 
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:82
+msgctxt "related_diagnostic"
+msgid "Unable to load buffer for precompiled file: %0"
+msgstr "无法为预编译文件加载缓冲：%0"
+
+#: clang/include/clang/Basic/DiagnosticSerializationKinds.td:84
+msgctxt "related_diagnostic"
+msgid "Unable to verify precompiled file signature: %0"
+msgstr "无法验证预编译文件签名：%0"
+
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:14197
 msgctxt "related_diagnostic"
 msgid "Unary operator not supported, only increment and decrement operations permitted"
@@ -166172,6 +167201,11 @@ msgstr "找不到定义"
 msgctxt "signature_help"
 msgid " (<C-s> to cycle)"
 msgstr "（按 <C-s> 切换）"
+
+#: clang-tools-extra/clangd/ClangdLSPServer.cpp:1395
+msgctxt "signature_help"
+msgid "Signature Help: clangd"
+msgstr "函数签名：clangd"
 
 msgctxt "signature_help"
 msgid "Signature Help: clangd {position}"

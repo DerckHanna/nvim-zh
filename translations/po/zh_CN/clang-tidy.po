@@ -314,6 +314,371 @@ msgctxt "altera-unroll-loops/note"
 msgid "full unrolling requested, but loop bounds may not be known; to partially unroll this loop, use the '#pragma unroll <num>' directive"
 msgstr "已请求完全展开，但循环边界可能未知；要部分展开此循环，请使用 '#pragma unroll <num>' 指令"
 
+#: clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:1253
+msgctxt "analyzer_note"
+msgid "'%0' initialized to a null pointer value"
+msgstr "'%0' 初始化为空指针"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:1253
+msgctxt "analyzer_note"
+msgid "'%0' initialized to nil"
+msgstr "'%0' 初始化为 nil"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:1362
+msgctxt "analyzer_note"
+msgid "Assigning %0"
+msgstr "赋值 %0"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:1362
+msgctxt "analyzer_note"
+msgid "Assigning %0 to '%1'"
+msgstr "将 %0 赋给 '%1'"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:1375
+msgctxt "analyzer_note"
+msgid "Assigning value"
+msgstr "正在赋值"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:3144
+msgctxt "analyzer_note"
+msgid "Assuming '%0' is %1"
+msgstr "假定 '%0' 为 %1"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:3065
+msgctxt "analyzer_note"
+msgid "Assuming '%0' is < %1"
+msgstr "假定 '%0' < %1"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:3065
+msgctxt "analyzer_note"
+msgid "Assuming '%0' is <= %1"
+msgstr "假定 '%0' <= %1"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:3065
+msgctxt "analyzer_note"
+msgid "Assuming '%0' is > %1"
+msgstr "假定 '%0' > %1"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:3065
+msgctxt "analyzer_note"
+msgid "Assuming '%0' is >= %1"
+msgstr "假定 '%0' >= %1"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:3059
+msgctxt "analyzer_note"
+msgid "Assuming '%0' is equal to %1"
+msgstr "假定 '%0' 等于 %1"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:3144
+msgctxt "analyzer_note"
+msgid "Assuming '%0' is false"
+msgstr "假定 '%0' 为假"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:3144
+msgctxt "analyzer_note"
+msgid "Assuming '%0' is nil"
+msgstr "假定 '%0' 为 nil"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:3144
+msgctxt "analyzer_note"
+msgid "Assuming '%0' is non-nil"
+msgstr "假定 '%0' 非 nil"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:3144
+msgctxt "analyzer_note"
+msgid "Assuming '%0' is non-null"
+msgstr "假定 '%0' 非空"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:3062
+msgctxt "analyzer_note"
+msgid "Assuming '%0' is not equal to %1"
+msgstr "假定 '%0' 不等于 %1"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:3144
+msgctxt "analyzer_note"
+msgid "Assuming '%0' is not equal to 0"
+msgstr "假定 '%0' 不等于 0"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:3144
+msgctxt "analyzer_note"
+msgid "Assuming '%0' is null"
+msgstr "假定 '%0' 为空指针"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:3144
+msgctxt "analyzer_note"
+msgid "Assuming '%0' is true"
+msgstr "假定 '%0' 为真"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:3176
+msgctxt "analyzer_note"
+msgid "Assuming field '%0' is %1"
+msgstr "假定字段 '%0' 为 %1"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:3176
+msgctxt "analyzer_note"
+msgid "Assuming field '%0' is false"
+msgstr "假定字段 '%0' 为假"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:3176
+msgctxt "analyzer_note"
+msgid "Assuming field '%0' is non-null"
+msgstr "假定字段 '%0' 非空"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:3176
+msgctxt "analyzer_note"
+msgid "Assuming field '%0' is not equal to 0"
+msgstr "假定字段 '%0' 不等于 0"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:3176
+msgctxt "analyzer_note"
+msgid "Assuming field '%0' is null"
+msgstr "假定字段 '%0' 为空指针"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:3176
+msgctxt "analyzer_note"
+msgid "Assuming field '%0' is true"
+msgstr "假定字段 '%0' 为真"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:2331
+msgctxt "analyzer_note"
+msgid "Assuming pointer value is null"
+msgstr "假定指针值为空"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporter.cpp:2500
+msgctxt "analyzer_note"
+msgid "Calling '%0'"
+msgstr "调用 '%0'"
+
+#: clang/lib/StaticAnalyzer/Checkers/ContainerModeling.cpp:410
+msgctxt "analyzer_note"
+msgid "Container '%0' became empty"
+msgstr "容器 '%0' 变为空"
+
+#: clang/lib/StaticAnalyzer/Checkers/ContainerModeling.cpp:449
+msgctxt "analyzer_note"
+msgid "Container '%0' extended to the back by 1 position"
+msgstr "容器 '%0' 向尾部扩展了 1 个位置"
+
+#: clang/lib/StaticAnalyzer/Checkers/ContainerModeling.cpp:523
+msgctxt "analyzer_note"
+msgid "Container '%0' extended to the front by 1 position"
+msgstr "容器 '%0' 向头部扩展了 1 个位置"
+
+#: clang/lib/StaticAnalyzer/Checkers/ContainerModeling.cpp:478
+msgctxt "analyzer_note"
+msgid "Container '%0' shrank from the back by 1 position"
+msgstr "容器 '%0' 从尾部缩减了 1 个位置"
+
+#: clang/lib/StaticAnalyzer/Checkers/ContainerModeling.cpp:560
+msgctxt "analyzer_note"
+msgid "Container '%0' shrank from the front by 1 position"
+msgstr "容器 '%0' 从头部缩减了 1 个位置"
+
+#: clang/lib/StaticAnalyzer/Checkers/ContainerModeling.cpp:410
+msgctxt "analyzer_note"
+msgid "Container became empty"
+msgstr "容器变为空"
+
+#: clang/lib/StaticAnalyzer/Checkers/ContainerModeling.cpp:449
+msgctxt "analyzer_note"
+msgid "Container extended to the back by 1 position"
+msgstr "容器向尾部扩展了 1 个位置"
+
+#: clang/lib/StaticAnalyzer/Checkers/ContainerModeling.cpp:523
+msgctxt "analyzer_note"
+msgid "Container extended to the front by 1 position"
+msgstr "容器向头部扩展了 1 个位置"
+
+#: clang/lib/StaticAnalyzer/Checkers/ContainerModeling.cpp:478
+msgctxt "analyzer_note"
+msgid "Container shrank from the back by 1 position"
+msgstr "容器从尾部缩减了 1 个位置"
+
+#: clang/lib/StaticAnalyzer/Checkers/ContainerModeling.cpp:560
+msgctxt "analyzer_note"
+msgid "Container shrank from the front by 1 position"
+msgstr "容器从头部缩减了 1 个位置"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporter.cpp:798
+msgctxt "analyzer_note"
+msgid "Control jumps to 'case %0:'  at line %1"
+msgstr "控制流跳转到第 %1 行的 'case %0:' 分支"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporter.cpp:837
+msgctxt "analyzer_note"
+msgid "Control jumps to line %0"
+msgstr "控制流跳转到第 %0 行"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporter.cpp:793
+msgctxt "analyzer_note"
+msgid "Control jumps to the 'default' case at line %0"
+msgstr "控制流跳转到第 %0 行的 'default' 分支"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporter.cpp:2500
+msgctxt "analyzer_note"
+msgid "Entered call from '%0'"
+msgstr "从 '%0' 进入调用"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporter.cpp:1139
+msgctxt "analyzer_note"
+msgid "Entering loop body"
+msgstr "进入循环体"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:1253
+msgctxt "analyzer_note"
+msgid "Initializing to a null pointer value"
+msgstr "初始化为空指针"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:1253
+msgctxt "analyzer_note"
+msgid "Initializing to nil"
+msgstr "初始化为 nil"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporter.cpp:854
+msgctxt "analyzer_note"
+msgid "Left side of '&&' is false"
+msgstr "'&&' 左侧为假"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporter.cpp:854
+msgctxt "analyzer_note"
+msgid "Left side of '&&' is true"
+msgstr "'&&' 左侧为真"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporter.cpp:869
+msgctxt "analyzer_note"
+msgid "Left side of '||' is false"
+msgstr "'||' 左侧为假"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporter.cpp:869
+msgctxt "analyzer_note"
+msgid "Left side of '||' is true"
+msgstr "'||' 左侧为真"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporter.cpp:1140
+msgctxt "analyzer_note"
+msgid "Loop body executed 0 times"
+msgstr "循环体未执行"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporter.cpp:1144
+msgctxt "analyzer_note"
+msgid "Loop body skipped when collection is empty"
+msgstr "当集合为空时跳过循环体"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporter.cpp:1142
+msgctxt "analyzer_note"
+msgid "Loop body skipped when range is empty"
+msgstr "当范围为空时跳过循环体"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporter.cpp:975
+msgctxt "analyzer_note"
+msgid "Loop condition is false.  Exiting loop"
+msgstr "循环条件为假。退出循环"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporter.cpp:985
+msgctxt "analyzer_note"
+msgid "Loop condition is false. Execution continues on line %0."
+msgstr "循环条件为假。继续在第 %0 行执行。"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporter.cpp:999
+msgctxt "analyzer_note"
+msgid "Loop condition is true.  Entering loop body"
+msgstr "循环条件为真。进入循环体"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporter.cpp:959
+msgctxt "analyzer_note"
+msgid "Loop condition is true. Execution continues on line %0."
+msgstr "循环条件为真。继续在第 %0 行执行。"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporter.cpp:1287
+msgctxt "analyzer_note"
+msgid "Looping back to the head of the loop"
+msgstr "回跳到循环起始处"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporter.cpp:788
+msgctxt "analyzer_note"
+msgid "No cases match in the switch statement. Control jumps to line %0"
+msgstr "switch 语句中没有匹配的分支。控制流跳转到第 %0 行"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:1341
+msgctxt "analyzer_note"
+msgid "Null pointer value stored"
+msgstr "存储了空指针值"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:1341
+msgctxt "analyzer_note"
+msgid "Null pointer value stored to '%0'"
+msgstr "将空指针值存储到 '%0'"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporter.cpp:2500
+msgctxt "analyzer_note"
+msgid "Returning from '%0'"
+msgstr "从 '%0' 返回"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:996
+msgctxt "analyzer_note"
+msgid "Returning nil"
+msgstr "返回了 nil"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:998
+msgctxt "analyzer_note"
+msgid "Returning null pointer"
+msgstr "返回了空指针"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:1016
+msgctxt "analyzer_note"
+msgid "Returning pointer"
+msgstr "返回了指针"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:1006
+msgctxt "analyzer_note"
+msgid "Returning the value %0"
+msgstr "返回值 %0"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:1016
+msgctxt "analyzer_note"
+msgid "Returning value"
+msgstr "返回值"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:707
+msgctxt "analyzer_note"
+msgid "Returning without writing to '%0'"
+msgstr "返回时未写入 '%0'"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:707
+msgctxt "analyzer_note"
+msgid "Returning without writing to '%0', which participates in a condition later"
+msgstr "返回时未写入 '%0'，该值稍后参与条件判断"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:1001
+msgctxt "analyzer_note"
+msgid "Returning zero"
+msgstr "返回了 0"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:1342
+msgctxt "analyzer_note"
+msgid "Storing null pointer value"
+msgstr "正在存储空指针值"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporter.cpp:1013
+msgctxt "analyzer_note"
+msgid "Taking false branch"
+msgstr "进入条件为假的分支"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporter.cpp:1017
+msgctxt "analyzer_note"
+msgid "Taking true branch"
+msgstr "进入条件为真的分支"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:1375
+msgctxt "analyzer_note"
+msgid "Value assigned"
+msgstr "已赋值"
+
+#: clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:1375
+msgctxt "analyzer_note"
+msgid "Value assigned to '%0'"
+msgstr "值已赋给 '%0'"
+
 #: clang-tools-extra/clang-tidy/android/CloexecAcceptCheck.cpp:35
 msgctxt "android-cloexec-accept"
 msgid "prefer accept4() to accept() because accept4() allows SOCK_CLOEXEC"
@@ -2522,6 +2887,1706 @@ msgctxt "cert-str34-c"
 msgid "comparison between 'signed char' and 'unsigned char'"
 msgstr "'signed char' 与 'unsigned char' 之间的比较"
 
+#: clang/lib/StaticAnalyzer/Checkers/CloneChecker.cpp:114
+msgctxt "clang-analyzer-alpha.clone.CloneChecker"
+msgid "Duplicate code detected"
+msgstr "检测到重复代码"
+
+#: clang/lib/StaticAnalyzer/Checkers/CloneChecker.cpp:165
+msgctxt "clang-analyzer-alpha.clone.CloneChecker"
+msgid "Potential copy-paste error; did you really mean to use '%0' here?"
+msgstr "可能存在复制粘贴错误；这里确定是要使用 '%0' 吗？"
+
+#: clang/lib/StaticAnalyzer/Checkers/CloneChecker.cpp:119
+msgctxt "clang-analyzer-alpha.clone.CloneChecker/note"
+msgid "Similar code here"
+msgstr "相似代码在这里"
+
+#: clang/lib/StaticAnalyzer/Checkers/CloneChecker.cpp:173
+msgctxt "clang-analyzer-alpha.clone.CloneChecker/note"
+msgid "Similar code using '%0' here"
+msgstr "这里有使用 '%0' 的相似代码"
+
+#: clang/lib/StaticAnalyzer/Checkers/BoolAssignmentChecker.cpp:41
+msgctxt "clang-analyzer-alpha.core.BoolAssignment"
+msgid "Assignment of a non-Boolean value"
+msgstr "赋了非布尔值"
+
+#: clang/lib/StaticAnalyzer/Checkers/BoolAssignmentChecker.cpp:40
+msgctxt "clang-analyzer-alpha.core.BoolAssignment"
+msgid "Might assign a tainted non-Boolean value"
+msgstr "可能正在赋入受污染的非布尔值"
+
+#: clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp:468
+msgctxt "clang-analyzer-alpha.core.C11Lock"
+msgid "This lock has already been acquired"
+msgstr "该锁已被获取"
+
+#: clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp:472
+msgctxt "clang-analyzer-alpha.core.C11Lock"
+msgid "This lock has already been destroyed"
+msgstr "该锁已被销毁"
+
+#: clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp:687
+msgctxt "clang-analyzer-alpha.core.C11Lock"
+msgid "This lock has already been initialized"
+msgstr "该锁已被初始化"
+
+#: clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp:547
+msgctxt "clang-analyzer-alpha.core.C11Lock"
+msgid "This lock has already been unlocked"
+msgstr "该锁已被解锁"
+
+#: clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp:686
+msgctxt "clang-analyzer-alpha.core.C11Lock"
+msgid "This lock is still being held"
+msgstr "该锁仍被持有"
+
+#: clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp:650
+msgctxt "clang-analyzer-alpha.core.C11Lock"
+msgid "This lock is still locked"
+msgstr "该锁仍处于锁定状态"
+
+#: clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp:567
+msgctxt "clang-analyzer-alpha.core.C11Lock"
+msgid "This was not the most recently acquired lock. Possible lock order reversal"
+msgstr "这不是最近一次获取的锁，可能存在加锁顺序反转"
+
+#: clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp:50
+msgctxt "clang-analyzer-alpha.core.C11Lock/note"
+msgid "Destroying %0 here"
+msgstr "此处销毁 %0"
+
+#: clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp:50
+msgctxt "clang-analyzer-alpha.core.C11Lock/note"
+msgid "Initializing %0 here"
+msgstr "此处初始化 %0"
+
+#: clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp:50
+msgctxt "clang-analyzer-alpha.core.C11Lock/note"
+msgid "Locking %0 here"
+msgstr "此处锁定 %0"
+
+#: clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp:519
+msgctxt "clang-analyzer-alpha.core.C11Lock/note"
+msgid "Mutex acquired here"
+msgstr "互斥锁在此处获取"
+
+#: clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp:626
+msgctxt "clang-analyzer-alpha.core.C11Lock/note"
+msgid "Mutex destroyed here"
+msgstr "互斥锁在此处销毁"
+
+#: clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp:681
+msgctxt "clang-analyzer-alpha.core.C11Lock/note"
+msgid "Mutex initialized here"
+msgstr "互斥锁在此处初始化"
+
+#: clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp:582
+msgctxt "clang-analyzer-alpha.core.C11Lock/note"
+msgid "Mutex released here"
+msgstr "互斥锁在此处释放"
+
+#: clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp:50
+msgctxt "clang-analyzer-alpha.core.C11Lock/note"
+msgid "Unlocking %0 here"
+msgstr "此处解锁 %0"
+
+#: clang/lib/StaticAnalyzer/Checkers/CastToStructChecker.cpp:67
+msgctxt "clang-analyzer-alpha.core.CastToStruct"
+msgid "Casting a non-structure type to a structure type and accessing a field can lead to memory access errors or data corruption."
+msgstr "将非结构体类型转换为结构体类型并访问字段可能导致内存访问错误或数据损坏。"
+
+#: clang/lib/StaticAnalyzer/Checkers/CastToStructChecker.cpp:99
+msgctxt "clang-analyzer-alpha.core.CastToStruct"
+msgid "Casting data to a larger structure type and accessing a field can lead to memory access errors or data corruption."
+msgstr "将数据转换为更大的结构体类型并访问字段可能导致内存访问错误或数据损坏。"
+
+#: clang/lib/StaticAnalyzer/Checkers/ConversionChecker.cpp:123
+msgctxt "clang-analyzer-alpha.core.Conversion"
+msgid "Loss of precision in implicit conversion"
+msgstr "隐式转换中丢失精度"
+
+#: clang/lib/StaticAnalyzer/Checkers/ConversionChecker.cpp:121
+msgctxt "clang-analyzer-alpha.core.Conversion"
+msgid "Loss of sign in implicit conversion"
+msgstr "隐式转换中丢失符号属性"
+
+#: clang/lib/StaticAnalyzer/Checkers/DynamicTypeChecker.cpp:68
+msgctxt "clang-analyzer-alpha.core.DynamicTypeChecker"
+msgid "Object has a dynamic type '%0' which is incompatible with static type '%1'"
+msgstr "对象的动态类型 '%0' 与静态类型 '%1' 不兼容"
+
+#: clang/lib/StaticAnalyzer/Checkers/DynamicTypeChecker.cpp:111
+msgctxt "clang-analyzer-alpha.core.DynamicTypeChecker/note"
+msgid "Type '%0' is inferred from explicit cast (from '%1' to '%2')"
+msgstr "类型 '%0' 是从显式转换（从 '%1' 到 '%2'）推断出的"
+
+#: clang/lib/StaticAnalyzer/Checkers/DynamicTypeChecker.cpp:119
+msgctxt "clang-analyzer-alpha.core.DynamicTypeChecker/note"
+msgid "Type '%0' is inferred from implicit cast (from '%1' to '%2')"
+msgstr "类型 '%0' 是从隐式转换（从 '%1' 到 '%2'）推断出的"
+
+#: clang/lib/StaticAnalyzer/Checkers/DynamicTypeChecker.cpp:127
+msgctxt "clang-analyzer-alpha.core.DynamicTypeChecker/note"
+msgid "Type '%0' is inferred from this context"
+msgstr "类型 '%0' 是从此上下文推断出的"
+
+#: clang/lib/StaticAnalyzer/Checkers/PointerArithChecker.cpp:187
+msgctxt "clang-analyzer-alpha.core.PointerArithm"
+msgid "Pointer arithmetic on a pointer to base class is dangerous because derived and base class may have different size."
+msgstr "对指向基类的指针执行指针算术是危险的，因为派生类与基类的大小可能不同。"
+
+#: clang/lib/StaticAnalyzer/Checkers/PointerArithChecker.cpp:207
+msgctxt "clang-analyzer-alpha.core.PointerArithm"
+msgid "Pointer arithmetic on non-array variables relies on memory layout, which is dangerous."
+msgstr "对非数组变量执行指针算术依赖内存布局，这是危险的。"
+
+#: clang/lib/StaticAnalyzer/Checkers/StackAddrEscapeChecker.cpp:217
+msgctxt "clang-analyzer-alpha.core.StackAddressAsyncEscape"
+msgid "Address of stack memory allocated by call to alloca() on line %0 is captured by an asynchronously-executed block"
+msgstr "由第 %0 行调用 alloca() 分配的栈内存地址被异步执行的块捕获"
+
+#: clang/lib/StaticAnalyzer/Checkers/StackAddrEscapeChecker.cpp:217
+msgctxt "clang-analyzer-alpha.core.StackAddressAsyncEscape"
+msgid "Address of stack memory associated with a compound literal declared on line %0 is captured by an asynchronously-executed block"
+msgstr "与第 %0 行声明的复合字面量关联的栈内存地址被异步执行的块捕获"
+
+#: clang/lib/StaticAnalyzer/Checkers/StackAddrEscapeChecker.cpp:217
+msgctxt "clang-analyzer-alpha.core.StackAddressAsyncEscape"
+msgid "Address of stack memory associated with local variable '%0' is captured by an asynchronously-executed block"
+msgstr "与局部变量 '%0' 关联的栈内存地址被异步执行的块捕获"
+
+#: clang/lib/StaticAnalyzer/Checkers/StackAddrEscapeChecker.cpp:217
+msgctxt "clang-analyzer-alpha.core.StackAddressAsyncEscape"
+msgid "Address of stack memory associated with temporary object of type '%0' is captured by an asynchronously-executed block"
+msgstr "与 %0 类型临时对象关联的栈内存地址被异步执行的块捕获"
+
+#: clang/lib/StaticAnalyzer/Checkers/StackAddrEscapeChecker.cpp:217
+msgctxt "clang-analyzer-alpha.core.StackAddressAsyncEscape"
+msgid "Address of stack memory associated with temporary object of type '%0' lifetime extended by local variable '%1' is captured by an asynchronously-executed block"
+msgstr "与生命周期被局部变量 '%1' 延长的 %0 类型临时对象关联的栈内存地址被异步执行的块捕获"
+
+#: clang/lib/StaticAnalyzer/Checkers/StackAddrEscapeChecker.cpp:217
+msgctxt "clang-analyzer-alpha.core.StackAddressAsyncEscape"
+msgid "Address of stack memory associated with temporary object of type '%0' lifetime extended by local variable is captured by an asynchronously-executed block"
+msgstr "与生命周期被局部变量延长的 %0 类型临时对象关联的栈内存地址被异步执行的块捕获"
+
+#: clang/lib/StaticAnalyzer/Checkers/StackAddrEscapeChecker.cpp:217
+msgctxt "clang-analyzer-alpha.core.StackAddressAsyncEscape"
+msgid "Address of stack-allocated block declared on line %0 is captured by an asynchronously-executed block"
+msgstr "第 %0 行声明的栈上分配块的地址被异步执行的块捕获"
+
+#: clang/lib/StaticAnalyzer/Checkers/StdVariantChecker.cpp:279
+msgctxt "clang-analyzer-alpha.core.StdVariant"
+msgid "std::variant %0 held a '%1', not a '%2'"
+msgstr "std::variant %0 中保存的是 '%1'，而不是 '%2'"
+
+#: clang/lib/StaticAnalyzer/Checkers/StdVariantChecker.cpp:279
+msgctxt "clang-analyzer-alpha.core.StdVariant"
+msgid "std::variant %0 held a '%1', not an '%2'"
+msgstr "std::variant %0 中保存的是 '%1'，而不是 '%2'"
+
+#: clang/lib/StaticAnalyzer/Checkers/StdVariantChecker.cpp:279
+msgctxt "clang-analyzer-alpha.core.StdVariant"
+msgid "std::variant %0 held an '%1', not a '%2'"
+msgstr "std::variant %0 中保存的是 '%1'，而不是 '%2'"
+
+#: clang/lib/StaticAnalyzer/Checkers/StdVariantChecker.cpp:279
+msgctxt "clang-analyzer-alpha.core.StdVariant"
+msgid "std::variant %0 held an '%1', not an '%2'"
+msgstr "std::variant %0 中保存的是 '%1'，而不是 '%2'"
+
+#: clang/lib/StaticAnalyzer/Checkers/StoreToImmutableChecker.cpp:109
+msgctxt "clang-analyzer-alpha.core.StoreToImmutable"
+msgid "Trying to write to immutable memory"
+msgstr "试图写入不可变内存"
+
+#: clang/lib/StaticAnalyzer/Checkers/StoreToImmutableChecker.cpp:111
+msgctxt "clang-analyzer-alpha.core.StoreToImmutable"
+msgid "Trying to write to immutable memory in global read-only storage"
+msgstr "试图写入全局只读存储中的不可变内存"
+
+#: clang/lib/StaticAnalyzer/Checkers/StoreToImmutableChecker.cpp:127
+msgctxt "clang-analyzer-alpha.core.StoreToImmutable/note"
+msgid "Enclosing memory region is declared as immutable here"
+msgstr "外围内存区域在这里被声明为不可变"
+
+#: clang/lib/StaticAnalyzer/Checkers/StoreToImmutableChecker.cpp:128
+msgctxt "clang-analyzer-alpha.core.StoreToImmutable/note"
+msgid "Memory region is declared as immutable here"
+msgstr "内存区域在这里被声明为不可变"
+
+#: clang/lib/StaticAnalyzer/Checkers/TestAfterDivZeroChecker.cpp:167
+msgctxt "clang-analyzer-alpha.core.TestAfterDivZero"
+msgid "Value being compared against zero has already been used for division"
+msgstr "与零进行比较的值此前已被用于除法运算"
+
+#: clang/lib/StaticAnalyzer/Checkers/TestAfterDivZeroChecker.cpp:126
+msgctxt "clang-analyzer-alpha.core.TestAfterDivZero/note"
+msgid "Division with compared value made here"
+msgstr "此处已使用该被比较的值进行了除法运算"
+
+#: clang/lib/StaticAnalyzer/Checkers/CXXDeleteChecker.cpp:66
+msgctxt "clang-analyzer-alpha.cplusplus.DeleteWithNonVirtualDtor"
+msgid "Destruction of a polymorphic object with no virtual destructor"
+msgstr "销毁没有虚析构函数的多态对象"
+
+#: clang/lib/StaticAnalyzer/Checkers/CXXDeleteChecker.cpp:208
+msgctxt "clang-analyzer-alpha.cplusplus.DeleteWithNonVirtualDtor/note"
+msgid "Casting from '%0' to '%1' here"
+msgstr "此处从 '%0' 转换为 '%1'"
+
+#: clang/lib/StaticAnalyzer/Checkers/InvalidatedIteratorChecker.cpp:121
+msgctxt "clang-analyzer-alpha.cplusplus.InvalidatedIterator"
+msgid "Invalidated iterator accessed."
+msgstr "访问了已失效的迭代器。"
+
+#: clang/lib/StaticAnalyzer/Checkers/IteratorRangeChecker.cpp:250
+msgctxt "clang-analyzer-alpha.cplusplus.IteratorRange"
+msgid "Iterator decremented ahead of its valid range."
+msgstr "迭代器递减超出了其有效范围之前。"
+
+#: clang/lib/StaticAnalyzer/Checkers/IteratorRangeChecker.cpp:257
+msgctxt "clang-analyzer-alpha.cplusplus.IteratorRange"
+msgid "Iterator incremented behind the past-the-end iterator."
+msgstr "迭代器递增超出了尾后迭代器。"
+
+#: clang/lib/StaticAnalyzer/Checkers/IteratorRangeChecker.cpp:203
+msgctxt "clang-analyzer-alpha.cplusplus.IteratorRange"
+msgid "Past-the-end iterator dereferenced."
+msgstr "解引用了尾后迭代器。"
+
+#: clang/lib/StaticAnalyzer/Checkers/MismatchedIteratorChecker.cpp:232
+msgctxt "clang-analyzer-alpha.cplusplus.MismatchedIterator"
+msgid "Container accessed using foreign iterator argument."
+msgstr "使用来自其他容器的迭代器实参访问了容器。"
+
+#: clang/lib/StaticAnalyzer/Checkers/MismatchedIteratorChecker.cpp:270
+msgctxt "clang-analyzer-alpha.cplusplus.MismatchedIterator"
+msgid "Iterators of different containers used where the same container is expected."
+msgstr "在期望同一容器迭代器处使用了不同容器的迭代器。"
+
+#: clang/lib/StaticAnalyzer/Checkers/SmartPtrChecker.cpp:92
+msgctxt "clang-analyzer-alpha.cplusplus.SmartPtr"
+msgid "Dereference of null smart pointer %0"
+msgstr "解引用了空智能指针 %0"
+
+#: clang/lib/StaticAnalyzer/Checkers/SmartPtrModeling.cpp:803
+msgctxt "clang-analyzer-alpha.cplusplus.SmartPtr/note"
+msgid "A null pointer value is moved to%0"
+msgstr "空指针值被移动到了%0"
+
+#: clang/lib/StaticAnalyzer/Checkers/SmartPtrModeling.cpp:396
+msgctxt "clang-analyzer-alpha.cplusplus.SmartPtr/note"
+msgid "Default constructed smart pointer%0 is null"
+msgstr "默认构造的智能指针%0 为空"
+
+#: clang/lib/StaticAnalyzer/Checkers/SmartPtrModeling.cpp:758
+msgctxt "clang-analyzer-alpha.cplusplus.SmartPtr/note"
+msgid "Smart pointer%0 is assigned to null"
+msgstr "智能指针%0 被赋值为空"
+
+#: clang/lib/StaticAnalyzer/Checkers/SmartPtrModeling.cpp:419
+msgctxt "clang-analyzer-alpha.cplusplus.SmartPtr/note"
+msgid "Smart pointer%0 is constructed"
+msgstr "智能指针%0 已构造"
+
+#: clang/lib/StaticAnalyzer/Checkers/SmartPtrModeling.cpp:417
+msgctxt "clang-analyzer-alpha.cplusplus.SmartPtr/note"
+msgid "Smart pointer%0 is constructed using a null value"
+msgstr "智能指针%0 使用空值构造"
+
+#: clang/lib/StaticAnalyzer/Checkers/SmartPtrModeling.cpp:797
+msgctxt "clang-analyzer-alpha.cplusplus.SmartPtr/note"
+msgid "Smart pointer%0 is null after being moved to%1"
+msgstr "智能指针%0 移动到%1 后变为空"
+
+#: clang/lib/StaticAnalyzer/Checkers/SmartPtrModeling.cpp:822
+msgctxt "clang-analyzer-alpha.cplusplus.SmartPtr/note"
+msgid "Smart pointer%0 is null after; previous value moved to%1"
+msgstr "智能指针%0 随后变为空；原值已移动到%1"
+
+#: clang/lib/StaticAnalyzer/Checkers/SmartPtrModeling.cpp:654
+msgctxt "clang-analyzer-alpha.cplusplus.SmartPtr/note"
+msgid "Smart pointer%0 is released and set to null"
+msgstr "智能指针%0 已释放并设为空"
+
+#: clang/lib/StaticAnalyzer/Checkers/SmartPtrModeling.cpp:618
+msgctxt "clang-analyzer-alpha.cplusplus.SmartPtr/note"
+msgid "Smart pointer%0 reset using a null value"
+msgstr "智能指针%0 使用空值进行了 reset"
+
+#: clang/lib/StaticAnalyzer/Checkers/UseAfterLifetimeEnd.cpp:50
+msgctxt "clang-analyzer-alpha.cplusplus.UseAfterLifetimeEnd"
+msgid "Returning value bound to '%0' that will go out of scope"
+msgstr "返回了绑定到即将超出作用域的 '%0' 的值"
+
+#: clang/lib/StaticAnalyzer/Checkers/UnreachableCodeChecker.cpp:174
+msgctxt "clang-analyzer-alpha.deadcode.UnreachableCode"
+msgid "This statement is never executed"
+msgstr "这条语句永远不会被执行"
+
+#: clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp:468
+msgctxt "clang-analyzer-alpha.fuchsia.Lock"
+msgid "This lock has already been acquired"
+msgstr "该锁已被获取"
+
+#: clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp:472
+msgctxt "clang-analyzer-alpha.fuchsia.Lock"
+msgid "This lock has already been destroyed"
+msgstr "该锁已被销毁"
+
+#: clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp:687
+msgctxt "clang-analyzer-alpha.fuchsia.Lock"
+msgid "This lock has already been initialized"
+msgstr "该锁已被初始化"
+
+#: clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp:547
+msgctxt "clang-analyzer-alpha.fuchsia.Lock"
+msgid "This lock has already been unlocked"
+msgstr "该锁已被解锁"
+
+#: clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp:686
+msgctxt "clang-analyzer-alpha.fuchsia.Lock"
+msgid "This lock is still being held"
+msgstr "该锁仍被持有"
+
+#: clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp:650
+msgctxt "clang-analyzer-alpha.fuchsia.Lock"
+msgid "This lock is still locked"
+msgstr "该锁仍处于锁定状态"
+
+#: clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp:567
+msgctxt "clang-analyzer-alpha.fuchsia.Lock"
+msgid "This was not the most recently acquired lock. Possible lock order reversal"
+msgstr "这不是最近一次获取的锁，可能存在加锁顺序反转"
+
+#: clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp:50
+msgctxt "clang-analyzer-alpha.fuchsia.Lock/note"
+msgid "Destroying %0 here"
+msgstr "此处销毁 %0"
+
+#: clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp:50
+msgctxt "clang-analyzer-alpha.fuchsia.Lock/note"
+msgid "Initializing %0 here"
+msgstr "此处初始化 %0"
+
+#: clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp:50
+msgctxt "clang-analyzer-alpha.fuchsia.Lock/note"
+msgid "Locking %0 here"
+msgstr "此处锁定 %0"
+
+#: clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp:519
+msgctxt "clang-analyzer-alpha.fuchsia.Lock/note"
+msgid "Mutex acquired here"
+msgstr "互斥锁在此处获取"
+
+#: clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp:626
+msgctxt "clang-analyzer-alpha.fuchsia.Lock/note"
+msgid "Mutex destroyed here"
+msgstr "互斥锁在此处销毁"
+
+#: clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp:681
+msgctxt "clang-analyzer-alpha.fuchsia.Lock/note"
+msgid "Mutex initialized here"
+msgstr "互斥锁在此处初始化"
+
+#: clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp:582
+msgctxt "clang-analyzer-alpha.fuchsia.Lock/note"
+msgid "Mutex released here"
+msgstr "互斥锁在此处释放"
+
+#: clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp:50
+msgctxt "clang-analyzer-alpha.fuchsia.Lock/note"
+msgid "Unlocking %0 here"
+msgstr "此处解锁 %0"
+
+#: clang/lib/StaticAnalyzer/Checkers/LLVMConventionsChecker.cpp:253
+msgctxt "clang-analyzer-alpha.llvm.Conventions"
+msgid "AST class '%0' has a field '%1' that allocates heap memory (type %2)"
+msgstr "AST 类 '%0' 的字段 '%1'（类型 %2）会分配堆内存"
+
+#: clang/lib/StaticAnalyzer/Checkers/LLVMConventionsChecker.cpp:253
+msgctxt "clang-analyzer-alpha.llvm.Conventions"
+msgid "AST class '%0' has a field '%1' that allocates heap memory via the following chain: %2 (type %3)"
+msgstr "AST 类 '%0' 的字段 '%1' 通过以下链条分配堆内存：%2（类型 %3）"
+
+#: clang/lib/StaticAnalyzer/Checkers/LLVMConventionsChecker.cpp:176
+msgctxt "clang-analyzer-alpha.llvm.Conventions"
+msgid "StringRef should not be bound to temporary std::string that it outlives"
+msgstr "StringRef 不应绑定到生命周期比它更短的临时 std::string"
+
+#: clang/lib/StaticAnalyzer/Checkers/DirectIvarAssignment.cpp:202
+msgctxt "clang-analyzer-alpha.osx.cocoa.DirectIvarAssignment"
+msgid "Direct assignment to an instance variable backing a property; use the setter instead"
+msgstr "直接对支撑属性的实例变量赋值；请改用 setter"
+
+#: clang/lib/StaticAnalyzer/Checkers/IvarInvalidationChecker.cpp:543
+msgctxt "clang-analyzer-alpha.osx.cocoa.InstanceVariableInvalidation"
+msgid "Instance variable %0 needs to be invalidated or set to nil"
+msgstr "实例变量 %0 需要被失效或置为 nil"
+
+#: clang/lib/StaticAnalyzer/Checkers/IvarInvalidationChecker.cpp:543
+msgctxt "clang-analyzer-alpha.osx.cocoa.InstanceVariableInvalidation"
+msgid "Property %0 needs to be invalidated or set to nil"
+msgstr "属性 %0 需要被失效或置为 nil"
+
+#: clang/lib/StaticAnalyzer/Checkers/IvarInvalidationChecker.cpp:521
+msgctxt "clang-analyzer-alpha.osx.cocoa.MissingInvalidationMethod"
+msgid "Instance variable %0 needs to be invalidated; no invalidation method is declared for %1"
+msgstr "实例变量 %0 需要被失效；未为 %1 声明失效方法"
+
+#: clang/lib/StaticAnalyzer/Checkers/IvarInvalidationChecker.cpp:521
+msgctxt "clang-analyzer-alpha.osx.cocoa.MissingInvalidationMethod"
+msgid "Instance variable %0 needs to be invalidated; no invalidation method is defined in the @implementation for %1"
+msgstr "实例变量 %0 需要被失效；在 %1 的 @implementation 中未定义失效方法"
+
+#: clang/lib/StaticAnalyzer/Checkers/IvarInvalidationChecker.cpp:521
+msgctxt "clang-analyzer-alpha.osx.cocoa.MissingInvalidationMethod"
+msgid "Property %0 needs to be invalidated; no invalidation method is declared for %1"
+msgstr "属性 %0 需要被失效；未为 %1 声明失效方法"
+
+#: clang/lib/StaticAnalyzer/Checkers/IvarInvalidationChecker.cpp:521
+msgctxt "clang-analyzer-alpha.osx.cocoa.MissingInvalidationMethod"
+msgid "Property %0 needs to be invalidated; no invalidation method is defined in the @implementation for %1"
+msgstr "属性 %0 需要被失效；在 %1 的 @implementation 中未定义失效方法"
+
+#: clang/lib/StaticAnalyzer/Checkers/LocalizationChecker.cpp:1380
+msgctxt "clang-analyzer-alpha.osx.cocoa.localizability.PluralMisuseChecker"
+msgid "Plural cases are not supported across all languages. Use a .stringsdict file instead"
+msgstr "并非所有语言都支持此类复数形式处理。请改用 .stringsdict 文件"
+
+#: clang/lib/StaticAnalyzer/Checkers/ReturnPointerRangeChecker.cpp:82
+msgctxt "clang-analyzer-alpha.security.ReturnPtrRange"
+msgid "Returned pointer value points outside the original object (potential buffer overflow)"
+msgstr "返回的指针值指向了原始对象之外（存在潜在的缓冲溢出）"
+
+#: clang/lib/StaticAnalyzer/Checkers/ReturnPointerRangeChecker.cpp:101
+msgctxt "clang-analyzer-alpha.security.ReturnPtrRange/note"
+msgid "Original object '%0' is an array of %1 '%2' objects"
+msgstr "原始对象 '%0' 是包含 %1 个 '%2' 对象的数组"
+
+#: clang/lib/StaticAnalyzer/Checkers/ReturnPointerRangeChecker.cpp:101
+msgctxt "clang-analyzer-alpha.security.ReturnPtrRange/note"
+msgid "Original object '%0' is an array of %1 '%2' objects, returned pointer points at index %3"
+msgstr "原始对象 '%0' 是包含 %1 个 '%2' 对象的数组，返回的指针指向索引 %3"
+
+#: clang/lib/StaticAnalyzer/Checkers/ReturnPointerRangeChecker.cpp:95
+msgctxt "clang-analyzer-alpha.security.ReturnPtrRange/note"
+msgid "Original object declared here"
+msgstr "原始对象在这里声明"
+
+#: clang/lib/StaticAnalyzer/Checkers/ReturnPointerRangeChecker.cpp:101
+msgctxt "clang-analyzer-alpha.security.ReturnPtrRange/note"
+msgid "Original object is an array of %0 '%1' objects"
+msgstr "原始对象是包含 %0 个 '%1' 对象的数组"
+
+#: clang/lib/StaticAnalyzer/Checkers/ReturnPointerRangeChecker.cpp:101
+msgctxt "clang-analyzer-alpha.security.ReturnPtrRange/note"
+msgid "Original object is an array of %0 '%1' objects, returned pointer points at index %2"
+msgstr "原始对象是包含 %0 个 '%1' 对象的数组，返回的指针指向索引 %2"
+
+#: clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp:468
+msgctxt "clang-analyzer-alpha.unix.PthreadLock"
+msgid "This lock has already been acquired"
+msgstr "该锁已被获取"
+
+#: clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp:472
+msgctxt "clang-analyzer-alpha.unix.PthreadLock"
+msgid "This lock has already been destroyed"
+msgstr "该锁已被销毁"
+
+#: clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp:687
+msgctxt "clang-analyzer-alpha.unix.PthreadLock"
+msgid "This lock has already been initialized"
+msgstr "该锁已被初始化"
+
+#: clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp:547
+msgctxt "clang-analyzer-alpha.unix.PthreadLock"
+msgid "This lock has already been unlocked"
+msgstr "该锁已被解锁"
+
+#: clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp:686
+msgctxt "clang-analyzer-alpha.unix.PthreadLock"
+msgid "This lock is still being held"
+msgstr "该锁仍被持有"
+
+#: clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp:650
+msgctxt "clang-analyzer-alpha.unix.PthreadLock"
+msgid "This lock is still locked"
+msgstr "该锁仍处于锁定状态"
+
+#: clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp:567
+msgctxt "clang-analyzer-alpha.unix.PthreadLock"
+msgid "This was not the most recently acquired lock. Possible lock order reversal"
+msgstr "这不是最近一次获取的锁，可能存在加锁顺序反转"
+
+#: clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp:50
+msgctxt "clang-analyzer-alpha.unix.PthreadLock/note"
+msgid "Destroying %0 here"
+msgstr "此处销毁 %0"
+
+#: clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp:50
+msgctxt "clang-analyzer-alpha.unix.PthreadLock/note"
+msgid "Initializing %0 here"
+msgstr "此处初始化 %0"
+
+#: clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp:50
+msgctxt "clang-analyzer-alpha.unix.PthreadLock/note"
+msgid "Locking %0 here"
+msgstr "此处锁定 %0"
+
+#: clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp:519
+msgctxt "clang-analyzer-alpha.unix.PthreadLock/note"
+msgid "Mutex acquired here"
+msgstr "互斥锁在此处获取"
+
+#: clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp:626
+msgctxt "clang-analyzer-alpha.unix.PthreadLock/note"
+msgid "Mutex destroyed here"
+msgstr "互斥锁在此处销毁"
+
+#: clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp:681
+msgctxt "clang-analyzer-alpha.unix.PthreadLock/note"
+msgid "Mutex initialized here"
+msgstr "互斥锁在此处初始化"
+
+#: clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp:582
+msgctxt "clang-analyzer-alpha.unix.PthreadLock/note"
+msgid "Mutex released here"
+msgstr "互斥锁在此处释放"
+
+#: clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp:50
+msgctxt "clang-analyzer-alpha.unix.PthreadLock/note"
+msgid "Unlocking %0 here"
+msgstr "此处解锁 %0"
+
+#: clang/lib/StaticAnalyzer/Checkers/SimpleStreamChecker.cpp:178
+msgctxt "clang-analyzer-alpha.unix.SimpleStream"
+msgid "Closing a previously closed file stream"
+msgstr "正在关闭此前已经关闭的文件流"
+
+#: clang/lib/StaticAnalyzer/Checkers/SimpleStreamChecker.cpp:191
+msgctxt "clang-analyzer-alpha.unix.SimpleStream"
+msgid "Opened file is never closed; potential resource leak"
+msgstr "已打开的文件从未关闭；可能存在资源泄漏"
+
+#: clang/lib/StaticAnalyzer/Checkers/CStringChecker.cpp:819
+msgctxt "clang-analyzer-alpha.unix.cstring.BufferOverlap"
+msgid "Arguments must not be overlapping buffers"
+msgstr "实参不得为相互重叠的缓冲"
+
+#: clang/lib/StaticAnalyzer/Checkers/CStringChecker.cpp:64
+msgctxt "clang-analyzer-alpha.unix.cstring.OutOfBounds"
+msgid "'snprintf' accesses out-of-bound array element"
+msgstr "'snprintf' 访问了越界数组元素"
+
+#: clang/lib/StaticAnalyzer/Checkers/CStringChecker.cpp:62
+msgctxt "clang-analyzer-alpha.unix.cstring.OutOfBounds"
+msgid "'snprintf' overflows the destination buffer"
+msgstr "'snprintf' 溢出了目标缓冲"
+
+#: clang/lib/StaticAnalyzer/Checkers/CStringChecker.cpp:64
+msgctxt "clang-analyzer-alpha.unix.cstring.OutOfBounds"
+msgid "'sprintf' accesses out-of-bound array element"
+msgstr "'sprintf' 访问了越界数组元素"
+
+#: clang/lib/StaticAnalyzer/Checkers/CStringChecker.cpp:62
+msgctxt "clang-analyzer-alpha.unix.cstring.OutOfBounds"
+msgid "'sprintf' overflows the destination buffer"
+msgstr "'sprintf' 溢出了目标缓冲"
+
+#: clang/lib/StaticAnalyzer/Checkers/CStringChecker.cpp:64
+msgctxt "clang-analyzer-alpha.unix.cstring.OutOfBounds"
+msgid "Locale transformation function accesses out-of-bound array element"
+msgstr "区域设置转换函数访问了越界数组元素"
+
+#: clang/lib/StaticAnalyzer/Checkers/CStringChecker.cpp:62
+msgctxt "clang-analyzer-alpha.unix.cstring.OutOfBounds"
+msgid "Locale transformation function overflows the destination buffer"
+msgstr "区域设置转换函数溢出了目标缓冲"
+
+#: clang/lib/StaticAnalyzer/Checkers/CStringChecker.cpp:64
+msgctxt "clang-analyzer-alpha.unix.cstring.OutOfBounds"
+msgid "Memory clearance function accesses out-of-bound array element"
+msgstr "内存清零函数访问了越界数组元素"
+
+#: clang/lib/StaticAnalyzer/Checkers/CStringChecker.cpp:62
+msgctxt "clang-analyzer-alpha.unix.cstring.OutOfBounds"
+msgid "Memory clearance function overflows the destination buffer"
+msgstr "内存清零函数溢出了目标缓冲"
+
+#: clang/lib/StaticAnalyzer/Checkers/CStringChecker.cpp:64
+msgctxt "clang-analyzer-alpha.unix.cstring.OutOfBounds"
+msgid "Memory comparison function accesses out-of-bound array element"
+msgstr "内存比较函数访问了越界数组元素"
+
+#: clang/lib/StaticAnalyzer/Checkers/CStringChecker.cpp:62
+msgctxt "clang-analyzer-alpha.unix.cstring.OutOfBounds"
+msgid "Memory comparison function overflows the destination buffer"
+msgstr "内存比较函数溢出了目标缓冲"
+
+#: clang/lib/StaticAnalyzer/Checkers/CStringChecker.cpp:64
+msgctxt "clang-analyzer-alpha.unix.cstring.OutOfBounds"
+msgid "Memory copy function accesses out-of-bound array element"
+msgstr "内存复制函数访问了越界数组元素"
+
+#: clang/lib/StaticAnalyzer/Checkers/CStringChecker.cpp:62
+msgctxt "clang-analyzer-alpha.unix.cstring.OutOfBounds"
+msgid "Memory copy function overflows the destination buffer"
+msgstr "内存复制函数溢出了目标缓冲"
+
+#: clang/lib/StaticAnalyzer/Checkers/CStringChecker.cpp:64
+msgctxt "clang-analyzer-alpha.unix.cstring.OutOfBounds"
+msgid "Memory set function accesses out-of-bound array element"
+msgstr "内存设置函数访问了越界数组元素"
+
+#: clang/lib/StaticAnalyzer/Checkers/CStringChecker.cpp:62
+msgctxt "clang-analyzer-alpha.unix.cstring.OutOfBounds"
+msgid "Memory set function overflows the destination buffer"
+msgstr "内存设置函数溢出了目标缓冲"
+
+#: clang/lib/StaticAnalyzer/Checkers/CStringChecker.cpp:93
+msgctxt "clang-analyzer-alpha.unix.cstring.OutOfBounds"
+msgid "Out-of-bound array access"
+msgstr "数组越界访问"
+
+#: clang/lib/StaticAnalyzer/Checkers/CStringChecker.cpp:64
+msgctxt "clang-analyzer-alpha.unix.cstring.OutOfBounds"
+msgid "String comparison function accesses out-of-bound array element"
+msgstr "字符串比较函数访问了越界数组元素"
+
+#: clang/lib/StaticAnalyzer/Checkers/CStringChecker.cpp:62
+msgctxt "clang-analyzer-alpha.unix.cstring.OutOfBounds"
+msgid "String comparison function overflows the destination buffer"
+msgstr "字符串比较函数溢出了目标缓冲"
+
+#: clang/lib/StaticAnalyzer/Checkers/CStringChecker.cpp:64
+msgctxt "clang-analyzer-alpha.unix.cstring.OutOfBounds"
+msgid "String concatenation function accesses out-of-bound array element"
+msgstr "字符串拼接函数访问了越界数组元素"
+
+#: clang/lib/StaticAnalyzer/Checkers/CStringChecker.cpp:62
+msgctxt "clang-analyzer-alpha.unix.cstring.OutOfBounds"
+msgid "String concatenation function overflows the destination buffer"
+msgstr "字符串拼接函数溢出了目标缓冲"
+
+#: clang/lib/StaticAnalyzer/Checkers/CStringChecker.cpp:64
+msgctxt "clang-analyzer-alpha.unix.cstring.OutOfBounds"
+msgid "String copy function accesses out-of-bound array element"
+msgstr "字符串复制函数访问了越界数组元素"
+
+#: clang/lib/StaticAnalyzer/Checkers/CStringChecker.cpp:62
+msgctxt "clang-analyzer-alpha.unix.cstring.OutOfBounds"
+msgid "String copy function overflows the destination buffer"
+msgstr "字符串复制函数溢出了目标缓冲"
+
+#: clang/lib/StaticAnalyzer/Checkers/CStringChecker.cpp:64
+msgctxt "clang-analyzer-alpha.unix.cstring.OutOfBounds"
+msgid "String length function accesses out-of-bound array element"
+msgstr "字符串长度函数访问了越界数组元素"
+
+#: clang/lib/StaticAnalyzer/Checkers/CStringChecker.cpp:62
+msgctxt "clang-analyzer-alpha.unix.cstring.OutOfBounds"
+msgid "String length function overflows the destination buffer"
+msgstr "字符串长度函数溢出了目标缓冲"
+
+#: clang/lib/StaticAnalyzer/Checkers/CStringChecker.cpp:64
+msgctxt "clang-analyzer-alpha.unix.cstring.OutOfBounds"
+msgid "strsep() accesses out-of-bound array element"
+msgstr "strsep() 访问了越界数组元素"
+
+#: clang/lib/StaticAnalyzer/Checkers/CStringChecker.cpp:62
+msgctxt "clang-analyzer-alpha.unix.cstring.OutOfBounds"
+msgid "strsep() overflows the destination buffer"
+msgstr "strsep() 溢出了目标缓冲"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/ForwardDeclChecker.cpp:344
+msgctxt "clang-analyzer-alpha.webkit.ForwardDeclChecker"
+msgid "Call argument for parameter '%0' uses a forward declared type '%1'"
+msgstr "形参 '%0' 的调用实参使用了前向声明的类型 '%1'"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/ForwardDeclChecker.cpp:344
+msgctxt "clang-analyzer-alpha.webkit.ForwardDeclChecker"
+msgid "Call argument uses a forward declared type '%0'"
+msgstr "调用实参使用了前向声明的类型 '%0'"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/ForwardDeclChecker.cpp:344
+msgctxt "clang-analyzer-alpha.webkit.ForwardDeclChecker"
+msgid "Local variable '%0' uses a forward declared type '%1'"
+msgstr "局部变量 '%0' 使用了前向声明的类型 '%1'"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/ForwardDeclChecker.cpp:175
+msgctxt "clang-analyzer-alpha.webkit.ForwardDeclChecker"
+msgid "Member variable '%0' uses a forward declared type '%1'"
+msgstr "成员变量 '%0' 使用了前向声明的类型 '%1'"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/ForwardDeclChecker.cpp:344
+msgctxt "clang-analyzer-alpha.webkit.ForwardDeclChecker"
+msgid "Receiver uses a forward declared type '%0'"
+msgstr "接收者使用了前向声明的类型 '%0'"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/MemoryUnsafeCastChecker.cpp:51
+msgctxt "clang-analyzer-alpha.webkit.MemoryUnsafeCastChecker"
+msgid "Unsafe cast from base type '%0' to derived type '%1'"
+msgstr "从基类型 '%0' 到派生类型 '%1' 的不安全转换"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/MemoryUnsafeCastChecker.cpp:71
+msgctxt "clang-analyzer-alpha.webkit.MemoryUnsafeCastChecker"
+msgid "Unsafe cast from type '%0' to an unrelated type '%1'"
+msgstr "从类型 '%0' 到无关类型 '%1' 的不安全转换"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/NoDeleteChecker.cpp:94
+msgctxt "clang-analyzer-alpha.webkit.NoDeleteChecker"
+msgid "A function '%0' has [[clang::annotate_type(\"webkit.nodelete\")]] but it contains a parameter '%1' which could destruct an object."
+msgstr "函数 '%0' 带有 [[clang::annotate_type(\"webkit.nodelete\")]]，但它包含一个可能会析构对象的形参 '%1'。"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/NoDeleteChecker.cpp:94
+msgctxt "clang-analyzer-alpha.webkit.NoDeleteChecker"
+msgid "A function '%0' has [[clang::annotate_type(\"webkit.nodelete\")]] but it contains code that could destruct an object."
+msgstr "函数 '%0' 带有 [[clang::annotate_type(\"webkit.nodelete\")]]，但它包含可能会析构对象的代码。"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefMemberChecker.cpp:276
+msgctxt "clang-analyzer-alpha.webkit.NoUncheckedPtrMemberChecker"
+msgid "Instance variable '%0' (of '%1') contains a raw pointer to CheckedPtr-capable type '%2'"
+msgstr "（'%1' 的）实例变量 '%0' 包含指向支持 CheckedPtr 的类型 '%2' 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefMemberChecker.cpp:276
+msgctxt "clang-analyzer-alpha.webkit.NoUncheckedPtrMemberChecker"
+msgid "Instance variable '%0' (of '%1') contains a reference to CheckedPtr-capable type '%2'"
+msgstr "（'%1' 的）实例变量 '%0' 包含指向支持 CheckedPtr 的类型 '%2' 的引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefMemberChecker.cpp:276
+msgctxt "clang-analyzer-alpha.webkit.NoUncheckedPtrMemberChecker"
+msgid "Instance variable '%0' (of '%1') is a raw pointer to CheckedPtr-capable type '%2'"
+msgstr "（'%1' 的）实例变量 '%0' 是指向支持 CheckedPtr 的类型 '%2' 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefMemberChecker.cpp:276
+msgctxt "clang-analyzer-alpha.webkit.NoUncheckedPtrMemberChecker"
+msgid "Instance variable '%0' (of '%1') is a reference to CheckedPtr-capable type '%2'"
+msgstr "（'%1' 的）实例变量 '%0' 是指向支持 CheckedPtr 的类型 '%2' 的引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefMemberChecker.cpp:278
+msgctxt "clang-analyzer-alpha.webkit.NoUncheckedPtrMemberChecker"
+msgid "Member variable '%0' (of '%1') contains a raw pointer to CheckedPtr-capable type '%2'"
+msgstr "（'%1' 的）成员变量 '%0' 包含指向支持 CheckedPtr 的类型 '%2' 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefMemberChecker.cpp:278
+msgctxt "clang-analyzer-alpha.webkit.NoUncheckedPtrMemberChecker"
+msgid "Member variable '%0' (of '%1') contains a reference to CheckedPtr-capable type '%2'"
+msgstr "（'%1' 的）成员变量 '%0' 包含指向支持 CheckedPtr 的类型 '%2' 的引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefMemberChecker.cpp:278
+msgctxt "clang-analyzer-alpha.webkit.NoUncheckedPtrMemberChecker"
+msgid "Member variable '%0' (of '%1') is a raw pointer to CheckedPtr-capable type '%2'"
+msgstr "（'%1' 的）成员变量 '%0' 是指向支持 CheckedPtr 的类型 '%2' 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefMemberChecker.cpp:278
+msgctxt "clang-analyzer-alpha.webkit.NoUncheckedPtrMemberChecker"
+msgid "Member variable '%0' (of '%1') is a reference to CheckedPtr-capable type '%2'"
+msgstr "（'%1' 的）成员变量 '%0' 是指向支持 CheckedPtr 的类型 '%2' 的引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefMemberChecker.cpp:332
+msgctxt "clang-analyzer-alpha.webkit.NoUncheckedPtrMemberChecker"
+msgid "Member variable is a raw-pointer/reference to CheckedPtr-capable type"
+msgstr "成员变量是指向支持 CheckedPtr 的类型的原始指针或引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefMemberChecker.cpp:274
+msgctxt "clang-analyzer-alpha.webkit.NoUncheckedPtrMemberChecker"
+msgid "Property '%0' (of '%1') contains a raw pointer to CheckedPtr-capable type '%2'"
+msgstr "（'%1' 的）属性 '%0' 包含指向支持 CheckedPtr 的类型 '%2' 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefMemberChecker.cpp:274
+msgctxt "clang-analyzer-alpha.webkit.NoUncheckedPtrMemberChecker"
+msgid "Property '%0' (of '%1') contains a reference to CheckedPtr-capable type '%2'"
+msgstr "（'%1' 的）属性 '%0' 包含指向支持 CheckedPtr 的类型 '%2' 的引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefMemberChecker.cpp:274
+msgctxt "clang-analyzer-alpha.webkit.NoUncheckedPtrMemberChecker"
+msgid "Property '%0' (of '%1') is a raw pointer to CheckedPtr-capable type '%2'"
+msgstr "（'%1' 的）属性 '%0' 是指向支持 CheckedPtr 的类型 '%2' 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefMemberChecker.cpp:274
+msgctxt "clang-analyzer-alpha.webkit.NoUncheckedPtrMemberChecker"
+msgid "Property '%0' (of '%1') is a reference to CheckedPtr-capable type '%2'"
+msgstr "（'%1' 的）属性 '%0' 是指向支持 CheckedPtr 的类型 '%2' 的引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefMemberChecker.cpp:276
+msgctxt "clang-analyzer-alpha.webkit.NoUnretainedMemberChecker"
+msgid "Instance variable '%0' (of '%1') contains a raw pointer to RetainPtr-capable type '%2'"
+msgstr "（'%1' 的）实例变量 '%0' 包含指向支持 RetainPtr 的类型 '%2' 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefMemberChecker.cpp:276
+msgctxt "clang-analyzer-alpha.webkit.NoUnretainedMemberChecker"
+msgid "Instance variable '%0' (of '%1') contains a reference to RetainPtr-capable type '%2'"
+msgstr "（'%1' 的）实例变量 '%0' 包含指向支持 RetainPtr 的类型 '%2' 的引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefMemberChecker.cpp:276
+msgctxt "clang-analyzer-alpha.webkit.NoUnretainedMemberChecker"
+msgid "Instance variable '%0' (of '%1') is a raw pointer to RetainPtr-capable type '%2'"
+msgstr "（'%1' 的）实例变量 '%0' 是指向支持 RetainPtr 的类型 '%2' 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefMemberChecker.cpp:276
+msgctxt "clang-analyzer-alpha.webkit.NoUnretainedMemberChecker"
+msgid "Instance variable '%0' (of '%1') is a reference to RetainPtr-capable type '%2'"
+msgstr "（'%1' 的）实例变量 '%0' 是指向支持 RetainPtr 的类型 '%2' 的引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefMemberChecker.cpp:278
+msgctxt "clang-analyzer-alpha.webkit.NoUnretainedMemberChecker"
+msgid "Member variable '%0' (of '%1') contains a raw pointer to RetainPtr-capable type '%2'"
+msgstr "（'%1' 的）成员变量 '%0' 包含指向支持 RetainPtr 的类型 '%2' 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefMemberChecker.cpp:278
+msgctxt "clang-analyzer-alpha.webkit.NoUnretainedMemberChecker"
+msgid "Member variable '%0' (of '%1') contains a reference to RetainPtr-capable type '%2'"
+msgstr "（'%1' 的）成员变量 '%0' 包含指向支持 RetainPtr 的类型 '%2' 的引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefMemberChecker.cpp:278
+msgctxt "clang-analyzer-alpha.webkit.NoUnretainedMemberChecker"
+msgid "Member variable '%0' (of '%1') is a raw pointer to RetainPtr-capable type '%2'"
+msgstr "（'%1' 的）成员变量 '%0' 是指向支持 RetainPtr 的类型 '%2' 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefMemberChecker.cpp:278
+msgctxt "clang-analyzer-alpha.webkit.NoUnretainedMemberChecker"
+msgid "Member variable '%0' (of '%1') is a reference to RetainPtr-capable type '%2'"
+msgstr "（'%1' 的）成员变量 '%0' 是指向支持 RetainPtr 的类型 '%2' 的引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefMemberChecker.cpp:350
+msgctxt "clang-analyzer-alpha.webkit.NoUnretainedMemberChecker"
+msgid "Member variable is a raw-pointer/reference to RetainPtr-capable type"
+msgstr "成员变量是指向支持 RetainPtr 的类型的原始指针或引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefMemberChecker.cpp:274
+msgctxt "clang-analyzer-alpha.webkit.NoUnretainedMemberChecker"
+msgid "Property '%0' (of '%1') contains a raw pointer to RetainPtr-capable type '%2'"
+msgstr "（'%1' 的）属性 '%0' 包含指向支持 RetainPtr 的类型 '%2' 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefMemberChecker.cpp:274
+msgctxt "clang-analyzer-alpha.webkit.NoUnretainedMemberChecker"
+msgid "Property '%0' (of '%1') contains a reference to RetainPtr-capable type '%2'"
+msgstr "（'%1' 的）属性 '%0' 包含指向支持 RetainPtr 的类型 '%2' 的引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefMemberChecker.cpp:274
+msgctxt "clang-analyzer-alpha.webkit.NoUnretainedMemberChecker"
+msgid "Property '%0' (of '%1') is a raw pointer to RetainPtr-capable type '%2'"
+msgstr "（'%1' 的）属性 '%0' 是指向支持 RetainPtr 的类型 '%2' 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefMemberChecker.cpp:274
+msgctxt "clang-analyzer-alpha.webkit.NoUnretainedMemberChecker"
+msgid "Property '%0' (of '%1') is a reference to RetainPtr-capable type '%2'"
+msgstr "（'%1' 的）属性 '%0' 是指向支持 RetainPtr 的类型 '%2' 的引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RetainPtrCtorAdoptChecker.cpp:580
+msgctxt "clang-analyzer-alpha.webkit.RetainPtrCtorAdoptChecker"
+msgid "Incorrect use of %0. The argument is +0 and results in an use-after-free when ARC is disabled."
+msgstr "%0 使用不当。在禁用 ARC 时，该实参引用计数为 +0，会导致释放后使用。"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RetainPtrCtorAdoptChecker.cpp:580
+msgctxt "clang-analyzer-alpha.webkit.RetainPtrCtorAdoptChecker"
+msgid "Incorrect use of %0. The argument is +0 and results in an use-after-free."
+msgstr "%0 使用不当。该实参引用计数为 +0，会导致释放后使用。"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RetainPtrCtorAdoptChecker.cpp:601
+msgctxt "clang-analyzer-alpha.webkit.RetainPtrCtorAdoptChecker"
+msgid "Incorrect use of %0. The argument is +1 and results in a memory leak when ARC is disabled."
+msgstr "%0 使用不当。在禁用 ARC 时，该实参引用计数为 +1，会导致内存泄漏。"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RetainPtrCtorAdoptChecker.cpp:601
+msgctxt "clang-analyzer-alpha.webkit.RetainPtrCtorAdoptChecker"
+msgid "Incorrect use of %0. The argument is +1 and results in a memory leak."
+msgstr "%0 使用不当。该实参引用计数为 +1，会导致内存泄漏。"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RetainPtrCtorAdoptChecker.cpp:621
+msgctxt "clang-analyzer-alpha.webkit.RetainPtrCtorAdoptChecker"
+msgid "The return value is +1 and results in a memory leak."
+msgstr "返回值引用计数为 +1，会导致内存泄漏。"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:391
+msgctxt "clang-analyzer-alpha.webkit.UncheckedCallArgsChecker"
+msgid "Function argument '%0' (parameter '%1' to '%2') is a raw pointer to CheckedPtr-capable type %3"
+msgstr "函数实参 '%0'（对应 '%2' 的形参 '%1'）是指向支持 CheckedPtr 的类型 %3 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:391
+msgctxt "clang-analyzer-alpha.webkit.UncheckedCallArgsChecker"
+msgid "Function argument '%0' (parameter '%1' to '%2') is a reference to CheckedPtr-capable type %3"
+msgstr "函数实参 '%0'（对应 '%2' 的形参 '%1'）是指向支持 CheckedPtr 的类型 %3 的引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:391
+msgctxt "clang-analyzer-alpha.webkit.UncheckedCallArgsChecker"
+msgid "Function argument '%0' (parameter '%1') is a raw pointer to CheckedPtr-capable type %2"
+msgstr "函数实参 '%0'（形参 '%1'）是指向支持 CheckedPtr 的类型 %2 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:391
+msgctxt "clang-analyzer-alpha.webkit.UncheckedCallArgsChecker"
+msgid "Function argument '%0' (parameter '%1') is a reference to CheckedPtr-capable type %2"
+msgstr "函数实参 '%0'（形参 '%1'）是指向支持 CheckedPtr 的类型 %2 的引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:444
+msgctxt "clang-analyzer-alpha.webkit.UncheckedCallArgsChecker"
+msgid "Function argument '%0' (parameter 'this') is a raw pointer to CheckedPtr-capable type %1"
+msgstr "函数实参 '%0'（形参 'this'）是指向支持 CheckedPtr 的类型 %1 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:444
+msgctxt "clang-analyzer-alpha.webkit.UncheckedCallArgsChecker"
+msgid "Function argument '%0' (parameter 'this'to '%1')) is a raw pointer to CheckedPtr-capable type %2"
+msgstr "函数实参 '%0'（形参 'this'，传给 '%1'）是指向支持 CheckedPtr 的类型 %2 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:391
+msgctxt "clang-analyzer-alpha.webkit.UncheckedCallArgsChecker"
+msgid "Function argument '%0' (to '%1') is a raw pointer to CheckedPtr-capable type %2"
+msgstr "函数实参 '%0'（传给 '%1'）是指向支持 CheckedPtr 的类型 %2 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:391
+msgctxt "clang-analyzer-alpha.webkit.UncheckedCallArgsChecker"
+msgid "Function argument '%0' (to '%1') is a reference to CheckedPtr-capable type %2"
+msgstr "函数实参 '%0'（传给 '%1'）是指向支持 CheckedPtr 的类型 %2 的引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:391
+msgctxt "clang-analyzer-alpha.webkit.UncheckedCallArgsChecker"
+msgid "Function argument '%0' is a raw pointer to CheckedPtr-capable type %1"
+msgstr "函数实参 '%0'是指向支持 CheckedPtr 的类型 %1 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:391
+msgctxt "clang-analyzer-alpha.webkit.UncheckedCallArgsChecker"
+msgid "Function argument '%0' is a reference to CheckedPtr-capable type %1"
+msgstr "函数实参 '%0'是指向支持 CheckedPtr 的类型 %1 的引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:391
+msgctxt "clang-analyzer-alpha.webkit.UncheckedCallArgsChecker"
+msgid "Function argument (parameter '%0' to '%1') is a raw pointer to CheckedPtr-capable type %2"
+msgstr "函数实参（对应 '%1' 的形参 '%0'）是指向支持 CheckedPtr 的类型 %2 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:391
+msgctxt "clang-analyzer-alpha.webkit.UncheckedCallArgsChecker"
+msgid "Function argument (parameter '%0' to '%1') is a reference to CheckedPtr-capable type %2"
+msgstr "函数实参（对应 '%1' 的形参 '%0'）是指向支持 CheckedPtr 的类型 %2 的引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:391
+msgctxt "clang-analyzer-alpha.webkit.UncheckedCallArgsChecker"
+msgid "Function argument (parameter '%0') is a raw pointer to CheckedPtr-capable type %1"
+msgstr "函数实参（形参 '%0'）是指向支持 CheckedPtr 的类型 %1 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:391
+msgctxt "clang-analyzer-alpha.webkit.UncheckedCallArgsChecker"
+msgid "Function argument (parameter '%0') is a reference to CheckedPtr-capable type %1"
+msgstr "函数实参（形参 '%0'）是指向支持 CheckedPtr 的类型 %1 的引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:444
+msgctxt "clang-analyzer-alpha.webkit.UncheckedCallArgsChecker"
+msgid "Function argument (parameter 'this') is a raw pointer to CheckedPtr-capable type %0"
+msgstr "函数实参（形参 'this'）是指向支持 CheckedPtr 的类型 %0 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:444
+msgctxt "clang-analyzer-alpha.webkit.UncheckedCallArgsChecker"
+msgid "Function argument (parameter 'this'to '%0')) is a raw pointer to CheckedPtr-capable type %1"
+msgstr "函数实参（形参 'this'，传给 '%0'）是指向支持 CheckedPtr 的类型 %1 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:391
+msgctxt "clang-analyzer-alpha.webkit.UncheckedCallArgsChecker"
+msgid "Function argument (to '%0') is a raw pointer to CheckedPtr-capable type %1"
+msgstr "函数实参（传给 '%0'）是指向支持 CheckedPtr 的类型 %1 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:391
+msgctxt "clang-analyzer-alpha.webkit.UncheckedCallArgsChecker"
+msgid "Function argument (to '%0') is a reference to CheckedPtr-capable type %1"
+msgstr "函数实参（传给 '%0'）是指向支持 CheckedPtr 的类型 %1 的引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:391
+msgctxt "clang-analyzer-alpha.webkit.UncheckedCallArgsChecker"
+msgid "Function argument is a raw pointer to CheckedPtr-capable type %0"
+msgstr "函数实参是指向支持 CheckedPtr 的类型 %0 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:391
+msgctxt "clang-analyzer-alpha.webkit.UncheckedCallArgsChecker"
+msgid "Function argument is a reference to CheckedPtr-capable type %0"
+msgstr "函数实参是指向支持 CheckedPtr 的类型 %0 的引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:469
+msgctxt "clang-analyzer-alpha.webkit.UncheckedCallArgsChecker"
+msgid "Receiver '%0' (to '%1') is a raw pointer to CheckedPtr-capable type %2"
+msgstr "接收者 '%0'（传给 '%1'）是指向支持 CheckedPtr 的类型 %2 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:469
+msgctxt "clang-analyzer-alpha.webkit.UncheckedCallArgsChecker"
+msgid "Receiver '%0' is a raw pointer to CheckedPtr-capable type %1"
+msgstr "接收者 '%0'是指向支持 CheckedPtr 的类型 %1 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:469
+msgctxt "clang-analyzer-alpha.webkit.UncheckedCallArgsChecker"
+msgid "Receiver (to '%0') is a raw pointer to CheckedPtr-capable type %1"
+msgstr "接收者（传给 '%0'）是指向支持 CheckedPtr 的类型 %1 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:469
+msgctxt "clang-analyzer-alpha.webkit.UncheckedCallArgsChecker"
+msgid "Receiver is a raw pointer to CheckedPtr-capable type %0"
+msgstr "接收者是指向支持 CheckedPtr 的类型 %0 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp:545
+msgctxt "clang-analyzer-alpha.webkit.UncheckedLambdaCapturesChecker"
+msgid "Captured variable '%0' contains a raw pointer to CheckedPtr-capable type"
+msgstr "显式捕获的变量 '%0' 包含指向支持 CheckedPtr 类型的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp:545
+msgctxt "clang-analyzer-alpha.webkit.UncheckedLambdaCapturesChecker"
+msgid "Captured variable '%0' contains a raw pointer to CheckedPtr-capable type '%1'"
+msgstr "显式捕获的变量 '%0' 包含指向支持 CheckedPtr 类型 '%1' 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp:545
+msgctxt "clang-analyzer-alpha.webkit.UncheckedLambdaCapturesChecker"
+msgid "Captured variable '%0' contains a raw reference to CheckedPtr-capable type"
+msgstr "显式捕获的变量 '%0' 包含指向支持 CheckedPtr 类型的原始引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp:545
+msgctxt "clang-analyzer-alpha.webkit.UncheckedLambdaCapturesChecker"
+msgid "Captured variable '%0' contains a raw reference to CheckedPtr-capable type '%1'"
+msgstr "显式捕获的变量 '%0' 包含指向支持 CheckedPtr 类型 '%1' 的原始引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp:545
+msgctxt "clang-analyzer-alpha.webkit.UncheckedLambdaCapturesChecker"
+msgid "Captured variable '%0' is a raw pointer to CheckedPtr-capable type"
+msgstr "显式捕获的变量 '%0' 是指向支持 CheckedPtr 类型的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp:545
+msgctxt "clang-analyzer-alpha.webkit.UncheckedLambdaCapturesChecker"
+msgid "Captured variable '%0' is a raw pointer to CheckedPtr-capable type '%1'"
+msgstr "显式捕获的变量 '%0' 是指向支持 CheckedPtr 类型 '%1' 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp:545
+msgctxt "clang-analyzer-alpha.webkit.UncheckedLambdaCapturesChecker"
+msgid "Captured variable '%0' is a raw reference to CheckedPtr-capable type"
+msgstr "显式捕获的变量 '%0' 是指向支持 CheckedPtr 类型的原始引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp:545
+msgctxt "clang-analyzer-alpha.webkit.UncheckedLambdaCapturesChecker"
+msgid "Captured variable '%0' is a raw reference to CheckedPtr-capable type '%1'"
+msgstr "显式捕获的变量 '%0' 是指向支持 CheckedPtr 类型 '%1' 的原始引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp:570
+msgctxt "clang-analyzer-alpha.webkit.UncheckedLambdaCapturesChecker"
+msgid "Captured variable 'this' is a raw pointer to CheckedPtr-capable type"
+msgstr "显式捕获的变量 'this' 是指向支持 CheckedPtr 类型的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp:570
+msgctxt "clang-analyzer-alpha.webkit.UncheckedLambdaCapturesChecker"
+msgid "Captured variable 'this' is a raw pointer to CheckedPtr-capable type '%0'"
+msgstr "显式捕获的变量 'this' 是指向支持 CheckedPtr 类型 '%0' 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp:545
+msgctxt "clang-analyzer-alpha.webkit.UncheckedLambdaCapturesChecker"
+msgid "Implicitly captured variable '%0' contains a raw pointer to CheckedPtr-capable type"
+msgstr "隐式捕获的变量 '%0' 包含指向支持 CheckedPtr 类型的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp:545
+msgctxt "clang-analyzer-alpha.webkit.UncheckedLambdaCapturesChecker"
+msgid "Implicitly captured variable '%0' contains a raw pointer to CheckedPtr-capable type '%1'"
+msgstr "隐式捕获的变量 '%0' 包含指向支持 CheckedPtr 类型 '%1' 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp:545
+msgctxt "clang-analyzer-alpha.webkit.UncheckedLambdaCapturesChecker"
+msgid "Implicitly captured variable '%0' contains a raw reference to CheckedPtr-capable type"
+msgstr "隐式捕获的变量 '%0' 包含指向支持 CheckedPtr 类型的原始引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp:545
+msgctxt "clang-analyzer-alpha.webkit.UncheckedLambdaCapturesChecker"
+msgid "Implicitly captured variable '%0' contains a raw reference to CheckedPtr-capable type '%1'"
+msgstr "隐式捕获的变量 '%0' 包含指向支持 CheckedPtr 类型 '%1' 的原始引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp:545
+msgctxt "clang-analyzer-alpha.webkit.UncheckedLambdaCapturesChecker"
+msgid "Implicitly captured variable '%0' is a raw pointer to CheckedPtr-capable type"
+msgstr "隐式捕获的变量 '%0' 是指向支持 CheckedPtr 类型的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp:545
+msgctxt "clang-analyzer-alpha.webkit.UncheckedLambdaCapturesChecker"
+msgid "Implicitly captured variable '%0' is a raw pointer to CheckedPtr-capable type '%1'"
+msgstr "隐式捕获的变量 '%0' 是指向支持 CheckedPtr 类型 '%1' 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp:545
+msgctxt "clang-analyzer-alpha.webkit.UncheckedLambdaCapturesChecker"
+msgid "Implicitly captured variable '%0' is a raw reference to CheckedPtr-capable type"
+msgstr "隐式捕获的变量 '%0' 是指向支持 CheckedPtr 类型的原始引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp:545
+msgctxt "clang-analyzer-alpha.webkit.UncheckedLambdaCapturesChecker"
+msgid "Implicitly captured variable '%0' is a raw reference to CheckedPtr-capable type '%1'"
+msgstr "隐式捕获的变量 '%0' 是指向支持 CheckedPtr 类型 '%1' 的原始引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp:570
+msgctxt "clang-analyzer-alpha.webkit.UncheckedLambdaCapturesChecker"
+msgid "Implicitly captured variable 'this' is a raw pointer to CheckedPtr-capable type"
+msgstr "隐式捕获的变量 'this' 是指向支持 CheckedPtr 类型的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp:570
+msgctxt "clang-analyzer-alpha.webkit.UncheckedLambdaCapturesChecker"
+msgid "Implicitly captured variable 'this' is a raw pointer to CheckedPtr-capable type '%0'"
+msgstr "隐式捕获的变量 'this' 是指向支持 CheckedPtr 类型 '%0' 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp:432
+msgctxt "clang-analyzer-alpha.webkit.UncheckedLocalVarsChecker"
+msgid "Global variable '%0' is a CheckedPtr-capable type '%1'"
+msgstr "全局变量 '%0' 是支持 CheckedPtr 的类型 '%1'"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp:432
+msgctxt "clang-analyzer-alpha.webkit.UncheckedLocalVarsChecker"
+msgid "Global variable '%0' is a raw pointer to CheckedPtr-capable type '%1'"
+msgstr "全局变量 '%0' 是指向支持 CheckedPtr 的类型 '%1' 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp:432
+msgctxt "clang-analyzer-alpha.webkit.UncheckedLocalVarsChecker"
+msgid "Global variable '%0' is a raw reference to CheckedPtr-capable type '%1'"
+msgstr "全局变量 '%0' 是指向支持 CheckedPtr 的类型 '%1' 的原始引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp:428
+msgctxt "clang-analyzer-alpha.webkit.UncheckedLocalVarsChecker"
+msgid "Local variable '%0' is a CheckedPtr-capable type '%1'"
+msgstr "局部变量 '%0' 是支持 CheckedPtr 的类型 '%1'"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp:428
+msgctxt "clang-analyzer-alpha.webkit.UncheckedLocalVarsChecker"
+msgid "Local variable '%0' is a raw pointer to CheckedPtr-capable type '%1'"
+msgstr "局部变量 '%0' 是指向支持 CheckedPtr 的类型 '%1' 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp:428
+msgctxt "clang-analyzer-alpha.webkit.UncheckedLocalVarsChecker"
+msgid "Local variable '%0' is a raw reference to CheckedPtr-capable type '%1'"
+msgstr "局部变量 '%0' 是指向支持 CheckedPtr 的类型 '%1' 的原始引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp:417
+msgctxt "clang-analyzer-alpha.webkit.UncheckedLocalVarsChecker"
+msgid "Parameter '%0' is a CheckedPtr-capable type '%1'"
+msgstr "形参 '%0' 是支持 CheckedPtr 的类型 '%1'"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp:417
+msgctxt "clang-analyzer-alpha.webkit.UncheckedLocalVarsChecker"
+msgid "Parameter '%0' is a raw pointer to CheckedPtr-capable type '%1'"
+msgstr "形参 '%0' 是指向支持 CheckedPtr 的类型 '%1' 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp:417
+msgctxt "clang-analyzer-alpha.webkit.UncheckedLocalVarsChecker"
+msgid "Parameter '%0' is a raw reference to CheckedPtr-capable type '%1'"
+msgstr "形参 '%0' 是指向支持 CheckedPtr 的类型 '%1' 的原始引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp:430
+msgctxt "clang-analyzer-alpha.webkit.UncheckedLocalVarsChecker"
+msgid "Static local variable '%0' is a CheckedPtr-capable type '%1'"
+msgstr "静态局部变量 '%0' 是支持 CheckedPtr 的类型 '%1'"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp:430
+msgctxt "clang-analyzer-alpha.webkit.UncheckedLocalVarsChecker"
+msgid "Static local variable '%0' is a raw pointer to CheckedPtr-capable type '%1'"
+msgstr "静态局部变量 '%0' 是指向支持 CheckedPtr 的类型 '%1' 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp:430
+msgctxt "clang-analyzer-alpha.webkit.UncheckedLocalVarsChecker"
+msgid "Static local variable '%0' is a raw reference to CheckedPtr-capable type '%1'"
+msgstr "静态局部变量 '%0' 是指向支持 CheckedPtr 的类型 '%1' 的原始引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp:434
+msgctxt "clang-analyzer-alpha.webkit.UncheckedLocalVarsChecker"
+msgid "Variable '%0' is a CheckedPtr-capable type '%1'"
+msgstr "变量 '%0' 是支持 CheckedPtr 的类型 '%1'"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp:434
+msgctxt "clang-analyzer-alpha.webkit.UncheckedLocalVarsChecker"
+msgid "Variable '%0' is a raw pointer to CheckedPtr-capable type '%1'"
+msgstr "变量 '%0' 是指向支持 CheckedPtr 的类型 '%1' 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp:434
+msgctxt "clang-analyzer-alpha.webkit.UncheckedLocalVarsChecker"
+msgid "Variable '%0' is a raw reference to CheckedPtr-capable type '%1'"
+msgstr "变量 '%0' 是指向支持 CheckedPtr 的类型 '%1' 的原始引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:391
+msgctxt "clang-analyzer-alpha.webkit.UncountedCallArgsChecker"
+msgid "Function argument '%0' (parameter '%1' to '%2') is a raw pointer to RefPtr-capable type %3"
+msgstr "函数实参 '%0'（对应 '%2' 的形参 '%1'）是指向支持 RefPtr 的类型 %3 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:391
+msgctxt "clang-analyzer-alpha.webkit.UncountedCallArgsChecker"
+msgid "Function argument '%0' (parameter '%1' to '%2') is a reference to RefPtr-capable type %3"
+msgstr "函数实参 '%0'（对应 '%2' 的形参 '%1'）是指向支持 RefPtr 的类型 %3 的引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:391
+msgctxt "clang-analyzer-alpha.webkit.UncountedCallArgsChecker"
+msgid "Function argument '%0' (parameter '%1') is a raw pointer to RefPtr-capable type %2"
+msgstr "函数实参 '%0'（形参 '%1'）是指向支持 RefPtr 的类型 %2 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:391
+msgctxt "clang-analyzer-alpha.webkit.UncountedCallArgsChecker"
+msgid "Function argument '%0' (parameter '%1') is a reference to RefPtr-capable type %2"
+msgstr "函数实参 '%0'（形参 '%1'）是指向支持 RefPtr 的类型 %2 的引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:444
+msgctxt "clang-analyzer-alpha.webkit.UncountedCallArgsChecker"
+msgid "Function argument '%0' (parameter 'this') is a raw pointer to RefPtr-capable type %1"
+msgstr "函数实参 '%0'（形参 'this'）是指向支持 RefPtr 的类型 %1 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:444
+msgctxt "clang-analyzer-alpha.webkit.UncountedCallArgsChecker"
+msgid "Function argument '%0' (parameter 'this'to '%1')) is a raw pointer to RefPtr-capable type %2"
+msgstr "函数实参 '%0'（形参 'this'，传给 '%1'）是指向支持 RefPtr 的类型 %2 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:391
+msgctxt "clang-analyzer-alpha.webkit.UncountedCallArgsChecker"
+msgid "Function argument '%0' (to '%1') is a raw pointer to RefPtr-capable type %2"
+msgstr "函数实参 '%0'（传给 '%1'）是指向支持 RefPtr 的类型 %2 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:391
+msgctxt "clang-analyzer-alpha.webkit.UncountedCallArgsChecker"
+msgid "Function argument '%0' (to '%1') is a reference to RefPtr-capable type %2"
+msgstr "函数实参 '%0'（传给 '%1'）是指向支持 RefPtr 的类型 %2 的引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:391
+msgctxt "clang-analyzer-alpha.webkit.UncountedCallArgsChecker"
+msgid "Function argument '%0' is a raw pointer to RefPtr-capable type %1"
+msgstr "函数实参 '%0'是指向支持 RefPtr 的类型 %1 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:391
+msgctxt "clang-analyzer-alpha.webkit.UncountedCallArgsChecker"
+msgid "Function argument '%0' is a reference to RefPtr-capable type %1"
+msgstr "函数实参 '%0'是指向支持 RefPtr 的类型 %1 的引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:391
+msgctxt "clang-analyzer-alpha.webkit.UncountedCallArgsChecker"
+msgid "Function argument (parameter '%0' to '%1') is a raw pointer to RefPtr-capable type %2"
+msgstr "函数实参（对应 '%1' 的形参 '%0'）是指向支持 RefPtr 的类型 %2 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:391
+msgctxt "clang-analyzer-alpha.webkit.UncountedCallArgsChecker"
+msgid "Function argument (parameter '%0' to '%1') is a reference to RefPtr-capable type %2"
+msgstr "函数实参（对应 '%1' 的形参 '%0'）是指向支持 RefPtr 的类型 %2 的引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:391
+msgctxt "clang-analyzer-alpha.webkit.UncountedCallArgsChecker"
+msgid "Function argument (parameter '%0') is a raw pointer to RefPtr-capable type %1"
+msgstr "函数实参（形参 '%0'）是指向支持 RefPtr 的类型 %1 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:391
+msgctxt "clang-analyzer-alpha.webkit.UncountedCallArgsChecker"
+msgid "Function argument (parameter '%0') is a reference to RefPtr-capable type %1"
+msgstr "函数实参（形参 '%0'）是指向支持 RefPtr 的类型 %1 的引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:444
+msgctxt "clang-analyzer-alpha.webkit.UncountedCallArgsChecker"
+msgid "Function argument (parameter 'this') is a raw pointer to RefPtr-capable type %0"
+msgstr "函数实参（形参 'this'）是指向支持 RefPtr 的类型 %0 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:444
+msgctxt "clang-analyzer-alpha.webkit.UncountedCallArgsChecker"
+msgid "Function argument (parameter 'this'to '%0')) is a raw pointer to RefPtr-capable type %1"
+msgstr "函数实参（形参 'this'，传给 '%0'）是指向支持 RefPtr 的类型 %1 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:391
+msgctxt "clang-analyzer-alpha.webkit.UncountedCallArgsChecker"
+msgid "Function argument (to '%0') is a raw pointer to RefPtr-capable type %1"
+msgstr "函数实参（传给 '%0'）是指向支持 RefPtr 的类型 %1 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:391
+msgctxt "clang-analyzer-alpha.webkit.UncountedCallArgsChecker"
+msgid "Function argument (to '%0') is a reference to RefPtr-capable type %1"
+msgstr "函数实参（传给 '%0'）是指向支持 RefPtr 的类型 %1 的引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:391
+msgctxt "clang-analyzer-alpha.webkit.UncountedCallArgsChecker"
+msgid "Function argument is a raw pointer to RefPtr-capable type %0"
+msgstr "函数实参是指向支持 RefPtr 的类型 %0 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:391
+msgctxt "clang-analyzer-alpha.webkit.UncountedCallArgsChecker"
+msgid "Function argument is a reference to RefPtr-capable type %0"
+msgstr "函数实参是指向支持 RefPtr 的类型 %0 的引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:469
+msgctxt "clang-analyzer-alpha.webkit.UncountedCallArgsChecker"
+msgid "Receiver '%0' (to '%1') is a raw pointer to RefPtr-capable type %2"
+msgstr "接收者 '%0'（传给 '%1'）是指向支持 RefPtr 的类型 %2 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:469
+msgctxt "clang-analyzer-alpha.webkit.UncountedCallArgsChecker"
+msgid "Receiver '%0' is a raw pointer to RefPtr-capable type %1"
+msgstr "接收者 '%0'是指向支持 RefPtr 的类型 %1 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:469
+msgctxt "clang-analyzer-alpha.webkit.UncountedCallArgsChecker"
+msgid "Receiver (to '%0') is a raw pointer to RefPtr-capable type %1"
+msgstr "接收者（传给 '%0'）是指向支持 RefPtr 的类型 %1 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:469
+msgctxt "clang-analyzer-alpha.webkit.UncountedCallArgsChecker"
+msgid "Receiver is a raw pointer to RefPtr-capable type %0"
+msgstr "接收者是指向支持 RefPtr 的类型 %0 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp:432
+msgctxt "clang-analyzer-alpha.webkit.UncountedLocalVarsChecker"
+msgid "Global variable '%0' is a RefPtr-capable type '%1'"
+msgstr "全局变量 '%0' 是支持 RefPtr 的类型 '%1'"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp:432
+msgctxt "clang-analyzer-alpha.webkit.UncountedLocalVarsChecker"
+msgid "Global variable '%0' is a raw pointer to RefPtr-capable type '%1'"
+msgstr "全局变量 '%0' 是指向支持 RefPtr 的类型 '%1' 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp:432
+msgctxt "clang-analyzer-alpha.webkit.UncountedLocalVarsChecker"
+msgid "Global variable '%0' is a raw reference to RefPtr-capable type '%1'"
+msgstr "全局变量 '%0' 是指向支持 RefPtr 的类型 '%1' 的原始引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp:428
+msgctxt "clang-analyzer-alpha.webkit.UncountedLocalVarsChecker"
+msgid "Local variable '%0' is a RefPtr-capable type '%1'"
+msgstr "局部变量 '%0' 是支持 RefPtr 的类型 '%1'"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp:428
+msgctxt "clang-analyzer-alpha.webkit.UncountedLocalVarsChecker"
+msgid "Local variable '%0' is a raw pointer to RefPtr-capable type '%1'"
+msgstr "局部变量 '%0' 是指向支持 RefPtr 的类型 '%1' 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp:428
+msgctxt "clang-analyzer-alpha.webkit.UncountedLocalVarsChecker"
+msgid "Local variable '%0' is a raw reference to RefPtr-capable type '%1'"
+msgstr "局部变量 '%0' 是指向支持 RefPtr 的类型 '%1' 的原始引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp:417
+msgctxt "clang-analyzer-alpha.webkit.UncountedLocalVarsChecker"
+msgid "Parameter '%0' is a RefPtr-capable type '%1'"
+msgstr "形参 '%0' 是支持 RefPtr 的类型 '%1'"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp:417
+msgctxt "clang-analyzer-alpha.webkit.UncountedLocalVarsChecker"
+msgid "Parameter '%0' is a raw pointer to RefPtr-capable type '%1'"
+msgstr "形参 '%0' 是指向支持 RefPtr 的类型 '%1' 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp:417
+msgctxt "clang-analyzer-alpha.webkit.UncountedLocalVarsChecker"
+msgid "Parameter '%0' is a raw reference to RefPtr-capable type '%1'"
+msgstr "形参 '%0' 是指向支持 RefPtr 的类型 '%1' 的原始引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp:430
+msgctxt "clang-analyzer-alpha.webkit.UncountedLocalVarsChecker"
+msgid "Static local variable '%0' is a RefPtr-capable type '%1'"
+msgstr "静态局部变量 '%0' 是支持 RefPtr 的类型 '%1'"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp:430
+msgctxt "clang-analyzer-alpha.webkit.UncountedLocalVarsChecker"
+msgid "Static local variable '%0' is a raw pointer to RefPtr-capable type '%1'"
+msgstr "静态局部变量 '%0' 是指向支持 RefPtr 的类型 '%1' 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp:430
+msgctxt "clang-analyzer-alpha.webkit.UncountedLocalVarsChecker"
+msgid "Static local variable '%0' is a raw reference to RefPtr-capable type '%1'"
+msgstr "静态局部变量 '%0' 是指向支持 RefPtr 的类型 '%1' 的原始引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp:434
+msgctxt "clang-analyzer-alpha.webkit.UncountedLocalVarsChecker"
+msgid "Variable '%0' is a RefPtr-capable type '%1'"
+msgstr "变量 '%0' 是支持 RefPtr 的类型 '%1'"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp:434
+msgctxt "clang-analyzer-alpha.webkit.UncountedLocalVarsChecker"
+msgid "Variable '%0' is a raw pointer to RefPtr-capable type '%1'"
+msgstr "变量 '%0' 是指向支持 RefPtr 的类型 '%1' 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp:434
+msgctxt "clang-analyzer-alpha.webkit.UncountedLocalVarsChecker"
+msgid "Variable '%0' is a raw reference to RefPtr-capable type '%1'"
+msgstr "变量 '%0' 是指向支持 RefPtr 的类型 '%1' 的原始引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:391
+msgctxt "clang-analyzer-alpha.webkit.UnretainedCallArgsChecker"
+msgid "Function argument '%0' (parameter '%1' to '%2') is a raw pointer to RetainPtr-capable type %3"
+msgstr "函数实参 '%0'（对应 '%2' 的形参 '%1'）是指向支持 RetainPtr 的类型 %3 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:391
+msgctxt "clang-analyzer-alpha.webkit.UnretainedCallArgsChecker"
+msgid "Function argument '%0' (parameter '%1' to '%2') is a reference to RetainPtr-capable type %3"
+msgstr "函数实参 '%0'（对应 '%2' 的形参 '%1'）是指向支持 RetainPtr 的类型 %3 的引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:391
+msgctxt "clang-analyzer-alpha.webkit.UnretainedCallArgsChecker"
+msgid "Function argument '%0' (parameter '%1') is a raw pointer to RetainPtr-capable type %2"
+msgstr "函数实参 '%0'（形参 '%1'）是指向支持 RetainPtr 的类型 %2 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:391
+msgctxt "clang-analyzer-alpha.webkit.UnretainedCallArgsChecker"
+msgid "Function argument '%0' (parameter '%1') is a reference to RetainPtr-capable type %2"
+msgstr "函数实参 '%0'（形参 '%1'）是指向支持 RetainPtr 的类型 %2 的引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:444
+msgctxt "clang-analyzer-alpha.webkit.UnretainedCallArgsChecker"
+msgid "Function argument '%0' (parameter 'this') is a raw pointer to RetainPtr-capable type %1"
+msgstr "函数实参 '%0'（形参 'this'）是指向支持 RetainPtr 的类型 %1 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:444
+msgctxt "clang-analyzer-alpha.webkit.UnretainedCallArgsChecker"
+msgid "Function argument '%0' (parameter 'this'to '%1')) is a raw pointer to RetainPtr-capable type %2"
+msgstr "函数实参 '%0'（形参 'this'，传给 '%1'）是指向支持 RetainPtr 的类型 %2 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:391
+msgctxt "clang-analyzer-alpha.webkit.UnretainedCallArgsChecker"
+msgid "Function argument '%0' (to '%1') is a raw pointer to RetainPtr-capable type %2"
+msgstr "函数实参 '%0'（传给 '%1'）是指向支持 RetainPtr 的类型 %2 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:391
+msgctxt "clang-analyzer-alpha.webkit.UnretainedCallArgsChecker"
+msgid "Function argument '%0' (to '%1') is a reference to RetainPtr-capable type %2"
+msgstr "函数实参 '%0'（传给 '%1'）是指向支持 RetainPtr 的类型 %2 的引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:391
+msgctxt "clang-analyzer-alpha.webkit.UnretainedCallArgsChecker"
+msgid "Function argument '%0' is a raw pointer to RetainPtr-capable type %1"
+msgstr "函数实参 '%0'是指向支持 RetainPtr 的类型 %1 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:391
+msgctxt "clang-analyzer-alpha.webkit.UnretainedCallArgsChecker"
+msgid "Function argument '%0' is a reference to RetainPtr-capable type %1"
+msgstr "函数实参 '%0'是指向支持 RetainPtr 的类型 %1 的引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:391
+msgctxt "clang-analyzer-alpha.webkit.UnretainedCallArgsChecker"
+msgid "Function argument (parameter '%0' to '%1') is a raw pointer to RetainPtr-capable type %2"
+msgstr "函数实参（对应 '%1' 的形参 '%0'）是指向支持 RetainPtr 的类型 %2 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:391
+msgctxt "clang-analyzer-alpha.webkit.UnretainedCallArgsChecker"
+msgid "Function argument (parameter '%0' to '%1') is a reference to RetainPtr-capable type %2"
+msgstr "函数实参（对应 '%1' 的形参 '%0'）是指向支持 RetainPtr 的类型 %2 的引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:391
+msgctxt "clang-analyzer-alpha.webkit.UnretainedCallArgsChecker"
+msgid "Function argument (parameter '%0') is a raw pointer to RetainPtr-capable type %1"
+msgstr "函数实参（形参 '%0'）是指向支持 RetainPtr 的类型 %1 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:391
+msgctxt "clang-analyzer-alpha.webkit.UnretainedCallArgsChecker"
+msgid "Function argument (parameter '%0') is a reference to RetainPtr-capable type %1"
+msgstr "函数实参（形参 '%0'）是指向支持 RetainPtr 的类型 %1 的引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:444
+msgctxt "clang-analyzer-alpha.webkit.UnretainedCallArgsChecker"
+msgid "Function argument (parameter 'this') is a raw pointer to RetainPtr-capable type %0"
+msgstr "函数实参（形参 'this'）是指向支持 RetainPtr 的类型 %0 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:444
+msgctxt "clang-analyzer-alpha.webkit.UnretainedCallArgsChecker"
+msgid "Function argument (parameter 'this'to '%0')) is a raw pointer to RetainPtr-capable type %1"
+msgstr "函数实参（形参 'this'，传给 '%0'）是指向支持 RetainPtr 的类型 %1 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:391
+msgctxt "clang-analyzer-alpha.webkit.UnretainedCallArgsChecker"
+msgid "Function argument (to '%0') is a raw pointer to RetainPtr-capable type %1"
+msgstr "函数实参（传给 '%0'）是指向支持 RetainPtr 的类型 %1 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:391
+msgctxt "clang-analyzer-alpha.webkit.UnretainedCallArgsChecker"
+msgid "Function argument (to '%0') is a reference to RetainPtr-capable type %1"
+msgstr "函数实参（传给 '%0'）是指向支持 RetainPtr 的类型 %1 的引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:391
+msgctxt "clang-analyzer-alpha.webkit.UnretainedCallArgsChecker"
+msgid "Function argument is a raw pointer to RetainPtr-capable type %0"
+msgstr "函数实参是指向支持 RetainPtr 的类型 %0 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:391
+msgctxt "clang-analyzer-alpha.webkit.UnretainedCallArgsChecker"
+msgid "Function argument is a reference to RetainPtr-capable type %0"
+msgstr "函数实参是指向支持 RetainPtr 的类型 %0 的引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:469
+msgctxt "clang-analyzer-alpha.webkit.UnretainedCallArgsChecker"
+msgid "Receiver '%0' (to '%1') is a raw pointer to RetainPtr-capable type %2"
+msgstr "接收者 '%0'（传给 '%1'）是指向支持 RetainPtr 的类型 %2 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:469
+msgctxt "clang-analyzer-alpha.webkit.UnretainedCallArgsChecker"
+msgid "Receiver '%0' is a raw pointer to RetainPtr-capable type %1"
+msgstr "接收者 '%0'是指向支持 RetainPtr 的类型 %1 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:469
+msgctxt "clang-analyzer-alpha.webkit.UnretainedCallArgsChecker"
+msgid "Receiver (to '%0') is a raw pointer to RetainPtr-capable type %1"
+msgstr "接收者（传给 '%0'）是指向支持 RetainPtr 的类型 %1 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp:469
+msgctxt "clang-analyzer-alpha.webkit.UnretainedCallArgsChecker"
+msgid "Receiver is a raw pointer to RetainPtr-capable type %0"
+msgstr "接收者是指向支持 RetainPtr 的类型 %0 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp:545
+msgctxt "clang-analyzer-alpha.webkit.UnretainedLambdaCapturesChecker"
+msgid "Captured variable '%0' contains a raw pointer to RetainPtr-capable type"
+msgstr "显式捕获的变量 '%0' 包含指向支持 RetainPtr 类型的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp:545
+msgctxt "clang-analyzer-alpha.webkit.UnretainedLambdaCapturesChecker"
+msgid "Captured variable '%0' contains a raw pointer to RetainPtr-capable type '%1'"
+msgstr "显式捕获的变量 '%0' 包含指向支持 RetainPtr 类型 '%1' 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp:545
+msgctxt "clang-analyzer-alpha.webkit.UnretainedLambdaCapturesChecker"
+msgid "Captured variable '%0' contains a raw reference to RetainPtr-capable type"
+msgstr "显式捕获的变量 '%0' 包含指向支持 RetainPtr 类型的原始引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp:545
+msgctxt "clang-analyzer-alpha.webkit.UnretainedLambdaCapturesChecker"
+msgid "Captured variable '%0' contains a raw reference to RetainPtr-capable type '%1'"
+msgstr "显式捕获的变量 '%0' 包含指向支持 RetainPtr 类型 '%1' 的原始引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp:545
+msgctxt "clang-analyzer-alpha.webkit.UnretainedLambdaCapturesChecker"
+msgid "Captured variable '%0' is a raw pointer to RetainPtr-capable type"
+msgstr "显式捕获的变量 '%0' 是指向支持 RetainPtr 类型的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp:545
+msgctxt "clang-analyzer-alpha.webkit.UnretainedLambdaCapturesChecker"
+msgid "Captured variable '%0' is a raw pointer to RetainPtr-capable type '%1'"
+msgstr "显式捕获的变量 '%0' 是指向支持 RetainPtr 类型 '%1' 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp:545
+msgctxt "clang-analyzer-alpha.webkit.UnretainedLambdaCapturesChecker"
+msgid "Captured variable '%0' is a raw reference to RetainPtr-capable type"
+msgstr "显式捕获的变量 '%0' 是指向支持 RetainPtr 类型的原始引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp:545
+msgctxt "clang-analyzer-alpha.webkit.UnretainedLambdaCapturesChecker"
+msgid "Captured variable '%0' is a raw reference to RetainPtr-capable type '%1'"
+msgstr "显式捕获的变量 '%0' 是指向支持 RetainPtr 类型 '%1' 的原始引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp:570
+msgctxt "clang-analyzer-alpha.webkit.UnretainedLambdaCapturesChecker"
+msgid "Captured variable 'this' is a raw pointer to RetainPtr-capable type"
+msgstr "显式捕获的变量 'this' 是指向支持 RetainPtr 类型的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp:570
+msgctxt "clang-analyzer-alpha.webkit.UnretainedLambdaCapturesChecker"
+msgid "Captured variable 'this' is a raw pointer to RetainPtr-capable type '%0'"
+msgstr "显式捕获的变量 'this' 是指向支持 RetainPtr 类型 '%0' 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp:545
+msgctxt "clang-analyzer-alpha.webkit.UnretainedLambdaCapturesChecker"
+msgid "Implicitly captured variable '%0' contains a raw pointer to RetainPtr-capable type"
+msgstr "隐式捕获的变量 '%0' 包含指向支持 RetainPtr 类型的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp:545
+msgctxt "clang-analyzer-alpha.webkit.UnretainedLambdaCapturesChecker"
+msgid "Implicitly captured variable '%0' contains a raw pointer to RetainPtr-capable type '%1'"
+msgstr "隐式捕获的变量 '%0' 包含指向支持 RetainPtr 类型 '%1' 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp:545
+msgctxt "clang-analyzer-alpha.webkit.UnretainedLambdaCapturesChecker"
+msgid "Implicitly captured variable '%0' contains a raw reference to RetainPtr-capable type"
+msgstr "隐式捕获的变量 '%0' 包含指向支持 RetainPtr 类型的原始引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp:545
+msgctxt "clang-analyzer-alpha.webkit.UnretainedLambdaCapturesChecker"
+msgid "Implicitly captured variable '%0' contains a raw reference to RetainPtr-capable type '%1'"
+msgstr "隐式捕获的变量 '%0' 包含指向支持 RetainPtr 类型 '%1' 的原始引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp:545
+msgctxt "clang-analyzer-alpha.webkit.UnretainedLambdaCapturesChecker"
+msgid "Implicitly captured variable '%0' is a raw pointer to RetainPtr-capable type"
+msgstr "隐式捕获的变量 '%0' 是指向支持 RetainPtr 类型的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp:545
+msgctxt "clang-analyzer-alpha.webkit.UnretainedLambdaCapturesChecker"
+msgid "Implicitly captured variable '%0' is a raw pointer to RetainPtr-capable type '%1'"
+msgstr "隐式捕获的变量 '%0' 是指向支持 RetainPtr 类型 '%1' 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp:545
+msgctxt "clang-analyzer-alpha.webkit.UnretainedLambdaCapturesChecker"
+msgid "Implicitly captured variable '%0' is a raw reference to RetainPtr-capable type"
+msgstr "隐式捕获的变量 '%0' 是指向支持 RetainPtr 类型的原始引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp:545
+msgctxt "clang-analyzer-alpha.webkit.UnretainedLambdaCapturesChecker"
+msgid "Implicitly captured variable '%0' is a raw reference to RetainPtr-capable type '%1'"
+msgstr "隐式捕获的变量 '%0' 是指向支持 RetainPtr 类型 '%1' 的原始引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp:570
+msgctxt "clang-analyzer-alpha.webkit.UnretainedLambdaCapturesChecker"
+msgid "Implicitly captured variable 'this' is a raw pointer to RetainPtr-capable type"
+msgstr "隐式捕获的变量 'this' 是指向支持 RetainPtr 类型的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp:570
+msgctxt "clang-analyzer-alpha.webkit.UnretainedLambdaCapturesChecker"
+msgid "Implicitly captured variable 'this' is a raw pointer to RetainPtr-capable type '%0'"
+msgstr "隐式捕获的变量 'this' 是指向支持 RetainPtr 类型 '%0' 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp:432
+msgctxt "clang-analyzer-alpha.webkit.UnretainedLocalVarsChecker"
+msgid "Global variable '%0' is a RetainPtr-capable type '%1'"
+msgstr "全局变量 '%0' 是支持 RetainPtr 的类型 '%1'"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp:432
+msgctxt "clang-analyzer-alpha.webkit.UnretainedLocalVarsChecker"
+msgid "Global variable '%0' is a raw pointer to RetainPtr-capable type '%1'"
+msgstr "全局变量 '%0' 是指向支持 RetainPtr 的类型 '%1' 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp:432
+msgctxt "clang-analyzer-alpha.webkit.UnretainedLocalVarsChecker"
+msgid "Global variable '%0' is a raw reference to RetainPtr-capable type '%1'"
+msgstr "全局变量 '%0' 是指向支持 RetainPtr 的类型 '%1' 的原始引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp:428
+msgctxt "clang-analyzer-alpha.webkit.UnretainedLocalVarsChecker"
+msgid "Local variable '%0' is a RetainPtr-capable type '%1'"
+msgstr "局部变量 '%0' 是支持 RetainPtr 的类型 '%1'"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp:428
+msgctxt "clang-analyzer-alpha.webkit.UnretainedLocalVarsChecker"
+msgid "Local variable '%0' is a raw pointer to RetainPtr-capable type '%1'"
+msgstr "局部变量 '%0' 是指向支持 RetainPtr 的类型 '%1' 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp:428
+msgctxt "clang-analyzer-alpha.webkit.UnretainedLocalVarsChecker"
+msgid "Local variable '%0' is a raw reference to RetainPtr-capable type '%1'"
+msgstr "局部变量 '%0' 是指向支持 RetainPtr 的类型 '%1' 的原始引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp:417
+msgctxt "clang-analyzer-alpha.webkit.UnretainedLocalVarsChecker"
+msgid "Parameter '%0' is a RetainPtr-capable type '%1'"
+msgstr "形参 '%0' 是支持 RetainPtr 的类型 '%1'"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp:417
+msgctxt "clang-analyzer-alpha.webkit.UnretainedLocalVarsChecker"
+msgid "Parameter '%0' is a raw pointer to RetainPtr-capable type '%1'"
+msgstr "形参 '%0' 是指向支持 RetainPtr 的类型 '%1' 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp:417
+msgctxt "clang-analyzer-alpha.webkit.UnretainedLocalVarsChecker"
+msgid "Parameter '%0' is a raw reference to RetainPtr-capable type '%1'"
+msgstr "形参 '%0' 是指向支持 RetainPtr 的类型 '%1' 的原始引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp:430
+msgctxt "clang-analyzer-alpha.webkit.UnretainedLocalVarsChecker"
+msgid "Static local variable '%0' is a RetainPtr-capable type '%1'"
+msgstr "静态局部变量 '%0' 是支持 RetainPtr 的类型 '%1'"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp:430
+msgctxt "clang-analyzer-alpha.webkit.UnretainedLocalVarsChecker"
+msgid "Static local variable '%0' is a raw pointer to RetainPtr-capable type '%1'"
+msgstr "静态局部变量 '%0' 是指向支持 RetainPtr 的类型 '%1' 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp:430
+msgctxt "clang-analyzer-alpha.webkit.UnretainedLocalVarsChecker"
+msgid "Static local variable '%0' is a raw reference to RetainPtr-capable type '%1'"
+msgstr "静态局部变量 '%0' 是指向支持 RetainPtr 的类型 '%1' 的原始引用"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp:434
+msgctxt "clang-analyzer-alpha.webkit.UnretainedLocalVarsChecker"
+msgid "Variable '%0' is a RetainPtr-capable type '%1'"
+msgstr "变量 '%0' 是支持 RetainPtr 的类型 '%1'"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp:434
+msgctxt "clang-analyzer-alpha.webkit.UnretainedLocalVarsChecker"
+msgid "Variable '%0' is a raw pointer to RetainPtr-capable type '%1'"
+msgstr "变量 '%0' 是指向支持 RetainPtr 的类型 '%1' 的原始指针"
+
+#: clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp:434
+msgctxt "clang-analyzer-alpha.webkit.UnretainedLocalVarsChecker"
+msgid "Variable '%0' is a raw reference to RetainPtr-capable type '%1'"
+msgstr "变量 '%0' 是指向支持 RetainPtr 的类型 '%1' 的原始引用"
+
 #: clang/lib/StaticAnalyzer/Checkers/CastValueChecker.cpp:114
 msgctxt "clang-analyzer-apiModeling.llvm.CastValue/note"
 msgid "'%0' is a '%1'"
@@ -4261,6 +6326,131 @@ msgstr "初始化期间存储到 '%0' 的值从未被读取"
 msgctxt "clang-analyzer-deadcode.DeadStores"
 msgid "Value stored to '%0' is never read"
 msgstr "存储到 '%0' 的值从未被读取"
+
+#: clang/lib/StaticAnalyzer/Checkers/DebugContainerModeling.cpp:76
+msgctxt "clang-analyzer-debug.DebugContainerModeling"
+msgid "Missing container argument"
+msgstr "缺少容器实参"
+
+#: clang/lib/StaticAnalyzer/Checkers/DebugIteratorModeling.cpp:80
+msgctxt "clang-analyzer-debug.DebugIteratorModeling"
+msgid "Missing iterator argument"
+msgstr "缺少迭代器实参"
+
+#: clang/lib/StaticAnalyzer/Checkers/LifetimeModeling.cpp:194
+msgctxt "clang-analyzer-debug.DebugLifetimeModeling"
+msgid " Origin %0 bound to %1"
+msgstr " 源点 %0 绑定到 %1"
+
+#: clang/lib/StaticAnalyzer/Checkers/LifetimeModeling.cpp:173
+msgctxt "clang-analyzer-debug.DebugLifetimeModeling"
+msgid "clang_analyzer_dumpLifetimeOriginsOf requires exactly 1 argument"
+msgstr "clang_analyzer_dumpLifetimeOriginsOf 需要且仅需要 1 个实参"
+
+#: clang/lib/StaticAnalyzer/Checkers/ExprInspectionChecker.cpp:205
+msgctxt "clang-analyzer-debug.ExprInspection"
+msgid "Cannot obtain the region"
+msgstr "无法获取内存区域"
+
+#: clang/lib/StaticAnalyzer/Checkers/ExprInspectionChecker.cpp:159
+msgctxt "clang-analyzer-debug.ExprInspection"
+msgid "FALSE"
+msgstr "FALSE"
+
+#: clang/lib/StaticAnalyzer/Checkers/ExprInspectionChecker.cpp:191
+msgctxt "clang-analyzer-debug.ExprInspection"
+msgid "Missing argument"
+msgstr "缺少实参"
+
+#: clang/lib/StaticAnalyzer/Checkers/ExprInspectionChecker.cpp:136
+msgctxt "clang-analyzer-debug.ExprInspection"
+msgid "Missing assertion argument"
+msgstr "缺少断言实参"
+
+#: clang/lib/StaticAnalyzer/Checkers/ExprInspectionChecker.cpp:555
+msgctxt "clang-analyzer-debug.ExprInspection"
+msgid "NO"
+msgstr "否（NO）"
+
+#: clang/lib/StaticAnalyzer/Checkers/ExprInspectionChecker.cpp:455
+msgctxt "clang-analyzer-debug.ExprInspection"
+msgid "Not a string literal"
+msgstr "不是字符串字面量"
+
+#: clang/lib/StaticAnalyzer/Checkers/ExprInspectionChecker.cpp:449
+msgctxt "clang-analyzer-debug.ExprInspection"
+msgid "Not a symbol"
+msgstr "不是符号"
+
+#: clang/lib/StaticAnalyzer/Checkers/ExprInspectionChecker.cpp:225
+msgctxt "clang-analyzer-debug.ExprInspection"
+msgid "REACHABLE"
+msgstr "REACHABLE"
+
+#: clang/lib/StaticAnalyzer/Checkers/ExprInspectionChecker.cpp:398
+msgctxt "clang-analyzer-debug.ExprInspection"
+msgid "SYMBOL DEAD"
+msgstr "符号已失效（SYMBOL DEAD）"
+
+#: clang/lib/StaticAnalyzer/Checkers/ExprInspectionChecker.cpp:156
+msgctxt "clang-analyzer-debug.ExprInspection"
+msgid "TRUE"
+msgstr "TRUE"
+
+#: clang/lib/StaticAnalyzer/Checkers/ExprInspectionChecker.cpp:146
+msgctxt "clang-analyzer-debug.ExprInspection"
+msgid "UNDEFINED"
+msgstr "UNDEFINED"
+
+#: clang/lib/StaticAnalyzer/Checkers/ExprInspectionChecker.cpp:154
+msgctxt "clang-analyzer-debug.ExprInspection"
+msgid "UNKNOWN"
+msgstr "UNKNOWN"
+
+#: clang/lib/StaticAnalyzer/Checkers/ExprInspectionChecker.cpp:540
+msgctxt "clang-analyzer-debug.ExprInspection"
+msgid "Unable to express"
+msgstr "无法表示"
+
+#: clang/lib/StaticAnalyzer/Checkers/ExprInspectionChecker.cpp:555
+msgctxt "clang-analyzer-debug.ExprInspection"
+msgid "YES"
+msgstr "是（YES）"
+
+#: clang/lib/StaticAnalyzer/Checkers/ExprInspectionChecker.cpp:442
+msgctxt "clang-analyzer-debug.ExprInspection"
+msgid "clang_analyzer_denote() requires a symbol and a string literal"
+msgstr "clang_analyzer_denote() 需要一个符号和一个字符串字面量"
+
+#: clang/lib/StaticAnalyzer/Checkers/ExprInspectionChecker.cpp:550
+msgctxt "clang-analyzer-debug.ExprInspection"
+msgid "clang_analyzer_isTainted() requires exactly one argument"
+msgstr "clang_analyzer_isTainted() 需要且仅需要 1 个实参"
+
+#: clang/lib/StaticAnalyzer/Checkers/ExprInspectionChecker.cpp:301
+msgctxt "clang-analyzer-debug.ExprInspection"
+msgid "n/a"
+msgstr "n/a"
+
+#: clang/lib/StaticAnalyzer/Checkers/DebugCheckers.cpp:334
+msgctxt "clang-analyzer-debug.ReportStmts"
+msgid "Statement"
+msgstr "语句"
+
+#: clang/lib/StaticAnalyzer/Checkers/AnalyzerStatsChecker.cpp:104
+msgctxt "clang-analyzer-debug.Stats"
+msgid "%0 -> Total CFGBlocks: %1 | Unreachable CFGBlocks: %2 | Exhausted Block: %3 | Empty WorkList: %4"
+msgstr "%0 -> CFGBlock 总数：%1 | 不可达 CFGBlock 数：%2 | 块耗尽：%3 | 工作列表为空：%4"
+
+#: clang/lib/StaticAnalyzer/Checkers/AnalyzerStatsChecker.cpp:123
+msgctxt "clang-analyzer-debug.Stats"
+msgid "(%0): The analyzer generated a sink at this point"
+msgstr "(%0)：分析器在此处生成了一个汇聚节点（sink）"
+
+#: clang/lib/StaticAnalyzer/Checkers/TaintTesterChecker.cpp:41
+msgctxt "clang-analyzer-debug.TaintTest"
+msgid "tainted"
+msgstr "已受污染（tainted）"
 
 #: clang/lib/StaticAnalyzer/Checkers/FuchsiaHandleChecker.cpp:616
 msgctxt "clang-analyzer-fuchsia.HandleChecker"

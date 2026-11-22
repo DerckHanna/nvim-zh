@@ -1,4 +1,2623 @@
 {
+ "clang-analyzer-alpha.clone.CloneChecker": {
+  "reason": "audited against LLVM StaticAnalyzer source",
+  "messages": [
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/CloneChecker.cpp",
+    "line": 114,
+    "message": "Duplicate code detected",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/CloneChecker.cpp",
+    "line": 119,
+    "message": "Similar code here",
+    "note": true,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/CloneChecker.cpp",
+    "line": 165,
+    "message": "Potential copy-paste error; did you really mean to use '%0' here?",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/CloneChecker.cpp",
+    "line": 173,
+    "message": "Similar code using '%0' here",
+    "note": true,
+    "fix": false
+   }
+  ]
+ },
+ "clang-analyzer-alpha.core.BoolAssignment": {
+  "reason": "audited against LLVM StaticAnalyzer source",
+  "messages": [
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/BoolAssignmentChecker.cpp",
+    "line": 40,
+    "message": "Might assign a tainted non-Boolean value",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/BoolAssignmentChecker.cpp",
+    "line": 41,
+    "message": "Assignment of a non-Boolean value",
+    "note": false,
+    "fix": false
+   }
+  ]
+ },
+ "clang-analyzer-alpha.core.C11Lock": {
+  "reason": "audited against LLVM StaticAnalyzer source",
+  "messages": [
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp",
+    "line": 468,
+    "message": "This lock has already been acquired",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp",
+    "line": 472,
+    "message": "This lock has already been destroyed",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp",
+    "line": 547,
+    "message": "This lock has already been unlocked",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp",
+    "line": 567,
+    "message": "This was not the most recently acquired lock. Possible lock order reversal",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp",
+    "line": 650,
+    "message": "This lock is still locked",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp",
+    "line": 686,
+    "message": "This lock is still being held",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp",
+    "line": 687,
+    "message": "This lock has already been initialized",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp",
+    "line": 519,
+    "message": "Mutex acquired here",
+    "note": true,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp",
+    "line": 50,
+    "message": "Locking %0 here",
+    "note": true,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp",
+    "line": 582,
+    "message": "Mutex released here",
+    "note": true,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp",
+    "line": 50,
+    "message": "Unlocking %0 here",
+    "note": true,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp",
+    "line": 626,
+    "message": "Mutex destroyed here",
+    "note": true,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp",
+    "line": 50,
+    "message": "Destroying %0 here",
+    "note": true,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp",
+    "line": 681,
+    "message": "Mutex initialized here",
+    "note": true,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp",
+    "line": 50,
+    "message": "Initializing %0 here",
+    "note": true,
+    "fix": false
+   }
+  ]
+ },
+ "clang-analyzer-alpha.core.CastToStruct": {
+  "reason": "audited against LLVM StaticAnalyzer source",
+  "messages": [
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/CastToStructChecker.cpp",
+    "line": 67,
+    "message": "Casting a non-structure type to a structure type and accessing a field can lead to memory access errors or data corruption.",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/CastToStructChecker.cpp",
+    "line": 99,
+    "message": "Casting data to a larger structure type and accessing a field can lead to memory access errors or data corruption.",
+    "note": false,
+    "fix": false
+   }
+  ]
+ },
+ "clang-analyzer-alpha.core.Conversion": {
+  "reason": "audited against LLVM StaticAnalyzer source",
+  "messages": [
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/ConversionChecker.cpp",
+    "line": 121,
+    "message": "Loss of sign in implicit conversion",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/ConversionChecker.cpp",
+    "line": 123,
+    "message": "Loss of precision in implicit conversion",
+    "note": false,
+    "fix": false
+   }
+  ]
+ },
+ "clang-analyzer-alpha.core.DynamicTypeChecker": {
+  "reason": "audited against LLVM StaticAnalyzer source",
+  "messages": [
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/DynamicTypeChecker.cpp",
+    "line": 68,
+    "message": "Object has a dynamic type '%0' which is incompatible with static type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/DynamicTypeChecker.cpp",
+    "line": 111,
+    "message": "Type '%0' is inferred from explicit cast (from '%1' to '%2')",
+    "note": true,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/DynamicTypeChecker.cpp",
+    "line": 119,
+    "message": "Type '%0' is inferred from implicit cast (from '%1' to '%2')",
+    "note": true,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/DynamicTypeChecker.cpp",
+    "line": 127,
+    "message": "Type '%0' is inferred from this context",
+    "note": true,
+    "fix": false
+   }
+  ]
+ },
+ "clang-analyzer-alpha.core.PointerArithm": {
+  "reason": "audited against LLVM StaticAnalyzer source",
+  "messages": [
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/PointerArithChecker.cpp",
+    "line": 187,
+    "message": "Pointer arithmetic on a pointer to base class is dangerous because derived and base class may have different size.",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/PointerArithChecker.cpp",
+    "line": 207,
+    "message": "Pointer arithmetic on non-array variables relies on memory layout, which is dangerous.",
+    "note": false,
+    "fix": false
+   }
+  ]
+ },
+ "clang-analyzer-alpha.core.PthreadLockBase": {
+  "reason": "state-modeling base checker in clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp without direct BugReport emission",
+  "messages": []
+ },
+ "clang-analyzer-alpha.core.StackAddressAsyncEscape": {
+  "reason": "audited against LLVM StaticAnalyzer source",
+  "messages": [
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/StackAddrEscapeChecker.cpp",
+    "line": 217,
+    "message": "Address of stack memory associated with a compound literal declared on line %0 is captured by an asynchronously-executed block",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/StackAddrEscapeChecker.cpp",
+    "line": 217,
+    "message": "Address of stack memory allocated by call to alloca() on line %0 is captured by an asynchronously-executed block",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/StackAddrEscapeChecker.cpp",
+    "line": 217,
+    "message": "Address of stack-allocated block declared on line %0 is captured by an asynchronously-executed block",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/StackAddrEscapeChecker.cpp",
+    "line": 217,
+    "message": "Address of stack memory associated with local variable '%0' is captured by an asynchronously-executed block",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/StackAddrEscapeChecker.cpp",
+    "line": 217,
+    "message": "Address of stack memory associated with temporary object of type '%0' lifetime extended by local variable is captured by an asynchronously-executed block",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/StackAddrEscapeChecker.cpp",
+    "line": 217,
+    "message": "Address of stack memory associated with temporary object of type '%0' lifetime extended by local variable '%1' is captured by an asynchronously-executed block",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/StackAddrEscapeChecker.cpp",
+    "line": 217,
+    "message": "Address of stack memory associated with temporary object of type '%0' is captured by an asynchronously-executed block",
+    "note": false,
+    "fix": false
+   }
+  ]
+ },
+ "clang-analyzer-alpha.core.StdVariant": {
+  "reason": "audited against LLVM StaticAnalyzer source",
+  "messages": [
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/StdVariantChecker.cpp",
+    "line": 279,
+    "message": "std::variant %0 held a '%1', not a '%2'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/StdVariantChecker.cpp",
+    "line": 279,
+    "message": "std::variant %0 held a '%1', not an '%2'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/StdVariantChecker.cpp",
+    "line": 279,
+    "message": "std::variant %0 held an '%1', not a '%2'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/StdVariantChecker.cpp",
+    "line": 279,
+    "message": "std::variant %0 held an '%1', not an '%2'",
+    "note": false,
+    "fix": false
+   }
+  ]
+ },
+ "clang-analyzer-alpha.core.StoreToImmutable": {
+  "reason": "audited against LLVM StaticAnalyzer source",
+  "messages": [
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/StoreToImmutableChecker.cpp",
+    "line": 109,
+    "message": "Trying to write to immutable memory",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/StoreToImmutableChecker.cpp",
+    "line": 111,
+    "message": "Trying to write to immutable memory in global read-only storage",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/StoreToImmutableChecker.cpp",
+    "line": 127,
+    "message": "Enclosing memory region is declared as immutable here",
+    "note": true,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/StoreToImmutableChecker.cpp",
+    "line": 128,
+    "message": "Memory region is declared as immutable here",
+    "note": true,
+    "fix": false
+   }
+  ]
+ },
+ "clang-analyzer-alpha.core.TestAfterDivZero": {
+  "reason": "audited against LLVM StaticAnalyzer source",
+  "messages": [
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/TestAfterDivZeroChecker.cpp",
+    "line": 167,
+    "message": "Value being compared against zero has already been used for division",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/TestAfterDivZeroChecker.cpp",
+    "line": 126,
+    "message": "Division with compared value made here",
+    "note": true,
+    "fix": false
+   }
+  ]
+ },
+ "clang-analyzer-alpha.cplusplus.ContainerModeling": {
+  "reason": "state-modeling checker in clang/lib/StaticAnalyzer/Checkers/ContainerModeling.cpp without direct BugReport emission",
+  "messages": []
+ },
+ "clang-analyzer-alpha.cplusplus.DeleteWithNonVirtualDtor": {
+  "reason": "audited against LLVM StaticAnalyzer source",
+  "messages": [
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/CXXDeleteChecker.cpp",
+    "line": 66,
+    "message": "Destruction of a polymorphic object with no virtual destructor",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/CXXDeleteChecker.cpp",
+    "line": 208,
+    "message": "Casting from '%0' to '%1' here",
+    "note": true,
+    "fix": false
+   }
+  ]
+ },
+ "clang-analyzer-alpha.cplusplus.InvalidatedIterator": {
+  "reason": "audited against LLVM StaticAnalyzer source",
+  "messages": [
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/InvalidatedIteratorChecker.cpp",
+    "line": 121,
+    "message": "Invalidated iterator accessed.",
+    "note": false,
+    "fix": false
+   }
+  ]
+ },
+ "clang-analyzer-alpha.cplusplus.IteratorModeling": {
+  "reason": "state-modeling checker in clang/lib/StaticAnalyzer/Checkers/IteratorModeling.cpp without direct BugReport emission",
+  "messages": []
+ },
+ "clang-analyzer-alpha.cplusplus.IteratorRange": {
+  "reason": "audited against LLVM StaticAnalyzer source",
+  "messages": [
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/IteratorRangeChecker.cpp",
+    "line": 203,
+    "message": "Past-the-end iterator dereferenced.",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/IteratorRangeChecker.cpp",
+    "line": 250,
+    "message": "Iterator decremented ahead of its valid range.",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/IteratorRangeChecker.cpp",
+    "line": 257,
+    "message": "Iterator incremented behind the past-the-end iterator.",
+    "note": false,
+    "fix": false
+   }
+  ]
+ },
+ "clang-analyzer-alpha.cplusplus.LifetimeModeling": {
+  "reason": "state-modeling checker in clang/lib/StaticAnalyzer/Checkers/LifetimeModeling.cpp without direct BugReport emission",
+  "messages": []
+ },
+ "clang-analyzer-alpha.cplusplus.MismatchedIterator": {
+  "reason": "audited against LLVM StaticAnalyzer source",
+  "messages": [
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/MismatchedIteratorChecker.cpp",
+    "line": 232,
+    "message": "Container accessed using foreign iterator argument.",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/MismatchedIteratorChecker.cpp",
+    "line": 270,
+    "message": "Iterators of different containers used where the same container is expected.",
+    "note": false,
+    "fix": false
+   }
+  ]
+ },
+ "clang-analyzer-alpha.cplusplus.STLAlgorithmModeling": {
+  "reason": "state-modeling checker in clang/lib/StaticAnalyzer/Checkers/STLAlgorithmModeling.cpp without direct BugReport emission",
+  "messages": []
+ },
+ "clang-analyzer-alpha.cplusplus.SmartPtr": {
+  "reason": "audited against LLVM StaticAnalyzer source",
+  "messages": [
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/SmartPtrChecker.cpp",
+    "line": 92,
+    "message": "Dereference of null smart pointer %0",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/SmartPtrModeling.cpp",
+    "line": 396,
+    "message": "Default constructed smart pointer%0 is null",
+    "note": true,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/SmartPtrModeling.cpp",
+    "line": 417,
+    "message": "Smart pointer%0 is constructed using a null value",
+    "note": true,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/SmartPtrModeling.cpp",
+    "line": 419,
+    "message": "Smart pointer%0 is constructed",
+    "note": true,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/SmartPtrModeling.cpp",
+    "line": 618,
+    "message": "Smart pointer%0 reset using a null value",
+    "note": true,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/SmartPtrModeling.cpp",
+    "line": 654,
+    "message": "Smart pointer%0 is released and set to null",
+    "note": true,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/SmartPtrModeling.cpp",
+    "line": 758,
+    "message": "Smart pointer%0 is assigned to null",
+    "note": true,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/SmartPtrModeling.cpp",
+    "line": 797,
+    "message": "Smart pointer%0 is null after being moved to%1",
+    "note": true,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/SmartPtrModeling.cpp",
+    "line": 803,
+    "message": "A null pointer value is moved to%0",
+    "note": true,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/SmartPtrModeling.cpp",
+    "line": 822,
+    "message": "Smart pointer%0 is null after; previous value moved to%1",
+    "note": true,
+    "fix": false
+   }
+  ]
+ },
+ "clang-analyzer-alpha.cplusplus.UseAfterLifetimeEnd": {
+  "reason": "audited against LLVM StaticAnalyzer source",
+  "messages": [
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/UseAfterLifetimeEnd.cpp",
+    "line": 50,
+    "message": "Returning value bound to '%0' that will go out of scope",
+    "note": false,
+    "fix": false
+   }
+  ]
+ },
+ "clang-analyzer-alpha.deadcode.UnreachableCode": {
+  "reason": "audited against LLVM StaticAnalyzer source",
+  "messages": [
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/UnreachableCodeChecker.cpp",
+    "line": 174,
+    "message": "This statement is never executed",
+    "note": false,
+    "fix": false
+   }
+  ]
+ },
+ "clang-analyzer-alpha.fuchsia.Lock": {
+  "reason": "audited against LLVM StaticAnalyzer source",
+  "messages": [
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp",
+    "line": 468,
+    "message": "This lock has already been acquired",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp",
+    "line": 472,
+    "message": "This lock has already been destroyed",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp",
+    "line": 547,
+    "message": "This lock has already been unlocked",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp",
+    "line": 567,
+    "message": "This was not the most recently acquired lock. Possible lock order reversal",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp",
+    "line": 650,
+    "message": "This lock is still locked",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp",
+    "line": 686,
+    "message": "This lock is still being held",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp",
+    "line": 687,
+    "message": "This lock has already been initialized",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp",
+    "line": 519,
+    "message": "Mutex acquired here",
+    "note": true,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp",
+    "line": 50,
+    "message": "Locking %0 here",
+    "note": true,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp",
+    "line": 582,
+    "message": "Mutex released here",
+    "note": true,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp",
+    "line": 50,
+    "message": "Unlocking %0 here",
+    "note": true,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp",
+    "line": 626,
+    "message": "Mutex destroyed here",
+    "note": true,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp",
+    "line": 50,
+    "message": "Destroying %0 here",
+    "note": true,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp",
+    "line": 681,
+    "message": "Mutex initialized here",
+    "note": true,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp",
+    "line": 50,
+    "message": "Initializing %0 here",
+    "note": true,
+    "fix": false
+   }
+  ]
+ },
+ "clang-analyzer-alpha.llvm.Conventions": {
+  "reason": "audited against LLVM StaticAnalyzer source",
+  "messages": [
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/LLVMConventionsChecker.cpp",
+    "line": 176,
+    "message": "StringRef should not be bound to temporary std::string that it outlives",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/LLVMConventionsChecker.cpp",
+    "line": 253,
+    "message": "AST class '%0' has a field '%1' that allocates heap memory (type %2)",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/LLVMConventionsChecker.cpp",
+    "line": 253,
+    "message": "AST class '%0' has a field '%1' that allocates heap memory via the following chain: %2 (type %3)",
+    "note": false,
+    "fix": false
+   }
+  ]
+ },
+ "clang-analyzer-alpha.osx.cocoa.DirectIvarAssignment": {
+  "reason": "audited against LLVM StaticAnalyzer source",
+  "messages": [
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/DirectIvarAssignment.cpp",
+    "line": 202,
+    "message": "Direct assignment to an instance variable backing a property; use the setter instead",
+    "note": false,
+    "fix": false
+   }
+  ]
+ },
+ "clang-analyzer-alpha.osx.cocoa.InstanceVariableInvalidation": {
+  "reason": "audited against LLVM StaticAnalyzer source",
+  "messages": [
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/IvarInvalidationChecker.cpp",
+    "line": 543,
+    "message": "Property %0 needs to be invalidated or set to nil",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/IvarInvalidationChecker.cpp",
+    "line": 543,
+    "message": "Instance variable %0 needs to be invalidated or set to nil",
+    "note": false,
+    "fix": false
+   }
+  ]
+ },
+ "clang-analyzer-alpha.osx.cocoa.IvarInvalidationModeling": {
+  "reason": "state-modeling checker in clang/lib/StaticAnalyzer/Checkers/IvarInvalidationChecker.cpp without direct BugReport emission",
+  "messages": []
+ },
+ "clang-analyzer-alpha.osx.cocoa.MissingInvalidationMethod": {
+  "reason": "audited against LLVM StaticAnalyzer source",
+  "messages": [
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/IvarInvalidationChecker.cpp",
+    "line": 521,
+    "message": "Property %0 needs to be invalidated; no invalidation method is declared for %1",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/IvarInvalidationChecker.cpp",
+    "line": 521,
+    "message": "Property %0 needs to be invalidated; no invalidation method is defined in the @implementation for %1",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/IvarInvalidationChecker.cpp",
+    "line": 521,
+    "message": "Instance variable %0 needs to be invalidated; no invalidation method is declared for %1",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/IvarInvalidationChecker.cpp",
+    "line": 521,
+    "message": "Instance variable %0 needs to be invalidated; no invalidation method is defined in the @implementation for %1",
+    "note": false,
+    "fix": false
+   }
+  ]
+ },
+ "clang-analyzer-alpha.osx.cocoa.localizability.PluralMisuseChecker": {
+  "reason": "audited against LLVM StaticAnalyzer source",
+  "messages": [
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/LocalizationChecker.cpp",
+    "line": 1380,
+    "message": "Plural cases are not supported across all languages. Use a .stringsdict file instead",
+    "note": false,
+    "fix": false
+   }
+  ]
+ },
+ "clang-analyzer-alpha.security.ReturnPtrRange": {
+  "reason": "audited against LLVM StaticAnalyzer source",
+  "messages": [
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/ReturnPointerRangeChecker.cpp",
+    "line": 82,
+    "message": "Returned pointer value points outside the original object (potential buffer overflow)",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/ReturnPointerRangeChecker.cpp",
+    "line": 95,
+    "message": "Original object declared here",
+    "note": true,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/ReturnPointerRangeChecker.cpp",
+    "line": 101,
+    "message": "Original object '%0' is an array of %1 '%2' objects, returned pointer points at index %3",
+    "note": true,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/ReturnPointerRangeChecker.cpp",
+    "line": 101,
+    "message": "Original object '%0' is an array of %1 '%2' objects",
+    "note": true,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/ReturnPointerRangeChecker.cpp",
+    "line": 101,
+    "message": "Original object is an array of %0 '%1' objects, returned pointer points at index %2",
+    "note": true,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/ReturnPointerRangeChecker.cpp",
+    "line": 101,
+    "message": "Original object is an array of %0 '%1' objects",
+    "note": true,
+    "fix": false
+   }
+  ]
+ },
+ "clang-analyzer-alpha.unix.PthreadLock": {
+  "reason": "audited against LLVM StaticAnalyzer source",
+  "messages": [
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp",
+    "line": 468,
+    "message": "This lock has already been acquired",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp",
+    "line": 472,
+    "message": "This lock has already been destroyed",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp",
+    "line": 547,
+    "message": "This lock has already been unlocked",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp",
+    "line": 567,
+    "message": "This was not the most recently acquired lock. Possible lock order reversal",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp",
+    "line": 650,
+    "message": "This lock is still locked",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp",
+    "line": 686,
+    "message": "This lock is still being held",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp",
+    "line": 687,
+    "message": "This lock has already been initialized",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp",
+    "line": 519,
+    "message": "Mutex acquired here",
+    "note": true,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp",
+    "line": 50,
+    "message": "Locking %0 here",
+    "note": true,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp",
+    "line": 582,
+    "message": "Mutex released here",
+    "note": true,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp",
+    "line": 50,
+    "message": "Unlocking %0 here",
+    "note": true,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp",
+    "line": 626,
+    "message": "Mutex destroyed here",
+    "note": true,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp",
+    "line": 50,
+    "message": "Destroying %0 here",
+    "note": true,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp",
+    "line": 681,
+    "message": "Mutex initialized here",
+    "note": true,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/PthreadLockChecker.cpp",
+    "line": 50,
+    "message": "Initializing %0 here",
+    "note": true,
+    "fix": false
+   }
+  ]
+ },
+ "clang-analyzer-alpha.unix.SimpleStream": {
+  "reason": "audited against LLVM StaticAnalyzer source",
+  "messages": [
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/SimpleStreamChecker.cpp",
+    "line": 178,
+    "message": "Closing a previously closed file stream",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/SimpleStreamChecker.cpp",
+    "line": 191,
+    "message": "Opened file is never closed; potential resource leak",
+    "note": false,
+    "fix": false
+   }
+  ]
+ },
+ "clang-analyzer-alpha.unix.cstring.BufferOverlap": {
+  "reason": "audited against LLVM StaticAnalyzer source",
+  "messages": [
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/CStringChecker.cpp",
+    "line": 819,
+    "message": "Arguments must not be overlapping buffers",
+    "note": false,
+    "fix": false
+   }
+  ]
+ },
+ "clang-analyzer-alpha.unix.cstring.OutOfBounds": {
+  "reason": "audited against LLVM StaticAnalyzer source",
+  "messages": [
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/CStringChecker.cpp",
+    "line": 93,
+    "message": "Out-of-bound array access",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/CStringChecker.cpp",
+    "line": 62,
+    "message": "Memory copy function overflows the destination buffer",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/CStringChecker.cpp",
+    "line": 64,
+    "message": "Memory copy function accesses out-of-bound array element",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/CStringChecker.cpp",
+    "line": 62,
+    "message": "Memory comparison function overflows the destination buffer",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/CStringChecker.cpp",
+    "line": 64,
+    "message": "Memory comparison function accesses out-of-bound array element",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/CStringChecker.cpp",
+    "line": 62,
+    "message": "String length function overflows the destination buffer",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/CStringChecker.cpp",
+    "line": 64,
+    "message": "String length function accesses out-of-bound array element",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/CStringChecker.cpp",
+    "line": 62,
+    "message": "String copy function overflows the destination buffer",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/CStringChecker.cpp",
+    "line": 64,
+    "message": "String copy function accesses out-of-bound array element",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/CStringChecker.cpp",
+    "line": 62,
+    "message": "String concatenation function overflows the destination buffer",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/CStringChecker.cpp",
+    "line": 64,
+    "message": "String concatenation function accesses out-of-bound array element",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/CStringChecker.cpp",
+    "line": 62,
+    "message": "Locale transformation function overflows the destination buffer",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/CStringChecker.cpp",
+    "line": 64,
+    "message": "Locale transformation function accesses out-of-bound array element",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/CStringChecker.cpp",
+    "line": 62,
+    "message": "String comparison function overflows the destination buffer",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/CStringChecker.cpp",
+    "line": 64,
+    "message": "String comparison function accesses out-of-bound array element",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/CStringChecker.cpp",
+    "line": 62,
+    "message": "strsep() overflows the destination buffer",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/CStringChecker.cpp",
+    "line": 64,
+    "message": "strsep() accesses out-of-bound array element",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/CStringChecker.cpp",
+    "line": 62,
+    "message": "Memory set function overflows the destination buffer",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/CStringChecker.cpp",
+    "line": 64,
+    "message": "Memory set function accesses out-of-bound array element",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/CStringChecker.cpp",
+    "line": 62,
+    "message": "Memory clearance function overflows the destination buffer",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/CStringChecker.cpp",
+    "line": 64,
+    "message": "Memory clearance function accesses out-of-bound array element",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/CStringChecker.cpp",
+    "line": 62,
+    "message": "'sprintf' overflows the destination buffer",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/CStringChecker.cpp",
+    "line": 64,
+    "message": "'sprintf' accesses out-of-bound array element",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/CStringChecker.cpp",
+    "line": 62,
+    "message": "'snprintf' overflows the destination buffer",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/CStringChecker.cpp",
+    "line": 64,
+    "message": "'snprintf' accesses out-of-bound array element",
+    "note": false,
+    "fix": false
+   }
+  ]
+ },
+ "clang-analyzer-alpha.webkit.ForwardDeclChecker": {
+  "reason": "audited against LLVM StaticAnalyzer source",
+  "messages": [
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/ForwardDeclChecker.cpp",
+    "line": 175,
+    "message": "Member variable '%0' uses a forward declared type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/ForwardDeclChecker.cpp",
+    "line": 344,
+    "message": "Local variable '%0' uses a forward declared type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/ForwardDeclChecker.cpp",
+    "line": 344,
+    "message": "Call argument for parameter '%0' uses a forward declared type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/ForwardDeclChecker.cpp",
+    "line": 344,
+    "message": "Call argument uses a forward declared type '%0'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/ForwardDeclChecker.cpp",
+    "line": 344,
+    "message": "Receiver uses a forward declared type '%0'",
+    "note": false,
+    "fix": false
+   }
+  ]
+ },
+ "clang-analyzer-alpha.webkit.MemoryUnsafeCastChecker": {
+  "reason": "audited against LLVM StaticAnalyzer source",
+  "messages": [
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/MemoryUnsafeCastChecker.cpp",
+    "line": 51,
+    "message": "Unsafe cast from base type '%0' to derived type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/MemoryUnsafeCastChecker.cpp",
+    "line": 71,
+    "message": "Unsafe cast from type '%0' to an unrelated type '%1'",
+    "note": false,
+    "fix": false
+   }
+  ]
+ },
+ "clang-analyzer-alpha.webkit.NoDeleteChecker": {
+  "reason": "audited against LLVM StaticAnalyzer source",
+  "messages": [
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/NoDeleteChecker.cpp",
+    "line": 94,
+    "message": "A function '%0' has [[clang::annotate_type(\"webkit.nodelete\")]] but it contains a parameter '%1' which could destruct an object.",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/NoDeleteChecker.cpp",
+    "line": 94,
+    "message": "A function '%0' has [[clang::annotate_type(\"webkit.nodelete\")]] but it contains code that could destruct an object.",
+    "note": false,
+    "fix": false
+   }
+  ]
+ },
+ "clang-analyzer-alpha.webkit.NoUncheckedPtrMemberChecker": {
+  "reason": "audited against LLVM StaticAnalyzer source",
+  "messages": [
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefMemberChecker.cpp",
+    "line": 332,
+    "message": "Member variable is a raw-pointer/reference to CheckedPtr-capable type",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefMemberChecker.cpp",
+    "line": 274,
+    "message": "Property '%0' (of '%1') is a raw pointer to CheckedPtr-capable type '%2'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefMemberChecker.cpp",
+    "line": 274,
+    "message": "Property '%0' (of '%1') is a reference to CheckedPtr-capable type '%2'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefMemberChecker.cpp",
+    "line": 274,
+    "message": "Property '%0' (of '%1') contains a raw pointer to CheckedPtr-capable type '%2'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefMemberChecker.cpp",
+    "line": 274,
+    "message": "Property '%0' (of '%1') contains a reference to CheckedPtr-capable type '%2'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefMemberChecker.cpp",
+    "line": 276,
+    "message": "Instance variable '%0' (of '%1') is a raw pointer to CheckedPtr-capable type '%2'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefMemberChecker.cpp",
+    "line": 276,
+    "message": "Instance variable '%0' (of '%1') is a reference to CheckedPtr-capable type '%2'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefMemberChecker.cpp",
+    "line": 276,
+    "message": "Instance variable '%0' (of '%1') contains a raw pointer to CheckedPtr-capable type '%2'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefMemberChecker.cpp",
+    "line": 276,
+    "message": "Instance variable '%0' (of '%1') contains a reference to CheckedPtr-capable type '%2'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefMemberChecker.cpp",
+    "line": 278,
+    "message": "Member variable '%0' (of '%1') is a raw pointer to CheckedPtr-capable type '%2'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefMemberChecker.cpp",
+    "line": 278,
+    "message": "Member variable '%0' (of '%1') is a reference to CheckedPtr-capable type '%2'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefMemberChecker.cpp",
+    "line": 278,
+    "message": "Member variable '%0' (of '%1') contains a raw pointer to CheckedPtr-capable type '%2'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefMemberChecker.cpp",
+    "line": 278,
+    "message": "Member variable '%0' (of '%1') contains a reference to CheckedPtr-capable type '%2'",
+    "note": false,
+    "fix": false
+   }
+  ]
+ },
+ "clang-analyzer-alpha.webkit.NoUnretainedMemberChecker": {
+  "reason": "audited against LLVM StaticAnalyzer source",
+  "messages": [
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefMemberChecker.cpp",
+    "line": 350,
+    "message": "Member variable is a raw-pointer/reference to RetainPtr-capable type",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefMemberChecker.cpp",
+    "line": 274,
+    "message": "Property '%0' (of '%1') is a raw pointer to RetainPtr-capable type '%2'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefMemberChecker.cpp",
+    "line": 274,
+    "message": "Property '%0' (of '%1') is a reference to RetainPtr-capable type '%2'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefMemberChecker.cpp",
+    "line": 274,
+    "message": "Property '%0' (of '%1') contains a raw pointer to RetainPtr-capable type '%2'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefMemberChecker.cpp",
+    "line": 274,
+    "message": "Property '%0' (of '%1') contains a reference to RetainPtr-capable type '%2'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefMemberChecker.cpp",
+    "line": 276,
+    "message": "Instance variable '%0' (of '%1') is a raw pointer to RetainPtr-capable type '%2'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefMemberChecker.cpp",
+    "line": 276,
+    "message": "Instance variable '%0' (of '%1') is a reference to RetainPtr-capable type '%2'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefMemberChecker.cpp",
+    "line": 276,
+    "message": "Instance variable '%0' (of '%1') contains a raw pointer to RetainPtr-capable type '%2'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefMemberChecker.cpp",
+    "line": 276,
+    "message": "Instance variable '%0' (of '%1') contains a reference to RetainPtr-capable type '%2'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefMemberChecker.cpp",
+    "line": 278,
+    "message": "Member variable '%0' (of '%1') is a raw pointer to RetainPtr-capable type '%2'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefMemberChecker.cpp",
+    "line": 278,
+    "message": "Member variable '%0' (of '%1') is a reference to RetainPtr-capable type '%2'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefMemberChecker.cpp",
+    "line": 278,
+    "message": "Member variable '%0' (of '%1') contains a raw pointer to RetainPtr-capable type '%2'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefMemberChecker.cpp",
+    "line": 278,
+    "message": "Member variable '%0' (of '%1') contains a reference to RetainPtr-capable type '%2'",
+    "note": false,
+    "fix": false
+   }
+  ]
+ },
+ "clang-analyzer-alpha.webkit.RetainPtrCtorAdoptChecker": {
+  "reason": "audited against LLVM StaticAnalyzer source",
+  "messages": [
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RetainPtrCtorAdoptChecker.cpp",
+    "line": 580,
+    "message": "Incorrect use of %0. The argument is +0 and results in an use-after-free.",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RetainPtrCtorAdoptChecker.cpp",
+    "line": 580,
+    "message": "Incorrect use of %0. The argument is +0 and results in an use-after-free when ARC is disabled.",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RetainPtrCtorAdoptChecker.cpp",
+    "line": 601,
+    "message": "Incorrect use of %0. The argument is +1 and results in a memory leak.",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RetainPtrCtorAdoptChecker.cpp",
+    "line": 601,
+    "message": "Incorrect use of %0. The argument is +1 and results in a memory leak when ARC is disabled.",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RetainPtrCtorAdoptChecker.cpp",
+    "line": 621,
+    "message": "The return value is +1 and results in a memory leak.",
+    "note": false,
+    "fix": false
+   }
+  ]
+ },
+ "clang-analyzer-alpha.webkit.UncheckedCallArgsChecker": {
+  "reason": "audited against LLVM StaticAnalyzer source",
+  "messages": [
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 391,
+    "message": "Function argument (parameter '%0' to '%1') is a raw pointer to CheckedPtr-capable type %2",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 391,
+    "message": "Function argument (parameter '%0') is a raw pointer to CheckedPtr-capable type %1",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 391,
+    "message": "Function argument (to '%0') is a raw pointer to CheckedPtr-capable type %1",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 391,
+    "message": "Function argument is a raw pointer to CheckedPtr-capable type %0",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 391,
+    "message": "Function argument '%0' (parameter '%1' to '%2') is a raw pointer to CheckedPtr-capable type %3",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 391,
+    "message": "Function argument '%0' (parameter '%1') is a raw pointer to CheckedPtr-capable type %2",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 391,
+    "message": "Function argument '%0' (to '%1') is a raw pointer to CheckedPtr-capable type %2",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 391,
+    "message": "Function argument '%0' is a raw pointer to CheckedPtr-capable type %1",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 391,
+    "message": "Function argument (parameter '%0' to '%1') is a reference to CheckedPtr-capable type %2",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 391,
+    "message": "Function argument (parameter '%0') is a reference to CheckedPtr-capable type %1",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 391,
+    "message": "Function argument (to '%0') is a reference to CheckedPtr-capable type %1",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 391,
+    "message": "Function argument is a reference to CheckedPtr-capable type %0",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 391,
+    "message": "Function argument '%0' (parameter '%1' to '%2') is a reference to CheckedPtr-capable type %3",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 391,
+    "message": "Function argument '%0' (parameter '%1') is a reference to CheckedPtr-capable type %2",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 391,
+    "message": "Function argument '%0' (to '%1') is a reference to CheckedPtr-capable type %2",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 391,
+    "message": "Function argument '%0' is a reference to CheckedPtr-capable type %1",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 444,
+    "message": "Function argument (parameter 'this'to '%0')) is a raw pointer to CheckedPtr-capable type %1",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 444,
+    "message": "Function argument (parameter 'this') is a raw pointer to CheckedPtr-capable type %0",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 444,
+    "message": "Function argument '%0' (parameter 'this'to '%1')) is a raw pointer to CheckedPtr-capable type %2",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 444,
+    "message": "Function argument '%0' (parameter 'this') is a raw pointer to CheckedPtr-capable type %1",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 469,
+    "message": "Receiver (to '%0') is a raw pointer to CheckedPtr-capable type %1",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 469,
+    "message": "Receiver is a raw pointer to CheckedPtr-capable type %0",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 469,
+    "message": "Receiver '%0' (to '%1') is a raw pointer to CheckedPtr-capable type %2",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 469,
+    "message": "Receiver '%0' is a raw pointer to CheckedPtr-capable type %1",
+    "note": false,
+    "fix": false
+   }
+  ]
+ },
+ "clang-analyzer-alpha.webkit.UncheckedLambdaCapturesChecker": {
+  "reason": "audited against LLVM StaticAnalyzer source",
+  "messages": [
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp",
+    "line": 545,
+    "message": "Captured variable '%0' is a raw pointer to CheckedPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp",
+    "line": 545,
+    "message": "Captured variable '%0' is a raw pointer to CheckedPtr-capable type",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp",
+    "line": 545,
+    "message": "Captured variable '%0' is a raw reference to CheckedPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp",
+    "line": 545,
+    "message": "Captured variable '%0' is a raw reference to CheckedPtr-capable type",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp",
+    "line": 545,
+    "message": "Captured variable '%0' contains a raw pointer to CheckedPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp",
+    "line": 545,
+    "message": "Captured variable '%0' contains a raw pointer to CheckedPtr-capable type",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp",
+    "line": 545,
+    "message": "Captured variable '%0' contains a raw reference to CheckedPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp",
+    "line": 545,
+    "message": "Captured variable '%0' contains a raw reference to CheckedPtr-capable type",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp",
+    "line": 570,
+    "message": "Captured variable 'this' is a raw pointer to CheckedPtr-capable type '%0'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp",
+    "line": 570,
+    "message": "Captured variable 'this' is a raw pointer to CheckedPtr-capable type",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp",
+    "line": 545,
+    "message": "Implicitly captured variable '%0' is a raw pointer to CheckedPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp",
+    "line": 545,
+    "message": "Implicitly captured variable '%0' is a raw pointer to CheckedPtr-capable type",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp",
+    "line": 545,
+    "message": "Implicitly captured variable '%0' is a raw reference to CheckedPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp",
+    "line": 545,
+    "message": "Implicitly captured variable '%0' is a raw reference to CheckedPtr-capable type",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp",
+    "line": 545,
+    "message": "Implicitly captured variable '%0' contains a raw pointer to CheckedPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp",
+    "line": 545,
+    "message": "Implicitly captured variable '%0' contains a raw pointer to CheckedPtr-capable type",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp",
+    "line": 545,
+    "message": "Implicitly captured variable '%0' contains a raw reference to CheckedPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp",
+    "line": 545,
+    "message": "Implicitly captured variable '%0' contains a raw reference to CheckedPtr-capable type",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp",
+    "line": 570,
+    "message": "Implicitly captured variable 'this' is a raw pointer to CheckedPtr-capable type '%0'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp",
+    "line": 570,
+    "message": "Implicitly captured variable 'this' is a raw pointer to CheckedPtr-capable type",
+    "note": false,
+    "fix": false
+   }
+  ]
+ },
+ "clang-analyzer-alpha.webkit.UncheckedLocalVarsChecker": {
+  "reason": "audited against LLVM StaticAnalyzer source",
+  "messages": [
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp",
+    "line": 417,
+    "message": "Parameter '%0' is a CheckedPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp",
+    "line": 417,
+    "message": "Parameter '%0' is a raw pointer to CheckedPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp",
+    "line": 417,
+    "message": "Parameter '%0' is a raw reference to CheckedPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp",
+    "line": 428,
+    "message": "Local variable '%0' is a CheckedPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp",
+    "line": 428,
+    "message": "Local variable '%0' is a raw pointer to CheckedPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp",
+    "line": 428,
+    "message": "Local variable '%0' is a raw reference to CheckedPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp",
+    "line": 430,
+    "message": "Static local variable '%0' is a CheckedPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp",
+    "line": 430,
+    "message": "Static local variable '%0' is a raw pointer to CheckedPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp",
+    "line": 430,
+    "message": "Static local variable '%0' is a raw reference to CheckedPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp",
+    "line": 432,
+    "message": "Global variable '%0' is a CheckedPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp",
+    "line": 432,
+    "message": "Global variable '%0' is a raw pointer to CheckedPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp",
+    "line": 432,
+    "message": "Global variable '%0' is a raw reference to CheckedPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp",
+    "line": 434,
+    "message": "Variable '%0' is a CheckedPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp",
+    "line": 434,
+    "message": "Variable '%0' is a raw pointer to CheckedPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp",
+    "line": 434,
+    "message": "Variable '%0' is a raw reference to CheckedPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   }
+  ]
+ },
+ "clang-analyzer-alpha.webkit.UncountedCallArgsChecker": {
+  "reason": "audited against LLVM StaticAnalyzer source",
+  "messages": [
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 391,
+    "message": "Function argument (parameter '%0' to '%1') is a raw pointer to RefPtr-capable type %2",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 391,
+    "message": "Function argument (parameter '%0') is a raw pointer to RefPtr-capable type %1",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 391,
+    "message": "Function argument (to '%0') is a raw pointer to RefPtr-capable type %1",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 391,
+    "message": "Function argument is a raw pointer to RefPtr-capable type %0",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 391,
+    "message": "Function argument '%0' (parameter '%1' to '%2') is a raw pointer to RefPtr-capable type %3",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 391,
+    "message": "Function argument '%0' (parameter '%1') is a raw pointer to RefPtr-capable type %2",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 391,
+    "message": "Function argument '%0' (to '%1') is a raw pointer to RefPtr-capable type %2",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 391,
+    "message": "Function argument '%0' is a raw pointer to RefPtr-capable type %1",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 391,
+    "message": "Function argument (parameter '%0' to '%1') is a reference to RefPtr-capable type %2",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 391,
+    "message": "Function argument (parameter '%0') is a reference to RefPtr-capable type %1",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 391,
+    "message": "Function argument (to '%0') is a reference to RefPtr-capable type %1",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 391,
+    "message": "Function argument is a reference to RefPtr-capable type %0",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 391,
+    "message": "Function argument '%0' (parameter '%1' to '%2') is a reference to RefPtr-capable type %3",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 391,
+    "message": "Function argument '%0' (parameter '%1') is a reference to RefPtr-capable type %2",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 391,
+    "message": "Function argument '%0' (to '%1') is a reference to RefPtr-capable type %2",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 391,
+    "message": "Function argument '%0' is a reference to RefPtr-capable type %1",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 444,
+    "message": "Function argument (parameter 'this'to '%0')) is a raw pointer to RefPtr-capable type %1",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 444,
+    "message": "Function argument (parameter 'this') is a raw pointer to RefPtr-capable type %0",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 444,
+    "message": "Function argument '%0' (parameter 'this'to '%1')) is a raw pointer to RefPtr-capable type %2",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 444,
+    "message": "Function argument '%0' (parameter 'this') is a raw pointer to RefPtr-capable type %1",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 469,
+    "message": "Receiver (to '%0') is a raw pointer to RefPtr-capable type %1",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 469,
+    "message": "Receiver is a raw pointer to RefPtr-capable type %0",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 469,
+    "message": "Receiver '%0' (to '%1') is a raw pointer to RefPtr-capable type %2",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 469,
+    "message": "Receiver '%0' is a raw pointer to RefPtr-capable type %1",
+    "note": false,
+    "fix": false
+   }
+  ]
+ },
+ "clang-analyzer-alpha.webkit.UncountedLocalVarsChecker": {
+  "reason": "audited against LLVM StaticAnalyzer source",
+  "messages": [
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp",
+    "line": 417,
+    "message": "Parameter '%0' is a RefPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp",
+    "line": 417,
+    "message": "Parameter '%0' is a raw pointer to RefPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp",
+    "line": 417,
+    "message": "Parameter '%0' is a raw reference to RefPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp",
+    "line": 428,
+    "message": "Local variable '%0' is a RefPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp",
+    "line": 428,
+    "message": "Local variable '%0' is a raw pointer to RefPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp",
+    "line": 428,
+    "message": "Local variable '%0' is a raw reference to RefPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp",
+    "line": 430,
+    "message": "Static local variable '%0' is a RefPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp",
+    "line": 430,
+    "message": "Static local variable '%0' is a raw pointer to RefPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp",
+    "line": 430,
+    "message": "Static local variable '%0' is a raw reference to RefPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp",
+    "line": 432,
+    "message": "Global variable '%0' is a RefPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp",
+    "line": 432,
+    "message": "Global variable '%0' is a raw pointer to RefPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp",
+    "line": 432,
+    "message": "Global variable '%0' is a raw reference to RefPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp",
+    "line": 434,
+    "message": "Variable '%0' is a RefPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp",
+    "line": 434,
+    "message": "Variable '%0' is a raw pointer to RefPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp",
+    "line": 434,
+    "message": "Variable '%0' is a raw reference to RefPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   }
+  ]
+ },
+ "clang-analyzer-alpha.webkit.UnretainedCallArgsChecker": {
+  "reason": "audited against LLVM StaticAnalyzer source",
+  "messages": [
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 391,
+    "message": "Function argument (parameter '%0' to '%1') is a raw pointer to RetainPtr-capable type %2",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 391,
+    "message": "Function argument (parameter '%0') is a raw pointer to RetainPtr-capable type %1",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 391,
+    "message": "Function argument (to '%0') is a raw pointer to RetainPtr-capable type %1",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 391,
+    "message": "Function argument is a raw pointer to RetainPtr-capable type %0",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 391,
+    "message": "Function argument '%0' (parameter '%1' to '%2') is a raw pointer to RetainPtr-capable type %3",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 391,
+    "message": "Function argument '%0' (parameter '%1') is a raw pointer to RetainPtr-capable type %2",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 391,
+    "message": "Function argument '%0' (to '%1') is a raw pointer to RetainPtr-capable type %2",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 391,
+    "message": "Function argument '%0' is a raw pointer to RetainPtr-capable type %1",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 391,
+    "message": "Function argument (parameter '%0' to '%1') is a reference to RetainPtr-capable type %2",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 391,
+    "message": "Function argument (parameter '%0') is a reference to RetainPtr-capable type %1",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 391,
+    "message": "Function argument (to '%0') is a reference to RetainPtr-capable type %1",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 391,
+    "message": "Function argument is a reference to RetainPtr-capable type %0",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 391,
+    "message": "Function argument '%0' (parameter '%1' to '%2') is a reference to RetainPtr-capable type %3",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 391,
+    "message": "Function argument '%0' (parameter '%1') is a reference to RetainPtr-capable type %2",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 391,
+    "message": "Function argument '%0' (to '%1') is a reference to RetainPtr-capable type %2",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 391,
+    "message": "Function argument '%0' is a reference to RetainPtr-capable type %1",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 444,
+    "message": "Function argument (parameter 'this'to '%0')) is a raw pointer to RetainPtr-capable type %1",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 444,
+    "message": "Function argument (parameter 'this') is a raw pointer to RetainPtr-capable type %0",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 444,
+    "message": "Function argument '%0' (parameter 'this'to '%1')) is a raw pointer to RetainPtr-capable type %2",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 444,
+    "message": "Function argument '%0' (parameter 'this') is a raw pointer to RetainPtr-capable type %1",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 469,
+    "message": "Receiver (to '%0') is a raw pointer to RetainPtr-capable type %1",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 469,
+    "message": "Receiver is a raw pointer to RetainPtr-capable type %0",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 469,
+    "message": "Receiver '%0' (to '%1') is a raw pointer to RetainPtr-capable type %2",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefCallArgsChecker.cpp",
+    "line": 469,
+    "message": "Receiver '%0' is a raw pointer to RetainPtr-capable type %1",
+    "note": false,
+    "fix": false
+   }
+  ]
+ },
+ "clang-analyzer-alpha.webkit.UnretainedLambdaCapturesChecker": {
+  "reason": "audited against LLVM StaticAnalyzer source",
+  "messages": [
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp",
+    "line": 545,
+    "message": "Captured variable '%0' is a raw pointer to RetainPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp",
+    "line": 545,
+    "message": "Captured variable '%0' is a raw pointer to RetainPtr-capable type",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp",
+    "line": 545,
+    "message": "Captured variable '%0' is a raw reference to RetainPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp",
+    "line": 545,
+    "message": "Captured variable '%0' is a raw reference to RetainPtr-capable type",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp",
+    "line": 545,
+    "message": "Captured variable '%0' contains a raw pointer to RetainPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp",
+    "line": 545,
+    "message": "Captured variable '%0' contains a raw pointer to RetainPtr-capable type",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp",
+    "line": 545,
+    "message": "Captured variable '%0' contains a raw reference to RetainPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp",
+    "line": 545,
+    "message": "Captured variable '%0' contains a raw reference to RetainPtr-capable type",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp",
+    "line": 570,
+    "message": "Captured variable 'this' is a raw pointer to RetainPtr-capable type '%0'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp",
+    "line": 570,
+    "message": "Captured variable 'this' is a raw pointer to RetainPtr-capable type",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp",
+    "line": 545,
+    "message": "Implicitly captured variable '%0' is a raw pointer to RetainPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp",
+    "line": 545,
+    "message": "Implicitly captured variable '%0' is a raw pointer to RetainPtr-capable type",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp",
+    "line": 545,
+    "message": "Implicitly captured variable '%0' is a raw reference to RetainPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp",
+    "line": 545,
+    "message": "Implicitly captured variable '%0' is a raw reference to RetainPtr-capable type",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp",
+    "line": 545,
+    "message": "Implicitly captured variable '%0' contains a raw pointer to RetainPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp",
+    "line": 545,
+    "message": "Implicitly captured variable '%0' contains a raw pointer to RetainPtr-capable type",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp",
+    "line": 545,
+    "message": "Implicitly captured variable '%0' contains a raw reference to RetainPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp",
+    "line": 545,
+    "message": "Implicitly captured variable '%0' contains a raw reference to RetainPtr-capable type",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp",
+    "line": 570,
+    "message": "Implicitly captured variable 'this' is a raw pointer to RetainPtr-capable type '%0'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLambdaCapturesChecker.cpp",
+    "line": 570,
+    "message": "Implicitly captured variable 'this' is a raw pointer to RetainPtr-capable type",
+    "note": false,
+    "fix": false
+   }
+  ]
+ },
+ "clang-analyzer-alpha.webkit.UnretainedLocalVarsChecker": {
+  "reason": "audited against LLVM StaticAnalyzer source",
+  "messages": [
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp",
+    "line": 417,
+    "message": "Parameter '%0' is a RetainPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp",
+    "line": 417,
+    "message": "Parameter '%0' is a raw pointer to RetainPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp",
+    "line": 417,
+    "message": "Parameter '%0' is a raw reference to RetainPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp",
+    "line": 428,
+    "message": "Local variable '%0' is a RetainPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp",
+    "line": 428,
+    "message": "Local variable '%0' is a raw pointer to RetainPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp",
+    "line": 428,
+    "message": "Local variable '%0' is a raw reference to RetainPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp",
+    "line": 430,
+    "message": "Static local variable '%0' is a RetainPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp",
+    "line": 430,
+    "message": "Static local variable '%0' is a raw pointer to RetainPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp",
+    "line": 430,
+    "message": "Static local variable '%0' is a raw reference to RetainPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp",
+    "line": 432,
+    "message": "Global variable '%0' is a RetainPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp",
+    "line": 432,
+    "message": "Global variable '%0' is a raw pointer to RetainPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp",
+    "line": 432,
+    "message": "Global variable '%0' is a raw reference to RetainPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp",
+    "line": 434,
+    "message": "Variable '%0' is a RetainPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp",
+    "line": 434,
+    "message": "Variable '%0' is a raw pointer to RetainPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/WebKit/RawPtrRefLocalVarsChecker.cpp",
+    "line": 434,
+    "message": "Variable '%0' is a raw reference to RetainPtr-capable type '%1'",
+    "note": false,
+    "fix": false
+   }
+  ]
+ },
  "clang-analyzer-apiModeling.Errno": {
   "messages": [],
   "reason": "state-modeling checker in clang/lib/StaticAnalyzer/Checkers/ErrnoModeling.cpp without direct BugReport emission"
@@ -2601,6 +5220,288 @@
    }
   ],
   "reason": "audited against LLVM StaticAnalyzer source"
+ },
+ "clang-analyzer-debug.AnalysisOrder": {
+  "reason": "debug callback-ordering tracer in clang/lib/StaticAnalyzer/Checkers/AnalysisOrderChecker.cpp without BugReport emission",
+  "messages": []
+ },
+ "clang-analyzer-debug.CheckerDocumentation": {
+  "reason": "documentation-only checker skeleton in clang/lib/StaticAnalyzer/Checkers/CheckerDocumentation.cpp without BugReport emission",
+  "messages": []
+ },
+ "clang-analyzer-debug.ConfigDumper": {
+  "reason": "debug analyzer-config dumper in clang/lib/StaticAnalyzer/Checkers/DebugCheckers.cpp without BugReport emission",
+  "messages": []
+ },
+ "clang-analyzer-debug.DebugContainerModeling": {
+  "reason": "audited against LLVM StaticAnalyzer source",
+  "messages": [
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/DebugContainerModeling.cpp",
+    "line": 76,
+    "message": "Missing container argument",
+    "note": false,
+    "fix": false
+   }
+  ]
+ },
+ "clang-analyzer-debug.DebugIteratorModeling": {
+  "reason": "audited against LLVM StaticAnalyzer source",
+  "messages": [
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/DebugIteratorModeling.cpp",
+    "line": 80,
+    "message": "Missing iterator argument",
+    "note": false,
+    "fix": false
+   }
+  ]
+ },
+ "clang-analyzer-debug.DebugLifetimeModeling": {
+  "reason": "audited against LLVM StaticAnalyzer source",
+  "messages": [
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/LifetimeModeling.cpp",
+    "line": 173,
+    "message": "clang_analyzer_dumpLifetimeOriginsOf requires exactly 1 argument",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/LifetimeModeling.cpp",
+    "line": 194,
+    "message": " Origin %0 bound to %1",
+    "note": false,
+    "fix": false
+   }
+  ]
+ },
+ "clang-analyzer-debug.DumpCFG": {
+  "reason": "debug CFG dumper in clang/lib/StaticAnalyzer/Checkers/DebugCheckers.cpp without BugReport emission",
+  "messages": []
+ },
+ "clang-analyzer-debug.DumpCallGraph": {
+  "reason": "debug CallGraph dumper in clang/lib/StaticAnalyzer/Checkers/DebugCheckers.cpp without BugReport emission",
+  "messages": []
+ },
+ "clang-analyzer-debug.DumpCalls": {
+  "reason": "debug call-event dumper in clang/lib/StaticAnalyzer/Checkers/TraversalChecker.cpp without BugReport emission",
+  "messages": []
+ },
+ "clang-analyzer-debug.DumpControlDependencies": {
+  "reason": "debug control-dependency dumper in clang/lib/StaticAnalyzer/Checkers/DebugCheckers.cpp without BugReport emission",
+  "messages": []
+ },
+ "clang-analyzer-debug.DumpDominators": {
+  "reason": "debug dominator-tree dumper in clang/lib/StaticAnalyzer/Checkers/DebugCheckers.cpp without BugReport emission",
+  "messages": []
+ },
+ "clang-analyzer-debug.DumpLiveExprs": {
+  "reason": "debug live-expression dumper in clang/lib/StaticAnalyzer/Checkers/DebugCheckers.cpp without BugReport emission",
+  "messages": []
+ },
+ "clang-analyzer-debug.DumpLiveVars": {
+  "reason": "debug live-variable dumper in clang/lib/StaticAnalyzer/Checkers/DebugCheckers.cpp without BugReport emission",
+  "messages": []
+ },
+ "clang-analyzer-debug.DumpPostDominators": {
+  "reason": "debug post-dominator dumper in clang/lib/StaticAnalyzer/Checkers/DebugCheckers.cpp without BugReport emission",
+  "messages": []
+ },
+ "clang-analyzer-debug.DumpTraversal": {
+  "reason": "debug path-traversal dumper in clang/lib/StaticAnalyzer/Checkers/TraversalChecker.cpp without BugReport emission",
+  "messages": []
+ },
+ "clang-analyzer-debug.ErrnoTest": {
+  "reason": "state-modeling test helper in clang/lib/StaticAnalyzer/Checkers/ErrnoTesterChecker.cpp without BugReport emission",
+  "messages": []
+ },
+ "clang-analyzer-debug.ExprInspection": {
+  "reason": "audited fixed inspection messages against LLVM StaticAnalyzer source; arbitrary evaluated symbol dumps retain source text",
+  "messages": [
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/ExprInspectionChecker.cpp",
+    "line": 136,
+    "message": "Missing assertion argument",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/ExprInspectionChecker.cpp",
+    "line": 146,
+    "message": "UNDEFINED",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/ExprInspectionChecker.cpp",
+    "line": 154,
+    "message": "UNKNOWN",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/ExprInspectionChecker.cpp",
+    "line": 156,
+    "message": "TRUE",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/ExprInspectionChecker.cpp",
+    "line": 159,
+    "message": "FALSE",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/ExprInspectionChecker.cpp",
+    "line": 191,
+    "message": "Missing argument",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/ExprInspectionChecker.cpp",
+    "line": 205,
+    "message": "Cannot obtain the region",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/ExprInspectionChecker.cpp",
+    "line": 225,
+    "message": "REACHABLE",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/ExprInspectionChecker.cpp",
+    "line": 301,
+    "message": "n/a",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/ExprInspectionChecker.cpp",
+    "line": 398,
+    "message": "SYMBOL DEAD",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/ExprInspectionChecker.cpp",
+    "line": 442,
+    "message": "clang_analyzer_denote() requires a symbol and a string literal",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/ExprInspectionChecker.cpp",
+    "line": 449,
+    "message": "Not a symbol",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/ExprInspectionChecker.cpp",
+    "line": 455,
+    "message": "Not a string literal",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/ExprInspectionChecker.cpp",
+    "line": 540,
+    "message": "Unable to express",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/ExprInspectionChecker.cpp",
+    "line": 550,
+    "message": "clang_analyzer_isTainted() requires exactly one argument",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/ExprInspectionChecker.cpp",
+    "line": 555,
+    "message": "YES",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/ExprInspectionChecker.cpp",
+    "line": 555,
+    "message": "NO",
+    "note": false,
+    "fix": false
+   }
+  ]
+ },
+ "clang-analyzer-debug.ReportStmts": {
+  "reason": "audited against LLVM StaticAnalyzer source",
+  "messages": [
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/DebugCheckers.cpp",
+    "line": 334,
+    "message": "Statement",
+    "note": false,
+    "fix": false
+   }
+  ]
+ },
+ "clang-analyzer-debug.Stats": {
+  "reason": "audited against LLVM StaticAnalyzer source",
+  "messages": [
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/AnalyzerStatsChecker.cpp",
+    "line": 104,
+    "message": "%0 -> Total CFGBlocks: %1 | Unreachable CFGBlocks: %2 | Exhausted Block: %3 | Empty WorkList: %4",
+    "note": false,
+    "fix": false
+   },
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/AnalyzerStatsChecker.cpp",
+    "line": 123,
+    "message": "(%0): The analyzer generated a sink at this point",
+    "note": false,
+    "fix": false
+   }
+  ]
+ },
+ "clang-analyzer-debug.StdCLibraryFunctionsTester": {
+  "reason": "modeling test toggle for StdLibraryFunctionsChecker in clang/lib/StaticAnalyzer/Checkers/StdLibraryFunctionsChecker.cpp without direct BugReport emission",
+  "messages": []
+ },
+ "clang-analyzer-debug.StreamTester": {
+  "reason": "modeling test toggle for StreamChecker in clang/lib/StaticAnalyzer/Checkers/StreamChecker.cpp without direct BugReport emission",
+  "messages": []
+ },
+ "clang-analyzer-debug.TaintTest": {
+  "reason": "audited against LLVM StaticAnalyzer source",
+  "messages": [
+   {
+    "source": "clang/lib/StaticAnalyzer/Checkers/TaintTesterChecker.cpp",
+    "line": 41,
+    "message": "tainted",
+    "note": false,
+    "fix": false
+   }
+  ]
+ },
+ "clang-analyzer-debug.ViewCFG": {
+  "reason": "debug GraphViz CFG viewer in clang/lib/StaticAnalyzer/Checkers/DebugCheckers.cpp without BugReport emission",
+  "messages": []
+ },
+ "clang-analyzer-debug.ViewCallGraph": {
+  "reason": "debug GraphViz CallGraph viewer in clang/lib/StaticAnalyzer/Checkers/DebugCheckers.cpp without BugReport emission",
+  "messages": []
+ },
+ "clang-analyzer-debug.ViewExplodedGraph": {
+  "reason": "debug GraphViz ExplodedGraph viewer in clang/lib/StaticAnalyzer/Checkers/DebugCheckers.cpp without BugReport emission",
+  "messages": []
  },
  "clang-analyzer-fuchsia.HandleChecker": {
   "messages": [

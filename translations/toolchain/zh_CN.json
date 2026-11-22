@@ -37010,6 +37010,1248 @@
     "msgstr": "隐式捕获的变量 'this' 是指向支持 RefPtr 类型的原始指针",
     "source_variant": "%select{Captured|Implicitly captured}0 variable 'this' is a raw pointer to RefPtr-capable type"
    }
+  },
+  "clang-analyzer-alpha.clone.CloneChecker": {
+   "Duplicate code detected": {
+    "msgstr": "检测到重复代码"
+   },
+   "Similar code here": {
+    "msgstr": "相似代码在这里",
+    "note": true
+   },
+   "Potential copy-paste error; did you really mean to use '%0' here?": {
+    "msgstr": "可能存在复制粘贴错误；这里确定是要使用 '%0' 吗？"
+   },
+   "Similar code using '%0' here": {
+    "msgstr": "这里有使用 '%0' 的相似代码",
+    "note": true
+   }
+  },
+  "clang-analyzer-alpha.core.BoolAssignment": {
+   "Might assign a tainted non-Boolean value": {
+    "msgstr": "可能正在赋入受污染的非布尔值"
+   },
+   "Assignment of a non-Boolean value": {
+    "msgstr": "赋了非布尔值"
+   }
+  },
+  "clang-analyzer-alpha.core.C11Lock": {
+   "This lock has already been acquired": {
+    "msgstr": "该锁已被获取"
+   },
+   "This lock has already been destroyed": {
+    "msgstr": "该锁已被销毁"
+   },
+   "This lock has already been unlocked": {
+    "msgstr": "该锁已被解锁"
+   },
+   "This was not the most recently acquired lock. Possible lock order reversal": {
+    "msgstr": "这不是最近一次获取的锁，可能存在加锁顺序反转"
+   },
+   "This lock is still locked": {
+    "msgstr": "该锁仍处于锁定状态"
+   },
+   "This lock is still being held": {
+    "msgstr": "该锁仍被持有"
+   },
+   "This lock has already been initialized": {
+    "msgstr": "该锁已被初始化"
+   },
+   "Mutex acquired here": {
+    "msgstr": "互斥锁在此处获取",
+    "note": true
+   },
+   "Locking %0 here": {
+    "msgstr": "此处锁定 %0",
+    "note": true
+   },
+   "Mutex released here": {
+    "msgstr": "互斥锁在此处释放",
+    "note": true
+   },
+   "Unlocking %0 here": {
+    "msgstr": "此处解锁 %0",
+    "note": true
+   },
+   "Mutex destroyed here": {
+    "msgstr": "互斥锁在此处销毁",
+    "note": true
+   },
+   "Destroying %0 here": {
+    "msgstr": "此处销毁 %0",
+    "note": true
+   },
+   "Mutex initialized here": {
+    "msgstr": "互斥锁在此处初始化",
+    "note": true
+   },
+   "Initializing %0 here": {
+    "msgstr": "此处初始化 %0",
+    "note": true
+   }
+  },
+  "clang-analyzer-alpha.fuchsia.Lock": {
+   "This lock has already been acquired": {
+    "msgstr": "该锁已被获取"
+   },
+   "This lock has already been destroyed": {
+    "msgstr": "该锁已被销毁"
+   },
+   "This lock has already been unlocked": {
+    "msgstr": "该锁已被解锁"
+   },
+   "This was not the most recently acquired lock. Possible lock order reversal": {
+    "msgstr": "这不是最近一次获取的锁，可能存在加锁顺序反转"
+   },
+   "This lock is still locked": {
+    "msgstr": "该锁仍处于锁定状态"
+   },
+   "This lock is still being held": {
+    "msgstr": "该锁仍被持有"
+   },
+   "This lock has already been initialized": {
+    "msgstr": "该锁已被初始化"
+   },
+   "Mutex acquired here": {
+    "msgstr": "互斥锁在此处获取",
+    "note": true
+   },
+   "Locking %0 here": {
+    "msgstr": "此处锁定 %0",
+    "note": true
+   },
+   "Mutex released here": {
+    "msgstr": "互斥锁在此处释放",
+    "note": true
+   },
+   "Unlocking %0 here": {
+    "msgstr": "此处解锁 %0",
+    "note": true
+   },
+   "Mutex destroyed here": {
+    "msgstr": "互斥锁在此处销毁",
+    "note": true
+   },
+   "Destroying %0 here": {
+    "msgstr": "此处销毁 %0",
+    "note": true
+   },
+   "Mutex initialized here": {
+    "msgstr": "互斥锁在此处初始化",
+    "note": true
+   },
+   "Initializing %0 here": {
+    "msgstr": "此处初始化 %0",
+    "note": true
+   }
+  },
+  "clang-analyzer-alpha.unix.PthreadLock": {
+   "This lock has already been acquired": {
+    "msgstr": "该锁已被获取"
+   },
+   "This lock has already been destroyed": {
+    "msgstr": "该锁已被销毁"
+   },
+   "This lock has already been unlocked": {
+    "msgstr": "该锁已被解锁"
+   },
+   "This was not the most recently acquired lock. Possible lock order reversal": {
+    "msgstr": "这不是最近一次获取的锁，可能存在加锁顺序反转"
+   },
+   "This lock is still locked": {
+    "msgstr": "该锁仍处于锁定状态"
+   },
+   "This lock is still being held": {
+    "msgstr": "该锁仍被持有"
+   },
+   "This lock has already been initialized": {
+    "msgstr": "该锁已被初始化"
+   },
+   "Mutex acquired here": {
+    "msgstr": "互斥锁在此处获取",
+    "note": true
+   },
+   "Locking %0 here": {
+    "msgstr": "此处锁定 %0",
+    "note": true
+   },
+   "Mutex released here": {
+    "msgstr": "互斥锁在此处释放",
+    "note": true
+   },
+   "Unlocking %0 here": {
+    "msgstr": "此处解锁 %0",
+    "note": true
+   },
+   "Mutex destroyed here": {
+    "msgstr": "互斥锁在此处销毁",
+    "note": true
+   },
+   "Destroying %0 here": {
+    "msgstr": "此处销毁 %0",
+    "note": true
+   },
+   "Mutex initialized here": {
+    "msgstr": "互斥锁在此处初始化",
+    "note": true
+   },
+   "Initializing %0 here": {
+    "msgstr": "此处初始化 %0",
+    "note": true
+   }
+  },
+  "clang-analyzer-alpha.core.CastToStruct": {
+   "Casting a non-structure type to a structure type and accessing a field can lead to memory access errors or data corruption.": {
+    "msgstr": "将非结构体类型转换为结构体类型并访问字段可能导致内存访问错误或数据损坏。"
+   },
+   "Casting data to a larger structure type and accessing a field can lead to memory access errors or data corruption.": {
+    "msgstr": "将数据转换为更大的结构体类型并访问字段可能导致内存访问错误或数据损坏。"
+   }
+  },
+  "clang-analyzer-alpha.core.Conversion": {
+   "Loss of sign in implicit conversion": {
+    "msgstr": "隐式转换中丢失符号属性"
+   },
+   "Loss of precision in implicit conversion": {
+    "msgstr": "隐式转换中丢失精度"
+   }
+  },
+  "clang-analyzer-alpha.core.DynamicTypeChecker": {
+   "Object has a dynamic type '%0' which is incompatible with static type '%1'": {
+    "msgstr": "对象的动态类型 '%0' 与静态类型 '%1' 不兼容"
+   },
+   "Type '%0' is inferred from explicit cast (from '%1' to '%2')": {
+    "msgstr": "类型 '%0' 是从显式转换（从 '%1' 到 '%2'）推断出的",
+    "note": true
+   },
+   "Type '%0' is inferred from implicit cast (from '%1' to '%2')": {
+    "msgstr": "类型 '%0' 是从隐式转换（从 '%1' 到 '%2'）推断出的",
+    "note": true
+   },
+   "Type '%0' is inferred from this context": {
+    "msgstr": "类型 '%0' 是从此上下文推断出的",
+    "note": true
+   }
+  },
+  "clang-analyzer-alpha.core.PointerArithm": {
+   "Pointer arithmetic on a pointer to base class is dangerous because derived and base class may have different size.": {
+    "msgstr": "对指向基类的指针执行指针算术是危险的，因为派生类与基类的大小可能不同。"
+   },
+   "Pointer arithmetic on non-array variables relies on memory layout, which is dangerous.": {
+    "msgstr": "对非数组变量执行指针算术依赖内存布局，这是危险的。"
+   }
+  },
+  "clang-analyzer-alpha.core.StackAddressAsyncEscape": {
+   "Address of stack memory associated with a compound literal declared on line %0 is captured by an asynchronously-executed block": {
+    "msgstr": "与第 %0 行声明的复合字面量关联的栈内存地址被异步执行的块捕获"
+   },
+   "Address of stack memory allocated by call to alloca() on line %0 is captured by an asynchronously-executed block": {
+    "msgstr": "由第 %0 行调用 alloca() 分配的栈内存地址被异步执行的块捕获"
+   },
+   "Address of stack-allocated block declared on line %0 is captured by an asynchronously-executed block": {
+    "msgstr": "第 %0 行声明的栈上分配块的地址被异步执行的块捕获"
+   },
+   "Address of stack memory associated with local variable '%0' is captured by an asynchronously-executed block": {
+    "msgstr": "与局部变量 '%0' 关联的栈内存地址被异步执行的块捕获"
+   },
+   "Address of stack memory associated with temporary object of type '%0' lifetime extended by local variable is captured by an asynchronously-executed block": {
+    "msgstr": "与生命周期被局部变量延长的 %0 类型临时对象关联的栈内存地址被异步执行的块捕获"
+   },
+   "Address of stack memory associated with temporary object of type '%0' lifetime extended by local variable '%1' is captured by an asynchronously-executed block": {
+    "msgstr": "与生命周期被局部变量 '%1' 延长的 %0 类型临时对象关联的栈内存地址被异步执行的块捕获"
+   },
+   "Address of stack memory associated with temporary object of type '%0' is captured by an asynchronously-executed block": {
+    "msgstr": "与 %0 类型临时对象关联的栈内存地址被异步执行的块捕获"
+   }
+  },
+  "clang-analyzer-alpha.core.StdVariant": {
+   "std::variant %0 held a '%1', not a '%2'": {
+    "msgstr": "std::variant %0 中保存的是 '%1'，而不是 '%2'"
+   },
+   "std::variant %0 held a '%1', not an '%2'": {
+    "msgstr": "std::variant %0 中保存的是 '%1'，而不是 '%2'"
+   },
+   "std::variant %0 held an '%1', not a '%2'": {
+    "msgstr": "std::variant %0 中保存的是 '%1'，而不是 '%2'"
+   },
+   "std::variant %0 held an '%1', not an '%2'": {
+    "msgstr": "std::variant %0 中保存的是 '%1'，而不是 '%2'"
+   }
+  },
+  "clang-analyzer-alpha.core.StoreToImmutable": {
+   "Trying to write to immutable memory": {
+    "msgstr": "试图写入不可变内存"
+   },
+   "Trying to write to immutable memory in global read-only storage": {
+    "msgstr": "试图写入全局只读存储中的不可变内存"
+   },
+   "Enclosing memory region is declared as immutable here": {
+    "msgstr": "外围内存区域在这里被声明为不可变",
+    "note": true
+   },
+   "Memory region is declared as immutable here": {
+    "msgstr": "内存区域在这里被声明为不可变",
+    "note": true
+   }
+  },
+  "clang-analyzer-alpha.core.TestAfterDivZero": {
+   "Value being compared against zero has already been used for division": {
+    "msgstr": "与零进行比较的值此前已被用于除法运算"
+   },
+   "Division with compared value made here": {
+    "msgstr": "此处已使用该被比较的值进行了除法运算",
+    "note": true
+   }
+  },
+  "clang-analyzer-alpha.cplusplus.DeleteWithNonVirtualDtor": {
+   "Destruction of a polymorphic object with no virtual destructor": {
+    "msgstr": "销毁没有虚析构函数的多态对象"
+   },
+   "Casting from '%0' to '%1' here": {
+    "msgstr": "此处从 '%0' 转换为 '%1'",
+    "note": true
+   }
+  },
+  "clang-analyzer-alpha.cplusplus.InvalidatedIterator": {
+   "Invalidated iterator accessed.": {
+    "msgstr": "访问了已失效的迭代器。"
+   }
+  },
+  "clang-analyzer-alpha.cplusplus.IteratorRange": {
+   "Past-the-end iterator dereferenced.": {
+    "msgstr": "解引用了尾后迭代器。"
+   },
+   "Iterator decremented ahead of its valid range.": {
+    "msgstr": "迭代器递减超出了其有效范围之前。"
+   },
+   "Iterator incremented behind the past-the-end iterator.": {
+    "msgstr": "迭代器递增超出了尾后迭代器。"
+   }
+  },
+  "clang-analyzer-alpha.cplusplus.MismatchedIterator": {
+   "Container accessed using foreign iterator argument.": {
+    "msgstr": "使用来自其他容器的迭代器实参访问了容器。"
+   },
+   "Iterators of different containers used where the same container is expected.": {
+    "msgstr": "在期望同一容器迭代器处使用了不同容器的迭代器。"
+   }
+  },
+  "clang-analyzer-alpha.cplusplus.SmartPtr": {
+   "Dereference of null smart pointer %0": {
+    "msgstr": "解引用了空智能指针 %0"
+   },
+   "Default constructed smart pointer%0 is null": {
+    "msgstr": "默认构造的智能指针%0 为空",
+    "note": true
+   },
+   "Smart pointer%0 is constructed using a null value": {
+    "msgstr": "智能指针%0 使用空值构造",
+    "note": true
+   },
+   "Smart pointer%0 is constructed": {
+    "msgstr": "智能指针%0 已构造",
+    "note": true
+   },
+   "Smart pointer%0 reset using a null value": {
+    "msgstr": "智能指针%0 使用空值进行了 reset",
+    "note": true
+   },
+   "Smart pointer%0 is released and set to null": {
+    "msgstr": "智能指针%0 已释放并设为空",
+    "note": true
+   },
+   "Smart pointer%0 is assigned to null": {
+    "msgstr": "智能指针%0 被赋值为空",
+    "note": true
+   },
+   "Smart pointer%0 is null after being moved to%1": {
+    "msgstr": "智能指针%0 移动到%1 后变为空",
+    "note": true
+   },
+   "A null pointer value is moved to%0": {
+    "msgstr": "空指针值被移动到了%0",
+    "note": true
+   },
+   "Smart pointer%0 is null after; previous value moved to%1": {
+    "msgstr": "智能指针%0 随后变为空；原值已移动到%1",
+    "note": true
+   }
+  },
+  "clang-analyzer-alpha.cplusplus.UseAfterLifetimeEnd": {
+   "Returning value bound to '%0' that will go out of scope": {
+    "msgstr": "返回了绑定到即将超出作用域的 '%0' 的值"
+   }
+  },
+  "clang-analyzer-alpha.deadcode.UnreachableCode": {
+   "This statement is never executed": {
+    "msgstr": "这条语句永远不会被执行"
+   }
+  },
+  "clang-analyzer-alpha.llvm.Conventions": {
+   "StringRef should not be bound to temporary std::string that it outlives": {
+    "msgstr": "StringRef 不应绑定到生命周期比它更短的临时 std::string"
+   },
+   "AST class '%0' has a field '%1' that allocates heap memory (type %2)": {
+    "msgstr": "AST 类 '%0' 的字段 '%1'（类型 %2）会分配堆内存"
+   },
+   "AST class '%0' has a field '%1' that allocates heap memory via the following chain: %2 (type %3)": {
+    "msgstr": "AST 类 '%0' 的字段 '%1' 通过以下链条分配堆内存：%2（类型 %3）"
+   }
+  },
+  "clang-analyzer-alpha.osx.cocoa.DirectIvarAssignment": {
+   "Direct assignment to an instance variable backing a property; use the setter instead": {
+    "msgstr": "直接对支撑属性的实例变量赋值；请改用 setter"
+   }
+  },
+  "clang-analyzer-alpha.osx.cocoa.InstanceVariableInvalidation": {
+   "Property %0 needs to be invalidated or set to nil": {
+    "msgstr": "属性 %0 需要被失效或置为 nil"
+   },
+   "Instance variable %0 needs to be invalidated or set to nil": {
+    "msgstr": "实例变量 %0 需要被失效或置为 nil"
+   }
+  },
+  "clang-analyzer-alpha.osx.cocoa.MissingInvalidationMethod": {
+   "Property %0 needs to be invalidated; no invalidation method is declared for %1": {
+    "msgstr": "属性 %0 需要被失效；未为 %1 声明失效方法"
+   },
+   "Property %0 needs to be invalidated; no invalidation method is defined in the @implementation for %1": {
+    "msgstr": "属性 %0 需要被失效；在 %1 的 @implementation 中未定义失效方法"
+   },
+   "Instance variable %0 needs to be invalidated; no invalidation method is declared for %1": {
+    "msgstr": "实例变量 %0 需要被失效；未为 %1 声明失效方法"
+   },
+   "Instance variable %0 needs to be invalidated; no invalidation method is defined in the @implementation for %1": {
+    "msgstr": "实例变量 %0 需要被失效；在 %1 的 @implementation 中未定义失效方法"
+   }
+  },
+  "clang-analyzer-alpha.osx.cocoa.localizability.PluralMisuseChecker": {
+   "Plural cases are not supported across all languages. Use a .stringsdict file instead": {
+    "msgstr": "并非所有语言都支持此类复数形式处理。请改用 .stringsdict 文件"
+   }
+  },
+  "clang-analyzer-alpha.security.ReturnPtrRange": {
+   "Returned pointer value points outside the original object (potential buffer overflow)": {
+    "msgstr": "返回的指针值指向了原始对象之外（存在潜在的缓冲溢出）"
+   },
+   "Original object declared here": {
+    "msgstr": "原始对象在这里声明",
+    "note": true
+   },
+   "Original object '%0' is an array of %1 '%2' objects, returned pointer points at index %3": {
+    "msgstr": "原始对象 '%0' 是包含 %1 个 '%2' 对象的数组，返回的指针指向索引 %3",
+    "note": true
+   },
+   "Original object '%0' is an array of %1 '%2' objects": {
+    "msgstr": "原始对象 '%0' 是包含 %1 个 '%2' 对象的数组",
+    "note": true
+   },
+   "Original object is an array of %0 '%1' objects, returned pointer points at index %2": {
+    "msgstr": "原始对象是包含 %0 个 '%1' 对象的数组，返回的指针指向索引 %2",
+    "note": true
+   },
+   "Original object is an array of %0 '%1' objects": {
+    "msgstr": "原始对象是包含 %0 个 '%1' 对象的数组",
+    "note": true
+   }
+  },
+  "clang-analyzer-alpha.unix.SimpleStream": {
+   "Closing a previously closed file stream": {
+    "msgstr": "正在关闭此前已经关闭的文件流"
+   },
+   "Opened file is never closed; potential resource leak": {
+    "msgstr": "已打开的文件从未关闭；可能存在资源泄漏"
+   }
+  },
+  "clang-analyzer-alpha.unix.cstring.BufferOverlap": {
+   "Arguments must not be overlapping buffers": {
+    "msgstr": "实参不得为相互重叠的缓冲"
+   }
+  },
+  "clang-analyzer-alpha.unix.cstring.OutOfBounds": {
+   "Out-of-bound array access": {
+    "msgstr": "数组越界访问"
+   },
+   "Memory copy function overflows the destination buffer": {
+    "msgstr": "内存复制函数溢出了目标缓冲"
+   },
+   "Memory copy function accesses out-of-bound array element": {
+    "msgstr": "内存复制函数访问了越界数组元素"
+   },
+   "Memory comparison function overflows the destination buffer": {
+    "msgstr": "内存比较函数溢出了目标缓冲"
+   },
+   "Memory comparison function accesses out-of-bound array element": {
+    "msgstr": "内存比较函数访问了越界数组元素"
+   },
+   "String length function overflows the destination buffer": {
+    "msgstr": "字符串长度函数溢出了目标缓冲"
+   },
+   "String length function accesses out-of-bound array element": {
+    "msgstr": "字符串长度函数访问了越界数组元素"
+   },
+   "String copy function overflows the destination buffer": {
+    "msgstr": "字符串复制函数溢出了目标缓冲"
+   },
+   "String copy function accesses out-of-bound array element": {
+    "msgstr": "字符串复制函数访问了越界数组元素"
+   },
+   "String concatenation function overflows the destination buffer": {
+    "msgstr": "字符串拼接函数溢出了目标缓冲"
+   },
+   "String concatenation function accesses out-of-bound array element": {
+    "msgstr": "字符串拼接函数访问了越界数组元素"
+   },
+   "Locale transformation function overflows the destination buffer": {
+    "msgstr": "区域设置转换函数溢出了目标缓冲"
+   },
+   "Locale transformation function accesses out-of-bound array element": {
+    "msgstr": "区域设置转换函数访问了越界数组元素"
+   },
+   "String comparison function overflows the destination buffer": {
+    "msgstr": "字符串比较函数溢出了目标缓冲"
+   },
+   "String comparison function accesses out-of-bound array element": {
+    "msgstr": "字符串比较函数访问了越界数组元素"
+   },
+   "strsep() overflows the destination buffer": {
+    "msgstr": "strsep() 溢出了目标缓冲"
+   },
+   "strsep() accesses out-of-bound array element": {
+    "msgstr": "strsep() 访问了越界数组元素"
+   },
+   "Memory set function overflows the destination buffer": {
+    "msgstr": "内存设置函数溢出了目标缓冲"
+   },
+   "Memory set function accesses out-of-bound array element": {
+    "msgstr": "内存设置函数访问了越界数组元素"
+   },
+   "Memory clearance function overflows the destination buffer": {
+    "msgstr": "内存清零函数溢出了目标缓冲"
+   },
+   "Memory clearance function accesses out-of-bound array element": {
+    "msgstr": "内存清零函数访问了越界数组元素"
+   },
+   "'sprintf' overflows the destination buffer": {
+    "msgstr": "'sprintf' 溢出了目标缓冲"
+   },
+   "'sprintf' accesses out-of-bound array element": {
+    "msgstr": "'sprintf' 访问了越界数组元素"
+   },
+   "'snprintf' overflows the destination buffer": {
+    "msgstr": "'snprintf' 溢出了目标缓冲"
+   },
+   "'snprintf' accesses out-of-bound array element": {
+    "msgstr": "'snprintf' 访问了越界数组元素"
+   }
+  },
+  "clang-analyzer-alpha.webkit.ForwardDeclChecker": {
+   "Member variable '%0' uses a forward declared type '%1'": {
+    "msgstr": "成员变量 '%0' 使用了前向声明的类型 '%1'"
+   },
+   "Local variable '%0' uses a forward declared type '%1'": {
+    "msgstr": "局部变量 '%0' 使用了前向声明的类型 '%1'"
+   },
+   "Call argument for parameter '%0' uses a forward declared type '%1'": {
+    "msgstr": "形参 '%0' 的调用实参使用了前向声明的类型 '%1'"
+   },
+   "Call argument uses a forward declared type '%0'": {
+    "msgstr": "调用实参使用了前向声明的类型 '%0'"
+   },
+   "Receiver uses a forward declared type '%0'": {
+    "msgstr": "接收者使用了前向声明的类型 '%0'"
+   }
+  },
+  "clang-analyzer-alpha.webkit.MemoryUnsafeCastChecker": {
+   "Unsafe cast from base type '%0' to derived type '%1'": {
+    "msgstr": "从基类型 '%0' 到派生类型 '%1' 的不安全转换"
+   },
+   "Unsafe cast from type '%0' to an unrelated type '%1'": {
+    "msgstr": "从类型 '%0' 到无关类型 '%1' 的不安全转换"
+   }
+  },
+  "clang-analyzer-alpha.webkit.NoDeleteChecker": {
+   "A function '%0' has [[clang::annotate_type(\"webkit.nodelete\")]] but it contains a parameter '%1' which could destruct an object.": {
+    "msgstr": "函数 '%0' 带有 [[clang::annotate_type(\"webkit.nodelete\")]]，但它包含一个可能会析构对象的形参 '%1'。"
+   },
+   "A function '%0' has [[clang::annotate_type(\"webkit.nodelete\")]] but it contains code that could destruct an object.": {
+    "msgstr": "函数 '%0' 带有 [[clang::annotate_type(\"webkit.nodelete\")]]，但它包含可能会析构对象的代码。"
+   }
+  },
+  "clang-analyzer-alpha.webkit.NoUncheckedPtrMemberChecker": {
+   "Member variable is a raw-pointer/reference to CheckedPtr-capable type": {
+    "msgstr": "成员变量是指向支持 CheckedPtr 的类型的原始指针或引用"
+   },
+   "Property '%0' (of '%1') is a raw pointer to CheckedPtr-capable type '%2'": {
+    "msgstr": "（'%1' 的）属性 '%0' 是指向支持 CheckedPtr 的类型 '%2' 的原始指针"
+   },
+   "Property '%0' (of '%1') is a reference to CheckedPtr-capable type '%2'": {
+    "msgstr": "（'%1' 的）属性 '%0' 是指向支持 CheckedPtr 的类型 '%2' 的引用"
+   },
+   "Property '%0' (of '%1') contains a raw pointer to CheckedPtr-capable type '%2'": {
+    "msgstr": "（'%1' 的）属性 '%0' 包含指向支持 CheckedPtr 的类型 '%2' 的原始指针"
+   },
+   "Property '%0' (of '%1') contains a reference to CheckedPtr-capable type '%2'": {
+    "msgstr": "（'%1' 的）属性 '%0' 包含指向支持 CheckedPtr 的类型 '%2' 的引用"
+   },
+   "Instance variable '%0' (of '%1') is a raw pointer to CheckedPtr-capable type '%2'": {
+    "msgstr": "（'%1' 的）实例变量 '%0' 是指向支持 CheckedPtr 的类型 '%2' 的原始指针"
+   },
+   "Instance variable '%0' (of '%1') is a reference to CheckedPtr-capable type '%2'": {
+    "msgstr": "（'%1' 的）实例变量 '%0' 是指向支持 CheckedPtr 的类型 '%2' 的引用"
+   },
+   "Instance variable '%0' (of '%1') contains a raw pointer to CheckedPtr-capable type '%2'": {
+    "msgstr": "（'%1' 的）实例变量 '%0' 包含指向支持 CheckedPtr 的类型 '%2' 的原始指针"
+   },
+   "Instance variable '%0' (of '%1') contains a reference to CheckedPtr-capable type '%2'": {
+    "msgstr": "（'%1' 的）实例变量 '%0' 包含指向支持 CheckedPtr 的类型 '%2' 的引用"
+   },
+   "Member variable '%0' (of '%1') is a raw pointer to CheckedPtr-capable type '%2'": {
+    "msgstr": "（'%1' 的）成员变量 '%0' 是指向支持 CheckedPtr 的类型 '%2' 的原始指针"
+   },
+   "Member variable '%0' (of '%1') is a reference to CheckedPtr-capable type '%2'": {
+    "msgstr": "（'%1' 的）成员变量 '%0' 是指向支持 CheckedPtr 的类型 '%2' 的引用"
+   },
+   "Member variable '%0' (of '%1') contains a raw pointer to CheckedPtr-capable type '%2'": {
+    "msgstr": "（'%1' 的）成员变量 '%0' 包含指向支持 CheckedPtr 的类型 '%2' 的原始指针"
+   },
+   "Member variable '%0' (of '%1') contains a reference to CheckedPtr-capable type '%2'": {
+    "msgstr": "（'%1' 的）成员变量 '%0' 包含指向支持 CheckedPtr 的类型 '%2' 的引用"
+   }
+  },
+  "clang-analyzer-alpha.webkit.NoUnretainedMemberChecker": {
+   "Member variable is a raw-pointer/reference to RetainPtr-capable type": {
+    "msgstr": "成员变量是指向支持 RetainPtr 的类型的原始指针或引用"
+   },
+   "Property '%0' (of '%1') is a raw pointer to RetainPtr-capable type '%2'": {
+    "msgstr": "（'%1' 的）属性 '%0' 是指向支持 RetainPtr 的类型 '%2' 的原始指针"
+   },
+   "Property '%0' (of '%1') is a reference to RetainPtr-capable type '%2'": {
+    "msgstr": "（'%1' 的）属性 '%0' 是指向支持 RetainPtr 的类型 '%2' 的引用"
+   },
+   "Property '%0' (of '%1') contains a raw pointer to RetainPtr-capable type '%2'": {
+    "msgstr": "（'%1' 的）属性 '%0' 包含指向支持 RetainPtr 的类型 '%2' 的原始指针"
+   },
+   "Property '%0' (of '%1') contains a reference to RetainPtr-capable type '%2'": {
+    "msgstr": "（'%1' 的）属性 '%0' 包含指向支持 RetainPtr 的类型 '%2' 的引用"
+   },
+   "Instance variable '%0' (of '%1') is a raw pointer to RetainPtr-capable type '%2'": {
+    "msgstr": "（'%1' 的）实例变量 '%0' 是指向支持 RetainPtr 的类型 '%2' 的原始指针"
+   },
+   "Instance variable '%0' (of '%1') is a reference to RetainPtr-capable type '%2'": {
+    "msgstr": "（'%1' 的）实例变量 '%0' 是指向支持 RetainPtr 的类型 '%2' 的引用"
+   },
+   "Instance variable '%0' (of '%1') contains a raw pointer to RetainPtr-capable type '%2'": {
+    "msgstr": "（'%1' 的）实例变量 '%0' 包含指向支持 RetainPtr 的类型 '%2' 的原始指针"
+   },
+   "Instance variable '%0' (of '%1') contains a reference to RetainPtr-capable type '%2'": {
+    "msgstr": "（'%1' 的）实例变量 '%0' 包含指向支持 RetainPtr 的类型 '%2' 的引用"
+   },
+   "Member variable '%0' (of '%1') is a raw pointer to RetainPtr-capable type '%2'": {
+    "msgstr": "（'%1' 的）成员变量 '%0' 是指向支持 RetainPtr 的类型 '%2' 的原始指针"
+   },
+   "Member variable '%0' (of '%1') is a reference to RetainPtr-capable type '%2'": {
+    "msgstr": "（'%1' 的）成员变量 '%0' 是指向支持 RetainPtr 的类型 '%2' 的引用"
+   },
+   "Member variable '%0' (of '%1') contains a raw pointer to RetainPtr-capable type '%2'": {
+    "msgstr": "（'%1' 的）成员变量 '%0' 包含指向支持 RetainPtr 的类型 '%2' 的原始指针"
+   },
+   "Member variable '%0' (of '%1') contains a reference to RetainPtr-capable type '%2'": {
+    "msgstr": "（'%1' 的）成员变量 '%0' 包含指向支持 RetainPtr 的类型 '%2' 的引用"
+   }
+  },
+  "clang-analyzer-alpha.webkit.RetainPtrCtorAdoptChecker": {
+   "Incorrect use of %0. The argument is +0 and results in an use-after-free.": {
+    "msgstr": "%0 使用不当。该实参引用计数为 +0，会导致释放后使用。"
+   },
+   "Incorrect use of %0. The argument is +0 and results in an use-after-free when ARC is disabled.": {
+    "msgstr": "%0 使用不当。在禁用 ARC 时，该实参引用计数为 +0，会导致释放后使用。"
+   },
+   "Incorrect use of %0. The argument is +1 and results in a memory leak.": {
+    "msgstr": "%0 使用不当。该实参引用计数为 +1，会导致内存泄漏。"
+   },
+   "Incorrect use of %0. The argument is +1 and results in a memory leak when ARC is disabled.": {
+    "msgstr": "%0 使用不当。在禁用 ARC 时，该实参引用计数为 +1，会导致内存泄漏。"
+   },
+   "The return value is +1 and results in a memory leak.": {
+    "msgstr": "返回值引用计数为 +1，会导致内存泄漏。"
+   }
+  },
+  "clang-analyzer-alpha.webkit.UncheckedCallArgsChecker": {
+   "Function argument (parameter '%0' to '%1') is a raw pointer to CheckedPtr-capable type %2": {
+    "msgstr": "函数实参（对应 '%1' 的形参 '%0'）是指向支持 CheckedPtr 的类型 %2 的原始指针"
+   },
+   "Function argument (parameter '%0') is a raw pointer to CheckedPtr-capable type %1": {
+    "msgstr": "函数实参（形参 '%0'）是指向支持 CheckedPtr 的类型 %1 的原始指针"
+   },
+   "Function argument (to '%0') is a raw pointer to CheckedPtr-capable type %1": {
+    "msgstr": "函数实参（传给 '%0'）是指向支持 CheckedPtr 的类型 %1 的原始指针"
+   },
+   "Function argument is a raw pointer to CheckedPtr-capable type %0": {
+    "msgstr": "函数实参是指向支持 CheckedPtr 的类型 %0 的原始指针"
+   },
+   "Function argument '%0' (parameter '%1' to '%2') is a raw pointer to CheckedPtr-capable type %3": {
+    "msgstr": "函数实参 '%0'（对应 '%2' 的形参 '%1'）是指向支持 CheckedPtr 的类型 %3 的原始指针"
+   },
+   "Function argument '%0' (parameter '%1') is a raw pointer to CheckedPtr-capable type %2": {
+    "msgstr": "函数实参 '%0'（形参 '%1'）是指向支持 CheckedPtr 的类型 %2 的原始指针"
+   },
+   "Function argument '%0' (to '%1') is a raw pointer to CheckedPtr-capable type %2": {
+    "msgstr": "函数实参 '%0'（传给 '%1'）是指向支持 CheckedPtr 的类型 %2 的原始指针"
+   },
+   "Function argument '%0' is a raw pointer to CheckedPtr-capable type %1": {
+    "msgstr": "函数实参 '%0'是指向支持 CheckedPtr 的类型 %1 的原始指针"
+   },
+   "Function argument (parameter '%0' to '%1') is a reference to CheckedPtr-capable type %2": {
+    "msgstr": "函数实参（对应 '%1' 的形参 '%0'）是指向支持 CheckedPtr 的类型 %2 的引用"
+   },
+   "Function argument (parameter '%0') is a reference to CheckedPtr-capable type %1": {
+    "msgstr": "函数实参（形参 '%0'）是指向支持 CheckedPtr 的类型 %1 的引用"
+   },
+   "Function argument (to '%0') is a reference to CheckedPtr-capable type %1": {
+    "msgstr": "函数实参（传给 '%0'）是指向支持 CheckedPtr 的类型 %1 的引用"
+   },
+   "Function argument is a reference to CheckedPtr-capable type %0": {
+    "msgstr": "函数实参是指向支持 CheckedPtr 的类型 %0 的引用"
+   },
+   "Function argument '%0' (parameter '%1' to '%2') is a reference to CheckedPtr-capable type %3": {
+    "msgstr": "函数实参 '%0'（对应 '%2' 的形参 '%1'）是指向支持 CheckedPtr 的类型 %3 的引用"
+   },
+   "Function argument '%0' (parameter '%1') is a reference to CheckedPtr-capable type %2": {
+    "msgstr": "函数实参 '%0'（形参 '%1'）是指向支持 CheckedPtr 的类型 %2 的引用"
+   },
+   "Function argument '%0' (to '%1') is a reference to CheckedPtr-capable type %2": {
+    "msgstr": "函数实参 '%0'（传给 '%1'）是指向支持 CheckedPtr 的类型 %2 的引用"
+   },
+   "Function argument '%0' is a reference to CheckedPtr-capable type %1": {
+    "msgstr": "函数实参 '%0'是指向支持 CheckedPtr 的类型 %1 的引用"
+   },
+   "Function argument (parameter 'this'to '%0')) is a raw pointer to CheckedPtr-capable type %1": {
+    "msgstr": "函数实参（形参 'this'，传给 '%0'）是指向支持 CheckedPtr 的类型 %1 的原始指针"
+   },
+   "Function argument (parameter 'this') is a raw pointer to CheckedPtr-capable type %0": {
+    "msgstr": "函数实参（形参 'this'）是指向支持 CheckedPtr 的类型 %0 的原始指针"
+   },
+   "Function argument '%0' (parameter 'this'to '%1')) is a raw pointer to CheckedPtr-capable type %2": {
+    "msgstr": "函数实参 '%0'（形参 'this'，传给 '%1'）是指向支持 CheckedPtr 的类型 %2 的原始指针"
+   },
+   "Function argument '%0' (parameter 'this') is a raw pointer to CheckedPtr-capable type %1": {
+    "msgstr": "函数实参 '%0'（形参 'this'）是指向支持 CheckedPtr 的类型 %1 的原始指针"
+   },
+   "Receiver (to '%0') is a raw pointer to CheckedPtr-capable type %1": {
+    "msgstr": "接收者（传给 '%0'）是指向支持 CheckedPtr 的类型 %1 的原始指针"
+   },
+   "Receiver is a raw pointer to CheckedPtr-capable type %0": {
+    "msgstr": "接收者是指向支持 CheckedPtr 的类型 %0 的原始指针"
+   },
+   "Receiver '%0' (to '%1') is a raw pointer to CheckedPtr-capable type %2": {
+    "msgstr": "接收者 '%0'（传给 '%1'）是指向支持 CheckedPtr 的类型 %2 的原始指针"
+   },
+   "Receiver '%0' is a raw pointer to CheckedPtr-capable type %1": {
+    "msgstr": "接收者 '%0'是指向支持 CheckedPtr 的类型 %1 的原始指针"
+   }
+  },
+  "clang-analyzer-alpha.webkit.UncountedCallArgsChecker": {
+   "Function argument (parameter '%0' to '%1') is a raw pointer to RefPtr-capable type %2": {
+    "msgstr": "函数实参（对应 '%1' 的形参 '%0'）是指向支持 RefPtr 的类型 %2 的原始指针"
+   },
+   "Function argument (parameter '%0') is a raw pointer to RefPtr-capable type %1": {
+    "msgstr": "函数实参（形参 '%0'）是指向支持 RefPtr 的类型 %1 的原始指针"
+   },
+   "Function argument (to '%0') is a raw pointer to RefPtr-capable type %1": {
+    "msgstr": "函数实参（传给 '%0'）是指向支持 RefPtr 的类型 %1 的原始指针"
+   },
+   "Function argument is a raw pointer to RefPtr-capable type %0": {
+    "msgstr": "函数实参是指向支持 RefPtr 的类型 %0 的原始指针"
+   },
+   "Function argument '%0' (parameter '%1' to '%2') is a raw pointer to RefPtr-capable type %3": {
+    "msgstr": "函数实参 '%0'（对应 '%2' 的形参 '%1'）是指向支持 RefPtr 的类型 %3 的原始指针"
+   },
+   "Function argument '%0' (parameter '%1') is a raw pointer to RefPtr-capable type %2": {
+    "msgstr": "函数实参 '%0'（形参 '%1'）是指向支持 RefPtr 的类型 %2 的原始指针"
+   },
+   "Function argument '%0' (to '%1') is a raw pointer to RefPtr-capable type %2": {
+    "msgstr": "函数实参 '%0'（传给 '%1'）是指向支持 RefPtr 的类型 %2 的原始指针"
+   },
+   "Function argument '%0' is a raw pointer to RefPtr-capable type %1": {
+    "msgstr": "函数实参 '%0'是指向支持 RefPtr 的类型 %1 的原始指针"
+   },
+   "Function argument (parameter '%0' to '%1') is a reference to RefPtr-capable type %2": {
+    "msgstr": "函数实参（对应 '%1' 的形参 '%0'）是指向支持 RefPtr 的类型 %2 的引用"
+   },
+   "Function argument (parameter '%0') is a reference to RefPtr-capable type %1": {
+    "msgstr": "函数实参（形参 '%0'）是指向支持 RefPtr 的类型 %1 的引用"
+   },
+   "Function argument (to '%0') is a reference to RefPtr-capable type %1": {
+    "msgstr": "函数实参（传给 '%0'）是指向支持 RefPtr 的类型 %1 的引用"
+   },
+   "Function argument is a reference to RefPtr-capable type %0": {
+    "msgstr": "函数实参是指向支持 RefPtr 的类型 %0 的引用"
+   },
+   "Function argument '%0' (parameter '%1' to '%2') is a reference to RefPtr-capable type %3": {
+    "msgstr": "函数实参 '%0'（对应 '%2' 的形参 '%1'）是指向支持 RefPtr 的类型 %3 的引用"
+   },
+   "Function argument '%0' (parameter '%1') is a reference to RefPtr-capable type %2": {
+    "msgstr": "函数实参 '%0'（形参 '%1'）是指向支持 RefPtr 的类型 %2 的引用"
+   },
+   "Function argument '%0' (to '%1') is a reference to RefPtr-capable type %2": {
+    "msgstr": "函数实参 '%0'（传给 '%1'）是指向支持 RefPtr 的类型 %2 的引用"
+   },
+   "Function argument '%0' is a reference to RefPtr-capable type %1": {
+    "msgstr": "函数实参 '%0'是指向支持 RefPtr 的类型 %1 的引用"
+   },
+   "Function argument (parameter 'this'to '%0')) is a raw pointer to RefPtr-capable type %1": {
+    "msgstr": "函数实参（形参 'this'，传给 '%0'）是指向支持 RefPtr 的类型 %1 的原始指针"
+   },
+   "Function argument (parameter 'this') is a raw pointer to RefPtr-capable type %0": {
+    "msgstr": "函数实参（形参 'this'）是指向支持 RefPtr 的类型 %0 的原始指针"
+   },
+   "Function argument '%0' (parameter 'this'to '%1')) is a raw pointer to RefPtr-capable type %2": {
+    "msgstr": "函数实参 '%0'（形参 'this'，传给 '%1'）是指向支持 RefPtr 的类型 %2 的原始指针"
+   },
+   "Function argument '%0' (parameter 'this') is a raw pointer to RefPtr-capable type %1": {
+    "msgstr": "函数实参 '%0'（形参 'this'）是指向支持 RefPtr 的类型 %1 的原始指针"
+   },
+   "Receiver (to '%0') is a raw pointer to RefPtr-capable type %1": {
+    "msgstr": "接收者（传给 '%0'）是指向支持 RefPtr 的类型 %1 的原始指针"
+   },
+   "Receiver is a raw pointer to RefPtr-capable type %0": {
+    "msgstr": "接收者是指向支持 RefPtr 的类型 %0 的原始指针"
+   },
+   "Receiver '%0' (to '%1') is a raw pointer to RefPtr-capable type %2": {
+    "msgstr": "接收者 '%0'（传给 '%1'）是指向支持 RefPtr 的类型 %2 的原始指针"
+   },
+   "Receiver '%0' is a raw pointer to RefPtr-capable type %1": {
+    "msgstr": "接收者 '%0'是指向支持 RefPtr 的类型 %1 的原始指针"
+   }
+  },
+  "clang-analyzer-alpha.webkit.UnretainedCallArgsChecker": {
+   "Function argument (parameter '%0' to '%1') is a raw pointer to RetainPtr-capable type %2": {
+    "msgstr": "函数实参（对应 '%1' 的形参 '%0'）是指向支持 RetainPtr 的类型 %2 的原始指针"
+   },
+   "Function argument (parameter '%0') is a raw pointer to RetainPtr-capable type %1": {
+    "msgstr": "函数实参（形参 '%0'）是指向支持 RetainPtr 的类型 %1 的原始指针"
+   },
+   "Function argument (to '%0') is a raw pointer to RetainPtr-capable type %1": {
+    "msgstr": "函数实参（传给 '%0'）是指向支持 RetainPtr 的类型 %1 的原始指针"
+   },
+   "Function argument is a raw pointer to RetainPtr-capable type %0": {
+    "msgstr": "函数实参是指向支持 RetainPtr 的类型 %0 的原始指针"
+   },
+   "Function argument '%0' (parameter '%1' to '%2') is a raw pointer to RetainPtr-capable type %3": {
+    "msgstr": "函数实参 '%0'（对应 '%2' 的形参 '%1'）是指向支持 RetainPtr 的类型 %3 的原始指针"
+   },
+   "Function argument '%0' (parameter '%1') is a raw pointer to RetainPtr-capable type %2": {
+    "msgstr": "函数实参 '%0'（形参 '%1'）是指向支持 RetainPtr 的类型 %2 的原始指针"
+   },
+   "Function argument '%0' (to '%1') is a raw pointer to RetainPtr-capable type %2": {
+    "msgstr": "函数实参 '%0'（传给 '%1'）是指向支持 RetainPtr 的类型 %2 的原始指针"
+   },
+   "Function argument '%0' is a raw pointer to RetainPtr-capable type %1": {
+    "msgstr": "函数实参 '%0'是指向支持 RetainPtr 的类型 %1 的原始指针"
+   },
+   "Function argument (parameter '%0' to '%1') is a reference to RetainPtr-capable type %2": {
+    "msgstr": "函数实参（对应 '%1' 的形参 '%0'）是指向支持 RetainPtr 的类型 %2 的引用"
+   },
+   "Function argument (parameter '%0') is a reference to RetainPtr-capable type %1": {
+    "msgstr": "函数实参（形参 '%0'）是指向支持 RetainPtr 的类型 %1 的引用"
+   },
+   "Function argument (to '%0') is a reference to RetainPtr-capable type %1": {
+    "msgstr": "函数实参（传给 '%0'）是指向支持 RetainPtr 的类型 %1 的引用"
+   },
+   "Function argument is a reference to RetainPtr-capable type %0": {
+    "msgstr": "函数实参是指向支持 RetainPtr 的类型 %0 的引用"
+   },
+   "Function argument '%0' (parameter '%1' to '%2') is a reference to RetainPtr-capable type %3": {
+    "msgstr": "函数实参 '%0'（对应 '%2' 的形参 '%1'）是指向支持 RetainPtr 的类型 %3 的引用"
+   },
+   "Function argument '%0' (parameter '%1') is a reference to RetainPtr-capable type %2": {
+    "msgstr": "函数实参 '%0'（形参 '%1'）是指向支持 RetainPtr 的类型 %2 的引用"
+   },
+   "Function argument '%0' (to '%1') is a reference to RetainPtr-capable type %2": {
+    "msgstr": "函数实参 '%0'（传给 '%1'）是指向支持 RetainPtr 的类型 %2 的引用"
+   },
+   "Function argument '%0' is a reference to RetainPtr-capable type %1": {
+    "msgstr": "函数实参 '%0'是指向支持 RetainPtr 的类型 %1 的引用"
+   },
+   "Function argument (parameter 'this'to '%0')) is a raw pointer to RetainPtr-capable type %1": {
+    "msgstr": "函数实参（形参 'this'，传给 '%0'）是指向支持 RetainPtr 的类型 %1 的原始指针"
+   },
+   "Function argument (parameter 'this') is a raw pointer to RetainPtr-capable type %0": {
+    "msgstr": "函数实参（形参 'this'）是指向支持 RetainPtr 的类型 %0 的原始指针"
+   },
+   "Function argument '%0' (parameter 'this'to '%1')) is a raw pointer to RetainPtr-capable type %2": {
+    "msgstr": "函数实参 '%0'（形参 'this'，传给 '%1'）是指向支持 RetainPtr 的类型 %2 的原始指针"
+   },
+   "Function argument '%0' (parameter 'this') is a raw pointer to RetainPtr-capable type %1": {
+    "msgstr": "函数实参 '%0'（形参 'this'）是指向支持 RetainPtr 的类型 %1 的原始指针"
+   },
+   "Receiver (to '%0') is a raw pointer to RetainPtr-capable type %1": {
+    "msgstr": "接收者（传给 '%0'）是指向支持 RetainPtr 的类型 %1 的原始指针"
+   },
+   "Receiver is a raw pointer to RetainPtr-capable type %0": {
+    "msgstr": "接收者是指向支持 RetainPtr 的类型 %0 的原始指针"
+   },
+   "Receiver '%0' (to '%1') is a raw pointer to RetainPtr-capable type %2": {
+    "msgstr": "接收者 '%0'（传给 '%1'）是指向支持 RetainPtr 的类型 %2 的原始指针"
+   },
+   "Receiver '%0' is a raw pointer to RetainPtr-capable type %1": {
+    "msgstr": "接收者 '%0'是指向支持 RetainPtr 的类型 %1 的原始指针"
+   }
+  },
+  "clang-analyzer-alpha.webkit.UncheckedLambdaCapturesChecker": {
+   "Captured variable '%0' is a raw pointer to CheckedPtr-capable type '%1'": {
+    "msgstr": "显式捕获的变量 '%0' 是指向支持 CheckedPtr 类型 '%1' 的原始指针"
+   },
+   "Captured variable '%0' is a raw pointer to CheckedPtr-capable type": {
+    "msgstr": "显式捕获的变量 '%0' 是指向支持 CheckedPtr 类型的原始指针"
+   },
+   "Captured variable '%0' is a raw reference to CheckedPtr-capable type '%1'": {
+    "msgstr": "显式捕获的变量 '%0' 是指向支持 CheckedPtr 类型 '%1' 的原始引用"
+   },
+   "Captured variable '%0' is a raw reference to CheckedPtr-capable type": {
+    "msgstr": "显式捕获的变量 '%0' 是指向支持 CheckedPtr 类型的原始引用"
+   },
+   "Captured variable '%0' contains a raw pointer to CheckedPtr-capable type '%1'": {
+    "msgstr": "显式捕获的变量 '%0' 包含指向支持 CheckedPtr 类型 '%1' 的原始指针"
+   },
+   "Captured variable '%0' contains a raw pointer to CheckedPtr-capable type": {
+    "msgstr": "显式捕获的变量 '%0' 包含指向支持 CheckedPtr 类型的原始指针"
+   },
+   "Captured variable '%0' contains a raw reference to CheckedPtr-capable type '%1'": {
+    "msgstr": "显式捕获的变量 '%0' 包含指向支持 CheckedPtr 类型 '%1' 的原始引用"
+   },
+   "Captured variable '%0' contains a raw reference to CheckedPtr-capable type": {
+    "msgstr": "显式捕获的变量 '%0' 包含指向支持 CheckedPtr 类型的原始引用"
+   },
+   "Captured variable 'this' is a raw pointer to CheckedPtr-capable type '%0'": {
+    "msgstr": "显式捕获的变量 'this' 是指向支持 CheckedPtr 类型 '%0' 的原始指针"
+   },
+   "Captured variable 'this' is a raw pointer to CheckedPtr-capable type": {
+    "msgstr": "显式捕获的变量 'this' 是指向支持 CheckedPtr 类型的原始指针"
+   },
+   "Implicitly captured variable '%0' is a raw pointer to CheckedPtr-capable type '%1'": {
+    "msgstr": "隐式捕获的变量 '%0' 是指向支持 CheckedPtr 类型 '%1' 的原始指针"
+   },
+   "Implicitly captured variable '%0' is a raw pointer to CheckedPtr-capable type": {
+    "msgstr": "隐式捕获的变量 '%0' 是指向支持 CheckedPtr 类型的原始指针"
+   },
+   "Implicitly captured variable '%0' is a raw reference to CheckedPtr-capable type '%1'": {
+    "msgstr": "隐式捕获的变量 '%0' 是指向支持 CheckedPtr 类型 '%1' 的原始引用"
+   },
+   "Implicitly captured variable '%0' is a raw reference to CheckedPtr-capable type": {
+    "msgstr": "隐式捕获的变量 '%0' 是指向支持 CheckedPtr 类型的原始引用"
+   },
+   "Implicitly captured variable '%0' contains a raw pointer to CheckedPtr-capable type '%1'": {
+    "msgstr": "隐式捕获的变量 '%0' 包含指向支持 CheckedPtr 类型 '%1' 的原始指针"
+   },
+   "Implicitly captured variable '%0' contains a raw pointer to CheckedPtr-capable type": {
+    "msgstr": "隐式捕获的变量 '%0' 包含指向支持 CheckedPtr 类型的原始指针"
+   },
+   "Implicitly captured variable '%0' contains a raw reference to CheckedPtr-capable type '%1'": {
+    "msgstr": "隐式捕获的变量 '%0' 包含指向支持 CheckedPtr 类型 '%1' 的原始引用"
+   },
+   "Implicitly captured variable '%0' contains a raw reference to CheckedPtr-capable type": {
+    "msgstr": "隐式捕获的变量 '%0' 包含指向支持 CheckedPtr 类型的原始引用"
+   },
+   "Implicitly captured variable 'this' is a raw pointer to CheckedPtr-capable type '%0'": {
+    "msgstr": "隐式捕获的变量 'this' 是指向支持 CheckedPtr 类型 '%0' 的原始指针"
+   },
+   "Implicitly captured variable 'this' is a raw pointer to CheckedPtr-capable type": {
+    "msgstr": "隐式捕获的变量 'this' 是指向支持 CheckedPtr 类型的原始指针"
+   }
+  },
+  "clang-analyzer-alpha.webkit.UnretainedLambdaCapturesChecker": {
+   "Captured variable '%0' is a raw pointer to RetainPtr-capable type '%1'": {
+    "msgstr": "显式捕获的变量 '%0' 是指向支持 RetainPtr 类型 '%1' 的原始指针"
+   },
+   "Captured variable '%0' is a raw pointer to RetainPtr-capable type": {
+    "msgstr": "显式捕获的变量 '%0' 是指向支持 RetainPtr 类型的原始指针"
+   },
+   "Captured variable '%0' is a raw reference to RetainPtr-capable type '%1'": {
+    "msgstr": "显式捕获的变量 '%0' 是指向支持 RetainPtr 类型 '%1' 的原始引用"
+   },
+   "Captured variable '%0' is a raw reference to RetainPtr-capable type": {
+    "msgstr": "显式捕获的变量 '%0' 是指向支持 RetainPtr 类型的原始引用"
+   },
+   "Captured variable '%0' contains a raw pointer to RetainPtr-capable type '%1'": {
+    "msgstr": "显式捕获的变量 '%0' 包含指向支持 RetainPtr 类型 '%1' 的原始指针"
+   },
+   "Captured variable '%0' contains a raw pointer to RetainPtr-capable type": {
+    "msgstr": "显式捕获的变量 '%0' 包含指向支持 RetainPtr 类型的原始指针"
+   },
+   "Captured variable '%0' contains a raw reference to RetainPtr-capable type '%1'": {
+    "msgstr": "显式捕获的变量 '%0' 包含指向支持 RetainPtr 类型 '%1' 的原始引用"
+   },
+   "Captured variable '%0' contains a raw reference to RetainPtr-capable type": {
+    "msgstr": "显式捕获的变量 '%0' 包含指向支持 RetainPtr 类型的原始引用"
+   },
+   "Captured variable 'this' is a raw pointer to RetainPtr-capable type '%0'": {
+    "msgstr": "显式捕获的变量 'this' 是指向支持 RetainPtr 类型 '%0' 的原始指针"
+   },
+   "Captured variable 'this' is a raw pointer to RetainPtr-capable type": {
+    "msgstr": "显式捕获的变量 'this' 是指向支持 RetainPtr 类型的原始指针"
+   },
+   "Implicitly captured variable '%0' is a raw pointer to RetainPtr-capable type '%1'": {
+    "msgstr": "隐式捕获的变量 '%0' 是指向支持 RetainPtr 类型 '%1' 的原始指针"
+   },
+   "Implicitly captured variable '%0' is a raw pointer to RetainPtr-capable type": {
+    "msgstr": "隐式捕获的变量 '%0' 是指向支持 RetainPtr 类型的原始指针"
+   },
+   "Implicitly captured variable '%0' is a raw reference to RetainPtr-capable type '%1'": {
+    "msgstr": "隐式捕获的变量 '%0' 是指向支持 RetainPtr 类型 '%1' 的原始引用"
+   },
+   "Implicitly captured variable '%0' is a raw reference to RetainPtr-capable type": {
+    "msgstr": "隐式捕获的变量 '%0' 是指向支持 RetainPtr 类型的原始引用"
+   },
+   "Implicitly captured variable '%0' contains a raw pointer to RetainPtr-capable type '%1'": {
+    "msgstr": "隐式捕获的变量 '%0' 包含指向支持 RetainPtr 类型 '%1' 的原始指针"
+   },
+   "Implicitly captured variable '%0' contains a raw pointer to RetainPtr-capable type": {
+    "msgstr": "隐式捕获的变量 '%0' 包含指向支持 RetainPtr 类型的原始指针"
+   },
+   "Implicitly captured variable '%0' contains a raw reference to RetainPtr-capable type '%1'": {
+    "msgstr": "隐式捕获的变量 '%0' 包含指向支持 RetainPtr 类型 '%1' 的原始引用"
+   },
+   "Implicitly captured variable '%0' contains a raw reference to RetainPtr-capable type": {
+    "msgstr": "隐式捕获的变量 '%0' 包含指向支持 RetainPtr 类型的原始引用"
+   },
+   "Implicitly captured variable 'this' is a raw pointer to RetainPtr-capable type '%0'": {
+    "msgstr": "隐式捕获的变量 'this' 是指向支持 RetainPtr 类型 '%0' 的原始指针"
+   },
+   "Implicitly captured variable 'this' is a raw pointer to RetainPtr-capable type": {
+    "msgstr": "隐式捕获的变量 'this' 是指向支持 RetainPtr 类型的原始指针"
+   }
+  },
+  "clang-analyzer-alpha.webkit.UncheckedLocalVarsChecker": {
+   "Parameter '%0' is a CheckedPtr-capable type '%1'": {
+    "msgstr": "形参 '%0' 是支持 CheckedPtr 的类型 '%1'"
+   },
+   "Parameter '%0' is a raw pointer to CheckedPtr-capable type '%1'": {
+    "msgstr": "形参 '%0' 是指向支持 CheckedPtr 的类型 '%1' 的原始指针"
+   },
+   "Parameter '%0' is a raw reference to CheckedPtr-capable type '%1'": {
+    "msgstr": "形参 '%0' 是指向支持 CheckedPtr 的类型 '%1' 的原始引用"
+   },
+   "Local variable '%0' is a CheckedPtr-capable type '%1'": {
+    "msgstr": "局部变量 '%0' 是支持 CheckedPtr 的类型 '%1'"
+   },
+   "Local variable '%0' is a raw pointer to CheckedPtr-capable type '%1'": {
+    "msgstr": "局部变量 '%0' 是指向支持 CheckedPtr 的类型 '%1' 的原始指针"
+   },
+   "Local variable '%0' is a raw reference to CheckedPtr-capable type '%1'": {
+    "msgstr": "局部变量 '%0' 是指向支持 CheckedPtr 的类型 '%1' 的原始引用"
+   },
+   "Static local variable '%0' is a CheckedPtr-capable type '%1'": {
+    "msgstr": "静态局部变量 '%0' 是支持 CheckedPtr 的类型 '%1'"
+   },
+   "Static local variable '%0' is a raw pointer to CheckedPtr-capable type '%1'": {
+    "msgstr": "静态局部变量 '%0' 是指向支持 CheckedPtr 的类型 '%1' 的原始指针"
+   },
+   "Static local variable '%0' is a raw reference to CheckedPtr-capable type '%1'": {
+    "msgstr": "静态局部变量 '%0' 是指向支持 CheckedPtr 的类型 '%1' 的原始引用"
+   },
+   "Global variable '%0' is a CheckedPtr-capable type '%1'": {
+    "msgstr": "全局变量 '%0' 是支持 CheckedPtr 的类型 '%1'"
+   },
+   "Global variable '%0' is a raw pointer to CheckedPtr-capable type '%1'": {
+    "msgstr": "全局变量 '%0' 是指向支持 CheckedPtr 的类型 '%1' 的原始指针"
+   },
+   "Global variable '%0' is a raw reference to CheckedPtr-capable type '%1'": {
+    "msgstr": "全局变量 '%0' 是指向支持 CheckedPtr 的类型 '%1' 的原始引用"
+   },
+   "Variable '%0' is a CheckedPtr-capable type '%1'": {
+    "msgstr": "变量 '%0' 是支持 CheckedPtr 的类型 '%1'"
+   },
+   "Variable '%0' is a raw pointer to CheckedPtr-capable type '%1'": {
+    "msgstr": "变量 '%0' 是指向支持 CheckedPtr 的类型 '%1' 的原始指针"
+   },
+   "Variable '%0' is a raw reference to CheckedPtr-capable type '%1'": {
+    "msgstr": "变量 '%0' 是指向支持 CheckedPtr 的类型 '%1' 的原始引用"
+   }
+  },
+  "clang-analyzer-alpha.webkit.UncountedLocalVarsChecker": {
+   "Parameter '%0' is a RefPtr-capable type '%1'": {
+    "msgstr": "形参 '%0' 是支持 RefPtr 的类型 '%1'"
+   },
+   "Parameter '%0' is a raw pointer to RefPtr-capable type '%1'": {
+    "msgstr": "形参 '%0' 是指向支持 RefPtr 的类型 '%1' 的原始指针"
+   },
+   "Parameter '%0' is a raw reference to RefPtr-capable type '%1'": {
+    "msgstr": "形参 '%0' 是指向支持 RefPtr 的类型 '%1' 的原始引用"
+   },
+   "Local variable '%0' is a RefPtr-capable type '%1'": {
+    "msgstr": "局部变量 '%0' 是支持 RefPtr 的类型 '%1'"
+   },
+   "Local variable '%0' is a raw pointer to RefPtr-capable type '%1'": {
+    "msgstr": "局部变量 '%0' 是指向支持 RefPtr 的类型 '%1' 的原始指针"
+   },
+   "Local variable '%0' is a raw reference to RefPtr-capable type '%1'": {
+    "msgstr": "局部变量 '%0' 是指向支持 RefPtr 的类型 '%1' 的原始引用"
+   },
+   "Static local variable '%0' is a RefPtr-capable type '%1'": {
+    "msgstr": "静态局部变量 '%0' 是支持 RefPtr 的类型 '%1'"
+   },
+   "Static local variable '%0' is a raw pointer to RefPtr-capable type '%1'": {
+    "msgstr": "静态局部变量 '%0' 是指向支持 RefPtr 的类型 '%1' 的原始指针"
+   },
+   "Static local variable '%0' is a raw reference to RefPtr-capable type '%1'": {
+    "msgstr": "静态局部变量 '%0' 是指向支持 RefPtr 的类型 '%1' 的原始引用"
+   },
+   "Global variable '%0' is a RefPtr-capable type '%1'": {
+    "msgstr": "全局变量 '%0' 是支持 RefPtr 的类型 '%1'"
+   },
+   "Global variable '%0' is a raw pointer to RefPtr-capable type '%1'": {
+    "msgstr": "全局变量 '%0' 是指向支持 RefPtr 的类型 '%1' 的原始指针"
+   },
+   "Global variable '%0' is a raw reference to RefPtr-capable type '%1'": {
+    "msgstr": "全局变量 '%0' 是指向支持 RefPtr 的类型 '%1' 的原始引用"
+   },
+   "Variable '%0' is a RefPtr-capable type '%1'": {
+    "msgstr": "变量 '%0' 是支持 RefPtr 的类型 '%1'"
+   },
+   "Variable '%0' is a raw pointer to RefPtr-capable type '%1'": {
+    "msgstr": "变量 '%0' 是指向支持 RefPtr 的类型 '%1' 的原始指针"
+   },
+   "Variable '%0' is a raw reference to RefPtr-capable type '%1'": {
+    "msgstr": "变量 '%0' 是指向支持 RefPtr 的类型 '%1' 的原始引用"
+   }
+  },
+  "clang-analyzer-alpha.webkit.UnretainedLocalVarsChecker": {
+   "Parameter '%0' is a RetainPtr-capable type '%1'": {
+    "msgstr": "形参 '%0' 是支持 RetainPtr 的类型 '%1'"
+   },
+   "Parameter '%0' is a raw pointer to RetainPtr-capable type '%1'": {
+    "msgstr": "形参 '%0' 是指向支持 RetainPtr 的类型 '%1' 的原始指针"
+   },
+   "Parameter '%0' is a raw reference to RetainPtr-capable type '%1'": {
+    "msgstr": "形参 '%0' 是指向支持 RetainPtr 的类型 '%1' 的原始引用"
+   },
+   "Local variable '%0' is a RetainPtr-capable type '%1'": {
+    "msgstr": "局部变量 '%0' 是支持 RetainPtr 的类型 '%1'"
+   },
+   "Local variable '%0' is a raw pointer to RetainPtr-capable type '%1'": {
+    "msgstr": "局部变量 '%0' 是指向支持 RetainPtr 的类型 '%1' 的原始指针"
+   },
+   "Local variable '%0' is a raw reference to RetainPtr-capable type '%1'": {
+    "msgstr": "局部变量 '%0' 是指向支持 RetainPtr 的类型 '%1' 的原始引用"
+   },
+   "Static local variable '%0' is a RetainPtr-capable type '%1'": {
+    "msgstr": "静态局部变量 '%0' 是支持 RetainPtr 的类型 '%1'"
+   },
+   "Static local variable '%0' is a raw pointer to RetainPtr-capable type '%1'": {
+    "msgstr": "静态局部变量 '%0' 是指向支持 RetainPtr 的类型 '%1' 的原始指针"
+   },
+   "Static local variable '%0' is a raw reference to RetainPtr-capable type '%1'": {
+    "msgstr": "静态局部变量 '%0' 是指向支持 RetainPtr 的类型 '%1' 的原始引用"
+   },
+   "Global variable '%0' is a RetainPtr-capable type '%1'": {
+    "msgstr": "全局变量 '%0' 是支持 RetainPtr 的类型 '%1'"
+   },
+   "Global variable '%0' is a raw pointer to RetainPtr-capable type '%1'": {
+    "msgstr": "全局变量 '%0' 是指向支持 RetainPtr 的类型 '%1' 的原始指针"
+   },
+   "Global variable '%0' is a raw reference to RetainPtr-capable type '%1'": {
+    "msgstr": "全局变量 '%0' 是指向支持 RetainPtr 的类型 '%1' 的原始引用"
+   },
+   "Variable '%0' is a RetainPtr-capable type '%1'": {
+    "msgstr": "变量 '%0' 是支持 RetainPtr 的类型 '%1'"
+   },
+   "Variable '%0' is a raw pointer to RetainPtr-capable type '%1'": {
+    "msgstr": "变量 '%0' 是指向支持 RetainPtr 的类型 '%1' 的原始指针"
+   },
+   "Variable '%0' is a raw reference to RetainPtr-capable type '%1'": {
+    "msgstr": "变量 '%0' 是指向支持 RetainPtr 的类型 '%1' 的原始引用"
+   }
+  },
+  "clang-analyzer-debug.DebugContainerModeling": {
+   "Missing container argument": {
+    "msgstr": "缺少容器实参"
+   }
+  },
+  "clang-analyzer-debug.DebugIteratorModeling": {
+   "Missing iterator argument": {
+    "msgstr": "缺少迭代器实参"
+   }
+  },
+  "clang-analyzer-debug.DebugLifetimeModeling": {
+   "clang_analyzer_dumpLifetimeOriginsOf requires exactly 1 argument": {
+    "msgstr": "clang_analyzer_dumpLifetimeOriginsOf 需要且仅需要 1 个实参"
+   },
+   " Origin %0 bound to %1": {
+    "msgstr": " 源点 %0 绑定到 %1"
+   }
+  },
+  "clang-analyzer-debug.ExprInspection": {
+   "Missing assertion argument": {
+    "msgstr": "缺少断言实参"
+   },
+   "UNDEFINED": {
+    "msgstr": "UNDEFINED"
+   },
+   "UNKNOWN": {
+    "msgstr": "UNKNOWN"
+   },
+   "TRUE": {
+    "msgstr": "TRUE"
+   },
+   "FALSE": {
+    "msgstr": "FALSE"
+   },
+   "Missing argument": {
+    "msgstr": "缺少实参"
+   },
+   "Cannot obtain the region": {
+    "msgstr": "无法获取内存区域"
+   },
+   "REACHABLE": {
+    "msgstr": "REACHABLE"
+   },
+   "n/a": {
+    "msgstr": "n/a"
+   },
+   "SYMBOL DEAD": {
+    "msgstr": "符号已失效（SYMBOL DEAD）"
+   },
+   "clang_analyzer_denote() requires a symbol and a string literal": {
+    "msgstr": "clang_analyzer_denote() 需要一个符号和一个字符串字面量"
+   },
+   "Not a symbol": {
+    "msgstr": "不是符号"
+   },
+   "Not a string literal": {
+    "msgstr": "不是字符串字面量"
+   },
+   "Unable to express": {
+    "msgstr": "无法表示"
+   },
+   "clang_analyzer_isTainted() requires exactly one argument": {
+    "msgstr": "clang_analyzer_isTainted() 需要且仅需要 1 个实参"
+   },
+   "YES": {
+    "msgstr": "是（YES）"
+   },
+   "NO": {
+    "msgstr": "否（NO）"
+   }
+  },
+  "clang-analyzer-debug.ReportStmts": {
+   "Statement": {
+    "msgstr": "语句"
+   }
+  },
+  "clang-analyzer-debug.Stats": {
+   "%0 -> Total CFGBlocks: %1 | Unreachable CFGBlocks: %2 | Exhausted Block: %3 | Empty WorkList: %4": {
+    "msgstr": "%0 -> CFGBlock 总数：%1 | 不可达 CFGBlock 数：%2 | 块耗尽：%3 | 工作列表为空：%4"
+   },
+   "(%0): The analyzer generated a sink at this point": {
+    "msgstr": "(%0)：分析器在此处生成了一个汇聚节点（sink）"
+   }
+  },
+  "clang-analyzer-debug.TaintTest": {
+   "tainted": {
+    "msgstr": "已受污染（tainted）"
+   }
   }
  },
  "reviewed": {
@@ -37023,11 +38265,6 @@
     "context": "clangd_legacy",
     "msgid": "Variable has incomplete type {type}",
     "msgstr": "变量的类型 {type} 是不完整类型"
-   },
-   {
-    "context": "diagnostic",
-    "msgid": "#include {0}",
-    "msgstr": "#include {0}"
    },
    {
     "context": "diagnostic",
@@ -37576,11 +38813,6 @@
    },
    {
     "context": "diagnostic",
-    "msgid": "Header {header} is not used directly",
-    "msgstr": "头文件 {header} 未被直接使用"
-   },
-   {
-    "context": "diagnostic",
     "msgid": "Ignoring return value of function declared with {attribute} attribute",
     "msgstr": "忽略了带有 {attribute} 属性的函数的返回值"
    },
@@ -37746,11 +38978,6 @@
     "context": "diagnostic",
     "msgid": "Multiple default labels in one switch",
     "msgstr": "同一个 switch 中有多个 default 标签"
-   },
-   {
-    "context": "diagnostic",
-    "msgid": "No header providing \"{0}\" is directly included",
-    "msgstr": "没有直接包含提供 \"{0}\" 的头文件"
    },
    {
     "context": "diagnostic",
@@ -38251,11 +39478,6 @@
    },
    {
     "context": "clangd_config",
-    "msgid": "Unknown {kind} key '{key}' ignored",
-    "msgstr": "已忽略未知的 {kind} 键 '{key}'"
-   },
-   {
-    "context": "clangd_config",
     "msgid": "clang-tidy check '{check}' is slow. It will only run if ClangTidy.FastCheckFilter is None",
     "msgstr": "clang-tidy 检查 '{check}' 运行较慢。仅当 ClangTidy.FastCheckFilter 为 None 时才会运行"
    },
@@ -38306,11 +39528,6 @@
    },
    {
     "context": "code_action",
-    "msgid": "Add using-declaration for {0} and remove qualifier",
-    "msgstr": "为 {0} 添加 using 声明并移除限定符"
-   },
-   {
-    "context": "code_action",
     "msgid": "Add {header} for {symbol}",
     "msgstr": "添加 {header} 以使用 {symbol}"
    },
@@ -38341,11 +39558,6 @@
    },
    {
     "context": "code_action",
-    "msgid": "Declare implicit {0} members",
-    "msgstr": "声明隐式 {0} 成员"
-   },
-   {
-    "context": "code_action",
     "msgid": "Declare memberwise initializer",
     "msgstr": "声明逐成员初始化器"
    },
@@ -38361,11 +39573,6 @@
    },
    {
     "context": "code_action",
-    "msgid": "Dump {0} AST",
-    "msgstr": "导出 {0} 的 AST"
-   },
-   {
-    "context": "code_action",
     "msgid": "Expand auto type",
     "msgstr": "展开 auto 类型"
    },
@@ -38378,11 +39585,6 @@
     "context": "code_action",
     "msgid": "Expand macro",
     "msgstr": "展开宏"
-   },
-   {
-    "context": "code_action",
-    "msgid": "Expand macro '{0}'",
-    "msgstr": "展开宏 '{0}'"
    },
    {
     "context": "code_action",
@@ -38491,11 +39693,6 @@
    },
    {
     "context": "code_action",
-    "msgid": "Swap operands to {0}",
-    "msgstr": "交换操作数为 {0}"
-   },
-   {
-    "context": "code_action",
     "msgid": "Wrap in NSLocalizedString",
     "msgstr": "用 NSLocalizedString 包裹"
    },
@@ -38546,18 +39743,8 @@
    },
    {
     "context": "completion",
-    "msgid": "[{0} overloads]",
-    "msgstr": "[{0} 个重载]"
-   },
-   {
-    "context": "completion",
     "msgid": "[{count} overloads]",
     "msgstr": "[{count} 个重载]"
-   },
-   {
-    "context": "diagnostic",
-    "msgid": "#include {0}",
-    "msgstr": "#include {0}"
    },
    {
     "context": "diagnostic",
@@ -38936,11 +40123,6 @@
    },
    {
     "context": "diagnostic",
-    "msgid": "Header {header} is not used directly",
-    "msgstr": "头文件 {header} 未被直接使用"
-   },
-   {
-    "context": "diagnostic",
     "msgid": "Ignoring return value of function declared with {attribute} attribute",
     "msgstr": "忽略了带有 {attribute} 属性的函数的返回值"
    },
@@ -39076,11 +40258,6 @@
     "context": "diagnostic",
     "msgid": "Member reference type {type} is not a pointer; did you mean to use '.'?",
     "msgstr": "成员访问所用的类型 {type} 不是指针，是否应使用 '.'？"
-   },
-   {
-    "context": "diagnostic",
-    "msgid": "No header providing \"{0}\" is directly included",
-    "msgstr": "没有直接包含提供 \"{0}\" 的头文件"
    },
    {
     "context": "diagnostic",
@@ -39669,11 +40846,6 @@
    },
    {
     "context": "hover_kind",
-    "msgid": "conversion-function",
-    "msgstr": "转换函数"
-   },
-   {
-    "context": "hover_kind",
     "msgid": "destructor",
     "msgstr": "析构函数"
    },
@@ -39724,16 +40896,6 @@
    },
    {
     "context": "hover_kind",
-    "msgid": "non-type-template-parm",
-    "msgstr": "非类型模板形参"
-   },
-   {
-    "context": "hover_kind",
-    "msgid": "parameter",
-    "msgstr": "形参"
-   },
-   {
-    "context": "hover_kind",
     "msgid": "static-method",
     "msgstr": "静态方法"
    },
@@ -39744,18 +40906,8 @@
    },
    {
     "context": "hover_kind",
-    "msgid": "template-template-parm",
-    "msgstr": "模板模板形参"
-   },
-   {
-    "context": "hover_kind",
     "msgid": "type-alias",
     "msgstr": "类型别名"
-   },
-   {
-    "context": "hover_kind",
-    "msgid": "type-template-parm",
-    "msgstr": "类型模板形参"
    },
    {
     "context": "hover_kind",
@@ -39920,6 +41072,294 @@
      "tests/fixtures/clangd/corpus/unknown_type.cpp",
      "tests/fixtures/clangd/observed.json"
     ]
+   },
+   {
+    "context": "clangd_config",
+    "msgid": "Unknown {kind} key '{key}'",
+    "msgstr": "未知的 {kind} 键 '{key}'",
+    "references": [
+     "clang-tools-extra/clangd/ConfigYAML.cpp:420"
+    ]
+   },
+   {
+    "context": "clangd_config",
+    "msgid": "Unknown {kind} key '{key}'; did you mean '{suggestion}'?",
+    "msgstr": "未知的 {kind} 键 '{key}'，是否想使用 '{suggestion}'？",
+    "references": [
+     "clang-tools-extra/clangd/ConfigYAML.cpp:424"
+    ]
+   },
+   {
+    "context": "clangd_config",
+    "msgid": "Invalid {key} value '{value}'. Valid values are {valid}.",
+    "msgstr": "无效的 {key} 值 '{value}'。有效值为 {valid}。",
+    "references": [
+     "clang-tools-extra/clangd/ConfigCompile.cpp:164"
+    ]
+   },
+   {
+    "context": "clangd_config",
+    "msgid": "Expected scalar or list of scalars",
+    "msgstr": "需要标量值或标量列表",
+    "references": [
+     "clang-tools-extra/clangd/ConfigYAML.cpp:477"
+    ]
+   },
+   {
+    "context": "clangd_config",
+    "msgid": "External must be either a scalar or a mapping.",
+    "msgstr": "External 必须是标量或映射。",
+    "references": [
+     "clang-tools-extra/clangd/ConfigYAML.cpp:206"
+    ]
+   },
+   {
+    "context": "clangd_config",
+    "msgid": "Only scalar value supported for External is 'None'",
+    "msgstr": "External 支持的唯一标量值是 'None'",
+    "references": [
+     "clang-tools-extra/clangd/ConfigYAML.cpp:222"
+    ]
+   },
+   {
+    "context": "clangd_config",
+    "msgid": "{key} should be a dictionary",
+    "msgstr": "{key} 应为字典",
+    "references": [
+     "clang-tools-extra/clangd/ConfigYAML.cpp:367"
+    ]
+   },
+   {
+    "context": "clangd_config",
+    "msgid": "{key} invalid number",
+    "msgstr": "{key} 包含无效数字",
+    "references": [
+     "clang-tools-extra/clangd/ConfigYAML.cpp:458"
+    ]
+   },
+   {
+    "context": "code_action",
+    "msgid": "Add using-declaration for {qualifier} and remove qualifier",
+    "msgstr": "为 {qualifier} 添加 using 声明并移除限定符",
+    "references": [
+     "clang-tools-extra/clangd/refactor/tweaks/AddUsing.cpp:149"
+    ]
+   },
+   {
+    "context": "code_action",
+    "msgid": "Declare implicit {kinds} members",
+    "msgstr": "声明隐式 {kinds} 成员",
+    "references": [
+     "clang-tools-extra/clangd/refactor/tweaks/SpecialMembers.cpp:146"
+    ]
+   },
+   {
+    "context": "code_action",
+    "msgid": "Dump {node} AST",
+    "msgstr": "导出 {node} 的 AST",
+    "references": [
+     "clang-tools-extra/clangd/refactor/tweaks/DumpAST.cpp:69"
+    ]
+   },
+   {
+    "context": "code_action",
+    "msgid": "Show {kind} layout",
+    "msgstr": "显示 {kind} 布局",
+    "references": [
+     "clang-tools-extra/clangd/refactor/tweaks/DumpAST.cpp:95"
+    ]
+   },
+   {
+    "context": "code_action",
+    "msgid": "Expand macro '{macro}'",
+    "msgstr": "展开宏 '{macro}'",
+    "references": [
+     "clang-tools-extra/clangd/refactor/tweaks/ExpandMacro.cpp:74"
+    ]
+   },
+   {
+    "context": "code_action",
+    "msgid": "Swap operands to {op}",
+    "msgstr": "交换操作数为 {op}",
+    "references": [
+     "clang-tools-extra/clangd/refactor/tweaks/SwapBinaryOperands.cpp:74"
+    ]
+   },
+   {
+    "context": "code_action",
+    "msgid": "Include {header}",
+    "msgstr": "包含 {header}",
+    "references": [
+     "clang-tools-extra/clangd/IncludeFixer.cpp:262"
+    ]
+   },
+   {
+    "context": "code_action",
+    "msgid": "Import {header}",
+    "msgstr": "导入 {header}",
+    "references": [
+     "clang-tools-extra/clangd/IncludeFixer.cpp:262"
+    ]
+   },
+   {
+    "context": "code_action",
+    "msgid": "Include {header} for symbol {symbol}",
+    "msgstr": "包含 {header} 以使用符号 {symbol}",
+    "references": [
+     "clang-tools-extra/clangd/IncludeFixer.cpp:264"
+    ]
+   },
+   {
+    "context": "code_action",
+    "msgid": "Import {header} for symbol {symbol}",
+    "msgstr": "导入 {header} 以使用符号 {symbol}",
+    "references": [
+     "clang-tools-extra/clangd/IncludeFixer.cpp:264"
+    ]
+   },
+   {
+    "context": "code_action",
+    "msgid": "remove '{text}'",
+    "msgstr": "移除 '{text}'",
+    "references": [
+     "clang-tools-extra/clangd/Diagnostics.cpp:830"
+    ]
+   },
+   {
+    "context": "code_action",
+    "msgid": "insert '{text}'",
+    "msgstr": "插入 '{text}'",
+    "references": [
+     "clang-tools-extra/clangd/Diagnostics.cpp:834"
+    ]
+   },
+   {
+    "context": "code_action",
+    "msgid": "Apply fix: {title}",
+    "msgstr": "应用修复：{title}",
+    "references": [
+     "clang-tools-extra/clangd/ClangdLSPServer.cpp:1067"
+    ]
+   },
+   {
+    "context": "diagnostic",
+    "msgid": "Included header {header} is not used directly",
+    "msgstr": "头文件 {header} 未被直接使用",
+    "references": [
+     "clang-tools-extra/clangd/IncludeCleaner.cpp:219"
+    ]
+   },
+   {
+    "context": "diagnostic",
+    "msgid": "No header providing \"{symbol}\" is directly included",
+    "msgstr": "没有直接包含提供 \"{symbol}\" 的头文件",
+    "references": [
+     "clang-tools-extra/clangd/IncludeCleaner.cpp:174"
+    ]
+   },
+   {
+    "context": "signature_help",
+    "msgid": "Signature Help: clangd",
+    "msgstr": "函数签名：clangd",
+    "references": [
+     "clang-tools-extra/clangd/ClangdLSPServer.cpp:1395"
+    ]
+   },
+   {
+    "context": "hover_kind",
+    "msgid": "conversion-func",
+    "msgstr": "转换函数",
+    "references": [
+     "clang/lib/Index/IndexSymbol.cpp"
+    ]
+   },
+   {
+    "context": "hover_kind",
+    "msgid": "param",
+    "msgstr": "形参",
+    "references": [
+     "clang/lib/Index/IndexSymbol.cpp"
+    ]
+   },
+   {
+    "context": "hover_kind",
+    "msgid": "template-type-param",
+    "msgstr": "类型模板形参",
+    "references": [
+     "clang/lib/Index/IndexSymbol.cpp"
+    ]
+   },
+   {
+    "context": "hover_kind",
+    "msgid": "template-template-param",
+    "msgstr": "模板模板形参",
+    "references": [
+     "clang/lib/Index/IndexSymbol.cpp"
+    ]
+   },
+   {
+    "context": "hover_kind",
+    "msgid": "non-type-template-param",
+    "msgstr": "非类型模板形参",
+    "references": [
+     "clang/lib/Index/IndexSymbol.cpp"
+    ]
+   },
+   {
+    "context": "hover_kind",
+    "msgid": "module",
+    "msgstr": "模块",
+    "references": [
+     "clang/lib/Index/IndexSymbol.cpp"
+    ]
+   },
+   {
+    "context": "hover_kind",
+    "msgid": "protocol",
+    "msgstr": "协议",
+    "references": [
+     "clang/lib/Index/IndexSymbol.cpp"
+    ]
+   },
+   {
+    "context": "hover_kind",
+    "msgid": "extension",
+    "msgstr": "扩展",
+    "references": [
+     "clang/lib/Index/IndexSymbol.cpp"
+    ]
+   },
+   {
+    "context": "hover_kind",
+    "msgid": "instance-property",
+    "msgstr": "实例属性",
+    "references": [
+     "clang/lib/Index/IndexSymbol.cpp"
+    ]
+   },
+   {
+    "context": "hover_kind",
+    "msgid": "class-property",
+    "msgstr": "类属性",
+    "references": [
+     "clang/lib/Index/IndexSymbol.cpp"
+    ]
+   },
+   {
+    "context": "hover_kind",
+    "msgid": "static-property",
+    "msgstr": "静态属性",
+    "references": [
+     "clang/lib/Index/IndexSymbol.cpp"
+    ]
+   },
+   {
+    "context": "hover_kind",
+    "msgid": "using",
+    "msgstr": "using 声明",
+    "references": [
+     "clang/lib/Index/IndexSymbol.cpp"
+    ]
    }
   ],
   "clang-tidy": [
@@ -39977,6 +41417,590 @@
     "msgid": "redundant return statement at the end of a function with a void return type",
     "references": [
      "clang-tools-extra/clang-tidy/readability/RedundantControlFlowCheck.cpp:0"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Taking true branch",
+    "msgstr": "进入条件为真的分支",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporter.cpp:1017"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Taking false branch",
+    "msgstr": "进入条件为假的分支",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporter.cpp:1013"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Entering loop body",
+    "msgstr": "进入循环体",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporter.cpp:1139"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Loop body executed 0 times",
+    "msgstr": "循环体未执行",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporter.cpp:1140"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Loop body skipped when range is empty",
+    "msgstr": "当范围为空时跳过循环体",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporter.cpp:1142"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Loop body skipped when collection is empty",
+    "msgstr": "当集合为空时跳过循环体",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporter.cpp:1144"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Looping back to the head of the loop",
+    "msgstr": "回跳到循环起始处",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporter.cpp:1287"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Loop condition is true.  Entering loop body",
+    "msgstr": "循环条件为真。进入循环体",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporter.cpp:999"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Loop condition is false.  Exiting loop",
+    "msgstr": "循环条件为假。退出循环",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporter.cpp:975"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Loop condition is true. Execution continues on line %0.",
+    "msgstr": "循环条件为真。继续在第 %0 行执行。",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporter.cpp:959"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Loop condition is false. Execution continues on line %0.",
+    "msgstr": "循环条件为假。继续在第 %0 行执行。",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporter.cpp:985"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Left side of '&&' is false",
+    "msgstr": "'&&' 左侧为假",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporter.cpp:854"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Left side of '&&' is true",
+    "msgstr": "'&&' 左侧为真",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporter.cpp:854"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Left side of '||' is false",
+    "msgstr": "'||' 左侧为假",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporter.cpp:869"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Left side of '||' is true",
+    "msgstr": "'||' 左侧为真",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporter.cpp:869"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Control jumps to line %0",
+    "msgstr": "控制流跳转到第 %0 行",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporter.cpp:837"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "No cases match in the switch statement. Control jumps to line %0",
+    "msgstr": "switch 语句中没有匹配的分支。控制流跳转到第 %0 行",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporter.cpp:788"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Control jumps to the 'default' case at line %0",
+    "msgstr": "控制流跳转到第 %0 行的 'default' 分支",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporter.cpp:793"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Control jumps to 'case %0:'  at line %1",
+    "msgstr": "控制流跳转到第 %1 行的 'case %0:' 分支",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporter.cpp:798"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Returning without writing to '%0'",
+    "msgstr": "返回时未写入 '%0'",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:707"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Returning without writing to '%0', which participates in a condition later",
+    "msgstr": "返回时未写入 '%0'，该值稍后参与条件判断",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:707"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Returning nil",
+    "msgstr": "返回了 nil",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:996"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Returning null pointer",
+    "msgstr": "返回了空指针",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:998"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Returning zero",
+    "msgstr": "返回了 0",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:1001"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Returning the value %0",
+    "msgstr": "返回值 %0",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:1006"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Returning pointer",
+    "msgstr": "返回了指针",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:1016"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Returning value",
+    "msgstr": "返回值",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:1016"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "'%0' initialized to a null pointer value",
+    "msgstr": "'%0' 初始化为空指针",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:1253"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "'%0' initialized to nil",
+    "msgstr": "'%0' 初始化为 nil",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:1253"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Initializing to a null pointer value",
+    "msgstr": "初始化为空指针",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:1253"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Initializing to nil",
+    "msgstr": "初始化为 nil",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:1253"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Null pointer value stored",
+    "msgstr": "存储了空指针值",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:1341"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Storing null pointer value",
+    "msgstr": "正在存储空指针值",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:1342"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Null pointer value stored to '%0'",
+    "msgstr": "将空指针值存储到 '%0'",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:1341"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Assigning value",
+    "msgstr": "正在赋值",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:1375"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Value assigned",
+    "msgstr": "已赋值",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:1375"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Value assigned to '%0'",
+    "msgstr": "值已赋给 '%0'",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:1375"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Assigning %0 to '%1'",
+    "msgstr": "将 %0 赋给 '%1'",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:1362"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Assigning %0",
+    "msgstr": "赋值 %0",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:1362"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Assuming pointer value is null",
+    "msgstr": "假定指针值为空",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:2331"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Assuming '%0' is true",
+    "msgstr": "假定 '%0' 为真",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:3144"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Assuming '%0' is false",
+    "msgstr": "假定 '%0' 为假",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:3144"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Assuming '%0' is null",
+    "msgstr": "假定 '%0' 为空指针",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:3144"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Assuming '%0' is non-null",
+    "msgstr": "假定 '%0' 非空",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:3144"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Assuming '%0' is nil",
+    "msgstr": "假定 '%0' 为 nil",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:3144"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Assuming '%0' is non-nil",
+    "msgstr": "假定 '%0' 非 nil",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:3144"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Assuming '%0' is not equal to 0",
+    "msgstr": "假定 '%0' 不等于 0",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:3144"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Assuming '%0' is equal to %1",
+    "msgstr": "假定 '%0' 等于 %1",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:3059"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Assuming '%0' is not equal to %1",
+    "msgstr": "假定 '%0' 不等于 %1",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:3062"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Assuming '%0' is %1",
+    "msgstr": "假定 '%0' 为 %1",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:3144"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Assuming '%0' is < %1",
+    "msgstr": "假定 '%0' < %1",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:3065"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Assuming '%0' is <= %1",
+    "msgstr": "假定 '%0' <= %1",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:3065"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Assuming '%0' is > %1",
+    "msgstr": "假定 '%0' > %1",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:3065"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Assuming '%0' is >= %1",
+    "msgstr": "假定 '%0' >= %1",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:3065"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Assuming field '%0' is true",
+    "msgstr": "假定字段 '%0' 为真",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:3176"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Assuming field '%0' is false",
+    "msgstr": "假定字段 '%0' 为假",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:3176"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Assuming field '%0' is null",
+    "msgstr": "假定字段 '%0' 为空指针",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:3176"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Assuming field '%0' is non-null",
+    "msgstr": "假定字段 '%0' 非空",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:3176"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Assuming field '%0' is not equal to 0",
+    "msgstr": "假定字段 '%0' 不等于 0",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:3176"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Assuming field '%0' is %1",
+    "msgstr": "假定字段 '%0' 为 %1",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporterVisitors.cpp:3176"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Calling '%0'",
+    "msgstr": "调用 '%0'",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporter.cpp:2500"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Returning from '%0'",
+    "msgstr": "从 '%0' 返回",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporter.cpp:2500"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Entered call from '%0'",
+    "msgstr": "从 '%0' 进入调用",
+    "references": [
+     "clang/lib/StaticAnalyzer/Core/BugReporter.cpp:2500"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Container '%0' became empty",
+    "msgstr": "容器 '%0' 变为空",
+    "references": [
+     "clang/lib/StaticAnalyzer/Checkers/ContainerModeling.cpp:410"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Container became empty",
+    "msgstr": "容器变为空",
+    "references": [
+     "clang/lib/StaticAnalyzer/Checkers/ContainerModeling.cpp:410"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Container '%0' extended to the back by 1 position",
+    "msgstr": "容器 '%0' 向尾部扩展了 1 个位置",
+    "references": [
+     "clang/lib/StaticAnalyzer/Checkers/ContainerModeling.cpp:449"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Container extended to the back by 1 position",
+    "msgstr": "容器向尾部扩展了 1 个位置",
+    "references": [
+     "clang/lib/StaticAnalyzer/Checkers/ContainerModeling.cpp:449"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Container '%0' shrank from the back by 1 position",
+    "msgstr": "容器 '%0' 从尾部缩减了 1 个位置",
+    "references": [
+     "clang/lib/StaticAnalyzer/Checkers/ContainerModeling.cpp:478"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Container shrank from the back by 1 position",
+    "msgstr": "容器从尾部缩减了 1 个位置",
+    "references": [
+     "clang/lib/StaticAnalyzer/Checkers/ContainerModeling.cpp:478"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Container '%0' extended to the front by 1 position",
+    "msgstr": "容器 '%0' 向头部扩展了 1 个位置",
+    "references": [
+     "clang/lib/StaticAnalyzer/Checkers/ContainerModeling.cpp:523"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Container extended to the front by 1 position",
+    "msgstr": "容器向头部扩展了 1 个位置",
+    "references": [
+     "clang/lib/StaticAnalyzer/Checkers/ContainerModeling.cpp:523"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Container '%0' shrank from the front by 1 position",
+    "msgstr": "容器 '%0' 从头部缩减了 1 个位置",
+    "references": [
+     "clang/lib/StaticAnalyzer/Checkers/ContainerModeling.cpp:560"
+    ]
+   },
+   {
+    "context": "analyzer_note",
+    "msgid": "Container shrank from the front by 1 position",
+    "msgstr": "容器从头部缩减了 1 个位置",
+    "references": [
+     "clang/lib/StaticAnalyzer/Checkers/ContainerModeling.cpp:560"
     ]
    }
   ]

@@ -25,7 +25,7 @@ require('nvim-zh').setup()
 
 运行 `vim.pack.update()` 更新主包，在确认界面用 `:write` 接受变更。可选包在 `:NvimZhPacks` 中独立更新。面板会在插件实现变化时提示重启。在线安装需要 `curl`，离线可用面板的 `a` 菜单导入已下载的附件。
 
-公开目录提供 SDK 2 格式。升级到 0.4.0 后，可在 `:NvimZhPacks` 中安装或更新可选包。见[发行说明](CHANGELOG.md)。
+公开目录提供 SDK 2 格式。升级到 0.4.1 后，可在 `:NvimZhPacks` 中安装或更新可选包。见[发行说明](CHANGELOG.md)。
 
 ## 可选汉化包
 

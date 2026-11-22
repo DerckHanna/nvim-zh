@@ -1,3 +1,4 @@
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -36,6 +37,21 @@ class ToolchainCatalogTests(unittest.TestCase):
             path.write_text(rendered.replace('msgstr "取消"', 'msgstr "放弃"', 1), encoding="utf-8")
             with self.assertRaisesRegex(catalog_tool.CatalogError, "stale"):
                 toolchain_catalog.verify_po(path, rendered)
+
+    def test_inventory_coverage_and_analyzer_audit_complete(self):
+        clangd_cov = json.loads((toolchain_catalog.ROOT / "manifests/clangd-coverage.json").read_text(encoding="utf-8"))
+        tidy_cov = json.loads((toolchain_catalog.ROOT / "manifests/clang-tidy-coverage.json").read_text(encoding="utf-8"))
+        zh = json.loads((toolchain_catalog.ROOT / "translations/toolchain/zh_CN.json").read_text(encoding="utf-8"))
+        self.assertEqual(clangd_cov["counts"]["by_component"].get("Serialization"), 62)
+        self.assertEqual(clangd_cov["counts"]["by_component"].get("Frontend"), 57)
+        for excluded in ("Driver", "InstallAPI", "CrossTU", "Refactoring", "Trap"):
+            self.assertIn(excluded, clangd_cov["excluded_components"])
+        incomplete = [c["name"] for c in tidy_cov["analyzer_checkers"] if c["message_audit"] != "complete"]
+        self.assertEqual(incomplete, [])
+        self.assertEqual(len(tidy_cov["analyzer_checkers"]), 205)
+        for dom in ("clang", "clangd"):
+            bad = [e["msgid"] for e in zh["reviewed"][dom] if "{0}" in e["msgid"]]
+            self.assertEqual(bad, [])
 
 
 if __name__ == "__main__":

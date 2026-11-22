@@ -12,15 +12,86 @@ from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
 
-# Components whose diagnostics clangd can emit. clangd parses, lexes, and
-# sema-checks in-process and never writes PCH files; Driver/Frontend/InstallAPI
-# diagnostics belong to compiler-driver processes, CrossTU/Refactoring/Trap to
-# paths the language server does not take.
-REACHABLE_COMPONENTS = ("Sema", "Parse", "Lex", "Common", "AST", "Comment")
-EXCLUDED_COMPONENTS = ("Driver", "Frontend", "InstallAPI", "CrossTU", "Refactoring", "Trap")
-EXCLUDED_REASON = ("component diagnostics belong to compiler-driver processes or "
-                   "non-language-server paths; clangd parses, lexes, and sema-checks "
-                   "in-process and never writes PCH files")
+# Components whose diagnostics clangd can emit. clangd builds in-process ASTs
+# and PrecompiledPreamble / C++20 Module Serialization streams while running
+# CompilerInvocation / CompilerInstance / FrontendAction (without CodeGen, CIR,
+# SSAF, ExtractAPI, VerifyDiagnosticConsumer, DependencyFile, FixItRewriter,
+# SerializedDiagnosticPrinter, or Plugins).
+FULL_REACHABLE_COMPONENTS = ("Sema", "Parse", "Lex", "Common", "AST", "Comment", "Serialization")
+REACHABLE_FRONTEND_DIAGNOSTICS = frozenset({
+    "err_ast_action_on_llvm_ir",
+    "err_builtin_needs_feature",
+    "err_fe_dependency_file_requires_MT",
+    "err_fe_error_reading",
+    "err_fe_error_reading_stdin",
+    "err_fe_expected_clang_command",
+    "err_fe_expected_compiler_job",
+    "err_fe_invalid_alignment",
+    "err_fe_invalid_code_complete_file",
+    "err_fe_invalid_exception_model",
+    "err_fe_invalid_multiple_actions",
+    "err_fe_invalid_source_date_epoch",
+    "err_fe_no_pch_in_dir",
+    "err_fe_remap_missing_to_file",
+    "err_fe_text_encoding_config",
+    "err_fe_unable_to_load_ast_file",
+    "err_fe_unable_to_open_output",
+    "err_file_is_not_module",
+    "err_frontend_action_unsupported_input_format",
+    "err_incompatible_fp_eval_method_options",
+    "err_invalid_vfs_overlay",
+    "err_missing_module",
+    "err_missing_module_name",
+    "err_missing_vfs_overlay_file",
+    "err_module_build_requires_fmodules",
+    "err_module_cannot_create_includes",
+    "err_module_header_file_not_found",
+    "err_module_interface_requires_cpp_modules",
+    "err_module_map_not_found",
+    "err_modules_embed_file_not_found",
+    "err_no_submodule",
+    "err_no_submodule_suggest",
+    "err_relocatable_without_isysroot",
+    "err_target_spirv_invalid_shader_stage",
+    "err_target_spirv_requires_vulkan",
+    "note_module_def_undef_here",
+    "note_module_import_here",
+    "note_private_top_level_defined",
+    "remark_module_build",
+    "remark_module_build_done",
+    "remark_module_lock",
+    "warn_eagerly_load_for_standard_cplusplus_modules",
+    "warn_fe_backend_invalid_feature_flag",
+    "warn_fe_backend_readonly_feature_flag",
+    "warn_fe_backend_unsupported_fp_exceptions",
+    "warn_fe_backend_unsupported_fp_rounding",
+    "warn_fe_cc_log_diagnostics_failure",
+    "warn_fe_macro_contains_embedded_newline",
+    "warn_fe_unable_to_open_stats_file",
+    "warn_hlsl_langstd_minimal",
+    "warn_missing_submodule",
+    "warn_module_config_macro_undef",
+    "warn_no_priv_submodule_use_toplevel",
+    "warn_option_invalid_ocl_version",
+    "warn_profile_data_misexpect",
+    "warn_unknown_diag_option",
+    "warn_unknown_warning_specifier",
+})
+REACHABLE_COMPONENTS = FULL_REACHABLE_COMPONENTS + ("Frontend (clangd-reachable subset)",)
+EXCLUDED_COMPONENTS = (
+    "Driver",
+    "Frontend (CodeGen/CIR/ExtractAPI/SSAF/Verify/SerializedDiag/DependencyFile/Plugin)",
+    "InstallAPI",
+    "CrossTU",
+    "Refactoring",
+    "Trap",
+)
+EXCLUDED_REASON = (
+    "Driver, InstallAPI, CrossTU, Refactoring, Trap, and CodeGen/CIR/ExtractAPI/SSAF/"
+    "Verify/SerializedDiag/DependencyFile/Plugin subsets of Frontend belong to "
+    "compiler-driver, codegen, standalone tooling, or disabled frontend paths; clangd "
+    "compiles in-process via SyntaxOnlyAction, VFS, and PrecompiledPreamble/Modules Serialization"
+)
 
 TBLGEN_TARGET = "clang/include/clang/Basic/Diagnostic.td"
 TBLGEN_INCLUDE = "clang/include/clang/Basic"
@@ -329,7 +400,11 @@ def diagnostic_records(defs: dict) -> list[dict]:
         if record.get("!anonymous"):
             continue
         component = record.get("Component")
-        if not isinstance(component, str) or component not in REACHABLE_COMPONENTS:
+        if not isinstance(component, str):
+            continue
+        if component not in FULL_REACHABLE_COMPONENTS and not (
+            component == "Frontend" and name in REACHABLE_FRONTEND_DIAGNOSTICS
+        ):
             continue
         if "Diagnostic" not in record.get("!superclasses", []):
             continue

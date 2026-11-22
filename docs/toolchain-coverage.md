@@ -15,9 +15,9 @@
 | 清单 | 范围和限制 |
 | --- | --- |
 | [clang-coverage.json](../manifests/clang-coverage.json) | 7,289 条 TableGen 诊断，34,872 个去重展开形态，另有 2 个包含栈前导。逐条保留定义位置、严重性和警告组。 |
-| [clangd-coverage.json](../manifests/clangd-coverage.json) | 6,663 条候选诊断，34,099 个展开形态。按组件筛选，真实可达性由样例或协议证据确认。 |
+| [clangd-coverage.json](../manifests/clangd-coverage.json) | 6,782 条候选诊断，34,289 个展开形态（含 `Serialization` 62 条及 `Frontend` 可达子集 57 条）。按组件与真实调用路径筛选，真实可达性由样例或协议证据确认。 |
 | [clangd-protocol.json](../manifests/clangd-protocol.json) | 逐方法记录能力、源码、显示入口和验证输入。实际帧、返回码和显示留在运行报告。 |
-| [clang-tidy-coverage.json](../manifests/clang-tidy-coverage.json) | 471 条模块注册和 205 条分析器注册，真实二进制列出的 602 个名字均有对应项。模块盘点识别 974 条候选消息，其中 164 条附加说明。113 个检查找到修复调用或辅助函数。35 个扫描告警和 14 个未求值调用均已核对。131 个已启用静态分析器检查的消息盘点全部完成并记录在 [analyzer_audit.json](../translations/toolchain/analyzer_audit.json)（共 1,715 条源码核对消息；116 个检查输出诊断，15 个仅做符号状态建模）。 |
+| [clang-tidy-coverage.json](../manifests/clang-tidy-coverage.json) | 471 条模块注册和 205 条分析器注册，真实二进制列出的 602 个名字均有对应项。模块盘点识别 974 条候选消息，其中 164 条附加说明。113 个检查找到修复调用或辅助函数。35 个扫描告警和 14 个未求值调用均已核对。全部 205 个静态分析器检查的消息盘点均已完成并记录在 [analyzer_audit.json](../translations/toolchain/analyzer_audit.json)（共 2,080 条源码核对消息；166 个检查输出诊断，39 个仅做符号状态建模、调试输出或文档骨架）。 |
 
 TableGen 展开处理 `%sub` 参数重编号、`%select`、枚举选择、复数和 `%diff`。固定版本的组合未达到展开上限。部分参数按实际类型、声明名和序数渲染，相关测试保留原始参数。静态展开的各分支仍需分别确认可达性和实际参数格式。检查工具的清单同时记录共用辅助函数、间接修复和拼接诊断的文本来源与调用位置。
 
@@ -25,9 +25,9 @@ TableGen 展开处理 `%sub` 参数重编号、`%select`、枚举选择、复数
 
 | 词库 | 表中合成命中 | 实际观察 |
 | --- | --- | --- |
-| Clang 33,543 条 | 44,693 条命中（`matched_source_ids=7,261`），31 条纯参数正文或自由文本保留原文，0 条缺译，0 条歧义 | 两个驱动共 48 次调用，生产匹配器命中 172 个真实输出项，保留 14 条项目原文、8 条修复编辑和 2 条链接器/汇编器消息。嵌套包含栈、参数建议、带撇号的路径和模板约束说明另经 TUI 验证。 |
-| clangd 33,016 条 | 43,541 条命中（`matched_source_ids=6,652`），12 条预期保留原文，0 条缺译，0 条歧义 | 独立探针取得 21 条主诊断，主诊断和附加说明合计 30 条命中，另有 1 条 `#error` 原文；TUI push 命中 14 条及 2 条碰撞原文。真实 TUI 核对了 `workspace/applyEdit`、模板相关说明和碰撞原文。 |
-| clang-tidy 3,103 条 | 3,104 条命中（`matched_source_ids=587`，覆盖 471 个模块检查和 116 个有消息输出的分析器检查），0 条缺译，0 条歧义 | 独立命令 20 条命中。TUI 协议中 10 条转发主诊断或附加说明命中。两种方式均验证应用修复与复查，独立流程还核对空指针路径和 YAML。 |
+| Clang 33,540 条 | 44,693 条命中（`matched_source_ids=7,261`），31 条纯参数正文或自由文本保留原文，0 条缺译，0 条歧义 | 两个驱动共 48 次调用，生产匹配器命中 172 个真实输出项，保留 14 条项目原文、8 条修复编辑和 2 条链接器/汇编器消息。嵌套包含栈、参数建议、带撇号的路径和模板约束说明另经 TUI 验证。 |
+| clangd 33,218 条 | 43,793 条命中（`matched_source_ids=6,771`），12 条预期保留原文，0 条缺译，0 条歧义 | 独立探针取得 21 条主诊断，主诊断和附加说明合计 30 条命中，另有 1 条 `#error` 原文；TUI push 命中 14 条及 2 条碰撞原文。真实 TUI 核对了 `workspace/applyEdit`、模板相关说明和碰撞原文。 |
+| clang-tidy 3,541 条 | 3,469 条命中（`matched_source_ids=637`，覆盖 471 个模块检查和 166 个有消息输出的分析器检查），0 条缺译，0 条歧义 | 独立命令 20 条命中。TUI 协议中 10 条转发主诊断或附加说明命中。两种方式均验证应用修复与复查，独立流程还核对空指针路径和 YAML。 |
 
 固定 clangd 的三个未实现请求均实测返回 `-32601`。独立客户端契约核对 document pull、workspace pull 与 completion resolve 的成功响应。源码与 TUI 协议证实该服务器发送 `window/showMessage`。`window/showMessageRequest` 和 `window/logMessage` 的固定组合结论依据编译服务器的发送绑定清单和本次协议记录，客户端的成功处理使用独立测试。
 

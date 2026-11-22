@@ -24,14 +24,19 @@ function M.match_message(domain, body, code, level, interface)
     contexts[1] = 'include_stack'
   elseif domain == 'clang-tidy' then
     if code then contexts[1] = level == 'note' and code .. '/note' or code end
-    if level == 'note' then contexts[#contexts + 1] = 'fix_note' end
+    if level == 'note' then
+      if code and code:match('^clang%-analyzer%-') then contexts[#contexts + 1] = 'analyzer_note' end
+      contexts[#contexts + 1] = 'fix_note'
+      if code and code:match('^clang%-analyzer%-') then contexts[#contexts + 1] = code end
+    end
   else
     local warning = code and (code:match(',(%-W[^,]+)$') or code)
     if warning then contexts[#contexts + 1] = warning end
     if interface == 'driver' then
       contexts[#contexts + 1] = 'driver'
       contexts[#contexts + 1] = 'unlocated'
-    elseif level == 'note' then
+    end
+    if level == 'note' then
       contexts[#contexts + 1] = 'note'
     else
       if body:match('^too few template arguments for ') or body:match('^too many template arguments for ') then

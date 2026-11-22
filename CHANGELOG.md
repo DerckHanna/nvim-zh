@@ -2,6 +2,21 @@
 
 本项目遵循语义化版本。
 
+## [0.4.1] - 2026-11-22
+
+### 新增
+
+- 系统性盘点并补全 C++ 工具链（`clang` / `clang++`、`clangd`、`clang-tidy`）诊断与界面覆盖（对齐 LLVM `llvmorg-23.1.5`）：
+  - `clangd` 词库新增 `Serialization`（62 条）与 `Frontend` 可达子集（57 条），覆盖增补至 6,782 条诊断、34,289 个展开形态（33,218 条目）。
+  - 静态分析器 `analyzer_audit.json` 完成全部 205 个 `clang-analyzer-*` 检查项审计（新增 74 个 `alpha.*` 与 `debug.*` 检查，共 2,080 条源码核对消息，0 未审）。
+  - 新增 `reviewed.clang-tidy` 的 `analyzer_note` 上下文（81 条 Core/建模通用路径说明）并补充 `clang-tidy` 转发与独立 `note` 回退匹配链，以及 `clang` 驱动无位置诊断的 `note`/`diagnostic` 回退匹配。
+
+### 修复
+
+- 修复 `clangd` 非 TableGen 诊断与 UI 键名：`Included header {header} is not used directly`、`No header providing "{symbol}" is directly included`、`Include {header}`/`Import {header}`、`Unknown {kind} key '{key}'` 等 `.clangd` 配置诊断、`Signature Help: clangd`、5 组 `IndexSymbol` `hover_kind` 键名与缺失项、`Show {kind} layout` / `remove '{text}'` / `insert '{text}'` / `Apply fix: {title}` 以及 5 处 `{0}` 占位符。
+- 补全 `compiler/nvim-zh-clang.vim` 仅含行号的 `fatal error` 与 `remark` 解析格式。
+- 公开包目录新增 `clang`、`clangd`、`clang-tidy` `0.4.1` SDK 2 发行包记录。
+
 ## [0.4.0] - 2026-11-22
 
 ### 新增

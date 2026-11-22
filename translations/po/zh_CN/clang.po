@@ -272,10 +272,6 @@ msgctxt "diagnostic"
 msgid "#include resolved using non-portable Microsoft search rules as: %0"
 msgstr "#include 使用不可移植的 Microsoft 搜索规则解析为：%0"
 
-msgctxt "diagnostic"
-msgid "#include {0}"
-msgstr "#include {0}"
-
 #: clang/include/clang/Basic/DiagnosticLexKinds.td:369
 msgctxt "diagnostic"
 msgid "#include_next in file found relative to primary source file or found by absolute path; will search from start of include path"
@@ -48996,10 +48992,6 @@ msgctxt "diagnostic"
 msgid "HTML tag '%0' requires an end tag"
 msgstr "HTML 标签 '%0' 需要结束标签"
 
-msgctxt "diagnostic"
-msgid "Header {header} is not used directly"
-msgstr "头文件 {header} 未被直接使用"
-
 #: clang/include/clang/Basic/DiagnosticSemaKinds.td:4924
 msgctxt "diagnostic"
 msgid "IBOutletCollection properties should be copy/strong and not assign"
@@ -49412,10 +49404,6 @@ msgstr "同一个 switch 中有多个 default 标签"
 msgctxt "diagnostic"
 msgid "Neon vector size must be 64 or 128 bits"
 msgstr "Neon 向量大小必须为 64 或 128 位"
-
-msgctxt "diagnostic"
-msgid "No header providing \"{0}\" is directly included"
-msgstr "没有直接包含提供 \"{0}\" 的头文件"
 
 msgctxt "diagnostic"
 msgid "No matching constructor for initialization of {type}"
